@@ -1,0 +1,32 @@
+{
+    "name": "codeinwp/woocommerce-product-addon",
+    "description": "PPOM for WooCommerce",
+    "type": "project",
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Themeisle",
+            "email": "friends@themeisle.com",
+            "homepage": "https://themeisle.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "optimize-autoloader": true,
+        "platform-check": false,
+        "platform": {
+            "php": "7.0"
+        }
+    },
+    "extra": {
+        "installer-disable": "true"
+    },
+    "require": {
+        "codeinwp/themeisle-sdk": "^3.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.5",
+        "yoast/phpunit-polyfills": "^1.0"
+    }
+}
