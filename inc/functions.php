@@ -938,21 +938,11 @@ function ppom_is_aviary_installed() {
 }
 
 function ppom_settings_link( $links ) {
-
-	$quote_url        = "https://najeebmedia.com/get-quote/";
 	$ppom_setting_url = admin_url( 'admin.php?page=ppom' );
 	$video_url        = 'https://najeebmedia.com/wordpress-plugin/woocommerce-personalized-product-option/#ppom-quick-video';
-	$ppom_deactivate  = '#';
 
-	$ppom_links   = array();
-	$ppom_links[] = sprintf( __( '<a href="%s">Add Fields</a>', "ppom" ), esc_url( $ppom_setting_url ) );
-	$ppom_links[] = sprintf( __( '<a href="%s" target="_blank">Quick Video Guide</a>', "ppom" ), esc_url( $video_url ) );
-	$ppom_links[] = sprintf( __( '<a href="%s">Customized Solution</a>', "ppom" ), esc_url( $quote_url ) );
-
-	foreach ( $ppom_links as $link ) {
-
-		array_push( $links, $link );
-	}
+	$links[] = sprintf( __( '<a href="%s">Add Fields</a>', "ppom" ), esc_url( $ppom_setting_url ) );
+	$links[] = sprintf( __( '<a href="%s" target="_blank">Quick Video Guide</a>', "ppom" ), esc_url( $video_url ) );
 
 	return $links;
 }
