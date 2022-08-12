@@ -27,7 +27,7 @@
   "scripts": {
     "build": "npm-run-all build:*",
     "dist": "bash ./bin/dist.sh",
-    "release": "npx semantic-release --dry-run",
+    "release": "npx semantic-release",
     "build:makepot": "bash ./bin/makepot.sh",
     "build:grunt": "grunt build"
   }
