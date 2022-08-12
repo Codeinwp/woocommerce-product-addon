@@ -9,6 +9,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 5.6
 
 
+
 == Description ==
 
 PPOM (Personalized Product Option Manager) is a WooCommerce plugin to add extra fields on your site product page. Adding extra options like sizes, colors with PPOM is so simple with drag and drop form builder.
