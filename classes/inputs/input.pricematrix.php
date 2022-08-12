@@ -31,8 +31,6 @@ class NM_PriceMatrix_wooproduct extends PPOM_Inputs {
 
 	private function get_settings() {
 
-		$matrix_detail = 'https://najeebmedia.com/2014/04/23/woocommerce-personalized-product-with-best-price-handling-ever-with-fixed-and-price-matrix/';
-
 		$input_meta = array(
 			'title'               => array(
 				'type'  => 'text',
@@ -60,7 +58,6 @@ class NM_PriceMatrix_wooproduct extends PPOM_Inputs {
 				'type'  => 'paired-pricematrix',
 				'title' => __( 'Price matrix', "ppom" ),
 				'desc'  => __( 'Type quantity range with price.', "ppom" ),
-				'link'  => __( '<a target="_blank" href="' . $matrix_detail . '">More Detail</a>', 'ppom' )
 			),
 			'qty_step'            => array(
 				'type'        => 'text',

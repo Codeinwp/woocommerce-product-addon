@@ -79,10 +79,17 @@ if ( ! $ranges ) {
     <?php
     if ( $show_slider == 'on' ) {
 
-        $first_range  = reset( $ranges );
-        $qty_ranges   = explode( '-', $first_range['raw'] );
-        $min_quantity = $qty_ranges[0] - 1;
+        $first_range = reset( $ranges );
 
+        if ( strpos( $first_range['raw'], '-' ) === false ) {
+            echo '</div>';
+
+            return;
+        }
+
+        $qty_ranges = explode( '-', $first_range['raw'] );
+
+        $min_quantity = $qty_ranges[0];
         $last_range   = end( $ranges );
         $qty_ranges   = explode( '-', $last_range['raw'] );
         $max_quantity = $qty_ranges[1];

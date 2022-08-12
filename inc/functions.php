@@ -939,10 +939,8 @@ function ppom_is_aviary_installed() {
 
 function ppom_settings_link( $links ) {
 	$ppom_setting_url = admin_url( 'admin.php?page=ppom' );
-	$video_url        = 'https://najeebmedia.com/wordpress-plugin/woocommerce-personalized-product-option/#ppom-quick-video';
 
 	$links[] = sprintf( __( '<a href="%s">Add Fields</a>', "ppom" ), esc_url( $ppom_setting_url ) );
-	$links[] = sprintf( __( '<a href="%s" target="_blank">Quick Video Guide</a>', "ppom" ), esc_url( $video_url ) );
 
 	return $links;
 }
@@ -1782,14 +1780,7 @@ function ppom_option_has_stock( $option ) {
 
 // check if PPOM PRO is installed
 function ppom_pro_is_installed() {
-
-	$return = false;
-
-	if ( class_exists( 'PPOM_PRO' ) ) {
-		$return = true;
-	}
-
-	return $return;
+	return class_exists( 'PPOM_PRO' );
 }
 
 // Check if PPOM API is enable
@@ -2007,7 +1998,7 @@ function ppom_get_version() {
 		return 16.0;
 	}
 
-	return floatval( PPOM_VERSION );
+	return PPOM_VERSION;
 }
 
 // Checking PPOM Pro version
@@ -2017,7 +2008,7 @@ function ppom_get_pro_version() {
 		return 16.0;
 	}
 
-	return floatval( PPOM_PRO_VERSION );
+	return  PPOM_PRO_VERSION;
 }
 
 // wp_is_mobile wrapper

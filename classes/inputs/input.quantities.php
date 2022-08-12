@@ -40,14 +40,11 @@ class NM_Quantities_wooproduct extends PPOM_Inputs {
 	}
 
 	private function get_settings() {
-
-		$how_link   = '<a href="https://najeebmedia.com/2016/09/29/add-quantity-fields-variations-woocommerce/" target="_blank">Example</a>';
 		$input_meta = array(
 			'title'            => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'ppom' ),
 				'desc'  => __( 'It will be shown as field label. See example for usage.', 'ppom' ),
-				'link'  => __( '<a target="_blank" href="' . esc_url( $how_link ) . '">Help</a>', 'ppom' ),
 			),
 			'data_name'        => array(
 				'type'  => 'text',

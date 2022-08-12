@@ -32,7 +32,6 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 
 	private function get_settings() {
 
-		$croppie_options_link = 'https://najeebmedia.com/2017/12/24/crops-photos-woocommerce-ppom-using-croppie/';
 		$input_meta           = array(
 			'title'               => array(
 				'type'  => 'text',
@@ -128,7 +127,6 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 				'type'        => 'select',
 				'title'       => __( 'Viewport type', 'ppom' ),
 				'desc'        => __( 'Select Squar or circle, see help', 'ppom' ),
-				'link'        => __( '<a target="_blank" href="' . esc_url( $croppie_options_link ) . '">Help</a>', 'ppom' ),
 				'options'     => array( 'square' => 'Squar', 'circle' => 'Circle' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' )
 			),
@@ -136,7 +134,6 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 				'type'        => 'text',
 				'title'       => __( 'Boundary height,width', 'ppom' ),
 				'desc'        => __( 'Separated by command h,w e.g: 200,200, see help', 'ppom' ),
-				'link'        => __( '<a target="_blank" href="' . esc_url( $croppie_options_link ) . '">Help</a>', 'ppom' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' )
 			),
 			'visibility'          => array(
@@ -162,35 +159,30 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 				'type'        => 'checkbox',
 				'title'       => __( 'Enforce Boundary', 'ppom' ),
 				'desc'        => __( 'Restricts zoom so image cannot be smaller than viewport.', 'ppom' ),
-				'link'        => __( '<a target="_blank" href="' . esc_url( $croppie_options_link ) . '">Help</a>', 'ppom' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' )
 			),
 			'resize'              => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Allow Resize', 'ppom' ),
 				'desc'        => __( 'Show cropping handler resize.', 'ppom' ),
-				'link'        => __( '<a target="_blank" href="' . esc_url( $croppie_options_link ) . '">Help</a>', 'ppom' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' )
 			),
 			'enable_zoom'         => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Enable Zoom', 'ppom' ),
 				'desc'        => __( 'Enable zooming functionality. If set to false - scrolling and pinching would not zoom.', 'ppom' ),
-				'link'        => __( '<a target="_blank" href="' . esc_url( $croppie_options_link ) . '">Help</a>', 'ppom' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' )
 			),
 			'show_zoomer'         => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Show Zoomer', 'ppom' ),
 				'desc'        => __( 'Hide or Show the zoom slider.', 'ppom' ),
-				'link'        => __( '<a target="_blank" href="' . esc_url( $croppie_options_link ) . '">Help</a>', 'ppom' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' )
 			),
 			'enable_exif'         => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Enable Exif', 'ppom' ),
 				'desc'        => __( 'Enable zooming functionality. If set to false - scrolling and pinching would not zoom.', 'ppom' ),
-				'link'        => __( '<a target="_blank" href="' . esc_url( $croppie_options_link ) . '">Help</a>', 'ppom' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' )
 			),
 			'desc_tooltip'        => array(

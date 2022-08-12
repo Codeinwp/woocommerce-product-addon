@@ -116,8 +116,6 @@ function ppom_meta_list( $post ) {
     $ppom_add_args    = array( 'action' => 'new', 'product_id' => $post->ID );
     $ppom_setting_url = add_query_arg( $ppom_add_args, $ppom_setting );
 
-    $video_url = 'https://najeebmedia.com/ppom/#howtovideo';
-    $html      .= sprintf( __( '<p><a href="%s" target="_blank">How to use?</a>', "ppom" ), $video_url );
     $html      .= sprintf( __( ' - <a href="%s" target="_blank">Create New Meta</a></p>', "ppom" ), $ppom_setting_url );
 
     echo apply_filters( 'ppom_select_meta_in_product', $html, $ppom, $all_meta );
@@ -164,29 +162,6 @@ function ppom_admin_show_notices() {
         delete_transient( "ppom_meta_imported" );
     }
 }
-
-function ppom_admin_pro_version_notice() {
-
-    $ppom_pro = 'https://najeebmedia.com/wordpress-plugin/woocommerce-personalized-product-option/';
-    echo '<p class="center"><a href="' . esc_url( $ppom_pro ) . '" class="btn btn-primary">Get PRO - Unlock All 20 Fields</a></p>';
-
-    // Get PRO discount
-    $ppom_buy = 'https://www.2checkout.com/checkout/purchase?sid=1686663&quantity=1&product_id=15';
-    echo '<p>COUPON Code: PPOM25-2018</p>';
-    echo '<p><a href="' . esc_url( $ppom_buy ) . '" class="btn btn-primary">Get 25% Discoun</a></p>';
-}
-
-function ppom_admin_rate_and_get() {
-
-    if ( ! ppom_pro_is_installed() ) {
-        return '';
-    }
-
-
-    $ppom_pro = 'https://najeebmedia.com/get-quote/';
-    echo '<p class="center"><a href="' . esc_url( $ppom_pro ) . '" class="btn btn-primary">Get One Addon Free - Contact</a></p>';
-}
-
 
 /*
  * saving form meta in admin call
@@ -678,8 +653,8 @@ function ppom_admin_bar_menu() {
 
 function ppom_admin_update_pro_notice() {
 
-    $ppom_url   = 'https://najeebmedia.com/ppom';
-    $buy_paddle = 'https://pay.paddle.com/checkout/536711';
+    $ppom_url   = 'https://themeisle.com/plugins/ppom-pro';
+    $buy_paddle = 'https://themeisle.com/plugins/ppom-pro#pricing';
 
     echo '<div class="ppom-more-plugins-block">';
     echo '<a class="btn btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . __( 'Buy PPOM PRO', 'ppom' ) . '</a>';

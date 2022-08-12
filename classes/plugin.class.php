@@ -863,7 +863,7 @@ class NM_PersonalizedProduct {
     function ppom_export_meta() {
 
         // if( ppom_pro_is_installed() ) return '';
-        $buy_pro = 'https://najeebmedia.com/ppom';
+        $buy_pro = 'https://themeisle.com/plugins/ppom-pro#pricing';
         $args    = array( "link_url" => $buy_pro, "link_text" => 'Buy $30.00', 'back_link' => true );
         wp_die( "Update to PRO Version for Export/Import", "Update to PRO", $args );
     }

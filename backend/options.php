@@ -44,12 +44,12 @@ $core_settings = array(
 	'ppom_legacy_price'                   => array(
 		'type'      => 'checkbox',
 		'title'     => __( 'Enable Legacy Price Calculations', 'ppom' ),
-		'reference' => array(
-			'ref_title' => __( 'See reference', 'ppom' ),
-			'ref_link'  => 'https://najeebmedia.com/blog/ppom-version-18-0-better-price-manipulation-currency-switcher/',
+//		'reference' => array(
+//			'ref_title' => __( 'See reference', 'ppom' ),
+//			'ref_link'  => 'https://najeebmedia.com/blog/ppom-version-18-0-better-price-manipulation-currency-switcher/',
 			// 'ref_video_title' => __( 'Quick Video', 'ppom' ),
 			// 'ref_video_link'  => 'https://www.youtube.com/watch?v=0wCC3aLXdOw',
-		),
+//		),
 	),
 	'ppom_permission_mfields'             => array(
 		'type'        => 'select',

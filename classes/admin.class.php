@@ -45,11 +45,6 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
                 'add_menu_pages'
         ) );
 
-
-        // Get PRO version
-        // add_action('ppom_after_ppom_field_admin', 'ppom_admin_pro_version_noticez', 10);
-        add_action( 'ppom_after_ppom_field_admin', 'ppom_admin_rate_and_get', 10 );
-
         // Getting products list
         add_action( 'wp_ajax_ppom_get_products', array( $this, 'get_products' ) );
         add_action( 'wp_ajax_ppom_attach_ppoms', array( $this, 'ppom_attach_ppoms' ) );
@@ -144,20 +139,18 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
         } elseif ( isset( $_REQUEST ['do_meta'] ) && $_REQUEST ['do_meta'] == 'clone' ) {
 
             $this->clone_product_meta( intval( $_REQUEST ['productmeta_id'] ) );
-        } else if ( isset ( $_REQUEST ['page'] ) && $_REQUEST ['page'] == 'ppom' && $view === 'addons' ) {
-            ppom_load_template( 'admin/addons-list.php' );
+//        } else if ( isset ( $_REQUEST ['page'] ) && $_REQUEST ['page'] == 'ppom' && $view === 'addons' ) {
+//            ppom_load_template( 'admin/addons-list.php' );
         } else {
             $url_add           = add_query_arg( array( 'action' => 'new' ) );
-            $video_url         = 'https://najeebmedia.com/ppom/#howtovideo';
+//            $video_url         = 'https://najeebmedia.com/ppom/#howtovideo';
             $ppom_settings_url = admin_url( "admin.php?page=wc-settings&tab=ppom_settings" );
-            $ppom_addons_url   = add_query_arg( array( 'view' => 'addons' ) );
 
             echo '<div class="ppom-product-meta-block text-center ppom-meta-card-block">';
             echo '<h2>' . __( 'How it works?', "ppom" ) . '</h2>';
-            printf( __( '<p><a href="%s" target="_blank">Watch a Quick Video</a>', "ppom" ), $video_url );
-            printf( __( ' - <a href="%s">PPOM Settings</a></p>', "ppom" ), $ppom_settings_url );
+//            printf( __( '<p><a href="%s" target="_blank">Watch a Quick Video</a>', "ppom" ), $video_url );
+            printf( __( '<a href="%s">PPOM Settings</a></p>', "ppom" ), $ppom_settings_url );
             echo '<a style="margin-right: 3px;" class="btn btn-success" href="' . esc_url( $url_add ) . '"><span class="dashicons dashicons-plus"></span> ' . __( 'Add PPOM Meta Group', "ppom" ) . '</a>';
-            echo '<a class="btn btn-success" href="' . esc_url( $ppom_addons_url ) . '">' . __( 'PPOM Addons', "ppom" ) . '</a>';
             echo '</div>';
             echo '<br>';
 

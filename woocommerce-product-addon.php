@@ -13,7 +13,7 @@
  * WC tested up to: 5.3.0
  *
  * WordPress Available:  no
- * Requires License:     yes
+ * Requires License:     no
  */
 
 // @since 6.1
