@@ -1,0 +1,9 @@
+.idea
+.vscode
+node_modules
+.DS_Store
+artifact
+dist
+vendor
+languages/ppom.pot
+*.log
