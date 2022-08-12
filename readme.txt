@@ -112,6 +112,13 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 9. Attach inputs to bulk products
 
 == Changelog ==
+
+##### [Version 30.1.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v30.1.0...v30.1.1) (2022-08-12)
+
+- change plugin maintainer
+
+
+
 = 30.1 August 5, 2022 =
 * Bug fixed: PPOM shortcode rendering issue fixed.
 * Bug fixed: [Client side validatation issue fixed for Font picker addon](https://clients.najeebmedia.com/forums/topic/field-not-being-validated-and-added-to-meta/)
