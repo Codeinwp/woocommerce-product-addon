@@ -420,7 +420,7 @@ class PPOM_SettingsFramework {
 
 		$saved_settings = get_option( self::$save_key );
 
-		$value = $default != null ? $default : null;
+		$value = $default !== null ? $default : null;
 
 		if ( isset( $saved_settings[ $key ] ) && $saved_settings[ $key ] != '' ) {
 			$value = $saved_settings[ $key ];
