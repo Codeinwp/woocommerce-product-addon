@@ -8,8 +8,6 @@ License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 5.6
 
-
-
 == Description ==
 
 PPOM (Personalized Product Option Manager) is a WooCommerce plugin to add extra fields on your site product page. Adding extra options like sizes, colors with PPOM is so simple with drag and drop form builder.
@@ -19,18 +17,15 @@ PPOM (Personalized Product Option Manager) is a WooCommerce plugin to add extra 
 * Go to product edit page and select PPOM fields group created in above step and click update.
 * That's all
 
-**[Live Front & Backend Demo](https://najeebmedia.com/ppom-demo)**
-*Note: Click on the `Initialize Demo` button when the Demo is ready.*
-
 == Input Types in Free Version ==
-* **Text** - [Demo](https://ppom.nmediahosting.com/product/happy-ninja/)
-* **Textarea** - [Demo](https://ppom.nmediahosting.com/product/happy-ninja/)
-* **Select Options (with price)** - [Demo](https://ppom.nmediahosting.com/product/ninja-silhouette/)
-* **Radio Options (with price)** - [Demo](https://ppom.nmediahosting.com/product/ninja-silhouette/)
-* **Checkbox Options (with price)** - [Demo](https://ppom.nmediahosting.com/product/ninja-silhouette/)
-* **Date** - [Demo](https://ppom.nmediahosting.com/product/happy-ninja/)
-* **Email** - [Demo](https://ppom.nmediahosting.com/product/happy-ninja/)
-* **Number** - [Demo](https://ppom.nmediahosting.com/product/happy-ninja/)
+* **Text** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
+* **Textarea** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
+* **Select Options (with price)** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
+* **Radio Options (with price)** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
+* **Checkbox Options (with price)** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
+* **Date** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
+* **Email** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
+* **Number** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
 * **Hidden** - *Hidden input with a default value*
 
 == Features in Free Version  ==
@@ -52,25 +47,24 @@ PPOM (Personalized Product Option Manager) is a WooCommerce plugin to add extra 
 == Security is Priority ==
 **All inputs are [sanitized and escaped](https://developer.wordpress.org/themes/theme-security/data-sanitization-escaping/,  "WordPress sanitized")**
 
-
 == PPOM PRO Inputs ==
-* **[Measure Input](https://ppom.nmediahosting.com/product/ppom-measure-input/)** - *Set prices for measure units like milk, cloths & frames, etc*
-* **[Color Picker](https://ppom.nmediahosting.com/product/woo-album-1/)** - *Allow customer to select any colors and save Hex value*
-* **[Color Palette](https://ppom.nmediahosting.com/product/woo-album-1/)** - *Allow customer to select color(s) from a pre defined set of colors by admin*
-* **[Date Range](http://ppom.nmediahosting.com/product/flying-ninja/)** - *Select two dates between from and to*
-* **[Images Options](https://ppom.nmediahosting.com/product/woo-logo-2/)** - *Allow customer to select image(s) from a pre defined images by admin*
-* **[Audio/Video](https://ppom.nmediahosting.com/product/woo-single-1/)** - *Allow customer to select audio/video from a pre defined audios/videos by admin*
-* **[File Upload](https://ppom.nmediahosting.com/product/happy-ninja-2/)** - *Allow customers to upload files. Admin can set filetypes, and filesize. Progressbar, thumb display, and responsive uploader*
-* **[Image Cropper](https://ppom.nmediahosting.com/product/woo-album-4/)** - *Allow users to upload and crop images*
-* **[Variation Quantities](https://ppom.nmediahosting.com/product/woo-logo/)** - *Allow customers to order different quantities for different options like Sizes or colors*
-* **[Price Matrix with Discount](https://ppom.nmediahosting.com/product/woo-album-3/)** - *Set tiered or discount prices on bulk purchase*
-* **[Timezone](https://ppom.nmediahosting.com/product-category/ppom-timezone-input/)** - *Select timezone from pre defined list of timezone. Exclude/include timezones*
-* **[HTML Content](https://ppom.nmediahosting.com/product-category/ppom-html/)** - *Add HTML tags, like `p` or `h1` tags to add more details for your extra fields*
+* **[Measure Input](https://demo-ppom-lite.s.themeisle.com/product/demo-for-measure-input/)** - *Set prices for measure units like milk, cloths & frames, etc*
+* **[Color Picker](https://demo-ppom-lite.s.themeisle.com/product/demo-for-color-picker/)** - *Allow customer to select any colors and save Hex value*
+* **[Color Palette](https://demo-ppom-lite.s.themeisle.com/product/demo-for-color-palette/)** - *Allow customer to select color(s) from a pre defined set of colors by admin*
+* **[Date Range](https://demo-ppom-lite.s.themeisle.com/product/demo-for-date-range-input/)** - *Select two dates between from and to*
+* **[Images Options](https://demo-ppom-lite.s.themeisle.com/product/demo-for-images-options/)** - *Allow customer to select image(s) from a pre defined images by admin*
+* **[Audio/Video](https://demo-ppom-lite.s.themeisle.com/product/demo-for-video-music/)** - *Allow customer to select audio/video from a pre defined audios/videos by admin*
+* **[File Upload](https://demo-ppom-lite.s.themeisle.com/product/demo-for-file-upload-input/)** - *Allow customers to upload files. Admin can set filetypes, and filesize. Progressbar, thumb display, and responsive uploader*
+* **[Image Cropper](https://demo-ppom-lite.s.themeisle.com/product/demo-for-basic-image-cropping-input/)** - *Allow users to upload and crop images*
+* **[Variation Quantities](https://demo-ppom-lite.s.themeisle.com/product/demo-for-variation-quantities/)** - *Allow customers to order different quantities for different options like Sizes or colors*
+* **[Price Matrix with Discount](https://demo-ppom-lite.s.themeisle.com/product/demo-for-price-matrix-discount/)** - *Set tiered or discount prices on bulk purchase*
+* **[Timezone](https://demo-ppom-lite.s.themeisle.com/product-category/timezone-input/)** - *Select timezone from pre defined list of timezone. Exclude/include timezones*
+* **[HTML Content](https://demo-ppom-lite.s.themeisle.com/product/demo-for-basic-html-with-content/)** - *Add HTML tags, like `p` or `h1` tags to add more details for your extra fields*
 
 [See All Inputs Guide](https://najeebmedia.com/2018/01/02/woocommerce-personalized-product-options-manager-inputs-guide/)
 
 == PPOM PRO Features ==
-* **[Tooltip](https://vimeo.com/285060863)** - *Tooltip feature to show description*
+* **Tooltip - *Tooltip feature to show description*
 * **Fields privacy** - *Set fields visibility options by roles, member id guest etc*
 * **Weight options** - [Weight can be assgined for options](https://najeebmedia.com/2018/11/20/ppom-options-now-have-weight/)
 * **Multiple Meta** - [Assign multiple metas groups to single product](https://najeebmedia.com/2018/10/25/ppom-version-15-0-multiple-meta/)
@@ -82,19 +76,13 @@ PPOM (Personalized Product Option Manager) is a WooCommerce plugin to add extra 
 * **Compatible with all WooCommerce themes.**
 
 
-[See All PRO Features](https://najeebmedia.com/wordpress-plugin/woocommerce-personalized-product-option/) - [All Fields Options](https://najeebmedia.com/2018/01/02/woocommerce-personalized-product-options-manager-inputs-guide/) - [Demos](http://ppom.nmediahosting.com/)
+[See All PRO Features](https://themeisle.com/plugins/ppom-pro/?utm_source=themeisle&utm_medium=product&utm_campaign) - [All Fields Options](https://najeebmedia.com/2018/01/02/woocommerce-personalized-product-options-manager-inputs-guide/) - [Demos](https://demo-ppom-lite.s.themeisle.com/)
 
 == Video Guide ==
 [vimeo https://vimeo.com/85584591]
 
 == PPOM Add-ons ==
-If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, please see our [30+ PPOM Add-ons](https://najeebmedia.com/ppom-addons) and coming more.
-
-
-= Our recent unique plugins are =
-* [WooCommerce GoogleSync](https://najeebmedia.com/googlesync)  - manage products with Google Sheet
-* [WooConvo](https://najeebmedia.com/wooconvo) - send messages and files after checkout to customers
-* [See all plugins here](https://profiles.wordpress.org/nmedia/#content-plugins)
+If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, please see our [30+ PPOM Add-ons](https://themeisle.com/plugins/ppom-pro/) and coming more.
 
 == Installation ==
 1. Upload plugin directory to the `/wp-content/plugins/` directory
@@ -103,7 +91,7 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 
 == Screenshots ==
 1. Plugin options (input fields)
-2. Selecting meta with product	
+2. Selecting meta with product
 3. Showing inputs on front end product
 4. Inputs attached to cart item
 5. Inputs attached to checkout page
@@ -408,7 +396,7 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 * Feature: Unique option id for DOM via filter ppom_dom_option_id
 * Feature: [Color palettes now has Label option](https://clients.najeebmedia.com/forums/topic/color-pallette-labels-dont-show-hex-value)
 = 18.0 June 23, 2019 [More Details](https://najeebmedia.com/blog/ppom-version-18-0-better-price-manipulation-currency-switcher/) =
-* Tweaks: [Extra colon removed in cart for Variation Quantities](https://clients.najeebmedia.com/forums/topic/colon-and-additional-data-appearing-on-my-cart/) 
+* Tweaks: [Extra colon removed in cart for Variation Quantities](https://clients.najeebmedia.com/forums/topic/colon-and-additional-data-appearing-on-my-cart/)
 * Tweaks: Datepicker future dates default value setting udpated
 * Bug fixed: [Datepicker past_dates issue fixed](https://wordpress.org/support/topic/ppom-has-stopped-working/#post-11695214)
 * Bug fixed: [Double quote (inches symbol) issue fixed for Variation Quantities](https://wordpress.org/support/topic/code-in-view-cart-page-for-inches-symbol/)
