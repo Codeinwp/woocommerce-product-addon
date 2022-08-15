@@ -41,13 +41,6 @@ add_filter(
 	}
 );
 
-add_filter(
-	'themesle_sdk_namespace_' . md5( __FILE__ ),
-	function () {
-		return 'sparks';
-	}
-);
-
 /*
  * plugin localization being initiated here
  */
