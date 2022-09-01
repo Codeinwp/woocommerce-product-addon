@@ -151,7 +151,7 @@ jQuery(function($) {
 
         var div = $(this).closest('.ppom-slider');
         var visibility_value = $(this).val();
-        console.log(visibility_value);
+        // console.log(visibility_value);
         if (visibility_value == 'roles') {
             div.find('[data-meta-id="visibility_role"]').show();
         }
@@ -225,7 +225,7 @@ jQuery(function($) {
 
                     if (this.checked) {
                         var field_id = $(meta_field).val();
-                        console.log(field_id)
+                        // console.log(field_id)
                         $(meta_field).parent().parent().parent('.row_no_' + field_id + '').remove();
                     }
                     $('.ppom_save_fields_model').find('#ppom_field_model_' + field_id + '').remove();
@@ -285,7 +285,7 @@ jQuery(function($) {
         var copy_model_id = $(this).attr('data-copy-model-id');
         var id = $(this).attr('data-field-index');
         id = Number(id);
-        console.log(id);
+        // console.log(id);
 
         var field_title = $('#ppom_field_model_' + id + '').find('.ppom-modal-body .ppom-fields-actions').attr('data-table-id');
         var data_name = $('#ppom_field_model_' + id + '').find('[data-meta-id="data_name"] input').val();
@@ -294,7 +294,7 @@ jQuery(function($) {
         var required = $('#ppom_field_model_' + id + '').find('[data-meta-id="required"] input').prop('checked');
         var type = $(this).attr('data-field-type');
 
-        console.log(field_title);
+        // console.log(field_title);
 
         if (required == true) {
             var _ok = 'Yes';
@@ -898,7 +898,7 @@ jQuery(function($) {
 
         var option_index = parseInt(ul.find('#ppom-meta-opt-index').val());
         ul.find('#ppom-meta-opt-index').val(option_index + 1);
-        console.log(option_index);
+        // console.log(option_index);
 
         var field_index = main_wrapper.find('.ppom-fields-actions').attr('data-field-no');
         var option_selector = clone_item.find('.ppom-option-keys');
@@ -1048,7 +1048,7 @@ jQuery(function($) {
 
         option_selector.each(function(i, meta_field) {
 
-            console.log(ppom_option_type);
+            // console.log(ppom_option_type);
             if (ppom_option_type == 'ppom_copy_option') {
                 var opt_in = $(meta_field).attr('data-opt-index');
                 if (opt_in !== undefined) {

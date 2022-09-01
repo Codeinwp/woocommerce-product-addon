@@ -469,7 +469,7 @@ function ppom_set_default_option(field_id) {
             
         case 'quantities':
             jQuery.each(field.options, function(label, options) {
-                console.log(options);
+                //console.log(options);
                 if( options.default === '' ) return;
                 var opt_id = product_id + '-' + field.data_name + '-' + options.id;
                 jQuery("#" + opt_id).val(options.default).trigger('change');

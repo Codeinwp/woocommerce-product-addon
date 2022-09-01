@@ -66,7 +66,7 @@ jQuery(function($) {
 function ppom_init_js_for_ppom_fields(ppom_fields) {
     
     
-    console.log(ppom_fields);
+    //console.log(ppom_fields);
     // Fixed the form button issue
     if (ppom_fields && ppom_fields.length > 0) {
         const css_type = jQuery('form.cart').css('display');

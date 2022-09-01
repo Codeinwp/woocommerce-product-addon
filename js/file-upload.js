@@ -641,7 +641,7 @@ function ppom_generate_cropper_data_for_cart(field_name) {
             format: 'png'
         }).then(function(canvas) {
             var image_url = canvas.toDataURL();
-            console.log(image_url);
+            //console.log(image_url);
             // remove first
             jQuery(`input[name="ppom[fields][${field_name}][${image_id}][cropped]"`).remove();
             

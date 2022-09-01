@@ -53,7 +53,7 @@ const PPOM_Validate = {
             
             const invalid_fields = PPOM_Validate.field_meta.filter(f => !PPOM_Validate.field_has_valid_data(f) && !PPOM_Validate.is_field_hidden(f.data_name))
             const validate_result = invalid_fields.length > 0 ? false : true;
-            console.log(invalid_fields);
+            //console.log(invalid_fields);
             
             return validate_result ? resolve() : reject(invalid_fields);
         });
@@ -102,7 +102,7 @@ const PPOM_Validate = {
 	},
 	
 	show_errors: (invalid_fields) => {
-	    console.log(invalid_fields);
+	    //console.log(invalid_fields);
 	    const $container = jQuery('#ppom-error-container').html('');
 	    const $ul_container = jQuery('<ul/>').addClass('woocommerce-error').appendTo($container);
 	    invalid_fields.map(f => $ul_container.append( `<li>${PPOM_Validate.get_message(f)}</li>`) );
