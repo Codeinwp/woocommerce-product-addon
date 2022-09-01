@@ -424,7 +424,7 @@ function ppom_update_option_prices() {
     /** ====== Product base price =========== ***/
 
     if (ppom_show_base_price) {
-        console.log(ppom_show_base_price);
+        //console.log(ppom_show_base_price);
 
         var price_tag = ppom_get_wc_price(ppom_product_base_price);
 
@@ -904,7 +904,7 @@ function ppom_update_get_prices() {
         option_price.quantity = jQuery(this).find('.ppom-bulkquantity-qty').val();
         option_price.include = jQuery(this).find('.ppom-bulkquantity-options').attr('data-includeprice');
         option_price.apply = 'bulkquantity';
-        console.log(jQuery(this));
+        //console.log(jQuery(this));
         options_price_added.push(option_price);
         ppom_set_order_quantity(option_price.quantity);
 
