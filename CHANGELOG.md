@@ -1,3 +1,7 @@
+##### [Version 30.1.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v30.1.3...v30.1.4) (2022-09-02)
+
+- [Fix] The fatal error related to the tsdk_utmify() function being missing has been fixed.
+
 ##### [Version 30.1.3](https://github.com/Codeinwp/woocommerce-product-addon/compare/v30.1.2...v30.1.3) (2022-09-02)
 
 - [Fix] Browser console logs have been removed.
