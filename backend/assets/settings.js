@@ -138,15 +138,24 @@ jQuery(function($) {
     **/
     $('.nmsf-multiselect-js').select2();
 
-    $('#ppom_permission_mfields').on('select2:unselecting', function(e){
-        if( typeof e.params.args === 'undefined' ) {
-            return;
+    const permissionField = $('#ppom_permission_mfields');
+
+    $(document).ready(function(){
+        if( permissionField.val().length === 0 ) {
+            permissionField.val(['administrator']);
+            permissionField.trigger('change');
         }
 
-        const element = $(e.params.args.data.element);
-        if( element.prop('value') === 'administrator' ) {
-            alert(nmsf_vars.administrator_role_cannot_be_removed);
-            e.preventDefault();
-        }
+        permissionField.on('select2:unselecting', function(e){
+            if( typeof e.params.args === 'undefined' ) {
+                return;
+            }
+
+            const element = $(e.params.args.data.element);
+            if( element.prop('value') === 'administrator' ) {
+                alert(nmsf_vars.administrator_role_cannot_be_removed);
+                e.preventDefault();
+            }
+        });
     });
 });
