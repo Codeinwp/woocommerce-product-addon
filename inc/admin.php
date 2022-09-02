@@ -203,7 +203,7 @@ function ppom_admin_save_form_meta() {
     $enable_ajax_validation = "";
 
     $ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];
-    $product_meta = apply_filters( 'ppom_meta_data_saving', $ppom_meta, $productmeta_id );
+    $product_meta = apply_filters( 'ppom_meta_data_saving', (array)$ppom_meta, $productmeta_id );
     $product_meta = ppom_sanitize_array_data( $product_meta );
     $product_meta = json_encode( $product_meta );
 
@@ -262,7 +262,7 @@ function ppom_admin_save_form_meta() {
 
     $ppom_id = $wpdb->insert_id;
 
-    $product_meta = apply_filters( 'ppom_meta_data_saving', $ppom, $ppom_id );
+    $product_meta = apply_filters( 'ppom_meta_data_saving', (array)$ppom, $ppom_id );
     // Updating PPOM Meta with ppom_id in each meta array
     ppom_admin_update_ppom_meta_only( $ppom_id, $product_meta );
 
@@ -342,7 +342,7 @@ function ppom_admin_update_form_meta() {
     global $wpdb;
 
     $ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];
-    $product_meta = apply_filters( 'ppom_meta_data_saving', $ppom_meta, $productmeta_id );
+    $product_meta = apply_filters( 'ppom_meta_data_saving', (array)$ppom_meta, $productmeta_id );
     $product_meta = ppom_sanitize_array_data( $product_meta );
     $product_meta = json_encode( $product_meta );
     // ppom_pa($product_meta); exit;
