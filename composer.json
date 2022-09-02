@@ -25,6 +25,11 @@
     "require": {
         "codeinwp/themeisle-sdk": "^3.2"
     },
+    "autoload": {
+        "files": [
+            "vendor/codeinwp/themeisle-sdk/load.php"
+        ]
+    },
     "require-dev": {
         "phpunit/phpunit": "^6.5",
         "yoast/phpunit-polyfills": "^1.0"
