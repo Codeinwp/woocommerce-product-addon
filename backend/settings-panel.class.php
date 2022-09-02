@@ -812,7 +812,8 @@ class PPOM_SettingsFramework {
 			case 'nmsf-settings-panel':
 
 				$localize_data = [
-					'migrate_back_msg' => __( 'Are you sure?', $this->get_config( 'ppom' ) )
+					'migrate_back_msg' => __( 'Are you sure?', $this->get_config( 'ppom' ) ),
+					'administrator_role_cannot_be_removed' => esc_html__( 'The administrator role cannot be removed.', $this->get_config( 'ppom' ) )
 				];
 
 				break;

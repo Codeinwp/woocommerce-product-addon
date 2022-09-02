@@ -137,4 +137,25 @@ jQuery(function($) {
         Select2 Init
     **/
     $('.nmsf-multiselect-js').select2();
+
+    const permissionField = $('#ppom_permission_mfields');
+
+    $(document).ready(function(){
+        if( permissionField.val().length === 0 ) {
+            permissionField.val(['administrator']);
+            permissionField.trigger('change');
+        }
+
+        permissionField.on('select2:unselecting', function(e){
+            if( typeof e.params.args === 'undefined' ) {
+                return;
+            }
+
+            const element = $(e.params.args.data.element);
+            if( element.prop('value') === 'administrator' ) {
+                alert(nmsf_vars.administrator_role_cannot_be_removed);
+                e.preventDefault();
+            }
+        });
+    });
 });
