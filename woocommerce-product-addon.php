@@ -1,8 +1,8 @@
 <?php
 /*
  * Plugin Name: PPOM for WooCommerce
- * Plugin URI: http://themeisle.com
- * Description: PPOM (Personalized Product Meta Manager) plugin allow WooCommerce Store Admin to create unlimited input fields and files to attach with Product Page
+ * Plugin URI: https://themeisle.com/plugins/ppom-pro/
+ * Description: PPOM (Personalized Product Meta Manager) plugin allow WooCommerce Store Admin to create unlimited input fields and files to attach with Product Pages.
  * Version: 30.1.2
  * Author: Themeisle
  * Text Domain: ppom
