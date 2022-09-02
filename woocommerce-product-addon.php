@@ -7,12 +7,12 @@
  * Author: Themeisle
  * Text Domain: ppom
  * Domain Path: /languages
- * Author URI: https://www.themeisle.com/
+ * Author URI: https://themeisle.com/
  *
  * WC requires at least: 3.0.0
  * WC tested up to: 5.3.0
  *
- * WordPress Available:  no
+ * WordPress Available:  yes
  * Requires License:     no
  */
 
