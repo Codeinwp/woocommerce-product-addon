@@ -3,7 +3,7 @@ Contributors: nmedia,themeisle
 Tags: woocommerce custom fields, woocommerce extra fields, woocommerce extra options, woocommerce personalized product, woocommerce product fields, woocommerce addons
 Requires at least: 3.5
 Tested up to: 6.0
-Stable tag: trunk
+Stable tag: 30.1.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 5.6
