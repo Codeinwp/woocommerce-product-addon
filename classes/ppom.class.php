@@ -208,7 +208,7 @@ class PPOM_Meta {
 		}
 
 		// Filter fields which are active only
-		$meta_fields = array_filter( $meta_fields, function ( $field ) {
+		$meta_fields = array_filter( (array) $meta_fields, function ( $field ) {
 			return ! isset( $field['status'] ) || $field['status'] == 'on';
 		} );
 

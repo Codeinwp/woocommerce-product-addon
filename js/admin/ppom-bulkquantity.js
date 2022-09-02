@@ -82,7 +82,7 @@ jQuery(function($){
 
 	    var buk_div = $(this).closest('div');
 	    var bulk_variation_val = buk_div.find('.ppom-bulk-variation-val').val();
-	    console.log(bulk_variation_val);
+	    // console.log(bulk_variation_val);
 	    var table = $(this).closest('div.table-content').find('table'),
 	    thead = table.find('thead'),
 	    lastTheadRow = thead.find('tr:last-child'),
@@ -106,7 +106,7 @@ jQuery(function($){
 
 	    var bulk_wrap = $(this).closest('.ppom-bulk-quantity-wrapper');
 	    bulk_wrap.find('table').find('input').each(function(index, el) {
-	    	console.log($(this).val());
+	    	// console.log($(this).val());
 	        var td_wrap = $(this);
 	        td_wrap.closest('td').html($(this).val());
 	    });
