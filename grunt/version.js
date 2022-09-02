@@ -12,7 +12,7 @@ module.exports = {
     },
     readmetxt: {
         options: {
-            prefix: 'Stable tag\\:.*\\s',
+            prefix: 'Stable tag: ',
         },
         src: ['readme.txt'],
     },
