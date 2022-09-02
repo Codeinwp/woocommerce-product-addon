@@ -653,11 +653,9 @@ function ppom_admin_bar_menu() {
 
 function ppom_admin_update_pro_notice() {
 
-    $ppom_url   = 'https://themeisle.com/plugins/ppom-pro';
-    $buy_paddle = 'https://themeisle.com/plugins/ppom-pro#pricing';
+	$buy_paddle = tsdk_utmify( 'https://themeisle.com/plugins/ppom-pro/upgrade/', 'addmorefields', 'ppompage' );
 
     echo '<div class="ppom-more-plugins-block">';
-    echo '<a class="btn btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . __( 'Buy PPOM PRO', 'ppom' ) . '</a>';
-    echo '<a class="btn btn-yellow ppom-nm-plugins" href="' . esc_url( $ppom_url ) . '">' . __( 'PPOM PRO Features & Demo', 'ppom' ) . '</a>';
+    echo '<a class="btn btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . __( 'Add more field types', 'ppom' ) . '</a>';
     echo '</div>';
 }

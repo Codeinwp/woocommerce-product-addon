@@ -1,18 +1,18 @@
 <?php
 /*
  * Plugin Name: PPOM for WooCommerce
- * Plugin URI: http://themeisle.com
- * Description: PPOM (Personalized Product Meta Manager) plugin allow WooCommerce Store Admin to create unlimited input fields and files to attach with Product Page
+ * Plugin URI: https://themeisle.com/plugins/ppom-pro/
+ * Description: PPOM (Personalized Product Meta Manager) plugin allow WooCommerce Store Admin to create unlimited input fields and files to attach with Product Pages.
  * Version: 30.1.2
  * Author: Themeisle
- * Text Domain: ppom
+ * Text Domain: woocommerce-product-addon
  * Domain Path: /languages
- * Author URI: https://www.themeisle.com/
+ * Author URI: https://themeisle.com/
  *
  * WC requires at least: 3.0.0
  * WC tested up to: 5.3.0
  *
- * WordPress Available:  no
+ * WordPress Available:  yes
  * Requires License:     no
  */
 
@@ -29,6 +29,7 @@ define( 'PPOM_DB_VERSION', '30.1.0' );
 define( "PPOM_PRODUCT_META_KEY", '_product_meta_id' );
 define( 'PPOM_TABLE_META', 'nm_personalized' );
 define( 'PPOM_UPLOAD_DIR_NAME', 'ppom_files' );
+define( 'PPOM_UPGRADE_URL', 'https://themeisle.com/plugins/ppom-pro/upgrade/' );
 
 require PPOM_PATH . '/vendor/autoload.php';
 

@@ -10,6 +10,12 @@ module.exports = {
         },
         src: ['woocommerce-product-addon.php'],
     },
+    readmetxt: {
+        options: {
+            prefix: 'Stable tag: ',
+        },
+        src: ['readme.txt'],
+    },
     entryHeader: {
         options: {
             prefix: 'Version\\:.*\\s',
