@@ -1,5 +1,5 @@
 === PPOM for WooCommerce ===
-Contributors: nmedia,themeisle
+Contributors: themeisle
 Tags: woocommerce custom fields, woocommerce extra fields, woocommerce extra options, woocommerce personalized product, woocommerce product fields, woocommerce addons
 Requires at least: 3.5
 Tested up to: 6.0
@@ -10,7 +10,7 @@ Requires PHP: 5.6
 
 == Description ==
 
-PPOM (Personalized Product Option Manager) is a WooCommerce plugin to add extra fields on your site product page. Adding extra options like sizes, colors with PPOM is so simple with drag and drop form builder.
+PPOM is a WooCommerce plugin to add extra fields and addons on your site product page. Adding extra options like sizes, colors with PPOM is so simple with drag and drop form builder.
 
 = How it works? =
 * Create PPOM fields with drag & drag form builder from `WooCommerce->PPOM Fields`
