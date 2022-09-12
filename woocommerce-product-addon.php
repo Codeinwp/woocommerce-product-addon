@@ -24,6 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'PPOM_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'PPOM_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 define( 'PPOM_WP_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __DIR__ ) ) );
+define( 'PPOM_BASENAME', basename( PPOM_WP_PLUGIN_DIR ) );
 define( 'PPOM_VERSION', '30.1.4' );
 define( 'PPOM_DB_VERSION', '30.1.0' );
 define( "PPOM_PRODUCT_META_KEY", '_product_meta_id' );
@@ -95,6 +96,15 @@ function PPOM() {
 	return NM_PersonalizedProduct::get_instance();
 }
 
+add_filter( 'themeisle_sdk_compatibilities/' . PPOM_BASENAME, function ( $compatibilities ) {
+	$compatibilities['ppompro'] = [
+		'basefile'  => defined( 'PPOM_PRO_PATH' ) ? PPOM_PRO_PATH . '/ppom.php' : '',
+		'required'  => '23.0',
+		'tested_up' => '25.0',
+	];
+
+	return $compatibilities;
+} );
 add_action( 'woocommerce_init', 'PPOM' );
 
 register_activation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'activate_plugin' ) );
