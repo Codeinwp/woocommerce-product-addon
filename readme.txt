@@ -78,7 +78,7 @@ PPOM is a WooCommerce plugin to add extra fields and addons on your product page
 [See All PRO Features](https://themeisle.com/plugins/ppom-pro/upgrade/?utm_source=themeisle&utm_medium=product&utm_campaign) - [Demos](https://demo-ppom-lite.s.themeisle.com/)
 
 == Video Guide ==
-[vimeo https://vimeo.com/85584591]
+[youtube https://www.youtube.com/watch?v=wGQBOzyMF4U]
 
 == PPOM Add-ons ==
 If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, please see our [30+ PPOM Add-ons](https://themeisle.com/plugins/ppom-pro/upgrade/?utm_source=plugin-readme&utm_medium=ppomfree&utm_campaign=30ppomaddons) and coming more.
