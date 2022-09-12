@@ -1,3 +1,8 @@
+#### [Version 31.0.0](https://github.com/Codeinwp/woocommerce-product-addon/compare/v30.1.4...v31.0.0) (2022-09-12)
+
+- Improvement on PPOM Pro compatibility
+- Readme.txt updated.
+
 ##### [Version 30.1.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v30.1.3...v30.1.4) (2022-09-02)
 
 - [Fix] The fatal error related to the tsdk_utmify() function being missing has been fixed.
