@@ -63,10 +63,10 @@ PPOM is a WooCommerce plugin to add extra fields and addons on your product page
 
 
 == PPOM PRO Features ==
-* **Tooltip - *Tooltip feature to show description*
+* **Tooltip** *Tooltip feature to show description*
 * **Fields privacy** - *Set fields visibility options by roles, member id guest etc*
-* **Weight options** - Weight can be assgined for options
-* **Multiple Meta** - Assign multiple metas groups to single product
+* **Weight options** - *Weight can be assgined for options*
+* **Multiple Meta** - *Assign multiple metas groups to single product*
 * **Options prices taxable**
 * **[Client-side validation](https://www.youtube.com/watch?v=1IoABjkQ--I)** - *No page refresh on error.*
 * **Compatible with WooCommerce Currency Switcher**
@@ -78,7 +78,7 @@ PPOM is a WooCommerce plugin to add extra fields and addons on your product page
 [See All PRO Features](https://themeisle.com/plugins/ppom-pro/upgrade/?utm_source=themeisle&utm_medium=product&utm_campaign) - [Demos](https://demo-ppom-lite.s.themeisle.com/)
 
 == Video Guide ==
-[vimeo https://vimeo.com/85584591]
+[youtube https://www.youtube.com/watch?v=wGQBOzyMF4U]
 
 == PPOM Add-ons ==
 If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, please see our [30+ PPOM Add-ons](https://themeisle.com/plugins/ppom-pro/upgrade/?utm_source=plugin-readme&utm_medium=ppomfree&utm_campaign=30ppomaddons) and coming more.
@@ -149,6 +149,9 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 
 
 == Frequently Asked Questions ==
+= Where can I find documentation for WooCommerce Product Addon? =
+[Installation & Overview](https://docs.themeisle.com/article/1700-personalized-product-meta-manager)
+[Docs for Free Inputs](https://docs.themeisle.com/article/1701-ppom-free-input-types)
 = I can add fields in Variable Products also? =
 Yes
 = Is there any fields limits =
