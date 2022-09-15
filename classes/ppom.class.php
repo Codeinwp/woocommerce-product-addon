@@ -1,10 +1,11 @@
 <?php
 /**
  * PPOM Meta Class
+ * Manages a PPOM Fields Group
+ *
  * @since version 15.0
  *
- * */
-
+ */
 
 class PPOM_Meta {
 

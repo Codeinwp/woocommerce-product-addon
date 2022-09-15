@@ -15,7 +15,7 @@ $form_meta = PPOM_FIELDS_META();
 
 $ppom                   = '';
 $productmeta_name       = '';
-$enable_ajax_validation = '';
+$enable_ajax_validation = ''; // QM-4
 $dynamic_price_hide     = '';
 $send_file_attachment   = '';
 $show_cart_thumb        = '';
@@ -34,7 +34,7 @@ if ( isset ( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' )
     $ppom_settings   = $ppom->get_settings_by_id( $product_meta_id );
 
     $productmeta_name       = ( isset( $ppom_settings->productmeta_name ) ? stripslashes( $ppom_settings->productmeta_name ) : '' );
-    $enable_ajax_validation = ( isset( $ppom_settings->productmeta_validation ) ? $ppom_settings->productmeta_validation : '' );
+    $enable_ajax_validation = ( isset( $ppom_settings->productmeta_validation ) ? $ppom_settings->productmeta_validation : '' ); // QM-4
     $dynamic_price_hide     = ( isset( $ppom_settings->dynamic_price_display ) ? $ppom_settings->dynamic_price_display : '' );
     $send_file_attachment   = ( isset( $ppom_settings->send_file_attachment ) ? $ppom_settings->send_file_attachment : '' );
     $show_cart_thumb        = ( isset( $ppom_settings->show_cart_thumb ) ? $ppom_settings->show_cart_thumb : '' );
@@ -44,7 +44,7 @@ if ( isset ( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' )
     $productmeta_categories = ( isset( $ppom_settings->productmeta_categories ) ? $ppom_settings->productmeta_categories : '' );
     $product_meta           = json_decode( $ppom_settings->the_meta, true );
 
-    // var_dump ( $enable_ajax_validation  );
+    // var_dump ( $enable_ajax_validation  ); // QM-4
 }
 
 $url_cancel = add_query_arg( array( 'action' => false, 'productmeta_id' => false, 'do_meta' => false ) );

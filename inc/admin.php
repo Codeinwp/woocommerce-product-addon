@@ -200,7 +200,7 @@ function ppom_admin_save_form_meta() {
     $send_file_attachment   = "NA";
     $aviary_api_key         = "NA";
     $show_cart_thumb        = "NA";
-    $enable_ajax_validation = "";
+    $enable_ajax_validation = ""; // QM-4
 
     $ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];
     $product_meta = apply_filters( 'ppom_meta_data_saving', (array)$ppom_meta, $productmeta_id );
@@ -209,7 +209,7 @@ function ppom_admin_save_form_meta() {
 
     // sanitize
     $productmeta_name       = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
-    $productmeta_validation = isset( $_REQUEST['enable_ajax_validation'] ) ? sanitize_text_field( $_REQUEST['enable_ajax_validation'] ) : '';
+    $productmeta_validation = isset( $_REQUEST['enable_ajax_validation'] ) ? sanitize_text_field( $_REQUEST['enable_ajax_validation'] ) : ''; // QM-4
     $dynamic_price_hide     = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
     $send_file_attachment   = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
     $show_cart_thumb        = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
@@ -348,7 +348,7 @@ function ppom_admin_update_form_meta() {
     // ppom_pa($product_meta); exit;
 
     $productmeta_name       = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
-    $productmeta_validation = isset( $_REQUEST['enable_ajax_validation'] ) ? sanitize_text_field( $_REQUEST['enable_ajax_validation'] ) : '';
+    $productmeta_validation = isset( $_REQUEST['enable_ajax_validation'] ) ? sanitize_text_field( $_REQUEST['enable_ajax_validation'] ) : ''; // QM-4
     $dynamic_price_hide     = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
     $send_file_attachment   = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
     $show_cart_thumb        = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
