@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce custom fields, woocommerce extra fields, woocommerce extra options, woocommerce personalized product, woocommerce product fields, woocommerce addons
 Requires at least: 3.5
 Tested up to: 6.0
-Stable tag: 31.0.0
+Stable tag: 31.0.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 5.6
@@ -100,6 +100,13 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 9. Attach inputs to bulk products
 
 == Changelog ==
+
+##### [Version 31.0.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v31.0.0...v31.0.1) (2022-09-16)
+
+- Themeisle-SDK upgraded to latest version (v3.2.30)
+
+
+
 
 #### [Version 31.0.0](https://github.com/Codeinwp/woocommerce-product-addon/compare/v30.1.4...v31.0.0) (2022-09-12)
 
