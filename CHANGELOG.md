@@ -1,3 +1,7 @@
+##### [Version 31.0.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v31.0.0...v31.0.1) (2022-09-16)
+
+- Themeisle-SDK upgraded to latest version (v3.2.30)
+
 #### [Version 31.0.0](https://github.com/Codeinwp/woocommerce-product-addon/compare/v30.1.4...v31.0.0) (2022-09-12)
 
 - Improvement on PPOM Pro compatibility
