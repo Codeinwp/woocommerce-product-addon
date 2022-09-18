@@ -500,7 +500,7 @@ class NM_PersonalizedProduct {
                     foreach ( $post_ids as $post_id ) {
 
                         $meta_id = array( intval( substr( $action, 10 ) ) );
-                        update_post_meta( $post_id, '_product_meta_id', $meta_id );
+                        update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $meta_id );
 
                         $nm_updated ++;
                     }
@@ -514,7 +514,7 @@ class NM_PersonalizedProduct {
                     $nm_removed = 0;
                     foreach ( $post_ids as $post_id ) {
 
-                        delete_post_meta( $post_id, '_product_meta_id' );
+                        delete_post_meta( $post_id, PPOM_PRODUCT_META_KEY );
 
                         $nm_removed ++;
                     }

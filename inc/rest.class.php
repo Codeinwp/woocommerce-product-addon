@@ -358,7 +358,7 @@ class PPOM_Rest {
 			);
 
 			// Also setting ppom meta to porduct
-			update_post_meta( $product_id, '_product_meta_id', $res_id );
+			update_post_meta( $product_id, PPOM_PRODUCT_META_KEY, $res_id );
 		} else {
 
 			$resp = array(
@@ -431,7 +431,7 @@ class PPOM_Rest {
 		if ( in_array( '__all_keys', $delete_fields ) ) {
 
 			// unset product meta key
-			delete_post_meta( $product_id, '_product_meta_id' );
+			delete_post_meta( $product_id, PPOM_PRODUCT_META_KEY );
 
 			// Deleting all fields
 			$ppom_table         = $wpdb->prefix . PPOM_TABLE_META;

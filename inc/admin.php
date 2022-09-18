@@ -141,7 +141,7 @@ function ppom_admin_process_product_meta( $post_id ) {
     }
 
     // ppom_pa($ppom_meta_selected); exit; 
-    update_post_meta( $post_id, '_product_meta_id', $ppom_meta_selected );
+    update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $ppom_meta_selected );
 
     do_action( 'ppom_proccess_meta', $post_id );
 }
