@@ -46,7 +46,7 @@ function ppom_get_input_cols() {
 		9  => '9 Col',
 		10 => '10 Col',
 		11 => '11 Col',
-		12 => '12 Col'
+		12 => '12 Col',
 	);
 
 	return apply_filters( 'ppom_field_cols', $ppom_cols );
@@ -61,7 +61,7 @@ function ppom_field_visibility_options() {
 		'everyone' => __( 'Everyone', 'ppom' ),
 		'guests'   => __( 'Only Guests', 'ppom' ),
 		'members'  => __( 'Only Members', 'ppom' ),
-		'roles'    => __( 'By Role', 'ppom' )
+		'roles'    => __( 'By Role', 'ppom' ),
 	);
 
 	return apply_filters( 'ppom_field_visibility_options', $visibility_options );
@@ -85,7 +85,7 @@ function ppom_array_get_timezone_list( $selected_regions, $show_time ) {
 			DateTimeZone::PACIFIC,
 		);
 	} else {
-		$selected_regions = explode( ",", $selected_regions );
+		$selected_regions = explode( ',', $selected_regions );
 		$tz_regions       = array();
 
 		foreach ( $selected_regions as $region ) {
@@ -131,7 +131,7 @@ function ppom_array_get_timezone_list( $selected_regions, $show_time ) {
 	$timezone_offsets = array();
 	foreach ( $timezones as $timezone ) {
 		$tz                            = new DateTimeZone( $timezone );
-		$timezone_offsets[ $timezone ] = $tz->getOffset( new DateTime );
+		$timezone_offsets[ $timezone ] = $tz->getOffset( new DateTime() );
 	}
 
 	// sort timezone by timezone name
@@ -264,7 +264,7 @@ function ppom_array_settings() {
 			'label'   => __( 'Yes', 'ppom' ),
 			'default' => 'no',
 			'id'      => 'ppom_enable_legacy_inputs_rendering',
-			'desc'    => __( "PPOM Version 22.0 is major update, if some issues occur you can revert back to old version by this.", 'ppom' )
+			'desc'    => __( 'PPOM Version 22.0 is major update, if some issues occur you can revert back to old version by this.', 'ppom' ),
 		),
 
 		array(
@@ -303,7 +303,7 @@ function ppom_array_settings() {
 			'name' => __( 'Advance Features (PRO)', 'ppom' ),
 			'type' => 'title',
 			'desc' => __( 'These options will work when PRO version is installed', 'ppom' ),
-			'id'   => 'ppom_pro_features'
+			'id'   => 'ppom_pro_features',
 		),
 
 		array(
@@ -545,7 +545,6 @@ function ppom_array_get_js_input_vars( $product, $args = null ) {
 				break;
 
 			case 'bulkquantity':
-
 				$fields_meta['options'] = stripslashes( $fields_meta['options'] );
 
 				// To make bulkquantity option WOOCS ready
@@ -592,17 +591,17 @@ function ppom_array_get_js_input_vars( $product, $args = null ) {
 	$ppom_label_fixed_fee                 = ppom_get_option( 'ppom_label_fixed_fee', __( 'Fixed Fee', 'ppom' ) );
 	$ppom_label_total_discount            = ppom_get_option( 'ppom_label_total_discount', __( 'Total Discount', 'ppom' ) );
 	$ppom_label_total                     = ppom_get_option( 'ppom_label_total', __( 'Total', 'ppom' ) );
-	$js_vars['total_discount_label']      = sprintf( __( "%s", 'ppom' ), $ppom_label_total_discount );
-	$js_vars['price_matrix_heading']      = sprintf( __( "%s", 'ppom' ), $ppom_label_discount_price );
-	$js_vars['product_base_label']        = sprintf( __( "%s", 'ppom' ), $ppom_label_product_price );
-	$js_vars['option_total_label']        = sprintf( __( "%s", 'ppom' ), $ppom_label_option_total );
-	$js_vars['fixed_fee_heading']         = sprintf( __( "%s", 'ppom' ), $ppom_label_fixed_fee );
-	$js_vars['total_without_fixed_label'] = sprintf( __( "%s", 'ppom' ), $ppom_label_total );
-	$js_vars['product_quantity_label']    = __( "Product Quantity", "ppom" );
-	$js_vars['product_title']             = sprintf( __( "%s", "ppom" ), $product->get_title() );
-	$js_vars['per_unit_label']            = __( "unit", "ppom" );
+	$js_vars['total_discount_label']      = sprintf( __( '%s', 'ppom' ), $ppom_label_total_discount );
+	$js_vars['price_matrix_heading']      = sprintf( __( '%s', 'ppom' ), $ppom_label_discount_price );
+	$js_vars['product_base_label']        = sprintf( __( '%s', 'ppom' ), $ppom_label_product_price );
+	$js_vars['option_total_label']        = sprintf( __( '%s', 'ppom' ), $ppom_label_option_total );
+	$js_vars['fixed_fee_heading']         = sprintf( __( '%s', 'ppom' ), $ppom_label_fixed_fee );
+	$js_vars['total_without_fixed_label'] = sprintf( __( '%s', 'ppom' ), $ppom_label_total );
+	$js_vars['product_quantity_label']    = __( 'Product Quantity', 'ppom' );
+	$js_vars['product_title']             = sprintf( __( '%s', 'ppom' ), $product->get_title() );
+	$js_vars['per_unit_label']            = __( 'unit', 'ppom' );
 	$js_vars['show_price_per_unit']       = $show_price_per_unit;
-	$js_vars['text_quantity']             = __( "Quantity", "ppom" );
+	$js_vars['text_quantity']             = __( 'Quantity', 'ppom' );
 	$js_vars['show_option_price']         = $ppom->price_display;
 	$js_vars['is_shortcode']              = 'no';
 	$js_vars['plugin_url']                = PPOM_URL;
@@ -615,16 +614,18 @@ function ppom_array_get_js_input_vars( $product, $args = null ) {
 
 /**
  * Showing Tax prefix
+ *
  * @since 20.5
  */
 function ppom_tax_label_display() {
-	/*if ( wc_tax_enabled() && 'excl' === get_option( 'woocommerce_tax_display_shop' ) &&  get_option( 'woocommerce_price_display_suffix' ) !== '' ) {
+	/*
+	if ( wc_tax_enabled() && 'excl' === get_option( 'woocommerce_tax_display_shop' ) &&  get_option( 'woocommerce_price_display_suffix' ) !== '' ) {
 		return sprintf(__("%s", 'ppom'), get_option( 'woocommerce_price_display_suffix' ));
 	}*/
 
 	$suffex = ppom_get_option( 'ppom_label_option_total_suffex' );
 	if ( wc_tax_enabled() && $suffex !== '' ) {
-		return sprintf( __( "%s", 'ppom' ), $suffex );
+		return sprintf( __( '%s', 'ppom' ), $suffex );
 	}
 }
 
@@ -656,8 +657,8 @@ function ppom_array_all_inputs() {
 			'palettes',
 			'audio',
 			'measure',
-			'divider'
-		)
+			'divider',
+		),
 	);
 
 	return apply_filters( 'ppom_all_inputs_array', $all_inputs );
@@ -677,17 +678,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/design-shirt-with-ppom-texter/'
+					'link'  => 'https://ppom.nmediahosting.com/product/design-shirt-with-ppom-texter/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#ppom-texter'
+					'link'  => $ppom_site_url . '#ppom-texter',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'WooCommerce Package Price', 'ppom' ),
@@ -695,17 +696,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/patient-ninja/'
+					'link'  => 'https://ppom.nmediahosting.com/product/patient-ninja/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#woocommercepackageprice'
+					'link'  => $ppom_site_url . '#woocommercepackageprice',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Fields PopUp', 'ppom' ),
@@ -713,17 +714,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/ppom-fields-popup/'
+					'link'  => 'https://ppom.nmediahosting.com/product/ppom-fields-popup/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => 'https://vimeo.com/309118167'
+					'link'  => 'https://vimeo.com/309118167',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#fieldspopup'
+					'link'  => $ppom_site_url . '#fieldspopup',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Google Font Map Picker', 'ppom' ),
@@ -731,17 +732,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/google-font-picker-ppom/'
+					'link'  => 'https://ppom.nmediahosting.com/product/google-font-picker-ppom/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => 'https://vimeo.com/377580122'
+					'link'  => 'https://vimeo.com/377580122',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#googlefontandmappicker'
+					'link'  => $ppom_site_url . '#googlefontandmappicker',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Image DropDown', 'ppom' ),
@@ -749,17 +750,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/image-dropdown/'
+					'link'  => 'https://ppom.nmediahosting.com/product/image-dropdown/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => 'https://najeebmedia.com/addon-image-drop-down/'
+					'link'  => 'https://najeebmedia.com/addon-image-drop-down/',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#imagedropdown'
+					'link'  => $ppom_site_url . '#imagedropdown',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Bulk Quantity Options', 'ppom' ),
@@ -767,17 +768,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/woo-logo-3/'
+					'link'  => 'https://ppom.nmediahosting.com/product/woo-logo-3/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#bulkquantity'
+					'link'  => $ppom_site_url . '#bulkquantity',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'PriceTable', 'ppom' ),
@@ -785,17 +786,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/price-table-add-on/'
+					'link'  => 'https://ppom.nmediahosting.com/product/price-table-add-on/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#pricetable'
+					'link'  => $ppom_site_url . '#pricetable',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Cart Edit', 'ppom' ),
@@ -803,17 +804,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/happy-ninja/'
+					'link'  => 'https://ppom.nmediahosting.com/product/happy-ninja/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => 'https://vimeo.com/358618266'
+					'link'  => 'https://vimeo.com/358618266',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#cartedit'
+					'link'  => $ppom_site_url . '#cartedit',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'SVG ADDON', 'ppom' ),
@@ -821,17 +822,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#svg'
+					'link'  => $ppom_site_url . '#svg',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'UploadCare', 'ppom' ),
@@ -839,17 +840,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#uploadcare'
+					'link'  => $ppom_site_url . '#uploadcare',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Domain Checker', 'ppom' ),
@@ -857,17 +858,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/ppom-domain-checker-addon/'
+					'link'  => 'https://ppom.nmediahosting.com/product/ppom-domain-checker-addon/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#domainchecker'
+					'link'  => $ppom_site_url . '#domainchecker',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Quantities Pack', 'ppom' ),
@@ -875,17 +876,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://najeebmedia.com/blog/ppom-quantity-pack-addon/'
+					'link'  => 'https://najeebmedia.com/blog/ppom-quantity-pack-addon/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#quantitypack'
+					'link'  => $ppom_site_url . '#quantitypack',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Fancy Cropper', 'ppom' ),
@@ -893,17 +894,17 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/fancy-cropper-demo/'
+					'link'  => 'https://ppom.nmediahosting.com/product/fancy-cropper-demo/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => 'https://vimeo.com/416623997'
+					'link'  => 'https://vimeo.com/416623997',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#fancycropper'
+					'link'  => $ppom_site_url . '#fancycropper',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Super List', 'ppom' ),
@@ -911,36 +912,39 @@ function ppom_array_get_addons_details() {
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/super-list-demo-copy/'
+					'link'  => 'https://ppom.nmediahosting.com/product/super-list-demo-copy/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#superlist'
+					'link'  => $ppom_site_url . '#superlist',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'PDF Export', 'ppom' ),
-			'desc'    => __( '
-PPOM PDF Export Add-on will generate a PDF against each order including all PPOM Fields in a beautiful format. Header and Footer can also be set for PDF. This is an awesome feature when you need to print order details.', 'ppom' ),
+			'desc'    => __(
+				'
+PPOM PDF Export Add-on will generate a PDF against each order including all PPOM Fields in a beautiful format. Header and Footer can also be set for PDF. This is an awesome feature when you need to print order details.',
+				'ppom' 
+			),
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/simple-t-shirt-design/'
+					'link'  => 'https://ppom.nmediahosting.com/product/simple-t-shirt-design/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => 'https://vimeo.com/326834403'
+					'link'  => 'https://vimeo.com/326834403',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#pdfexport'
+					'link'  => $ppom_site_url . '#pdfexport',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Event Calendar', 'ppom' ),
@@ -948,17 +952,17 @@ PPOM PDF Export Add-on will generate a PDF against each order including all PPOM
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/multiple-event-calendar/'
+					'link'  => 'https://ppom.nmediahosting.com/product/multiple-event-calendar/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => 'https://vimeo.com/349698112'
+					'link'  => 'https://vimeo.com/349698112',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#eventcalendar'
+					'link'  => $ppom_site_url . '#eventcalendar',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Field Collapsed', 'ppom' ),
@@ -966,17 +970,17 @@ PPOM PDF Export Add-on will generate a PDF against each order including all PPOM
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/ppom-collapsed-fields/'
+					'link'  => 'https://ppom.nmediahosting.com/product/ppom-collapsed-fields/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => 'https://vimeo.com/284667121'
+					'link'  => 'https://vimeo.com/284667121',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#fieldcollapes'
+					'link'  => $ppom_site_url . '#fieldcollapes',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Text Counter', 'ppom' ),
@@ -984,17 +988,17 @@ PPOM PDF Export Add-on will generate a PDF against each order including all PPOM
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/ppom-text-counter-add-on/'
+					'link'  => 'https://ppom.nmediahosting.com/product/ppom-text-counter-add-on/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => 'https://vimeo.com/314283537'
+					'link'  => 'https://vimeo.com/314283537',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#textcounter'
+					'link'  => $ppom_site_url . '#textcounter',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Enquiry Form', 'ppom' ),
@@ -1002,17 +1006,17 @@ PPOM PDF Export Add-on will generate a PDF against each order including all PPOM
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => 'https://vimeo.com/325028677'
+					'link'  => 'https://vimeo.com/325028677',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#enquiryform'
+					'link'  => $ppom_site_url . '#enquiryform',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'AutoComplete/MultiSelect', 'ppom' ),
@@ -1020,17 +1024,17 @@ PPOM PDF Export Add-on will generate a PDF against each order including all PPOM
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/ppom-auto-complete-demo/'
+					'link'  => 'https://ppom.nmediahosting.com/product/ppom-auto-complete-demo/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#autocompletemultiselect'
+					'link'  => $ppom_site_url . '#autocompletemultiselect',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Variation Quantity Matrix', 'ppom' ),
@@ -1038,17 +1042,17 @@ PPOM PDF Export Add-on will generate a PDF against each order including all PPOM
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/t-shirt-variations/'
+					'link'  => 'https://ppom.nmediahosting.com/product/t-shirt-variations/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => 'https://vimeo.com/391981516'
+					'link'  => 'https://vimeo.com/391981516',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#variationquantitymatrix'
+					'link'  => $ppom_site_url . '#variationquantitymatrix',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'WooCommerce Variation Quantity', 'ppom' ),
@@ -1056,17 +1060,17 @@ PPOM PDF Export Add-on will generate a PDF against each order including all PPOM
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/woocommerce-variation-quantity/'
+					'link'  => 'https://ppom.nmediahosting.com/product/woocommerce-variation-quantity/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => 'https://vimeo.com/402089812'
+					'link'  => 'https://vimeo.com/402089812',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#woocemmrcevariationquantity'
+					'link'  => $ppom_site_url . '#woocemmrcevariationquantity',
 				),
-			)
+			),
 		),
 		array(
 			'title'   => __( 'Option Quantity', 'ppom' ),
@@ -1074,17 +1078,17 @@ PPOM PDF Export Add-on will generate a PDF against each order including all PPOM
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'ppom' ),
-					'link'  => 'https://najeebmedia.com/blog/option-quantity-ppom-add-on-released/'
+					'link'  => 'https://najeebmedia.com/blog/option-quantity-ppom-add-on-released/',
 				),
 				array(
 					'title' => __( 'Quick Video', 'ppom' ),
-					'link'  => ''
+					'link'  => '',
 				),
 				array(
 					'title' => __( 'More Info', 'ppom' ),
-					'link'  => $ppom_site_url . '#optionquantity'
+					'link'  => $ppom_site_url . '#optionquantity',
 				),
-			)
+			),
 		),
 	);
 

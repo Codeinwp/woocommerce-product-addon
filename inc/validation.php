@@ -107,7 +107,7 @@ function ppom_fields_with_html() {
 /**
  * Updates the quantity arguments.
  *
- * @param array $data List of data to update.
+ * @param array       $data List of data to update.
  * @param \WC_Product $product Product object.
  *
  * @return array
@@ -175,8 +175,8 @@ function ppom_validation_product_limits( $data, $product ) {
 /**
  * Adds variation min max settings to be used by JS.
  *
- * @param array $data Available variation data.
- * @param \WC_Product $product Product object.
+ * @param array                $data Available variation data.
+ * @param \WC_Product          $product Product object.
  * @param \WC_Product_Variable $variation Variation object.
  *
  * @return array $data

@@ -33,7 +33,7 @@ function ppom_woocommerce_show_fields_on_product( $product_id, $args = null ) {
 
 	if ( ! $ppom->has_unique_datanames() ) {
 
-		printf( __( "<div class='error'>Some of your fields has duplicated datanames, please fix it</div>", 'ppom' ), "ppom" );
+		printf( __( "<div class='error'>Some of your fields has duplicated datanames, please fix it</div>", 'ppom' ), 'ppom' );
 
 		return;
 	}
@@ -51,7 +51,7 @@ function ppom_woocommerce_show_fields_on_product( $product_id, $args = null ) {
 		'product'          => $product,
 		'ppom_fields_meta' => $ppom->fields,
 		'ppom_id'          => $ppom->meta_id,
-		'args'             => $args
+		'args'             => $args,
 	);
 	ob_start();
 	ppom_load_template( 'render-fields.php', $template_vars );
@@ -135,9 +135,9 @@ function ppom_woocommerce_validate_product( $passed, $product_id, $qty ) {
 	if ( ppom_get_price_mode() == 'legacy' && isset( $_POST['ppom']['fields'] ) ) {
 
 		if ( ppom_is_price_attached_with_fields( $_POST['ppom']['fields'] ) &&
-		     empty( $_POST['ppom']['ppom_option_price'] )
+			 empty( $_POST['ppom']['ppom_option_price'] )
 		) {
-			$error_message = __( 'Sorry, an error has occurred. Please enable JavaScript or contact site owner.', "ppom" );
+			$error_message = __( 'Sorry, an error has occurred. Please enable JavaScript or contact site owner.', 'ppom' );
 			ppom_wc_add_notice( $error_message );
 			$passed = false;
 
@@ -152,11 +152,14 @@ function ppom_woocommerce_ajax_validate() {
 
 	// ppom_pa($_POST); exit;
 	$ppom_nonce            = $_REQUEST['ppom_nonce'];
-	$validate_nonce_action = "ppom_validating_action";
+	$validate_nonce_action = 'ppom_validating_action';
 	if ( ! wp_verify_nonce( $ppom_nonce, $validate_nonce_action ) ) {
 
-		$message  = sprintf( __( '<div class="woocommerce-error" role="alert">%s</div>', "ppom" ), 'Error while validating, try again' );
-		$response = array( 'status' => 'error', 'message' => $message );
+		$message  = sprintf( __( '<div class="woocommerce-error" role="alert">%s</div>', 'ppom' ), 'Error while validating, try again' );
+		$response = array(
+			'status'  => 'error',
+			'message' => $message,
+		);
 		wp_send_json( $response );
 	}
 
@@ -176,14 +179,19 @@ function ppom_woocommerce_ajax_validate() {
 			if ( $type != 'error' ) {
 				continue;
 			}
-			wc_get_template( "notices/{$type}.php", array(
-					'messages' => $message
+			wc_get_template(
+				"notices/{$type}.php",
+				array(
+					'messages' => $message,
 				)
 			);
 		}
 
 		$all_notices = wc_kses_notice( ob_get_clean() );
-		$response    = array( 'status' => 'error', 'message' => $all_notices );
+		$response    = array(
+			'status'  => 'error',
+			'message' => $all_notices,
+		);
 	} else {
 		$response = array( 'status' => 'success' );
 	}
@@ -218,7 +226,7 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 		$passed = apply_filters( 'ppom_before_fields_validation', $passed, $field, $post_data, $product_id );
 
 		if ( empty( $field['data_name'] ) || empty( $field['required'] )
-		                                     && ( empty( $field['min_checked'] ) && empty( $field['max_checked'] ) )
+											 && ( empty( $field['min_checked'] ) && empty( $field['max_checked'] ) )
 		) {
 			continue;
 		}
@@ -239,13 +247,12 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 			// Note: Checkbox is being validate by hook: ppom_has_posted_field_value
 			// $error_message = isset($field['error_message']) ? $field['error_message'] : '';
 			// $error_message = (isset($field['error_message']) && $field['error_message'] != '') ? $title.": ".$field['error_message'] : "{$title} is a required field";
-			$error_message = ( isset( $field['error_message'] ) && $field['error_message'] != '' ) ? sprintf( __( "%s: %s", 'ppom' ), $title, $field['error_message'] ) : "{$title} " . __( "is a required field", 'ppom' );
+			$error_message = ( isset( $field['error_message'] ) && $field['error_message'] != '' ) ? sprintf( __( '%1$s: %2$s', 'ppom' ), $title, $field['error_message'] ) : "{$title} " . __( 'is a required field', 'ppom' );
 			$error_message = sprintf( __( '%s', 'ppom' ), $error_message );
 			$error_message = stripslashes( $error_message );
 			ppom_wc_add_notice( $error_message );
 			$passed = false;
-		}
-
+		}   
 	}
 
 	// ppom_pa($post_data); exit;
@@ -326,9 +333,8 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 		foreach ( $option_prices as $option ) {
 			if ( $option['apply'] == 'quantities' ) {
 				$ppom_total_quantities += $option['quantity'];
-				$ppom_item_order_qty   = $ppom_total_quantities;
-			}
-
+				$ppom_item_order_qty    = $ppom_total_quantities;
+			}       
 		}
 	}
 
@@ -349,7 +355,6 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 			switch ( $option['apply'] ) {
 
 				case 'variable':
-
 					$option_price = $option['price'];
 					// verify prices from server due to security
 					if ( isset( $option['data_name'] ) && isset( $option['option_id'] ) ) {
@@ -361,7 +366,6 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 					break;
 
 				case 'onetime':
-
 					$option_price = $option['price'];
 					// verify prices from server due to security
 					if ( isset( $option['data_name'] ) && isset( $option['option_id'] ) ) {
@@ -372,7 +376,6 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 					break;
 
 				case 'quantities':
-
 					$ppom_quantities_use_option_price = apply_filters( 'ppom_quantities_use_option_price', true, $option_prices );
 					if ( $ppom_quantities_use_option_price ) {
 
@@ -395,8 +398,6 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 					break;
 
 				case 'bulkquantity':
-
-
 					// Note: May need to add matrix price like in quantites (above)
 
 					$ppom_quantities_price += wc_format_decimal( ( $option['price'] * $option['quantity'] ), wc_get_price_decimals() );
@@ -409,7 +410,6 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 
 				// Fixed price addon
 				case 'fixedprice':
-
 					$ppom_item_org_price = $option['unitprice'];
 
 					// Well, it should NOT be like this but have to do this. will see later.
@@ -417,7 +417,6 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 					break;
 
 				case 'measure':
-
 					$measer_qty   = isset( $option['qty'] ) ? intval( $option['qty'] ) : 0;
 					$option_price = $option['price'];
 
@@ -431,15 +430,14 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 
 			/**
 			 * @since 15.4: Updating options weight
-			 **/
+			 */
 			if ( ppom_pro_is_installed() ) {
 				$option_weight = ppom_get_field_option_weight_by_id( $option, $ppom_meta_ids );
 				if ( $option_weight > 0 ) {
 					$new_weight = $wc_product->get_weight() + $option_weight;
 					$wc_product->set_weight( $new_weight );
 				}
-			}
-
+			}       
 		}
 	}
 
@@ -475,7 +473,7 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 				/**
 				 * when discount is in PRICE not Percent then applied to whole price Base+Option)
 				 * so need to get per unit discount
-				 **/
+				 */
 
 				/*
 				** @since 16.8
@@ -486,7 +484,7 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 
 					$ppom_total_discount += $matrix_found['price'];
 				} else {
-					$discount_per_unit   = $matrix_found['price'] / $ppom_item_order_qty;
+					$discount_per_unit    = $matrix_found['price'] / $ppom_item_order_qty;
 					$ppom_total_discount += $discount_per_unit;
 				}
 			}
@@ -563,13 +561,13 @@ function ppom_woocommerce_add_fixed_fee( $cart ) {
 				}
 
 				// if(  'incl' === get_option( 'woocommerce_tax_display_shop' ) ) {
-				// 	$taxable = false;
+				// $taxable = false;
 				// }
 
 				$fee_price = apply_filters( 'ppom_cart_fixed_fee', $fee_price, $fee, $cart );
 
 				if ( $fee_price != 0 ) {
-					$cart->add_fee( sprintf( __( "%s", "ppom" ), esc_html( $label ) ), $fee_price, $taxable );
+					$cart->add_fee( sprintf( __( '%s', 'ppom' ), esc_html( $label ) ), $fee_price, $taxable );
 					$fee_no ++;
 				}
 			}
@@ -600,7 +598,7 @@ function ppom_woocommerce_mini_cart_fixed_fee() {
 		$fixed_fee_html .= '</tr>';
 	}
 
-	$fixed_fee_html .= '<tr><td colspan="2">' . __( "Total will be calculated in the cart", "ppom" ) . '</td></tr>';
+	$fixed_fee_html .= '<tr><td colspan="2">' . __( 'Total will be calculated in the cart', 'ppom' ) . '</td></tr>';
 	$fixed_fee_html .= '</table>';
 
 	echo apply_filters( 'ppom_mini_cart_fixed_fee', $fixed_fee_html );
@@ -648,15 +646,20 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 			// WPML
 			$meta_key = ppom_wpml_translate( $meta_key, 'PPOM' );
 
-			$item_meta[] = array( 'name'    => wp_strip_all_tags( $meta_key ),
-			                      'value'   => $meta_value,
-			                      'hidden'  => $hidden,
-			                      'display' => $display
+			$item_meta[] = array(
+				'name'    => wp_strip_all_tags( $meta_key ),
+				'value'   => $meta_value,
+				'hidden'  => $hidden,
+				'display' => $display,
 			);
 		} else {
-			$item_meta[] = array( 'name' => ( $key ), 'value' => $meta, 'hidden' => $hidden, 'display' => $display );
-		}
-
+			$item_meta[] = array(
+				'name'    => ( $key ),
+				'value'   => $meta,
+				'hidden'  => $hidden,
+				'display' => $display,
+			);
+		}   
 	}
 
 	return $item_meta;
@@ -732,14 +735,14 @@ function ppom_woocommerce_alter_price( $price, $product ) {
 					}
 				}
 			}
-		}
-
+		}   
 	}
 
 	return apply_filters( 'ppom_loop_matrix_price', $price, $from_pice, $to_price );
 }
 
-/*function ppom_hide_variation_price_html($show, $parent, $variation) {
+/*
+function ppom_hide_variation_price_html($show, $parent, $variation) {
 	
 	$product_id = $parent->get_id();
 	$ppom		= new PPOM_Meta( $product_id );
@@ -920,7 +923,7 @@ function ppom_woocommerce_control_cart_quantity_legacy( $quantity, $cart_item_ke
 
 	// ppom_pa($cart_item)
 	if ( ! isset( $cart_item['ppom']['ppom_option_price'] ) &&
-	     ! isset( $cart_item['ppom']['ppom_pricematrix'] ) ) {
+		 ! isset( $cart_item['ppom']['ppom_pricematrix'] ) ) {
 		return $quantity;
 	}
 
@@ -982,7 +985,8 @@ function ppom_woocommerce_control_cart_quantity( $quantity, $cart_item_key ) {
 }
 
 // Control subtotal when quantities input used
-/*function ppom_woocommerce_item_subtotal( $item_subtotal, $cart_item, $cart_item_key) {
+/*
+function ppom_woocommerce_item_subtotal( $item_subtotal, $cart_item, $cart_item_key) {
 	
 	if( !isset($cart_item['ppom']['ppom_option_price']) ) return $item_subtotal;
 	
@@ -1025,7 +1029,7 @@ function ppom_woocommerce_control_checkout_quantity( $quantity, $cart_item, $car
 
 	// If no quantity updated then return default
 	if ( $ppom_has_quantities > 0 ) {
-		$quantity = '<strong class="product-quantity">' . sprintf( "&times; %s", $ppom_has_quantities ) . '</strong>';
+		$quantity = '<strong class="product-quantity">' . sprintf( '&times; %s', $ppom_has_quantities ) . '</strong>';
 	}
 
 	return $quantity;
@@ -1051,7 +1055,7 @@ function ppom_woocommerce_control_oder_item_quantity( $quantity, $item ) {
 	$ppom_has_quantities = ppom_price_get_total_quantities( $ppom_fields_post, $product_id );
 
 	if ( $ppom_has_quantities > 0 ) {
-		$quantity = '<strong class="product-quantity">' . sprintf( "&times; %s", $ppom_has_quantities ) . '</strong>';
+		$quantity = '<strong class="product-quantity">' . sprintf( '&times; %s', $ppom_has_quantities ) . '</strong>';
 	}
 
 	return $quantity;
@@ -1077,7 +1081,7 @@ function ppom_woocommerce_control_email_item_quantity( $quantity, $item ) {
 	$ppom_has_quantities = ppom_price_get_total_quantities( $ppom_fields_post, $product_id );
 
 	if ( $ppom_has_quantities > 0 ) {
-		$quantity = '<strong class="product-quantity">' . sprintf( "%s", $ppom_has_quantities ) . '</strong>';
+		$quantity = '<strong class="product-quantity">' . sprintf( '%s', $ppom_has_quantities ) . '</strong>';
 	}
 
 	return $quantity;
@@ -1125,7 +1129,7 @@ function ppom_woocommerce_cart_update_validate( $cart_validated, $cart_item_key,
 
 function ppom_woocommerce_order_item_meta( $item, $cart_item_key, $values, $order ) {
 
-	if ( ! isset ( $values ['ppom']['fields'] ) ) {
+	if ( ! isset( $values ['ppom']['fields'] ) ) {
 		return;
 	}
 	// ADDED WC BUNDLES COMPATIBILITY
@@ -1199,12 +1203,12 @@ function ppom_woocommerce_order_value( $display_value, $meta = null, $item = nul
 
 		case 'file':
 		case 'cropper':
-
 			/**
 			 * File upload and croppers now save only filename in meta
 			 * seperated by commas, now here we will build it's html to show thumbs in item orde
+			 *
 			 * @since: 10.10
-			 **/
+			 */
 			$display_value = ppom_generate_html_for_files( $meta->value, $input_type, $item );
 			break;
 
@@ -1213,7 +1217,6 @@ function ppom_woocommerce_order_value( $display_value, $meta = null, $item = nul
 			break;
 
 		default:
-
 			// Important hook: changing order value format using local hooks
 			// Also being used for export order lite
 			$display_value = apply_filters( 'ppom_order_display_value', $display_value, $meta, $item );
@@ -1257,7 +1260,7 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 
 	// since 8.1, files will be send to email as attachment
 
-	//ppom_pa($cart); exit;
+	// ppom_pa($cart); exit;
 	foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
 
 		// ppom_pa($cart_item); exit;
@@ -1304,18 +1307,19 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 						break;
 					}
 
-					/*$moved_files[] = array('path' => $destination_path,
+					/*
+					$moved_files[] = array('path' => $destination_path,
 											'file_name' => $file_name,
 											'product_id' => $product_id);*/
 
 					if ( file_exists( $source_file ) ) {
 
 						if ( ! rename( $source_file, $destination_path ) ) {
-							die ( 'Error while re-naming order image ' . $source_file );
+							die( 'Error while re-naming order image ' . $source_file );
 						}
 					}
 
-					//renaming edited files
+					// renaming edited files
 					$source_file_edit      = $edits_dir_path . $file_name;
 					$destination_path_edit = '';
 
@@ -1324,7 +1328,7 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 
 						$destination_path_edit = $edits_dir_path . $new_filename;
 						if ( ! rename( $source_file_edit, $destination_path_edit ) ) {
-							die ( 'Error while re-naming order image ' . $source_file_edit );
+							die( 'Error while re-naming order image ' . $source_file_edit );
 						} else {
 							$file_edited = true;
 						}
@@ -1338,7 +1342,7 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 						'file_edited'    => $file_edited,
 						'file_edit_path' => $destination_path_edit,
 						'product_id'     => $product_id,
-						'field_name'     => $key
+						'field_name'     => $key,
 					);
 
 					// $moved_files['file_edited'] = $file_edited;

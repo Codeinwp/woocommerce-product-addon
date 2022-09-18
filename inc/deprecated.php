@@ -1,7 +1,6 @@
 <?php
 /**
  * PPOM Deprecated functions here
- *
  * */
 
 // check if product has meta Returns Meta ID if true otherwise null
