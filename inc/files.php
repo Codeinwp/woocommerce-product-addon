@@ -1,7 +1,6 @@
 <?php
 /**
  * Manage file uploads, thumbs and generate links for uploaded files
- *
  **/
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed.' );
@@ -54,7 +53,7 @@ function ppom_get_dir_url( $thumb = false ) {
 function ppom_is_file_image( $file_name ) {
 
 	$type = strtolower( substr( strrchr( $file_name, '.' ), 1 ) );
-	if ( ( $type == "gif" ) || ( $type == "jpeg" ) || ( $type == "png" ) || ( $type == "pjpeg" ) || ( $type == "jpg" ) ) {
+	if ( ( $type == 'gif' ) || ( $type == 'jpeg' ) || ( $type == 'png' ) || ( $type == 'pjpeg' ) || ( $type == 'jpg' ) ) {
 		return true;
 	} else {
 		return false;
@@ -95,9 +94,8 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 		$edited_thumb_path = ppom_get_dir_path() . 'edits/thumbs/' . $file_name;
 		if ( file_exists( $edited_thumb_path ) ) {
 			$file_thumb_url = ppom_get_dir_url() . 'edits/thumbs/' . $file_name;
-		}
-
-	} else if ( file_exists( $file_dir_path ) && $post_type == 'shop_order' ) {
+		}   
+	} elseif ( file_exists( $file_dir_path ) && $post_type == 'shop_order' ) {
 		$file_link = $file_thumb_url;
 	} else {
 		$file_link = ppom_get_dir_url() . $file_name;
@@ -105,9 +103,9 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 
 	$ppom_cart_meta_thumb_size = ppom_get_thumbs_size();
 
-	$thumb_html = '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $file_thumb_url ) . '" alt="' . sprintf( __( "%s", "ppom" ), $file_name ) . '">';
+	$thumb_html = '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $file_thumb_url ) . '" alt="' . sprintf( __( '%s', 'ppom' ), $file_name ) . '">';
 
-	$ppom_html = '<table class="table table-bordered">';
+	$ppom_html  = '<table class="table table-bordered">';
 	$ppom_html .= '<tr><td><a href="' . esc_url( $file_link ) . '" class="lightbox et_pb_lightbox_image" itemprop="image" title="' . esc_attr( $file_name ) . '">' . $thumb_html . '</a></td>';
 	$ppom_html .= '<td>' . esc_attr( ppom_files_trim_name( $file_name ) ) . '</td>';
 	$ppom_html .= '</tr>';
@@ -117,13 +115,13 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 	if ( $cropped && file_exists( ppom_get_dir_path( 'cropped' ) . $cropped_file_name ) ) {
 
 		$cropped_url   = ppom_get_dir_url() . 'cropped/' . $cropped_file_name;
-		$ppom_html     .= '<tr>';
-		$ppom_html     .= '<td><a href="' . esc_url( $cropped_url ) . '" class="lightbox et_pb_lightbox_image" itemprop="image" title="' . esc_attr( $file_name ) . '">';
-		$ppom_html     .= '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $cropped_url ) . '">';
-		$ppom_html     .= '</a></td>';
-		$cropped_title = sprintf( __( "Your image-%s", 'ppom' ), $size );
-		$ppom_html     .= '<td>' . $cropped_title . '</td>';
-		$ppom_html     .= '</tr>';
+		$ppom_html    .= '<tr>';
+		$ppom_html    .= '<td><a href="' . esc_url( $cropped_url ) . '" class="lightbox et_pb_lightbox_image" itemprop="image" title="' . esc_attr( $file_name ) . '">';
+		$ppom_html    .= '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $cropped_url ) . '">';
+		$ppom_html    .= '</a></td>';
+		$cropped_title = sprintf( __( 'Your image-%s', 'ppom' ), $size );
+		$ppom_html    .= '<td>' . $cropped_title . '</td>';
+		$ppom_html    .= '</tr>';
 	}
 
 	$ppom_html .= '</table>';
@@ -136,14 +134,14 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 
 function ppom_upload_file() {
 
-	header( "Expires: Mon, 26 Jul 1997 05:00:00 GMT" );
-	header( "Last-Modified: " . gmdate( "D, d M Y H:i:s" ) . " GMT" );
-	header( "Cache-Control: no-store, no-cache, must-revalidate" );
-	header( "Cache-Control: post-check=0, pre-check=0", false );
-	header( "Pragma: no-cache" );
+	header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
+	header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+	header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+	header( 'Cache-Control: post-check=0, pre-check=0', false );
+	header( 'Pragma: no-cache' );
 
 	$ppom_nonce               = $_REQUEST['ppom_nonce'];
-	$file_upload_nonce_action = "ppom_uploading_file_action";
+	$file_upload_nonce_action = 'ppom_uploading_file_action';
 	if ( ! wp_verify_nonce( $ppom_nonce, $file_upload_nonce_action ) && apply_filters( 'ppom_verify_upload_file', true ) ) {
 		$response ['status']  = 'error';
 		$response ['message'] = __( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', 'ppom' );
@@ -196,8 +194,8 @@ function ppom_upload_file() {
 	// usleep(5000);
 
 	// Get parameters
-	$chunk  = isset ( $_REQUEST ["chunk"] ) ? intval( $_REQUEST ["chunk"] ) : 0;
-	$chunks = isset ( $_REQUEST ["chunks"] ) ? intval( $_REQUEST ["chunks"] ) : 0;
+	$chunk  = isset( $_REQUEST ['chunk'] ) ? intval( $_REQUEST ['chunk'] ) : 0;
+	$chunks = isset( $_REQUEST ['chunks'] ) ? intval( $_REQUEST ['chunks'] ) : 0;
 	// $file_name = isset ( $_REQUEST ["name"] ) ? sanitize_file_name($_REQUEST ["name"]) : '';
 
 	$file_path_thumb = $file_dir_path . 'thumbs';
@@ -235,63 +233,63 @@ function ppom_upload_file() {
 
 		closedir( $dir );
 	} else {
-		die ( '{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}' );
+		die( '{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}' );
 	}
 
 
 	// Look for the content type header
-	if ( isset ( $_SERVER ["HTTP_CONTENT_TYPE"] ) ) {
-		$contentType = $_SERVER ["HTTP_CONTENT_TYPE"];
+	if ( isset( $_SERVER ['HTTP_CONTENT_TYPE'] ) ) {
+		$contentType = $_SERVER ['HTTP_CONTENT_TYPE'];
 	}
 
-	if ( isset ( $_SERVER ["CONTENT_TYPE"] ) ) {
-		$contentType = $_SERVER ["CONTENT_TYPE"];
+	if ( isset( $_SERVER ['CONTENT_TYPE'] ) ) {
+		$contentType = $_SERVER ['CONTENT_TYPE'];
 	}
 
 	// Handle non multipart uploads older WebKit versions didn't support multipart in HTML5
-	if ( strpos( $contentType, "multipart" ) !== false ) {
-		if ( isset ( $_FILES ['file'] ['tmp_name'] ) && is_uploaded_file( $_FILES ['file'] ['tmp_name'] ) ) {
+	if ( strpos( $contentType, 'multipart' ) !== false ) {
+		if ( isset( $_FILES ['file'] ['tmp_name'] ) && is_uploaded_file( $_FILES ['file'] ['tmp_name'] ) ) {
 			// Open temp file
-			$out = fopen( "{$file_path}.part", $chunk == 0 ? "wb" : "ab" );
+			$out = fopen( "{$file_path}.part", $chunk == 0 ? 'wb' : 'ab' );
 			if ( $out ) {
 				// Read binary input stream and append it to temp file
-				$in = fopen( sanitize_text_field( $_FILES ['file'] ['tmp_name'] ), "rb" );
+				$in = fopen( sanitize_text_field( $_FILES ['file'] ['tmp_name'] ), 'rb' );
 
 				if ( $in ) {
 					while ( $buff = fread( $in, 4096 ) ) {
 						fwrite( $out, $buff );
 					}
 				} else {
-					die ( '{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}' );
+					die( '{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}' );
 				}
 				fclose( $in );
 				fclose( $out );
 				@unlink( sanitize_text_field( $_FILES ['file'] ['tmp_name'] ) );
 			} else {
-				die ( '{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}' );
+				die( '{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}' );
 			}
 		} else {
-			die ( '{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}' );
+			die( '{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}' );
 		}
 	} else {
 		// Open temp file
-		$out = fopen( "{$file_path}.part", $chunk == 0 ? "wb" : "ab" );
+		$out = fopen( "{$file_path}.part", $chunk == 0 ? 'wb' : 'ab' );
 		if ( $out ) {
 			// Read binary input stream and append it to temp file
-			$in = fopen( "php://input", "rb" );
+			$in = fopen( 'php://input', 'rb' );
 
 			if ( $in ) {
 				while ( $buff = fread( $in, 4096 ) ) {
 					fwrite( $out, $buff );
 				}
 			} else {
-				die ( '{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}' );
+				die( '{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}' );
 			}
 
 			fclose( $in );
 			fclose( $out );
 		} else {
-			die ( '{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}' );
+			die( '{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}' );
 		}
 	}
 
@@ -312,7 +310,7 @@ function ppom_upload_file() {
 			$thumb_dir_path = ppom_create_image_thumb( $file_dir_path, $file_name, $thumb_size );
 			if ( file_exists( $thumb_dir_path ) ) {
 				list( $fw, $fh ) = getimagesize( $file_path );
-				$response = array(
+				$response        = array(
 					'file_name' => $file_name,
 					'file_w'    => $fw,
 					'file_h'    => $fh,
@@ -335,8 +333,8 @@ function ppom_upload_file() {
 		}
 	}
 	// Return JSON-RPC response
-	//die ( '{"jsonrpc" : "2.0", "result" : '. json_encode($response) .', "id" : "id"}' );
-	die ( json_encode( apply_filters( 'ppom_file_upload', $response, $file_type, $file_dir_path, $file_name ) ) );
+	// die ( '{"jsonrpc" : "2.0", "result" : '. json_encode($response) .', "id" : "id"}' );
+	die( json_encode( apply_filters( 'ppom_file_upload', $response, $file_type, $file_dir_path, $file_name ) ) );
 }
 
 // Deleting file
@@ -345,9 +343,9 @@ function ppom_delete_file() {
 	$file_name = sanitize_file_name( $_REQUEST ['file_name'] );
 
 	$ppom_nonce        = $_REQUEST['ppom_nonce'];
-	$file_nonce_action = "ppom_deleting_file_action";
+	$file_nonce_action = 'ppom_deleting_file_action';
 	if ( ! wp_verify_nonce( $ppom_nonce, $file_nonce_action ) ) {
-		printf( __( "Error while deleting file %s", "ppom" ), $file_name );
+		printf( __( 'Error while deleting file %s', 'ppom' ), $file_name );
 		die( 0 );
 	}
 
@@ -373,15 +371,13 @@ function ppom_delete_file() {
 		if ( ! file_exists( $file_path ) ) {
 			_e( 'File removed', 'ppom' );
 		} else {
-			printf( __( "Error while deleting file %s", "ppom" ), $file_path );
-		}
-
-
+			printf( __( 'Error while deleting file %s', 'ppom' ), $file_path );
+		}   
 	} else {
-		printf( __( "Error while deleting file %s", "ppom" ), $file_path );
+		printf( __( 'Error while deleting file %s', 'ppom' ), $file_path );
 	}
 
-	die ( 0 );
+	die( 0 );
 }
 
 // Creating thumb for image
@@ -420,9 +416,9 @@ function ppom_get_file_download_url( $file_name, $order_id, $product_id ) {
 		if ( rename( $base_dir_path, $confirmed_dir_path . $file_name ) ) {
 			$file_download_url_found = $ppom_dir_url . 'confirmed/' . $order_id . '/' . $file_name;
 		}
-	} else if ( file_exists( $confirmed_dir_path . $file_name ) ) {
+	} elseif ( file_exists( $confirmed_dir_path . $file_name ) ) {
 		$file_download_url_found = $ppom_dir_url . 'confirmed/' . $order_id . '/' . $file_name;
-	} else if ( file_exists( $edits_dir_path ) ) {
+	} elseif ( file_exists( $edits_dir_path ) ) {
 		$file_download_url_found = $ppom_dir_url . 'edits/' . $file_name;
 	}
 
@@ -454,17 +450,21 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 	if ( $is_image ) {
 
 		list( $fw, $fh ) = getimagesize( $file_path );
-		$file_meta = $fw . '(w) x ' . $fh . '(h)';
-		$file_meta .= ' - ' . __( 'Size: ', "ppom" ) . ppom_get_filesize_in_kb( $file_name );
+		$file_meta       = $fw . '(w) x ' . $fh . '(h)';
+		$file_meta      .= ' - ' . __( 'Size: ', 'ppom' ) . ppom_get_filesize_in_kb( $file_name );
 
 		$thumb_url = ppom_get_dir_url( true ) . $file_name . '?nocache=' . time();
 
-		//large view
+		// large view
 		$image_url = ppom_get_dir_url() . $file_name . '?nocache=' . time();
-		$html      .= '<div style="display:none" id="u_i_c_big_' . $file_id . '"><p id="thumb-thickbox"><img src="' . $image_url . '" /></p></div>';
+		$html     .= '<div style="display:none" id="u_i_c_big_' . $file_id . '"><p id="thumb-thickbox"><img src="' . $image_url . '" /></p></div>';
 
 		// Loading Modals
-		$modal_vars = array( 'file_id' => $file_id, 'image_full' => $image_url, 'image_title' => $file_name );
+		$modal_vars = array(
+			'file_id'     => $file_id,
+			'image_full'  => $image_url,
+			'image_title' => $file_name,
+		);
 		ob_start();
 		ppom_load_template( 'v10/file-modals.php', $modal_vars );
 		$html .= ob_get_clean();
@@ -472,7 +472,7 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 		// Tools group
 		$file_tools .= '<div class="btn-group" role="group" aria-label="Tools" style="text-align: center; display: block;">';
 		// $file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="'.__('Remove', "ppom").'"><span class="fa fa-times"></span></a>';
-		$file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', "ppom" ) . '">' . __( 'Delete', 'ppom' ) . '</span></a>';
+		$file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', 'ppom' ) . '">' . __( 'Delete', 'ppom' ) . '</span></a>';
 
 		if ( apply_filters( 'ppom_show_image_popup', false ) ) {
 			$file_tools .= '<a href="#" data-toggle="modal" data-target="#modalFile' . esc_attr( $file_id ) . '" class="btn btn-primary"><span class="fa fa-expand"></span></a>';
@@ -483,10 +483,10 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 
 	} else {
 
-		$file_meta .= __( 'Size: ', "ppom" ) . ppom_get_filesize_in_kb( $file_name );
-		$thumb_url = PPOM_URL . '/images/file.png';
+		$file_meta .= __( 'Size: ', 'ppom' ) . ppom_get_filesize_in_kb( $file_name );
+		$thumb_url  = PPOM_URL . '/images/file.png';
 
-		$file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="' . __( 'Remove', "ppom" ) . '"><span class="fa fa-times"></span></a>';    //delete icon
+		$file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="' . __( 'Remove', 'ppom' ) . '"><span class="fa fa-times"></span></a>';    // delete icon
 		// $file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="'.__('Remove', "ppom").'">Delete</a>';	//delete icon
 	}
 
@@ -565,7 +565,7 @@ function ppom_get_croppie_options( $settings ) {
 	// Boundary settings
 
 	$boundary = ! empty( $settings['boundary'] ) ? $settings['boundary'] : '200,200';
-	$boundary = explode( ",", $boundary );
+	$boundary = explode( ',', $boundary );
 
 	$boundary_h = $boundary[0];
 	$boundary_w = $boundary[1];
@@ -575,7 +575,10 @@ function ppom_get_croppie_options( $settings ) {
 	}
 
 	// boundary height, width
-	$cropping_settigs['boundary'] = array( 'height' => $boundary_h, 'width' => $boundary_w );
+	$cropping_settigs['boundary'] = array(
+		'height' => $boundary_h,
+		'width'  => $boundary_w,
+	);
 
 	$enable_exif = ( isset( $settings['enable_exif'] ) && $settings['enable_exif'] == 'on' ) ? true : false;
 	// exif
@@ -618,10 +621,16 @@ function ppom_get_viewport_settings( $settings ) {
 	}
 
 
-	$the_viewport = array( 'width' => 300, 'height' => 300 );
+	$the_viewport = array(
+		'width'  => 300,
+		'height' => 300,
+	);
 	if ( ! empty( $first_viewport_size['width'] ) && ! empty( $first_viewport_size['height'] ) ) {
 
-		$the_viewport = array( 'width' => $first_viewport_size['width'], 'height' => $first_viewport_size['height'] );
+		$the_viewport = array(
+			'width'  => $first_viewport_size['width'],
+			'height' => $first_viewport_size['height'],
+		);
 	}
 
 	$the_viewport['type'] = $viewport_type;
@@ -646,8 +655,8 @@ function ppom_files_removed_unused_images() {
 			if ( is_file( $file_path ) ) {
 
 				// Get Files Created Date
-				$file_created_date = date( "Y-m-d H:i:s.", filemtime( $file_path ) );
-				$today             = date( "Y-m-d H:i:s" );
+				$file_created_date = date( 'Y-m-d H:i:s.', filemtime( $file_path ) );
+				$today             = date( 'Y-m-d H:i:s' );
 
 				$day_count = ppom_files_uploaded_days_count( $file_created_date, $today );
 

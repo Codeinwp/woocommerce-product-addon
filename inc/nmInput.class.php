@@ -22,7 +22,7 @@ class NM_Form {
 
 	function __construct() {
 
-		//  should control echo or return
+		// should control echo or return
 		$this->echoable = $this->get_property( 'echoable' );
 
 		// control defaul settings
@@ -45,7 +45,6 @@ class NM_Form {
 			case 'email':
 			case 'number':
 			case 'color':
-
 				$input_html = $this->Regular( $args, $default_value );
 
 				break;
@@ -156,7 +155,7 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 		if ( $price !== '' ) {
@@ -190,7 +189,7 @@ class NM_Form {
 			$html .= 'data-inputmask-regex="' . esc_attr( $args['input_mask'] ) . '" ';
 		}
 
-		//Values
+		// Values
 		if ( $default_value != '' ) {
 			$html .= 'value="' . esc_attr( $default_value ) . '" ';
 		}
@@ -203,10 +202,10 @@ class NM_Form {
 
 
 		$html .= '>';
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $default_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $default_value );
 	}
 
 
@@ -236,7 +235,7 @@ class NM_Form {
 		$html                = '<div class="' . esc_attr( $input_wrapper_class ) . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 		$classes .= ' ppom-measure-input';
@@ -261,11 +260,11 @@ class NM_Form {
 				// $measure_label = $option['label'].'/'.$
 				$option_id = $option['option_id'];
 				$unit      = $option['raw'];
-				$html      .= '<input checked name="ppom[unit][' . $id . ']" value="' . esc_attr( $unit ) . '" class="form-check-input ppom-measure-unit" type="radio" id="' . esc_attr( $option_id ) . '" data-apply="measure" ';
-				$html      .= sprintf( __( 'data-use_units="' . esc_attr( $use_units ) . '" data-price="%s" data-label="%s" data-data_name="%s" data-unit="%s" data-optionid="%s">', "ppom" ), $option['price'], esc_attr( $data_label ), $id, $unit, $option_id );
-				$html      .= '<label class="form-check-label" id="' . esc_attr( $option_id ) . '">';
-				$html      .= sprintf( __( "%s", "ppom" ), $option['label'] );
-				$html      .= '</label>';
+				$html     .= '<input checked name="ppom[unit][' . $id . ']" value="' . esc_attr( $unit ) . '" class="form-check-input ppom-measure-unit" type="radio" id="' . esc_attr( $option_id ) . '" data-apply="measure" ';
+				$html     .= sprintf( __( 'data-use_units="' . esc_attr( $use_units ) . '" data-price="%s" data-label="%s" data-data_name="%s" data-unit="%s" data-optionid="%s">', 'ppom' ), $option['price'], esc_attr( $data_label ), $id, $unit, $option_id );
+				$html     .= '<label class="form-check-label" id="' . esc_attr( $option_id ) . '">';
+				$html     .= sprintf( __( '%s', 'ppom' ), $option['label'] );
+				$html     .= '</label>';
 			}
 
 			// $html .= '</div>';
@@ -275,13 +274,15 @@ class NM_Form {
 		} else {
 
 			$option_id = "{$id}_unit";
-			$html      .= '<input style="display:none"  value="" checked name="ppom[unit][' . $id . ']" class="form-check-input ppom-input ppom-measure-unit" type="radio" id="' . esc_attr( $option_id ) . '" data-apply="measure" ';
-			$html      .= sprintf( __( 'data-use_units="no" data-price="%s" data-label="%s" data-data_name="%s" data-optionid="%s" data-qty="%s">', "ppom" ),
+			$html     .= '<input style="display:none"  value="" checked name="ppom[unit][' . $id . ']" class="form-check-input ppom-input ppom-measure-unit" type="radio" id="' . esc_attr( $option_id ) . '" data-apply="measure" ';
+			$html     .= sprintf(
+				__( 'data-use_units="no" data-price="%1$s" data-label="%2$s" data-data_name="%3$s" data-optionid="%4$s" data-qty="%5$s">', 'ppom' ),
 				ppom_get_product_price( $product ),
 				esc_attr( $label ),
 				$id,
 				$option_id,
-				esc_attr( $default_value ) );
+				esc_attr( $default_value ) 
+			);
 
 		}// Units used closed
 
@@ -302,9 +303,9 @@ class NM_Form {
 		$html .= 'data-price="' . esc_attr( ppom_get_product_price( $product ) ) . '" ';
 		$html .= 'data-title="' . esc_attr( $label ) . '" '; // Input main label/title
 		$html .= 'data-use_units="' . esc_attr( $use_units ) . '" '; // Input main label/title
-		//   $html .= '<input type="text" class="form-control" aria-label="Text input with dropdown button">';
+		// $html .= '<input type="text" class="form-control" aria-label="Text input with dropdown button">';
 
-		//Values
+		// Values
 		if ( $default_value != '' ) {
 			$html .= 'value="' . esc_attr( $default_value ) . '" ';
 		}
@@ -316,12 +317,12 @@ class NM_Form {
 		}
 
 
-		$html .= '>'; //closing input
-		$html .= '</div>'; //input-group
-		$html .= '</div>';    //form-group
+		$html .= '>'; // closing input
+		$html .= '</div>'; // input-group
+		$html .= '</div>';    // form-group
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $default_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $default_value );
 	}
 
 	/**
@@ -350,7 +351,7 @@ class NM_Form {
 
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 		if ( $rich_editor == 'on' ) {
@@ -360,7 +361,7 @@ class NM_Form {
 				'textarea_rows' => $rows,
 				'editor_class'  => $classes,
 				'teeny'         => true,
-				'textarea_name' => $name
+				'textarea_name' => $name,
 			);
 
 			ob_start();
@@ -386,19 +387,19 @@ class NM_Form {
 
 			$html .= '>';  // Closing textarea
 
-			//Values
+			// Values
 			if ( $default_value != '' ) {
 				$default_value = str_replace( '<br />', "\n", $default_value );
-				$html          .= esc_html( $default_value );
+				$html         .= esc_html( $default_value );
 			}
 
 			$html .= '</textarea>';
 		}
 
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $default_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $default_value );
 
 	}
 
@@ -439,7 +440,7 @@ class NM_Form {
 
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 		$html .= '<select ';
@@ -477,7 +478,7 @@ class NM_Form {
 				"ppom-{$product_type}-option",
 				$ppom_has_percent,
 			);
-			$option_class     = apply_filters( 'ppom_option_classes', implode( " ", $option_class ), $args );
+			$option_class     = apply_filters( 'ppom_option_classes', implode( ' ', $option_class ), $args );
 
 			// if option has weight and price is not set, then set it zero for calculation
 			if ( empty( $option_price ) && ! empty( $value['option_weight'] ) ) {
@@ -513,11 +514,11 @@ class NM_Form {
 		}
 
 		$html .= '</select>';
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $selected_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $selected_value );
 	}
 
 	/**
@@ -552,7 +553,7 @@ class NM_Form {
 
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 		$html .= '<select ';
@@ -592,11 +593,11 @@ class NM_Form {
 		}
 
 		$html .= '</select>';
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $selected_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $selected_value );
 	}
 
 
@@ -634,7 +635,7 @@ class NM_Form {
 
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 		if ( is_array( $checked_value ) ) {
@@ -680,11 +681,11 @@ class NM_Form {
 			$html .= '</div>';    // closing form-check
 		}
 
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $checked_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $checked_value );
 	}
 
 
@@ -721,7 +722,7 @@ class NM_Form {
 
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 		foreach ( $options as $key => $value ) {
@@ -763,11 +764,11 @@ class NM_Form {
 			$html .= '</div>';    // closing form-check
 		}
 
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $checked_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $checked_value );
 	}
 
 	// A custom input will be just some option html
@@ -808,18 +809,18 @@ class NM_Form {
 
 		// apply for selected palette border color
 		$selected_palette_bcolor = isset( $args['selected_palette_bcolor'] ) ? $args['selected_palette_bcolor'] : '';
-		$html                    .= '<style>';
-		$html                    .= '.ppom-palettes label > input:checked + .ppom-single-palette {
+		$html                   .= '<style>';
+		$html                   .= '.ppom-palettes label > input:checked + .ppom-single-palette {
                         border: 2px solid ' . esc_attr( $selected_palette_bcolor ) . ' !important;
                     }';
-		$html                    .= '</style>';
+		$html                   .= '</style>';
 
 		$input_wrapper_class = $this->get_default_setting_value( 'global', 'input_wrapper_class', $id );
 		$input_wrapper_class = apply_filters( 'ppom_input_wrapper_class', $input_wrapper_class, $args );
-		$html                .= '<div class="' . $input_wrapper_class . '">';
+		$html               .= '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 		// ppom_pa($options);
 		$html .= '<div class="ppom-palettes ppom-palettes-' . esc_attr( $id ) . '">';
@@ -899,12 +900,12 @@ class NM_Form {
 
 			$html .= '</label>';
 		}
-		$html .= '</div>'; //.ppom-palettes
+		$html .= '</div>'; // .ppom-palettes
 
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $default_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $default_value );
 	}
 
 	// Image type
@@ -924,7 +925,7 @@ class NM_Form {
 		// Options
 		$images = isset( $args['images'] ) ? $args['images'] : '';
 		if ( ! $images ) {
-			return __( "Images not selected", "ppom" );
+			return __( 'Images not selected', 'ppom' );
 		}
 
 		$input_wrapper_class = $this->get_default_setting_value( 'global', 'input_wrapper_class', $id );
@@ -932,22 +933,22 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 		// apply for selected images border color
 		$selected_img_bordercolor = isset( $args['selected_img_bordercolor'] ) ? $args['selected_img_bordercolor'] : '';
-		$html                     .= '<style>';
-		$html                     .= '.' . $id . ' .nm-boxes-outer input:checked + img {
+		$html                    .= '<style>';
+		$html                    .= '.' . $id . ' .nm-boxes-outer input:checked + img {
                        border: 2px solid ' . esc_attr( $selected_img_bordercolor ) . ' !important;
                    }
                     .' . $id . ' .pre_upload_image img{
                        height: ' . esc_attr( $args['image_height'] ) . ' !important;
                        width : ' . esc_attr( $args['image_width'] ) . ' !important;
                    }';
-		$html                     .= '</style>';
+		$html                    .= '</style>';
 
-		//   ppom_pa($images);
+		// ppom_pa($images);
 
 		if ( isset( $args['legacy_view'] ) && $args['legacy_view'] == 'on' ) {
 			$html .= '<div class="ppom_upload_image_box">';
@@ -990,9 +991,10 @@ class NM_Form {
 				}
 
 				// Loading Modals
-				$modal_vars = array( 'image_id'    => $image_id,
-				                     'image_full'  => $image_full,
-				                     'image_title' => $image_label
+				$modal_vars = array(
+					'image_id'    => $image_id,
+					'image_full'  => $image_full,
+					'image_title' => $image_label,
 				);
 				ppom_load_template( 'v10/image-modals.php', $modal_vars );
 				?>
@@ -1013,8 +1015,8 @@ class NM_Form {
 					$html .= 'value="' . esc_attr( json_encode( $image ) ) . '" />';
 				} else {
 
-					//default selected
-					// 	$checked = ($image['raw'] == $default_value ? 'checked = "checked"' : '' );
+					// default selected
+					// $checked = ($image['raw'] == $default_value ? 'checked = "checked"' : '' );
 					$html .= '<input type="radio" ';
 					$html .= 'id="' . esc_attr( $option_id ) . '" ';
 					$html .= 'data-price="' . esc_attr( $image_price ) . '" ';
@@ -1028,13 +1030,13 @@ class NM_Form {
 				}
 
 				$html .= '<div class="p_u_i_name">' . $image_label . '</div>';
-				$html .= '</div>';    //input_image
+				$html .= '</div>';    // input_image
 
 
 				$html .= '</div>';  // pre_upload_image
 			}
 
-			$html .= '</div>'; //.ppom_upload_image_box
+			$html .= '</div>'; // .ppom_upload_image_box
 
 		} else {
 			$html .= '<div class="nm-boxes-outer">';
@@ -1078,8 +1080,7 @@ class NM_Form {
 
 							$checked_option = ( $image['raw'] == $default_value ? 'checked=checked' : '' );
 
-						}
-
+						}                   
 					}
 
 					$html .= '<label>';
@@ -1098,8 +1099,8 @@ class NM_Form {
 						$html .= 'value="' . esc_attr( json_encode( $image ) ) . '" ' . esc_attr( $checked_option ) . ' />';
 					} else {
 
-						//default selected
-						// 			$checked = ($image['label'] == $default_value ? 'checked = "checked"' : '' );
+						// default selected
+						// $checked = ($image['label'] == $default_value ? 'checked = "checked"' : '' );
 						$html .= '<input type="radio" ';
 						$html .= 'id="' . esc_attr( $option_id ) . '" ';
 						$html .= 'class="ppom-input" ';
@@ -1118,9 +1119,8 @@ class NM_Form {
 						} else {
 
 							$image_url = wp_get_attachment_thumb_url( $image['image_id'] );
-							$html      .= '<img data-image-tooltip="' . wp_get_attachment_url( $image['image_id'] ) . '" class="img-thumbnail ppom-zoom-' . esc_attr( $id ) . '" src="' . esc_url( $image_url ) . '" />';
-						}
-
+							$html     .= '<img data-image-tooltip="' . wp_get_attachment_url( $image['image_id'] ) . '" class="img-thumbnail ppom-zoom-' . esc_attr( $id ) . '" src="' . esc_url( $image_url ) . '" />';
+						}                   
 					} else {
 						if ( isset( $image['url'] ) && $image['url'] != '' ) {
 							$html .= '<a href="' . $image['url'] . '"><img width="150" height="150" src="' . esc_url( $image['link'] ) . '" /></a>';
@@ -1137,12 +1137,12 @@ class NM_Form {
 
 			$html .= '<div style="clear:both"></div>';
 
-			$html .= '</div>';        //nm-boxes-outer
+			$html .= '</div>';        // nm-boxes-outer
 		}
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $default_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $default_value );
 		// return 'asd';
 	}
 
@@ -1163,7 +1163,7 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 		// Check if price matrix table is not hidden by settings
@@ -1178,9 +1178,8 @@ class NM_Form {
 					if ( $discount == 'on' ) {
 						$price = "-{$percent}";
 					} else {
-						$price = "{$percent} (" . wc_price( $price ) . ")";
-					}
-
+						$price = "{$percent} (" . wc_price( $price ) . ')';
+					}               
 				} else {
 					$price = wc_price( $price );
 				}
@@ -1227,12 +1226,12 @@ class NM_Form {
 
 		}
 
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 		$html .= '<input name="ppom[ppom_pricematrix]" data-dataname="' . esc_attr( $id ) . '" data-discount="' . esc_attr( $discount ) . '" class="active ppom_pricematrix ppom-input" type="hidden" value="' . esc_attr( json_encode( $ranges ) ) . '" />';
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $default_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $default_value );
 	}
 
 	// Variation Quantities
@@ -1259,19 +1258,22 @@ class NM_Form {
 		$html                = '<div class="ppom-input-quantities ' . $input_wrapper_class . ' table-responsive">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 
-		$template_vars = array( 'args' => $args, 'default_value' => $default_value );
+		$template_vars = array(
+			'args'          => $args,
+			'default_value' => $default_value,
+		);
 		ob_start();
 		ppom_load_template( 'input/quantities.php', $template_vars );
 		$html .= ob_get_clean();
 
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $default_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $default_value );
 	}
 
 	// HTML or Text (section)
@@ -1301,10 +1303,10 @@ class NM_Form {
 
 		$html .= '<input type="hidden" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( $field_html ) . '">';
 
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $default_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $default_value );
 	}
 
 	// Audio/video
@@ -1322,7 +1324,7 @@ class NM_Form {
 		// Options
 		$audios = isset( $args['audios'] ) ? $args['audios'] : '';
 		if ( ! $audios ) {
-			return __( "audios not selected", "ppom" );
+			return __( 'audios not selected', 'ppom' );
 		}
 
 		$input_wrapper_class = $this->get_default_setting_value( 'global', 'input_wrapper_class', $id );
@@ -1330,7 +1332,7 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 		// ppom_pa($audios);
@@ -1386,17 +1388,17 @@ class NM_Form {
 			}
 
 			$html .= '<div class="p_u_i_name">' . $audio_title_price . '</div>';
-			$html .= '</div>';    //input_image
+			$html .= '</div>';    // input_image
 
 
 			$html .= '</div>';  // pre_upload_image
 		}
 
-		$html .= '</div>'; //.ppom_upload_image_box
-		$html .= '</div>';    //form-group
+		$html .= '</div>'; // .ppom_upload_image_box
+		$html .= '</div>';    // form-group
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $default_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $default_value );
 	}
 
 	// File Upload
@@ -1413,26 +1415,26 @@ class NM_Form {
 		$html = '<div id="ppom-file-container-' . esc_attr( $args['id'] ) . '" class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 
 		$container_height = isset( $args['dragdrop'] ) ? 'auto' : '30px';
-		$html             .= '<div class="ppom-file-container text-center" ';
-		$html             .= 'style="height: ' . esc_attr( $container_height ) . ' ;">';
-		$html             .= '<a id="selectfiles-' . esc_attr( $args['id'] ) . '" ';
-		$html             .= 'href="javascript:;" ';
-		$html             .= 'class="btn btn-primary ' . esc_attr( $args['button_class'] ) . '">';
-		$html             .= $args['button_label'] . '</a>';
-		$html             .= '<span class="ppom-dragdrop-text">';
-		$html             .= __( "Drag File Here", "ppom" );
-		$html             .= '</span>';
-		$html             .= '</div>';        //ppom-file-container
+		$html            .= '<div class="ppom-file-container text-center" ';
+		$html            .= 'style="height: ' . esc_attr( $container_height ) . ' ;">';
+		$html            .= '<a id="selectfiles-' . esc_attr( $args['id'] ) . '" ';
+		$html            .= 'href="javascript:;" ';
+		$html            .= 'class="btn btn-primary ' . esc_attr( $args['button_class'] ) . '">';
+		$html            .= $args['button_label'] . '</a>';
+		$html            .= '<span class="ppom-dragdrop-text">';
+		$html            .= __( 'Drag File Here', 'ppom' );
+		$html            .= '</span>';
+		$html            .= '</div>';        // ppom-file-container
 
 		if ( $args['dragdrop'] ) {
 
 			$html .= '<div class="ppom-droptext">';
-			$html .= __( 'Drag file/directory here', "ppom" );
+			$html .= __( 'Drag file/directory here', 'ppom' );
 			$html .= '</div>';
 		}
 
@@ -1470,17 +1472,17 @@ class NM_Form {
 				$html .= 'class="' . esc_attr( $file_class ) . '" ';
 				$html .= 'type="checkbox"/>';
 
-				$html .= '</div>'; //u_i_c_box
+				$html .= '</div>'; // u_i_c_box
 
 			}
 		}
 
 		$html .= '</div>';  // filelist
 
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $default_files );
+		return apply_filters( 'nmforms_input_html', $html, $args, $default_files );
 	}
 
 	// Cropper
@@ -1499,23 +1501,23 @@ class NM_Form {
 		$html = '<div id="ppom-file-container-' . esc_attr( $args['id'] ) . '" class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 		$container_height = isset( $args['dragdrop'] ) ? 'auto' : '30px';
-		$html             .= '<div class="ppom-file-container text-center" ';
-		$html             .= 'style="height: ' . esc_attr( $container_height ) . ' ;">';
-		$html             .= '<a id="selectfiles-' . esc_attr( $args['id'] ) . '" ';
-		$html             .= 'href="javascript:;" ';
-		$html             .= 'class="btn btn-primary ' . esc_attr( $args['button_class'] ) . '">';
-		$html             .= $args['button_label'] . '</a>';
-		$html             .= '<span class="ppom-dragdrop-text">' . __( 'Drag file/directory here', "ppom" ) . '</span>';
-		$html             .= '</div>';        //ppom-file-container
+		$html            .= '<div class="ppom-file-container text-center" ';
+		$html            .= 'style="height: ' . esc_attr( $container_height ) . ' ;">';
+		$html            .= '<a id="selectfiles-' . esc_attr( $args['id'] ) . '" ';
+		$html            .= 'href="javascript:;" ';
+		$html            .= 'class="btn btn-primary ' . esc_attr( $args['button_class'] ) . '">';
+		$html            .= $args['button_label'] . '</a>';
+		$html            .= '<span class="ppom-dragdrop-text">' . __( 'Drag file/directory here', 'ppom' ) . '</span>';
+		$html            .= '</div>';        // ppom-file-container
 
 		if ( $args['dragdrop'] ) {
 
 			$html .= '<div class="ppom-droptext">';
-			$html .= __( 'Drag file/directory here', "ppom" );
+			$html .= __( 'Drag file/directory here', 'ppom' );
 			$html .= '</div>';
 		}
 
@@ -1523,7 +1525,7 @@ class NM_Form {
 
 		$html .= '<div class="ppom-croppie-wrapper-' . esc_attr( $args['id'] ) . ' text-center">';
 		$html .= '<div class="ppom-croppie-preview">';
-		// 	ppom_pa($args);
+		// ppom_pa($args);
 
 		// @since: 12.8
 		// Showing size option if more than one found.
@@ -1531,7 +1533,7 @@ class NM_Form {
 
 			$cropping_sizes = $args['options'];
 
-			$select_css = 'width:' . $args['croppie_options']['boundary']['width'] . 'px;';
+			$select_css  = 'width:' . $args['croppie_options']['boundary']['width'] . 'px;';
 			$select_css .= 'margin:5px auto;display:none;';
 
 			$html .= '<select style="' . esc_attr( $select_css ) . '" ';
@@ -1554,7 +1556,7 @@ class NM_Form {
 				$without_tax  = $size['without_tax'];
 				$option_id    = $size['option_id'];
 
-				if ( $option_id == "__first_option__" ) {
+				if ( $option_id == '__first_option__' ) {
 					continue;
 				}
 
@@ -1575,12 +1577,12 @@ class NM_Form {
 		}
 
 		$html .= '</div>';    // ppom-croppie-preview
-		$html .= '</div>'; //ppom-croppie-wrapper
+		$html .= '</div>'; // ppom-croppie-wrapper
 
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $selected_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $selected_value );
 	}
 
 	// A custom input will be just some option html
@@ -1595,15 +1597,15 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( "%s", "ppom" ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
 		}
 
 		$html .= apply_filters( 'nmform_custom_input', $html, $args, $default_value );
 
-		$html .= '</div>';    //form-group
+		$html .= '</div>';    // form-group
 
 		// filter: nmforms_input_htmls
-		return apply_filters( "nmforms_input_html", $html, $args, $default_value );
+		return apply_filters( 'nmforms_input_html', $html, $args, $default_value );
 	}
 
 
@@ -1611,7 +1613,6 @@ class NM_Form {
 	 * this function return current or/else default attribute values
 	 *
 	 * filter: nmform_attribute_value
-	 *
 	 * */
 	private function get_attribute_value( $attr, $args ) {
 
@@ -1665,31 +1666,37 @@ class NM_Form {
 				break;
 
 			case 'defaults':
-
 				$value = array(
 					'global'   => array(
 						'type'                => 'text',
 						'input_wrapper_class' => 'form-group',
 						'label_class'         => 'form-control-label',
 					),
-					'text'     => array( 'placeholder' => "", 'attributes' => array() ),
+					'text'     => array(
+						'placeholder' => '',
+						'attributes'  => array(),
+					),
 					'date'     => array(),
 					'email'    => array(),
 					'number'   => array(),
 					'cropper'  => array( 'classes' => array( 'ppom-cropping-size', 'form-control' ) ),
-					'textarea' => array( 'cols' => 6, 'rows' => 3, 'placeholder' => '' ),
+					'textarea' => array(
+						'cols'        => 6,
+						'rows'        => 3,
+						'placeholder' => '',
+					),
 					'select'   => array( 'multiple' => false ),
 					'checkbox' => array(
 						'label_class'         => 'form-control-label',
 						'check_wrapper_class' => 'form-check',
 						'check_label_class'   => 'form-check-label',
-						'classes'             => array( 'ppom-check-input' )
+						'classes'             => array( 'ppom-check-input' ),
 					),
 					'radio'    => array(
 						'label_class'         => 'form-control-label',
 						'radio_wrapper_class' => 'form-check',
 						'radio_label_class'   => 'form-check-label',
-						'classes'             => array( 'ppom-check-input' )
+						'classes'             => array( 'ppom-check-input' ),
 					),
 				);
 				break;
@@ -1702,7 +1709,6 @@ class NM_Form {
 
 	/**
 	 * ====================== FILTERS =====================================
-	 *
 	 * */
 
 	public function adjust_attributes_values( $attr_value, $attr, $args ) {
@@ -1720,14 +1726,13 @@ class NM_Form {
 				// adding ppom-input class to all inputs
 				// {type} also added as class
 				$attr_value[] = $type;
-				$attr_value   = implode( " ", $attr_value );
+				$attr_value   = implode( ' ', $attr_value );
 				break;
 
 			/**
 			 * converting name to array for multiple:select
 			 * */
 			case 'name':
-
 				$type     = $this->get_attribute_value( 'type', $args );
 				$multiple = $this->get_attribute_value( 'multiple', $args );
 				if ( $type == 'select' && $multiple ) {
@@ -1742,12 +1747,11 @@ class NM_Form {
 
 	/**
 	 * ====================== ENDs FILTERS =====================================
-	 *
 	 * */
 
 	public static function get_instance() {
 		// create a new object if it doesn't exist.
-		is_null( self::$ins ) && self::$ins = new self;
+		is_null( self::$ins ) && self::$ins = new self();
 
 		return self::$ins;
 	}

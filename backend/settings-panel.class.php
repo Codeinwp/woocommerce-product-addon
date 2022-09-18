@@ -22,7 +22,6 @@ class PPOM_SettingsFramework {
 	 * Return setting key.
 	 *
 	 * @var string
-	 *
 	 */
 	private static $save_key = '';
 
@@ -30,7 +29,6 @@ class PPOM_SettingsFramework {
 	 * Return saved settings.
 	 *
 	 * @var string
-	 *
 	 */
 	private static $saved_settings = '';
 
@@ -38,7 +36,6 @@ class PPOM_SettingsFramework {
 	 * Return setting tabs.
 	 *
 	 * @var array
-	 *
 	 */
 	public $tabs = [];
 
@@ -46,7 +43,6 @@ class PPOM_SettingsFramework {
 	 * Return setting panels.
 	 *
 	 * @var array
-	 *
 	 */
 	public $panels = [];
 
@@ -54,7 +50,6 @@ class PPOM_SettingsFramework {
 	 * Return panels setting.
 	 *
 	 * @var array
-	 *
 	 */
 	public $settings_array = [];
 
@@ -62,7 +57,6 @@ class PPOM_SettingsFramework {
 	 * Return settings config array.
 	 *
 	 * @var array
-	 *
 	 */
 	public $config = [];
 
@@ -70,13 +64,11 @@ class PPOM_SettingsFramework {
 	 * Return current settings panel assets URL.
 	 *
 	 * @var url
-	 *
 	 */
 	private static $assets_url = '';
 
 	/**
 	 * Return main scripts framework class.
-	 *
 	 */
 	var $scripts_class;
 
@@ -91,10 +83,13 @@ class PPOM_SettingsFramework {
 		self::$save_key = "{$this->get_config('id')}-settings_panel";
 
 		// Save Settings action
-		add_action( 'wp_ajax_' . $this->get_config( 'id' ) . '_settings_panel_action', array(
-			$this,
-			'save_settings'
-		) );
+		add_action(
+			'wp_ajax_' . $this->get_config( 'id' ) . '_settings_panel_action',
+			array(
+				$this,
+				'save_settings',
+			) 
+		);
 
 		// PPOM settings migration action, it only used for ppom plugin
 		add_action( 'admin_post_ppom_migrate_settings_panel', array( $this, 'ppom_migrate_settings_panel' ) );
@@ -114,7 +109,7 @@ class PPOM_SettingsFramework {
 	public static function get_instance() {
 
 		// create a new object if it doesn't exist.
-		is_null( self::$ins ) && self::$ins = new self;
+		is_null( self::$ins ) && self::$ins = new self();
 
 		return self::$ins;
 	}
@@ -178,7 +173,13 @@ class PPOM_SettingsFramework {
 
 		wp_dequeue_script( 'woocommerce_settings' );
 
-		self::load_template( "/templates/admin-settings.php", array( 'tabs' => $this->tabs, 'class_ins' => $this ) );
+		self::load_template(
+			'/templates/admin-settings.php',
+			array(
+				'tabs'      => $this->tabs,
+				'class_ins' => $this,
+			) 
+		);
 	}
 
 
@@ -221,14 +222,17 @@ class PPOM_SettingsFramework {
 		// only used for store all settings on single array
 		$this->settings_array = array_merge( $this->settings_array, $settings );
 
-		$this->tabs = array_map( function ( $tab ) use ( $panel_id, $settings ) {
-			if ( isset( $tab['panels'] ) && isset( $tab['panels'][ $panel_id ] ) ) {
-				$existing_settings                      = ! isset( $tab['panels'][ $panel_id ]['settings'] ) ? [] : $tab['panels'][ $panel_id ]['settings'];
-				$tab['panels'][ $panel_id ]['settings'] = array_merge( $existing_settings, $settings );
-			}
+		$this->tabs = array_map(
+			function ( $tab ) use ( $panel_id, $settings ) {
+				if ( isset( $tab['panels'] ) && isset( $tab['panels'][ $panel_id ] ) ) {
+					  $existing_settings                      = ! isset( $tab['panels'][ $panel_id ]['settings'] ) ? [] : $tab['panels'][ $panel_id ]['settings'];
+					  $tab['panels'][ $panel_id ]['settings'] = array_merge( $existing_settings, $settings );
+				}
 
-			return $tab;
-		}, $this->tabs );
+				return $tab;
+			},
+			$this->tabs 
+		);
 
 		return $this;
 	}
@@ -241,10 +245,13 @@ class PPOM_SettingsFramework {
 
 		$type = isset( $input_meta['type'] ) ? $input_meta['type'] : '';
 
-		self::load_template( "/templates/inputs/{$type}.php", array(
-			'input_meta' => $input_meta,
-			'class_ins'  => $this
-		) );
+		self::load_template(
+			"/templates/inputs/{$type}.php",
+			array(
+				'input_meta' => $input_meta,
+				'class_ins'  => $this,
+			) 
+		);
 	}
 
 
@@ -291,12 +298,12 @@ class PPOM_SettingsFramework {
 	function save_settings() {
 
 		if ( ! isset( $_POST['ppom_settings_nonce'] )
-		     || ! wp_verify_nonce( $_POST['ppom_settings_nonce'], 'ppom_settings_nonce_action' )
-		     || ! ppom_security_role()
+			 || ! wp_verify_nonce( $_POST['ppom_settings_nonce'], 'ppom_settings_nonce_action' )
+			 || ! ppom_security_role()
 		) {
 			$response = array(
 				'status'  => 'error',
-				'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'ppom' )
+				'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'ppom' ),
 			);
 
 			wp_send_json( $response );
@@ -307,12 +314,15 @@ class PPOM_SettingsFramework {
 		if ( isset( $_REQUEST[ self::$save_key ] ) ) {
 
 			// $settings_meta = $_REQUEST[self::$save_key];
-			$settings_meta = array_map( function ( $setting ) {
+			$settings_meta = array_map(
+				function ( $setting ) {
 
-				$setting = is_array( $setting ) ? array_map( 'sanitize_text_field', $setting ) : sanitize_text_field( $setting );
+					$setting = is_array( $setting ) ? array_map( 'sanitize_text_field', $setting ) : sanitize_text_field( $setting );
 
-				return $setting;
-			}, $_REQUEST[ self::$save_key ] );
+					return $setting;
+				},
+				$_REQUEST[ self::$save_key ] 
+			);
 
 
 			// Generate and saved css
@@ -322,13 +332,13 @@ class PPOM_SettingsFramework {
 
 			$response = array(
 				'status'  => 'success',
-				'message' => __( 'Settings saved successfully.', $this->get_config( 'ppom' ) )
+				'message' => __( 'Settings saved successfully.', $this->get_config( 'ppom' ) ),
 			);
 
 		} else {
 			$response = array(
 				'status'  => 'error',
-				'message' => __( 'Settings saved error.', $this->get_config( 'ppom' ) )
+				'message' => __( 'Settings saved error.', $this->get_config( 'ppom' ) ),
 			);
 		}
 
@@ -358,11 +368,11 @@ class PPOM_SettingsFramework {
 				}
 
 				if ( $type == 'css_editor' ) {
-					$css_val         = isset( $val[ $mode ] ) ? $val[ $mode ] : '';
+					$css_val          = isset( $val[ $mode ] ) ? $val[ $mode ] : '';
 					$ppom_css_output .= $this->generate_css_editor_output_css( $settings, $css_val );
-				} else if ( $type == 'typography' ) {
+				} elseif ( $type == 'typography' ) {
 					$ppom_css_output .= $this->generate_typograpy_output_css( $settings, $val );
-				} else if ( is_array( $output ) && ! empty( $output ) ) {
+				} elseif ( is_array( $output ) && ! empty( $output ) ) {
 					foreach ( $output as $css_key => $css_selector ) {
 						$ppom_css_output .= $css_selector . '{' . $css_key . ':' . $val . ' !important;}';
 					}
@@ -409,7 +419,7 @@ class PPOM_SettingsFramework {
 			return '';
 		}
 
-		return self::$save_key . "[" . esc_attr( $id ) . "]";
+		return self::$save_key . '[' . esc_attr( $id ) . ']';
 	}
 
 
@@ -437,16 +447,16 @@ class PPOM_SettingsFramework {
 	function ppom_migrate_settings_panel() {
 
 		if ( ! isset( $_GET['ppom_migrate_nonce'] )
-		     || ! wp_verify_nonce( $_GET['ppom_migrate_nonce'], 'ppom_migrate_nonce_action' )
+			 || ! wp_verify_nonce( $_GET['ppom_migrate_nonce'], 'ppom_migrate_nonce_action' )
 		) {
-			wp_die( "Sorry, you are not allowed to clone", "ppom" );
+			wp_die( 'Sorry, you are not allowed to clone', 'ppom' );
 		}
 
 		$ppom_settings_url = admin_url( 'admin.php' );
 		$ppom_settings_url = add_query_arg(
 			array(
 				'page' => 'wc-settings',
-				'tab'  => 'ppom_settings'
+				'tab'  => 'ppom_settings',
 			),
 			$ppom_settings_url
 		);
@@ -510,19 +520,19 @@ class PPOM_SettingsFramework {
 		$option = array(
 			'top'    => array(
 				'title' => __( 'Top', $this->get_config( 'ppom' ) ),
-				'icon'  => 'dashicons dashicons-arrow-up-alt'
+				'icon'  => 'dashicons dashicons-arrow-up-alt',
 			),
 			'right'  => array(
 				'title' => __( 'Right', $this->get_config( 'ppom' ) ),
-				'icon'  => 'dashicons dashicons-arrow-right-alt'
+				'icon'  => 'dashicons dashicons-arrow-right-alt',
 			),
 			'bottom' => array(
 				'title' => __( 'Bottom', $this->get_config( 'ppom' ) ),
-				'icon'  => 'dashicons dashicons-arrow-down-alt'
+				'icon'  => 'dashicons dashicons-arrow-down-alt',
 			),
 			'left'   => array(
 				'title' => __( 'Left', $this->get_config( 'ppom' ) ),
-				'icon'  => 'dashicons dashicons-arrow-left-alt'
+				'icon'  => 'dashicons dashicons-arrow-left-alt',
 			),
 		);
 
@@ -628,7 +638,7 @@ class PPOM_SettingsFramework {
 		$file_path = PPOM_PATH . '/backend/' . $file_name;
 
 		if ( file_exists( $file_path ) ) {
-			include( $file_path );
+			include $file_path;
 		} else {
 			die( 'File not found' . $file_path );
 		}
@@ -652,7 +662,7 @@ class PPOM_SettingsFramework {
 				$this->get_config( 'menu_position' )
 			);
 
-		} else if ( $this->get_config( 'menu_type' ) === 'submenu' ) {
+		} elseif ( $this->get_config( 'menu_type' ) === 'submenu' ) {
 
 			$menu = add_submenu_page(
 				$this->get_config( 'menu_parent' ),
@@ -691,7 +701,7 @@ class PPOM_SettingsFramework {
 				'version' => '1.0',
 			),
 			'nmsf-videopopup-lib'      => array(
-				'src'     => self::$assets_url . "/videopopup/videopopup.js",
+				'src'     => self::$assets_url . '/videopopup/videopopup.js',
 				'deps'    => array( 'jquery' ),
 				'version' => $this->get_config( 'plugin_version' ),
 			),
@@ -733,7 +743,7 @@ class PPOM_SettingsFramework {
 				'version' => $this->get_config( 'plugin_version' ),
 			),
 			'nmsf-videopopup-lib'    => array(
-				'src'     => self::$assets_url . "/videopopup/videopopup.css",
+				'src'     => self::$assets_url . '/videopopup/videopopup.css',
 				'deps'    => array(),
 				'version' => '4.0.0',
 			),
@@ -810,10 +820,9 @@ class PPOM_SettingsFramework {
 		switch ( $handle ) {
 
 			case 'nmsf-settings-panel':
-
 				$localize_data = [
-					'migrate_back_msg' => __( 'Are you sure?', $this->get_config( 'ppom' ) ),
-					'administrator_role_cannot_be_removed' => esc_html__( 'The administrator role cannot be removed.', $this->get_config( 'ppom' ) )
+					'migrate_back_msg'                     => __( 'Are you sure?', $this->get_config( 'ppom' ) ),
+					'administrator_role_cannot_be_removed' => esc_html__( 'The administrator role cannot be removed.', $this->get_config( 'ppom' ) ),
 				];
 
 				break;

@@ -59,50 +59,50 @@ class NM_Divider_wooproduct extends PPOM_Inputs {
 			'title'           => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'ppom' ),
-				'desc'  => __( 'It will be shown as field label', 'ppom' )
+				'desc'  => __( 'It will be shown as field label', 'ppom' ),
 			),
 			'data_name'       => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'ppom' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'ppom' )
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'ppom' ),
 			),
 			'divider_styles'  => array(
 				'type'        => 'select',
 				'title'       => __( 'Select style', 'ppom' ),
-				'desc'        => __( 'Select style you want to render', "ppom" ),
+				'desc'        => __( 'Select style you want to render', 'ppom' ),
 				'options'     => $this->ppom_divider_style(),
-				'col_classes' => array( 'col-md-3', 'col-sm-12' )
+				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'style1_border'   => array(
 				'type'        => 'select',
 				'title'       => __( 'Style border', 'ppom' ),
-				'desc'        => __( 'It will only apply on style 1.', "ppom" ),
+				'desc'        => __( 'It will only apply on style 1.', 'ppom' ),
 				'options'     => $this->border_style(),
-				'col_classes' => array( 'col-md-3', 'col-sm-12' )
+				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'divider_height'  => array(
 				'type'        => 'text',
 				'title'       => __( 'Divider height', 'ppom' ),
 				'desc'        => __( 'Provide the divider height e.g: 3px.', 'ppom' ),
-				'col_classes' => array( 'col-md-3', 'col-sm-12' )
+				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'divider_txtsize' => array(
 				'type'        => 'text',
 				'title'       => __( 'Font size', 'ppom' ),
 				'desc'        => __( 'Provide divider text font size e.g: 18px', 'ppom' ),
-				'col_classes' => array( 'col-md-3', 'col-sm-12' )
+				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'divider_color'   => array(
 				'type'        => 'color',
 				'title'       => __( 'Divider color', 'ppom' ),
 				'desc'        => __( 'Choose the divider color.', 'ppom' ),
-				'col_classes' => array( 'col-md-3', 'col-sm-12' )
+				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'divider_txtclr'  => array(
 				'type'        => 'color',
 				'title'       => __( 'Divider text color', 'ppom' ),
 				'desc'        => __( 'Choose the divider text color.', 'ppom' ),
-				'col_classes' => array( 'col-md-3', 'col-sm-12' )
+				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 
 		);

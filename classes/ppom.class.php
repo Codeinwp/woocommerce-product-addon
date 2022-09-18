@@ -1,8 +1,8 @@
 <?php
 /**
  * PPOM Meta Class
- * @since version 15.0
  *
+ * @since version 15.0
  * */
 
 
@@ -26,7 +26,7 @@ class PPOM_Meta {
 		$this->ppom_settings = $this->settings();
 		$this->fields        = $this->get_fields();
 
-		//Now we are creating properties agains each methods in our Alpha class.
+		// Now we are creating properties agains each methods in our Alpha class.
 		$methods          = get_class_methods( $this );
 		$excluded_methods = array(
 			'__construct',
@@ -38,7 +38,7 @@ class PPOM_Meta {
 			'get_meta_id',
 			'get_fields',
 			'has_unique_datanames',
-			'get_instance'
+			'get_instance',
 		);
 
 		foreach ( $methods as $method ) {
@@ -76,6 +76,7 @@ class PPOM_Meta {
 
 			/**
 			 * checking product against categories
+			 *
 			 * @since 6.4
 			 */
 
@@ -102,16 +103,14 @@ class PPOM_Meta {
 							$ppom_product_id = array_merge( $ppom_in_category, $ppom_product_id );
 						} else {
 							$ppom_product_id = array_merge( $ppom_product_id, $ppom_in_category );
-						}
-
+						}                   
 					} elseif ( ! $ppom_product_id ) { // If no meta groups attached to products
 
 						$ppom_product_id = $ppom_in_category;
 					}
 					break;
 
-			}
-
+			}       
 		}
 
 		return apply_filters( 'ppom_product_meta_id', $ppom_product_id, $product_id );
@@ -161,12 +160,12 @@ class PPOM_Meta {
 
 		$meta_id = $this->single_meta_id();
 
-		if ( ! $meta_id || $meta_id == __( "None", 'ppom' ) ) {
+		if ( ! $meta_id || $meta_id == __( 'None', 'ppom' ) ) {
 			return null;
 		}
 
 		global $wpdb;
-		$qry           = "SELECT * FROM " . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
+		$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
 		$meta_settings = $wpdb->get_row( $qry );
 
 		$meta_settings = empty( $meta_settings ) ? null : $meta_settings;
@@ -192,7 +191,7 @@ class PPOM_Meta {
 
 			foreach ( $this->meta_id as $meta_id ) {
 
-				$qry    = "SELECT the_meta FROM " . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
+				$qry    = 'SELECT the_meta FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
 				$fields = $wpdb->get_var( $qry );
 				$fields = json_decode( $fields, true );
 
@@ -202,15 +201,18 @@ class PPOM_Meta {
 			}
 		} else {
 			$meta_id     = $this->meta_id;
-			$qry         = "SELECT the_meta FROM " . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
+			$qry         = 'SELECT the_meta FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
 			$fields      = $wpdb->get_var( $qry );
 			$meta_fields = json_decode( $fields, true );
 		}
 
 		// Filter fields which are active only
-		$meta_fields = array_filter( (array) $meta_fields, function ( $field ) {
-			return ! isset( $field['status'] ) || $field['status'] == 'on';
-		} );
+		$meta_fields = array_filter(
+			(array) $meta_fields,
+			function ( $field ) {
+				return ! isset( $field['status'] ) || $field['status'] == 'on';
+			} 
+		);
 
 		// ppom_pa($meta_fields);
 
@@ -223,10 +225,10 @@ class PPOM_Meta {
 		$meta_fields = array();
 		global $wpdb;
 
-		$ppom_ids = explode( ",", $ppom_id );
+		$ppom_ids = explode( ',', $ppom_id );
 		foreach ( $ppom_ids as $meta_id ) {
 
-			$qry    = "SELECT the_meta FROM " . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
+			$qry    = 'SELECT the_meta FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
 			$fields = $wpdb->get_var( $qry );
 			$fields = json_decode( $fields, true );
 			if ( is_array( $fields ) ) {
@@ -235,13 +237,19 @@ class PPOM_Meta {
 		}
 
 		// Filter fields which are active only
-		$meta_fields = array_filter( $meta_fields, function ( $field ) {
-			return ! isset( $field['status'] ) || $field['status'] == 'on';
-		} );
+		$meta_fields = array_filter(
+			$meta_fields,
+			function ( $field ) {
+				return ! isset( $field['status'] ) || $field['status'] == 'on';
+			} 
+		);
 
-		$meta_fields = array_filter( $meta_fields, function ( $field ) {
-			return ! isset( $field['status'] ) || $field['status'] == 'on';
-		} );
+		$meta_fields = array_filter(
+			$meta_fields,
+			function ( $field ) {
+				return ! isset( $field['status'] ) || $field['status'] == 'on';
+			} 
+		);
 
 		// if( empty($meta_fields) ) return null;
 
@@ -252,8 +260,8 @@ class PPOM_Meta {
 
 		$p_categories = get_the_terms( $product_id, 'product_cat' );
 
-		// 	ppom_pa($p_categories);
-		// 	ppom_pa($this->ppom_with_cat);
+		// ppom_pa($p_categories);
+		// ppom_pa($this->ppom_with_cat);
 
 		$meta_found = array();
 		if ( $p_categories ) {
@@ -261,22 +269,21 @@ class PPOM_Meta {
 			if ( $this->ppom_with_cat ) {
 				foreach ( $this->ppom_with_cat as $meta_cats ) {
 
-					// 			if( $meta_found )	//if we found any meta so dont need to loop again
-					// 				continue;
+					// if( $meta_found )   //if we found any meta so dont need to loop again
+					// continue;
 
 					if ( $meta_cats->productmeta_categories == 'All' ) {
 						$meta_found[] = $meta_cats->productmeta_id;
 					} else {
-						//making array of meta cats
+						// making array of meta cats
 						$meta_cat_array = explode( "\r\n", $meta_cats->productmeta_categories );
-						//Now iterating the p_categories to check it's slug in meta cats
+						// Now iterating the p_categories to check it's slug in meta cats
 						foreach ( $p_categories as $cat ) {
 							if ( in_array( $cat->slug, $meta_cat_array ) ) {
 								$meta_found[] = $meta_cats->productmeta_id;
 							}
 						}
-					}
-
+					}               
 				}
 			}
 		}
@@ -292,7 +299,7 @@ class PPOM_Meta {
 		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
 
 		$qry            = "SELECT productmeta_id,  productmeta_categories FROM {$ppom_table}";
-		$qry            .= " WHERE productmeta_categories != ''";
+		$qry           .= " WHERE productmeta_categories != ''";
 		$meta_with_cats = $wpdb->get_results( $qry );
 
 		return $meta_with_cats;
@@ -444,7 +451,7 @@ class PPOM_Meta {
 
 		global $wpdb;
 
-		$qry           = "SELECT * FROM " . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
+		$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
 		$meta_settings = $wpdb->get_row( $qry );
 
 		$meta_settings = empty( $meta_settings ) ? null : $meta_settings;

@@ -17,7 +17,6 @@ class PPOM_FRONTEND_SCRIPTS {
 	 * Return scripts URL.
 	 *
 	 * @var URL
-	 *
 	 */
 	private static $scripts_url = '';
 
@@ -25,14 +24,12 @@ class PPOM_FRONTEND_SCRIPTS {
 	 * Return current ppom version.
 	 *
 	 * @var string
-	 *
 	 */
 	private static $version = '';
 
 
 	/**
 	 * Return main scripts framework class.
-	 *
 	 */
 	private static $scripts_class;
 
@@ -88,7 +85,7 @@ class PPOM_FRONTEND_SCRIPTS {
 					'jquery',
 					'jquery-ui-core',
 					'jquery-ui-draggable',
-					'jquery-ui-slider'
+					'jquery-ui-slider',
 				),
 				'version' => '1.0.7',
 			),
@@ -384,7 +381,6 @@ class PPOM_FRONTEND_SCRIPTS {
 								break;
 
 							case 'cropper':
-
 								PPOM_SCRIPTS::enqueue_style( 'ppom-croppie-lib' );
 								PPOM_SCRIPTS::enqueue_script( 'ppom-croppie-lib' );
 								PPOM_SCRIPTS::enqueue_script( 'ppom-exif' );
@@ -400,7 +396,6 @@ class PPOM_FRONTEND_SCRIPTS {
 								break;
 
 							case 'file':
-
 								$ppom_file_inputs[] = $field;
 
 								PPOM_SCRIPTS::enqueue_script( 'ppom-file-upload' );
@@ -408,7 +403,6 @@ class PPOM_FRONTEND_SCRIPTS {
 								break;
 
 							case 'bulkquantity':
-
 								$fields_meta['options'] = stripslashes( $fields_meta['options'] );
 
 								// To make bulkquantity option WOOCS ready
@@ -456,7 +450,7 @@ class PPOM_FRONTEND_SCRIPTS {
 
 							$field_conditions = $field['conditions'];
 
-							//WPML Translation
+							// WPML Translation
 							$condition_rules = $field_conditions['rules'];
 							$rule_index      = 0;
 							foreach ( $condition_rules as $rule ) {
@@ -473,7 +467,7 @@ class PPOM_FRONTEND_SCRIPTS {
 
 						/**
 						 * creating action space to render hooks for more addons
-						 **/
+						 */
 						do_action( 'ppom_hooks_inputs', $field, $data_name );
 					}
 				}
@@ -491,7 +485,7 @@ class PPOM_FRONTEND_SCRIPTS {
 				$input_js_vars['wc_no_decimal']            = $decimal_palces;
 				$input_js_vars['wc_product_price']         = ppom_get_product_price( $product, '', 'product' );
 				$input_js_vars['wc_product_regular_price'] = ppom_get_product_regular_price( $product );
-				$input_js_vars['product_title']            = sprintf( __( "%s", "ppom" ), $product->get_title() );
+				$input_js_vars['product_title']            = sprintf( __( '%s', 'ppom' ), $product->get_title() );
 				$input_js_vars['show_price_per_unit']      = $show_price_per_unit;
 				$input_js_vars['show_option_price']        = $ppom->price_display;
 				$input_js_vars['product_id']               = $product_id;
@@ -506,10 +500,14 @@ class PPOM_FRONTEND_SCRIPTS {
 					$ppom_conditions_script = ppom_get_conditions_mode() === 'new' ? 'ppom-conditions-v2' : 'ppom-conditions';
 					$ppom_conditions_script = apply_filters( 'ppom_conditional_script_file', $ppom_conditions_script, $product );
 
-					PPOM_SCRIPTS::enqueue_script( $ppom_conditions_script, self::$scripts_url . "/js/{$ppom_conditions_script}.js", array(
-						'jquery',
-						'ppom-inputs'
-					) );
+					PPOM_SCRIPTS::enqueue_script(
+						$ppom_conditions_script,
+						self::$scripts_url . "/js/{$ppom_conditions_script}.js",
+						array(
+							'jquery',
+							'ppom-inputs',
+						) 
+					);
 
 					self::set_localize_data( $ppom_conditions_script, 'ppom_input_vars', $product, $input_js_vars, $global_js_vars );
 				}
@@ -538,12 +536,11 @@ class PPOM_FRONTEND_SCRIPTS {
 		switch ( $handle ) {
 
 			case 'ppom-file-upload':
-
 				$localize_data = array(
 					'file_upload_path_thumb' => ppom_get_dir_url( true ),
 					'file_upload_path'       => ppom_get_dir_url(),
-					'mesage_max_files_limit' => __( ' files allowed only', "ppom" ),
-					'delete_file_msg'        => __( "Are you sure?", "ppom" ),
+					'mesage_max_files_limit' => __( ' files allowed only', 'ppom' ),
+					'delete_file_msg'        => __( 'Are you sure?', 'ppom' ),
 					'aviary_api_key'         => '',
 					'plupload_runtime'       => ( ppom_if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
 					'ppom_file_upload_nonce' => wp_create_nonce( 'ppom_uploading_file_action' ),
@@ -556,7 +553,6 @@ class PPOM_FRONTEND_SCRIPTS {
 			case 'ppom-price':
 			case 'ppom-conditions':
 			case 'ppom-conditions-v2':
-
 				$ppom_label_product_price  = ppom_get_option( 'ppom_label_product_price', __( 'Product Price', 'ppom' ) );
 				$ppom_label_option_total   = ppom_get_option( 'ppom_label_option_total', __( 'Option Total', 'ppom' ) );
 				$ppom_label_fixed_fee      = ppom_get_option( 'ppom_label_fixed_fee', __( 'Fixed Fee', 'ppom' ) );
@@ -568,21 +564,21 @@ class PPOM_FRONTEND_SCRIPTS {
 					'wc_thousand_sep'           => wc_get_price_thousand_separator(),
 					'wc_currency_pos'           => get_option( 'woocommerce_currency_pos' ),
 					'wc_decimal_sep'            => get_option( 'woocommerce_price_decimal_sep' ),
-					'total_discount_label'      => sprintf( __( "%s", 'ppom' ), $ppom_label_total_discount ),
+					'total_discount_label'      => sprintf( __( '%s', 'ppom' ), $ppom_label_total_discount ),
 					'price_matrix_heading'      => '',
-					'product_base_label'        => sprintf( __( "%s", 'ppom' ), $ppom_label_product_price ),
-					'option_total_label'        => sprintf( __( "%s", 'ppom' ), $ppom_label_option_total ),
-					'fixed_fee_heading'         => sprintf( __( "%s", 'ppom' ), $ppom_label_fixed_fee ),
-					'total_without_fixed_label' => sprintf( __( "%s", 'ppom' ), $ppom_label_total ),
-					'product_quantity_label'    => __( "Product Quantity", "ppom" ),
-					'per_unit_label'            => __( "unit", "ppom" ),
-					'text_quantity'             => __( "Quantity", "ppom" ),
+					'product_base_label'        => sprintf( __( '%s', 'ppom' ), $ppom_label_product_price ),
+					'option_total_label'        => sprintf( __( '%s', 'ppom' ), $ppom_label_option_total ),
+					'fixed_fee_heading'         => sprintf( __( '%s', 'ppom' ), $ppom_label_fixed_fee ),
+					'total_without_fixed_label' => sprintf( __( '%s', 'ppom' ), $ppom_label_total ),
+					'product_quantity_label'    => __( 'Product Quantity', 'ppom' ),
+					'per_unit_label'            => __( 'unit', 'ppom' ),
+					'text_quantity'             => __( 'Quantity', 'ppom' ),
 					'is_shortcode'              => 'no',
 					'is_mobile'                 => ppom_is_mobile(),
 					'tax_prefix'                => ppom_tax_label_display(),
-					'validate_msg'              => __( "is a required field", 'ppom' ),
-					'image_max_msg'             => __( "You can only select a maximum of", 'ppom' ),
-					'image_min_msg'             => __( "You can only select a minimum of", 'ppom' ),
+					'validate_msg'              => __( 'is a required field', 'ppom' ),
+					'image_max_msg'             => __( 'You can only select a maximum of', 'ppom' ),
+					'image_min_msg'             => __( 'You can only select a minimum of', 'ppom' ),
 				);
 
 				break;

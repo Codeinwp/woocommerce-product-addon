@@ -1,11 +1,11 @@
 <?php
 /**
  * Rendering all fields on product page
- * @since 10.0
  *
+ * @since 10.0
  * */
-if ( ! defined( "ABSPATH" ) ) {
-	die( "Not Allowed" );
+if ( ! defined( 'ABSPATH' ) ) {
+	die( 'Not Allowed' );
 }
 
 // ppom_pa($args);
@@ -29,7 +29,7 @@ echo '<input type="hidden" name="ppom_cart_key" value="' . esc_attr( $cart_key )
 // Price placeholder, it will be cloned via js in ppom-price.js
 echo '<div id="ppom-price-cloner-wrapper">';
 echo '<span id="ppom-price-cloner">';
-printf( __( get_woocommerce_price_format(), "ppom" ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' );
+printf( __( get_woocommerce_price_format(), 'ppom' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' );
 echo '</span>';
 echo '</div>';
 
@@ -72,14 +72,14 @@ foreach ( $ppom_fields_meta as $meta ) {
 	}
 
 	if ( empty( $data_name ) ) {
-		printf( __( "Please provide data name property for %s", "ppom" ), $title );
+		printf( __( 'Please provide data name property for %s', 'ppom' ), $title );
 		continue;
 	}
 	// Dataname senatize
 	$data_name = sanitize_key( $data_name );
 
 	if ( ! empty( $classes ) ) {
-		$classes   = explode( ",", $classes );
+		$classes   = explode( ',', $classes );
 		$classes[] = 'form-control';
 	} else {
 		$classes = array( 'form-control' );
@@ -109,12 +109,11 @@ foreach ( $ppom_fields_meta as $meta ) {
 			default:
 				$default_value = $posted_values[ $data_name ];
 				break;
-		}
-
-	} else if ( isset( $_GET[ $data_name ] ) ) {
+		}   
+	} elseif ( isset( $_GET[ $data_name ] ) ) {
 		// When Cart Edit addon used
 		$default_value = sanitize_text_field( $_GET[ $data_name ] );
-	} else if ( isset( $_POST['ppom']['fields'][ $data_name ] ) ) {
+	} elseif ( isset( $_POST['ppom']['fields'][ $data_name ] ) ) {
 		$default_value = sanitize_text_field( $_POST['ppom']['fields'][ $data_name ] );
 	} else {
 
@@ -122,7 +121,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 		switch ( $type ) {
 
 			case 'textarea':
-
 				if ( is_numeric( $default_value ) ) {
 					$content_post  = get_post( intval( $default_value ) );
 					$content       = ! empty( $content_post ) ? $content_post->post_content : '';
@@ -144,16 +142,15 @@ foreach ( $ppom_fields_meta as $meta ) {
 				$default_value = isset( $meta['selected'] ) ? $meta['selected'] : '';
 				break;
 
-		}
-
+		}   
 	}
 
 	// Stripslashes: default values
 	$default_value = ! is_array( $default_value ) ? stripslashes( $default_value ) : $default_value;
-	$default_value = apply_filters( "ppom_field_default_value", $default_value, $meta, $product );
+	$default_value = apply_filters( 'ppom_field_default_value', $default_value, $meta, $product );
 
 
-	//WPML
+	// WPML
 	$title       = ppom_wpml_translate( $title, 'PPOM' );
 	$description = ppom_wpml_translate( $description, 'PPOM' );
 	$description = apply_filters( 'ppom_description_content', $description, $meta );
@@ -169,7 +166,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 	$placeholder = isset( $meta['placeholder'] ) ? stripslashes( $meta['placeholder'] ) : '';
 
 	if ( is_array( $options ) ) {
-		$options = array_map( "ppom_translation_options", $options );
+		$options = array_map( 'ppom_translation_options', $options );
 	}
 	// Form row
 
@@ -185,8 +182,8 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 			if ( $allow_nextprev == 'yes' ) {
 				echo '<div class="ppom-collapse-nextprev-btn" data-collapse-index="' . $ppom_collapse_counter . '">';
-				echo '<button class="ppom-collapse-prev">' . __( "Prev", "ppom" ) . '</button>';
-				echo '<button class="ppom-collapse-next">' . __( "Next", "ppom" ) . '</button>';
+				echo '<button class="ppom-collapse-prev">' . __( 'Prev', 'ppom' ) . '</button>';
+				echo '<button class="ppom-collapse-next">' . __( 'Next', 'ppom' ) . '</button>';
 				echo '</div>';
 			}
 			echo '</div>';
@@ -227,7 +224,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 		case 'daterange':
 		case 'number':
 		case 'color':
-
 			$min  = isset( $meta['min'] ) ? $meta['min'] : '';
 			$max  = isset( $meta['max'] ) ? $meta['max'] : '';
 			$step = isset( $meta['step'] ) ? $meta['step'] : '';
@@ -254,7 +250,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'max'          => $max,
 				'step'         => $step,
 				'placeholder'  => $placeholder,
-				'autocomplete' => "false",
+				'autocomplete' => 'false',
 				'use_regex'    => $regex,
 				'input_mask'   => $mask,
 				'onetime'      => $onetime,
@@ -268,7 +264,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 			break;
 
 		case 'measure':
-
 			$min           = isset( $meta['min'] ) ? $meta['min'] : '';
 			$max           = isset( $meta['max'] ) ? $meta['max'] : '';
 			$step          = isset( $meta['step'] ) ? $meta['step'] : '';
@@ -297,7 +292,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 			break;
 
 		case 'textarea':
-
 			if ( ! empty( $default_value ) ) {
 
 				$default_value = str_replace( ']]>', ']]&gt;', $default_value );
@@ -327,7 +321,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 			break;
 
 		case 'checkbox':
-
 			$options = ppom_convert_options_to_key_val( $options, $meta, $product );
 			$taxable = ( isset( $meta['onetime_taxable'] ) ? $meta['onetime_taxable'] : '' );
 
@@ -336,7 +329,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'id'         => $data_name,
 				'type'       => 'checkbox',
 				'name'       => "ppom[fields][{$data_name}]",
-				//'classes'   => $classes, // apply default class: form-check-input
+				// 'classes'   => $classes, // apply default class: form-check-input
 				'label'      => $field_label,
 				'title'      => $title,
 				'attributes' => $ppom_field_attributes,
@@ -350,7 +343,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 			break;
 
 		case 'select':
-
 			$option_process = array();
 			$option_process = ppom_convert_options_to_key_val( $options, $meta, $product );
 
@@ -376,7 +368,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 			break;
 
 		case 'radio':
-
 			$options = ppom_convert_options_to_key_val( $options, $meta, $product );
 			$onetime = isset( $meta['onetime'] ) ? $meta['onetime'] : '';
 			$taxable = ( isset( $meta['onetime_taxable'] ) ? $meta['onetime_taxable'] : '' );
@@ -385,7 +376,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'id'         => $data_name,
 				'type'       => 'radio',
 				'name'       => "ppom[fields][{$data_name}]",
-				//'classes'   => $classes, // apply default class: form-check-input
+				// 'classes'   => $classes, // apply default class: form-check-input
 				'label'      => $field_label,
 				'title'      => $title,
 				'attributes' => $ppom_field_attributes,
@@ -399,14 +390,13 @@ foreach ( $ppom_fields_meta as $meta ) {
 			break;
 
 		case 'timezone':
-
 			$regions      = isset( $meta['regions'] ) ? $meta['regions'] : 'All';
 			$show_time    = isset( $meta['show_time'] ) ? $meta['show_time'] : '';
 			$first_option = isset( $meta['first_option'] ) ? $meta['first_option'] : '';
 
 			$options = ppom_array_get_timezone_list( $regions, $show_time );
 			if ( ! empty( $first_option ) ) {
-				$options[''] = sprintf( __( "%s", "ppom" ), $first_option );
+				$options[''] = sprintf( __( '%s', 'ppom' ), $first_option );
 			}
 
 			// ppom_pa($options);
@@ -517,7 +507,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 			break;
 
 		case 'pricematrix':
-
 			$options             = ppom_convert_options_to_key_val( $options, $meta, $product );
 			$discount            = isset( $meta['discount'] ) ? $meta['discount'] : '';
 			$show_slider         = isset( $meta['show_slider'] ) ? $meta['show_slider'] : '';
@@ -543,7 +532,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 			break;
 
 		case 'quantities':
-
 			$view_control         = ( isset( $meta['view_control'] ) ? $meta['view_control'] : '' );
 			$horizontal_layout    = ( isset( $meta['horizontal'] ) ? $meta['horizontal'] : '' );
 			$include_productprice = isset( $meta['use_productprice'] ) ? $meta['use_productprice'] : '';
@@ -578,7 +566,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 		// Section or HTML
 		case 'section':
-
 			$field_html = isset( $meta['html'] ) ? ppom_wpml_translate( $meta['html'], 'PPOM' ) : '';
 
 			$ppom_field_setting = array(
@@ -595,7 +582,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 		// Audio/videos
 		case 'audio':
-
 			$audios           = isset( $meta['audio'] ) ? $meta['audio'] : array();
 			$multiple_allowed = isset( $meta['multiple_allowed'] ) ? $meta['multiple_allowed'] : '';
 			// $audios = ppom_convert_options_to_key_val($audios, $meta, $product);
@@ -607,7 +593,8 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'classes'          => $classes,
 				'label'            => $field_label,
 				'title'            => $title,
-				/*'legacy_view'	=> (isset($meta['legacy_view'])) ? $meta['legacy_view'] : '',
+				/*
+				'legacy_view' => (isset($meta['legacy_view'])) ? $meta['legacy_view'] : '',
 				'popup_width'	=> $popup_width,
 				'popup_height'	=> $popup_height,*/
 				'multiple_allowed' => $multiple_allowed,
@@ -621,8 +608,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 		// File upload
 		case 'file':
-
-			$label_select  = ( $meta['button_label_select'] == '' ? __( 'Select files', "ppom" ) : $meta['button_label_select'] );
+			$label_select  = ( $meta['button_label_select'] == '' ? __( 'Select files', 'ppom' ) : $meta['button_label_select'] );
 			$files_allowed = ( $meta['files_allowed'] == '' ? 1 : $meta['files_allowed'] );
 			$file_types    = ( $meta['file_types'] == '' ? 'jpg,png,gif' : $meta['file_types'] );
 			$file_size     = ( $meta['file_size'] == '' ? '10mb' : $meta['file_size'] );
@@ -655,7 +641,8 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'photo_editing' => $photo_editing,
 				'editing_tools' => $editing_tools,
 				'aviary_apikey' => $ppom_settings->aviary_api_key,
-				/*'popupwidth'			=> $popup_width,
+				/*
+				'popupwidth'          => $popup_width,
 				'popup-height'			=> $popup_height,*/
 				'file_cost'     => $file_cost,
 				'taxable'       => $taxable,
@@ -669,8 +656,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 		// Cropper
 		case 'cropper':
-
-			$label_select  = ( $meta['button_label_select'] == '' ? __( 'Select files', "ppom" ) : $meta['button_label_select'] );
+			$label_select  = ( $meta['button_label_select'] == '' ? __( 'Select files', 'ppom' ) : $meta['button_label_select'] );
 			$files_allowed = ( $meta['files_allowed'] == '' ? 1 : $meta['files_allowed'] );
 			$file_types    = 'jpg,png,gif';
 			$file_size     = ( $meta['file_size'] == '' ? '10mb' : $meta['file_size'] );
@@ -717,7 +703,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 		// Fixed Price Addon
 		// DEPRECATED: UPDATE TO FIXEDPRICE VERSION 18.0
 		case 'fixedprice_DEPRECATED':
-
 			break;
 
 		case 'hidden';
@@ -732,15 +717,14 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 	/**
 	 * creating action space to render more addons
-	 **/
+	 */
 	do_action( 'ppom_rendering_inputs', $meta, $data_name, $classes, $field_label, $options );
 
-	echo '</div>';  //col-lg-*
+	echo '</div>';  // col-lg-*
 
 	if ( count( $ppom_fields_meta ) == $ppom_field_counter && $section_started ) {
 		echo '</div>';
 	}
-
 }
 
 echo '</div>'; // Ends form-row

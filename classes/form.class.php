@@ -30,14 +30,14 @@ class PPOM_Form {
 	 *
 	 * @var number
 	 */
-// 	public static $product_id;
+	// public static $product_id;
 
 	/**
 	 * Return wc product object
 	 *
 	 * @var object
 	 */
-// 	public static $product;
+	// public static $product;
 
 	/**
 	 * Return templates args
@@ -61,7 +61,7 @@ class PPOM_Form {
 	public static function get_instance() {
 
 		// create a new object if it doesn't exist.
-		is_null( self::$ins ) && self::$ins = new self;
+		is_null( self::$ins ) && self::$ins = new self();
 
 		return self::$ins;
 	}
@@ -123,7 +123,7 @@ class PPOM_Form {
 			}
 
 			if ( empty( $data_name ) ) {
-				printf( __( "Please provide data name property for %s", "ppom" ), $title );
+				printf( __( 'Please provide data name property for %s', 'ppom' ), $title );
 				continue;
 			}
 
@@ -150,8 +150,8 @@ class PPOM_Form {
 
 					if ( $allow_nextprev == 'yes' ) {
 						echo '<div class="ppom-collapse-nextprev-btn" data-collapse-index="' . esc_attr( $ppom_collapse_counter ) . '">';
-						echo '<button class="ppom-collapse-prev">' . __( "Prev", "ppom" ) . '</button>';
-						echo '<button class="ppom-collapse-next">' . __( "Next", "ppom" ) . '</button>';
+						echo '<button class="ppom-collapse-prev">' . __( 'Prev', 'ppom' ) . '</button>';
+						echo '<button class="ppom-collapse-next">' . __( 'Next', 'ppom' ) . '</button>';
 						echo '</div>';
 					}
 					echo '</div>';
@@ -177,7 +177,7 @@ class PPOM_Form {
 
 
 			$field_wrapper_div = '<div data-data_name=' . esc_attr( $data_name ) . ' ' . $ppom_cond_data . ' class="' . esc_attr( $field_wrapper_class ) . '">';
-			$field_html        .= apply_filters( 'ppom_field_wrapper_div', $field_wrapper_div, $meta, $this->product );
+			$field_html       .= apply_filters( 'ppom_field_wrapper_div', $field_wrapper_div, $meta, $this->product );
 
 			/**
 			 * creating action space to render more addons
@@ -188,7 +188,7 @@ class PPOM_Form {
 			 *
 			 * Updated by Najeeb on May 24, 2021
 			 * Now the CORE inputs will be rendered via function rather hooks
-			 **/
+			 */
 			ob_start();
 
 
@@ -213,7 +213,7 @@ class PPOM_Form {
 
 			// Filter: nmforms_input_htmls
 			// @TODO need to change with relevant name
-			echo apply_filters( "nmforms_input_html", $field_html, $meta, $default_value );
+			echo apply_filters( 'nmforms_input_html', $field_html, $meta, $default_value );
 
 		}
 	}
@@ -226,7 +226,7 @@ class PPOM_Form {
 		$template_vars = array(
 			'field_meta'    => $meta,
 			'default_value' => $default_value,
-			'product'       => $this->product
+			'product'       => $this->product,
 		);
 
 		$template_vars = apply_filters( 'ppom_input_templates_vars', $template_vars, $this );
@@ -277,7 +277,7 @@ class PPOM_Form {
 			$field_column = 12;
 		}
 
-		return apply_filters( "ppom_input_meta_width", $field_column, $input_meta );
+		return apply_filters( 'ppom_input_meta_width', $field_column, $input_meta );
 	}
 
 	/**
@@ -288,11 +288,12 @@ class PPOM_Form {
 		$template_vars = array(
 			'ppom_id'    => self::$ppom->meta_id,
 			'product'    => $this->product,
-			'product_id' => $this->product_id
+			'product_id' => $this->product_id,
 		);
 
 		ob_start();
-		ppom_load_input_templates( 'frontend/component/form-data.php',
+		ppom_load_input_templates(
+			'frontend/component/form-data.php',
 			apply_filters( 'ppom_form_extra_contents', $template_vars, $this )
 		);
 		echo ob_get_clean();
@@ -359,19 +360,17 @@ class PPOM_Form {
 				default:
 					$default_value = $posted_values[ $data_name ];
 					break;
-			}
-
-		} else if ( isset( $_GET[ $data_name ] ) ) {
+			}       
+		} elseif ( isset( $_GET[ $data_name ] ) ) {
 			// When Cart Edit addon used
 			$default_value = sanitize_text_field( $_GET[ $data_name ] );
-		} else if ( isset( $_POST['ppom']['fields'][ $data_name ] ) && apply_filters( 'ppom_retain_after_add_to_cart', true ) ) {
+		} elseif ( isset( $_POST['ppom']['fields'][ $data_name ] ) && apply_filters( 'ppom_retain_after_add_to_cart', true ) ) {
 			$default_value = sanitize_text_field( $_POST['ppom']['fields'][ $data_name ] );
 		} else {
 			// Default values in settings
 			switch ( $type ) {
 
 				case 'textarea':
-
 					if ( is_numeric( $default_value ) ) {
 						$content_post  = get_post( intval( $default_value ) );
 						$content       = ! empty( $content_post ) ? $content_post->post_content : '';
@@ -398,6 +397,6 @@ class PPOM_Form {
 		// Stripslashes: default values
 		$default_value = ! is_array( $default_value ) ? stripslashes( $default_value ) : $default_value;
 
-		return apply_filters( "ppom_field_default_value", $default_value, $meta, $this->product );
+		return apply_filters( 'ppom_field_default_value', $default_value, $meta, $this->product );
 	}
 }
