@@ -212,7 +212,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 						$the_placeholder = isset( $field_meta['placeholder'] ) ? $field_meta['placeholder'] : '';
 						$defualt_fields  = isset( PPOM()->inputs[ $field_type ]->settings ) ? PPOM()->inputs[ $field_type ]->settings : array();
 						$defualt_fields  = apply_filters( "ppom_settings_{$field_type}", $defualt_fields, $field_type );
-						$defualt_fields  = $form_meta->ppom_tabs_panel_classes( $defualt_fields );
+						$defualt_fields  = $form_meta->update_html_classes( $defualt_fields );
 						?>
 
 						<!-- New PPOM Model  -->
