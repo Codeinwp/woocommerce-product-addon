@@ -226,10 +226,13 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		die( 0 );
 	}
 
-
-	/*
-	 * PPOM Attachments
-	*/
+	/**
+	 * Ajax handler for "Attach to Product" feature.
+	 * Attaches products to the PPOM Field Group.
+	 * Removes prodducts from the PPOM Field Group.
+	 *
+	 * @return void
+	 */
 	function ppom_attach_ppoms() {
 
 		if ( ! isset( $_POST['ppom_attached_nonce'] )
@@ -255,7 +258,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 			foreach ( $_POST['ppom_removed'] as $product_id ) {
 
-				delete_post_meta( intval( $product_id ), '_product_meta_id' );
+				delete_post_meta( intval( $product_id ), PPOM_PRODUCT_META_KEY );
 				$ppom_udpated ++;
 			}
 		}
@@ -264,7 +267,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 			foreach ( $_POST['ppom_attached'] as $product_id ) {
 
-				update_post_meta( intval( $product_id ), '_product_meta_id', $ppom_id );
+				update_post_meta( intval( $product_id ), PPOM_PRODUCT_META_KEY, $ppom_id );
 				$ppom_udpated ++;
 			}
 		}

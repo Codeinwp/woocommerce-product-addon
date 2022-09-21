@@ -150,7 +150,7 @@ function ppom_admin_process_product_meta( $post_id ) {
 	}
 
 	// ppom_pa($ppom_meta_selected); exit; 
-	update_post_meta( $post_id, '_product_meta_id', $ppom_meta_selected );
+	update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $ppom_meta_selected );
 
 	do_action( 'ppom_proccess_meta', $post_id );
 }
@@ -206,10 +206,9 @@ function ppom_admin_save_form_meta() {
 
 	extract( $_REQUEST );
 
-	$send_file_attachment   = 'NA';
-	$aviary_api_key         = 'NA';
-	$show_cart_thumb        = 'NA';
-	$enable_ajax_validation = '';
+	$send_file_attachment = 'NA';
+	$aviary_api_key       = 'NA';
+	$show_cart_thumb      = 'NA';
 
 	$ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];
 	$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );
@@ -218,7 +217,6 @@ function ppom_admin_save_form_meta() {
 
 	// sanitize
 	$productmeta_name       = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
-	$productmeta_validation = isset( $_REQUEST['enable_ajax_validation'] ) ? sanitize_text_field( $_REQUEST['enable_ajax_validation'] ) : '';
 	$dynamic_price_hide     = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
 	$send_file_attachment   = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
 	$show_cart_thumb        = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
@@ -241,7 +239,6 @@ function ppom_admin_save_form_meta() {
 		'ppom_settings_meta_data_new',
 		array(
 			'productmeta_name'       => $productmeta_name,
-			'productmeta_validation' => $productmeta_validation,
 			'dynamic_price_display'  => $dynamic_price_hide,
 			'send_file_attachment'   => $send_file_attachment,
 			'show_cart_thumb'        => $show_cart_thumb,
@@ -368,7 +365,6 @@ function ppom_admin_update_form_meta() {
 	// ppom_pa($product_meta); exit;
 
 	$productmeta_name       = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
-	$productmeta_validation = isset( $_REQUEST['enable_ajax_validation'] ) ? sanitize_text_field( $_REQUEST['enable_ajax_validation'] ) : '';
 	$dynamic_price_hide     = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
 	$send_file_attachment   = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
 	$show_cart_thumb        = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
@@ -391,7 +387,6 @@ function ppom_admin_update_form_meta() {
 		'ppom_settings_meta_data_update',
 		array(
 			'productmeta_name'       => $productmeta_name,
-			'productmeta_validation' => $productmeta_validation,
 			'dynamic_price_display'  => $dynamic_price_hide,
 			'send_file_attachment'   => $send_file_attachment,
 			'show_cart_thumb'        => $show_cart_thumb,

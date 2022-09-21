@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Getting products with already attached PPOM
 $ppom_attached_params = array(
-	'meta_key'       => '_product_meta_id',
+	'meta_key'       => PPOM_PRODUCT_META_KEY,
 	'meta_value'     => $ppom_id,
 	'compare'        => '=',
 	'post_type'      => 'product',

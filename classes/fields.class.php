@@ -159,7 +159,7 @@ class PPOM_Fields_Meta {
 			$field_desc  = isset( $meta->desc ) ? $meta->desc : null;
 			$settings    = isset( $meta->settings ) ? $meta->settings : array();
 
-			$settings = $this->ppom_tabs_panel_classes( $settings );
+			$settings = $this->update_html_classes( $settings );
 
 			// new model
 			$html .= '<div class="ppom-modal-box ppom-slider ppom-field-' . esc_attr( $fields_type ) . '">';
@@ -1163,8 +1163,13 @@ class PPOM_Fields_Meta {
 
 	}
 
-
-	function ppom_tabs_panel_classes( $settings ) {
+	/**
+	 * Updates HTML classes of the given setting fields.
+	 *
+	 * @param  array $settings
+	 * @return array Returns setting fields as updated their HTML classes.
+	 */
+	function update_html_classes( $settings ) {
 
 		foreach ( $settings as $fields_meta_key => $meta ) {
 

@@ -15,7 +15,6 @@ $form_meta = PPOM_FIELDS_META();
 
 $ppom                   = '';
 $productmeta_name       = '';
-$enable_ajax_validation = '';
 $dynamic_price_hide     = '';
 $send_file_attachment   = '';
 $show_cart_thumb        = '';
@@ -34,7 +33,6 @@ if ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) 
 	$ppom_settings   = $ppom->get_settings_by_id( $product_meta_id );
 
 	$productmeta_name       = ( isset( $ppom_settings->productmeta_name ) ? stripslashes( $ppom_settings->productmeta_name ) : '' );
-	$enable_ajax_validation = ( isset( $ppom_settings->productmeta_validation ) ? $ppom_settings->productmeta_validation : '' );
 	$dynamic_price_hide     = ( isset( $ppom_settings->dynamic_price_display ) ? $ppom_settings->dynamic_price_display : '' );
 	$send_file_attachment   = ( isset( $ppom_settings->send_file_attachment ) ? $ppom_settings->send_file_attachment : '' );
 	$show_cart_thumb        = ( isset( $ppom_settings->show_cart_thumb ) ? $ppom_settings->show_cart_thumb : '' );
@@ -43,8 +41,6 @@ if ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) 
 	$productmeta_js         = ( isset( $ppom_settings->productmeta_js ) ? $ppom_settings->productmeta_js : '' );
 	$productmeta_categories = ( isset( $ppom_settings->productmeta_categories ) ? $ppom_settings->productmeta_categories : '' );
 	$product_meta           = json_decode( $ppom_settings->the_meta, true );
-
-	// var_dump ( $enable_ajax_validation  );
 }
 
 $url_cancel = add_query_arg(
@@ -216,7 +212,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 						$the_placeholder = isset( $field_meta['placeholder'] ) ? $field_meta['placeholder'] : '';
 						$defualt_fields  = isset( PPOM()->inputs[ $field_type ]->settings ) ? PPOM()->inputs[ $field_type ]->settings : array();
 						$defualt_fields  = apply_filters( "ppom_settings_{$field_type}", $defualt_fields, $field_type );
-						$defualt_fields  = $form_meta->ppom_tabs_panel_classes( $defualt_fields );
+						$defualt_fields  = $form_meta->update_html_classes( $defualt_fields );
 						?>
 
 						<!-- New PPOM Model  -->

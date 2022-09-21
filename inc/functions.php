@@ -2197,7 +2197,7 @@ function ppom_reset_cart_quantity_to_one( $product_id ) {
 // Attachhing PPOM Meta with product helper function
 function ppom_attach_fields_to_product( $ppom_meta_id, $product_id ) {
 	$ppom_meta = array( $ppom_meta_id );
-	update_post_meta( $product_id, '_product_meta_id', $ppom_meta );
+	update_post_meta( $product_id, PPOM_PRODUCT_META_KEY, $ppom_meta );
 }
 
 // Get confirmed dir thumbs

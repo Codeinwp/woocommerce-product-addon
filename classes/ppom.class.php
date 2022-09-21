@@ -1,16 +1,18 @@
 <?php
 /**
  * PPOM Meta Class
+ * Manages a PPOM Fields Group
  *
  * @since version 15.0
- * */
-
+ */
 
 class PPOM_Meta {
 
 	protected static $wc_product;
 	private static $ins = null;
 	public static $product_id;
+
+	// QM-5
 	var $meta_id;
 
 	// $product_id can be null if get instance to get data by meta_id
@@ -59,7 +61,7 @@ class PPOM_Meta {
 		return self::$ins;
 	}
 
-
+	// QM-5
 	function get_meta_id( $product_id ) {
 
 		$ppom_product_id = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
@@ -130,6 +132,7 @@ class PPOM_Meta {
 
 	// since 15.0 multiple meta can be set against single product
 	// so we have to set one active one meta for compatiblility isues
+	// QM-5
 	function single_meta_id() {
 
 		$single_meta = $this->meta_id;
@@ -145,6 +148,7 @@ class PPOM_Meta {
 		return $single_meta;
 	}
 
+	// QM-5
 	function has_multiple_meta() {
 
 		$multiple_meta = false;
@@ -156,6 +160,7 @@ class PPOM_Meta {
 	}
 
 	// getting settings
+	// QM-5
 	function settings() {
 
 		$meta_id = $this->single_meta_id();
