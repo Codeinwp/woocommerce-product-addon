@@ -40,59 +40,59 @@ class NM_Section_wooproduct extends PPOM_Inputs {
 			'data_name'       => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'ppom' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'ppom' )
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'ppom' ),
 			),
 			'width'           => array(
 				'type'    => 'select',
 				'title'   => __( 'Width', 'ppom' ),
-				'desc'    => __( 'Select width column.', "ppom" ),
+				'desc'    => __( 'Select width column.', 'ppom' ),
 				'options' => ppom_get_input_cols(),
 				'default' => 12,
 			),
 			'description'     => array(
 				'type'  => 'textarea',
 				'title' => __( 'Description', 'ppom' ),
-				'desc'  => __( 'Small description, it will be display near name title.', 'ppom' )
+				'desc'  => __( 'Small description, it will be display near name title.', 'ppom' ),
 			),
 			'html'            => array(
 				'type'  => 'textarea',
 				'title' => __( 'Content', 'ppom' ),
-				'desc'  => __( 'Add your text/HTML here.', 'ppom' )
+				'desc'  => __( 'Add your text/HTML here.', 'ppom' ),
 			),
 			'visibility'      => array(
 				'type'    => 'select',
 				'title'   => __( 'Visibility', 'ppom' ),
-				'desc'    => __( 'Set field visibility based on user.', "ppom" ),
+				'desc'    => __( 'Set field visibility based on user.', 'ppom' ),
 				'options' => ppom_field_visibility_options(),
 				'default' => 'everyone',
 			),
 			'visibility_role' => array(
 				'type'   => 'text',
 				'title'  => __( 'User Roles', 'ppom' ),
-				'desc'   => __( 'Role separated by comma.', "ppom" ),
+				'desc'   => __( 'Role separated by comma.', 'ppom' ),
 				'hidden' => true,
 			),
 			'desc_tooltip'    => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Show tooltip (PRO)', 'ppom' ),
 				'desc'        => __( 'Show Description in Tooltip with Help Icon', 'ppom' ),
-				'col_classes' => array( 'col-md-3', 'col-sm-12' )
+				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'cart_display'    => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Show in Cart', 'ppom' ),
 				'desc'        => __( 'Display Field Value in Cart', 'ppom' ),
-				'col_classes' => array( 'col-md-3', 'col-sm-12' )
+				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'logic'           => array(
 				'type'  => 'checkbox',
-				'title' => __( 'Enable Conditions', "ppom" ),
-				'desc'  => __( 'Tick it to turn conditional logic to work below', "ppom" )
+				'title' => __( 'Enable Conditions', 'ppom' ),
+				'desc'  => __( 'Tick it to turn conditional logic to work below', 'ppom' ),
 			),
 			'conditions'      => array(
 				'type'  => 'html-conditions',
-				'title' => __( 'Conditions', "ppom" ),
-				'desc'  => __( 'Tick it to turn conditional logic to work below', "ppom" )
+				'title' => __( 'Conditions', 'ppom' ),
+				'desc'  => __( 'Tick it to turn conditional logic to work below', 'ppom' ),
 			),
 		);
 

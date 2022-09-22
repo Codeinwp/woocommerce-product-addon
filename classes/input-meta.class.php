@@ -50,7 +50,7 @@ class PPOM_InputManager {
 
 		$title = ppom_wpml_translate( $title, 'PPOM' );
 
-		return apply_filters( "ppom_input_meta_title", $title, self::$input_meta );
+		return apply_filters( 'ppom_input_meta_title', $title, self::$input_meta );
 	}
 
 
@@ -69,7 +69,7 @@ class PPOM_InputManager {
 		// old Filter
 		$desc = apply_filters( 'ppom_description_content', $desc, self::$input_meta );
 
-		return apply_filters( "ppom_input_meta_desc", $desc, self::$input_meta );
+		return apply_filters( 'ppom_input_meta_desc', $desc, self::$input_meta );
 	}
 
 
@@ -82,7 +82,7 @@ class PPOM_InputManager {
 
 		$required = isset( self::$input_meta['required'] ) ? self::$input_meta['required'] : '';
 
-		return apply_filters( "ppom_input_meta_required", $required, self::$input_meta );
+		return apply_filters( 'ppom_input_meta_required', $required, self::$input_meta );
 	}
 
 
@@ -106,7 +106,7 @@ class PPOM_InputManager {
 
 		$data_name = isset( self::$input_meta['data_name'] ) ? sanitize_key( self::$input_meta['data_name'] ) : $this->title();
 
-		return apply_filters( "ppom_input_meta_data_name", $data_name, self::$input_meta );
+		return apply_filters( 'ppom_input_meta_data_name', $data_name, self::$input_meta );
 	}
 
 
@@ -121,7 +121,7 @@ class PPOM_InputManager {
 
 		$placeholder = ppom_wpml_translate( $placeholder, 'PPOM' );
 
-		return apply_filters( "ppom_input_meta_placeholder", $placeholder, self::$input_meta );
+		return apply_filters( 'ppom_input_meta_placeholder', $placeholder, self::$input_meta );
 	}
 
 
@@ -136,7 +136,7 @@ class PPOM_InputManager {
 
 		$error_msg = ppom_wpml_translate( $error_msg, 'PPOM' );
 
-		return apply_filters( "ppom_input_meta_error_msg", $error_msg, self::$input_meta );
+		return apply_filters( 'ppom_input_meta_error_msg', $error_msg, self::$input_meta );
 	}
 
 
@@ -171,7 +171,7 @@ class PPOM_InputManager {
 			$field_label = $field_label . $show_desc;
 		}
 
-		return apply_filters( "ppom_input_meta_label_html", $field_label, self::$input_meta );
+		return apply_filters( 'ppom_input_meta_label_html', $field_label, self::$input_meta );
 	}
 
 
@@ -185,7 +185,7 @@ class PPOM_InputManager {
 		$show_desc = ( ! empty( $this->desc() ) ) ? '<span class="show_description ppom-input-desc">' . $this->desc() . '</span>' : '';
 		$show_desc = apply_filters( 'ppom_field_description', $show_desc, self::$input_meta );
 
-		return apply_filters( "ppom_input_meta_tooltip_desc", $show_desc, self::$input_meta );
+		return apply_filters( 'ppom_input_meta_tooltip_desc', $show_desc, self::$input_meta );
 	}
 
 
@@ -201,10 +201,10 @@ class PPOM_InputManager {
 		$options = isset( self::$input_meta['options'] ) ? self::$input_meta['options'] : array();
 
 		if ( is_array( $options ) ) {
-			$options = array_map( "ppom_translation_options", $options );
+			$options = array_map( 'ppom_translation_options', $options );
 		}
 
-		return apply_filters( "ppom_input_meta_multi_options", $options, self::$input_meta );
+		return apply_filters( 'ppom_input_meta_multi_options', $options, self::$input_meta );
 	}
 
 
@@ -217,7 +217,7 @@ class PPOM_InputManager {
 
 		$images = isset( self::$input_meta['images'] ) ? self::$input_meta['images'] : array();
 
-		return apply_filters( "ppom_input_meta_images", $images, self::$input_meta );
+		return apply_filters( 'ppom_input_meta_images', $images, self::$input_meta );
 	}
 
 
@@ -230,11 +230,12 @@ class PPOM_InputManager {
 
 		$audios = isset( self::$input_meta['audio'] ) ? self::$input_meta['audio'] : array();
 
-		return apply_filters( "ppom_input_meta_audio", $audios, self::$input_meta );
+		return apply_filters( 'ppom_input_meta_audio', $audios, self::$input_meta );
 	}
 
 
-	/*===================================
+	/*
+	===================================
 		Wrapper Classes Section
 	===================================*/
 
@@ -263,7 +264,7 @@ class PPOM_InputManager {
 
 		$classes = [ 'form-control-label' ];
 
-		$label_classes = apply_filters( "ppom_input_label_classes", $classes, self::$input_meta );
+		$label_classes = apply_filters( 'ppom_input_label_classes', $classes, self::$input_meta );
 
 		$label_classes = implode( ' ', $label_classes );
 
@@ -299,11 +300,11 @@ class PPOM_InputManager {
 		// }
 
 		if ( $this->required() ) {
-			$classes[] = "ppom-required";
+			$classes[] = 'ppom-required';
 		}
 
 		if ( ( $this->input_type == 'radio' && ( $key = array_search( 'form-control', $classes ) ) !== false ) ||
-		     $this->input_type == 'checkbox' && ( $key = array_search( 'form-control', $classes ) ) !== false ) {
+			 $this->input_type == 'checkbox' && ( $key = array_search( 'form-control', $classes ) ) !== false ) {
 			unset( $classes[ $key ] );
 			$classes[] = 'ppom-check-input';
 		}
@@ -313,7 +314,7 @@ class PPOM_InputManager {
 			$classes[] = 'form-select';
 		}
 
-		$classes = apply_filters( "ppom_input_meta_classes", $classes, self::$input_meta );
+		$classes = apply_filters( 'ppom_input_meta_classes', $classes, self::$input_meta );
 
 		return $classes;
 	}
@@ -379,12 +380,12 @@ class PPOM_InputManager {
 	 */
 	function form_name() {
 
-		$form_name = "ppom[fields][" . esc_attr( $this->data_name() ) . "]";
+		$form_name = 'ppom[fields][' . esc_attr( $this->data_name() ) . ']';
 		if ( $this->input_type == 'checkbox' ) {
 			$form_name .= '[]';
 		}
 
-		return apply_filters( "ppom_input_name_attr", $form_name, self::$input_meta );
+		return apply_filters( 'ppom_input_name_attr', $form_name, self::$input_meta );
 	}
 
 

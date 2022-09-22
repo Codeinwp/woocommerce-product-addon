@@ -19,7 +19,6 @@ class PPOM_SCRIPTS {
 	 * Return scripts URL.
 	 *
 	 * @var URL
-	 *
 	 */
 	public static $scripts_url = PPOM_URL;
 
@@ -27,7 +26,6 @@ class PPOM_SCRIPTS {
 	 * Return current ppom version.
 	 *
 	 * @var string
-	 *
 	 */
 	public static $version = PPOM_VERSION;
 
@@ -40,7 +38,6 @@ class PPOM_SCRIPTS {
 
 	/**
 	 * Register Script
-	 *
 	 */
 	private static function register_script( $handle, $path, $deps = array( 'jquery' ), $version = '', $in_footer = true ) {
 		wp_register_script( $handle, $path, $deps, $version, $in_footer );
@@ -49,7 +46,6 @@ class PPOM_SCRIPTS {
 
 	/**
 	 * Register and Enqueue Scripts.
-	 *
 	 */
 	public static function enqueue_script( $handle, $path = '', $deps = array( 'jquery' ), $version = '', $in_footer = true ) {
 		if ( ! wp_script_is( $handle, 'registered' ) && $path ) {
@@ -61,7 +57,6 @@ class PPOM_SCRIPTS {
 
 	/**
 	 * Register Styles.
-	 *
 	 */
 	private static function register_style( $handle, $path, $deps = array(), $version = false, $media = 'all' ) {
 		wp_register_style( $handle, $path, $deps, $version, $media );
@@ -70,7 +65,6 @@ class PPOM_SCRIPTS {
 
 	/**
 	 * Register and Enqueue Styles.
-	 *
 	 */
 	public static function enqueue_style( $handle, $path = '', $deps = array(), $version = '', $media = 'all' ) {
 		if ( ! wp_script_is( $handle, 'registered' ) && $path ) {
@@ -105,7 +99,6 @@ class PPOM_SCRIPTS {
 
 	/**
 	 * Localize Scripts Data
-	 *
 	 */
 	public static function localize_script( $handle, $js_var_name, $js_var_data = array() ) {
 
@@ -122,7 +115,6 @@ class PPOM_SCRIPTS {
 
 	/**
 	 * Add Inline CSS
-	 *
 	 */
 	public static function inline_style( $handle, $css ) {
 
@@ -134,7 +126,6 @@ class PPOM_SCRIPTS {
 
 	/**
 	 * Add Inline JS
-	 *
 	 */
 	public static function inline_script( $handle, $js ) {
 
@@ -146,7 +137,6 @@ class PPOM_SCRIPTS {
 
 	/**
 	 * get plugin url
-	 *
 	 */
 	public static function get_url() {
 
@@ -155,7 +145,6 @@ class PPOM_SCRIPTS {
 
 	/**
 	 * get plugin version
-	 *
 	 */
 	public static function get_version() {
 
@@ -165,7 +154,7 @@ class PPOM_SCRIPTS {
 	public static function get_instance() {
 
 		// create a new object if it doesn't exist.
-		is_null( self::$ins ) && self::$ins = new self;
+		is_null( self::$ins ) && self::$ins = new self();
 
 		return self::$ins;
 	}

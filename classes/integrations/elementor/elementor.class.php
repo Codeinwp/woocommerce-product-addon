@@ -89,7 +89,7 @@ class PPOM_ELEMENTOR {
 	public function init_widgets() {
 
 		// Include Widget files
-		require_once( PPOM_PATH . '/classes/integrations/elementor/shortcode-widget.php' );
+		require_once PPOM_PATH . '/classes/integrations/elementor/shortcode-widget.php';
 
 		// Register Widget
 		\Elementor\Plugin::instance()->widgets_manager->register_widget_type( new \PPOM_Elementor_Shortcode_Widget() );

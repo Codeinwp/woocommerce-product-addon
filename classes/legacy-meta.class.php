@@ -131,7 +131,7 @@ class PPOM_Legacy_InputManager {
 		$options = isset( self::$input_meta['options'] ) ? self::$input_meta['options'] : array();
 
 		if ( is_array( $options ) ) {
-			$options = array_map( "ppom_translation_options", $options );
+			$options = array_map( 'ppom_translation_options', $options );
 		}
 
 		return $options;
@@ -157,7 +157,7 @@ class PPOM_Legacy_InputManager {
 		}
 
 		if ( ( $this->input_type == 'radio' && ( $key = array_search( 'form-control', $classes ) ) !== false ) ||
-		     $this->input_type == 'checkbox' && ( $key = array_search( 'form-control', $classes ) ) !== false ) {
+			 $this->input_type == 'checkbox' && ( $key = array_search( 'form-control', $classes ) ) !== false ) {
 			unset( $classes[ $key ] );
 			$classes[] = 'ppom-check-input';
 		}
