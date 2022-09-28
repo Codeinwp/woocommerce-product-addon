@@ -410,6 +410,8 @@ jQuery(function($) {
         var field_type = $(this).data('field-type');
         var clone_new_field = $(".ppom-field-" + field_type + ":last").clone();
 
+        $( document ).trigger( 'ppom_new_field_created', [ clone_new_field, field_no ] );
+
         // field attr name apply on all fields meta with ppom-meta-field class
         clone_new_field.find('.ppom-meta-field').each(function(i, meta_field) {
             var field_name = 'ppom[' + field_no + '][' + $(meta_field).attr('data-metatype') + ']';
