@@ -64,6 +64,7 @@ if ( $postid && is_numeric( $postid ) && $rich_editor != 'on' ) {
 				id="<?php echo esc_attr( $fm->data_name() ); ?>"
 				class="<?php echo esc_attr( $fm->input_classes() ); ?>"
 				placeholder="<?php echo esc_attr( $fm->placeholder() ); ?>"
+				<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 
 		<?php
 		// Add input extra attributes

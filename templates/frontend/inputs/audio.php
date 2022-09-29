@@ -81,6 +81,7 @@ if ( ! $fm->audio_video() ) {
 								data-label="<?php echo esc_attr( $audio_title ); ?>"
 								data-price="<?php echo esc_attr( $audio_price ); ?>"
 								value="<?php echo esc_attr( json_encode( $audio ) ); ?>"
+								<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 								<?php echo $checked_option; ?>
 						>
 					<?php } else { ?>
@@ -94,6 +95,7 @@ if ( ! $fm->audio_video() ) {
 								data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 								data-price="<?php echo esc_attr( $audio_price ); ?>"
 								value="<?php echo esc_attr( json_encode( $audio ) ); ?>"
+								<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 								<?php echo $checked_option; ?>
 						>
 					<?php } ?>

@@ -111,6 +111,7 @@ if ( ! $ranges ) {
 						id="<?php echo esc_attr( $fm->data_name() ); ?>"
 						min="<?php echo esc_attr( $min_quantity ); ?>"
 						max="<?php echo esc_attr( $max_quantity ); ?>"
+						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 						step="<?php echo esc_attr( $qty_step ); ?>"
 				>
 			<?php } ?>

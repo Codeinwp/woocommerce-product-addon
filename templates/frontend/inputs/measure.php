@@ -57,6 +57,7 @@ $input_classes = $input_classes . ' ppom-measure-input';
 				data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 				data-optionid="<?php echo esc_attr( $option_id ); ?>"
 				data-qty="<?php echo esc_attr( $default_value ); ?>"
+				<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 				style="display: none;"
 				checked
 		>
@@ -74,6 +75,7 @@ $input_classes = $input_classes . ' ppom-measure-input';
 				data-title="<?php echo esc_attr( $fm->field_label() ); ?>"
 				data-use_units="<?php echo esc_attr( $use_units ); ?>"
 				data-errormsg="<?php echo esc_attr( $fm->error_msg() ); ?>"
+				<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 				max="<?php echo esc_attr( $maxlength ); ?>"
 				min="<?php echo esc_attr( $minlength ); ?>"
 				step="<?php echo esc_attr( $step ); ?>"

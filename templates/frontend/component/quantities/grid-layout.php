@@ -101,6 +101,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 						data-includeprice="<?php echo esc_attr( $include_productprice ); ?>"
 						data-usebase_price="<?php echo esc_attr( $usebaseprice ); ?>"
 						data-unlink_qty="<?php echo esc_attr( $unlink_qty ); ?>"
+						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 						data-price="<?php echo esc_attr( $the_price ); ?>"
 						value="<?php echo esc_attr( $selected_val ); ?>"
 					<?php echo esc_attr( $required ); ?>
