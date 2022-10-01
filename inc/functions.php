@@ -996,7 +996,7 @@ function ppom_settings_link( $links ) {
 }
 
 // Get field type by data_name
-function ppom_get_field_meta_by_dataname( $product_id, $data_name, $ppom_id = null ) {
+function ppom_get_field_meta_by_dataname( $product_id, $original_data_name, $ppom_id = null ) {
 
 	$ppom        = new PPOM_Meta( $product_id );
 	$ppom_fields = $ppom->fields;
@@ -1010,7 +1010,7 @@ function ppom_get_field_meta_by_dataname( $product_id, $data_name, $ppom_id = nu
 	}
 
 	// ppom_pa($ppom_fields);
-	$data_name = apply_filters( 'ppom_get_field_by_dataname_dataname', $data_name, $ppom );
+	$data_name = apply_filters( 'ppom_get_field_by_dataname_dataname', $original_data_name, $ppom );
 
 	$field_meta = '';
 	foreach ( $ppom_fields as $field ) {
@@ -1025,7 +1025,7 @@ function ppom_get_field_meta_by_dataname( $product_id, $data_name, $ppom_id = nu
 		}
 	}
 
-	return $field_meta;
+	return apply_filters( 'ppom_get_field_by_dataname__field_meta', $field_meta, $original_data_name, $data_name );
 }
 
 // Is PPOM meta has field of specific type
