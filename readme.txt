@@ -45,7 +45,7 @@ PPOM (Product Addons for WooCommerce) lets add extra custom fields and addons on
 * **Multi-language ready** - *WPML/Polylang supported*
 
 == Security is Priority ==
-**All inputs are [sanitized and escaped](https://developer.wordpress.org/themes/theme-security/data-sanitization-escaping/,  "WordPress sanitized")**
+All inputs are [sanitized and escaped](https://developer.wordpress.org/themes/theme-security/data-sanitization-escaping/,  "WordPress sanitized")
 
 == PPOM PRO Inputs ==
 * **[Measure Input](https://demo-ppom-lite.s.themeisle.com/product/demo-for-measure-input/)** - *Set prices for measure units like milk, cloths & frames, etc*
