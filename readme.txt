@@ -89,15 +89,17 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 3. After activation, you can set options from `WooCommerce -> PPOM Settings` menu
 
 == Screenshots ==
-1. Plugin options (input fields)
-2. Selecting meta with product
-3. Showing inputs on front end product
-4. Inputs attached to cart item
-5. Inputs attached to checkout page
-6. Inputs attached with order invoice
+1. "Select" field sample settings
+2. "Select" field on the product
+3. "Text" field sample settings
+4. "Text" field on the product
+5. Inputs attached to the cart page
+6. Inputs attached to the checkout page
 7. Finally admin can see all attached inputs in orders panel
-8. After Order is paid in my account
-9. Attach inputs to bulk products
+8. Managing PPOM Field Groups
+9. PPOM General Settings
+10. Free fields
+11. PRO fields (only available in PRO plans)
 
 == Changelog ==
 
