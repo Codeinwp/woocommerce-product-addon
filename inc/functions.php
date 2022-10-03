@@ -1025,7 +1025,7 @@ function ppom_get_field_meta_by_dataname( $product_id, $original_data_name, $ppo
 		}
 	}
 
-	return apply_filters( 'ppom_get_field_by_dataname__field_meta', $field_meta, $original_data_name, $data_name );
+	return apply_filters( 'ppom_get_field_by_dataname__field_meta', $ppom_fields, $field_meta, $original_data_name, $data_name );
 }
 
 // Is PPOM meta has field of specific type
