@@ -98,8 +98,6 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 7. Finally admin can see all attached inputs in orders panel
 8. Managing PPOM Field Groups
 9. PPOM General Settings
-10. Free fields
-11. PRO fields (only available in PRO plans)
 
 == Changelog ==
 
