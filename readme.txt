@@ -1,6 +1,6 @@
 === Product Addons & Fields for WooCommerce ===
 Contributors: themeisle
-Tags: woocommerce custom fields, woocommerce extra fields, woocommerce extra options, woocommerce personalized product, woocommerce product fields, woocommerce addons
+Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, woocommerce product addon
 Requires at least: 3.5
 Tested up to: 6.0
 Stable tag: 31.0.1
@@ -10,7 +10,7 @@ Requires PHP: 5.6
 
 == Description ==
 
-PPOM lets add extra custom fields and addons on your product pages. Adding extra options like sizes, colors with PPOM is so simple with drag and drop form builder.
+PPOM (Product Addons for WooCommerce) lets add extra custom fields and addons on your product pages. Adding extra options like sizes, colors with PPOM is so simple with drag and drop form builder.
 
 = How it works? =
 * Create PPOM fields with drag & drag form builder from `WooCommerce->PPOM Fields`
@@ -169,7 +169,7 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 [Docs for Free Inputs](https://docs.themeisle.com/article/1701-ppom-free-input-types)
 = I can add fields in Variable Products also? =
 Yes
-= Is there any fields limits =
+= Is there any fields limits? =
 No - But sometime due to server limitation you cannot add more fields.
 = Can we price with option? =
 Yes, price can be added with Select,Radio,Checbox
