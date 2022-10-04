@@ -58,10 +58,7 @@ jQuery(function($){
 			        $.post(ajaxurl, data, function(resp){
 			        	$('#ppom_delete_selected_products_btn').html('Delete');
 			        	if (resp) {
-					        swal.fire({title: "Done", text: resp, type: "success" ,confirmButtonColor: '#217ac8'},
-						        function(){ 
-						        	location.reload();
-					        });
+					        swal.fire({title: "Done", text: resp, type: "success" ,confirmButtonColor: '#217ac8'}).then(()=>location.reload());
 			        	}else{
 	        	 			swal.fire(resp, "", "error");
 			        	}
@@ -158,10 +155,7 @@ jQuery(function($){
 		        $.post(ajaxurl, data, function(resp){
 		        	$("#del-file-" + productmeta_id).html('<span class="dashicons dashicons-no"></span>');
 		        	if (resp.status === 'success') {
-				        swal.fire({title: "Done", text: resp.message, type: "success" ,confirmButtonColor: '#217ac8'},
-					        function(){ 
-					            location.reload();
-				        });
+				        swal.fire({title: "Done", text: resp.message, type: "success" ,confirmButtonColor: '#217ac8'}).then(()=>location.reload());
 		        	}else{
         	 			swal.fire(resp.message, "", "error");
 		        	}
