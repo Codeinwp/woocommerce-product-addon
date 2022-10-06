@@ -228,7 +228,7 @@ jQuery(function($) {
         if (field_meta.type === 'imageselect') {
 
             var dd_selector = 'ppom_imageselect_' + field_meta.data_name;
-            var ddData = $('#' + dd_selector).data('ddslick');
+            var ddData = $('#' + dd_selector).data('ppom_ddslick');
             var image_replace = $('#' + dd_selector).attr('data-enable-rpimg');
             ppom_create_hidden_input(ddData);
             ppom_update_option_prices();
