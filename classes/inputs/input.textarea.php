@@ -70,7 +70,7 @@ class NM_Textarea_wooproduct extends PPOM_Inputs {
 			),
 			'price'           => array(
 				'type'        => 'text',
-				'title'       => __( 'Addon-on Price', 'ppom' ),
+				'title'       => __( 'Add-on Price', 'ppom' ),
 				'desc'        => __( 'Price will be added as Add-on if text provided', 'ppom' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
