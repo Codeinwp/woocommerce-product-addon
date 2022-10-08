@@ -1355,3 +1355,22 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 		do_action( 'ppom_after_files_moved', $all_moved_files, $order_id, $order );
 	}
 }
+
+/**
+ * Responsible from the adding a support for Order Again functionality in the WooCommerce My Account -> Order View page.
+ * The method adds PPOM Fields to the given order item from the provided order. (Clones the PPOM data of data order item to the new cart)
+ *
+ * @param  array $cart_item_data Current custom item data.
+ * @param  \WC_Order_Item_Product $item Order Item Product
+ * @param  \WC_Order $order
+ * @return void
+ */
+function ppom_wc_order_again_compatibility( $cart_item_data, $item, $order ) {
+	$ppom_data = $item->get_meta('_ppom_fields');
+
+    if( is_array($ppom_data) && array_key_exists( 'fields', $ppom_data ) ) {
+        $cart_item_data['ppom'] = $ppom_data;
+    }
+
+	return $cart_item_data;
+}
