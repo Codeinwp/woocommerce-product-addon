@@ -101,7 +101,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 									<i class="fa fa-lock" aria-hidden="true"></i>
 								</span>
 								<span class="upsell-btn-wrapper">
-									<a target="_blank" href="https://themeisle.com/plugins/ppom-pro/?utm_source=themeisle&utm_medium=product&utm_campaign=front">Get Pro</a>
+									<a target="_blank" href="<?php echo tsdk_utmify('https://themeisle.com/plugins/ppom-pro/upgrade/','lockedfields'); ?>">Get Pro</a>
 								</span>
 							</li>
 						<?php
