@@ -403,6 +403,10 @@ jQuery(function($) {
     **/
     var option_index = 0;
     $(document).on('click', '.ppom_select_field', function(event) {
+        if( $(this).hasClass('locked') ) {
+            return;
+        }
+
         event.preventDefault();
 
         $('#ppom_fields_model_id').find('.ppom-js-modal-close').trigger('click');

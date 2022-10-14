@@ -63,6 +63,10 @@ require_once PPOM_PATH . '/inc/files.php';
 require_once PPOM_PATH . '/inc/nmInput.class.php';
 require_once PPOM_PATH . '/inc/prices.php';
 
+if( is_admin() ) {
+	require_once PPOM_PATH . '/classes/freemium.class.php';
+}
+
 
 /*
  ======= For now we are including class file, we will replace  =========== */
