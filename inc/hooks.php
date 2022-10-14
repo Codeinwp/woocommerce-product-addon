@@ -13,8 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Saving Cropped image when posted from product page.
 function ppom_hooks_save_cropped_image( $ppom_fields, $posted_data ) {
 
-	$product_id = $posted_data['add-to-cart'];
-	// var_dump($product_id);
+	if( ! isset( $posted_data['ppom_product_id'] ) ) {
+		return;
+	}
+
+	$product_id = intval( $posted_data['ppom_product_id'] );
+
 	$cropped_fields = ppom_has_field_by_type( $product_id, 'cropper' );
 	if ( empty( $cropped_fields ) ) {
 		return $ppom_fields;
