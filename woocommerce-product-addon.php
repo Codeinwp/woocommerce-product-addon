@@ -10,7 +10,7 @@
  * Author URI: https://themeisle.com/
  *
  * WC requires at least: 3.0.0
- * WC tested up to: 5.3.0
+ * WC tested up to: 6.9.4
  *
  * WordPress Available:  yes
  * Requires License:     no
@@ -62,6 +62,10 @@ require_once PPOM_PATH . '/inc/admin.php';
 require_once PPOM_PATH . '/inc/files.php';
 require_once PPOM_PATH . '/inc/nmInput.class.php';
 require_once PPOM_PATH . '/inc/prices.php';
+
+if( is_admin() ) {
+	require_once PPOM_PATH . '/classes/freemium.class.php';
+}
 
 
 /*

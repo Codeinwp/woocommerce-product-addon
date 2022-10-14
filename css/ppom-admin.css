@@ -45,6 +45,7 @@
     width: 32%;
     /*background-color: #d6d3da !important;*/
     background-color: #fff !important;
+    color: #0c7fa8;
     margin: 1px;
     margin-left: 4px;
     text-align: center;
@@ -58,6 +59,10 @@
     box-shadow: 10px 10px 5px #f2e8e8a1;
     -webkit-box-shadow: 10px 10px 5px #f2e8e8a1;
     -moz-box-shadow: 10px 10px 5px #f2e8e8a1;
+}
+
+.ppom-fields-name-model .ppom-modal-body ul li i {
+    color: #0c7fa8;
 }
 
 .ppom-fields-name-model .ppom-modal-body ul li:hover {
@@ -1060,4 +1065,23 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 .ppom-admin-addons-actions {
     text-align: center;
     display: flex;
+}
+
+/* Freemium */
+.ppom-fields-name-model .ppom-modal-body ul li.locked {
+    opacity: 0.4;
+    color:#000;
+}
+
+.ppom-fields-name-model .ppom-modal-body ul li.locked:hover {
+    background: #fff !important;
+    color:#000 !important;
+}
+
+.ppom-fields-name-model .ppom-modal-body ul li.locked i {
+    color:#000;
+}
+
+.ppom-fields-name-model .upsell-btn-wrapper {
+    float: right !important;
 }

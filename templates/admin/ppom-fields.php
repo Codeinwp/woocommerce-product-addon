@@ -85,6 +85,28 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 						<?php
 					}
 				}
+
+				// show only if pro is not activated.
+				if( ! ppom_pro_is_installed() ) {
+					foreach( ( new PPOM_Freemium() )->get_pro_fields() as $field ) {
+						?>
+							<li onclick="return;" class="ppom_select_field list-group-item locked">
+								<span class="ppom-fields-icon">
+									<?php echo $field['icon']; ?>
+								</span>
+								<span>
+									<?php echo $field['title']; ?>
+								</span>
+								<span>
+									<i class="fa fa-lock" aria-hidden="true"></i>
+								</span>
+								<span class="upsell-btn-wrapper">
+									<a target="_blank" href="<?php echo esc_url( tsdk_utmify('https://themeisle.com/plugins/ppom-pro/upgrade/','lockedfields') ); ?>">Get Pro</a>
+								</span>
+							</li>
+						<?php
+					}
+				}
 				?>
 			</ul>
 		</div>
