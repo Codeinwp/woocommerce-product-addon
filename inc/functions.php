@@ -2332,3 +2332,17 @@ function ppom_settings_migrated() {
 
 	return $r != null ? true : false;
 }
+
+/**
+ * PPOM Check Pro Feature Compatibility
+ *
+ * @param  string $feature_slug That represents feature key to look the if there is a compatibility.
+ * @return bool
+ */
+function ppom_check_pro_compatibility($feature_slug) {
+	if( ! defined( 'PPOM_PRO_COMPATIBILITY_FEATURES' ) || ! is_array( PPOM_PRO_COMPATIBILITY_FEATURES ) ) {
+		return false;
+	}
+
+	return isset( PPOM_PRO_COMPATIBILITY_FEATURES[ $feature_slug ] ) && PPOM_PRO_COMPATIBILITY_FEATURES[ $feature_slug ];
+}
