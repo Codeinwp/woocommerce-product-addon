@@ -80,7 +80,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 	if( ppom_check_pro_compatibility('cond_field_repeat') && isset( $meta['cond_field_repeater_enable'] ) && $meta['cond_field_repeater_enable'] === 'on' ) {?>
 		<span class="ppom-option-notice">
 			<?php
-				esc_html_e( sprintf( 'The %s field cannot be used because the Conditional Field Repeater mode is activated, although Legacy Input Rendering is enabled. <strong>Conditional Field Repeater</strong> cannot work if the <strong>Legacy Input Rendering</strong> is enabled.', sprintf('<strong>%s</strong>', $title) ), 'ppom' );
+				printf( 'The %s field cannot be used because the Conditional Field Repeater mode is activated, although Legacy Input Rendering is enabled. <strong>Conditional Field Repeater</strong> cannot work if the <strong>Legacy Input Rendering</strong> is enabled.', sprintf('<strong>%s</strong>', esc_html( $title ) ) );
 			?>
 		</span>
 		<?php
