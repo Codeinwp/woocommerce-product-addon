@@ -166,13 +166,11 @@ jQuery(function($){
 
 		if( 'delete' === type ) {
 			deleteSelectedProducts(checkedProducts_ids);
-			return;
+		}else if( 'export' === type ) {
+			$('#ppom-groups-export-form').submit();
 		}
 
-		if( 'export' === type ) {
-			$('#ppom-groups-export-form').submit();
-			return;
-		}
+		$(this).val(-1);
 	});
 
 	const exportOption = ppom_vars.ppomProActivated === 'yes' ? `<option value="export">${ppom_vars.i18n.exportLabel}</option>` : `<option disabled value="export">${ppom_vars.i18n.exportLockedLabel}</option>`;
