@@ -31,6 +31,9 @@ define( 'PPOM_PRODUCT_META_KEY', '_product_meta_id' );
 define( 'PPOM_TABLE_META', 'nm_personalized' );
 define( 'PPOM_UPLOAD_DIR_NAME', 'ppom_files' );
 define( 'PPOM_UPGRADE_URL', 'https://themeisle.com/plugins/ppom-pro/upgrade/' );
+define( 'PPOM_COMPATIBILITY_FEATURES', [
+	'pro_cond_field_repeat' => true // Compatibility for Conditional Field Repeater feature
+] );
 
 require PPOM_PATH . '/vendor/autoload.php';
 
