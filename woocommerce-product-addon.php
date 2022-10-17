@@ -109,7 +109,7 @@ add_filter(
 	function ( $compatibilities ) {
 		$compatibilities['ppompro'] = [
 			'basefile'  => defined( 'PPOM_PRO_PATH' ) ? PPOM_PRO_PATH . '/ppom.php' : '',
-			'required'  => '25.0',
+			'required'  => '22.0',
 			'tested_up' => '25.0',
 		];
 
