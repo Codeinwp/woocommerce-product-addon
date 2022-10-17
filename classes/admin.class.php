@@ -159,7 +159,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			?>
 			<div class="ppom-manage-fields-topbar d-flex">
 				<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'ppom'); ?></h1>
-				<div>
+				<div class="ppom-top-nav">
 					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($addons); ?>">+ <?php esc_html_e( 'All Addons', 'ppom' ); ?></a>
 					<a  href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'ppom'); ?></a>
 				</div>
