@@ -63,6 +63,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		// adding wpml support for PPOM Settings
 		add_filter( 'woocommerce_admin_settings_sanitize_option', array( $this, 'ppom_setting_wpml' ), 10, 3 );
+		add_action( 'ppom_pdf_setting_action', 'ppom_admin_update_pro_notice', 10 );
 
 		add_action( 'admin_head', array( $this, 'ppom_tabs_custom_style' ) );
 
