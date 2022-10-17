@@ -390,10 +390,11 @@ ul.ppom-options-container li {
     max-height: 140px;
 }
 
-.ppom-heading-style {
+.ppom-wrapper h1.ppom-heading-style {
     border-bottom: 2px solid #f957006e;
     padding-bottom: 9px;
     font-family: roboto;
+    font-size:23px;
     /*font-size: 30px;*/
 }
 

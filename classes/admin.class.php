@@ -66,8 +66,6 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		add_action( 'admin_head', array( $this, 'ppom_tabs_custom_style' ) );
 
-		add_action( 'ppom_pdf_setting_action', 'ppom_admin_update_pro_notice', 10 );
-
 		add_action(
 			'woocommerce_admin_field_ppom_multi_select',
 			array(
@@ -155,7 +153,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$view    = ( isset( $_REQUEST ['view'] ) ? sanitize_text_field( $_REQUEST ['view'] ) : '' );
 
 		if ( $action != 'new' && $do_meta != 'edit' && $do_meta != 'clone' && $view != 'addons' ) {
-			echo '<h1 class="ppom-heading-style">' . __( 'Themeisle WooCommerce Personalized Product Fields Manager', 'ppom' ) . '</h1>';
+			?>
+			<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'ppom'); ?></h1>
+			<?php
 			echo '<p>' . __( 'Create different meta groups for different products.', 'ppom' ) . '</p>';
 		}
 
@@ -168,20 +168,6 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 			ppom_load_template( 'admin/addons-list.php' );
 		} else {
-			$url_add = add_query_arg( array( 'action' => 'new' ) );
-			$addons  = add_query_arg( array( 'view' => 'addons' ) );
-			// $video_url         = 'https://najeebmedia.com/ppom/#howtovideo';
-			$ppom_settings_url = admin_url( 'admin.php?page=wc-settings&tab=ppom_settings' );
-
-			echo '<div class="ppom-product-meta-block text-center ppom-meta-card-block">';
-			echo '<h2>' . __( 'How it works?', 'ppom' ) . '</h2>';
-			// printf( __( '<p><a href="%s" target="_blank">Watch a Quick Video</a>', "ppom" ), $video_url );
-			printf( __( '<a href="%s">PPOM Settings</a></p>', 'ppom' ), $ppom_settings_url );
-			echo '<a style="margin-right: 3px;" class="btn btn-success" href="' . esc_url( $url_add ) . '"><span class="dashicons dashicons-plus"></span> ' . __( 'Add PPOM Meta Group', 'ppom' ) . '</a>';
-			echo '<a style="margin-right: 3px;" class="btn btn-success" href="' . esc_url( $addons ) . '"><span class="dashicons dashicons-plus"></span> ' . __( 'All Addons', 'ppom' ) . '</a>';
-			echo '</div>';
-			echo '<br>';
-
 			do_action( 'ppom_pdf_setting_action' );
 			do_action( 'ppom_enquiryform_setting_action' );
 

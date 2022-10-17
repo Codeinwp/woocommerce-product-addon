@@ -15,26 +15,9 @@ $all_forms = PPOM()->get_product_meta_all();
 wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 ?>
 
-<div class="wrapper">
-	<h2 class="ppom-heading-style"><?php _e( 'PPOM Meta List', 'ppom' ); ?></h2>
-</div>
-
-
 <div class="ppom-existing-meta-wrapper">
-
-	<form method="post" action="admin-post.php" enctype="multipart/form-data">
+	<form id="ppom-groups-export-form" method="post" action="admin-post.php" enctype="multipart/form-data">
 		<input type="hidden" name="action" value="ppom_export_meta"/>
-
-		<div class="ppom-product-table-header">
-
-			<span class="ppom-product-count-span"><?php _e( 'Select', 'ppom' ); ?> "<span
-						id="selected_products_count">0</span>"<?php _e( ' PPOM Meta', 'ppom' ); ?></span>
-			<button class="btn btn-danger"
-					id="ppom_delete_selected_products_btn"><?php _e( 'Delete', 'ppom' ); ?></button>
-			<button class="btn btn-yellow" id="export_selected_products_btn"><?php _e( 'Export', 'ppom' ); ?></button>
-			<span class="pull-right"><strong><?php echo count( $all_forms ); ?><?php _e( 'Items', 'ppom' ); ?></strong></span>
-			<span class="clear"></span>
-		</div>
 		<div class="table-responsive">
 			<table id="ppom-meta-table" class="table">
 				<thead>
@@ -105,7 +88,7 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 						</td>
 						<td><?php echo ppom_admin_simplify_meta( $productmeta->the_meta ); ?></td>
 						<td>
-							<a class="btn btn-primary ppom-products-modal"
+							<a class="btn btn-sm btn-secondary ppom-products-modal"
 							   data-ppom_id="<?php echo esc_attr( $productmeta->productmeta_id ); ?>"
 							   data-formmodal-id="ppom-product-modal"><?php _e( 'Attach to Products', 'ppom' ); ?></a>
 						</td>
@@ -124,6 +107,7 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 				}
 				?>
 			</table>
+			
 		</div>
 	</form>
 </div>

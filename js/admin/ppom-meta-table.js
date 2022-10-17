@@ -20,54 +20,45 @@ jQuery(function($){
 	/**
         1- Apply DataTable JS Library To PPOM Meta List
     **/
-	$('#ppom-meta-table').DataTable();
+	$('#ppom-meta-table').DataTable({
+		pageLength: 50,
+		dom: 'f<"ppom-toolbar"><"top">rt<"bottom">lpi'
+	});
 	var append_overly_model =  ("<div class='ppom-modal-overlay ppom-js-modal-close'></div>");
 
     /**
         2- Delete Selected Products
     **/
-    $('body').on('click', '#ppom_delete_selected_products_btn', function(e){
-        e.preventDefault();
-        
-        var checkedProducts_ids;
-        var check_field = $('.ppom_product_checkbox:checked');
-		checkedProducts_ids = $('.ppom_product_checkbox:checked').map(function() {
-		    return parseInt(this.value);
-		}).get();
-        
-        if (check_field.length > 0  ) {
-            swal.fire({
-                title: "Are you sure?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55 ",
-                cancelButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-            	}).then( (result ) => {
-                    if (!result.isConfirmed) return;
+    function deleteSelectedProducts(checkedProducts_ids) {
+		swal.fire({
+			title: "Are you sure?",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#DD6B55 ",
+			cancelButtonColor: "#DD6B55",
+			confirmButtonText: "Yes",
+			cancelButtonText: "No",
+			}).then( (result ) => {
+				if (!result.isConfirmed) return;
 
-                    $('#ppom_delete_selected_products_btn').html('Deleting...');
-					
-					var data = {
-						action 			: 'ppom_delete_selected_meta',
-						productmeta_ids	: checkedProducts_ids,
-						ppom_meta_nonce : $("#ppom_meta_nonce").val()
-					};
+				$('#ppom_delete_selected_products_btn').html('Deleting...');
+				
+				var data = {
+					action 			: 'ppom_delete_selected_meta',
+					productmeta_ids	: checkedProducts_ids,
+					ppom_meta_nonce : $("#ppom_meta_nonce").val()
+				};
 
-			        $.post(ajaxurl, data, function(resp){
-			        	$('#ppom_delete_selected_products_btn').html('Delete');
-			        	if (resp) {
-					        swal.fire({title: "Done", text: resp, type: "success" ,confirmButtonColor: '#217ac8'}).then(()=>location.reload());
-			        	}else{
-	        	 			swal.fire(resp, "", "error");
-			        	}
-			        });
-            });
-        }else{
-            swal.fire("Please at least check one Meta!", "", "error");
-        }
-    });
+				$.post(ajaxurl, data, function(resp){
+					$('#ppom_delete_selected_products_btn').html('Delete');
+					if (resp) {
+						swal.fire({title: "Done", text: resp, type: "success" ,confirmButtonColor: '#217ac8'}).then(()=>location.reload());
+					}else{
+						swal.fire(resp, "", "error").then();
+					}
+				});
+		});
+	}
 
 
     /**
@@ -130,8 +121,6 @@ jQuery(function($){
         5- Delete Single Product Meta
     **/
 	$('body').on('click','a.ppom-delete-single-product', function(e){
-
-
 		e.preventDefault();
 		var productmeta_id = $(this).attr('data-product-id');
 
@@ -162,5 +151,40 @@ jQuery(function($){
 		        });
         });
     });
+
+	$(document).on( 'change', '#ppom-bulk-actions', function(){
+		const type = $(this).val();
+
+		const checkedProducts_ids = $('.ppom_product_checkbox:checked').map(function() {
+		    return parseInt(this.value);
+		}).get();
+
+		if ( ! ( checkedProducts_ids.length > 0 ) ) {
+			swal.fire("Please at least check one Meta!", "", "error");
+			return;
+		}
+
+		if( 'delete' === type ) {
+			deleteSelectedProducts(checkedProducts_ids);
+			return;
+		}
+
+		if( 'export' === type ) {
+			$('#ppom-groups-export-form').submit();
+			return;
+		}
+	});
+
+	const exportOption = ppom_vars.ppomProActivated === 'yes' ? `<option value="export">${ppom_vars.i18n.exportLabel}</option>` : `<option disabled value="export">${ppom_vars.i18n.exportLockedLabel}</option>`;
+
+	const bulkActions = `<select id="ppom-bulk-actions">
+			<option value="-1">${ppom_vars.i18n.bulkActionsLabel}</option>
+			<option value="delete">${ppom_vars.i18n.deleteLabel}</option>
+			${exportOption}
+		</select>`;
+
+	const btn = `<a style="margin-right: 30px; float:right" class="btn btn-success btn-sm" href="${ppom_vars.i18n.addGroupUrl}"><span class="dashicons dashicons-plus"></span>${ppom_vars.i18n.addGroupLabel}</a>`;
+
+	$('div.ppom-toolbar').html(`<div class="">${bulkActions} ${btn}</div>`);
 
 });
