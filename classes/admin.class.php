@@ -151,10 +151,18 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$action  = ( isset( $_REQUEST ['action'] ) ? sanitize_text_field( $_REQUEST ['action'] ) : '' );
 		$do_meta = ( isset( $_REQUEST ['do_meta'] ) ? sanitize_text_field( $_REQUEST ['do_meta'] ) : '' );
 		$view    = ( isset( $_REQUEST ['view'] ) ? sanitize_text_field( $_REQUEST ['view'] ) : '' );
+		$ppom_settings_url = admin_url( "admin.php?page=wc-settings&tab=ppom_settings" );
+		$addons           = add_query_arg( array( 'view' => 'addons' ) );
 
 		if ( $action != 'new' && $do_meta != 'edit' && $do_meta != 'clone' && $view != 'addons' ) {
 			?>
-			<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'ppom'); ?></h1>
+			<div class="ppom-manage-fields-topbar d-flex">
+				<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'ppom'); ?></h1>
+				<div>
+					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($addons); ?>">+ <?php esc_html_e( 'All Addons', 'ppom' ); ?></a>
+					<a  href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'ppom'); ?></a>
+				</div>
+			</div>
 			<?php
 			echo '<p>' . __( 'You can create different meta groups for different products.', 'ppom' ) . '</p>';
 		}

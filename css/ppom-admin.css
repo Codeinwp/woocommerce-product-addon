@@ -389,11 +389,16 @@ ul.ppom-options-container li {
     max-height: 140px;
 }
 
-.ppom-wrapper h1.ppom-heading-style {
-    border-bottom: 2px solid #f957006e;
+.ppom-manage-fields-topbar {
     padding-bottom: 9px;
+    border-bottom: 2px solid #f957006e;
+    justify-content: space-between;
+}
+
+.ppom-wrapper h1.ppom-heading-style {
     font-family: roboto;
     font-size:23px;
+    display: inline;
     /*font-size: 30px;*/
 }
 
