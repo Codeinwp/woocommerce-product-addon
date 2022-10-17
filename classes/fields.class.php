@@ -144,7 +144,9 @@ class PPOM_Fields_Meta {
 				'bulkActionsLabel'=>esc_html__( 'Bulk Actions', 'ppom' ),
 				'deleteLabel'=>esc_html__( 'Delete', 'ppom' ),
 				'exportLabel'=>esc_html__( 'Export', 'ppom' ),
-				'exportLockedLabel'=>esc_html__( 'Export (PRO)', 'ppom' )
+				'exportLockedLabel'=>esc_html__( 'Export (PRO)', 'ppom' ),
+				'importLabel'=>esc_html__( 'Import Field Groups ', 'ppom' ),
+				'importLockedLabel'=>esc_html__( 'Import Field Groups (PRO)', 'ppom' )
 			]
 		);
 

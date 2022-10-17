@@ -22,7 +22,7 @@ jQuery(function($){
     **/
 	$('#ppom-meta-table').DataTable({
 		pageLength: 50,
-		dom: 'f<"ppom-toolbar"><"top">rt<"bottom">lpi'
+		dom: 'f<"ppom-toolbar"><"top">rt<"bottom">lpi',
 	});
 	var append_overly_model =  ("<div class='ppom-modal-overlay ppom-js-modal-close'></div>");
 
@@ -177,14 +177,15 @@ jQuery(function($){
 
 	const exportOption = ppom_vars.ppomProActivated === 'yes' ? `<option value="export">${ppom_vars.i18n.exportLabel}</option>` : `<option disabled value="export">${ppom_vars.i18n.exportLockedLabel}</option>`;
 
+	const importBtn = ppom_vars.ppomProActivated === 'yes' ? `<a class="btn btn-secondary btn-sm ml-4 ppom-import-export-btn" href=""><span class="dashicons dashicons-download"></span>${ppom_vars.i18n.importLabel}</a>` : `<a disabled class="btn btn-secondary btn-sm ml-4 disabled" href=""><span class="dashicons dashicons-download"></span>${ppom_vars.i18n.importLockedLabel}</a>`;
+
 	const bulkActions = `<select id="ppom-bulk-actions">
 			<option value="-1">${ppom_vars.i18n.bulkActionsLabel}</option>
 			<option value="delete">${ppom_vars.i18n.deleteLabel}</option>
 			${exportOption}
 		</select>`;
 
-	const btn = `<a style="margin-right: 30px; float:right" class="btn btn-success btn-sm" href="${ppom_vars.i18n.addGroupUrl}"><span class="dashicons dashicons-plus"></span>${ppom_vars.i18n.addGroupLabel}</a>`;
+	const btn = `<a class="btn btn-success btn-sm float-right mr-4" href="${ppom_vars.i18n.addGroupUrl}"><span class="dashicons dashicons-plus"></span>${ppom_vars.i18n.addGroupLabel}</a>`;
 
-	$('div.ppom-toolbar').html(`<div class="">${bulkActions} ${btn}</div>`);
-
+	$('div.ppom-toolbar').html(`<div class="">${bulkActions} ${importBtn} <span id="ppom-toolbar-extra"></span> ${btn}</div>`);
 });

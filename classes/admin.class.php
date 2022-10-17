@@ -156,7 +156,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			?>
 			<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'ppom'); ?></h1>
 			<?php
-			echo '<p>' . __( 'Create different meta groups for different products.', 'ppom' ) . '</p>';
+			echo '<p>' . __( 'You can create different meta groups for different products.', 'ppom' ) . '</p>';
 		}
 
 		if ( ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) || $action == 'new' ) {
