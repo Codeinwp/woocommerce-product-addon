@@ -414,6 +414,8 @@ jQuery(function($) {
         var field_type = $(this).data('field-type');
         var clone_new_field = $(".ppom-field-" + field_type + ":last").clone();
 
+        $( document ).trigger( 'ppom_new_field_created', [ clone_new_field, field_no ] );
+
         // field attr name apply on all fields meta with ppom-meta-field class
         clone_new_field.find('.ppom-meta-field').each(function(i, meta_field) {
             var field_name = 'ppom[' + field_no + '][' + $(meta_field).attr('data-metatype') + ']';
@@ -949,8 +951,22 @@ jQuery(function($) {
     **/
     $(document).on('keyup', '[data-meta-id="title"] input[type="text"]', function() {
 
+        /**
+         * If auto generated data name starts with the "_", that causes the order item meta is recognized as
+         * "hidden" in {prefix}_woocommerce_order_ittemmeta table order_by WC Core. To prevent that, add "f" char
+         * to beginning of the dataname as auto.
+         *
+         * With the prefix, all fields that will be created from now on; will be shown on order thank you page anymore.
+         *
+         * "f" is a randomly chosen character.
+         */
+        const START_CHAR_DISALLOW_BEING_HIDDEN_FIELD = 'f';
+
         var $this = $(this);
         var field_id = $this.val().toLowerCase().replace(/[^A-Za-z\d]/g, '_');
+
+        field_id = field_id.charAt(0) === '_' ? `${START_CHAR_DISALLOW_BEING_HIDDEN_FIELD}${field_id}` : field_id;
+
         var selector = $this.closest('.ppom-slider');
 
         var wp_field = selector.find('.ppom-fields-actions').attr('data-table-id');

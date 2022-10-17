@@ -50,6 +50,7 @@ $product_type = $product->get_type();
 			name="<?php echo esc_attr( $fm->form_name() ); ?>"
 			class="<?php echo esc_attr( $fm->input_classes() ); ?>"
 			data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
+			<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 
 			<?php
 			// Add input extra attributes

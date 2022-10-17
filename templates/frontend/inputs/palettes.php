@@ -120,6 +120,7 @@ echo '</style>';
 							data-taxable="<?php echo esc_attr( $taxable ); ?>"
 							data-without_tax="<?php echo esc_attr( $without_tax ); ?>"
 							data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
+							<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 							value="<?php echo esc_attr( $raw_label ); ?>"
 							<?php echo $checked_option; ?>
 					>

@@ -75,6 +75,18 @@ foreach ( $ppom_fields_meta as $meta ) {
 		printf( __( 'Please provide data name property for %s', 'ppom' ), $title );
 		continue;
 	}
+
+	// If conditional field repeater is enabled, render a notice about the Conditional Field Repeater doesn't work with the legacy input rendering.
+	if( ppom_check_pro_compatibility('cond_field_repeat') && isset( $meta['cond_field_repeater_enable'] ) && $meta['cond_field_repeater_enable'] === 'on' ) {?>
+		<span class="ppom-option-notice">
+			<?php
+				printf( 'The %s field cannot be used because the Conditional Field Repeater mode is activated, although Legacy Input Rendering is enabled. <strong>Conditional Field Repeater</strong> cannot work if the <strong>Legacy Input Rendering</strong> is enabled.', sprintf('<strong>%s</strong>', esc_html( $title ) ) );
+			?>
+		</span>
+		<?php
+		continue;
+	}
+
 	// Dataname senatize
 	$data_name = sanitize_key( $data_name );
 

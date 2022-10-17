@@ -9,6 +9,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed.' );
 }
 
+/**
+ * Renders field if legacy input rendering mode is on
+ *
+ * @return void
+ */
 function ppom_woocommerce_show_fields() {
 
 	global $product;

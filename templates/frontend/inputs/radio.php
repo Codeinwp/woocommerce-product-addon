@@ -92,6 +92,7 @@ $product_type        = $product->get_type();
 						data-onetime="<?php echo esc_attr( $onetime ); ?>"
 						data-taxable="<?php echo esc_attr( $taxable ); ?>"
 						data-without_tax="<?php echo esc_attr( $without_tax ); ?>"
+						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 						data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 						<?php echo $checked_option; ?>
 				>

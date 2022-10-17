@@ -225,6 +225,7 @@ $custom_attr = array();
 										data-optionid="<?php echo esc_attr( $option_id ); ?>"
 										data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 										value="<?php echo esc_attr( json_encode( $image ) ); ?>"
+										<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 									<?php echo esc_attr( $checked_option ); ?>
 								>
 							<?php } else { ?>
@@ -242,6 +243,7 @@ $custom_attr = array();
 										data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 										data-builder="<?php echo esc_attr( $builder ); ?>"
 										value="<?php echo esc_attr( json_encode( $image ) ); ?>"
+										<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 									<?php echo esc_attr( $checked_option ); ?>
 
 										<?php

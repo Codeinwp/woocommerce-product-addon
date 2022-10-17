@@ -66,6 +66,7 @@ $default_value = strip_tags( $default_value );
 			data-onetime="<?php echo esc_attr( $onetime ); ?>"
 			data-taxable="<?php echo esc_attr( $taxable ); ?>"
 			data-without_tax="<?php echo esc_attr( $price_without_tax ); ?>"
+			<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 			value="<?php echo esc_attr( $default_value ); ?>"
 
 			<?php
