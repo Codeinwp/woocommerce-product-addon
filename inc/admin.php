@@ -683,7 +683,7 @@ function ppom_admin_update_pro_notice() {
 
 	$buy_paddle = tsdk_utmify( 'https://themeisle.com/plugins/ppom-pro/upgrade/', 'addmorefields', 'ppompage' );
 
-	echo '<div class="ppom-more-plugins-block">';
-	echo '<a class="btn btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . __( 'Add more field types', 'ppom' ) . '</a>';
-	echo '</div>';
+    echo '<div class="ppom-more-plugins-block pb-5">';
+    echo '<a class="btn btn-sm btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . __( 'Add more field types', 'ppom' ) . '</a>';
+    echo '</div>';
 }

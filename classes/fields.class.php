@@ -137,6 +137,17 @@ class PPOM_Fields_Meta {
 		$ppom_admin_meta = array(
 			'plugin_admin_page' => admin_url( 'admin.php?page=ppom' ),
 			'loader'            => PPOM_URL . '/images/loading.gif',
+			'ppomProActivated'=>ppom_pro_is_installed() ? 'yes' : 'no',
+			'i18n' => [
+				'addGroupUrl'=>add_query_arg( array( 'action' => 'new' ) ),
+				'addGroupLabel'=>esc_html__( 'Add New Group', 'ppom' ),
+				'bulkActionsLabel'=>esc_html__( 'Bulk Actions', 'ppom' ),
+				'deleteLabel'=>esc_html__( 'Delete', 'ppom' ),
+				'exportLabel'=>esc_html__( 'Export', 'ppom' ),
+				'exportLockedLabel'=>esc_html__( 'Export (PRO)', 'ppom' ),
+				'importLabel'=>esc_html__( 'Import Field Groups ', 'ppom' ),
+				'importLockedLabel'=>esc_html__( 'Import Field Groups (PRO)', 'ppom' )
+			]
 		);
 
 		// localize ppom_vars

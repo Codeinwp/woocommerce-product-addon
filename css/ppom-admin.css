@@ -166,8 +166,7 @@ ul.ppom-options-container li {
 .ppom-meta-card-block {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     transition: 0.3s;
-    padding: 10px 0;
-    background-color: #ebeeef;
+    background-color: #f2f5f9;
 }
 
 .btn-yellow {
@@ -390,10 +389,16 @@ ul.ppom-options-container li {
     max-height: 140px;
 }
 
-.ppom-heading-style {
-    border-bottom: 2px solid #f957006e;
+.ppom-manage-fields-topbar {
     padding-bottom: 9px;
+    border-bottom: 2px solid #f957006e;
+    justify-content: space-between;
+}
+
+.ppom-wrapper h1.ppom-heading-style {
     font-family: roboto;
+    font-size:23px;
+    display: inline;
     /*font-size: 30px;*/
 }
 
@@ -1084,4 +1089,19 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 
 .ppom-fields-name-model .upsell-btn-wrapper {
     float: right !important;
+}
+
+.ppom-cancle-import-export-btn {
+    font-size:24px;
+    text-decoration: none !important;
+    line-height: 16px;
+}
+
+.ppom-cancle-import-export-btn .dashicons {
+    font-size:24px;
+    color: #605f5f;
+}
+
+.ppom-top-nav {
+    line-height:35px;
 }
