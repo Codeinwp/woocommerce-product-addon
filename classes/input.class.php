@@ -39,7 +39,7 @@ class PPOM_Inputs {
 
 	public static function get_instance() {
 		// create a new object if it doesn't exist.
-		is_null( self::$ins ) && self::$ins = new self;
+		is_null( self::$ins ) && self::$ins = new self();
 
 		return self::$ins;
 	}
@@ -56,9 +56,10 @@ class PPOM_Inputs {
 
 			/**
 			 * adding filter: nm_input_class-filename
+			 *
 			 * @since 6.7
 			 * @since 7.6: changing path for eventcalendar addon
-			 **/
+			 */
 
 			$_inputs = '';
 			switch ( $type ) {
@@ -75,13 +76,12 @@ class PPOM_Inputs {
 
 			if ( file_exists( $_inputs ) ) {
 
-				include_once( $_inputs );
+				include_once $_inputs;
 				if ( class_exists( $class_name ) ) {
 					return new $class_name();
 				} else {
 					return null;
-				}
-
+				}           
 			}
 		} else {
 			return new $class_name();
@@ -104,8 +104,7 @@ class PPOM_Inputs {
 				return new $class_name();
 			} else {
 				return null;
-			}
-
+			}       
 		}
 	}
 
@@ -120,12 +119,12 @@ class PPOM_Inputs {
 			}
 		}
 
-		//front end scripts
+		// front end scripts
 		if ( $this->input_scripts['custom'] ) {
 			foreach ( $this->input_scripts['custom'] as $scripts => $script ) {
 
-				//checking if it is style
-				//nm_personalizedproduct_pa($script);	
+				// checking if it is style
+				// nm_personalizedproduct_pa($script);   
 				if ( $script['type'] == 'js' ) {
 					wp_enqueue_script( $this->plugin_meta['shortname'] . '-' . $script['script_name'], $this->plugin_meta['url'] . $script['script_source'], $script['depends'], '3.0', $script['in_footer'] );
 				} else {
@@ -140,7 +139,7 @@ class PPOM_Inputs {
 	 * check if browser is ie
 	 */
 	function if_browser_is_ie() {
-		//print_r($_SERVER['HTTP_USER_AGENT']);
+		// print_r($_SERVER['HTTP_USER_AGENT']);
 
 		if ( ! ( isset( $_SERVER['HTTP_USER_AGENT'] ) && ( strpos( $_SERVER['HTTP_USER_AGENT'], 'Trident' ) !== false || strpos( $_SERVER['HTTP_USER_AGENT'], 'MSIE' ) !== false ) ) ) {
 			return false;
@@ -154,16 +153,16 @@ class PPOM_Inputs {
 	 */
 	function current_page_url() {
 		$page_url = 'http';
-		if ( isset( $_SERVER["HTTPS"] ) ) {
-			if ( $_SERVER["HTTPS"] == "on" ) {
-				$page_url .= "s";
+		if ( isset( $_SERVER['HTTPS'] ) ) {
+			if ( $_SERVER['HTTPS'] == 'on' ) {
+				$page_url .= 's';
 			}
 		}
-		$page_url .= "://";
-		if ( $_SERVER["SERVER_PORT"] != "80" ) {
-			$page_url .= $_SERVER["SERVER_NAME"] . ":" . $_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
+		$page_url .= '://';
+		if ( $_SERVER['SERVER_PORT'] != '80' ) {
+			$page_url .= $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . $_SERVER['REQUEST_URI'];
 		} else {
-			$page_url .= $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"];
+			$page_url .= $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 		}
 
 		return $page_url;

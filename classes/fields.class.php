@@ -24,52 +24,52 @@ class PPOM_Fields_Meta {
 
 	public static function get_instance() {
 		// create a new object if it doesn't exist.
-		is_null( self::$ins ) && self::$ins = new self;
+		is_null( self::$ins ) && self::$ins = new self();
 
 		return self::$ins;
 	}
 
 
 	/*
-    **============ Load all scripts ===========
-    */
+	**============ Load all scripts ===========
+	*/
 	function load_script( $hook ) {
 
-		if ( ! isset( $_GET['page'] ) || $_GET['page'] != "ppom" ) {
+		if ( ! isset( $_GET['page'] ) || $_GET['page'] != 'ppom' ) {
 			return;
 		}
 
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		// Preloader script
-		wp_enqueue_script( 'ppom-perload', PPOM_URL . "/js/admin/pre-load.js", array( 'jquery' ), PPOM_VERSION, true );
+		wp_enqueue_script( 'ppom-perload', PPOM_URL . '/js/admin/pre-load.js', array( 'jquery' ), PPOM_VERSION, true );
 
 		// Bootstrap Files
-		wp_enqueue_style( 'ppom-bs', PPOM_URL . "/css/bootstrap/bootstrap.css" );
+		wp_enqueue_style( 'ppom-bs', PPOM_URL . '/css/bootstrap/bootstrap.css' );
 
 		// Bulk Quantity Addon JS File
-		wp_enqueue_script( 'ppom-bulkquantity', PPOM_URL . "/js/admin//ppom-bulkquantity.js", array( 'jquery' ), PPOM_VERSION, true );
+		wp_enqueue_script( 'ppom-bulkquantity', PPOM_URL . '/js/admin//ppom-bulkquantity.js', array( 'jquery' ), PPOM_VERSION, true );
 
 		// PPOM Meta Table File
-		wp_enqueue_script( 'ppom-meta-table', PPOM_URL . "/js/admin/ppom-meta-table.js", array( 'jquery' ), PPOM_VERSION, true );
+		wp_enqueue_script( 'ppom-meta-table', PPOM_URL . '/js/admin/ppom-meta-table.js', array( 'jquery' ), PPOM_VERSION, true );
 
 		// Font-awesome File
 		if ( ppom_load_fontawesome() ) {
-			wp_enqueue_style( 'ppom-fontawsome', PPOM_URL . "/css/font-awesome/css/font-awesome.min.css" );
+			wp_enqueue_style( 'ppom-fontawsome', PPOM_URL . '/css/font-awesome/css/font-awesome.min.css' );
 		}
 
 		// Swal Files
-		wp_enqueue_style( 'ppom-swal', PPOM_URL . "/js/sweetalert/sweetalert2.min.css" );
-		wp_enqueue_script( 'ppom-swal', PPOM_URL . "/js/sweetalert/sweetalert2.js", [], PPOM_VERSION, true );
+		wp_enqueue_style( 'ppom-swal', PPOM_URL . '/js/sweetalert/sweetalert2.min.css' );
+		wp_enqueue_script( 'ppom-swal', PPOM_URL . '/js/sweetalert/sweetalert2.js', [], PPOM_VERSION, true );
 
 		// Select2 Files
-		wp_enqueue_style( 'ppom-select2', PPOM_URL . "/css/select2.css" );
-		wp_enqueue_script( 'ppom-select2', PPOM_URL . "/js/select2.js", array( 'jquery' ), PPOM_VERSION, true );
+		wp_enqueue_style( 'ppom-select2', PPOM_URL . '/css/select2.css' );
+		wp_enqueue_script( 'ppom-select2', PPOM_URL . '/js/select2.js', array( 'jquery' ), PPOM_VERSION, true );
 
 		if ( isset( $_GET['do_meta'] ) && $_GET['do_meta'] == 'edit' ) {
 
 			// CSS Code Editor Files
-			wp_enqueue_style( 'ppom-codemirror-theme', PPOM_URL . "/css/codemirror-theme.css" );
+			wp_enqueue_style( 'ppom-codemirror-theme', PPOM_URL . '/css/codemirror-theme.css' );
 			$css_code_editor = wp_enqueue_code_editor( array( 'type' => 'text/css' ) );
 			// ppom_pa($css_code_editor); exit;
 			if ( false !== $css_code_editor ) {
@@ -100,37 +100,54 @@ class PPOM_Fields_Meta {
 		}
 
 		// Tabletojson JS File
-		wp_enqueue_script( 'ppom-tabletojson', PPOM_URL . "/js/admin/jquery.tabletojson.min.js", array( 'jquery' ), PPOM_VERSION, true );
+		wp_enqueue_script( 'ppom-tabletojson', PPOM_URL . '/js/admin/jquery.tabletojson.min.js', array( 'jquery' ), PPOM_VERSION, true );
 
 		// Datatable Files
-		wp_enqueue_style( 'ppom-datatables', PPOM_URL . "/js/datatable/datatables.min.css" );
-		wp_enqueue_script( 'ppom-datatables', PPOM_URL . "/js/datatable/jquery.dataTables.min.js", array( 'jquery' ), PPOM_VERSION, true );
+		wp_enqueue_style( 'ppom-datatables', PPOM_URL . '/js/datatable/datatables.min.css' );
+		wp_enqueue_script( 'ppom-datatables', PPOM_URL . '/js/datatable/jquery.dataTables.min.js', array( 'jquery' ), PPOM_VERSION, true );
 
 		// Description Tooltips JS File
-		wp_enqueue_script( 'ppom-tooltip', PPOM_URL . "/js/ppom-tooltip.js", array( 'jquery' ), PPOM_VERSION, true );
+		wp_enqueue_script( 'ppom-tooltip', PPOM_URL . '/js/ppom-tooltip.js', array( 'jquery' ), PPOM_VERSION, true );
 
 		// Add the color picker css file
 		wp_enqueue_style( 'wp-color-picker' );
 
 		// PPOM Admin Files
-		wp_enqueue_style( 'ppom-field', PPOM_URL . "/css/ppom-admin.css", '', PPOM_VERSION );
-		wp_enqueue_script( 'ppom-field', PPOM_URL . "/js/admin/ppom-admin.js", array(
-			'ppom-swal',
-			'ppom-select2',
-			'ppom-tabletojson',
-			'ppom-datatables',
-			'ppom-tooltip',
-			'jquery-ui-core',
-			'jquery-ui-sortable',
-			'ppom-perload',
-			'wp-color-picker'
-		), PPOM_VERSION, true );
+		wp_enqueue_style( 'ppom-field', PPOM_URL . '/css/ppom-admin.css', '', PPOM_VERSION );
+		wp_enqueue_script(
+			'ppom-field',
+			PPOM_URL . '/js/admin/ppom-admin.js',
+			array(
+				'ppom-swal',
+				'ppom-select2',
+				'ppom-tabletojson',
+				'ppom-datatables',
+				'ppom-tooltip',
+				'jquery-ui-core',
+				'jquery-ui-sortable',
+				'ppom-perload',
+				'wp-color-picker',
+			),
+			PPOM_VERSION,
+			true 
+		);
 
 		wp_enqueue_media();
 
 		$ppom_admin_meta = array(
 			'plugin_admin_page' => admin_url( 'admin.php?page=ppom' ),
 			'loader'            => PPOM_URL . '/images/loading.gif',
+			'ppomProActivated'=>ppom_pro_is_installed() ? 'yes' : 'no',
+			'i18n' => [
+				'addGroupUrl'=>add_query_arg( array( 'action' => 'new' ) ),
+				'addGroupLabel'=>esc_html__( 'Add New Group', 'ppom' ),
+				'bulkActionsLabel'=>esc_html__( 'Bulk Actions', 'ppom' ),
+				'deleteLabel'=>esc_html__( 'Delete', 'ppom' ),
+				'exportLabel'=>esc_html__( 'Export', 'ppom' ),
+				'exportLockedLabel'=>esc_html__( 'Export (PRO)', 'ppom' ),
+				'importLabel'=>esc_html__( 'Import Field Groups ', 'ppom' ),
+				'importLockedLabel'=>esc_html__( 'Import Field Groups (PRO)', 'ppom' )
+			]
 		);
 
 		// localize ppom_vars
@@ -140,12 +157,12 @@ class PPOM_Fields_Meta {
 
 
 	/*
-    **============ Render all fields ===========
-    */
+	**============ Render all fields ===========
+	*/
 	function render_field_settings() {
 		// ppom_pa(PPOM() -> inputs);
 
-		$html = '';
+		$html  = '';
 		$html .= '<div id="ppom-fields-wrapper">';
 		foreach ( PPOM()->inputs as $fields_type => $meta ) {
 
@@ -153,12 +170,12 @@ class PPOM_Fields_Meta {
 			$field_desc  = isset( $meta->desc ) ? $meta->desc : null;
 			$settings    = isset( $meta->settings ) ? $meta->settings : array();
 
-			$settings = $this->ppom_tabs_panel_classes( $settings );
+			$settings = $this->update_html_classes( $settings );
 
 			// new model
 			$html .= '<div class="ppom-modal-box ppom-slider ppom-field-' . esc_attr( $fields_type ) . '">';
 			$html .= '<header>';
-			$html .= '<h3>' . sprintf( __( "%s", "ppom" ), $field_title ) . '</h3>';
+			$html .= '<h3>' . sprintf( __( '%s', 'ppom' ), $field_title ) . '</h3>';
 			$html .= '</header>';
 			$html .= '<div class="ppom-modal-body">';
 
@@ -178,11 +195,11 @@ class PPOM_Fields_Meta {
 	}
 
 	/*
-    **============ Render all fields meta ===========
-    */
+	**============ Render all fields meta ===========
+	*/
 	function render_field_meta( $field_meta, $fields_type, $field_index = '', $save_meta = '' ) {
 		// ppom_pa($save_meta);
-		$html = '';
+		$html  = '';
 		$html .= '<div data-table-id="' . esc_attr( $fields_type ) . '" class="row ppom-tabs ppom-fields-actions" data-field-no="' . esc_attr( $field_index ) . '">';
 		$html .= '<input type="hidden" name="ppom[' . $field_index . '][type]" value="' . $fields_type . '" class="ppom-meta-field" data-metatype="type">';
 		$html .= '<div class="col-md-12 ppom-tabs-header">';
@@ -200,7 +217,7 @@ class PPOM_Fields_Meta {
 			if ( in_array( 'all', $tab_depend ) && ! in_array( $fields_type, $not_allowed ) ) {
 
 				$html .= '<label for="' . esc_attr( $tab_index ) . '" id="' . esc_attr( $tab_index ) . '" class="' . esc_attr( $tab_class ) . '">' . $tab_label . '</label>';
-			} else if ( in_array( $fields_type, $tab_depend ) ) {
+			} elseif ( in_array( $fields_type, $tab_depend ) ) {
 
 				$html .= '<label for="' . esc_attr( $tab_index ) . '" id="' . esc_attr( $tab_index ) . '" class="' . esc_attr( $tab_class ) . '">' . $tab_label . '</label>';
 			}
@@ -245,8 +262,8 @@ class PPOM_Fields_Meta {
 				$html .= '<div data-meta-id="' . esc_attr( $fields_meta_key ) . '" class="' . esc_attr( $panel_classes ) . '">';
 				$html .= '<div class="form-group">';
 
-				$html .= '<label>' . sprintf( __( "%s", "ppom" ), $title ) . '';
-				$html .= '<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip" title="' . sprintf( __( "%s", "ppom" ), $desc ) . '">';
+				$html .= '<label>' . sprintf( __( '%s', 'ppom' ), $title ) . '';
+				$html .= '<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip" title="' . sprintf( __( '%s', 'ppom' ), $desc ) . '">';
 				$html .= '<i class="dashicons dashicons-editor-help"></i>';
 				$html .= '</span>' . $link . '';
 				$html .= '</label>';
@@ -287,7 +304,7 @@ class PPOM_Fields_Meta {
 		switch ( $type ) {
 
 			case 'number':
-			case 'text' :
+			case 'text':
 				// ppom_pa($values);
 				$html_input .= '<input data-metatype="' . esc_attr( $name ) . '" type="' . esc_attr( $type ) . '"  value="' . esc_html( $values ) . '" class="form-control ppom-meta-field"';
 
@@ -312,8 +329,7 @@ class PPOM_Fields_Meta {
 				$html_input .= '</div>';
 				break;
 
-			case 'textarea' :
-
+			case 'textarea':
 				$html_input .= '<textarea data-metatype="' . esc_attr( $name ) . '" class="form-control ppom-meta-field ppom-adjust-box-height"';
 
 				if ( $field_index != '' ) {
@@ -325,8 +341,7 @@ class PPOM_Fields_Meta {
 
 				break;
 
-			case 'select' :
-
+			case 'select':
 				$html_input .= '<select id="' . $name . '" data-metatype="' . esc_attr( $name ) . '" class="form-control ppom-meta-field"';
 
 				if ( $field_index != '' ) {
@@ -337,35 +352,34 @@ class PPOM_Fields_Meta {
 				$html_input .= '>';
 
 				foreach ( $options as $key => $val ) {
-					$selected   = ( $key == $values ) ? 'selected="selected"' : '';
+					$selected    = ( $key == $values ) ? 'selected="selected"' : '';
 					$html_input .= '<option value="' . $key . '" ' . $selected . '>' . esc_html( $val ) . '</option>';
 				}
 				$html_input .= '</select>';
 
 				break;
 
-			case 'paired' :
-
-				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Option', "ppom" );
-				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Price (optional)', "ppom" );
+			case 'paired':
+				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Option', 'ppom' );
+				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Price (optional)', 'ppom' );
 
 				$weight_unit  = get_option( 'woocommerce_weight_unit' );
-				$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( "Discount", "ppom" );
-				$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( "Tooltip", "ppom" );
-				$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (PRO only)", "ppom" );
-				$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( "Stock (PRO only)", "ppom" );
+				$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Discount', 'ppom' );
+				$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Tooltip', 'ppom' );
+				$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (PRO only)", 'ppom' );
+				$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock (PRO only)', 'ppom' );
 
 				if ( ppom_pro_is_installed() ) {
 
-					$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( "Discount", "ppom" );
-					$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( "Tooltip", "ppom" );
-					$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (optional)", "ppom" );
-					$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( "Stock (optional)", "ppom" );
+					$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Discount', 'ppom' );
+					$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Tooltip', 'ppom' );
+					$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (optional)", 'ppom' );
+					$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock (optional)', 'ppom' );
 				}
 
-				$plc_id = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Unique Option ID)', "ppom" );
+				$plc_id = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Unique Option ID)', 'ppom' );
 
-				$opt_index0 = 1;
+				$opt_index0  = 1;
 				$html_input .= '<ul class="ppom-options-container ppom-options-sortable">';
 
 				if ( $values ) {
@@ -379,7 +393,7 @@ class PPOM_Fields_Meta {
 						$weight   = isset( $option['weight'] ) ? $option['weight'] : '';
 						$stock    = isset( $option['stock'] ) ? $option['stock'] : '';
 
-						$option_id  = ppom_get_option_id( $option );
+						$option_id   = ppom_get_option_id( $option );
 						$html_input .= '<li class="data-options ppom-sortable-handle" style="display: flex;" data-condition-type="simple_options">';
 						$html_input .= '<span class="dashicons dashicons-move"></span>';
 						$html_input .= '<input type="text" class="option-title form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . $plc_option . '" data-metatype="option" data-opt-index="' . esc_attr( $opt_index ) . '">';
@@ -430,14 +444,13 @@ class PPOM_Fields_Meta {
 				break;
 
 			case 'paired-palettes';
-			case 'paired-pricematrix' :
+			case 'paired-pricematrix':
+				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Option', 'ppom' );
+				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Price (optional)', 'ppom' );
+				$plc_label  = ( ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Label', 'ppom' );
+				$plc_id     = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Unique Option ID)', 'ppom' );
 
-				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Option', "ppom" );
-				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Price (optional)', "ppom" );
-				$plc_label  = ( ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Label', "ppom" );
-				$plc_id     = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Unique Option ID)', "ppom" );
-
-				$opt_index0 = 1;
+				$opt_index0  = 1;
 				$html_input .= '<ul class="ppom-options-container ppom-options-sortable ' . $type . '">';
 
 				if ( $values ) {
@@ -449,7 +462,7 @@ class PPOM_Fields_Meta {
 						$label   = isset( $option['label'] ) ? $option['label'] : '';
 						$isfixed = isset( $option['isfixed'] ) ? $option['isfixed'] : '';
 
-						$option_id  = ppom_get_option_id( $option );
+						$option_id   = ppom_get_option_id( $option );
 						$html_input .= '<li class="data-options ppom-sortable-handle" style="display: flex;">';
 						$html_input .= '<span class="dashicons dashicons-move"></span>';
 						$html_input .= '<input type="text" class="option-title form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . $plc_option . '" data-metatype="option" data-opt-index="' . esc_attr( $opt_index ) . '">';
@@ -490,12 +503,11 @@ class PPOM_Fields_Meta {
 				break;
 
 
-			case 'font_paired' :
+			case 'font_paired':
+				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Data Name', 'ppom' );
+				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Font Name', 'ppom' );
 
-				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Data Name', "ppom" );
-				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Font Name', "ppom" );
-
-				$opt_index0 = 1;
+				$opt_index0  = 1;
 				$html_input .= '<ul class="ppom-options-container ppom-options-sortable">';
 
 				if ( $values ) {
@@ -532,9 +544,8 @@ class PPOM_Fields_Meta {
 
 				break;
 
-			case 'paired-quantity' :
-
-				$opt_index0 = 1;
+			case 'paired-quantity':
+				$opt_index0  = 1;
 				$html_input .= '<ul class="ppom-options-container">';
 
 				if ( $values ) {
@@ -549,13 +560,13 @@ class PPOM_Fields_Meta {
 
 						$html_input .= '<li class="data-options" style="display: flex;">';
 						$html_input .= '<span class="dashicons dashicons-move"></span>';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . __( 'option', "ppom" ) . '" data-metatype="option" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][price]" value="' . esc_attr( $option['price'] ) . '" placeholder="' . __( 'price (if any)', "ppom" ) . '" data-metatype="price" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][weight]" value="' . esc_attr( $weight ) . '" placeholder="' . __( 'weight (if any)', "ppom" ) . '" data-metatype="weight" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][default]" value="' . esc_attr( $default ) . '" placeholder="' . __( 'Default. Qty', "ppom" ) . '" data-metatype="default" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][min]" value="' . esc_attr( $option['min'] ) . '" placeholder="' . __( 'Min. Qty', "ppom" ) . '" data-metatype="min" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][max]" value="' . esc_attr( $option['max'] ) . '" placeholder="' . __( 'Max. Qty', "ppom" ) . '" data-metatype="max" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][stock]" value="' . esc_attr( $stock ) . '" placeholder="' . __( 'Stock', "ppom" ) . '" data-metatype="stock" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . __( 'option', 'ppom' ) . '" data-metatype="option" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][price]" value="' . esc_attr( $option['price'] ) . '" placeholder="' . __( 'price (if any)', 'ppom' ) . '" data-metatype="price" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][weight]" value="' . esc_attr( $weight ) . '" placeholder="' . __( 'weight (if any)', 'ppom' ) . '" data-metatype="weight" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][default]" value="' . esc_attr( $default ) . '" placeholder="' . __( 'Default. Qty', 'ppom' ) . '" data-metatype="default" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][min]" value="' . esc_attr( $option['min'] ) . '" placeholder="' . __( 'Min. Qty', 'ppom' ) . '" data-metatype="min" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][max]" value="' . esc_attr( $option['max'] ) . '" placeholder="' . __( 'Max. Qty', 'ppom' ) . '" data-metatype="max" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][stock]" value="' . esc_attr( $stock ) . '" placeholder="' . __( 'Stock', 'ppom' ) . '" data-metatype="stock" data-opt-index="' . esc_attr( $opt_index ) . '">';
 
 						$html_input .= '<button class="btn btn-success ppom-add-option" data-option-type="paired-quantity"><i class="fa fa-plus" aria-hidden="true"></i></button>';
 						$html_input .= '<button class="btn btn-danger ppom-remove-option"><i class="fa fa-minus" aria-hidden="true"></i></button>';
@@ -568,13 +579,13 @@ class PPOM_Fields_Meta {
 				} else {
 					$html_input .= '<li class="data-options" style="display: flex;">';
 					$html_input .= '<span class="dashicons dashicons-move"></span>';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'option', "ppom" ) . '" data-metatype="option">';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'price (if any)', "ppom" ) . '" data-metatype="price">';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'weight (if any)', "ppom" ) . '" data-metatype="weight">';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Default. Qty', "ppom" ) . '" data-metatype="default">';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Min. Qty', "ppom" ) . '" data-metatype="min">';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Max. Qty', "ppom" ) . '" data-metatype="max">';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Stock', "ppom" ) . '" data-metatype="stock">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'option', 'ppom' ) . '" data-metatype="option">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'price (if any)', 'ppom' ) . '" data-metatype="price">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'weight (if any)', 'ppom' ) . '" data-metatype="weight">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Default. Qty', 'ppom' ) . '" data-metatype="default">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Min. Qty', 'ppom' ) . '" data-metatype="min">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Max. Qty', 'ppom' ) . '" data-metatype="max">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Stock', 'ppom' ) . '" data-metatype="stock">';
 
 					$html_input .= '<button class="btn btn-success ppom-add-option" data-option-type="paired-quantity"><i class="fa fa-plus" aria-hidden="true"></i></button>';
 					$html_input .= '<button class="btn btn-danger ppom-remove-option"><i class="fa fa-minus" aria-hidden="true"></i></button>';
@@ -587,13 +598,12 @@ class PPOM_Fields_Meta {
 
 				break;
 
-			case 'paired-measure' :
-
+			case 'paired-measure':
 				$html_input .= '<ul class="ppom-options-container">';
 
 				$add_option_img = $plugin_meta['url'] . '/images/plus.png';
 				$del_option_img = $plugin_meta['url'] . '/images/minus.png';
-				$plc_id         = ( ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Unique ID)', "ppom" );
+				$plc_id         = ( ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Unique ID)', 'ppom' );
 
 				if ( $value ) {
 					foreach ( $value as $option ) {
@@ -602,8 +612,8 @@ class PPOM_Fields_Meta {
 
 						$html_input .= '<li class="data-options">';
 						$html_input .= '<span class="dashicons dashicons-move"></span>';
-						$html_input .= '<input type="text" name="options[option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . __( 'Unit', "ppom" ) . '">';
-						$html_input .= '<input type="text" name="options[price]" value="' . esc_attr( $option['price'] ) . '" placeholder="' . __( 'price (if any)', "ppom" ) . '">';
+						$html_input .= '<input type="text" name="options[option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . __( 'Unit', 'ppom' ) . '">';
+						$html_input .= '<input type="text" name="options[price]" value="' . esc_attr( $option['price'] ) . '" placeholder="' . __( 'price (if any)', 'ppom' ) . '">';
 						$html_input .= '<input type="text" class="option-id" name="options[id]" value="' . esc_attr( $option_id ) . '" placeholder="' . $plc_id . '">';
 						$html_input .= '<img class="add_option" src="' . esc_url( $add_option_img ) . '" title="add rule" alt="add rule" style="cursor:pointer; margin:0 3px;">';
 						$html_input .= '<img class="remove_option" src="' . esc_url( $del_option_img ) . '" title="remove rule" alt="remove rule" style="cursor:pointer; margin:0 3px;">';
@@ -612,8 +622,8 @@ class PPOM_Fields_Meta {
 				} else {
 					$html_input .= '<li class="data-options">';
 					$html_input .= '<span class="dashicons dashicons-move"></span>';
-					$html_input .= '<input type="text" name="options[option]" placeholder="' . __( 'Unit', "ppom" ) . '">';
-					$html_input .= '<input type="text" name="options[price]" placeholder="' . __( 'price (if any)', "ppom" ) . '">';
+					$html_input .= '<input type="text" name="options[option]" placeholder="' . __( 'Unit', 'ppom' ) . '">';
+					$html_input .= '<input type="text" name="options[price]" placeholder="' . __( 'price (if any)', 'ppom' ) . '">';
 					$html_input .= '<input type="text" class="option-id" name="options[id]" placeholder="' . $plc_id . '">';
 					$html_input .= '<img class="add_option" src="' . esc_url( $add_option_img ) . '" title="add rule" alt="add rule" style="cursor:pointer; margin:0 3px;">';
 					$html_input .= '<img class="remove_option" src="' . esc_url( $del_option_img ) . '" title="remove rule" alt="remove rule" style="cursor:pointer; margin:0 3px;">';
@@ -624,9 +634,8 @@ class PPOM_Fields_Meta {
 
 				break;
 
-			case 'paired-cropper' :
-
-				$opt_index0 = 1;
+			case 'paired-cropper':
+				$opt_index0  = 1;
 				$html_input .= '<ul class="ppom-options-container ppom-cropper-boundary">';
 
 				if ( $values ) {
@@ -638,10 +647,10 @@ class PPOM_Fields_Meta {
 
 						$html_input .= '<li class="data-options" style=display:flex;>';
 						$html_input .= '<span class="dashicons dashicons-move"></span>';
-						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . __( 'Label', "ppom" ) . '" class="form-control ppom-option-keys" data-metatype="option" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][width]" value="' . esc_attr( stripslashes( $option['width'] ) ) . '" placeholder="' . __( 'Width', "ppom" ) . '" class="form-control ppom-option-keys" data-metatype="width" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][height]" value="' . esc_attr( $option['height'] ) . '" placeholder="' . __( 'Height', "ppom" ) . '" class="form-control ppom-option-keys" data-metatype="height" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][price]" value="' . esc_attr( $price ) . '" placeholder="' . __( 'Price (optional)', "ppom" ) . '" class="form-control ppom-option-keys" data-metatype="price" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . __( 'Label', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="option" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][width]" value="' . esc_attr( stripslashes( $option['width'] ) ) . '" placeholder="' . __( 'Width', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="width" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][height]" value="' . esc_attr( $option['height'] ) . '" placeholder="' . __( 'Height', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="height" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][price]" value="' . esc_attr( $price ) . '" placeholder="' . __( 'Price (optional)', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="price" data-opt-index="' . esc_attr( $opt_index ) . '">';
 
 						$html_input .= '<button class="btn btn-success ppom-add-option" data-option-type="paired-cropper"><i class="fa fa-plus" aria-hidden="true"></i></button>';
 						$html_input .= '<button class="btn btn-danger ppom-remove-option"><i class="fa fa-minus" aria-hidden="true"></i></button>';
@@ -654,10 +663,10 @@ class PPOM_Fields_Meta {
 				} else {
 					$html_input .= '<li class="data-options" style=display:flex;>';
 					$html_input .= '<span class="dashicons dashicons-move"></span>';
-					$html_input .= '<input type="text" placeholder="' . __( 'option', "ppom" ) . '" class="form-control ppom-option-keys" data-metatype="option">';
-					$html_input .= '<input type="text" placeholder="' . __( 'Width', "ppom" ) . '" class="form-control ppom-option-keys" data-metatype="width">';
-					$html_input .= '<input type="text" placeholder="' . __( 'Height', "ppom" ) . '" class="form-control ppom-option-keys" data-metatype="height">';
-					$html_input .= '<input type="text" placeholder="' . __( 'Price (optional)', "ppom" ) . '" class="form-control ppom-option-keys" data-metatype="price">';
+					$html_input .= '<input type="text" placeholder="' . __( 'option', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="option">';
+					$html_input .= '<input type="text" placeholder="' . __( 'Width', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="width">';
+					$html_input .= '<input type="text" placeholder="' . __( 'Height', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="height">';
+					$html_input .= '<input type="text" placeholder="' . __( 'Price (optional)', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="price">';
 
 					$html_input .= '<button class="btn btn-success ppom-add-option" data-option-type="paired-cropper"><i class="fa fa-plus" aria-hidden="true"></i></button>';
 					$html_input .= '<button class="btn btn-danger ppom-remove-option"><i class="fa fa-minus" aria-hidden="true"></i></button>';
@@ -669,8 +678,7 @@ class PPOM_Fields_Meta {
 
 				break;
 
-			case 'checkbox' :
-
+			case 'checkbox':
 				if ( $options ) {
 					foreach ( $options as $key => $val ) {
 
@@ -717,8 +725,7 @@ class PPOM_Fields_Meta {
 				}
 				break;
 
-			case 'html-conditions' :
-
+			case 'html-conditions':
 				$condition_index = 1;
 				$rule_i          = 1;
 				if ( $values ) {
@@ -731,7 +738,7 @@ class PPOM_Fields_Meta {
 					$bound_all       = ( $values['bound'] == 'All' ) ? 'selected="selected"' : '';
 					$bound_any       = ( $values['bound'] == 'Any' ) ? 'selected="selected"' : '';
 
-					$html_input = '<div class="row ppom-condition-style-wrap">';
+					$html_input  = '<div class="row ppom-condition-style-wrap">';
 					$html_input .= '<div class="col-md-3 col-sm-3">';
 					$html_input .= '<select name="ppom[' . esc_attr( $field_index ) . '][conditions][visibility]" class="form-control ppom-condition-visible-bound" data-metatype="visibility">';
 					$html_input .= '<option ' . $visibility_show . ' value="Show">' . __( 'Show', 'ppom' ) . '</option>';
@@ -766,7 +773,7 @@ class PPOM_Fields_Meta {
 						$operator_less    = ( $condition['operators'] == 'less than' ) ? 'selected="selected"' : '';
 
 						$html_input .= '<div class="webcontact-rules" id="rule-box-' . esc_attr( $rule_i ) . '">';
-						$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule ', "ppom" ) . $rule_i ++ . '</label></div>';
+						$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule ', 'ppom' ) . $rule_i ++ . '</label></div>';
 
 						// conditional elements
 						$html_input .= '<div class="col-md-4 col-sm-4">';
@@ -779,10 +786,10 @@ class PPOM_Fields_Meta {
 						// is value meta
 						$html_input .= '<div class="col-md-2 col-sm-2">';
 						$html_input .= '<select name="ppom[' . esc_attr( $field_index ) . '][conditions][rules][' . esc_attr( $rule_index ) . '][operators]" class="form-control ppom-conditional-keys" data-metatype="operators">';
-						$html_input .= '<option ' . $operator_is . ' value="is">' . __( 'is', "ppom" ) . '</option>';
-						$html_input .= '<option ' . $operator_not . ' value="not">' . __( 'not', "ppom" ) . '</option>';
-						$html_input .= '<option ' . $operator_greater . ' value="greater than">' . __( 'greater than', "ppom" ) . '</option>';
-						$html_input .= '<option ' . $operator_less . ' value="less than">' . __( 'less than', "ppom" ) . '</option>';
+						$html_input .= '<option ' . $operator_is . ' value="is">' . __( 'is', 'ppom' ) . '</option>';
+						$html_input .= '<option ' . $operator_not . ' value="not">' . __( 'not', 'ppom' ) . '</option>';
+						$html_input .= '<option ' . $operator_greater . ' value="greater than">' . __( 'greater than', 'ppom' ) . '</option>';
+						$html_input .= '<option ' . $operator_less . ' value="less than">' . __( 'less than', 'ppom' ) . '</option>';
 						$html_input .= '</select> ';
 						$html_input .= '</div>';
 
@@ -812,24 +819,24 @@ class PPOM_Fields_Meta {
 					$html_input .= '<div class="row ppom-condition-style-wrap">';
 					$html_input .= '<div class="col-md-4 col-sm-4">';
 					$html_input .= '<select class="form-control ppom-condition-visible-bound" data-metatype="visibility">';
-					$html_input .= '<option value="Show">' . __( 'Show', "ppom" ) . '</option>';
-					$html_input .= '<option value="Hide">' . __( 'Hide', "ppom" ) . '</option>';
+					$html_input .= '<option value="Show">' . __( 'Show', 'ppom' ) . '</option>';
+					$html_input .= '<option value="Hide">' . __( 'Hide', 'ppom' ) . '</option>';
 					$html_input .= '</select> ';
 					$html_input .= '</div>';
 					$html_input .= '<div class="col-md-4 col-sm-4">';
 					$html_input .= '<select class="form-control ppom-condition-visible-bound" data-metatype="bound">';
-					$html_input .= '<option value="All">' . __( 'All', "ppom" ) . '</option>';
-					$html_input .= '<option value="Any">' . __( 'Any', "ppom" ) . '</option>';
+					$html_input .= '<option value="All">' . __( 'All', 'ppom' ) . '</option>';
+					$html_input .= '<option value="Any">' . __( 'Any', 'ppom' ) . '</option>';
 					$html_input .= '</select> ';
 					$html_input .= '</div>';
 					$html_input .= '<div class="col-md-4 col-sm-4">';
-					$html_input .= '<p>' . __( ' of the following matches', "ppom" ) . '</p>';
+					$html_input .= '<p>' . __( ' of the following matches', 'ppom' ) . '</p>';
 					$html_input .= '</div>';
 					$html_input .= '</div>';
 
 					$html_input .= '<div class="row ppom-condition-clone-js">';
 					$html_input .= '<div class="webcontact-rules" id="rule-box-' . esc_attr( $rule_i ) . '">';
-					$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule ', "ppom" ) . $rule_i ++ . '</label></div>';
+					$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule ', 'ppom' ) . $rule_i ++ . '</label></div>';
 
 					// conditional elements
 					$html_input .= '<div class="col-md-4 col-sm-4">';
@@ -839,10 +846,10 @@ class PPOM_Fields_Meta {
 					// is
 					$html_input .= '<div class="col-md-2 col-sm-2">';
 					$html_input .= '<select data-metatype="operators" class="ppom-conditional-keys form-control">';
-					$html_input .= '<option value="is">' . __( 'is', "ppom" ) . '</option>';
-					$html_input .= '<option value="not">' . __( 'not', "ppom" ) . '</option>';
-					$html_input .= '<option value="greater than">' . __( 'greater than', "ppom" ) . '</option>';
-					$html_input .= '<option value="less than">' . __( 'less than', "ppom" ) . '</option>';
+					$html_input .= '<option value="is">' . __( 'is', 'ppom' ) . '</option>';
+					$html_input .= '<option value="not">' . __( 'not', 'ppom' ) . '</option>';
+					$html_input .= '<option value="greater than">' . __( 'greater than', 'ppom' ) . '</option>';
+					$html_input .= '<option value="less than">' . __( 'less than', 'ppom' ) . '</option>';
 					$html_input .= '</select> ';
 					$html_input .= '</div>';
 
@@ -867,14 +874,13 @@ class PPOM_Fields_Meta {
 
 				break;
 
-			case 'pre-images' :
-
+			case 'pre-images':
 				$html_input .= '<div class="pre-upload-box table-responsive">';
 
-				$html_input .= '<button class="btn btn-info ppom-pre-upload-image-btn" data-metatype="images">' . __( 'Select/Upload Image', "ppom" ) . '</button>';
+				$html_input .= '<button class="btn btn-info ppom-pre-upload-image-btn" data-metatype="images">' . __( 'Select/Upload Image', 'ppom' ) . '</button>';
 				// ppom_pa($value);
 
-				$opt_index0 = 0;
+				$opt_index0  = 0;
 				$html_input .= '<ul class="ppom-options-container">';
 				if ( $values ) {
 
@@ -918,13 +924,12 @@ class PPOM_Fields_Meta {
 
 				break;
 
-			case 'imageselect' :
-
+			case 'imageselect':
 				$html_input .= '<div class="pre-upload-box table-responsive">';
 
-				$html_input .= '<button class="btn btn-info ppom-pre-upload-image-btn" data-metatype="imageselect">' . __( 'Select/Upload Image', "ppom" ) . '</button>';
+				$html_input .= '<button class="btn btn-info ppom-pre-upload-image-btn" data-metatype="imageselect">' . __( 'Select/Upload Image', 'ppom' ) . '</button>';
 
-				$opt_index0 = 0;
+				$opt_index0  = 0;
 				$html_input .= '<ul class="ppom-options-container">';
 				if ( $values && is_array( $values ) ) {
 
@@ -965,13 +970,12 @@ class PPOM_Fields_Meta {
 
 				break;
 
-			case 'pre-audios' :
-
+			case 'pre-audios':
 				$html_input .= '<div class="pre-upload-box">';
-				$html_input .= '<button class="btn btn-info ppom-pre-upload-image-btn" data-metatype="audio">' . __( 'Select Audio/Video', "ppom" ) . '</button>';
+				$html_input .= '<button class="btn btn-info ppom-pre-upload-image-btn" data-metatype="audio">' . __( 'Select Audio/Video', 'ppom' ) . '</button>';
 
 				$html_input .= '<ul class="ppom-options-container">';
-				$opt_index0 = 0;
+				$opt_index0  = 0;
 				// ppom_pa($values);
 				if ( $values ) {
 					$last_array_id = max( array_keys( $values ) );
@@ -1010,10 +1014,10 @@ class PPOM_Fields_Meta {
 
 			/**
 			 * new addon: bulk quantity
+			 *
 			 * @since 7.1
-			 **/
-			case 'bulk-quantity' :
-
+			 */
+			case 'bulk-quantity':
 				$bulk_data = json_decode( $values, true );
 				// ppom_pa($bulk_data[0]);
 				$html_input .= '<div class="ppom-bulk-quantity-wrapper">';
@@ -1035,7 +1039,7 @@ class PPOM_Fields_Meta {
 
 				if ( $values ) {
 					foreach ( $bulk_data[0] as $title => $value ) {
-						$deleteIcon = ( $title != 'Quantity Range' && $title != 'Base Price' ) ? '<span class="remove ppom-rm-bulk-variation"><i class="fa fa-times" aria-hidden="true"></i></span>' : '';
+						$deleteIcon  = ( $title != 'Quantity Range' && $title != 'Base Price' ) ? '<span class="remove ppom-rm-bulk-variation"><i class="fa fa-times" aria-hidden="true"></i></span>' : '';
 						$html_input .= '<th>' . $title . ' ' . $deleteIcon . '</th>';
 					}
 				} else {
@@ -1110,13 +1114,13 @@ class PPOM_Fields_Meta {
 			'fields_tab'          => array(
 				'label'        => __( 'Fields', 'ppom' ),
 				'class'        => array( 'ppom-tabs-label', 'ppom-active-tab' ),
-				'field_depend' => array( 'all' )
+				'field_depend' => array( 'all' ),
 			),
 			'condition_tab'       => array(
 				'label'        => __( 'Conditions', 'ppom' ),
 				'class'        => array( 'ppom-tabs-label', 'ppom-condition-tab-js' ),
 				'field_depend' => array( 'all' ),
-				'not_allowed'  => array( 'hidden', 'koll' )
+				'not_allowed'  => array( 'hidden', 'koll' ),
 			),
 			'add_option_tab'      => array(
 				'label'        => __( 'Add Options', 'ppom' ),
@@ -1131,36 +1135,36 @@ class PPOM_Fields_Meta {
 					'pricematrix',
 					'palettes',
 					'fixedprice',
-					'bulkquantity'
-				)
+					'bulkquantity',
+				),
 			),
 			'add_images_tab'      => array(
 				'label'        => __( 'Add Images', 'ppom' ),
 				'class'        => array( 'ppom-tabs-label' ),
-				'field_depend' => array( 'image', 'imageselect' )
+				'field_depend' => array( 'image', 'imageselect' ),
 			),
 			'add_audio_video_tab' => array(
 				'label'        => __( 'Add Audio/Video', 'ppom' ),
 				'class'        => array( 'ppom-tabs-label' ),
-				'field_depend' => array( 'audio' )
+				'field_depend' => array( 'audio' ),
 			),
 
 			// Font Picker Addon tabs
 			'fonts_family_tab'    => array(
 				'label'        => __( 'Fonts Family', 'ppom' ),
 				'class'        => array( 'ppom-tabs-label' ),
-				'field_depend' => array( 'fonts' )
+				'field_depend' => array( 'fonts' ),
 			),
 			'custom_fonts_tab'    => array(
 				'label'        => __( 'Custom Fonts', 'ppom' ),
 				'class'        => array( 'ppom-tabs-label' ),
-				'field_depend' => array( 'fonts' )
+				'field_depend' => array( 'fonts' ),
 			),
 
 			'image_dimension_tab' => array(
 				'label'        => __( 'Image Dimensions', 'ppom' ),
 				'class'        => array( 'ppom-tabs-label' ),
-				'field_depend' => array( 'file' )
+				'field_depend' => array( 'file' ),
 			),
 
 
@@ -1170,8 +1174,13 @@ class PPOM_Fields_Meta {
 
 	}
 
-
-	function ppom_tabs_panel_classes( $settings ) {
+	/**
+	 * Updates HTML classes of the given setting fields.
+	 *
+	 * @param  array $settings
+	 * @return array Returns setting fields as updated their HTML classes.
+	 */
+	function update_html_classes( $settings ) {
 
 		foreach ( $settings as $fields_meta_key => $meta ) {
 
@@ -1180,21 +1189,21 @@ class PPOM_Fields_Meta {
 			if ( $type == 'html-conditions' ) {
 
 				$settings['conditions']['tabs_class'] = array( 'ppom_handle_condition_tab', 'col-md-12' );
-			} else if ( $type == 'paired' || $type == 'paired-cropper'
-			            || $type == 'paired-quantity' ||
-			            $type == 'paired-pricematrix' ||
-			            $type == 'bulk-quantity' || $type == 'paired-palettes' ) {
-				//Bulk Quantity Addon Tabs
-				//Fixed Price Addon Tabs
+			} elseif ( $type == 'paired' || $type == 'paired-cropper'
+						|| $type == 'paired-quantity' ||
+						$type == 'paired-pricematrix' ||
+						$type == 'bulk-quantity' || $type == 'paired-palettes' ) {
+				// Bulk Quantity Addon Tabs
+				// Fixed Price Addon Tabs
 
 				$settings['options']['tabs_class'] = array( 'ppom_handle_add_option_tab', 'col-md-12' );
-			} else if ( $type == 'pre-images' || $type == 'imageselect' ) { // Image DropDown Addon Tabs
+			} elseif ( $type == 'pre-images' || $type == 'imageselect' ) { // Image DropDown Addon Tabs
 
 				$settings['images']['tabs_class'] = array( 'ppom_handle_add_images_tab', 'col-md-12' );
-			} else if ( $type == 'pre-audios' ) {
+			} elseif ( $type == 'pre-audios' ) {
 
 				$settings['audio']['tabs_class'] = array( 'ppom_handle_add_audio_video_tab', 'col-md-12' );
-			} else if ( $fields_meta_key == 'logic' ) {
+			} elseif ( $fields_meta_key == 'logic' ) {
 
 				$settings['logic']['tabs_class'] = array( 'ppom_handle_condition_tab', 'col-md-12' );
 			}
@@ -1213,8 +1222,7 @@ class PPOM_Fields_Meta {
 				$settings['min_img_w']['tabs_class']           = array( 'ppom_handle_image_dimension_tab', 'col-md-6' );
 				$settings['max_img_w']['tabs_class']           = array( 'ppom_handle_image_dimension_tab', 'col-md-6' );
 				$settings['img_dimension_error']['tabs_class'] = array( 'ppom_handle_image_dimension_tab', 'col-md-6' );
-			}
-
+			}       
 		}
 
 		// ppom_pa

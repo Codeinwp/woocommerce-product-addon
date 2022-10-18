@@ -21,8 +21,8 @@ class NM_Hidden_wooproduct extends PPOM_Inputs {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
 
-		$this->title    = __( 'Hidden Input', "ppom" );
-		$this->desc     = __( 'regular hidden input', "ppom" );
+		$this->title    = __( 'Hidden Input', 'ppom' );
+		$this->desc     = __( 'regular hidden input', 'ppom' );
 		$this->icon     = __( '<i class="fa fa-hashtag" aria-hidden="true"></i>', 'ppom' );
 		$this->settings = self::get_settings();
 
@@ -36,36 +36,36 @@ class NM_Hidden_wooproduct extends PPOM_Inputs {
 			'title'           => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'ppom' ),
-				'desc'  => __( 'Label will show in cart', 'ppom' )
+				'desc'  => __( 'Label will show in cart', 'ppom' ),
 			),
 			'data_name'       => array(
 				'type'  => 'text',
-				'title' => __( 'Data name', "ppom" ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', "ppom" )
+				'title' => __( 'Data name', 'ppom' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'ppom' ),
 			),
 			'field_value'     => array(
 				'type'  => 'text',
-				'title' => __( 'Field value', "ppom" ),
-				'desc'  => __( 'you can pre-set the value of this hidden input.', "ppom" )
+				'title' => __( 'Field value', 'ppom' ),
+				'desc'  => __( 'you can pre-set the value of this hidden input.', 'ppom' ),
 			),
 			'visibility'      => array(
 				'type'    => 'select',
 				'title'   => __( 'Visibility', 'ppom' ),
-				'desc'    => __( 'Set field visibility based on user.', "ppom" ),
+				'desc'    => __( 'Set field visibility based on user.', 'ppom' ),
 				'options' => ppom_field_visibility_options(),
 				'default' => 'everyone',
 			),
 			'visibility_role' => array(
 				'type'   => 'text',
 				'title'  => __( 'User Roles', 'ppom' ),
-				'desc'   => __( 'Role separated by comma.', "ppom" ),
+				'desc'   => __( 'Role separated by comma.', 'ppom' ),
 				'hidden' => true,
 			),
 			'cart_display'    => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Show in Cart', 'ppom' ),
 				'desc'        => __( 'Display Field Value in Cart', 'ppom' ),
-				'col_classes' => array( 'col-md-3', 'col-sm-12' )
+				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 		);
 

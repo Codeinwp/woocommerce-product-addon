@@ -45,6 +45,7 @@
     width: 32%;
     /*background-color: #d6d3da !important;*/
     background-color: #fff !important;
+    color: #0c7fa8;
     margin: 1px;
     margin-left: 4px;
     text-align: center;
@@ -58,6 +59,10 @@
     box-shadow: 10px 10px 5px #f2e8e8a1;
     -webkit-box-shadow: 10px 10px 5px #f2e8e8a1;
     -moz-box-shadow: 10px 10px 5px #f2e8e8a1;
+}
+
+.ppom-fields-name-model .ppom-modal-body ul li i {
+    color: #0c7fa8;
 }
 
 .ppom-fields-name-model .ppom-modal-body ul li:hover {
@@ -161,8 +166,7 @@ ul.ppom-options-container li {
 .ppom-meta-card-block {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     transition: 0.3s;
-    padding: 10px 0;
-    background-color: #ebeeef;
+    background-color: #f2f5f9;
 }
 
 .btn-yellow {
@@ -385,10 +389,16 @@ ul.ppom-options-container li {
     max-height: 140px;
 }
 
-.ppom-heading-style {
-    border-bottom: 2px solid #f957006e;
+.ppom-manage-fields-topbar {
     padding-bottom: 9px;
+    border-bottom: 2px solid #f957006e;
+    justify-content: space-between;
+}
+
+.ppom-wrapper h1.ppom-heading-style {
     font-family: roboto;
+    font-size:23px;
+    display: inline;
     /*font-size: 30px;*/
 }
 
@@ -1060,4 +1070,38 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 .ppom-admin-addons-actions {
     text-align: center;
     display: flex;
+}
+
+/* Freemium */
+.ppom-fields-name-model .ppom-modal-body ul li.locked {
+    opacity: 0.4;
+    color:#000;
+}
+
+.ppom-fields-name-model .ppom-modal-body ul li.locked:hover {
+    background: #fff !important;
+    color:#000 !important;
+}
+
+.ppom-fields-name-model .ppom-modal-body ul li.locked i {
+    color:#000;
+}
+
+.ppom-fields-name-model .upsell-btn-wrapper {
+    float: right !important;
+}
+
+.ppom-cancle-import-export-btn {
+    font-size:24px;
+    text-decoration: none !important;
+    line-height: 16px;
+}
+
+.ppom-cancle-import-export-btn .dashicons {
+    font-size:24px;
+    color: #605f5f;
+}
+
+.ppom-top-nav {
+    line-height:35px;
 }

@@ -9,7 +9,7 @@
 **========== Block direct access =========== 
 */
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 $ppom_id = is_array( $ppom_id ) ? implode( ',', $ppom_id ) : $ppom_id;
@@ -39,7 +39,7 @@ $cart_key = isset( $_GET['_cart_key'] ) ? sanitize_key( $_GET['_cart_key'] ) : '
 <div id="ppom-price-cloner-wrapper">
 	<span id="ppom-price-cloner">
 		<?php
-        printf( __( get_woocommerce_price_format(), "ppom" ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' );
-        ?>
+		printf( __( get_woocommerce_price_format(), 'ppom' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' );
+		?>
 	</span>
 </div>

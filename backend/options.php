@@ -1,7 +1,6 @@
 <?php
 /**
  * Plugin Admin Settings
- *
  */
 
 /* 
@@ -11,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/*** Check if class exist ***/
+/*** Check if class exist */
 if ( ! class_exists( 'PPOM_SettingsFramework' ) ) {
 	return;
 }
@@ -19,7 +18,7 @@ if ( ! class_exists( 'PPOM_SettingsFramework' ) ) {
 /**
  * Register Panel Fieds Against Panel ID
  * --------------------------------------
- **/
+ */
 $core_settings = array(
 	'ppom_general_section1'               => array(
 		'type'  => 'section',
@@ -34,7 +33,7 @@ $core_settings = array(
 	'ppom_enable_legacy_inputs_rendering' => array(
 		'type'  => 'checkbox',
 		'title' => __( 'Legacy Inputs Rendering', 'ppom' ),
-		'desc'  => __( "PPOM Version 22.0 is major update, if some issues occur you can revert back to old version by this.", 'ppom' ),
+		'desc'  => __( 'PPOM Version 22.0 is major update, if some issues occur you can revert back to old version by this.', 'ppom' ),
 	),
 	'ppom_new_conditions'                 => array(
 		'type'  => 'checkbox',
@@ -42,14 +41,14 @@ $core_settings = array(
 		'desc'  => __( 'If you found any issue in conditions you may enable this option.', 'ppom' ),
 	),
 	'ppom_legacy_price'                   => array(
-		'type'      => 'checkbox',
-		'title'     => __( 'Enable Legacy Price Calculations', 'ppom' ),
-//		'reference' => array(
-//			'ref_title' => __( 'See reference', 'ppom' ),
-//			'ref_link'  => 'https://najeebmedia.com/blog/ppom-version-18-0-better-price-manipulation-currency-switcher/',
+		'type'  => 'checkbox',
+		'title' => __( 'Enable Legacy Price Calculations', 'ppom' ),
+// 'reference' => array(
+// 'ref_title' => __( 'See reference', 'ppom' ),
+// 'ref_link'  => 'https://najeebmedia.com/blog/ppom-version-18-0-better-price-manipulation-currency-switcher/',
 			// 'ref_video_title' => __( 'Quick Video', 'ppom' ),
 			// 'ref_video_link'  => 'https://www.youtube.com/watch?v=0wCC3aLXdOw',
-//		),
+// ),
 	),
 	'ppom_permission_mfields'             => array(
 		'type'        => 'select',
@@ -58,7 +57,7 @@ $core_settings = array(
 		'default'     => 'administrator',
 		'placeholder' => __( 'choose role', 'ppom' ),
 		'options'     => ppom_get_all_editable_roles(),
-		'style'       => 'multiselect'
+		'style'       => 'multiselect',
 	),
 	'ppom_restricted_file_type'           => array(
 		'type'    => 'text',
@@ -99,7 +98,7 @@ $core_settings = array(
 /**
  * Register Panel Against Tab ID
  * -------------------------------
- **/
+ */
 $panel_meta = array(
 	'ppom_admin_core_settings' => array(
 		'id'          => 'ppom_admin_core_settings',
@@ -114,7 +113,7 @@ $panel_meta = array(
 /**
  * Register Main Tabs
  * --------------------------
- **/
+ */
 $register_tabs = array(
 	'ppom_general_tab' => array(
 		'tab_id'  => 'ppom_general_tab',
@@ -129,6 +128,6 @@ $register_tabs = array(
 /**
  * Register Settings Panel
  * --------------------------
- **/
+ */
 PPOMSETTINGS()->register_tabs( $register_tabs )->register_panel( 'ppom_general_tab', $panel_meta );
 PPOMSETTINGS()->register_setting( 'ppom_admin_core_settings', $core_settings );

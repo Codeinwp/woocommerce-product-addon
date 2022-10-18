@@ -11,7 +11,7 @@
 **========== Block direct access =========== 
 */
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 $fm = new PPOM_InputManager( $field_meta, 'measure' );
@@ -36,55 +36,57 @@ $input_classes = $input_classes . ' ppom-measure-input';
 
 <div class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
 
-    <!-- if title of field exist -->
-    <?php if ( $fm->field_label() ): ?>
-        <label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-               for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
-    <?php endif ?>
+	<!-- if title of field exist -->
+	<?php if ( $fm->field_label() ) : ?>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
+			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+	<?php endif ?>
 
-    <div class="ppom-measure">
+	<div class="ppom-measure">
 
-        <!-- Unit Input -->
-        <input
-                type="radio"
-                name="ppom[unit][<?php echo esc_attr( $fm->data_name() ); ?>]"
-                id="<?php echo esc_attr( $option_id ); ?>"
-                class="form-check-input ppom-input ppom-measure-unit"
-                data-apply="measure"
-                data-use_units="no"
-                data-price="<?php echo esc_attr( $unit_price ); ?>"
-                data-label="<?php echo esc_attr( $fm->field_label() ); ?>"
-                data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
-                data-optionid="<?php echo esc_attr( $option_id ); ?>"
-                data-qty="<?php echo esc_attr( $default_value ); ?>"
-                style="display: none;"
-                checked
-        >
+		<!-- Unit Input -->
+		<input
+				type="radio"
+				name="ppom[unit][<?php echo esc_attr( $fm->data_name() ); ?>]"
+				id="<?php echo esc_attr( $option_id ); ?>"
+				class="form-check-input ppom-input ppom-measure-unit"
+				data-apply="measure"
+				data-use_units="no"
+				data-price="<?php echo esc_attr( $unit_price ); ?>"
+				data-label="<?php echo esc_attr( $fm->field_label() ); ?>"
+				data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
+				data-optionid="<?php echo esc_attr( $option_id ); ?>"
+				data-qty="<?php echo esc_attr( $default_value ); ?>"
+				<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+				style="display: none;"
+				checked
+		>
 
-        <!-- Regular Measure Input -->
-        <input
-                type="number"
-                name="<?php echo esc_attr( $fm->form_name() ); ?>"
-                id="<?php echo esc_attr( $fm->data_name() ); ?>"
-                class="<?php echo esc_attr( $input_classes ); ?>"
-                placeholder="<?php echo esc_attr( $fm->placeholder() ); ?>"
-                autocomplete="false"
-                data-type="measure"
-                data-price="<?php echo esc_attr( $unit_price ); ?>"
-                data-title="<?php echo esc_attr( $fm->field_label() ); ?>"
-                data-use_units="<?php echo esc_attr( $use_units ); ?>"
-                data-errormsg="<?php echo esc_attr( $fm->error_msg() ); ?>"
-                max="<?php echo esc_attr( $maxlength ); ?>"
-                min="<?php echo esc_attr( $minlength ); ?>"
-                step="<?php echo esc_attr( $step ); ?>"
-                value="<?php echo esc_attr( $default_value ); ?>"
+		<!-- Regular Measure Input -->
+		<input
+				type="number"
+				name="<?php echo esc_attr( $fm->form_name() ); ?>"
+				id="<?php echo esc_attr( $fm->data_name() ); ?>"
+				class="<?php echo esc_attr( $input_classes ); ?>"
+				placeholder="<?php echo esc_attr( $fm->placeholder() ); ?>"
+				autocomplete="false"
+				data-type="measure"
+				data-price="<?php echo esc_attr( $unit_price ); ?>"
+				data-title="<?php echo esc_attr( $fm->field_label() ); ?>"
+				data-use_units="<?php echo esc_attr( $use_units ); ?>"
+				data-errormsg="<?php echo esc_attr( $fm->error_msg() ); ?>"
+				<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+				max="<?php echo esc_attr( $maxlength ); ?>"
+				min="<?php echo esc_attr( $minlength ); ?>"
+				step="<?php echo esc_attr( $step ); ?>"
+				value="<?php echo esc_attr( $default_value ); ?>"
 
-                <?php
-                // Add input extra attributes
-                foreach ( $input_attr as $key => $val ) {
-                    echo $key . '="' . $val . '"';
-                }
-                ?>
-        >
-    </div>
+				<?php
+				// Add input extra attributes
+				foreach ( $input_attr as $key => $val ) {
+					echo $key . '="' . $val . '"';
+				}
+				?>
+		>
+	</div>
 </div>
