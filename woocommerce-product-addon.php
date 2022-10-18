@@ -47,7 +47,7 @@ add_filter(
 );
 
 /*
- * plugin localization being initiated here
+ * plugin localization being initiated here 
  */
 add_action( 'init', 'ppom_i18n_setup' );
 function ppom_i18n_setup() {
