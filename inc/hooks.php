@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function ppom_hooks_save_cropped_image( $ppom_fields, $posted_data ) {
 
 	if( ! isset( $posted_data['ppom_product_id'] ) ) {
-		return;
+		return $ppom_fields;
 	}
 
 	$product_id = intval( $posted_data['ppom_product_id'] );

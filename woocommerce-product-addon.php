@@ -32,7 +32,8 @@ define( 'PPOM_TABLE_META', 'nm_personalized' );
 define( 'PPOM_UPLOAD_DIR_NAME', 'ppom_files' );
 define( 'PPOM_UPGRADE_URL', 'https://themeisle.com/plugins/ppom-pro/upgrade/' );
 define( 'PPOM_COMPATIBILITY_FEATURES', [
-	'pro_cond_field_repeat' => true // Compatibility for Conditional Field Repeater feature
+	'pro_cond_field_repeat' => true, // Compatibility for Conditional Field Repeater feature
+	'pgfbdfm_wp_filter_param_fix' => true // Fix for the wrong params of the ppom_get_field_by_dataname__field_meta WP filter.
 ] );
 
 require PPOM_PATH . '/vendor/autoload.php';
