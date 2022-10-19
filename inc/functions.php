@@ -1025,7 +1025,13 @@ function ppom_get_field_meta_by_dataname( $product_id, $original_data_name, $ppo
 		}
 	}
 
-	return apply_filters( 'ppom_get_field_by_dataname__field_meta', $ppom_fields, $field_meta, $original_data_name, $data_name );
+	// Keep the apply_filters call has wrong param (released with v32.0.0)
+	if( ppom_pro_is_installed() && ! ppom_check_pro_compatibility( 'pgfbdfm_wp_filter_param_fix' ) ) {
+		return apply_filters( 'ppom_get_field_by_dataname__field_meta', $ppom_fields, $field_meta, $original_data_name, $data_name );
+	}
+
+	// apply_filters call param fixed with PPOM v32.0.1
+	return apply_filters( 'ppom_get_field_by_dataname__field_meta', $field_meta, $ppom_fields, $original_data_name, $data_name );
 }
 
 // Is PPOM meta has field of specific type
