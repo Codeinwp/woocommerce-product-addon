@@ -1,3 +1,9 @@
+##### [Version 32.0.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.0...v32.0.1) (2022-10-19)
+
+- [Fix] PPOM Field prices are not passed into the cart issue (affects only non-pro users) has been fixed. (that was a regression occurred after the v32.0.0 release)
+- [Fix] in the various areas (cart, checkout, admin order details etc.); PPOM Field Titles are shown as data-name instead of human-readable field title issue has been fixed. (that was a regression occurred after the v32.0.0 release)
+- [Fix] A minor fix on the ppom_hooks_save_cropped_image global function.
+
 #### [Version 32.0.0](https://github.com/Codeinwp/woocommerce-product-addon/compare/v31.0.1...v32.0.0) (2022-10-18)
 
 
