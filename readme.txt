@@ -18,14 +18,14 @@ PPOM (Product Addons for WooCommerce) lets add extra custom fields and addons on
 * That's all
 
 == Input Types in Free Version ==
-* **Text** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
-* **Textarea** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
-* **Select Options (with price)** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
-* **Radio Options (with price)** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
-* **Checkbox Options (with price)** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
-* **Date** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
-* **Email** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
-* **Number** - [Demo](https://demo-ppom-lite.s.themeisle.com/product/general-fields/)
+* **Text** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
+* **Textarea** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
+* **Select Options (with price)** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
+* **Radio Options (with price)** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
+* **Checkbox Options (with price)** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
+* **Date** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
+* **Email** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
+* **Number** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
 * **Hidden** - *Hidden input with a default value*
 
 == Features in Free Version  ==
@@ -48,18 +48,18 @@ PPOM (Product Addons for WooCommerce) lets add extra custom fields and addons on
 All inputs are [sanitized and escaped](https://developer.wordpress.org/themes/theme-security/data-sanitization-escaping/,  "WordPress sanitized")
 
 == PPOM PRO Inputs ==
-* **[Measure Input](https://demo-ppom-lite.s.themeisle.com/product/demo-for-measure-input/)** - *Set prices for measure units like milk, cloths & frames, etc*
-* **[Color Picker](https://demo-ppom-lite.s.themeisle.com/product/demo-for-color-picker/)** - *Allow customer to select any colors and save Hex value*
-* **[Color Palette](https://demo-ppom-lite.s.themeisle.com/product/demo-for-color-palette/)** - *Allow customer to select color(s) from a pre defined set of colors by admin*
-* **[Date Range](https://demo-ppom-lite.s.themeisle.com/product/demo-for-date-range-input/)** - *Select two dates between from and to*
-* **[Images Options](https://demo-ppom-lite.s.themeisle.com/product/demo-for-images-options/)** - *Allow customer to select image(s) from a pre defined images by admin*
-* **[Audio/Video](https://demo-ppom-lite.s.themeisle.com/product/demo-for-video-music/)** - *Allow customer to select audio/video from a pre defined audios/videos by admin*
-* **[File Upload](https://demo-ppom-lite.s.themeisle.com/product/demo-for-file-upload-input/)** - *Allow customers to upload files. Admin can set filetypes, and filesize. Progressbar, thumb display, and responsive uploader*
-* **[Image Cropper](https://demo-ppom-lite.s.themeisle.com/product/demo-for-basic-image-cropping-input/)** - *Allow users to upload and crop images*
-* **[Variation Quantities](https://demo-ppom-lite.s.themeisle.com/product/demo-for-variation-quantities/)** - *Allow customers to order different quantities for different options like Sizes or colors*
-* **[Price Matrix with Discount](https://demo-ppom-lite.s.themeisle.com/product/demo-for-price-matrix-discount/)** - *Set tiered or discount prices on bulk purchase*
-* **[Timezone](https://demo-ppom-lite.s.themeisle.com/product-category/timezone-input/)** - *Select timezone from pre defined list of timezone. Exclude/include timezones*
-* **[HTML Content](https://demo-ppom-lite.s.themeisle.com/product/demo-for-basic-html-with-content/)** - *Add HTML tags, like `p` or `h1` tags to add more details for your extra fields*
+* **[Measure Input](https://demo-ppom-lite.vertisite.cloud/product/demo-for-measure-input/)** - *Set prices for measure units like milk, cloths & frames, etc*
+* **[Color Picker](https://demo-ppom-lite.vertisite.cloud/product/demo-for-color-picker/)** - *Allow customer to select any colors and save Hex value*
+* **[Color Palette](https://demo-ppom-lite.vertisite.cloud/product/demo-for-color-palette/)** - *Allow customer to select color(s) from a pre defined set of colors by admin*
+* **[Date Range](https://demo-ppom-lite.vertisite.cloud/product/demo-for-date-range-input/)** - *Select two dates between from and to*
+* **[Images Options](https://demo-ppom-lite.vertisite.cloud/product/demo-for-images-options/)** - *Allow customer to select image(s) from a pre defined images by admin*
+* **[Audio/Video](https://demo-ppom-lite.vertisite.cloud/product/demo-for-video-music/)** - *Allow customer to select audio/video from a pre defined audios/videos by admin*
+* **[File Upload](https://demo-ppom-lite.vertisite.cloud/product/demo-for-file-upload-input/)** - *Allow customers to upload files. Admin can set filetypes, and filesize. Progressbar, thumb display, and responsive uploader*
+* **[Image Cropper](https://demo-ppom-lite.vertisite.cloud/product/demo-for-basic-image-cropping-input/)** - *Allow users to upload and crop images*
+* **[Variation Quantities](https://demo-ppom-lite.vertisite.cloud/product/demo-for-variation-quantities/)** - *Allow customers to order different quantities for different options like Sizes or colors*
+* **[Price Matrix with Discount](https://demo-ppom-lite.vertisite.cloud/product/demo-for-price-matrix-discount/)** - *Set tiered or discount prices on bulk purchase*
+* **[Timezone](https://demo-ppom-lite.vertisite.cloud/product-category/timezone-input/)** - *Select timezone from pre defined list of timezone. Exclude/include timezones*
+* **[HTML Content](https://demo-ppom-lite.vertisite.cloud/product/demo-for-basic-html-with-content/)** - *Add HTML tags, like `p` or `h1` tags to add more details for your extra fields*
 
 
 == PPOM PRO Features ==
@@ -75,7 +75,7 @@ All inputs are [sanitized and escaped](https://developer.wordpress.org/themes/th
 * **Compatible with all WooCommerce themes.**
 
 
-[See All PRO Features](https://themeisle.com/plugins/ppom-pro/upgrade/?utm_source=themeisle&utm_medium=product&utm_campaign) - [Demos](https://demo-ppom-lite.s.themeisle.com/)
+[See All PRO Features](https://themeisle.com/plugins/ppom-pro/upgrade/?utm_source=themeisle&utm_medium=product&utm_campaign) - [Demos](https://demo-ppom-lite.vertisite.cloud/)
 
 == Video Guide ==
 [youtube https://www.youtube.com/watch?v=wGQBOzyMF4U]
@@ -113,8 +113,8 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 #### [Version 32.0.0](https://github.com/Codeinwp/woocommerce-product-addon/compare/v31.0.1...v32.0.0) (2022-10-18)
 
 
-- [Fix] Order Again PPOM compatibility support has been added. [#47](https://github.com/Codeinwp/woocommerce-product-addon/issues/47) 
-- [Fix] [Pro compatibility] Fix the conditional field issue of the PPOM Pro Image Dropdown field [#48](https://github.com/Codeinwp/woocommerce-product-addon/issues/48) 
+- [Fix] Order Again PPOM compatibility support has been added. [#47](https://github.com/Codeinwp/woocommerce-product-addon/issues/47)
+- [Fix] [Pro compatibility] Fix the conditional field issue of the PPOM Pro Image Dropdown field [#48](https://github.com/Codeinwp/woocommerce-product-addon/issues/48)
 - [Fix] [Pro compatibility] Fix for PPOM Pro (Image Cropper doesn't work with some AJAX add to cart plugins)
 - [Fix] Reload the PPOM Field Group Listing screen if a field is deleted.
 - [Fix] [Pro compatibility] Conditional Field Support of the Image Dropdown field of the PPOM Pro has been fixed.
@@ -197,7 +197,7 @@ No - But sometime due to server limitation you cannot add more fields.
 = Can we price with option? =
 Yes, price can be added with Select,Radio,Checbox
 = Can I see Demo, how fields are displayed and added to cart? =
-Yes, [See here](https://demo-ppom-lite.s.themeisle.com/)
+Yes, [See here](https://demo-ppom-lite.vertisite.cloud/)
 
 == Upgrade Notice ==
 * Since version 10 we have major changes
