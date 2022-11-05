@@ -10,7 +10,7 @@
  * Author URI: https://themeisle.com/
  *
  * WC requires at least: 3.0.0
- * WC tested up to: 6.9.4
+ * WC tested up to: 7.0
  *
  * WordPress Available:  yes
  * Requires License:     no
