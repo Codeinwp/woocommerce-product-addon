@@ -72,14 +72,12 @@ if ( $postid && is_numeric( $postid ) && $rich_editor != 'on' ) {
 			echo $key . '="' . $val . '"';
 		}
 		?>
-		>
-		<?php
+		><?php
 		if ( $textarea_value != '' ) {
 			$textarea_value = str_replace( '<br />', "\n", $textarea_value );
 			echo esc_html( $textarea_value );
 		}
-		?>
-			</textarea>
+		?></textarea>
 
 	<?php } ?>
 
