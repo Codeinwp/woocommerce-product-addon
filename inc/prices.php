@@ -936,7 +936,7 @@ function ppom_price_get_total_bulkquantities( $price_array, $product, $ppom_fiel
 			if ( $price['type'] == 'bulkquantity' ) {
 				$total_bulkquantities += intval( $price['quantity'] );
 			}
-			$total_bq_baseprice += intval( $price['base_price'] );
+			$total_bq_baseprice += floatval( $price['base_price'] );
 		}
 	}
 
