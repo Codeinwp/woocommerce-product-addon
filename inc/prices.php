@@ -1258,7 +1258,17 @@ function ppom_price_cart_fee( $cart ) {
 			$taxable   = apply_filters( 'ppom_cart_fixed_fee_taxable', $taxable, $fee, $cart );
 
 			if ( $fee_price != 0 ) {
-				$cart->add_fee( sprintf( __( '%s', 'ppom' ), esc_html( $label ) ), $fee_price, $taxable );
+				$tax_class = ''; // empty represents the "standard" rate
+
+				// if wc prices include tax: substract the tax from additional fixed fee since already WC will add tax.
+				if( wc_prices_include_tax() ) {
+					$tax = WC_Tax::calc_tax( $fee_price, \WC_Tax::get_rates($tax_class), true );
+
+					$total_tax = array_sum($tax);
+					$fee_price = $fee_price - $total_tax;
+				}
+
+				$cart->add_fee( sprintf( __( '%s', 'ppom' ), esc_html( $label ) ), $fee_price, $taxable, $tax_class );
 				$fee_no ++;
 			}
 		}
