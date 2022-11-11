@@ -1258,7 +1258,7 @@ function ppom_price_cart_fee( $cart ) {
 			$taxable   = apply_filters( 'ppom_cart_fixed_fee_taxable', $taxable, $fee, $cart );
 
 			if ( $fee_price != 0 ) {
-				$tax_class = ''; // empty represents the "standard" rate
+				$tax_class = $product->get_tax_class( 'unfiltered' );
 
 				// if wc prices include tax: substract the tax from additional fixed fee since already WC will add tax.
 				if( wc_prices_include_tax() ) {
