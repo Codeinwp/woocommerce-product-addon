@@ -309,17 +309,21 @@ function ppom_update_option_prices() {
             ppom_show_base_price = false;
         }
 
-        // console.log(option);
-        var option_label_with_qty = option.label + ' ' + ppom_get_formatted_price(option.price) + ' x ' + option.quantity;
+        var quantity = option.quantity;
 
-        var option_price_with_qty = parseFloat(option.quantity) * parseFloat(option.price);
+        // console.log(option);
+        var option_label_with_qty = option.label + ' ' + ppom_get_formatted_price(option.price) + ' x ' + quantity;
+
+        var option_price_with_qty = parseFloat(quantity) * parseFloat(option.price);
         ppom_add_price_item_in_table(option_label_with_qty, option_price_with_qty, 'ppom-bulkquantity-price');
         ppom_option_total += option_price_with_qty;
 
         // Base price
-        var base_label = ppom_input_vars.product_base_label;
-        ppom_add_price_item_in_table(base_label, option.base, 'ppom-bulkquantity-baseprice');
-        ppom_option_total += parseFloat(option.base);
+        var base_price_tag = ppom_get_wc_price(option.base);
+        var base_label = ppom_input_vars.product_base_label + ' ' + jQuery(base_price_tag).html() + ' x ' + quantity;
+        var lineBaseTotal = parseFloat(option.base) * quantity;
+        ppom_add_price_item_in_table(base_label, lineBaseTotal, 'ppom-bulkquantity-baseprice');
+        ppom_option_total += lineBaseTotal;
 
     });
     /** ====== Bulkquantity Addon =========== ***/
