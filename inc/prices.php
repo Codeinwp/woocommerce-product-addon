@@ -1144,7 +1144,7 @@ function ppom_price_bulkquantity_chunk( $product, $bulkquantity_options, $produc
 
 			// var_dump($bq);
 			$quantity = intval( $product_quantity );
-			if ( $quantity >= $range_start && $quantity <= $range_end ) {
+			if ( $quantity >= $range_start && $quantity < $range_end ) {
 				$bq_found = $bq;
 				break;
 			}
