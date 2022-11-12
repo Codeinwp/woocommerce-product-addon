@@ -372,10 +372,19 @@ function ppom_get_field_meta_by_type(type) {
     return field_meta;
 }
 
+function ppom_bq_qty_changed(qty, data_name, context) {
+    if( context === 'range' ) {
+        // update the quantity too.
+        jQuery(`.ppom-bulkquantity-qty.${data_name}`).val(qty);
+    }else if( context === 'number' ) {
+        // update slider too.
+        jQuery(`input[type=range].${data_name}`).val(qty);
+    }
+
+    ppom_bulkquantity_price_manager(qty, data_name)
+}
+
 function ppom_bulkquantity_price_manager(quantity, data_name) {
-
-    jQuery(`.ppom-bulkquantity-qty.${data_name}`).val(quantity);
-
     var ppom_base_price = 0;
     jQuery.each(JSON.parse(ppom_bulkquantity_meta[data_name]), function(idx, obj) {
 
