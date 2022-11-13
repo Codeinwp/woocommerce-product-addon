@@ -88,7 +88,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 
 				// show only if pro is not activated.
 				if( ! ppom_pro_is_installed() ) {
-					foreach( ( new PPOM_Freemium() )->get_pro_fields() as $field ) {
+					foreach( PPOM_Freemium::get_instance()->get_pro_fields() as $field ) {
 						?>
 							<li onclick="return;" class="ppom_select_field list-group-item locked">
 								<span class="ppom-fields-icon">

@@ -146,7 +146,9 @@ class PPOM_Fields_Meta {
 				'exportLabel'=>esc_html__( 'Export', 'ppom' ),
 				'exportLockedLabel'=>esc_html__( 'Export (PRO)', 'ppom' ),
 				'importLabel'=>esc_html__( 'Import Field Groups ', 'ppom' ),
-				'importLockedLabel'=>esc_html__( 'Import Field Groups (PRO)', 'ppom' )
+				'importLockedLabel'=>esc_html__( 'Import Field Groups (PRO)', 'ppom' ),
+				'freemiumCFRContent' => \PPOM_Freemium::get_instance()->get_freemium_cfr_content(),
+				'freemiumCFRTab' => \PPOM_Freemium::TAB_KEY_FREEMIUM_CFR
 			]
 		);
 
@@ -679,6 +681,8 @@ class PPOM_Fields_Meta {
 				break;
 
 			case 'checkbox':
+				$disabled_attr = ( isset($data['disabled']) && $data['disabled'] === true ) ? 'disabled' : '';
+
 				if ( $options ) {
 					foreach ( $options as $key => $val ) {
 
@@ -702,7 +706,7 @@ class PPOM_Fields_Meta {
 						}
 						// $html_input .= '<option value="' . $key . '" ' . $selected . '>' . $val . '</option>';
 						$html_input .= '<label style="float:left;">';
-						$html_input .= '<input type="checkbox" value="' . $key . '" name="ppom[' . esc_attr( $field_index ) . '][' . esc_attr( $name ) . '][]" ' . $checked . '> ' . $val . '<br>';
+						$html_input .= '<input type="checkbox" '.$disabled_attr.' value="' . $key . '" name="ppom[' . esc_attr( $field_index ) . '][' . esc_attr( $name ) . '][]" ' . $checked . '> ' . $val . '<br>';
 						$html_input .= '<span></span>';
 						$html_input .= '</label>';
 					}
@@ -710,7 +714,7 @@ class PPOM_Fields_Meta {
 					$checked = ( ( isset( $values ) && $values != '' ) ? 'checked = "checked"' : '' );
 
 					$html_input .= '<label style="float:left;">';
-					$html_input .= '<input type="checkbox" class="ppom-meta-field" data-metatype="' . esc_attr( $name ) . '" ' . $checked . '';
+					$html_input .= '<input type="checkbox" '.$disabled_attr.' class="ppom-meta-field" data-metatype="' . esc_attr( $name ) . '" ' . $checked . '';
 
 					if ( $field_index != '' ) {
 

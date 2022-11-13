@@ -10,6 +10,97 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class PPOM_Freemium
  */
 class PPOM_Freemium {
+	const TAB_KEY_FREEMIUM_CFR = 'locked_conditional_field_repeater';
+
+	public static $instance = null;
+
+	/**
+	 * Constructor
+	 *
+	 * @return void
+	 */
+	private function __construct()
+	{
+		if( ppom_pro_is_installed() ) {
+			return;
+		}
+
+		add_filter( 'ppom_fields_tabs_show', array( $this, 'add_locked_cfr_tab' ), 10, 1 );
+		add_filter( 'ppom_all_inputs', array( $this, 'locked_cfr_register_form_elements' ), PHP_INT_MAX );
+	}
+
+	/**
+	 * Get instance
+	 *
+	 * @return void
+	 */
+	public static function get_instance() {
+		if( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+	/**
+	 * Add a tab to all PPOM field types as Conditional Repeater (PRO)
+	 *
+	 * @param  array $tabs Current tabs.
+	 * @return array
+	 */
+	public function add_locked_cfr_tab( $tabs ) {
+		$tabs[self::TAB_KEY_FREEMIUM_CFR] = array(
+			'label' => __( 'Conditional Repeater (PRO)', 'ppom' ),
+			'class' => array( 'ppom-tabs-label' ),
+			'field_depend' => array( 'all' )
+		);
+		return $tabs;
+	}
+
+	/**
+	 * HTML content of the freemium Conditional Field Repeater
+	 *
+	 * @return string
+	 */
+	public function get_freemium_cfr_content() {
+		ob_start();
+		$upgrade_url = tsdk_utmify( 'https://themeisle.com/plugins/ppom-pro/upgrade/', 'lockedconditionalfield', 'ppompage' );
+		?>
+		<div class="freemium-cfr-content">
+			<p><?php esc_html_e( 'Conditional Field Repeater allows repeating this field across a value of another PPOM field. Conditional Field Repeater feature is the part of the PPOM Pro.', 'ppom' ); ?></p>
+
+			<p><?php printf( '<strong>%s</strong> %s', esc_html__( 'Use case example:', 'ppom' ),  esc_html__( 'Get the number of players from another PPOM field, and repeat this field(let\'s say that\'s a text field representing the player name) across the number of players. That\'s pretty useful for dynamic repeating the PPOM field.', 'ppom' ) ); ?></p>
+
+			<a target="_blank" class="btn btn-sm btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php echo __( 'Upgrade to Pro', 'ppom' ); ?></a>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+     * Adds admin setting fields to all input types.
+     *
+     * @param  array $inputs current input classes
+     * @return array
+     */
+    public function locked_cfr_register_form_elements( $inputs ) {
+        return array_map( function($input_class) {
+            if( ! is_object( $input_class ) || ! property_exists( $input_class, 'settings' ) || !is_array($input_class->settings) ) {
+                return $input_class;
+            }
+
+            $input_class->settings['locked_cfr'] = array(
+                'type' => 'checkbox',
+                'title' => __( 'Enable Conditional Repeat', 'ppom' ),
+				'disabled' => true,
+                'desc' => __( 'This control turns on the Conditional Field Repeater mode for this field, in this way, this field is repeated by the selected field(selected in the Origin setting) below', 'ppom' ),
+				'tabs_class' => array( 'ppom_handle_' . self::TAB_KEY_FREEMIUM_CFR )
+            );
+
+            return $input_class;
+        }, $inputs );
+    }
+
 	public function get_pro_fields() {
 		return [
 			[

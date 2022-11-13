@@ -69,6 +69,7 @@ require_once PPOM_PATH . '/inc/prices.php';
 
 if( is_admin() ) {
 	require_once PPOM_PATH . '/classes/freemium.class.php';
+	PPOM_Freemium::get_instance();
 }
 
 
