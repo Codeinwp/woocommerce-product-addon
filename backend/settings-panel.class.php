@@ -121,19 +121,19 @@ class PPOM_SettingsFramework {
 	public function register_config() {
 
 		$this->config = array(
-			'name'            => __( 'PPOM Admin Settings', 'ppom' ),
+			'name'            => __( 'PPOM Admin Settings', 'woocommerce-product-addon' ),
 			'id'              => 'ppom',
 			'version'         => '1.0',
 			'form_tag'        => false,
 			'menu_type'       => 'wc',
-			'menu_title'      => __( 'PPOM Settings', 'ppom' ),
-			'menu_page_title' => __( 'PPOM Settings', 'ppom' ),
+			'menu_title'      => __( 'PPOM Settings', 'woocommerce-product-addon' ),
+			'menu_page_title' => __( 'PPOM Settings', 'woocommerce-product-addon' ),
 			'menu_slug'       => 'ppom_settings',
 			'wc_slug'         => 'wc-settings',
 			'menu_capability' => 'manage_options',
 			'menu_parent'     => 'woocommerce',
 			'menu_position'   => 50,
-			'plugin_name'     => __( 'PPOM', 'ppom' ),
+			'plugin_name'     => __( 'PPOM', 'woocommerce-product-addon' ),
 			'plugin_version'  => PPOM_VERSION,
 			'plugin_domain'   => 'ppom',
 			'plugin_url'      => PPOM_URL,
@@ -303,7 +303,7 @@ class PPOM_SettingsFramework {
 		) {
 			$response = array(
 				'status'  => 'error',
-				'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'ppom' ),
+				'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'woocommerce-product-addon' ),
 			);
 
 			wp_send_json( $response );

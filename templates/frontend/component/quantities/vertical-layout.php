@@ -64,7 +64,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 				$max          = ( ! empty( $opt['max'] ) ? $opt['max'] : 10000 );
 				$stock        = $opt['stock'] !== '' ? intval( $opt['stock'] ) : '';
 				$max          = $max > $stock && $manage_stock ? $stock : $max;
-				$in_stock     = $manage_stock ? sprintf( __( '%s in stock', 'ppom' ), $stock ) : '';
+				$in_stock     = $manage_stock ? sprintf( __( '%s in stock', 'woocommerce-product-addon' ), $stock ) : '';
 				$out_of_stock = $manage_stock && $stock < 1 ? true : false;
 				$disabled     = $out_of_stock ? 'disabled="disabled"' : '';
 				$min          = $out_of_stock ? 0 : $min;
@@ -119,7 +119,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 
 
 				<?php
-				printf( __( '<span class="ppom-instock">%s</span>', 'ppom' ), $in_stock );
+				printf( __( '<span class="ppom-instock">%s</span>', 'woocommerce-product-addon' ), $in_stock );
 				?>
 
 			</td>

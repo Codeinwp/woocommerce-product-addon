@@ -116,7 +116,7 @@ class PPOM_Rest {
 		if ( $product_id == '' ) {
 			$response_info = array(
 				'status'  => 'no_product',
-				'message' => __( 'No Product Found', 'ppom' ),
+				'message' => __( 'No Product Found', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -128,7 +128,7 @@ class PPOM_Rest {
 
 			$response_info = array(
 				'status'  => 'no_meta',
-				'message' => __( 'No Meta Found', 'ppom' ),
+				'message' => __( 'No Meta Found', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -169,7 +169,7 @@ class PPOM_Rest {
 
 			$response_info = array(
 				'status'  => false,
-				'message' => __( 'No Meta Found', 'ppom' ),
+				'message' => __( 'No Meta Found', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -206,7 +206,7 @@ class PPOM_Rest {
 		if ( empty( $all_data['fields'] ) ) {
 			$response_info = array(
 				'status'  => 'no_fields',
-				'message' => __( 'No fields to save', 'ppom' ),
+				'message' => __( 'No fields to save', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -215,7 +215,7 @@ class PPOM_Rest {
 		if ( empty( $secretkey ) || ! $this->is_secret_key_valid( $secretkey ) ) {
 			$response_info = array(
 				'status'  => 'key_not_valid',
-				'message' => __( 'Secret key is not valid', 'ppom' ),
+				'message' => __( 'Secret key is not valid', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -225,7 +225,7 @@ class PPOM_Rest {
 		if ( $product_id == '' ) {
 			$response_info = array(
 				'status'  => 'no_product',
-				'message' => __( 'No Product Found', 'ppom' ),
+				'message' => __( 'No Product Found', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -273,7 +273,7 @@ class PPOM_Rest {
 		if ( empty( $all_data['fields'] ) ) {
 			$response_info = array(
 				'status'  => 'no_fields',
-				'message' => __( 'No fields to save', 'ppom' ),
+				'message' => __( 'No fields to save', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -282,7 +282,7 @@ class PPOM_Rest {
 		if ( empty( $secretkey ) || ! $this->is_secret_key_valid( $secretkey ) ) {
 			$response_info = array(
 				'status'  => 'key_not_valid',
-				'message' => __( 'Secret key is not valid', 'ppom' ),
+				'message' => __( 'Secret key is not valid', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -292,7 +292,7 @@ class PPOM_Rest {
 		if ( $product_id == '' ) {
 			$response_info = array(
 				'status'  => 'no_product',
-				'message' => __( 'No Product Found', 'ppom' ),
+				'message' => __( 'No Product Found', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -390,7 +390,7 @@ class PPOM_Rest {
 		} else {
 
 			$resp = array(
-				'message'    => __( 'No changes found.', 'ppom' ),
+				'message'    => __( 'No changes found.', 'woocommerce-product-addon' ),
 				'status'     => 'error',
 				'meta_id'    => '',
 				'product_id' => $product_id,
@@ -533,7 +533,7 @@ class PPOM_Rest {
 		if ( ! $order ) {
 			$response_info = array(
 				'status'  => 'no_order',
-				'message' => __( 'No Order Found', 'ppom' ),
+				'message' => __( 'No Order Found', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -573,7 +573,7 @@ class PPOM_Rest {
 		if ( ! $order ) {
 			$response_info = array(
 				'status'  => 'no_order',
-				'message' => __( 'No Order Found', 'ppom' ),
+				'message' => __( 'No Order Found', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -582,7 +582,7 @@ class PPOM_Rest {
 		if ( empty( $all_data['fields'] ) ) {
 			$response_info = array(
 				'status'  => 'no_fields',
-				'message' => __( 'No meta found to save', 'ppom' ),
+				'message' => __( 'No meta found to save', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -591,7 +591,7 @@ class PPOM_Rest {
 		if ( empty( $secretkey ) || ! $this->is_secret_key_valid( $secretkey ) ) {
 			$response_info = array(
 				'status'  => 'key_not_valid',
-				'message' => __( 'Secret key is not valid', 'ppom' ),
+				'message' => __( 'Secret key is not valid', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -606,7 +606,7 @@ class PPOM_Rest {
 		if ( empty( $order_item_meta ) ) {
 			$response_info = array(
 				'status'  => 'fields_not_valid',
-				'message' => __( 'Submitted fields are in valid format.', 'ppom' ),
+				'message' => __( 'Submitted fields are in valid format.', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -678,7 +678,7 @@ class PPOM_Rest {
 		if ( ! $order ) {
 			$response_info = array(
 				'status'  => 'no_order',
-				'message' => __( 'No Order Found', 'ppom' ),
+				'message' => __( 'No Order Found', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -687,7 +687,7 @@ class PPOM_Rest {
 		if ( empty( $all_data['fields'] ) ) {
 			$response_info = array(
 				'status'  => 'no_fields',
-				'message' => __( 'No fields to delete', 'ppom' ),
+				'message' => __( 'No fields to delete', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );
@@ -696,7 +696,7 @@ class PPOM_Rest {
 		if ( empty( $secretkey ) || ! $this->is_secret_key_valid( $secretkey ) ) {
 			$response_info = array(
 				'status'  => 'key_not_valid',
-				'message' => __( 'Secret key is not valid', 'ppom' ),
+				'message' => __( 'Secret key is not valid', 'woocommerce-product-addon' ),
 			);
 
 			return new WP_REST_Response( $response_info );

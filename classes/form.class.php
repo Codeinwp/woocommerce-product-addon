@@ -123,7 +123,7 @@ class PPOM_Form {
 			}
 
 			if ( empty( $data_name ) ) {
-				printf( __( 'Please provide data name property for %s', 'ppom' ), $title );
+				printf( __( 'Please provide data name property for %s', 'woocommerce-product-addon' ), $title );
 				continue;
 			}
 
@@ -150,8 +150,8 @@ class PPOM_Form {
 
 					if ( $allow_nextprev == 'yes' ) {
 						echo '<div class="ppom-collapse-nextprev-btn" data-collapse-index="' . esc_attr( $ppom_collapse_counter ) . '">';
-						echo '<button class="ppom-collapse-prev">' . __( 'Prev', 'ppom' ) . '</button>';
-						echo '<button class="ppom-collapse-next">' . __( 'Next', 'ppom' ) . '</button>';
+						echo '<button class="ppom-collapse-prev">' . __( 'Prev', 'woocommerce-product-addon' ) . '</button>';
+						echo '<button class="ppom-collapse-next">' . __( 'Next', 'woocommerce-product-addon' ) . '</button>';
 						echo '</div>';
 					}
 					echo '</div>';

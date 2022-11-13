@@ -242,20 +242,20 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 <div id="display-total-price">
 	<span style="display:none;font-weight:700" class="ppom-total-option-price">
 		<?php 
-		echo __( 'Options Total: ', 'ppom' );
+		echo __( 'Options Total: ', 'woocommerce-product-addon' );
 		printf( __( get_woocommerce_price_format(), 'ppom' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' ); 
 		?>
 	</span><br>
 	<span style="display:none;font-weight:700" class="ppom-total-price">
 		<?php 
-		echo __( 'Product Total: ', 'ppom' );
+		echo __( 'Product Total: ', 'woocommerce-product-addon' );
 		printf( __( get_woocommerce_price_format(), 'ppom' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' ); 
 		?>
 	</span>
 	<span style="display:none;font-weight:700" class="ppom-grand-total-price">
 	<hr style="margin: 0">
 		<?php 
-		echo __( 'Grand Total: ', 'ppom' );
+		echo __( 'Grand Total: ', 'woocommerce-product-addon' );
 		printf( __( get_woocommerce_price_format(), 'ppom' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' ); 
 		?>
 	</span>

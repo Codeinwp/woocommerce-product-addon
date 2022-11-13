@@ -374,7 +374,7 @@ class NM_PersonalizedProduct {
 		if ( ! in_array( $product->get_type(), array( 'variable', 'grouped', 'external' ) ) ) {
 			// only if can be purchased
 			if ( $ppom->is_exists ) {
-				$text = apply_filters( 'ppom_select_option_text', __( 'Select options', 'ppom' ), $text, $product );
+				$text = apply_filters( 'ppom_select_option_text', __( 'Select options', 'woocommerce-product-addon' ), $text, $product );
 			}
 		}
 
@@ -442,8 +442,8 @@ class NM_PersonalizedProduct {
 				?>
 				<script type="text/javascript">
 					jQuery(document).ready(function () {
-						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'ppom' ), $meta->productmeta_id ); ?>', "ppom").text('<?php _e( $meta->productmeta_name, 'ppom' ); ?>').appendTo("select[name='action']");
-						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'ppom' ), $meta->productmeta_id ); ?>').text('<?php _e( $meta->productmeta_name, 'ppom' ); ?>').appendTo("select[name='action2']");
+						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'woocommerce-product-addon' ), $meta->productmeta_id ); ?>', "ppom").text('<?php _e( $meta->productmeta_name, 'ppom' ); ?>').appendTo("select[name='action']");
+						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'woocommerce-product-addon' ), $meta->productmeta_id ); ?>').text('<?php _e( $meta->productmeta_name, 'ppom' ); ?>').appendTo("select[name='action2']");
 					});
 				</script>
 				<?php
@@ -868,7 +868,7 @@ class NM_PersonalizedProduct {
 		if ( is_product() && isset( $_GET['ppom_title'] ) ) {
 
 			$meta_title = sanitize_text_field( $_GET['ppom_title'] );
-			wc_add_notice( sprintf( __( 'PPOM Meta Successfully Changed to - %s', 'ppom' ), $meta_title ) );
+			wc_add_notice( sprintf( __( 'PPOM Meta Successfully Changed to - %s', 'woocommerce-product-addon' ), $meta_title ) );
 		}
 	}
 
@@ -888,7 +888,7 @@ class NM_PersonalizedProduct {
 	function add_ppom_meta_tabs( $default_tabs ) {
 
 		$default_tabs['ppom_tab'] = array(
-			'label'    => __( 'PPOM Fields', 'ppom' ),
+			'label'    => __( 'PPOM Fields', 'woocommerce-product-addon' ),
 			'target'   => 'ppom_meta_data_tab',
 			'priority' => 60,
 			'class'    => array( 'show_if_simple', 'show_if_variable' ),

@@ -58,10 +58,10 @@ function ppom_get_input_cols() {
 function ppom_field_visibility_options() {
 
 	$visibility_options = array(
-		'everyone' => __( 'Everyone', 'ppom' ),
-		'guests'   => __( 'Only Guests', 'ppom' ),
-		'members'  => __( 'Only Members', 'ppom' ),
-		'roles'    => __( 'By Role', 'ppom' ),
+		'everyone' => __( 'Everyone', 'woocommerce-product-addon' ),
+		'guests'   => __( 'Only Guests', 'woocommerce-product-addon' ),
+		'members'  => __( 'Only Members', 'woocommerce-product-addon' ),
+		'roles'    => __( 'By Role', 'woocommerce-product-addon' ),
 	);
 
 	return apply_filters( 'ppom_field_visibility_options', $visibility_options );
@@ -173,124 +173,124 @@ function ppom_array_settings() {
 		array(
 			'title' => 'Settings Panel Migration',
 			'type'  => 'title',
-			'desc'  => __( 'Please migrate settings to new settings panel framework. <a href="' . esc_url( $ppom_migrate_url ) . '" class="page-title-action">Start Migration</a>', 'ppom' ),
+			'desc'  => __( 'Please migrate settings to new settings panel framework. <a href="' . esc_url( $ppom_migrate_url ) . '" class="page-title-action">Start Migration</a>', 'woocommerce-product-addon' ),
 			'id'    => 'ppom_settings_migration',
 		),
 
 		array(
 			'title' => 'PPOM Labels',
 			'type'  => 'title',
-			'desc'  => __( 'Following settings help you the control and customize plugin as per your need. <a href="' . esc_url( $ppom_fields ) . '">PPOM Fields Manager</a>', 'ppom' ),
+			'desc'  => __( 'Following settings help you the control and customize plugin as per your need. <a href="' . esc_url( $ppom_fields ) . '">PPOM Fields Manager</a>', 'woocommerce-product-addon' ),
 			'id'    => 'ppom_labels_settings',
 		),
 
 		array(
-			'title'    => __( 'Option Total', 'ppom' ),
+			'title'    => __( 'Option Total', 'woocommerce-product-addon' ),
 			'type'     => 'text',
-			'desc'     => __( 'Label For Price Table', 'ppom' ),
-			'default'  => __( 'Option Total', 'ppom' ),
+			'desc'     => __( 'Label For Price Table', 'woocommerce-product-addon' ),
+			'default'  => __( 'Option Total', 'woocommerce-product-addon' ),
 			'id'       => 'ppom_label_option_total',
 			'css'      => 'min-width:300px;',
 			'desc_tip' => true,
 		),
 
 		array(
-			'title'    => __( 'Option Total Suffix', 'ppom' ),
+			'title'    => __( 'Option Total Suffix', 'woocommerce-product-addon' ),
 			'type'     => 'text',
-			'desc'     => __( 'E.g for Tax/Va info like. Vat included', 'ppom' ),
+			'desc'     => __( 'E.g for Tax/Va info like. Vat included', 'woocommerce-product-addon' ),
 			'default'  => __( '', 'ppom' ),
 			'id'       => 'ppom_label_option_total_suffex',
 			'css'      => 'min-width:300px;',
 			'desc_tip' => true,
 		),
 		array(
-			'title'    => __( 'Product Price', 'ppom' ),
+			'title'    => __( 'Product Price', 'woocommerce-product-addon' ),
 			'type'     => 'text',
-			'desc'     => __( 'Label For Price Table', 'ppom' ),
-			'default'  => __( 'Product Price', 'ppom' ),
+			'desc'     => __( 'Label For Price Table', 'woocommerce-product-addon' ),
+			'default'  => __( 'Product Price', 'woocommerce-product-addon' ),
 			'id'       => 'ppom_label_product_price',
 			'css'      => 'min-width:300px;',
 			'desc_tip' => true,
 		),
 		array(
-			'title'    => __( 'Total', 'ppom' ),
+			'title'    => __( 'Total', 'woocommerce-product-addon' ),
 			'type'     => 'text',
-			'desc'     => __( 'Label For Price Table', 'ppom' ),
-			'default'  => __( 'Total', 'ppom' ),
+			'desc'     => __( 'Label For Price Table', 'woocommerce-product-addon' ),
+			'default'  => __( 'Total', 'woocommerce-product-addon' ),
 			'id'       => 'ppom_label_total',
 			'css'      => 'min-width:300px;',
 			'desc_tip' => true,
 		),
 		array(
-			'title'    => __( 'Fixed Fee', 'ppom' ),
+			'title'    => __( 'Fixed Fee', 'woocommerce-product-addon' ),
 			'type'     => 'text',
-			'desc'     => __( 'Label For Price Table', 'ppom' ),
-			'default'  => __( 'Fixed Fee', 'ppom' ),
+			'desc'     => __( 'Label For Price Table', 'woocommerce-product-addon' ),
+			'default'  => __( 'Fixed Fee', 'woocommerce-product-addon' ),
 			'id'       => 'ppom_label_fixed_fee',
 			'css'      => 'min-width:300px;',
 			'desc_tip' => true,
 		),
 		array(
-			'title'    => __( 'Discount Price', 'ppom' ),
+			'title'    => __( 'Discount Price', 'woocommerce-product-addon' ),
 			'type'     => 'text',
-			'desc'     => __( 'Label For Price Table', 'ppom' ),
-			'default'  => __( 'Discount Price', 'ppom' ),
+			'desc'     => __( 'Label For Price Table', 'woocommerce-product-addon' ),
+			'default'  => __( 'Discount Price', 'woocommerce-product-addon' ),
 			'id'       => 'ppom_label_discount_price',
 			'css'      => 'min-width:300px;',
 			'desc_tip' => true,
 		),
 		array(
-			'title'    => __( 'Total Discount', 'ppom' ),
+			'title'    => __( 'Total Discount', 'woocommerce-product-addon' ),
 			'type'     => 'text',
-			'desc'     => __( 'Label For Price Table', 'ppom' ),
-			'default'  => __( 'Total Discount', 'ppom' ),
+			'desc'     => __( 'Label For Price Table', 'woocommerce-product-addon' ),
+			'default'  => __( 'Total Discount', 'woocommerce-product-addon' ),
 			'id'       => 'ppom_label_total_discount',
 			'css'      => 'min-width:300px;',
 			'desc_tip' => true,
 		),
 
 		array(
-			'title'   => __( 'Disable Bootstrap', 'ppom' ),
+			'title'   => __( 'Disable Bootstrap', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_disable_bootstrap',
-			'desc'    => __( 'Bootstrap JS is being loaded from CDN, it will disable if your site already loading it.', 'ppom' ),
+			'desc'    => __( 'Bootstrap JS is being loaded from CDN, it will disable if your site already loading it.', 'woocommerce-product-addon' ),
 		),
 
 		array(
-			'title'   => __( 'Enable Legacy Inputs Rendering', 'ppom' ),
+			'title'   => __( 'Enable Legacy Inputs Rendering', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_enable_legacy_inputs_rendering',
-			'desc'    => __( 'PPOM Version 22.0 is major update, if some issues occur you can revert back to old version by this.', 'ppom' ),
+			'desc'    => __( 'PPOM Version 22.0 is major update, if some issues occur you can revert back to old version by this.', 'woocommerce-product-addon' ),
 		),
 
 		array(
-			'title'   => __( 'Disable FontAwesome', 'ppom' ),
+			'title'   => __( 'Disable FontAwesome', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_disable_fontawesome',
-			'desc'    => __( 'FontAwesome are being loaded from CDN, it will disable if your site already loading it.', 'ppom' ),
+			'desc'    => __( 'FontAwesome are being loaded from CDN, it will disable if your site already loading it.', 'woocommerce-product-addon' ),
 		),
 		array(
-			'title'   => __( 'Enable Legacy Price Calculations', 'ppom' ),
+			'title'   => __( 'Enable Legacy Price Calculations', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_legacy_price',
 		),
 		array(
-			'title'       => __( 'PPOM Permissions', 'ppom' ),
+			'title'       => __( 'PPOM Permissions', 'woocommerce-product-addon' ),
 			'type'        => 'ppom_multi_select',
-			'label'       => __( 'Button', 'ppom' ),
+			'label'       => __( 'Button', 'woocommerce-product-addon' ),
 			'default'     => 'administrator',
 			'placeholder' => 'choose role',
 			'options'     => ppom_get_all_editable_roles(),
 			'id'          => 'ppom_permission_mfields',
-			'desc'        => __( 'You can set permissions here so PPOM fields can be managed by different roles', 'ppom' ),
+			'desc'        => __( 'You can set permissions here so PPOM fields can be managed by different roles', 'woocommerce-product-addon' ),
 			'desc_tip'    => true,
 		),
 
@@ -300,104 +300,104 @@ function ppom_array_settings() {
 		),
 
 		array(
-			'name' => __( 'Advance Features (PRO)', 'ppom' ),
+			'name' => __( 'Advance Features (PRO)', 'woocommerce-product-addon' ),
 			'type' => 'title',
-			'desc' => __( 'These options will work when PRO version is installed', 'ppom' ),
+			'desc' => __( 'These options will work when PRO version is installed', 'woocommerce-product-addon' ),
 			'id'   => 'ppom_pro_features',
 		),
 
 		array(
-			'title'   => __( 'Hide Product Price?', 'ppom' ),
+			'title'   => __( 'Hide Product Price?', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_hide_product_price',
-			'desc'    => __( 'Hides Product core price under price Title (When PPOM Fields attached)', 'ppom' ),
+			'desc'    => __( 'Hides Product core price under price Title (When PPOM Fields attached)', 'woocommerce-product-addon' ),
 
 		),
 
 		array(
-			'title'   => __( 'Hide Variable Product Price?', 'ppom' ),
+			'title'   => __( 'Hide Variable Product Price?', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_hide_variable_product_price',
-			'desc'    => __( 'Hides Variable Product core price under price Title (When PPOM Fields attached)', 'ppom' ),
+			'desc'    => __( 'Hides Variable Product core price under price Title (When PPOM Fields attached)', 'woocommerce-product-addon' ),
 
 		),
 
 
 		array(
-			'title'   => __( 'Hide Options Price?', 'ppom' ),
+			'title'   => __( 'Hide Options Price?', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_hide_option_price',
-			'desc'    => __( 'Hides options price in Selec/Radio/Checkbox/Image display prices with label', 'ppom' ),
+			'desc'    => __( 'Hides options price in Selec/Radio/Checkbox/Image display prices with label', 'woocommerce-product-addon' ),
 
 		),
 
 		array(
-			'title'   => __( 'Taxable Options Price?', 'ppom' ),
+			'title'   => __( 'Taxable Options Price?', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_taxable_option_price',
-			'desc'    => __( 'Apply tax settings on option prices from WooCommerce->Tax', 'ppom' ),
+			'desc'    => __( 'Apply tax settings on option prices from WooCommerce->Tax', 'woocommerce-product-addon' ),
 
 		),
 
 		array(
-			'title'   => __( 'Clear Fields after Add to Cart?', 'ppom' ),
+			'title'   => __( 'Clear Fields after Add to Cart?', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_hide_clear_fields',
-			'desc'    => __( 'Empty all fields on Product page after to cart.', 'ppom' ),
+			'desc'    => __( 'Empty all fields on Product page after to cart.', 'woocommerce-product-addon' ),
 
 		),
 
 		array(
-			'title'   => __( 'Enable PPOM REST API?', 'ppom' ),
+			'title'   => __( 'Enable PPOM REST API?', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_api_enable',
-			'desc'    => __( 'Check this option to enable PPOM REST API', 'ppom' ),
+			'desc'    => __( 'Check this option to enable PPOM REST API', 'woocommerce-product-addon' ),
 		),
 
 		array(
-			'title'   => __( 'Use optimized Price Table Caculation (BETA)', 'ppom' ),
+			'title'   => __( 'Use optimized Price Table Caculation (BETA)', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_price_table_v2',
-			'desc'    => __( 'A Fast and Optimized script to caculate price on product page in Table.', 'ppom' ),
+			'desc'    => __( 'A Fast and Optimized script to caculate price on product page in Table.', 'woocommerce-product-addon' ),
 		),
 
 		array(
-			'title'   => __( 'Enable New Conditional Logic Script', 'ppom' ),
+			'title'   => __( 'Enable New Conditional Logic Script', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_new_conditions',
-			'desc'    => __( 'A faster approach to load conditional fields. Beta version, please report bug in new conditional script.', 'ppom' ),
+			'desc'    => __( 'A faster approach to load conditional fields. Beta version, please report bug in new conditional script.', 'woocommerce-product-addon' ),
 		),
 
 		array(
-			'title'   => __( 'Do not send Product Meta to PayPal Invoice', 'ppom' ),
+			'title'   => __( 'Do not send Product Meta to PayPal Invoice', 'woocommerce-product-addon' ),
 			'type'    => 'checkbox',
-			'label'   => __( 'Yes', 'ppom' ),
+			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_disable_meta_paypal_invoice',
-			'desc'    => __( 'Product meta will not be sent to PayPal invoice, only the Item name will be sent to invoice', 'ppom' ),
+			'desc'    => __( 'Product meta will not be sent to PayPal invoice, only the Item name will be sent to invoice', 'woocommerce-product-addon' ),
 		),
 
 		array(
-			'title'    => __( 'Select Option Label', 'ppom' ),
+			'title'    => __( 'Select Option Label', 'woocommerce-product-addon' ),
 			'type'     => 'text',
-			'desc'     => __( 'Label For Price Table', 'ppom' ),
-			'default'  => __( 'Select Options', 'ppom' ),
+			'desc'     => __( 'Label For Price Table', 'woocommerce-product-addon' ),
+			'default'  => __( 'Select Options', 'woocommerce-product-addon' ),
 			'id'       => 'ppom_label_select_option',
 			'css'      => 'min-width:300px;',
 			'desc_tip' => true,
@@ -405,69 +405,69 @@ function ppom_array_settings() {
 
 
 		array(
-			'title'    => __( 'PPOM API Secret Key', 'ppom' ),
+			'title'    => __( 'PPOM API Secret Key', 'woocommerce-product-addon' ),
 			'type'     => 'text',
-			'desc'     => __( 'Enter any characters to create a secret key. This key must be set while requesting to API', 'ppom' ),
+			'desc'     => __( 'Enter any characters to create a secret key. This key must be set while requesting to API', 'woocommerce-product-addon' ),
 			'id'       => 'ppom_rest_secret_key',
 			'css'      => 'min-width:300px;',
 			'desc_tip' => true,
 		),
 
 		array(
-			'title'    => __( 'Delete Un-used images', 'ppom' ),
+			'title'    => __( 'Delete Un-used images', 'woocommerce-product-addon' ),
 			'type'     => 'select',
-			'label'    => __( 'Button', 'ppom' ),
+			'label'    => __( 'Button', 'woocommerce-product-addon' ),
 			'default'  => 'daily',
 			'options'  => array(
-				'daily'   => __( 'Daily', 'ppom' ),
-				'weekly'  => __( 'Weekly', 'ppom' ),
-				'monthly' => __( 'Monthly', 'ppom' ),
+				'daily'   => __( 'Daily', 'woocommerce-product-addon' ),
+				'weekly'  => __( 'Weekly', 'woocommerce-product-addon' ),
+				'monthly' => __( 'Monthly', 'woocommerce-product-addon' ),
 			),
 			'id'       => 'ppom_remove_unused_images_schedule',
-			'desc'     => __( 'Set duration to uploaded images of abandoned cart. Re-activate plugin to when update this option', 'ppom' ),
+			'desc'     => __( 'Set duration to uploaded images of abandoned cart. Re-activate plugin to when update this option', 'woocommerce-product-addon' ),
 			'desc_tip' => true,
 		),
 
 		array(
-			'title'    => __( 'Meta Group Overrides', 'ppom' ),
+			'title'    => __( 'Meta Group Overrides', 'woocommerce-product-addon' ),
 			'type'     => 'select',
-			'label'    => __( 'Button', 'ppom' ),
+			'label'    => __( 'Button', 'woocommerce-product-addon' ),
 			'default'  => 'default',
 			'options'  => array(
-				'default'             => __( 'Default', 'ppom' ),
-				'category_override'   => __( 'Category Overrides Individual Assignment', 'ppom' ),
-				'individual_override' => __( 'Individual Overrides Category Assignment', 'ppom' ),
+				'default'             => __( 'Default', 'woocommerce-product-addon' ),
+				'category_override'   => __( 'Category Overrides Individual Assignment', 'woocommerce-product-addon' ),
+				'individual_override' => __( 'Individual Overrides Category Assignment', 'woocommerce-product-addon' ),
 			),
 			'id'       => 'ppom_meta_overrides',
-			'desc'     => __( 'Leave if default if not sure.', 'ppom' ),
+			'desc'     => __( 'Leave if default if not sure.', 'woocommerce-product-addon' ),
 			'desc_tip' => true,
 		),
 
 		array(
-			'title'    => __( 'Meta Group Priority', 'ppom' ),
+			'title'    => __( 'Meta Group Priority', 'woocommerce-product-addon' ),
 			'type'     => 'select',
-			'label'    => __( 'Button', 'ppom' ),
+			'label'    => __( 'Button', 'woocommerce-product-addon' ),
 			'default'  => 'default',
 			'options'  => array(
-				'category_first'   => __( 'Category First', 'ppom' ),
-				'individual_first' => __( 'Individual First', 'ppom' ),
+				'category_first'   => __( 'Category First', 'woocommerce-product-addon' ),
+				'individual_first' => __( 'Individual First', 'woocommerce-product-addon' ),
 			),
 			'id'       => 'ppom_meta_priority',
-			'desc'     => __( 'Leave if default if not sure.', 'ppom' ),
+			'desc'     => __( 'Leave if default if not sure.', 'woocommerce-product-addon' ),
 			'desc_tip' => true,
 		),
 
 		array(
-			'title'    => __( 'Price Table Position', 'ppom' ),
+			'title'    => __( 'Price Table Position', 'woocommerce-product-addon' ),
 			'type'     => 'select',
-			'label'    => __( 'Button', 'ppom' ),
+			'label'    => __( 'Button', 'woocommerce-product-addon' ),
 			'default'  => 'after',
 			'options'  => array(
-				'after'  => __( 'After PPOM Fields', 'ppom' ),
-				'before' => __( 'Before  PPOM Fields', 'ppom' ),
+				'after'  => __( 'After PPOM Fields', 'woocommerce-product-addon' ),
+				'before' => __( 'Before  PPOM Fields', 'woocommerce-product-addon' ),
 			),
 			'id'       => 'ppom_price_table_location',
-			'desc'     => __( 'Set the location to render Price Table on Front-end', 'ppom' ),
+			'desc'     => __( 'Set the location to render Price Table on Front-end', 'woocommerce-product-addon' ),
 			'desc_tip' => true,
 		),
 
@@ -585,23 +585,23 @@ function ppom_array_get_js_input_vars( $product, $args = null ) {
 	$context                              = 'product';
 	$js_vars['wc_product_price']          = ppom_get_product_price( $product, $variation_id, $context );
 	$js_vars['wc_product_regular_price']  = ppom_get_product_regular_price( $product );
-	$ppom_label_discount_price            = ppom_get_option( 'ppom_label_discount_price', __( 'Discount Price', 'ppom' ) );
-	$ppom_label_product_price             = ppom_get_option( 'ppom_label_product_price', __( 'Product Price', 'ppom' ) );
-	$ppom_label_option_total              = ppom_get_option( 'ppom_label_option_total', __( 'Option Total', 'ppom' ) );
-	$ppom_label_fixed_fee                 = ppom_get_option( 'ppom_label_fixed_fee', __( 'Fixed Fee', 'ppom' ) );
-	$ppom_label_total_discount            = ppom_get_option( 'ppom_label_total_discount', __( 'Total Discount', 'ppom' ) );
-	$ppom_label_total                     = ppom_get_option( 'ppom_label_total', __( 'Total', 'ppom' ) );
-	$js_vars['total_discount_label']      = sprintf( __( '%s', 'ppom' ), $ppom_label_total_discount );
-	$js_vars['price_matrix_heading']      = sprintf( __( '%s', 'ppom' ), $ppom_label_discount_price );
-	$js_vars['product_base_label']        = sprintf( __( '%s', 'ppom' ), $ppom_label_product_price );
-	$js_vars['option_total_label']        = sprintf( __( '%s', 'ppom' ), $ppom_label_option_total );
-	$js_vars['fixed_fee_heading']         = sprintf( __( '%s', 'ppom' ), $ppom_label_fixed_fee );
-	$js_vars['total_without_fixed_label'] = sprintf( __( '%s', 'ppom' ), $ppom_label_total );
-	$js_vars['product_quantity_label']    = __( 'Product Quantity', 'ppom' );
-	$js_vars['product_title']             = sprintf( __( '%s', 'ppom' ), $product->get_title() );
-	$js_vars['per_unit_label']            = __( 'unit', 'ppom' );
+	$ppom_label_discount_price            = ppom_get_option( 'ppom_label_discount_price', __( 'Discount Price', 'woocommerce-product-addon' ) );
+	$ppom_label_product_price             = ppom_get_option( 'ppom_label_product_price', __( 'Product Price', 'woocommerce-product-addon' ) );
+	$ppom_label_option_total              = ppom_get_option( 'ppom_label_option_total', __( 'Option Total', 'woocommerce-product-addon' ) );
+	$ppom_label_fixed_fee                 = ppom_get_option( 'ppom_label_fixed_fee', __( 'Fixed Fee', 'woocommerce-product-addon' ) );
+	$ppom_label_total_discount            = ppom_get_option( 'ppom_label_total_discount', __( 'Total Discount', 'woocommerce-product-addon' ) );
+	$ppom_label_total                     = ppom_get_option( 'ppom_label_total', __( 'Total', 'woocommerce-product-addon' ) );
+	$js_vars['total_discount_label']      = sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_total_discount );
+	$js_vars['price_matrix_heading']      = sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_discount_price );
+	$js_vars['product_base_label']        = sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_product_price );
+	$js_vars['option_total_label']        = sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_option_total );
+	$js_vars['fixed_fee_heading']         = sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_fixed_fee );
+	$js_vars['total_without_fixed_label'] = sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_total );
+	$js_vars['product_quantity_label']    = __( 'Product Quantity', 'woocommerce-product-addon' );
+	$js_vars['product_title']             = sprintf( __( '%s', 'woocommerce-product-addon' ), $product->get_title() );
+	$js_vars['per_unit_label']            = __( 'unit', 'woocommerce-product-addon' );
 	$js_vars['show_price_per_unit']       = $show_price_per_unit;
-	$js_vars['text_quantity']             = __( 'Quantity', 'ppom' );
+	$js_vars['text_quantity']             = __( 'Quantity', 'woocommerce-product-addon' );
 	$js_vars['show_option_price']         = $ppom->price_display;
 	$js_vars['is_shortcode']              = 'no';
 	$js_vars['plugin_url']                = PPOM_URL;
@@ -625,7 +625,7 @@ function ppom_tax_label_display() {
 
 	$suffex = ppom_get_option( 'ppom_label_option_total_suffex' );
 	if ( wc_tax_enabled() && $suffex !== '' ) {
-		return sprintf( __( '%s', 'ppom' ), $suffex );
+		return sprintf( __( '%s', 'woocommerce-product-addon' ), $suffex );
 	}
 }
 
@@ -673,259 +673,259 @@ function ppom_array_get_addons_details() {
 
 	$addons = array(
 		array(
-			'title'   => __( 'Texter', 'ppom' ),
-			'desc'    => __( 'PPOM Texter Addon is the best and simple solution for web2print business using WooCommerce. Now define a fixed position and area for Text in your Templates like on Mug, T-shirt or Visiting Cards with preset font family, size. The client will fill the text with his all of its attributes and send to cart. It’s like a smart Product Designer. Multiple templates can also be attached to one product.', 'ppom' ),
+			'title'   => __( 'Texter', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Texter Addon is the best and simple solution for web2print business using WooCommerce. Now define a fixed position and area for Text in your Templates like on Mug, T-shirt or Visiting Cards with preset font family, size. The client will fill the text with his all of its attributes and send to cart. It’s like a smart Product Designer. Multiple templates can also be attached to one product.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/design-shirt-with-ppom-texter/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#ppom-texter',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'WooCommerce Package Price', 'ppom' ),
-			'desc'    => __( 'Sometimes prices are very complex like for a printing company, they are selling their visiting cards in Packages.So Package Price Add-on allows admin to set prices against package. It’s usage is very simple, just add quantity (package) and it’s price. There is also option to set unit like you are selling visiting cards then unit may called as “cards”.', 'ppom' ),
+			'title'   => __( 'WooCommerce Package Price', 'woocommerce-product-addon' ),
+			'desc'    => __( 'Sometimes prices are very complex like for a printing company, they are selling their visiting cards in Packages.So Package Price Add-on allows admin to set prices against package. It’s usage is very simple, just add quantity (package) and it’s price. There is also option to set unit like you are selling visiting cards then unit may called as “cards”.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/patient-ninja/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#woocommercepackageprice',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Fields PopUp', 'ppom' ),
-			'desc'    => __( 'PPOM Fields PopUp wrap all PPOM fields inside a popup. A product with large number of fields can now has simple button with customized label. To enable this PopUp just one click required in product edit page. ', 'ppom' ),
+			'title'   => __( 'Fields PopUp', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Fields PopUp wrap all PPOM fields inside a popup. A product with large number of fields can now has simple button with customized label. To enable this PopUp just one click required in product edit page. ', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/ppom-fields-popup/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => 'https://vimeo.com/309118167',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#fieldspopup',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Google Font Map Picker', 'ppom' ),
-			'desc'    => __( 'Google Font and Map Picker has two input fields. Font selector loads fonts from Google and client can pick font and can see live preview of font effect. Admin can also filter font families and set Custom Fonts. Google Map fetch coordinate based on address and show map.', 'ppom' ),
+			'title'   => __( 'Google Font Map Picker', 'woocommerce-product-addon' ),
+			'desc'    => __( 'Google Font and Map Picker has two input fields. Font selector loads fonts from Google and client can pick font and can see live preview of font effect. Admin can also filter font families and set Custom Fonts. Google Map fetch coordinate based on address and show map.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/google-font-picker-ppom/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => 'https://vimeo.com/377580122',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#googlefontandmappicker',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Image DropDown', 'ppom' ),
-			'desc'    => __( 'PPOM Image DropDown Addon show images inside a select box. The title, description, and prices can be added along with all images. It’s best when you have a long list of images and don’t want to use Image Type input.', 'ppom' ),
+			'title'   => __( 'Image DropDown', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Image DropDown Addon show images inside a select box. The title, description, and prices can be added along with all images. It’s best when you have a long list of images and don’t want to use Image Type input.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/image-dropdown/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => 'https://najeebmedia.com/addon-image-drop-down/',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#imagedropdown',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Bulk Quantity Options', 'ppom' ),
-			'desc'    => __( 'Bulk Quantity for Options Addon allow store admin to set discount prices for each options. This Addon is best tool for companies like Printin, designing and who looking to sale products with options with different prices.', 'ppom' ),
+			'title'   => __( 'Bulk Quantity Options', 'woocommerce-product-addon' ),
+			'desc'    => __( 'Bulk Quantity for Options Addon allow store admin to set discount prices for each options. This Addon is best tool for companies like Printin, designing and who looking to sale products with options with different prices.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/woo-logo-3/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#bulkquantity',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'PriceTable', 'ppom' ),
-			'desc'    => __( 'PPOM Price Table Add-on a completely new way to sell Packages, Plans, or products with a list of features. More than ten beautiful designs for the price tables available to sell plans in WooCommerce Store.', 'ppom' ),
+			'title'   => __( 'PriceTable', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Price Table Add-on a completely new way to sell Packages, Plans, or products with a list of features. More than ten beautiful designs for the price tables available to sell plans in WooCommerce Store.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/price-table-add-on/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#pricetable',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Cart Edit', 'ppom' ),
-			'desc'    => __( 'PPOM Cart Edit Addon allow clients to edit fields once these are added to cart on cart page. It has also option to show all meta fields in different column on cart page. Extra column can be disable from Settings -> PPOM Cart tab.', 'ppom' ),
+			'title'   => __( 'Cart Edit', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Cart Edit Addon allow clients to edit fields once these are added to cart on cart page. It has also option to show all meta fields in different column on cart page. Extra column can be disable from Settings -> PPOM Cart tab.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/happy-ninja/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => 'https://vimeo.com/358618266',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#cartedit',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'SVG ADDON', 'ppom' ),
-			'desc'    => __( 'PPOM SVG Add-on is a new product designer plugin. Now you can create and upload your SVG template for complex designs with Google Fonts. The customer can select the design part to make the product as per his need.', 'ppom' ),
+			'title'   => __( 'SVG ADDON', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM SVG Add-on is a new product designer plugin. Now you can create and upload your SVG template for complex designs with Google Fonts. The customer can select the design part to make the product as per his need.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#svg',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'UploadCare', 'ppom' ),
-			'desc'    => __( 'PPOM UploadCare now can be used for image editing on WooCommerce Product pages for any web2print business. It has tons of options that we integrated with our PPOM Add-on.', 'ppom' ),
+			'title'   => __( 'UploadCare', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM UploadCare now can be used for image editing on WooCommerce Product pages for any web2print business. It has tons of options that we integrated with our PPOM Add-on.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#uploadcare',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Domain Checker', 'ppom' ),
-			'desc'    => __( 'Domain Checker Addon will check any domain’s availability. Adds domain to cart if it’s not already registered. A simple solution to sell domains with WooCommerce PPOM. Customized messages for domain availability/not-availability. Ajax base script to check domain and show result.', 'ppom' ),
+			'title'   => __( 'Domain Checker', 'woocommerce-product-addon' ),
+			'desc'    => __( 'Domain Checker Addon will check any domain’s availability. Adds domain to cart if it’s not already registered. A simple solution to sell domains with WooCommerce PPOM. Customized messages for domain availability/not-availability. Ajax base script to check domain and show result.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/ppom-domain-checker-addon/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#domainchecker',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Quantities Pack', 'ppom' ),
-			'desc'    => __( 'PPOM Quantity Pack Add-on is a special input type which is very similar to Variation Quantities input but with a good difference. Like if you are want to sell some products with different options in specific quantities, not sure?', 'ppom' ),
+			'title'   => __( 'Quantities Pack', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Quantity Pack Add-on is a special input type which is very similar to Variation Quantities input but with a good difference. Like if you are want to sell some products with different options in specific quantities, not sure?', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://najeebmedia.com/blog/ppom-quantity-pack-addon/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#quantitypack',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Fancy Cropper', 'ppom' ),
-			'desc'    => __( 'PPOM Fancy Cropper allows customers to upload images and crop before sending to cart. Admin can set different sizes and options for cropper. All cropped images are added to the cart and received in order meta for admin to download and process. For further order processing, WooConvo Revision Addon can be used.', 'ppom' ),
+			'title'   => __( 'Fancy Cropper', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Fancy Cropper allows customers to upload images and crop before sending to cart. Admin can set different sizes and options for cropper. All cropped images are added to the cart and received in order meta for admin to download and process. For further order processing, WooConvo Revision Addon can be used.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/fancy-cropper-demo/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => 'https://vimeo.com/416623997',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#fancycropper',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Super List', 'ppom' ),
-			'desc'    => __( 'PPOM Super List addon contains many pre-defined lists to render as Select field on product page. It includes Countries, Currencies, Months etc. ', 'ppom' ),
+			'title'   => __( 'Super List', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Super List addon contains many pre-defined lists to render as Select field on product page. It includes Countries, Currencies, Months etc. ', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/super-list-demo-copy/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#superlist',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'PDF Export', 'ppom' ),
+			'title'   => __( 'PDF Export', 'woocommerce-product-addon' ),
 			'desc'    => __(
 				'
 PPOM PDF Export Add-on will generate a PDF against each order including all PPOM Fields in a beautiful format. Header and Footer can also be set for PDF. This is an awesome feature when you need to print order details.',
@@ -933,159 +933,159 @@ PPOM PDF Export Add-on will generate a PDF against each order including all PPOM
 			),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/simple-t-shirt-design/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => 'https://vimeo.com/326834403',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#pdfexport',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Event Calendar', 'ppom' ),
-			'desc'    => __( 'WooCommerce Event Calendar enables clients to purchase tickets against different events from Product Page and checkout. This Event Calendar Add-on is very simple to use, manage Ticket Price, Stocks.', 'ppom' ),
+			'title'   => __( 'Event Calendar', 'woocommerce-product-addon' ),
+			'desc'    => __( 'WooCommerce Event Calendar enables clients to purchase tickets against different events from Product Page and checkout. This Event Calendar Add-on is very simple to use, manage Ticket Price, Stocks.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/multiple-event-calendar/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => 'https://vimeo.com/349698112',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#eventcalendar',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Field Collapsed', 'ppom' ),
-			'desc'    => __( 'PPOM Field Collapsed Add-on is front-end design which groups field inside beautiful section. Like steps, and if your product has a large number of fields then it is the best add-on to a short length of your product page.', 'ppom' ),
+			'title'   => __( 'Field Collapsed', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Field Collapsed Add-on is front-end design which groups field inside beautiful section. Like steps, and if your product has a large number of fields then it is the best add-on to a short length of your product page.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/ppom-collapsed-fields/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => 'https://vimeo.com/284667121',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#fieldcollapes',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Text Counter', 'ppom' ),
-			'desc'    => __( 'PPOM Text Counter Add-on is special type text input field. It can restrict a total number of words or character with nice info panel below. Each word or character can be changed and the price will be added to cart.', 'ppom' ),
+			'title'   => __( 'Text Counter', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Text Counter Add-on is special type text input field. It can restrict a total number of words or character with nice info panel below. Each word or character can be changed and the price will be added to cart.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/ppom-text-counter-add-on/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => 'https://vimeo.com/314283537',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#textcounter',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Enquiry Form', 'ppom' ),
-			'desc'    => __( 'PPOM Enquiry Form Add-on adds button on product page. A customer can ask the admin about any product with PPOM Field in email. All PPOM Meta Fields are sent with message typed by the customer. Multiple email recipients can be added for product enquiry.', 'ppom' ),
+			'title'   => __( 'Enquiry Form', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Enquiry Form Add-on adds button on product page. A customer can ask the admin about any product with PPOM Field in email. All PPOM Meta Fields are sent with message typed by the customer. Multiple email recipients can be added for product enquiry.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => 'https://vimeo.com/325028677',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#enquiryform',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'AutoComplete/MultiSelect', 'ppom' ),
-			'desc'    => __( 'PPOM AutoComplete/MultiSelect Add-on contain two special inputs. AutoComplete allows users to choose an option from the options list provided in settings. It’s like a Select input but values are filtered by keywords. It’s best to use when you have a long list of options', 'ppom' ),
+			'title'   => __( 'AutoComplete/MultiSelect', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM AutoComplete/MultiSelect Add-on contain two special inputs. AutoComplete allows users to choose an option from the options list provided in settings. It’s like a Select input but values are filtered by keywords. It’s best to use when you have a long list of options', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/ppom-auto-complete-demo/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#autocompletemultiselect',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Variation Quantity Matrix', 'ppom' ),
-			'desc'    => __( 'PPOM Variation Quantity Matrix Add-on is an advanced form of Variation Quantity Field. Variation Quantity Matrix is a super simple form when quantities need to be collected against multiple options. Like if you selling T-Shirt and need to collect Quantities against each Color of each Size, this Add-on can be used to render a Tabular/Grid. ', 'ppom' ),
+			'title'   => __( 'Variation Quantity Matrix', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Variation Quantity Matrix Add-on is an advanced form of Variation Quantity Field. Variation Quantity Matrix is a super simple form when quantities need to be collected against multiple options. Like if you selling T-Shirt and need to collect Quantities against each Color of each Size, this Add-on can be used to render a Tabular/Grid. ', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/t-shirt-variations/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => 'https://vimeo.com/391981516',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#variationquantitymatrix',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'WooCommerce Variation Quantity', 'ppom' ),
-			'desc'    => __( 'PPOM WooCommerce Variation Quantity Add-on turn default WC variations into variations quantities and each variations can be ordered with different quantities. In other words client can bulk order with WooCommerce Variations. It is very similar to PPOM Variation Quantity input but the only difference is that it use WooCommerce core variations.', 'ppom' ),
+			'title'   => __( 'WooCommerce Variation Quantity', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM WooCommerce Variation Quantity Add-on turn default WC variations into variations quantities and each variations can be ordered with different quantities. In other words client can bulk order with WooCommerce Variations. It is very similar to PPOM Variation Quantity input but the only difference is that it use WooCommerce core variations.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://ppom.nmediahosting.com/product/woocommerce-variation-quantity/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => 'https://vimeo.com/402089812',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#woocemmrcevariationquantity',
 				),
 			),
 		),
 		array(
-			'title'   => __( 'Option Quantity', 'ppom' ),
-			'desc'    => __( 'PPOM Option Quantity Add-on is simple ‘Number’ input type which can be used to accept option quantity BUT Price can also be set. Like for a Pizza Product, customer have a option to order more then one drink and each extra drink as price. Here this Option Quantity will do the trick.  This Add-on can be used as Name your Price.', 'ppom' ),
+			'title'   => __( 'Option Quantity', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Option Quantity Add-on is simple ‘Number’ input type which can be used to accept option quantity BUT Price can also be set. Like for a Pizza Product, customer have a option to order more then one drink and each extra drink as price. Here this Option Quantity will do the trick.  This Add-on can be used as Name your Price.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'ppom' ),
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://najeebmedia.com/blog/option-quantity-ppom-add-on-released/',
 				),
 				array(
-					'title' => __( 'Quick Video', 'ppom' ),
+					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
 					'link'  => '',
 				),
 				array(
-					'title' => __( 'More Info', 'ppom' ),
+					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#optionquantity',
 				),
 			),

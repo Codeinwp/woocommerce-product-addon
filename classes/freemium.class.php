@@ -50,7 +50,7 @@ class PPOM_Freemium {
 	 */
 	public function add_locked_cfr_tab( $tabs ) {
 		$tabs[self::TAB_KEY_FREEMIUM_CFR] = array(
-			'label' => __( 'Conditional Repeater (PRO)', 'ppom' ),
+			'label' => __( 'Conditional Repeater (PRO)', 'woocommerce-product-addon' ),
 			'class' => array( 'ppom-tabs-label' ),
 			'field_depend' => array( 'all' )
 		);
@@ -69,9 +69,9 @@ class PPOM_Freemium {
 		<div class="freemium-cfr-content">
 			<p><?php esc_html_e( 'Conditional Field Repeater allows repeating this field across a value of another PPOM field. Conditional Field Repeater feature is the part of the PPOM Pro.', 'ppom' ); ?></p>
 
-			<p><?php printf( '<strong>%s</strong> %s', esc_html__( 'Use case example:', 'ppom' ),  esc_html__( 'Get the number of players from another PPOM field, and repeat this field(let\'s say that\'s a text field representing the player name) across the number of players. That\'s pretty useful for dynamic repeating the PPOM field.', 'ppom' ) ); ?></p>
+			<p><?php printf( '<strong>%s</strong> %s', esc_html__( 'Use case example:', 'ppom' ),  esc_html__( 'Get the number of players from another PPOM field, and repeat this field(let\'s say that\'s a text field representing the player name) across the number of players. That\'s pretty useful for dynamic repeating the PPOM field.', 'woocommerce-product-addon' ) ); ?></p>
 
-			<a target="_blank" class="btn btn-sm btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php echo __( 'Upgrade to Pro', 'ppom' ); ?></a>
+			<a target="_blank" class="btn btn-sm btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php echo __( 'Upgrade to Pro', 'woocommerce-product-addon' ); ?></a>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -91,9 +91,9 @@ class PPOM_Freemium {
 
             $input_class->settings['locked_cfr'] = array(
                 'type' => 'checkbox',
-                'title' => __( 'Enable Conditional Repeat', 'ppom' ),
+                'title' => __( 'Enable Conditional Repeat', 'woocommerce-product-addon' ),
 				'disabled' => true,
-                'desc' => __( 'This control turns on the Conditional Field Repeater mode for this field, in this way, this field is repeated by the selected field(selected in the Origin setting) below', 'ppom' ),
+                'desc' => __( 'This control turns on the Conditional Field Repeater mode for this field, in this way, this field is repeated by the selected field(selected in the Origin setting) below', 'woocommerce-product-addon' ),
 				'tabs_class' => array( 'ppom_handle_' . self::TAB_KEY_FREEMIUM_CFR )
             );
 
@@ -104,123 +104,123 @@ class PPOM_Freemium {
 	public function get_pro_fields() {
 		return [
 			[
-				'title' => __( 'Collapse', 'ppom' ),
+				'title' => __( 'Collapse', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-money" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Emojis', 'ppom' ),
+				'title' => __( 'Emojis', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-user-plus" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Phone Input', 'ppom' ),
+				'title' => __( 'Phone Input', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-check" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Chained Input', 'ppom' ),
+				'title' => __( 'Chained Input', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-check" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Conditional Images', 'ppom' ),
+				'title' => __( 'Conditional Images', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-picture-o" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Domain', 'ppom' ),
+				'title' => __( 'Domain', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-server" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Fonts Picker', 'ppom' ),
+				'title' => __( 'Fonts Picker', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-font" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Texter', 'ppom' ),
+				'title' => __( 'Texter', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-keyboard-o" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Text Counter', 'ppom' ),
+				'title' => __( 'Text Counter', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-comments-o" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Fixed Price', 'ppom' ),
+				'title' => __( 'Fixed Price', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-money" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Select Option Quantity', 'ppom' ),
+				'title' => __( 'Select Option Quantity', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-list-ol" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Image DropDown', 'ppom' ),
+				'title' => __( 'Image DropDown', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-file-image-o" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Super List', 'ppom' ),
+				'title' => __( 'Super List', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-check" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Quantity Option', 'ppom' ),
+				'title' => __( 'Quantity Option', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-money" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Quantities Pack', 'ppom' ),
+				'title' => __( 'Quantities Pack', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-list-alt" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Radio Switcher', 'ppom' ),
+				'title' => __( 'Radio Switcher', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-dot-circle-o" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Variation Matrix', 'ppom' ),
+				'title' => __( 'Variation Matrix', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-list-alt" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'DateRange Input', 'ppom' ),
+				'title' => __( 'DateRange Input', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-table" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Color picker', 'ppom' ),
+				'title' => __( 'Color picker', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-modx" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'File Input', 'ppom' ),
+				'title' => __( 'File Input', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-file" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Image Cropper', 'ppom' ),
+				'title' => __( 'Image Cropper', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-crop" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Timezone Input', 'ppom' ),
+				'title' => __( 'Timezone Input', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-clock-o" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Variation Quantity', 'ppom' ),
+				'title' => __( 'Variation Quantity', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-list-ol" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Images', 'ppom' ),
+				'title' => __( 'Images', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-picture-o" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Price Matrix', 'ppom' ),
+				'title' => __( 'Price Matrix', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-usd" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'HTML', 'ppom' ),
+				'title' => __( 'HTML', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-code" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Color Palettes', 'ppom' ),
+				'title' => __( 'Color Palettes', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-user-plus" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Audio / Video', 'ppom' ),
+				'title' => __( 'Audio / Video', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-file-video-o" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Measure Input', 'ppom' ),
+				'title' => __( 'Measure Input', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-building-o" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Divider', 'ppom' ),
+				'title' => __( 'Divider', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-pencil-square-o" aria-hidden="true"></i>',
 			],
 		];

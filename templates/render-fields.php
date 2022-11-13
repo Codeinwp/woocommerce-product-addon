@@ -72,7 +72,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 	}
 
 	if ( empty( $data_name ) ) {
-		printf( __( 'Please provide data name property for %s', 'ppom' ), $title );
+		printf( __( 'Please provide data name property for %s', 'woocommerce-product-addon' ), $title );
 		continue;
 	}
 
@@ -194,8 +194,8 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 			if ( $allow_nextprev == 'yes' ) {
 				echo '<div class="ppom-collapse-nextprev-btn" data-collapse-index="' . $ppom_collapse_counter . '">';
-				echo '<button class="ppom-collapse-prev">' . __( 'Prev', 'ppom' ) . '</button>';
-				echo '<button class="ppom-collapse-next">' . __( 'Next', 'ppom' ) . '</button>';
+				echo '<button class="ppom-collapse-prev">' . __( 'Prev', 'woocommerce-product-addon' ) . '</button>';
+				echo '<button class="ppom-collapse-next">' . __( 'Next', 'woocommerce-product-addon' ) . '</button>';
 				echo '</div>';
 			}
 			echo '</div>';
@@ -408,7 +408,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 			$options = ppom_array_get_timezone_list( $regions, $show_time );
 			if ( ! empty( $first_option ) ) {
-				$options[''] = sprintf( __( '%s', 'ppom' ), $first_option );
+				$options[''] = sprintf( __( '%s', 'woocommerce-product-addon' ), $first_option );
 			}
 
 			// ppom_pa($options);
@@ -620,7 +620,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 		// File upload
 		case 'file':
-			$label_select  = ( $meta['button_label_select'] == '' ? __( 'Select files', 'ppom' ) : $meta['button_label_select'] );
+			$label_select  = ( $meta['button_label_select'] == '' ? __( 'Select files', 'woocommerce-product-addon' ) : $meta['button_label_select'] );
 			$files_allowed = ( $meta['files_allowed'] == '' ? 1 : $meta['files_allowed'] );
 			$file_types    = ( $meta['file_types'] == '' ? 'jpg,png,gif' : $meta['file_types'] );
 			$file_size     = ( $meta['file_size'] == '' ? '10mb' : $meta['file_size'] );
@@ -668,7 +668,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 		// Cropper
 		case 'cropper':
-			$label_select  = ( $meta['button_label_select'] == '' ? __( 'Select files', 'ppom' ) : $meta['button_label_select'] );
+			$label_select  = ( $meta['button_label_select'] == '' ? __( 'Select files', 'woocommerce-product-addon' ) : $meta['button_label_select'] );
 			$files_allowed = ( $meta['files_allowed'] == '' ? 1 : $meta['files_allowed'] );
 			$file_types    = 'jpg,png,gif';
 			$file_size     = ( $meta['file_size'] == '' ? '10mb' : $meta['file_size'] );

@@ -30,8 +30,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		*/
 		$this->menu_pages = array(
 			array(
-				'page_title'  => __( 'PPOM', 'ppom' ),
-				'menu_title'  => __( 'PPOM', 'ppom' ),
+				'page_title'  => __( 'PPOM', 'woocommerce-product-addon' ),
+				'menu_title'  => __( 'PPOM', 'woocommerce-product-addon' ),
 				'cap'         => 'manage_options',
 				'slug'        => 'ppom',
 				'callback'    => 'product_meta',
@@ -96,8 +96,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			if ( $page ['parent_slug'] == '' ) {
 
 				$menu = add_options_page(
-					__( 'PPOM Fields', 'ppom' ),
-					__( 'PPOM Fields', 'ppom' ),
+					__( 'PPOM Fields', 'woocommerce-product-addon' ),
+					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
 					$page ['slug'],
 					array(
@@ -112,7 +112,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				$menu = add_submenu_page(
 					$page ['parent_slug'],
 					__( $page ['page_title'], 'ppom' ),
-					__( 'PPOM Fields', 'ppom' ),
+					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
 					$page ['slug'],
 					array(
@@ -127,7 +127,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				// Menu page for roles set by PPOM Permission Settings
 				add_menu_page(
 					__( $page ['page_title'], 'ppom' ),
-					__( 'PPOM Fields', 'ppom' ),
+					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
 					$page ['slug'],
 					array(
@@ -165,7 +165,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				</div>
 			</div>
 			<?php
-			echo '<p>' . __( 'You can create different meta groups for different products.', 'ppom' ) . '</p>';
+			echo '<p>' . __( 'You can create different meta groups for different products.', 'woocommerce-product-addon' ) . '</p>';
 		}
 
 		if ( ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) || $action == 'new' ) {
@@ -236,7 +236,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		) {
 			$response = array(
 				'status'  => 'error',
-				'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'ppom' ),
+				'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'woocommerce-product-addon' ),
 			);
 
 			wp_send_json( $response );
@@ -282,11 +282,11 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	function validate_plugin() {
 
 		echo '<div class="wrap">';
-		echo '<h2>' . __( 'Provide API key below:', 'ppom' ) . '</h2>';
-		echo '<p>' . __( 'If you don\'t know your API key, please login into your: <a target="_blank" href="http://wordpresspoets.com/member-area">Member area</a>', 'ppom' ) . '</p>';
+		echo '<h2>' . __( 'Provide API key below:', 'woocommerce-product-addon' ) . '</h2>';
+		echo '<p>' . __( 'If you don\'t know your API key, please login into your: <a target="_blank" href="http://wordpresspoets.com/member-area">Member area</a>', 'woocommerce-product-addon' ) . '</p>';
 
 		echo '<form onsubmit="return validate_api_wooproduct(this)">';
-		echo '<p><label id="plugin_api_key">' . __( 'Entery API key', 'ppom' ) . ':</label><br /><input type="text" name="plugin_api_key" id="plugin_api_key" /></p>';
+		echo '<p><label id="plugin_api_key">' . __( 'Entery API key', 'woocommerce-product-addon' ) . ':</label><br /><input type="text" name="plugin_api_key" id="plugin_api_key" /></p>';
 		wp_nonce_field();
 		echo '<p><input type="submit" class="button-primary button" name="plugin_api_key" /></p>';
 		echo '<p id="nm-sending-api"></p>';
@@ -297,7 +297,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 	public static function add_settings_tab( $settings_tabs ) {
 
-		$settings_tabs['ppom_settings'] = __( 'PPOM Settings', 'ppom' );
+		$settings_tabs['ppom_settings'] = __( 'PPOM Settings', 'woocommerce-product-addon' );
 
 		return $settings_tabs;
 	}

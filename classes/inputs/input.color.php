@@ -21,9 +21,9 @@ class NM_Color_wooproduct extends PPOM_Inputs {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
 
-		$this->title    = __( 'Color picker', 'ppom' );
-		$this->desc     = __( 'Color pallete input', 'ppom' );
-		$this->icon     = __( '<i class="fa fa-modx" aria-hidden="true"></i>', 'ppom' );
+		$this->title    = __( 'Color picker', 'woocommerce-product-addon' );
+		$this->desc     = __( 'Color pallete input', 'woocommerce-product-addon' );
+		$this->icon     = __( '<i class="fa fa-modx" aria-hidden="true"></i>', 'woocommerce-product-addon' );
 		$this->settings = self::get_settings();
 
 	}
@@ -33,46 +33,46 @@ class NM_Color_wooproduct extends PPOM_Inputs {
 		$input_meta = array(
 			'title'           => array(
 				'type'  => 'text',
-				'title' => __( 'Title', 'ppom' ),
-				'desc'  => __( 'It will be shown as field label', 'ppom' ),
+				'title' => __( 'Title', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as field label', 'woocommerce-product-addon' ),
 			),
 			'data_name'       => array(
 				'type'  => 'text',
-				'title' => __( 'Data name', 'ppom' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'ppom' ),
+				'title' => __( 'Data name', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'     => array(
 				'type'  => 'textarea',
-				'title' => __( 'Description', 'ppom' ),
-				'desc'  => __( 'Small description, it will be display near name title.', 'ppom' ),
+				'title' => __( 'Description', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Small description, it will be display near name title.', 'woocommerce-product-addon' ),
 			),
 			'error_message'   => array(
 				'type'  => 'text',
-				'title' => __( 'Error message', 'ppom' ),
-				'desc'  => __( 'Insert the error message for validation.', 'ppom' ),
+				'title' => __( 'Error message', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Insert the error message for validation.', 'woocommerce-product-addon' ),
 			),
 			'default_color'   => array(
 				'type'        => 'text',
-				'title'       => __( 'Default color', 'ppom' ),
-				'desc'        => __( 'Define default color e.g: #effeff', 'ppom' ),
+				'title'       => __( 'Default color', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Define default color e.g: #effeff', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'palettes_colors' => array(
 				'type'        => 'text',
-				'title'       => __( 'Palettes colors', 'ppom' ),
-				'desc'        => __( 'Color codes seperated by comma e.g: #125, #459, #78b', 'ppom' ),
+				'title'       => __( 'Palettes colors', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Color codes seperated by comma e.g: #125, #459, #78b', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'palettes_width'  => array(
 				'type'        => 'text',
-				'title'       => __( 'Palettes width', 'ppom' ),
-				'desc'        => __( 'e.g: 500', 'ppom' ),
+				'title'       => __( 'Palettes width', 'woocommerce-product-addon' ),
+				'desc'        => __( 'e.g: 500', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'palettes_mode'   => array(
 				'type'        => 'select',
-				'title'       => __( 'Palettes mode', 'ppom' ),
-				'desc'        => __( 'Select Mode', 'ppom' ),
+				'title'       => __( 'Palettes mode', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Select Mode', 'woocommerce-product-addon' ),
 				'options'     => array(
 					'hsl' => 'Hue, Saturation, Lightness',
 					'hsv' => 'Hue, Saturation, Value',
@@ -81,59 +81,59 @@ class NM_Color_wooproduct extends PPOM_Inputs {
 			),
 			'width'           => array(
 				'type'        => 'select',
-				'title'       => __( 'Width', 'ppom' ),
-				'desc'        => __( 'Select width column.', 'ppom' ),
+				'title'       => __( 'Width', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Select width column.', 'woocommerce-product-addon' ),
 				'options'     => ppom_get_input_cols(),
 				'default'     => 12,
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'visibility'      => array(
 				'type'        => 'select',
-				'title'       => __( 'Visibility', 'ppom' ),
-				'desc'        => __( 'Set field visibility based on user.', 'ppom' ),
+				'title'       => __( 'Visibility', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Set field visibility based on user.', 'woocommerce-product-addon' ),
 				'options'     => ppom_field_visibility_options(),
 				'default'     => 'everyone',
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'visibility_role' => array(
 				'type'   => 'text',
-				'title'  => __( 'User Roles', 'ppom' ),
-				'desc'   => __( 'Role separated by comma.', 'ppom' ),
+				'title'  => __( 'User Roles', 'woocommerce-product-addon' ),
+				'desc'   => __( 'Role separated by comma.', 'woocommerce-product-addon' ),
 				'hidden' => true,
 			),
 			'show_palettes'   => array(
 				'type'        => 'checkbox',
-				'title'       => __( 'Show palettes', 'ppom' ),
-				'desc'        => __( 'Tick if need to show a group of common colors beneath the square', 'ppom' ),
+				'title'       => __( 'Show palettes', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Tick if need to show a group of common colors beneath the square', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'show_onload'     => array(
 				'type'        => 'checkbox',
-				'title'       => __( 'Show on load', 'ppom' ),
-				'desc'        => __( 'Display color picker by default, otherwise show on click', 'ppom' ),
+				'title'       => __( 'Show on load', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Display color picker by default, otherwise show on click', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'desc_tooltip'    => array(
 				'type'        => 'checkbox',
-				'title'       => __( 'Show tooltip (PRO)', 'ppom' ),
-				'desc'        => __( 'Show Description in Tooltip with Help Icon', 'ppom' ),
+				'title'       => __( 'Show tooltip (PRO)', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Show Description in Tooltip with Help Icon', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'required'        => array(
 				'type'        => 'checkbox',
-				'title'       => __( 'Required', 'ppom' ),
-				'desc'        => __( 'Select this if it must be required.', 'ppom' ),
+				'title'       => __( 'Required', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Select this if it must be required.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'logic'           => array(
 				'type'  => 'checkbox',
-				'title' => __( 'Enable Conditions', 'ppom' ),
-				'desc'  => __( 'Tick it to turn conditional logic to work below', 'ppom' ),
+				'title' => __( 'Enable Conditions', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Tick it to turn conditional logic to work below', 'woocommerce-product-addon' ),
 			),
 			'conditions'      => array(
 				'type'  => 'html-conditions',
-				'title' => __( 'Conditions', 'ppom' ),
-				'desc'  => __( 'Tick it to turn conditional logic to work below', 'ppom' ),
+				'title' => __( 'Conditions', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Tick it to turn conditional logic to work below', 'woocommerce-product-addon' ),
 			),
 		);
 

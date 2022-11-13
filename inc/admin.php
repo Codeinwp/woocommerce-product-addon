@@ -14,14 +14,14 @@ function ppom_admin_show_product_meta( $columns ) {
 
 	unset( $columns['date'] );
 	unset( $columns['product_tag'] );
-	$columns['ppom_meta'] = __( 'PPOM', 'ppom' );
-	$columns['date']      = __( 'Date', 'ppom' );
+	$columns['ppom_meta'] = __( 'PPOM', 'woocommerce-product-addon' );
+	$columns['date']      = __( 'Date', 'woocommerce-product-addon' );
 
 	return $columns;
 
 	return array_merge(
 		$columns,
-		array( 'ppom_meta' => __( 'PPOM', 'ppom' ) )
+		array( 'ppom_meta' => __( 'PPOM', 'woocommerce-product-addon' ) )
 	);
 }
 
@@ -47,10 +47,10 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 							),
 							$ppom_settings_url 
 						);
-						echo sprintf( __( '<a href="%1$s">%2$s</a>', 'ppom' ), $url_edit, $meta_title );
+						echo sprintf( __( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), $url_edit, $meta_title );
 						echo ', ';
 					} else {
-						echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'ppom' ), $ppom_settings_url, 'Add Fields' );
+						echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), $ppom_settings_url, 'Add Fields' );
 					}
 				}
 			} elseif ( $ppom->ppom_settings ) {
@@ -61,9 +61,9 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 					),
 					$ppom_settings_url 
 				);
-				echo sprintf( __( '<a href="%1$s">%2$s</a>', 'ppom' ), $url_edit, $ppom->meta_title );
+				echo sprintf( __( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), $url_edit, $ppom->meta_title );
 			} else {
-				echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'ppom' ), $ppom_settings_url, 'Add Fields' );
+				echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), $ppom_settings_url, 'Add Fields' );
 			}
 
 			break;
@@ -73,7 +73,7 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 
 function ppom_admin_product_meta_metabox() {
 
-	add_meta_box( 'ppom-select-meta', __( 'Select PPOM Meta', 'ppom' ), 'ppom_meta_list', 'product', 'side', 'default' );
+	add_meta_box( 'ppom-select-meta', __( 'Select PPOM Meta', 'woocommerce-product-addon' ), 'ppom_meta_list', 'product', 'side', 'default' );
 }
 
 function ppom_meta_list( $post ) {
@@ -83,13 +83,13 @@ function ppom_meta_list( $post ) {
 	$ppom_setting = admin_url( 'admin.php?page=ppom' );
 
 	$html  = '<div class="options_group">';
-	$html .= '<p>' . __( 'Select Meta to Show Fields on this product', 'ppom' );
+	$html .= '<p>' . __( 'Select Meta to Show Fields on this product', 'woocommerce-product-addon' );
 	// $html .= __(' Or <a target="_blank" class="button" href="'.esc_url($ppom_setting).'">Create New Meta</a>', 'ppom');
 	$html .= '</p>';
 
 	$html .= '<p>';
 	$html .= '<select name="ppom_product_meta" id="ppom_product_meta" class="select">';
-	$html .= '<option selected="selected"> ' . __( 'None', 'ppom' ) . '</option>';
+	$html .= '<option selected="selected"> ' . __( 'None', 'woocommerce-product-addon' ) . '</option>';
 
 	foreach ( $all_meta as $meta ) {
 
@@ -125,7 +125,7 @@ function ppom_meta_list( $post ) {
 	);
 	$ppom_setting_url = add_query_arg( $ppom_add_args, $ppom_setting );
 
-	$html .= sprintf( __( ' - <a href="%s" target="_blank">Create New Meta</a></p>', 'ppom' ), $ppom_setting_url );
+	$html .= sprintf( __( ' - <a href="%s" target="_blank">Create New Meta</a></p>', 'woocommerce-product-addon' ), $ppom_setting_url );
 
 	echo apply_filters( 'ppom_select_meta_in_product', $html, $ppom, $all_meta );
 
@@ -181,7 +181,7 @@ function ppom_admin_save_form_meta() {
 
 	if ( $db_version < 22.1 ) {
 		$resp = array(
-			'message' => __( 'Since version 22.0, Database has some changes. Please Deactivate & then activate the PPOM plugin.', 'ppom' ),
+			'message' => __( 'Since version 22.0, Database has some changes. Please Deactivate & then activate the PPOM plugin.', 'woocommerce-product-addon' ),
 			'status'  => 'error',
 		);
 
@@ -195,7 +195,7 @@ function ppom_admin_save_form_meta() {
 		 || ! ppom_security_role()
 	) {
 		$resp = array(
-			'message' => __( 'Sorry, you are not allowed to perform this action.', 'ppom' ),
+			'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
 			'status'  => 'error',
 		);
 
@@ -228,7 +228,7 @@ function ppom_admin_save_form_meta() {
 
 	if ( strlen( $productmeta_name ) > 50 ) {
 		$resp = array(
-			'message' => __( 'PPOM title is too long to save, please make it less than 50 characters.', 'ppom' ),
+			'message' => __( 'PPOM title is too long to save, please make it less than 50 characters.', 'woocommerce-product-addon' ),
 			'status'  => 'error',
 		);
 
@@ -296,7 +296,7 @@ function ppom_admin_save_form_meta() {
 	if ( $ppom_id ) {
 
 		$resp = array(
-			'message'        => __( 'Form added successfully', 'ppom' ),
+			'message'        => __( 'Form added successfully', 'woocommerce-product-addon' ),
 			'status'         => 'success',
 			'productmeta_id' => $ppom_id,
 			'redirect_to'    => $redirect_to,
@@ -304,7 +304,7 @@ function ppom_admin_save_form_meta() {
 	} else {
 
 		$resp = array(
-			'message'        => __( 'No changes found.', 'ppom' ),
+			'message'        => __( 'No changes found.', 'woocommerce-product-addon' ),
 			'status'         => 'success',
 			'productmeta_id' => '',
 		);
@@ -333,7 +333,7 @@ function ppom_admin_update_form_meta() {
 
 	if ( $db_version < 22.1 ) {
 		$resp = array(
-			'message'        => __( 'Since version 22.0, Database has some changes. Please Deactivate & then activate the PPOM plugin.', 'ppom' ),
+			'message'        => __( 'Since version 22.0, Database has some changes. Please Deactivate & then activate the PPOM plugin.', 'woocommerce-product-addon' ),
 			'status'         => 'error',
 			'productmeta_id' => $productmeta_id,
 			'redirect_to'    => $redirect_to,
@@ -348,7 +348,7 @@ function ppom_admin_update_form_meta() {
 		 || ! ppom_security_role()
 	) {
 		$resp = array(
-			'message' => __( 'Sorry, you are not allowed to perform this action.', 'ppom' ),
+			'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
 			'status'  => 'error',
 		);
 
@@ -375,7 +375,7 @@ function ppom_admin_update_form_meta() {
 
 	if ( strlen( $productmeta_name ) > 50 ) {
 		$resp = array(
-			'message' => __( 'PPOM title is too long to save, please make it less than 50 characters.', 'ppom' ),
+			'message' => __( 'PPOM title is too long to save, please make it less than 50 characters.', 'woocommerce-product-addon' ),
 			'status'  => 'error',
 		);
 
@@ -439,7 +439,7 @@ function ppom_admin_update_form_meta() {
 	if ( $rows_effected ) {
 
 		$resp = array(
-			'message'        => __( 'Form updated successfully', 'ppom' ),
+			'message'        => __( 'Form updated successfully', 'woocommerce-product-addon' ),
 			'status'         => 'success',
 			'productmeta_id' => $productmeta_id,
 			'redirect_to'    => $redirect_to,
@@ -447,7 +447,7 @@ function ppom_admin_update_form_meta() {
 	} else {
 
 		$resp = array(
-			'message'        => __( 'Form updated successfully.', 'ppom' ),
+			'message'        => __( 'Form updated successfully.', 'woocommerce-product-addon' ),
 			'status'         => 'success',
 			'productmeta_id' => $productmeta_id,
 			'redirect_to'    => $redirect_to,
@@ -506,7 +506,7 @@ function ppom_admin_delete_meta() {
 	) {
 		$response = array(
 			'status'  => 'error',
-			'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'ppom' ),
+			'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'woocommerce-product-addon' ),
 		);
 
 		wp_send_json( $response );
@@ -525,12 +525,12 @@ function ppom_admin_delete_meta() {
 	if ( $res ) {
 		$response = array(
 			'status'  => 'success',
-			'message' => __( 'Meta deleted successfully', 'ppom' ),
+			'message' => __( 'Meta deleted successfully', 'woocommerce-product-addon' ),
 		);
 	} else {
 		$response = array(
 			'status'  => 'error',
-			'message' => __( 'Error while deleting the PPOM, try again.', 'ppom' ),
+			'message' => __( 'Error while deleting the PPOM, try again.', 'woocommerce-product-addon' ),
 		);
 	}
 
@@ -651,7 +651,7 @@ function ppom_admin_bar_menu() {
 	$wp_admin_bar->add_node(
 		array(
 			'id'    => 'ppom-setting-bar',
-			'title' => sprintf( __( '%s', 'ppom' ), $bar_title ),
+			'title' => sprintf( __( '%s', 'woocommerce-product-addon' ), $bar_title ),
 			'href'  => $ppom_setting_url,
 		) 
 	);
@@ -671,7 +671,7 @@ function ppom_admin_bar_menu() {
 		$wp_admin_bar->add_node(
 			array(
 				'id'     => "ppom-setting-bar-{$meta->productmeta_id}",
-				'title'  => sprintf( __( '%s', 'ppom' ), $bar_title ),
+				'title'  => sprintf( __( '%s', 'woocommerce-product-addon' ), $bar_title ),
 				'href'   => $apply_link,
 				'parent' => 'ppom-setting-bar',
 			) 
@@ -684,6 +684,6 @@ function ppom_admin_update_pro_notice() {
 	$buy_paddle = tsdk_utmify( 'https://themeisle.com/plugins/ppom-pro/upgrade/', 'addmorefields', 'ppompage' );
 
     echo '<div class="ppom-more-plugins-block pb-5">';
-    echo '<a class="btn btn-sm btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . __( 'Add more field types', 'ppom' ) . '</a>';
+    echo '<a class="btn btn-sm btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . __( 'Add more field types', 'woocommerce-product-addon' ) . '</a>';
     echo '</div>';
 }

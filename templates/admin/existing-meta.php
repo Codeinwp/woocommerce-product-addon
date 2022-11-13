@@ -69,7 +69,7 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 					);
 					$url_clone    = wp_nonce_url( $url_clone, 'ppom_clone_nonce_action', 'ppom_clone_nonce' );
 					$url_products = admin_url( 'edit.php?post_type=product', ( is_ssl() ? 'https' : 'http' ) );
-					$product_link = '<a href="' . esc_url( $url_products ) . '">' . __( 'Products', 'ppom' ) . '</a>';
+					$product_link = '<a href="' . esc_url( $url_products ) . '">' . __( 'Products', 'woocommerce-product-addon' ) . '</a>';
 					?>
 					<tr>
 						<td class="ppom-meta-table-checkbox-mr ppom-checkboxe-style">
