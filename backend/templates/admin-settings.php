@@ -57,7 +57,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 					</div>
 					<div class="col-md-6 col-sm-6">
 						<a href="<?php echo esc_url( $migrate_url ); ?>"
-						   class="button button-primary button-large nmsf-migrate-back-btn"><?php echo _e( 'Switch to Legacy Settings', $class_ins->get_config( 'ppom' ) ); ?></a>
+						   class="button button-primary button-large nmsf-migrate-back-btn"><?php echo _e( 'Switch to Legacy Settings', 'woocommerce-product-addon' ); ?></a>
 						<input type="submit" class="button button-primary button-large" value="Submit"/>
 					</div>
 				</div>
@@ -236,7 +236,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 
 																		<?php if ( $hint != '' ) { ?>
 																			<span class="nmsf-hint-area">
-																			<span><?php echo _e( 'Hint: ', $class_ins->get_config( 'ppom' ) ); ?></span>
+																			<span><?php echo _e( 'Hint: ', 'woocommerce-product-addon' ); ?></span>
 																			<?php echo esc_html( $hint ); ?>
 																		</span>
 																		<?php } ?>

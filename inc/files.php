@@ -103,7 +103,7 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 
 	$ppom_cart_meta_thumb_size = ppom_get_thumbs_size();
 
-	$thumb_html = '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $file_thumb_url ) . '" alt="' . sprintf( __( '%s', 'ppom' ), $file_name ) . '">';
+	$thumb_html = '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $file_thumb_url ) . '" alt="' . sprintf( __( '%s', 'woocommerce-product-addon' ), $file_name ) . '">';
 
 	$ppom_html  = '<table class="table table-bordered">';
 	$ppom_html .= '<tr><td><a href="' . esc_url( $file_link ) . '" class="lightbox et_pb_lightbox_image" itemprop="image" title="' . esc_attr( $file_name ) . '">' . $thumb_html . '</a></td>';
@@ -119,7 +119,7 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 		$ppom_html    .= '<td><a href="' . esc_url( $cropped_url ) . '" class="lightbox et_pb_lightbox_image" itemprop="image" title="' . esc_attr( $file_name ) . '">';
 		$ppom_html    .= '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $cropped_url ) . '">';
 		$ppom_html    .= '</a></td>';
-		$cropped_title = sprintf( __( 'Your image-%s', 'ppom' ), $size );
+		$cropped_title = sprintf( __( 'Your image-%s', 'woocommerce-product-addon' ), $size );
 		$ppom_html    .= '<td>' . $cropped_title . '</td>';
 		$ppom_html    .= '</tr>';
 	}
@@ -144,7 +144,7 @@ function ppom_upload_file() {
 	$file_upload_nonce_action = 'ppom_uploading_file_action';
 	if ( ! wp_verify_nonce( $ppom_nonce, $file_upload_nonce_action ) && apply_filters( 'ppom_verify_upload_file', true ) ) {
 		$response ['status']  = 'error';
-		$response ['message'] = __( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', 'ppom' );
+		$response ['message'] = __( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', 'woocommerce-product-addon' );
 		wp_send_json( $response );
 	}
 
@@ -154,7 +154,7 @@ function ppom_upload_file() {
 	if ( $file_dir_path == 'errDirectory' ) {
 
 		$response ['status']  = 'error';
-		$response ['message'] = __( 'Error while creating directory', 'ppom' );
+		$response ['message'] = __( 'Error while creating directory', 'woocommerce-product-addon' );
 		wp_send_json( $response );
 	}
 
@@ -179,7 +179,7 @@ function ppom_upload_file() {
 
 	if ( in_array( strtolower( $extension ), $restricted_type ) ) {
 		$response ['status']  = 'error';
-		$response ['message'] = __( 'File type not valid - ' . $extension, 'ppom' );
+		$response ['message'] = __( 'File type not valid - ' . $extension, 'woocommerce-product-addon' );
 		wp_send_json( $response );
 	}
 	/* ========== Invalid File type checking ========== */
@@ -345,7 +345,7 @@ function ppom_delete_file() {
 	$ppom_nonce        = $_REQUEST['ppom_nonce'];
 	$file_nonce_action = 'ppom_deleting_file_action';
 	if ( ! wp_verify_nonce( $ppom_nonce, $file_nonce_action ) ) {
-		printf( __( 'Error while deleting file %s', 'ppom' ), $file_name );
+		printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_name );
 		die( 0 );
 	}
 
@@ -369,12 +369,12 @@ function ppom_delete_file() {
 
 		// make sure file is removed
 		if ( ! file_exists( $file_path ) ) {
-			_e( 'File removed', 'ppom' );
+			_e( 'File removed', 'woocommerce-product-addon' );
 		} else {
-			printf( __( 'Error while deleting file %s', 'ppom' ), $file_path );
+			printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
 		}   
 	} else {
-		printf( __( 'Error while deleting file %s', 'ppom' ), $file_path );
+		printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
 	}
 
 	die( 0 );
@@ -451,7 +451,7 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 
 		list( $fw, $fh ) = getimagesize( $file_path );
 		$file_meta       = $fw . '(w) x ' . $fh . '(h)';
-		$file_meta      .= ' - ' . __( 'Size: ', 'ppom' ) . ppom_get_filesize_in_kb( $file_name );
+		$file_meta      .= ' - ' . __( 'Size: ', 'woocommerce-product-addon' ) . ppom_get_filesize_in_kb( $file_name );
 
 		$thumb_url = ppom_get_dir_url( true ) . $file_name . '?nocache=' . time();
 
@@ -471,8 +471,8 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 
 		// Tools group
 		$file_tools .= '<div class="btn-group" role="group" aria-label="Tools" style="text-align: center; display: block;">';
-		// $file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="'.__('Remove', "ppom").'"><span class="fa fa-times"></span></a>';
-		$file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', 'ppom' ) . '">' . __( 'Delete', 'ppom' ) . '</span></a>';
+		// $file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="'.__('Remove', "woocommerce-product-addon").'"><span class="fa fa-times"></span></a>';
+		$file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '">' . __( 'Delete', 'woocommerce-product-addon' ) . '</span></a>';
 
 		if ( apply_filters( 'ppom_show_image_popup', false ) ) {
 			$file_tools .= '<a href="#" data-toggle="modal" data-target="#modalFile' . esc_attr( $file_id ) . '" class="btn btn-primary"><span class="fa fa-expand"></span></a>';
@@ -483,11 +483,11 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 
 	} else {
 
-		$file_meta .= __( 'Size: ', 'ppom' ) . ppom_get_filesize_in_kb( $file_name );
+		$file_meta .= __( 'Size: ', 'woocommerce-product-addon' ) . ppom_get_filesize_in_kb( $file_name );
 		$thumb_url  = PPOM_URL . '/images/file.png';
 
-		$file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="' . __( 'Remove', 'ppom' ) . '"><span class="fa fa-times"></span></a>';    // delete icon
-		// $file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="'.__('Remove', "ppom").'">Delete</a>';	//delete icon
+		$file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '"><span class="fa fa-times"></span></a>';    // delete icon
+		// $file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="'.__('Remove', "woocommerce-product-addon").'">Delete</a>';	//delete icon
 	}
 
 

@@ -51,7 +51,7 @@ $url_cancel = add_query_arg(
 	) 
 );
 
-echo '<p><a class="btn btn-primary" href="' . $url_cancel . '">' . __( '&laquo; Existing Product Meta', 'ppom' ) . '</a></p>';
+echo '<p><a class="btn btn-primary" href="' . $url_cancel . '">' . __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ) . '</a></p>';
 
 $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 
@@ -62,7 +62,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 	<!-- All fields inputs name show -->
 	<div id="ppom_fields_model_id" class="ppom-modal-box ppom-fields-name-model">
 		<header>
-			<h3><?php _e( 'Select Field', 'ppom' ); ?></h3>
+			<h3><?php _e( 'Select Field', 'woocommerce-product-addon' ); ?></h3>
 		</header>
 		<div class="ppom-modal-body">
 			<ul class="list-group list-inline">
@@ -88,7 +88,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 
 				// show only if pro is not activated.
 				if( ! ppom_pro_is_installed() ) {
-					foreach( ( new PPOM_Freemium() )->get_pro_fields() as $field ) {
+					foreach( PPOM_Freemium::get_instance()->get_pro_fields() as $field ) {
 						?>
 							<li onclick="return;" class="ppom_select_field list-group-item locked">
 								<span class="ppom-fields-icon">
@@ -112,7 +112,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 		</div>
 		<footer>
 			<button type="button"
-					class="btn btn-default close-model ppom-js-modal-close"><?php _e( 'Close', 'ppom' ); ?></button>
+					class="btn btn-default close-model ppom-js-modal-close"><?php _e( 'Close', 'woocommerce-product-addon' ); ?></button>
 		</footer>
 	</div>
 
@@ -135,7 +135,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 
 
 			<div class="ppom-basic-setting-section">
-				<h2 class="ppom-heading-style"><?php _e( 'Product Meta Basic Settings', 'ppom' ); ?><span></span></h2>
+				<h2 class="ppom-heading-style"><?php _e( 'Product Meta Basic Settings', 'woocommerce-product-addon' ); ?><span></span></h2>
 				<div class="ppom-tabs-init ppom-admin-tabs-css">
 					<!--General Tab-->
 					<input type="radio" name="css-tabs" id="ppom-general-tab" checked>
@@ -144,9 +144,9 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 						<div class="row">
 							<div class="col-md-6 col-sm-12">
 								<div class="form-group">
-									<label><?php _e( 'Meta group name', 'ppom' ); ?>
+									<label><?php _e( 'Meta group name', 'woocommerce-product-addon' ); ?>
 										<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip"
-											  title="<?php _e( 'For your reference.', 'ppom' ); ?>"><i
+											  title="<?php _e( 'For your reference.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
 									<input type="text" class="form-control" maxlength="50" name="productmeta_name"
@@ -155,24 +155,24 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 							</div>
 							<div class="col-md-6 col-sm-12">
 								<div class="form-group">
-									<label><?php _e( 'Control price display on product page', 'ppom' ); ?>
+									<label><?php _e( 'Control price display on product page', 'woocommerce-product-addon' ); ?>
 										<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip"
-											  title="<?php _e( 'Control how price table will be shown for options or disable.', 'ppom' ); ?>"><i
+											  title="<?php _e( 'Control how price table will be shown for options or disable.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
 									<select name="dynamic_price_hide" class="form-control">
-										<option value="no"><?php _e( 'Select Option', 'ppom' ); ?></option>
-										<option value="hide" <?php selected( $dynamic_price_hide, 'hide' ); ?>><?php _e( 'Do Not Show Price Table', 'ppom' ); ?></option>
-										<option value="option_sum" <?php selected( $dynamic_price_hide, 'option_sum' ); ?>><?php _e( "Show Only Option's Total", 'ppom' ); ?></option>
-										<option value="all_option" <?php selected( $dynamic_price_hide, 'all_option' ); ?>><?php _e( "Show Each Option's Price", 'ppom' ); ?></option>
+										<option value="no"><?php _e( 'Select Option', 'woocommerce-product-addon' ); ?></option>
+										<option value="hide" <?php selected( $dynamic_price_hide, 'hide' ); ?>><?php _e( 'Do Not Show Price Table', 'woocommerce-product-addon' ); ?></option>
+										<option value="option_sum" <?php selected( $dynamic_price_hide, 'option_sum' ); ?>><?php _e( "Show Only Option's Total", 'woocommerce-product-addon' ); ?></option>
+										<option value="all_option" <?php selected( $dynamic_price_hide, 'all_option' ); ?>><?php _e( "Show Each Option's Price", 'woocommerce-product-addon' ); ?></option>
 									</select>
 								</div>
 							</div>
 							<div class="col-md-6 col-sm-12">
 								<div class="form-group">
-									<label><?php _e( 'Apply for Categories', 'ppom' ); ?>
+									<label><?php _e( 'Apply for Categories', 'woocommerce-product-addon' ); ?>
 										<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip"
-											  title="<?php _e( 'If you want to apply this meta against categories, type here each category SLUG per line. For All type: All. Leave blank for default.', 'ppom' ); ?>"><i
+											  title="<?php _e( 'If you want to apply this meta against categories, type here each category SLUG per line. For All type: All. Leave blank for default.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
 									<textarea class="form-control"
@@ -192,9 +192,9 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 						<div class="row">
 							<div class="col-md-6 col-sm-12">
 								<div class="form-group">
-									<label><?php _e( 'Custom CSS', 'ppom' ); ?>
+									<label><?php _e( 'Custom CSS', 'woocommerce-product-addon' ); ?>
 										<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip"
-											  title="<?php _e( 'Add your own CSS.', 'ppom' ); ?>"><i
+											  title="<?php _e( 'Add your own CSS.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
 									<textarea id="ppom-css-editor" class="form-control"
@@ -203,9 +203,9 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 							</div>
 							<div class="col-md-6 col-sm-12">
 								<div class="form-group">
-									<label><?php _e( 'Custom Javascipt', 'ppom' ); ?>
+									<label><?php _e( 'Custom Javascipt', 'woocommerce-product-addon' ); ?>
 										<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip"
-											  title="<?php _e( 'Add your own javascipt script.', 'ppom' ); ?>"><i
+											  title="<?php _e( 'Add your own javascipt script.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
 									<textarea id="ppom-js-editor" class="form-control"
@@ -256,10 +256,10 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 								<footer>
 									<span class="ppom-req-field-id"></span>
 									<button type="button"
-											class="btn btn-default close-model ppom-js-modal-close"><?php _e( 'Close', 'ppom' ); ?></button>
+											class="btn btn-default close-model ppom-js-modal-close"><?php _e( 'Close', 'woocommerce-product-addon' ); ?></button>
 									<button class="btn btn-primary ppom-update-field ppom-add-fields-js-action"
 											data-field-index='<?php echo esc_attr( $f_index ); ?>'
-											data-field-type='<?php echo esc_attr( $field_type ); ?>'><?php _e( 'Update Field', 'ppom' ); ?></button>
+											data-field-type='<?php echo esc_attr( $field_type ); ?>'><?php _e( 'Update Field', 'woocommerce-product-addon' ); ?></button>
 								</footer>
 								<?php
 								$ppom_field_index = $f_index;
@@ -278,15 +278,15 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 
 			<!-- all fields append on table -->
 			<div class="table-responsive">
-				<h2 class="ppom-heading-style"><?php _e( 'Add PPOM Fields', 'ppom' ); ?></h2>
+				<h2 class="ppom-heading-style"><?php _e( 'Add PPOM Fields', 'woocommerce-product-addon' ); ?></h2>
 				<table class="table ppom_field_table  table-striped">
 					<thead>
 					<tr>
 						<th colspan="6">
 							<button type="button" class="btn btn-primary"
-									data-modal-id="ppom_fields_model_id"><?php _e( 'Add field', 'ppom' ); ?></button>
+									data-modal-id="ppom_fields_model_id"><?php _e( 'Add field', 'woocommerce-product-addon' ); ?></button>
 							<button type="button"
-									class="btn btn-danger ppom_remove_field"><?php _e( 'Remove', 'ppom' ); ?></button>
+									class="btn btn-danger ppom_remove_field"><?php _e( 'Remove', 'woocommerce-product-addon' ); ?></button>
 						</th>
 					</tr>
 					<tr class="ppom-thead-bg">
@@ -297,13 +297,13 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 								<span></span>
 							</label>
 						</th>
-						<th><?php _e( 'Status', 'ppom' ); ?></th>
-						<th><?php _e( 'Data Name', 'ppom' ); ?></th>
-						<th><?php _e( 'Type', 'ppom' ); ?></th>
-						<th><?php _e( 'Title', 'ppom' ); ?></th>
-						<th><?php _e( 'Placeholder', 'ppom' ); ?></th>
-						<th><?php _e( 'Required', 'ppom' ); ?></th>
-						<th><?php _e( 'Actions', 'ppom' ); ?></th>
+						<th><?php _e( 'Status', 'woocommerce-product-addon' ); ?></th>
+						<th><?php _e( 'Data Name', 'woocommerce-product-addon' ); ?></th>
+						<th><?php _e( 'Type', 'woocommerce-product-addon' ); ?></th>
+						<th><?php _e( 'Title', 'woocommerce-product-addon' ); ?></th>
+						<th><?php _e( 'Placeholder', 'woocommerce-product-addon' ); ?></th>
+						<th><?php _e( 'Required', 'woocommerce-product-addon' ); ?></th>
+						<th><?php _e( 'Actions', 'woocommerce-product-addon' ); ?></th>
 					</tr>
 					</thead>
 					<tfoot>
@@ -315,20 +315,20 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 								<span></span>
 							</label>
 						</th>
-						<th><?php _e( 'Status', 'ppom' ); ?></th>
-						<th><?php _e( 'Data Name', 'ppom' ); ?></th>
-						<th><?php _e( 'Type', 'ppom' ); ?></th>
-						<th><?php _e( 'Title', 'ppom' ); ?></th>
-						<th><?php _e( 'Placeholder', 'ppom' ); ?></th>
-						<th><?php _e( 'Required', 'ppom' ); ?></th>
-						<th><?php _e( 'Actions', 'ppom' ); ?></th>
+						<th><?php _e( 'Status', 'woocommerce-product-addon' ); ?></th>
+						<th><?php _e( 'Data Name', 'woocommerce-product-addon' ); ?></th>
+						<th><?php _e( 'Type', 'woocommerce-product-addon' ); ?></th>
+						<th><?php _e( 'Title', 'woocommerce-product-addon' ); ?></th>
+						<th><?php _e( 'Placeholder', 'woocommerce-product-addon' ); ?></th>
+						<th><?php _e( 'Required', 'woocommerce-product-addon' ); ?></th>
+						<th><?php _e( 'Actions', 'woocommerce-product-addon' ); ?></th>
 					</tr>
 					<tr>
 						<th colspan="12">
 							<div class="ppom-submit-btn text-right">
 								<span class="ppom-meta-save-notice"></span>
 								<input type="submit" class="btn btn-primary"
-									   value="<?php _e( 'Save Fields', 'ppom' ); ?>">
+									   value="<?php _e( 'Save Fields', 'woocommerce-product-addon' ); ?>">
 							</div>
 						</th>
 					</tr>
@@ -388,13 +388,13 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 								<td>
 									<button class="btn  ppom_copy_field"
 											data-field-type="<?php echo esc_attr( $field_type ); ?>"
-											title="<?php _e( 'Copy Field', 'ppom' ); ?>"
+											title="<?php _e( 'Copy Field', 'woocommerce-product-addon' ); ?>"
 											id="<?php echo esc_attr( $f_index ); ?>"><span
 												class="dashicons dashicons-admin-page"></span></span></i></button>
 									<button class="btn ppom-edit-field"
 											data-modal-id="ppom_field_model_<?php echo esc_attr( $f_index ); ?>"
 											id="<?php echo esc_attr( $f_index ); ?>"
-											title="<?php _e( 'Edit Field', 'ppom' ); ?>"><span
+											title="<?php _e( 'Edit Field', 'woocommerce-product-addon' ); ?>"><span
 												class="dashicons dashicons-edit"></span></button>
 								</td>
 							</tr>
@@ -413,7 +413,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 </div>
 
 <br><p><a class="btn btn-primary"
-		  href="<?php echo esc_url( $url_cancel ); ?>"><?php echo __( '&laquo; Existing Product Meta', 'ppom' ); ?></a>
+		  href="<?php echo esc_url( $url_cancel ); ?>"><?php echo __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ); ?></a>
 </p>
 
 <div class="checker">

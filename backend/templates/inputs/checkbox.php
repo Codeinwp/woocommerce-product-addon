@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $input_id    = isset( $input_meta['input_id'] ) ? $input_meta['input_id'] : '';
 $input_style = isset( $input_meta['style'] ) ? $input_meta['style'] : '';
 $default     = isset( $input_meta['default'] ) ? $input_meta['default'] : '';
-$label       = isset( $input_meta['label'] ) ? $input_meta['label'] : __( 'Enable', 'ppom' );
+$label       = isset( $input_meta['label'] ) ? $input_meta['label'] : __( 'Enable', 'woocommerce-product-addon' );
 
 $checked = $class_ins::get_saved_settings( $input_id );
 

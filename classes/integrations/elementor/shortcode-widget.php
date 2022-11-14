@@ -21,7 +21,7 @@ class PPOM_Elementor_Shortcode_Widget extends \Elementor\Widget_Base {
 	 * widget title
 	 */
 	public function get_title() {
-		return __( 'PPOM Shortcode', 'ppom' );
+		return __( 'PPOM Shortcode', 'woocommerce-product-addon' );
 	}
 
 
@@ -49,7 +49,7 @@ class PPOM_Elementor_Shortcode_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'content_section',
 			[
-				'label' => __( 'Product Details', 'ppom' ),
+				'label' => __( 'Product Details', 'woocommerce-product-addon' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
 			]
 		);
@@ -57,9 +57,9 @@ class PPOM_Elementor_Shortcode_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'ppom_product_id',
 			[
-				'label'       => __( 'Product ID', 'ppom' ),
+				'label'       => __( 'Product ID', 'woocommerce-product-addon' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
-				'placeholder' => __( 'Provide Product ID', 'ppom' ),
+				'placeholder' => __( 'Provide Product ID', 'woocommerce-product-addon' ),
 			]
 		);
 

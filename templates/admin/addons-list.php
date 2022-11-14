@@ -27,7 +27,7 @@ $addons_list = ppom_array_get_addons_details();
 
 	<div class="ppom-admin-addons-header">
 		<div class="ppom-admin-addons-header-logo">
-			<h3><?php _e( 'PPOM Addons', 'ppom' ); ?></h3>
+			<h3><?php _e( 'PPOM Addons', 'woocommerce-product-addon' ); ?></h3>
 		</div>
 		<div class="ppom-admin-addons-header-search-input">
 			<input type="search" id="myInput" class="form-control" placeholder="Search Addons" onkeyup="myFunction()">

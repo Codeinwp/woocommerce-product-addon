@@ -25,15 +25,15 @@ wp_nonce_field( 'ppom_attached_nonce_action', 'ppom_attached_nonce' );
 if ( count( $ppom_attached ) > 0 ) :
 	?>
 
-	<h3><?php _e( 'Already Attached', 'ppom' ); ?></h3>
+	<h3><?php _e( 'Already Attached', 'woocommerce-product-addon' ); ?></h3>
 	<table id="ppom-already-attached-table" class="ppom-table table table-striped">
 		<thead>
 		<tr>
 			<th>
-				<strong><?php _e( 'Product Title', 'ppom' ); ?></strong>
+				<strong><?php _e( 'Product Title', 'woocommerce-product-addon' ); ?></strong>
 			</th>
 			<th>
-				<strong><?php _e( 'PPOM Fields', 'ppom' ); ?></strong>
+				<strong><?php _e( 'PPOM Fields', 'woocommerce-product-addon' ); ?></strong>
 			</th>
 		</tr>
 		</thead>
@@ -65,15 +65,15 @@ if ( count( $ppom_attached ) > 0 ) :
 endif;
 ?>
 
-<h3><?php _e( 'Attach', 'ppom' ); ?></h3>
+<h3><?php _e( 'Attach', 'woocommerce-product-addon' ); ?></h3>
 <table id="ppom-product-table" class="ppom-table table table-striped">
 	<thead>
 	<tr>
 		<th>
-			<strong><?php _e( 'Product Title', 'ppom' ); ?></strong>
+			<strong><?php _e( 'Product Title', 'woocommerce-product-addon' ); ?></strong>
 		</th>
 		<th>
-			<strong><?php _e( 'PPOM Fields', 'ppom' ); ?></strong>
+			<strong><?php _e( 'PPOM Fields', 'woocommerce-product-addon' ); ?></strong>
 		</th>
 	</tr>
 	</thead>

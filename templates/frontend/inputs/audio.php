@@ -21,7 +21,7 @@ $multiple_allowed = $fm->get_meta_value( 'multiple_allowed' );
 // If audio/video empty
 if ( ! $fm->audio_video() ) {
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please Add Some Audio/Video', 'ppom' ) . '</p>';
+	echo '<p>' . __( 'Please Add Some Audio/Video', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return;
