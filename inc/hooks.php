@@ -335,9 +335,9 @@ function ppom_hooks_load_input_scripts( $product, $ppom_id = null ) {
 						'plugin_url'             => PPOM_URL,
 						'file_upload_path_thumb' => ppom_get_dir_url( true ),
 						'file_upload_path'       => ppom_get_dir_url(),
-						'mesage_max_files_limit' => __( ' files allowed only', 'ppom' ),
+						'mesage_max_files_limit' => __( ' files allowed only', 'woocommerce-product-addon' ),
 						'file_inputs'            => $ppom_file_inputs,
-						'delete_file_msg'        => __( 'Are you sure?', 'ppom' ),
+						'delete_file_msg'        => __( 'Are you sure?', 'woocommerce-product-addon' ),
 						'plupload_runtime'       => ( ppom_if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
 						'croppie_options'        => $croppie_options,
 						'ppom_file_upload_nonce' => wp_create_nonce( $file_upload_nonce_action ),
@@ -363,9 +363,9 @@ function ppom_hooks_load_input_scripts( $product, $ppom_id = null ) {
 						'plugin_url'             => PPOM_URL,
 						'file_upload_path_thumb' => ppom_get_dir_url( true ),
 						'file_upload_path'       => ppom_get_dir_url(),
-						'mesage_max_files_limit' => __( ' files allowed only', 'ppom' ),
+						'mesage_max_files_limit' => __( ' files allowed only', 'woocommerce-product-addon' ),
 						'file_inputs'            => $ppom_file_inputs,
-						'delete_file_msg'        => __( 'Are you sure?', 'ppom' ),
+						'delete_file_msg'        => __( 'Are you sure?', 'woocommerce-product-addon' ),
 						'aviary_api_key'         => '',
 						'plupload_runtime'       => ( ppom_if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
 						'ppom_file_upload_nonce' => wp_create_nonce( $file_upload_nonce_action ),
@@ -785,7 +785,7 @@ function ppom_hooks_hide_cart_quantity( $classes, $product ) {
 function ppom_hooks_weekly_cron_schedule( $schedules ) {
 	$schedules['weekly'] = array(
 		'interval' => 60 * 60 * 24 * 7, // 604,800, seconds in a week
-		'display'  => __( 'Weekly', 'ppom' ),
+		'display'  => __( 'Weekly', 'woocommerce-product-addon' ),
 	);
 
 	return $schedules;
@@ -822,7 +822,7 @@ function ppom_hooks_render_shortcode( $attr ) {
 
 		$product = wc_get_product( $params['product_id'] );
 		if ( ! $product ) {
-			echo __( 'Product ID is not valid', 'ppom' );
+			echo __( 'Product ID is not valid', 'woocommerce-product-addon' );
 
 			return ob_get_clean();
 		}

@@ -165,7 +165,7 @@ class PPOM_Meta {
 
 		$meta_id = $this->single_meta_id();
 
-		if ( ! $meta_id || $meta_id == __( 'None', 'ppom' ) ) {
+		if ( ! $meta_id || $meta_id == __( 'None', 'woocommerce-product-addon' ) ) {
 			return null;
 		}
 

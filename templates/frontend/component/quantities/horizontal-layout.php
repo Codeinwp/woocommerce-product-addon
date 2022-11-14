@@ -42,7 +42,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 	<table class="table table-bordered table-hover ppom-style">
 		<thead>
 		<tr>
-			<th><?php _e( 'Options', 'ppom' ); ?></th>
+			<th><?php _e( 'Options', 'woocommerce-product-addon' ); ?></th>
 			<?php 
 			foreach ( $options as $opt ) {
 				$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
@@ -55,7 +55,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 		</thead>
 
 		<tr>
-			<th><?php _e( 'Quantity', 'ppom' ); ?></th>
+			<th><?php _e( 'Quantity', 'woocommerce-product-addon' ); ?></th>
 			<?php 
 			foreach ( $options as $opt ) {
 
@@ -70,7 +70,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 				$required     = ( $fm->required() == 'on' ? 'required' : '' );
 				$label        = $opt['raw'];
 				$name         = $fm->form_name() . '[' . htmlentities( $label ) . ']';
-				$in_stock     = $manage_stock ? sprintf( __( '%s in stock', 'ppom' ), $stock ) : '';
+				$in_stock     = $manage_stock ? sprintf( __( '%s in stock', 'woocommerce-product-addon' ), $stock ) : '';
 				$out_of_stock = $manage_stock && $stock < 1 ? true : false;
 				$disabled     = $out_of_stock ? 'disabled="disabled"' : '';
 				$min          = $out_of_stock ? 0 : $min;
@@ -113,7 +113,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 					>
 
 					<?php
-					printf( __( '<span class="ppom-instock">%s</span>', 'ppom' ), $in_stock );
+					printf( __( '<span class="ppom-instock">%s</span>', 'woocommerce-product-addon' ), $in_stock );
 					?>
 				</td>
 			<?php } ?>

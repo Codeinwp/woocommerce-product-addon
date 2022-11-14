@@ -485,7 +485,7 @@ class PPOM_FRONTEND_SCRIPTS {
 				$input_js_vars['wc_no_decimal']            = $decimal_palces;
 				$input_js_vars['wc_product_price']         = ppom_get_product_price( $product, '', 'product' );
 				$input_js_vars['wc_product_regular_price'] = ppom_get_product_regular_price( $product );
-				$input_js_vars['product_title']            = sprintf( __( '%s', 'ppom' ), $product->get_title() );
+				$input_js_vars['product_title']            = sprintf( __( '%s', 'woocommerce-product-addon' ), $product->get_title() );
 				$input_js_vars['show_price_per_unit']      = $show_price_per_unit;
 				$input_js_vars['show_option_price']        = $ppom->price_display;
 				$input_js_vars['product_id']               = $product_id;
@@ -539,8 +539,8 @@ class PPOM_FRONTEND_SCRIPTS {
 				$localize_data = array(
 					'file_upload_path_thumb' => ppom_get_dir_url( true ),
 					'file_upload_path'       => ppom_get_dir_url(),
-					'mesage_max_files_limit' => __( ' files allowed only', 'ppom' ),
-					'delete_file_msg'        => __( 'Are you sure?', 'ppom' ),
+					'mesage_max_files_limit' => __( ' files allowed only', 'woocommerce-product-addon' ),
+					'delete_file_msg'        => __( 'Are you sure?', 'woocommerce-product-addon' ),
 					'aviary_api_key'         => '',
 					'plupload_runtime'       => ( ppom_if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
 					'ppom_file_upload_nonce' => wp_create_nonce( 'ppom_uploading_file_action' ),
@@ -553,32 +553,32 @@ class PPOM_FRONTEND_SCRIPTS {
 			case 'ppom-price':
 			case 'ppom-conditions':
 			case 'ppom-conditions-v2':
-				$ppom_label_product_price  = ppom_get_option( 'ppom_label_product_price', __( 'Product Price', 'ppom' ) );
-				$ppom_label_option_total   = ppom_get_option( 'ppom_label_option_total', __( 'Option Total', 'ppom' ) );
-				$ppom_label_fixed_fee      = ppom_get_option( 'ppom_label_fixed_fee', __( 'Fixed Fee', 'ppom' ) );
-				$ppom_label_total_discount = ppom_get_option( 'ppom_label_total_discount', __( 'Total Discount', 'ppom' ) );
-				$ppom_label_total          = ppom_get_option( 'ppom_label_total', __( 'Total', 'ppom' ) );
+				$ppom_label_product_price  = ppom_get_option( 'ppom_label_product_price', __( 'Product Price', 'woocommerce-product-addon' ) );
+				$ppom_label_option_total   = ppom_get_option( 'ppom_label_option_total', __( 'Option Total', 'woocommerce-product-addon' ) );
+				$ppom_label_fixed_fee      = ppom_get_option( 'ppom_label_fixed_fee', __( 'Fixed Fee', 'woocommerce-product-addon' ) );
+				$ppom_label_total_discount = ppom_get_option( 'ppom_label_total_discount', __( 'Total Discount', 'woocommerce-product-addon' ) );
+				$ppom_label_total          = ppom_get_option( 'ppom_label_total', __( 'Total', 'woocommerce-product-addon' ) );
 
 				$localize_data = array(
 					'ppom_validate_nonce'       => wp_create_nonce( 'ppom_validating_action' ),
 					'wc_thousand_sep'           => wc_get_price_thousand_separator(),
 					'wc_currency_pos'           => get_option( 'woocommerce_currency_pos' ),
 					'wc_decimal_sep'            => get_option( 'woocommerce_price_decimal_sep' ),
-					'total_discount_label'      => sprintf( __( '%s', 'ppom' ), $ppom_label_total_discount ),
+					'total_discount_label'      => sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_total_discount ),
 					'price_matrix_heading'      => '',
-					'product_base_label'        => sprintf( __( '%s', 'ppom' ), $ppom_label_product_price ),
-					'option_total_label'        => sprintf( __( '%s', 'ppom' ), $ppom_label_option_total ),
-					'fixed_fee_heading'         => sprintf( __( '%s', 'ppom' ), $ppom_label_fixed_fee ),
-					'total_without_fixed_label' => sprintf( __( '%s', 'ppom' ), $ppom_label_total ),
-					'product_quantity_label'    => __( 'Product Quantity', 'ppom' ),
-					'per_unit_label'            => __( 'unit', 'ppom' ),
-					'text_quantity'             => __( 'Quantity', 'ppom' ),
+					'product_base_label'        => sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_product_price ),
+					'option_total_label'        => sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_option_total ),
+					'fixed_fee_heading'         => sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_fixed_fee ),
+					'total_without_fixed_label' => sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_total ),
+					'product_quantity_label'    => __( 'Product Quantity', 'woocommerce-product-addon' ),
+					'per_unit_label'            => __( 'unit', 'woocommerce-product-addon' ),
+					'text_quantity'             => __( 'Quantity', 'woocommerce-product-addon' ),
 					'is_shortcode'              => 'no',
 					'is_mobile'                 => ppom_is_mobile(),
 					'tax_prefix'                => ppom_tax_label_display(),
-					'validate_msg'              => __( 'is a required field', 'ppom' ),
-					'image_max_msg'             => __( 'You can only select a maximum of', 'ppom' ),
-					'image_min_msg'             => __( 'You can only select a minimum of', 'ppom' ),
+					'validate_msg'              => __( 'is a required field', 'woocommerce-product-addon' ),
+					'image_max_msg'             => __( 'You can only select a maximum of', 'woocommerce-product-addon' ),
+					'image_min_msg'             => __( 'You can only select a minimum of', 'woocommerce-product-addon' ),
 				);
 
 				break;

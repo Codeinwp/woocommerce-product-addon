@@ -155,7 +155,7 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 		if ( $price !== '' ) {
@@ -235,7 +235,7 @@ class NM_Form {
 		$html                = '<div class="' . esc_attr( $input_wrapper_class ) . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 		$classes .= ' ppom-measure-input';
@@ -251,7 +251,7 @@ class NM_Form {
 
 		if ( $use_units ) {
 			$html .= '<div class="form-check form-check-inline">';
-			// $html .= '<button class="btn btn-outline-secondary ppom-measure-btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.__('Select',"ppom").'</button>';
+			// $html .= '<button class="btn btn-outline-secondary ppom-measure-btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.__('Select',"woocommerce-product-addon").'</button>';
 			// $html .= '<div class="dropdown-menu">';
 
 			foreach ( $options as $option ) {
@@ -261,9 +261,9 @@ class NM_Form {
 				$option_id = $option['option_id'];
 				$unit      = $option['raw'];
 				$html     .= '<input checked name="ppom[unit][' . $id . ']" value="' . esc_attr( $unit ) . '" class="form-check-input ppom-measure-unit" type="radio" id="' . esc_attr( $option_id ) . '" data-apply="measure" ';
-				$html     .= sprintf( __( 'data-use_units="' . esc_attr( $use_units ) . '" data-price="%s" data-label="%s" data-data_name="%s" data-unit="%s" data-optionid="%s">', 'ppom' ), $option['price'], esc_attr( $data_label ), $id, $unit, $option_id );
+				$html     .= sprintf( __( 'data-use_units="' . esc_attr( $use_units ) . '" data-price="%s" data-label="%s" data-data_name="%s" data-unit="%s" data-optionid="%s">', 'woocommerce-product-addon' ), $option['price'], esc_attr( $data_label ), $id, $unit, $option_id );
 				$html     .= '<label class="form-check-label" id="' . esc_attr( $option_id ) . '">';
-				$html     .= sprintf( __( '%s', 'ppom' ), $option['label'] );
+				$html     .= sprintf( __( '%s', 'woocommerce-product-addon' ), $option['label'] );
 				$html     .= '</label>';
 			}
 
@@ -276,7 +276,7 @@ class NM_Form {
 			$option_id = "{$id}_unit";
 			$html     .= '<input style="display:none"  value="" checked name="ppom[unit][' . $id . ']" class="form-check-input ppom-input ppom-measure-unit" type="radio" id="' . esc_attr( $option_id ) . '" data-apply="measure" ';
 			$html     .= sprintf(
-				__( 'data-use_units="no" data-price="%1$s" data-label="%2$s" data-data_name="%3$s" data-optionid="%4$s" data-qty="%5$s">', 'ppom' ),
+				__( 'data-use_units="no" data-price="%1$s" data-label="%2$s" data-data_name="%3$s" data-optionid="%4$s" data-qty="%5$s">', 'woocommerce-product-addon' ),
 				ppom_get_product_price( $product ),
 				esc_attr( $label ),
 				$id,
@@ -351,7 +351,7 @@ class NM_Form {
 
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 		if ( $rich_editor == 'on' ) {
@@ -440,7 +440,7 @@ class NM_Form {
 
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 		$html .= '<select ';
@@ -553,7 +553,7 @@ class NM_Form {
 
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 		$html .= '<select ';
@@ -635,7 +635,7 @@ class NM_Form {
 
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 		if ( is_array( $checked_value ) ) {
@@ -722,7 +722,7 @@ class NM_Form {
 
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 		foreach ( $options as $key => $value ) {
@@ -820,7 +820,7 @@ class NM_Form {
 		$html               .= '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 		// ppom_pa($options);
 		$html .= '<div class="ppom-palettes ppom-palettes-' . esc_attr( $id ) . '">';
@@ -925,7 +925,7 @@ class NM_Form {
 		// Options
 		$images = isset( $args['images'] ) ? $args['images'] : '';
 		if ( ! $images ) {
-			return __( 'Images not selected', 'ppom' );
+			return __( 'Images not selected', 'woocommerce-product-addon' );
 		}
 
 		$input_wrapper_class = $this->get_default_setting_value( 'global', 'input_wrapper_class', $id );
@@ -933,7 +933,7 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 		// apply for selected images border color
@@ -1163,7 +1163,7 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 		// Check if price matrix table is not hidden by settings
@@ -1244,9 +1244,9 @@ class NM_Form {
 		$product_id   = ppom_get_product_id( $product );
 		$matrix_found = ppom_has_field_by_type( $product_id, 'pricematrix' );
 		if ( ! empty( $matrix_found ) && ppom_is_field_has_price( $args ) ) {
-			$error_msg = __( 'Quantities cannot be used with Price Matrix, Remove prices from quantities input.', 'ppom' );
+			$error_msg = __( 'Quantities cannot be used with Price Matrix, Remove prices from quantities input.', 'woocommerce-product-addon' );
 
-			return sprintf( __( '<div class="woocommerce-error">%s</div>', 'ppom' ), $error_msg );
+			return sprintf( __( '<div class="woocommerce-error">%s</div>', 'woocommerce-product-addon' ), $error_msg );
 		}
 
 		$type  = $this->get_attribute_value( 'type', $args );
@@ -1258,7 +1258,7 @@ class NM_Form {
 		$html                = '<div class="ppom-input-quantities ' . $input_wrapper_class . ' table-responsive">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 
@@ -1324,7 +1324,7 @@ class NM_Form {
 		// Options
 		$audios = isset( $args['audios'] ) ? $args['audios'] : '';
 		if ( ! $audios ) {
-			return __( 'audios not selected', 'ppom' );
+			return __( 'audios not selected', 'woocommerce-product-addon' );
 		}
 
 		$input_wrapper_class = $this->get_default_setting_value( 'global', 'input_wrapper_class', $id );
@@ -1332,7 +1332,7 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 		// ppom_pa($audios);
@@ -1415,7 +1415,7 @@ class NM_Form {
 		$html = '<div id="ppom-file-container-' . esc_attr( $args['id'] ) . '" class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 
@@ -1427,14 +1427,14 @@ class NM_Form {
 		$html            .= 'class="btn btn-primary ' . esc_attr( $args['button_class'] ) . '">';
 		$html            .= $args['button_label'] . '</a>';
 		$html            .= '<span class="ppom-dragdrop-text">';
-		$html            .= __( 'Drag File Here', 'ppom' );
+		$html            .= __( 'Drag File Here', 'woocommerce-product-addon' );
 		$html            .= '</span>';
 		$html            .= '</div>';        // ppom-file-container
 
 		if ( $args['dragdrop'] ) {
 
 			$html .= '<div class="ppom-droptext">';
-			$html .= __( 'Drag file/directory here', 'ppom' );
+			$html .= __( 'Drag file/directory here', 'woocommerce-product-addon' );
 			$html .= '</div>';
 		}
 
@@ -1501,7 +1501,7 @@ class NM_Form {
 		$html = '<div id="ppom-file-container-' . esc_attr( $args['id'] ) . '" class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 		$container_height = isset( $args['dragdrop'] ) ? 'auto' : '30px';
@@ -1511,13 +1511,13 @@ class NM_Form {
 		$html            .= 'href="javascript:;" ';
 		$html            .= 'class="btn btn-primary ' . esc_attr( $args['button_class'] ) . '">';
 		$html            .= $args['button_label'] . '</a>';
-		$html            .= '<span class="ppom-dragdrop-text">' . __( 'Drag file/directory here', 'ppom' ) . '</span>';
+		$html            .= '<span class="ppom-dragdrop-text">' . __( 'Drag file/directory here', 'woocommerce-product-addon' ) . '</span>';
 		$html            .= '</div>';        // ppom-file-container
 
 		if ( $args['dragdrop'] ) {
 
 			$html .= '<div class="ppom-droptext">';
-			$html .= __( 'Drag file/directory here', 'ppom' );
+			$html .= __( 'Drag file/directory here', 'woocommerce-product-addon' );
 			$html .= '</div>';
 		}
 
@@ -1545,7 +1545,7 @@ class NM_Form {
 
 			if ( $args['first_option'] ) {
 
-				$html .= sprintf( __( '<option value="">%s</option>', 'ppom' ), $args['first_option'] );
+				$html .= sprintf( __( '<option value="">%s</option>', 'woocommerce-product-addon' ), $args['first_option'] );
 			}
 
 			foreach ( $cropping_sizes as $key => $size ) {
@@ -1597,7 +1597,7 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= sprintf( __( '%s', 'ppom' ), $label ) . '</label>';
+			$html .= sprintf( __( '%s', 'woocommerce-product-addon' ), $label ) . '</label>';
 		}
 
 		$html .= apply_filters( 'nmform_custom_input', $html, $args, $default_value );

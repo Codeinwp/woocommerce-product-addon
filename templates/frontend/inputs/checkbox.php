@@ -35,7 +35,7 @@ $taxable = $fm->get_meta_value( 'onetime_taxable' );
 if ( ! $options ) {
 
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please add some options to render this input.', 'ppom' ) . '</p>';
+	echo '<p>' . __( 'Please add some options to render this input.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';

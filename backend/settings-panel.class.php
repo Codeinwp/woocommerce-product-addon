@@ -121,21 +121,21 @@ class PPOM_SettingsFramework {
 	public function register_config() {
 
 		$this->config = array(
-			'name'            => __( 'PPOM Admin Settings', 'ppom' ),
+			'name'            => __( 'PPOM Admin Settings', 'woocommerce-product-addon' ),
 			'id'              => 'ppom',
 			'version'         => '1.0',
 			'form_tag'        => false,
 			'menu_type'       => 'wc',
-			'menu_title'      => __( 'PPOM Settings', 'ppom' ),
-			'menu_page_title' => __( 'PPOM Settings', 'ppom' ),
+			'menu_title'      => __( 'PPOM Settings', 'woocommerce-product-addon' ),
+			'menu_page_title' => __( 'PPOM Settings', 'woocommerce-product-addon' ),
 			'menu_slug'       => 'ppom_settings',
 			'wc_slug'         => 'wc-settings',
 			'menu_capability' => 'manage_options',
 			'menu_parent'     => 'woocommerce',
 			'menu_position'   => 50,
-			'plugin_name'     => __( 'PPOM', 'ppom' ),
+			'plugin_name'     => __( 'PPOM', 'woocommerce-product-addon' ),
 			'plugin_version'  => PPOM_VERSION,
-			'plugin_domain'   => 'ppom',
+			'plugin_domain'   => 'woocommerce-product-addon',
 			'plugin_url'      => PPOM_URL,
 		);
 	}
@@ -303,7 +303,7 @@ class PPOM_SettingsFramework {
 		) {
 			$response = array(
 				'status'  => 'error',
-				'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'ppom' ),
+				'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'woocommerce-product-addon' ),
 			);
 
 			wp_send_json( $response );
@@ -332,13 +332,13 @@ class PPOM_SettingsFramework {
 
 			$response = array(
 				'status'  => 'success',
-				'message' => __( 'Settings saved successfully.', $this->get_config( 'ppom' ) ),
+				'message' => __( 'Settings saved successfully.', 'woocommerce-product-addon' ),
 			);
 
 		} else {
 			$response = array(
 				'status'  => 'error',
-				'message' => __( 'Settings saved error.', $this->get_config( 'ppom' ) ),
+				'message' => __( 'Settings saved error.', 'woocommerce-product-addon' ),
 			);
 		}
 
@@ -496,15 +496,15 @@ class PPOM_SettingsFramework {
 	public function border_style() {
 
 		$style = array(
-			'none'   => __( 'None', $this->get_config( 'ppom' ) ),
-			'solid'  => __( 'Solid', $this->get_config( 'ppom' ) ),
-			'dotted' => __( 'Dotted', $this->get_config( 'ppom' ) ),
-			'dashed' => __( 'Dashed', $this->get_config( 'ppom' ) ),
-			'double' => __( 'Double', $this->get_config( 'ppom' ) ),
-			'groove' => __( 'Groove', $this->get_config( 'ppom' ) ),
-			'rige'   => __( 'Ridge', $this->get_config( 'ppom' ) ),
-			'inset'  => __( 'Inset', $this->get_config( 'ppom' ) ),
-			'outset' => __( 'Outset', $this->get_config( 'ppom' ) ),
+			'none'   => __( 'None', 'woocommerce-product-addon' ),
+			'solid'  => __( 'Solid', 'woocommerce-product-addon' ),
+			'dotted' => __( 'Dotted', 'woocommerce-product-addon' ),
+			'dashed' => __( 'Dashed', 'woocommerce-product-addon' ),
+			'double' => __( 'Double', 'woocommerce-product-addon' ),
+			'groove' => __( 'Groove', 'woocommerce-product-addon' ),
+			'rige'   => __( 'Ridge', 'woocommerce-product-addon' ),
+			'inset'  => __( 'Inset', 'woocommerce-product-addon' ),
+			'outset' => __( 'Outset', 'woocommerce-product-addon' ),
 		);
 
 		return $style;
@@ -519,19 +519,19 @@ class PPOM_SettingsFramework {
 
 		$option = array(
 			'top'    => array(
-				'title' => __( 'Top', $this->get_config( 'ppom' ) ),
+				'title' => __( 'Top', 'woocommerce-product-addon' ),
 				'icon'  => 'dashicons dashicons-arrow-up-alt',
 			),
 			'right'  => array(
-				'title' => __( 'Right', $this->get_config( 'ppom' ) ),
+				'title' => __( 'Right', 'woocommerce-product-addon' ),
 				'icon'  => 'dashicons dashicons-arrow-right-alt',
 			),
 			'bottom' => array(
-				'title' => __( 'Bottom', $this->get_config( 'ppom' ) ),
+				'title' => __( 'Bottom', 'woocommerce-product-addon' ),
 				'icon'  => 'dashicons dashicons-arrow-down-alt',
 			),
 			'left'   => array(
-				'title' => __( 'Left', $this->get_config( 'ppom' ) ),
+				'title' => __( 'Left', 'woocommerce-product-addon' ),
 				'icon'  => 'dashicons dashicons-arrow-left-alt',
 			),
 		);
@@ -547,13 +547,13 @@ class PPOM_SettingsFramework {
 
 		$option = array(
 			'font-size'   => array(
-				'title' => __( 'Font Size', $this->get_config( 'ppom' ) ),
+				'title' => __( 'Font Size', 'woocommerce-product-addon' ),
 			),
 			'line-height' => array(
-				'title' => __( 'Line Height', $this->get_config( 'ppom' ) ),
+				'title' => __( 'Line Height', 'woocommerce-product-addon' ),
 			),
 			'color'       => array(
-				'title' => __( 'Font Color', $this->get_config( 'ppom' ) ),
+				'title' => __( 'Font Color', 'woocommerce-product-addon' ),
 			),
 		);
 
@@ -821,8 +821,8 @@ class PPOM_SettingsFramework {
 
 			case 'nmsf-settings-panel':
 				$localize_data = [
-					'migrate_back_msg'                     => __( 'Are you sure?', $this->get_config( 'ppom' ) ),
-					'administrator_role_cannot_be_removed' => esc_html__( 'The administrator role cannot be removed.', $this->get_config( 'ppom' ) ),
+					'migrate_back_msg'                     => __( 'Are you sure?', 'woocommerce-product-addon' ),
+					'administrator_role_cannot_be_removed' => esc_html__( 'The administrator role cannot be removed.', 'woocommerce-product-addon' ),
 				];
 
 				break;

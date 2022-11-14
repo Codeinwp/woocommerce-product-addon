@@ -34,7 +34,7 @@ $selected_opt = $class_ins::get_saved_settings( $input_id );
 			name="<?php echo esc_attr( $class_ins::get_form_name( $input_id ) ); ?>[]"
 			data-rule-id="<?php echo esc_attr( $input_id ); ?>"
 			id="<?php echo esc_attr( $input_id ); ?>"
-			data-placeholder="<?php esc_attr_e( 'Choose Options', 'ppom' ); ?>"
+			data-placeholder="<?php esc_attr_e( 'Choose Options', 'woocommerce_product_addon' ); ?>"
 			class="nmsf-multiselect-js"
 	>
 		<?php
