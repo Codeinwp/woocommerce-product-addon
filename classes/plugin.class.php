@@ -451,8 +451,8 @@ class NM_PersonalizedProduct {
 			?>
 			<script type="text/javascript">
 				jQuery(document).ready(function () {
-					jQuery('<option>').val('nm_delete_meta').text('<?php _e( 'Remove Meta', 'ppom' ); ?>').appendTo("select[name='action']");
-					jQuery('<option>').val('nm_delete_meta').text('<?php _e( 'Remove Meta', 'ppom' ); ?>').appendTo("select[name='action2']");
+					jQuery('<option>').val('nm_delete_meta').text('<?php _e( 'Remove Meta', 'woocommerce-product-addon' ); ?>').appendTo("select[name='action']");
+					jQuery('<option>').val('nm_delete_meta').text('<?php _e( 'Remove Meta', 'woocommerce-product-addon' ); ?>').appendTo("select[name='action2']");
 				});
 			</script>
 			<?php

@@ -251,7 +251,7 @@ class NM_Form {
 
 		if ( $use_units ) {
 			$html .= '<div class="form-check form-check-inline">';
-			// $html .= '<button class="btn btn-outline-secondary ppom-measure-btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.__('Select',"ppom").'</button>';
+			// $html .= '<button class="btn btn-outline-secondary ppom-measure-btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.__('Select',"woocommerce-product-addon").'</button>';
 			// $html .= '<div class="dropdown-menu">';
 
 			foreach ( $options as $option ) {

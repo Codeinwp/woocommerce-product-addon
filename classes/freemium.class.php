@@ -69,7 +69,7 @@ class PPOM_Freemium {
 		<div class="freemium-cfr-content">
 			<p><?php esc_html_e( 'Conditional Field Repeater allows repeating this field across a value of another PPOM field. Conditional Field Repeater feature is the part of the PPOM Pro.', 'ppom' ); ?></p>
 
-			<p><?php printf( '<strong>%s</strong> %s', esc_html__( 'Use case example:', 'ppom' ),  esc_html__( 'Get the number of players from another PPOM field, and repeat this field(let\'s say that\'s a text field representing the player name) across the number of players. That\'s pretty useful for dynamic repeating the PPOM field.', 'woocommerce-product-addon' ) ); ?></p>
+			<p><?php printf( '<strong>%s</strong> %s', esc_html__( 'Use case example:', 'woocommerce-product-addon' ),  esc_html__( 'Get the number of players from another PPOM field, and repeat this field(let\'s say that\'s a text field representing the player name) across the number of players. That\'s pretty useful for dynamic repeating the PPOM field.', 'woocommerce-product-addon' ) ); ?></p>
 
 			<a target="_blank" class="btn btn-sm btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php echo __( 'Upgrade to Pro', 'woocommerce-product-addon' ); ?></a>
 		</div>

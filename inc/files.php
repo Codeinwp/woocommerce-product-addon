@@ -471,8 +471,8 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 
 		// Tools group
 		$file_tools .= '<div class="btn-group" role="group" aria-label="Tools" style="text-align: center; display: block;">';
-		// $file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="'.__('Remove', "ppom").'"><span class="fa fa-times"></span></a>';
-		$file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', 'ppom' ) . '">' . __( 'Delete', 'woocommerce-product-addon' ) . '</span></a>';
+		// $file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="'.__('Remove', "woocommerce-product-addon").'"><span class="fa fa-times"></span></a>';
+		$file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '">' . __( 'Delete', 'woocommerce-product-addon' ) . '</span></a>';
 
 		if ( apply_filters( 'ppom_show_image_popup', false ) ) {
 			$file_tools .= '<a href="#" data-toggle="modal" data-target="#modalFile' . esc_attr( $file_id ) . '" class="btn btn-primary"><span class="fa fa-expand"></span></a>';
@@ -487,7 +487,7 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 		$thumb_url  = PPOM_URL . '/images/file.png';
 
 		$file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '"><span class="fa fa-times"></span></a>';    // delete icon
-		// $file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="'.__('Remove', "ppom").'">Delete</a>';	//delete icon
+		// $file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="'.__('Remove', "woocommerce-product-addon").'">Delete</a>';	//delete icon
 	}
 
 
