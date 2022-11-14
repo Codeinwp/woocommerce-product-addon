@@ -179,7 +179,7 @@ function ppom_upload_file() {
 
 	if ( in_array( strtolower( $extension ), $restricted_type ) ) {
 		$response ['status']  = 'error';
-		$response ['message'] = __( 'File type not valid - ' . $extension, 'ppom' );
+		$response ['message'] = __( 'File type not valid - ' . $extension, 'woocommerce-product-addon' );
 		wp_send_json( $response );
 	}
 	/* ========== Invalid File type checking ========== */
@@ -369,7 +369,7 @@ function ppom_delete_file() {
 
 		// make sure file is removed
 		if ( ! file_exists( $file_path ) ) {
-			_e( 'File removed', 'ppom' );
+			_e( 'File removed', 'woocommerce-product-addon' );
 		} else {
 			printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
 		}   

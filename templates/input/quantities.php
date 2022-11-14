@@ -32,7 +32,7 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 		<table class="table table-bordered table-hover">
 			<thead>
 			<tr>
-				<th><?php _e( 'Options', 'ppom' ); ?></th>
+				<th><?php _e( 'Options', 'woocommerce-product-addon' ); ?></th>
 				<?php foreach ( $options as $opt ) { ?>
 					<th>
 						<label class="quantities-lable"> <?php echo stripslashes( trim( $opt['option'] ) ); ?>
@@ -50,7 +50,7 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 			</thead>
 
 			<tr>
-				<th><?php _e( 'Quantity', 'ppom' ); ?></th>
+				<th><?php _e( 'Quantity', 'woocommerce-product-addon' ); ?></th>
 				<?php foreach ( $options as $opt ) { ?>
 					<td>
 						<?php
@@ -173,8 +173,8 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 	<table class="table table-bordered table-hover">
 		<thead>
 		<tr>
-			<th><?php _e( 'Options', 'ppom' ); ?></th>
-			<th><?php _e( 'Quantity', 'ppom' ); ?></th>
+			<th><?php _e( 'Options', 'woocommerce-product-addon' ); ?></th>
+			<th><?php _e( 'Quantity', 'woocommerce-product-addon' ); ?></th>
 		</tr>
 		</thead>
 		<?php foreach ( $options as $opt ) { ?>
@@ -243,20 +243,20 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 	<span style="display:none;font-weight:700" class="ppom-total-option-price">
 		<?php 
 		echo __( 'Options Total: ', 'woocommerce-product-addon' );
-		printf( __( get_woocommerce_price_format(), 'ppom' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' ); 
+		printf( __( get_woocommerce_price_format(), 'woocommerce-product-addon' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' ); 
 		?>
 	</span><br>
 	<span style="display:none;font-weight:700" class="ppom-total-price">
 		<?php 
 		echo __( 'Product Total: ', 'woocommerce-product-addon' );
-		printf( __( get_woocommerce_price_format(), 'ppom' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' ); 
+		printf( __( get_woocommerce_price_format(), 'woocommerce-product-addon' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' ); 
 		?>
 	</span>
 	<span style="display:none;font-weight:700" class="ppom-grand-total-price">
 	<hr style="margin: 0">
 		<?php 
 		echo __( 'Grand Total: ', 'woocommerce-product-addon' );
-		printf( __( get_woocommerce_price_format(), 'ppom' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' ); 
+		printf( __( get_woocommerce_price_format(), 'woocommerce-product-addon' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' ); 
 		?>
 	</span>
 </div>

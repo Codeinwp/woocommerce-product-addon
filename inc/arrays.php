@@ -198,7 +198,7 @@ function ppom_array_settings() {
 			'title'    => __( 'Option Total Suffix', 'woocommerce-product-addon' ),
 			'type'     => 'text',
 			'desc'     => __( 'E.g for Tax/Va info like. Vat included', 'woocommerce-product-addon' ),
-			'default'  => __( '', 'ppom' ),
+			'default'  => __( '', 'woocommerce-product-addon' ),
 			'id'       => 'ppom_label_option_total_suffex',
 			'css'      => 'min-width:300px;',
 			'desc_tip' => true,
@@ -620,7 +620,7 @@ function ppom_array_get_js_input_vars( $product, $args = null ) {
 function ppom_tax_label_display() {
 	/*
 	if ( wc_tax_enabled() && 'excl' === get_option( 'woocommerce_tax_display_shop' ) &&  get_option( 'woocommerce_price_display_suffix' ) !== '' ) {
-		return sprintf(__("%s", 'ppom'), get_option( 'woocommerce_price_display_suffix' ));
+		return sprintf(__("%s", 'woocommerce-product-addon'), get_option( 'woocommerce_price_display_suffix' ));
 	}*/
 
 	$suffex = ppom_get_option( 'ppom_label_option_total_suffex' );
@@ -929,7 +929,7 @@ function ppom_array_get_addons_details() {
 			'desc'    => __(
 				'
 PPOM PDF Export Add-on will generate a PDF against each order including all PPOM Fields in a beautiful format. Header and Footer can also be set for PDF. This is an awesome feature when you need to print order details.',
-				'ppom' 
+				'woocommerce-product-addon' 
 			),
 			'actions' => array(
 				array(

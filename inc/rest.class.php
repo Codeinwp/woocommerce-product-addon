@@ -142,7 +142,7 @@ class PPOM_Rest {
 
 		$response_info = array(
 			'status'      => 'success',
-			'message'     => __( "Meta found {$meta_id}", 'ppom' ),
+			'message'     => __( "Meta found {$meta_id}", 'woocommerce-product-addon' ),
 			'meta_id'     => intval( $meta_id ),
 			'product_id'  => $product_id,
 			'ppom_fields' => $ppom_fields,
@@ -179,7 +179,7 @@ class PPOM_Rest {
 
 		$response_info = array(
 			'status'      => true,
-			'message'     => __( "Meta found {$ppom_id}", 'ppom' ),
+			'message'     => __( "Meta found {$ppom_id}", 'woocommerce-product-addon' ),
 			'meta_id'     => intval( $ppom_id ),
 			'ppom_fields' => $ppom_fields,
 		);
@@ -544,7 +544,7 @@ class PPOM_Rest {
 
 		$response_info = array(
 			'status'           => 'success',
-			'message'          => __( "Order found {$order_id}", 'ppom' ),
+			'message'          => __( "Order found {$order_id}", 'woocommerce-product-addon' ),
 			'order_items_meta' => $item_product_meta,
 		);
 
@@ -648,7 +648,7 @@ class PPOM_Rest {
 
 		$response_info = array(
 			'status'           => 'success',
-			'message'          => __( "Order updated {$order_id}", 'ppom' ),
+			'message'          => __( "Order updated {$order_id}", 'woocommerce-product-addon' ),
 			'order_items_meta' => $item_product_meta,
 		);
 
@@ -732,7 +732,7 @@ class PPOM_Rest {
 
 		$response_info = array(
 			'status'           => 'success',
-			'message'          => __( "Order updated {$order_id}", 'ppom' ),
+			'message'          => __( "Order updated {$order_id}", 'woocommerce-product-addon' ),
 			'order_items_meta' => $item_product_meta,
 		);
 

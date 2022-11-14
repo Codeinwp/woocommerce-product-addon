@@ -101,7 +101,7 @@ class NM_Date_wooproduct extends PPOM_Inputs {
 			'year_range'        => array(
 				'type'        => 'text',
 				'title'       => __( 'Year Range', 'woocommerce-product-addon' ),
-				'desc'        => __( '[ jQuery datePicker ] Years to allow date selections. Example: c-10:c+10. TIP: The letter `c` indicates the current year so `c+1` will indicate next year.  Thus c:c+1 will be ' . date( 'Y' ) . ':' . date( 'Y', strtotime( 'ppom' ) ), 'ppom' ),
+				'desc'        => __( '[ jQuery datePicker ] Years to allow date selections. Example: c-10:c+10. TIP: The letter `c` indicates the current year so `c+1` will indicate next year.  Thus c:c+1 will be ' . date( 'Y' ) . ':' . date( 'Y', strtotime( 'ppom' ) ), 'woocommerce-product-addon' ),
 				'link'        => __( '<a target="_blank" href="https://api.jqueryui.com/datepicker/#option-yearRange">Example</a>', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),

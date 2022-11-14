@@ -135,7 +135,7 @@ class PPOM_SettingsFramework {
 			'menu_position'   => 50,
 			'plugin_name'     => __( 'PPOM', 'woocommerce-product-addon' ),
 			'plugin_version'  => PPOM_VERSION,
-			'plugin_domain'   => 'ppom',
+			'plugin_domain'   => 'woocommerce-product-addon',
 			'plugin_url'      => PPOM_URL,
 		);
 	}

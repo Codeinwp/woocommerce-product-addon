@@ -53,7 +53,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 		>
 			<?php echo esc_html( $btn_label ); ?>
 		</a>
-		<span class="ppom-dragdrop-text"><?php echo _e( 'Drag file/directory here', 'ppom' ); ?></span>
+		<span class="ppom-dragdrop-text"><?php echo _e( 'Drag file/directory here', 'woocommerce-product-addon' ); ?></span>
 	</div> <!-- ppom-file-container -->
 
 	<div id="filelist-<?php echo esc_attr( $fm->data_name() ); ?>" class="filelist"></div>

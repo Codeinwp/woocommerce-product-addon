@@ -84,7 +84,7 @@ function ppom_meta_list( $post ) {
 
 	$html  = '<div class="options_group">';
 	$html .= '<p>' . __( 'Select Meta to Show Fields on this product', 'woocommerce-product-addon' );
-	// $html .= __(' Or <a target="_blank" class="button" href="'.esc_url($ppom_setting).'">Create New Meta</a>', 'ppom');
+	// $html .= __(' Or <a target="_blank" class="button" href="'.esc_url($ppom_setting).'">Create New Meta</a>', 'woocommerce-product-addon');
 	$html .= '</p>';
 
 	$html .= '<p>';
@@ -163,7 +163,7 @@ function ppom_admin_show_notices() {
 		<div id="message" class="<?php echo esc_attr( $resp_notices['class'] ); ?> updated notice is-dismissible">
 			<p><?php wc_print_notices( $resp_notices['message'] ); ?></p>
 			<button type="button" class="notice-dismiss">
-				<span class="screen-reader-text"><?php _e( 'Dismiss this notice', 'ppom' ); ?></span>
+				<span class="screen-reader-text"><?php _e( 'Dismiss this notice', 'woocommerce-product-addon' ); ?></span>
 			</button>
 		</div>
 		<?php
@@ -546,7 +546,7 @@ function ppom_admin_delete_selected_meta() {
 		 || ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
 		 || ! ppom_security_role()
 	) {
-		_e( 'Sorry, you are not allowed to perform this action', 'ppom' );
+		_e( 'Sorry, you are not allowed to perform this action', 'woocommerce-product-addon' );
 		die( 0 );
 	}
 
@@ -559,7 +559,7 @@ function ppom_admin_delete_selected_meta() {
 	$res = $wpdb->query( $wpdb->prepare( "DELETE FROM {$tbl_name} WHERE productmeta_id IN ({$productmeta_ids})", $productmeta_ids ) );
 
 	if ( $res ) {
-		_e( 'Meta deleted successfully', 'ppom' );
+		_e( 'Meta deleted successfully', 'woocommerce-product-addon' );
 	} else {
 		$wpdb->show_errors();
 		$wpdb->print_error();

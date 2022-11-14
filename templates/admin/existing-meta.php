@@ -28,11 +28,11 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 							<span></span>
 						</label>
 					</th>
-					<th><?php _e( 'Meta ID', 'ppom' ); ?></th>
-					<th><?php _e( 'Name', 'ppom' ); ?></th>
-					<th><?php _e( 'Meta', 'ppom' ); ?></th>
-					<th><?php _e( 'Select Products', 'ppom' ); ?></th>
-					<th><?php _e( 'Actions', 'ppom' ); ?></th>
+					<th><?php _e( 'Meta ID', 'woocommerce-product-addon' ); ?></th>
+					<th><?php _e( 'Name', 'woocommerce-product-addon' ); ?></th>
+					<th><?php _e( 'Meta', 'woocommerce-product-addon' ); ?></th>
+					<th><?php _e( 'Select Products', 'woocommerce-product-addon' ); ?></th>
+					<th><?php _e( 'Actions', 'woocommerce-product-addon' ); ?></th>
 				</tr>
 				</thead>
 				<tfoot>
@@ -43,11 +43,11 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 							<span></span>
 						</label>
 					</th>
-					<th><?php _e( 'Meta ID', 'ppom' ); ?></th>
-					<th><?php _e( 'Name', 'ppom' ); ?></th>
-					<th><?php _e( 'Meta', 'ppom' ); ?></th>
-					<th><?php _e( 'Select Products', 'ppom' ); ?></th>
-					<th><?php _e( 'Actions', 'ppom' ); ?></th>
+					<th><?php _e( 'Meta ID', 'woocommerce-product-addon' ); ?></th>
+					<th><?php _e( 'Name', 'woocommerce-product-addon' ); ?></th>
+					<th><?php _e( 'Meta', 'woocommerce-product-addon' ); ?></th>
+					<th><?php _e( 'Select Products', 'woocommerce-product-addon' ); ?></th>
+					<th><?php _e( 'Actions', 'woocommerce-product-addon' ); ?></th>
 				</tr>
 				</tfoot>
 
@@ -90,16 +90,16 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 						<td>
 							<a class="btn btn-sm btn-secondary ppom-products-modal"
 							   data-ppom_id="<?php echo esc_attr( $productmeta->productmeta_id ); ?>"
-							   data-formmodal-id="ppom-product-modal"><?php _e( 'Attach to Products', 'ppom' ); ?></a>
+							   data-formmodal-id="ppom-product-modal"><?php _e( 'Attach to Products', 'woocommerce-product-addon' ); ?></a>
 						</td>
 						<td class="ppom-admin-meta-actions-colunm">
 							<a id="del-file-<?php echo esc_attr( $productmeta->productmeta_id ); ?>" href="#"
 							   class="button button-sm ppom-delete-single-product"
 							   data-product-id="<?php echo esc_attr( $productmeta->productmeta_id ); ?>"><span
 										class="dashicons dashicons-no"></span></a>
-							<a href="<?php echo esc_url( $url_edit ); ?>" title="<?php _e( 'Edit', 'ppom' ); ?>"
+							<a href="<?php echo esc_url( $url_edit ); ?>" title="<?php _e( 'Edit', 'woocommerce-product-addon' ); ?>"
 							   class="button"><span class="dashicons dashicons-edit"></span></a>
-							<a href="<?php echo esc_url( $url_clone ); ?>" title="<?php _e( 'Clone', 'ppom' ); ?>"
+							<a href="<?php echo esc_url( $url_clone ); ?>" title="<?php _e( 'Clone', 'woocommerce-product-addon' ); ?>"
 							   class="button"><span class="dashicons dashicons-image-rotate-right"></span></a>
 						</td>
 					</tr>
@@ -119,7 +119,7 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 		<input type="hidden" name="ppom_id" id="ppom_id">
 
 		<header>
-			<h3><?php _e( 'WooCommerce Products', 'ppom' ); ?></h3>
+			<h3><?php _e( 'WooCommerce Products', 'woocommerce-product-addon' ); ?></h3>
 		</header>
 
 		<div class="ppom-modal-body">
@@ -128,8 +128,8 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 
 		<footer>
 			<button type="button"
-					class="btn btn-default close-model ppom-js-modal-close"><?php _e( 'Close', 'ppom' ); ?></button>
-			<button type="submit" class="btn btn-info"><?php _e( 'Save', 'ppom' ); ?></button>
+					class="btn btn-default close-model ppom-js-modal-close"><?php _e( 'Close', 'woocommerce-product-addon' ); ?></button>
+			<button type="submit" class="btn btn-info"><?php _e( 'Save', 'woocommerce-product-addon' ); ?></button>
 		</footer>
 	</form>
 </div>

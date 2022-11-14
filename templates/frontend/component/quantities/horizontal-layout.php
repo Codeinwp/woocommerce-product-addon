@@ -42,7 +42,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 	<table class="table table-bordered table-hover ppom-style">
 		<thead>
 		<tr>
-			<th><?php _e( 'Options', 'ppom' ); ?></th>
+			<th><?php _e( 'Options', 'woocommerce-product-addon' ); ?></th>
 			<?php 
 			foreach ( $options as $opt ) {
 				$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
@@ -55,7 +55,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 		</thead>
 
 		<tr>
-			<th><?php _e( 'Quantity', 'ppom' ); ?></th>
+			<th><?php _e( 'Quantity', 'woocommerce-product-addon' ); ?></th>
 			<?php 
 			foreach ( $options as $opt ) {
 

@@ -29,7 +29,7 @@ echo '<input type="hidden" name="ppom_cart_key" value="' . esc_attr( $cart_key )
 // Price placeholder, it will be cloned via js in ppom-price.js
 echo '<div id="ppom-price-cloner-wrapper">';
 echo '<span id="ppom-price-cloner">';
-printf( __( get_woocommerce_price_format(), 'ppom' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' );
+printf( __( get_woocommerce_price_format(), 'woocommerce-product-addon' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' );
 echo '</span>';
 echo '</div>';
 

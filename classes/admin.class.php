@@ -111,7 +111,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 				$menu = add_submenu_page(
 					$page ['parent_slug'],
-					__( $page ['page_title'], 'ppom' ),
+					__( $page ['page_title'], 'woocommerce-product-addon' ),
 					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
 					$page ['slug'],
@@ -126,7 +126,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				$cap = 'ppom_options_page';
 				// Menu page for roles set by PPOM Permission Settings
 				add_menu_page(
-					__( $page ['page_title'], 'ppom' ),
+					__( $page ['page_title'], 'woocommerce-product-addon' ),
 					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
 					$page ['slug'],
@@ -158,10 +158,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		if ( $action != 'new' && $do_meta != 'edit' && $do_meta != 'clone' && $view != 'addons' ) {
 			?>
 			<div class="ppom-manage-fields-topbar d-flex">
-				<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'ppom'); ?></h1>
+				<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'woocommerce-product-addon'); ?></h1>
 				<div class="ppom-top-nav">
-					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($addons); ?>">+ <?php esc_html_e( 'All Addons', 'ppom' ); ?></a>
-					<a  href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'ppom'); ?></a>
+					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($addons); ?>">+ <?php esc_html_e( 'All Addons', 'woocommerce-product-addon' ); ?></a>
+					<a  href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'woocommerce-product-addon'); ?></a>
 				</div>
 			</div>
 			<?php
@@ -197,7 +197,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	function get_products() {
 
 		if ( ! ppom_security_role() ) {
-			_e( 'Sorry, you are not allowed to perform this action', 'ppom' );
+			_e( 'Sorry, you are not allowed to perform this action', 'woocommerce-product-addon' );
 			die( 0 );
 		}
 
@@ -358,8 +358,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			</th>
 			<td class="forminp">
 				<select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="width:350px"
-						data-placeholder="<?php esc_attr_e( 'Choose Roles', 'ppom' ); ?>"
-						aria-label="<?php esc_attr_e( 'Roles', 'ppom' ); ?>" class="wc-enhanced-select">
+						data-placeholder="<?php esc_attr_e( 'Choose Roles', 'woocommerce-product-addon' ); ?>"
+						aria-label="<?php esc_attr_e( 'Roles', 'woocommerce-product-addon' ); ?>" class="wc-enhanced-select">
 					<?php
 					if ( ! empty( $selected_roles ) ) {
 						foreach ( $selected_roles as $key => $val ) {
@@ -367,8 +367,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 						}
 					}
 					?>
-				</select> <br/><a class="select_all button" href="#"><?php esc_html_e( 'Select all', 'ppom' ); ?></a> <a
-						class="select_none button" href="#"><?php esc_html_e( 'Select none', 'ppom' ); ?></a>
+				</select> <br/><a class="select_all button" href="#"><?php esc_html_e( 'Select all', 'woocommerce-product-addon' ); ?></a> <a
+						class="select_none button" href="#"><?php esc_html_e( 'Select none', 'woocommerce-product-addon' ); ?></a>
 			</td>
 		</tr>
 		<?php

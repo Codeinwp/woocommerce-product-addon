@@ -140,13 +140,13 @@ class PPOM_Fields_Meta {
 			'ppomProActivated'=>ppom_pro_is_installed() ? 'yes' : 'no',
 			'i18n' => [
 				'addGroupUrl'=>add_query_arg( array( 'action' => 'new' ) ),
-				'addGroupLabel'=>esc_html__( 'Add New Group', 'ppom' ),
-				'bulkActionsLabel'=>esc_html__( 'Bulk Actions', 'ppom' ),
-				'deleteLabel'=>esc_html__( 'Delete', 'ppom' ),
-				'exportLabel'=>esc_html__( 'Export', 'ppom' ),
-				'exportLockedLabel'=>esc_html__( 'Export (PRO)', 'ppom' ),
-				'importLabel'=>esc_html__( 'Import Field Groups ', 'ppom' ),
-				'importLockedLabel'=>esc_html__( 'Import Field Groups (PRO)', 'ppom' ),
+				'addGroupLabel'=>esc_html__( 'Add New Group', 'woocommerce-product-addon' ),
+				'bulkActionsLabel'=>esc_html__( 'Bulk Actions', 'woocommerce-product-addon' ),
+				'deleteLabel'=>esc_html__( 'Delete', 'woocommerce-product-addon' ),
+				'exportLabel'=>esc_html__( 'Export', 'woocommerce-product-addon' ),
+				'exportLockedLabel'=>esc_html__( 'Export (PRO)', 'woocommerce-product-addon' ),
+				'importLabel'=>esc_html__( 'Import Field Groups ', 'woocommerce-product-addon' ),
+				'importLockedLabel'=>esc_html__( 'Import Field Groups (PRO)', 'woocommerce-product-addon' ),
 				'freemiumCFRContent' => \PPOM_Freemium::get_instance()->get_freemium_cfr_content(),
 				'freemiumCFRTab' => \PPOM_Freemium::TAB_KEY_FREEMIUM_CFR
 			]
@@ -186,8 +186,8 @@ class PPOM_Fields_Meta {
 			$html .= '</div>';
 			$html .= '<footer>';
 			$html .= '<span class="ppom-req-field-id"></span>';
-			$html .= '<button type="button" class="btn btn-default ppom-close-checker ppom-close-fields ppom-js-modal-close" style="margin-right: 5px;">' . esc_html__( 'close', 'ppom' ) . '</button>';
-			$html .= '<button type="button" class="btn btn-primary ppom-field-checker ppom-add-field" data-field-type="' . esc_attr( $field_title ) . '">' . esc_html__( 'Add Field', 'ppom' ) . '</button>';
+			$html .= '<button type="button" class="btn btn-default ppom-close-checker ppom-close-fields ppom-js-modal-close" style="margin-right: 5px;">' . esc_html__( 'close', 'woocommerce-product-addon' ) . '</button>';
+			$html .= '<button type="button" class="btn btn-primary ppom-field-checker ppom-add-field" data-field-type="' . esc_attr( $field_title ) . '">' . esc_html__( 'Add Field', 'woocommerce-product-addon' ) . '</button>';
 			$html .= '</footer>';
 			$html .= '</div>';
 		}
@@ -368,14 +368,14 @@ class PPOM_Fields_Meta {
 				$weight_unit  = get_option( 'woocommerce_weight_unit' );
 				$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Discount', 'woocommerce-product-addon' );
 				$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Tooltip', 'woocommerce-product-addon' );
-				$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (PRO only)", 'ppom' );
+				$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (PRO only)", 'woocommerce-product-addon' );
 				$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock (PRO only)', 'woocommerce-product-addon' );
 
 				if ( ppom_pro_is_installed() ) {
 
 					$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Discount', 'woocommerce-product-addon' );
 					$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Tooltip', 'woocommerce-product-addon' );
-					$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (optional)", 'ppom' );
+					$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (optional)", 'woocommerce-product-addon' );
 					$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock (optional)', 'woocommerce-product-addon' );
 				}
 

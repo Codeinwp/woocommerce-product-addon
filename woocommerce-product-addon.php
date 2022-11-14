@@ -52,7 +52,7 @@ add_filter(
  */
 add_action( 'init', 'ppom_i18n_setup' );
 function ppom_i18n_setup() {
-	load_plugin_textdomain( 'ppom', false, basename( dirname( __FILE__ ) ) . '/languages' );
+	load_plugin_textdomain( 'woocommerce-product-addon', false, basename( dirname( __FILE__ ) ) . '/languages' );
 }
 
 

@@ -28,7 +28,7 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 	}
 
 
-	// 'link' => __ ( '<a href="https://github.com/RobinHerbots/Inputmask" target="_blank">Options</a>', 'ppom' ) 
+	// 'link' => __ ( '<a href="https://github.com/RobinHerbots/Inputmask" target="_blank">Options</a>', 'woocommerce-product-addon' ) 
 
 	private function get_settings() {
 

@@ -442,8 +442,8 @@ class NM_PersonalizedProduct {
 				?>
 				<script type="text/javascript">
 					jQuery(document).ready(function () {
-						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'woocommerce-product-addon' ), $meta->productmeta_id ); ?>', "ppom").text('<?php _e( $meta->productmeta_name, 'ppom' ); ?>').appendTo("select[name='action']");
-						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'woocommerce-product-addon' ), $meta->productmeta_id ); ?>').text('<?php _e( $meta->productmeta_name, 'ppom' ); ?>').appendTo("select[name='action2']");
+						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'woocommerce-product-addon' ), $meta->productmeta_id ); ?>', "ppom").text('<?php _e( $meta->productmeta_name, 'woocommerce-product-addon' ); ?>').appendTo("select[name='action']");
+						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'woocommerce-product-addon' ), $meta->productmeta_id ); ?>').text('<?php _e( $meta->productmeta_name, 'woocommerce-product-addon' ); ?>').appendTo("select[name='action2']");
 					});
 				</script>
 				<?php
@@ -555,10 +555,10 @@ class NM_PersonalizedProduct {
 		global $post_type, $pagenow;
 
 		if ( $pagenow == 'edit.php' && $post_type == 'product' && isset( $_REQUEST['nm_updated'] ) && (int) $_REQUEST['nm_updated'] ) {
-			$message = sprintf( _n( 'Product meta updated.', '%s Products meta updated.', $_REQUEST['nm_updated'], 'ppom' ), number_format_i18n( $_REQUEST['nm_updated'] ) );
+			$message = sprintf( _n( 'Product meta updated.', '%s Products meta updated.', $_REQUEST['nm_updated'], 'woocommerce-product-addon' ), number_format_i18n( $_REQUEST['nm_updated'] ) );
 			echo "<div class=\"updated\"><p>{$message}</p></div>";
 		} elseif ( $pagenow == 'edit.php' && $post_type == 'product' && isset( $_REQUEST['nm_removed'] ) && (int) $_REQUEST['nm_removed'] ) {
-			$message = sprintf( _n( 'Product meta removed.', '%s Products meta removed.', $_REQUEST['nm_removed'], 'ppom' ), number_format_i18n( $_REQUEST['nm_removed'] ) );
+			$message = sprintf( _n( 'Product meta removed.', '%s Products meta removed.', $_REQUEST['nm_removed'], 'woocommerce-product-addon' ), number_format_i18n( $_REQUEST['nm_removed'] ) );
 			echo "<div class=\"updated\"><p>{$message}</p></div>";
 		}
 	}
@@ -721,7 +721,7 @@ class NM_PersonalizedProduct {
 		if ( ! isset( $_GET['ppom_clone_nonce'] )
 			 || ! wp_verify_nonce( $_GET['ppom_clone_nonce'], 'ppom_clone_nonce_action' )
 		) {
-			_e( 'Sorry, you are not allowed to clone', 'ppom' );
+			_e( 'Sorry, you are not allowed to clone', 'woocommerce-product-addon' );
 
 			return;
 		}
