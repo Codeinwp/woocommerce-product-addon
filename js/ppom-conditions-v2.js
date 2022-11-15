@@ -288,6 +288,7 @@ function ppom_check_conditions(data_name, callback) {
 
         let matched = 0;
         var matched_conditions = [];
+        let cond_elements = [];
         for (var t = 1; t <= total_cond; t++) {
 
             const cond_element = jQuery(this).data(`cond-input${t}`);
@@ -300,7 +301,12 @@ function ppom_check_conditions(data_name, callback) {
             // if (cond_element !== data_name) continue;
             is_matched = ppom_compare_values(field_val, cond_val, operator);
             // console.log(`${data_name} TRIGGERS :: ${t} ***** ${element_data_name} ==> field value ${field_val} || cond_valu ${cond_val} || operator ${operator} || Binding ${binding} is_matched=>${is_matched}`);
-            matched = is_matched ? ++matched : matched;
+
+            if(is_matched) {
+                matched = ++matched;
+                cond_elements.push(cond_element);
+            }
+
             matched_conditions[element_data_name] = matched;
             
             event_type = visibility === 'hide' ? 'ppom_field_hidden' : 'ppom_field_shown';
@@ -310,16 +316,18 @@ function ppom_check_conditions(data_name, callback) {
                  (matched_conditions[element_data_name] == total_cond && binding === 'All')
                 ) {
                 
-                if( visibility === 'hide' ){
-                    jQuery(this).addClass(`ppom-locked-${data_name} ppom-c-hide`).removeClass('ppom-c-show');
-                }else{
-                    jQuery(this).removeClass(`ppom-locked-${data_name} ppom-c-hide`);   
-                }
+                // remove/add locked classes for all dependent fields
+                cond_elements.forEach(cond_dataname => {
+                    if( visibility === 'hide' ){
+                        jQuery(this).addClass(`ppom-locked-${cond_dataname} ppom-c-hide`).removeClass('ppom-c-show');
+                    }else{
+                        jQuery(this).removeClass(`ppom-locked-${cond_dataname} ppom-c-hide`);
+                    }
+                });
+
                 if (typeof callback == "function")
                     callback(element_data_name, event_type);
                 // return is_matched;
-
-                
             }
             else if ( ! is_matched || matched_conditions[element_data_name] !== total_cond) {
                 

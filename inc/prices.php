@@ -787,7 +787,7 @@ function ppom_generate_field_price( $field_price, $field_meta, $apply, $option =
 	$option_id  = isset( $option['option_id'] ) ? $option['option_id'] : '';
 
 	if ( $field_type == 'file' ) {
-		$option_label = sprintf( __( '%d Files', 'ppom' ), count( $option ) );
+		$option_label = sprintf( __( '%d Files', 'woocommerce-product-addon' ), count( $option ) );
 	}
 
 	return apply_filters(
@@ -796,7 +796,7 @@ function ppom_generate_field_price( $field_price, $field_meta, $apply, $option =
 			'type'         => $field_type,
 			'option_id'    => $option_id,
 			'label'        => $field_title,
-			'label_price'  => sprintf( __( '%s', 'ppom' ), $label_price ),
+			'label_price'  => sprintf( __( '%s', 'woocommerce-product-addon' ), $label_price ),
 			'price'        => $field_price,
 			'apply'        => $apply,
 			'data_name'    => $data_name,
@@ -1227,7 +1227,7 @@ function ppom_price_cart_fee( $cart ) {
 			$discount_label   = $cart_counter . '-' . $matrix_found['label'];
 			$matrix_discount  = floatval( $matrix_discount );
 			$discount_taxable = apply_filters( 'ppom_matrix_discount_taxable', false, $item, $cart );
-			$cart->add_fee( sprintf( __( '%s', 'ppom' ), esc_html( $discount_label ) ), - $matrix_discount, $discount_taxable );
+			$cart->add_fee( sprintf( __( '%s', 'woocommerce-product-addon' ), esc_html( $discount_label ) ), - $matrix_discount, $discount_taxable );
 			// ppom_pa($discount_label);
 		}
 
@@ -1258,7 +1258,17 @@ function ppom_price_cart_fee( $cart ) {
 			$taxable   = apply_filters( 'ppom_cart_fixed_fee_taxable', $taxable, $fee, $cart );
 
 			if ( $fee_price != 0 ) {
-				$cart->add_fee( sprintf( __( '%s', 'ppom' ), esc_html( $label ) ), $fee_price, $taxable );
+				$tax_class = $product->get_tax_class( 'unfiltered' );
+
+				// if wc prices include tax: substract the tax from additional fixed fee since already WC will add tax.
+				if( wc_prices_include_tax() ) {
+					$tax = WC_Tax::calc_tax( $fee_price, \WC_Tax::get_rates($tax_class), true );
+
+					$total_tax = array_sum($tax);
+					$fee_price = $fee_price - $total_tax;
+				}
+
+				$cart->add_fee( sprintf( __( '%s', 'woocommerce-product-addon' ), esc_html( $label ) ), $fee_price, $taxable, $tax_class );
 				$fee_no ++;
 			}
 		}

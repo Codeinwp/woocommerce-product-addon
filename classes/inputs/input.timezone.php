@@ -21,9 +21,9 @@ class NM_Timezone_wooproduct extends PPOM_Inputs {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
 
-		$this->title    = __( 'Timezone Input', 'ppom' );
-		$this->desc     = __( 'Show Timezone', 'ppom' );
-		$this->icon     = __( '<i class="fa fa-clock-o" aria-hidden="true"></i>', 'ppom' );
+		$this->title    = __( 'Timezone Input', 'woocommerce-product-addon' );
+		$this->desc     = __( 'Show Timezone', 'woocommerce-product-addon' );
+		$this->icon     = __( '<i class="fa fa-clock-o" aria-hidden="true"></i>', 'woocommerce-product-addon' );
 		$this->settings = self::get_settings();
 
 	}
@@ -33,97 +33,97 @@ class NM_Timezone_wooproduct extends PPOM_Inputs {
 		$input_meta = array(
 			'title'           => array(
 				'type'  => 'text',
-				'title' => __( 'Title', 'ppom' ),
-				'desc'  => __( 'It will be shown as field label', 'ppom' ),
+				'title' => __( 'Title', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as field label', 'woocommerce-product-addon' ),
 			),
 			'data_name'       => array(
 				'type'  => 'text',
-				'title' => __( 'Data name', 'ppom' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'ppom' ),
+				'title' => __( 'Data name', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'     => array(
 				'type'  => 'textarea',
-				'title' => __( 'Description', 'ppom' ),
-				'desc'  => __( 'Small description, it will be display near name title.', 'ppom' ),
+				'title' => __( 'Description', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Small description, it will be display near name title.', 'woocommerce-product-addon' ),
 			),
 			'error_message'   => array(
 				'type'  => 'text',
-				'title' => __( 'Error message', 'ppom' ),
-				'desc'  => __( 'Insert the error message for validation.', 'ppom' ),
+				'title' => __( 'Error message', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Insert the error message for validation.', 'woocommerce-product-addon' ),
 			),
 			'selected'        => array(
 				'type'        => 'text',
-				'title'       => __( 'Selected option', 'ppom' ),
-				'desc'        => __( 'Type option name (given above) if you want already selected.', 'ppom' ),
+				'title'       => __( 'Selected option', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Type option name (given above) if you want already selected.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'first_option'    => array(
 				'type'        => 'text',
-				'title'       => __( 'First option', 'ppom' ),
-				'desc'        => __( 'Just for info e.g: Select your option.', 'ppom' ),
+				'title'       => __( 'First option', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Just for info e.g: Select your option.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'regions'         => array(
 				'type'    => 'textarea',
-				'title'   => __( 'Regions', 'ppom' ),
-				'desc'    => __( 'All,AFRICA, AMERICA, ANTARCTICA, ASIA, ATLANTIC, AUSTRALIA, EUROPE, INDIAN, PACIFIC', 'ppom' ),
+				'title'   => __( 'Regions', 'woocommerce-product-addon' ),
+				'desc'    => __( 'All,AFRICA, AMERICA, ANTARCTICA, ASIA, ATLANTIC, AUSTRALIA, EUROPE, INDIAN, PACIFIC', 'woocommerce-product-addon' ),
 				'default' => 'All',
 			),
 			'class'           => array(
 				'type'        => 'text',
-				'title'       => __( 'Class', 'ppom' ),
-				'desc'        => __( 'Insert an additional class(es) (separateb by comma) for more personalization.', 'ppom' ),
+				'title'       => __( 'Class', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Insert an additional class(es) (separateb by comma) for more personalization.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'width'           => array(
 				'type'        => 'select',
-				'title'       => __( 'Width', 'ppom' ),
-				'desc'        => __( 'Select width column', 'ppom' ),
+				'title'       => __( 'Width', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Select width column', 'woocommerce-product-addon' ),
 				'options'     => ppom_get_input_cols(),
 				'default'     => 12,
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'visibility'      => array(
 				'type'        => 'select',
-				'title'       => __( 'Visibility', 'ppom' ),
-				'desc'        => __( 'Set field visibility based on user.', 'ppom' ),
+				'title'       => __( 'Visibility', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Set field visibility based on user.', 'woocommerce-product-addon' ),
 				'options'     => ppom_field_visibility_options(),
 				'default'     => 'everyone',
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'visibility_role' => array(
 				'type'   => 'text',
-				'title'  => __( 'User Roles', 'ppom' ),
-				'desc'   => __( 'Role separated by comma.', 'ppom' ),
+				'title'  => __( 'User Roles', 'woocommerce-product-addon' ),
+				'desc'   => __( 'Role separated by comma.', 'woocommerce-product-addon' ),
 				'hidden' => true,
 			),
 			'show_time'       => array(
 				'type'        => 'checkbox',
-				'title'       => __( 'Show Local Time', 'ppom' ),
-				'desc'        => __( 'It will show current local time.', 'ppom' ),
+				'title'       => __( 'Show Local Time', 'woocommerce-product-addon' ),
+				'desc'        => __( 'It will show current local time.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'desc_tooltip'    => array(
 				'type'        => 'checkbox',
-				'title'       => __( 'Show tooltip (PRO)', 'ppom' ),
-				'desc'        => __( 'Show Description in Tooltip with Help Icon', 'ppom' ),
+				'title'       => __( 'Show tooltip (PRO)', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Show Description in Tooltip with Help Icon', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'required'        => array(
 				'type'        => 'checkbox',
-				'title'       => __( 'Required', 'ppom' ),
-				'desc'        => __( 'Select this if it must be required.', 'ppom' ),
+				'title'       => __( 'Required', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Select this if it must be required.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'logic'           => array(
 				'type'  => 'checkbox',
-				'title' => __( 'Enable Conditions', 'ppom' ),
-				'desc'  => __( 'Tick it to turn conditional logic to work below', 'ppom' ),
+				'title' => __( 'Enable Conditions', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Tick it to turn conditional logic to work below', 'woocommerce-product-addon' ),
 			),
 			'conditions'      => array(
 				'type'  => 'html-conditions',
-				'title' => __( 'Conditions', 'ppom' ),
-				'desc'  => __( 'Tick it to turn conditional logic to work below', 'ppom' ),
+				'title' => __( 'Conditions', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Tick it to turn conditional logic to work below', 'woocommerce-product-addon' ),
 			),
 		);
 

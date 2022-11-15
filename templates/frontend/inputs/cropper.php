@@ -25,7 +25,7 @@ $btn_label    = $fm->get_meta_value( 'button_label_select' );
 $first_option = $fm->get_meta_value( 'first_option' );
 
 $field_label = ( $file_cost == '' ) ? $fm->field_label() : $fm->field_label() . ' - ' . wc_price( $file_cost );
-$btn_label   = ( $btn_label == '' ? __( 'Select files', 'ppom' ) : $btn_label );
+$btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-addon' ) : $btn_label );
 
 $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $product );
 
@@ -41,7 +41,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 	<!-- if title of field exist -->
 	<?php if ( $field_label ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo sprintf( __( '%s', 'ppom' ), $field_label ); ?></label>
+			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo sprintf( __( '%s', 'woocommerce-product-addon' ), $field_label ); ?></label>
 	<?php endif ?>
 
 
@@ -53,7 +53,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 		>
 			<?php echo esc_html( $btn_label ); ?>
 		</a>
-		<span class="ppom-dragdrop-text"><?php echo _e( 'Drag file/directory here', 'ppom' ); ?></span>
+		<span class="ppom-dragdrop-text"><?php echo _e( 'Drag file/directory here', 'woocommerce-product-addon' ); ?></span>
 	</div> <!-- ppom-file-container -->
 
 	<div id="filelist-<?php echo esc_attr( $fm->data_name() ); ?>" class="filelist"></div>
@@ -81,7 +81,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 					<?php
 
 					if ( $first_option ) {
-						echo sprintf( __( '<option value="">%s</option>', 'ppom' ), $first_option );
+						echo sprintf( __( '<option value="">%s</option>', 'woocommerce-product-addon' ), $first_option );
 					}
 
 					foreach ( $options as $key => $size ) {

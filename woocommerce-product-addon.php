@@ -52,7 +52,7 @@ add_filter(
  */
 add_action( 'init', 'ppom_i18n_setup' );
 function ppom_i18n_setup() {
-	load_plugin_textdomain( 'ppom', false, basename( dirname( __FILE__ ) ) . '/languages' );
+	load_plugin_textdomain( 'woocommerce-product-addon', false, basename( dirname( __FILE__ ) ) . '/languages' );
 }
 
 
@@ -69,6 +69,7 @@ require_once PPOM_PATH . '/inc/prices.php';
 
 if( is_admin() ) {
 	require_once PPOM_PATH . '/classes/freemium.class.php';
+	PPOM_Freemium::get_instance();
 }
 
 
