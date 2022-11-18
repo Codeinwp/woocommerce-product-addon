@@ -7,7 +7,7 @@
   "author": "Themeisle <friends@themeisle.com>",
   "license": "GPL-2.0+",
   "plugin": {
-    "textdomain": "ppom"
+    "textdomain": "woocommerce-product-addon"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.1",
