@@ -1088,8 +1088,8 @@ class PPOM_Fields_Meta {
 				$html_input .= '</table>';
 				$html_input .= '</div>';
 				$html_input .= '<div class="text-right">';
-				$html_input .= '<button class="btn btn-info ppom-save-bulk-json">Save Changing</button>';
-				$html_input .= '<button class="btn btn-success ppom-edit-bulk-json">Edit Changing</button>';
+				$html_input .= '<button class="btn btn-info ppom-save-bulk-json">'.esc_html__( 'Save Changing', 'woocommerce-product-addon' ).'</button> ';
+				$html_input .= '<button class="btn btn-success ppom-edit-bulk-json">'.esc_html__( 'Edit Changing', 'woocommerce-product-addon' ).'</button>';
 
 				if ( $values ) {
 					$html_input .= "<input type='hidden' name='ppom[" . esc_attr( $field_index ) . "][options]' class='ppom-saved-bulk-data ppom-meta-field' value='" . json_encode( $bulk_data ) . "' data-metatype='options'>";
