@@ -395,7 +395,6 @@ function ppom_bulkquantity_price_manager(quantity, data_name) {
         if (quantity >= parseInt(qty_range_from) && quantity <= parseInt(qty_range_to)) {
 
             // Setting Initial Price to 0 and taking base price
-            var price = 0;
             ppom_base_price = (obj['Base Price'] == undefined || obj['Base Price'] == '') ? 0 : obj['Base Price'];
             jQuery(`.ppom-bulkquantity-options.${data_name} option:selected`).attr('data-baseprice', ppom_base_price);
 
@@ -403,6 +402,8 @@ function ppom_bulkquantity_price_manager(quantity, data_name) {
             var variation = jQuery('.ppom-bulkquantity-options').val();
             var var_price = obj[variation];
             jQuery(`.ppom-bulkquantity-options.${data_name} option:selected`).attr('data-price', var_price);
+
+            return false;
         }
 
     });
