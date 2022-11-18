@@ -25,6 +25,15 @@ jQuery(function($){
     **/
 	var body = $('body');
 
+	const ppomBQ = {
+		setMaskRangeInput() {
+			$('.ppom-bulk-qty-val-picker,.ppom-bulk-qty-val').inputmask('99-99');
+		}
+	}
+
+	body.ready(function(){
+		ppomBQ.setMaskRangeInput();
+	});
 
 	/**
         2- Add New Quantity Row 
@@ -43,7 +52,8 @@ jQuery(function($){
         var clon_qty_section = tbody.find('tr:last-child').clone();
         clon_qty_section.find('.ppom-bulk-qty-val-picker').val(bulk_qty_val);
         clon_qty_section.appendTo(tbody);
-	    
+
+		ppomBQ.setMaskRangeInput();
 	});
 
 

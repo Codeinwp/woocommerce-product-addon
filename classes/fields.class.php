@@ -49,6 +49,7 @@ class PPOM_Fields_Meta {
 
 		// Bulk Quantity Addon JS File
 		wp_enqueue_script( 'ppom-bulkquantity', PPOM_URL . '/js/admin//ppom-bulkquantity.js', array( 'jquery' ), PPOM_VERSION, true );
+		wp_enqueue_script( 'ppom-inputmask', PPOM_URL . '/js/inputmask/jquery.inputmask.min.js', array( 'jquery' ), '5.0.6', true );
 
 		// PPOM Meta Table File
 		wp_enqueue_script( 'ppom-meta-table', PPOM_URL . '/js/admin/ppom-meta-table.js', array( 'jquery' ), PPOM_VERSION, true );
