@@ -27,25 +27,34 @@ $addons_list = ppom_array_get_addons_details();
 
 	<div class="ppom-admin-addons-header">
 		<div class="ppom-admin-addons-header-logo">
-			<h3><?php _e( 'PPOM Addons', 'woocommerce-product-addon' ); ?></h3>
+			<h3><?php _e( 'PPOM PRO Features', 'woocommerce-product-addon' ); ?></h3>
 		</div>
 		<div class="ppom-admin-addons-header-search-input">
-			<input type="search" id="myInput" class="form-control" placeholder="Search Addons" onkeyup="myFunction()">
+			<input type="search" id="myInput" class="form-control" placeholder="<?php echo esc_attr( __( 'Search', 'woocommerce-product-addon' ) ); ?>" onkeyup="myFunction()">
 		</div>
 	</div>
 
 	<ul class="ppom_addons_model_cards" id="myUL">
 			<?php
 			foreach ( $addons_list as $meta ) {
+				$types = [
+					'field'=>esc_html__('Field', 'woocommerce-product-addon'),
+					'feature'=>esc_html__('Feature', 'woocommerce-product-addon'),
+				];
+
 				$addon_title = isset( $meta['title'] ) ? $meta['title'] : '';
 				$addon_desc  = isset( $meta['desc'] ) ? $meta['desc'] : '';
 				$actions     = isset( $meta['actions'] ) ? $meta['actions'] : '';
+				$type     = ( isset( $meta['type'] ) && array_key_exists( $meta['type'], $types ) ) ? $types[$meta['type']] : '';
+
 				?>
 				<li class="ppom_addons_model_cards_item">
 					<div class="ppom_addons_model_card">
 						<div class="ppom_addons_model_card_content">
 							<div class="ppom_addons_model_heading_button_display">
 								<h4 class="ppom_addons_model_card_title"><?php echo $addon_title; ?></h4>
+								<span class="badge badge-secondary"><?php esc_html_e('PRO', 'woocommerce-product-addon'); ?></span>
+								<span style="margin-right:5px" class="ppom-addon-type badge badge-secondary"><?php esc_html_e( $type ); ?></span>
 							</div>
 							<hr>
 							<p class="ppom_addons_model_card_text"><?php echo $addon_desc; ?></p>

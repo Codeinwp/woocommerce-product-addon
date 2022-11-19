@@ -679,16 +679,19 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#texter',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Fixed Price', 'woocommerce-product-addon' ),
 			'desc'    => __( 'Sometimes prices are very complex like for a printing company, they are selling their visiting cards in Packages.So Package Price Add-on allows admin to set prices against package. It’s usage is very simple, just add quantity (package) and it’s price. There is also option to set unit like you are selling visiting cards then unit may called as “cards”.', 'woocommerce-product-addon' ),
 			'actions' => array(),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Fields PopUp', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Fields PopUp wrap all PPOM fields inside a popup. A product with large number of fields can now has simple button with customized label. To enable this PopUp just one click required in product edit page. ', 'woocommerce-product-addon' ),
 			'actions' => array(),
+			'type' => 'feature'
 		),
 		array(
 			'title'   => __( 'Font Picker', 'woocommerce-product-addon' ),
@@ -699,6 +702,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#fonts-picker',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Image DropDown', 'woocommerce-product-addon' ),
@@ -709,16 +713,19 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#image-dropdown',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Bulk Quantity Options', 'woocommerce-product-addon' ),
 			'desc'    => __( 'Bulk Quantity for Options Addon allow store admin to set discount prices for each options. This Addon is best tool for companies like Printin, designing and who looking to sale products with options with different prices.', 'woocommerce-product-addon' ),
 			'actions' => array(),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Cart Edit', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Cart Edit Addon allow clients to edit fields once these are added to cart on cart page. It has also option to show all meta fields in different column on cart page. Extra column can be disable from Settings -> PPOM Cart tab.', 'woocommerce-product-addon' ),
 			'actions' => array(),
+			'type' => 'feature'
 		),
 		array(
 			'title'   => __( 'Domain Checker', 'woocommerce-product-addon' ),
@@ -729,6 +736,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#domain',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Quantities Pack', 'woocommerce-product-addon' ),
@@ -739,6 +747,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#quantities-pack',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Super List', 'woocommerce-product-addon' ),
@@ -749,6 +758,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#super-list',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Collapse', 'woocommerce-product-addon' ),
@@ -759,6 +769,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#collapse',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Text Counter', 'woocommerce-product-addon' ),
@@ -769,11 +780,13 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#text-counter',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Enquiry Form', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Enquiry Form Add-on adds button on product page. A customer can ask the admin about any product with PPOM Field in email. All PPOM Meta Fields are sent with message typed by the customer. Multiple email recipients can be added for product enquiry.', 'woocommerce-product-addon' ),
 			'actions' => array(),
+			'type' => 'feature'
 		),
 		array(
 			'title'   => __( 'Variation Quantity Matrix', 'woocommerce-product-addon' ),
@@ -784,6 +797,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#variation-matrix',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Quantity Option', 'woocommerce-product-addon' ),
@@ -794,6 +808,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#quantity-option',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Emojis', 'woocommerce-product-addon' ),
@@ -812,6 +827,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://vertis.d.pr/i/9SaoOW',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Phone Input', 'woocommerce-product-addon' ),
@@ -822,6 +838,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#phone-input',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Chained Input', 'woocommerce-product-addon' ),
@@ -840,6 +857,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://vertis.d.pr/i/j4ZiNf',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Conditional Images', 'woocommerce-product-addon' ),
@@ -850,6 +868,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#conditional-images',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Select Option Quantity', 'woocommerce-product-addon' ),
@@ -860,6 +879,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#select-option',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Radio Switcher', 'woocommerce-product-addon' ),
@@ -870,6 +890,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#radio-switcher',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Date Range Input', 'woocommerce-product-addon' ),
@@ -884,6 +905,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-date-range-input/',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Color Picker', 'woocommerce-product-addon' ),
@@ -898,6 +920,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-color-picker/',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'File Input', 'woocommerce-product-addon' ),
@@ -912,6 +935,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-file-upload-input/',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Image Cropper', 'woocommerce-product-addon' ),
@@ -926,6 +950,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-basic-image-cropping-input/',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Timezone Input', 'woocommerce-product-addon' ),
@@ -940,6 +965,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-timezone-with-region/',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Variation Quantity', 'woocommerce-product-addon' ),
@@ -954,6 +980,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-variation-quantities/',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Images', 'woocommerce-product-addon' ),
@@ -968,6 +995,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-images-options/',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Price Matrix', 'woocommerce-product-addon' ),
@@ -982,6 +1010,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-price-matrix-discount/',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'HTML', 'woocommerce-product-addon' ),
@@ -996,6 +1025,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-basic-html-with-content/',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Color Palettes', 'woocommerce-product-addon' ),
@@ -1010,6 +1040,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-color-palette/',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Audio / Video', 'woocommerce-product-addon' ),
@@ -1024,6 +1055,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-video-audio/',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Measure Input', 'woocommerce-product-addon' ),
@@ -1038,6 +1070,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-measure-input/',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Divider', 'woocommerce-product-addon' ),
@@ -1048,11 +1081,13 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#divider',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Conditional Field Repeater', 'woocommerce-product-addon' ),
 			'desc'    => esc_html__( 'Conditional Field Repeater is a feature used to repeat a PPOM field by the value of another PPOM field (number field).', 'woocommerce-product-addon' ),
 			'actions' => array(),
+			'type' => 'feature'
 		),
 	);
 
