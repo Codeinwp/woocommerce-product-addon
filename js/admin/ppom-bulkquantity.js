@@ -27,7 +27,15 @@ jQuery(function($){
 
 	const ppomBQ = {
 		setMaskRangeInput() {
-			$('.ppom-bulk-qty-val-picker,.ppom-bulk-qty-val').inputmask('99-99');
+			$('.ppom-bulk-qty-val-picker,.ppom-bulk-qty-val').each((i, el)=>{
+				let input = $(el);
+
+				if( input.inputmask('hasMaskedValue') ) {
+					return true;
+				}
+
+				input.inputmask({regex: "[0-9]*-[0-9]*"});
+			});
 		},
 		formValidation(formData) {
 			const notification = (msgSlug, magicValues) => {
