@@ -727,8 +727,8 @@ function ppom_array_get_addons_details() {
 			),
 		),
 		array(
-			'title'   => __( 'Google Font Map Picker', 'woocommerce-product-addon' ),
-			'desc'    => __( 'Google Font and Map Picker has two input fields. Font selector loads fonts from Google and client can pick font and can see live preview of font effect. Admin can also filter font families and set Custom Fonts. Google Map fetch coordinate based on address and show map.', 'woocommerce-product-addon' ),
+			'title'   => __( 'Font Picker', 'woocommerce-product-addon' ),
+			'desc'    => __( 'Font selector loads fonts from Google and client can pick font and can see live preview of font effect. Admin can also filter font families and set Custom Fonts.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'woocommerce-product-addon' ),
