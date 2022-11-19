@@ -781,24 +781,6 @@ function ppom_array_get_addons_details() {
 			),
 		),
 		array(
-			'title'   => __( 'PriceTable', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM Price Table Add-on a completely new way to sell Packages, Plans, or products with a list of features. More than ten beautiful designs for the price tables available to sell plans in WooCommerce Store.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/price-table-add-on/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#pricetable',
-				),
-			),
-		),
-		array(
 			'title'   => __( 'Cart Edit', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Cart Edit Addon allow clients to edit fields once these are added to cart on cart page. It has also option to show all meta fields in different column on cart page. Extra column can be disable from Settings -> PPOM Cart tab.', 'woocommerce-product-addon' ),
 			'actions' => array(
