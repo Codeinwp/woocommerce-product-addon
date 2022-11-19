@@ -799,24 +799,6 @@ function ppom_array_get_addons_details() {
 			),
 		),
 		array(
-			'title'   => __( 'SVG ADDON', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM SVG Add-on is a new product designer plugin. Now you can create and upload your SVG template for complex designs with Google Fonts. The customer can select the design part to make the product as per his need.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#svg',
-				),
-			),
-		),
-		array(
 			'title'   => __( 'UploadCare', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM UploadCare now can be used for image editing on WooCommerce Product pages for any web2print business. It has tons of options that we integrated with our PPOM Add-on.', 'woocommerce-product-addon' ),
 			'actions' => array(
