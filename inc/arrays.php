@@ -835,24 +835,6 @@ function ppom_array_get_addons_details() {
 			),
 		),
 		array(
-			'title'   => __( 'Fancy Cropper', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM Fancy Cropper allows customers to upload images and crop before sending to cart. Admin can set different sizes and options for cropper. All cropped images are added to the cart and received in order meta for admin to download and process. For further order processing, WooConvo Revision Addon can be used.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/fancy-cropper-demo/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/416623997',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#fancycropper',
-				),
-			),
-		),
-		array(
 			'title'   => __( 'Super List', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Super List addon contains many pre-defined lists to render as Select field on product page. It includes Countries, Currencies, Months etc. ', 'woocommerce-product-addon' ),
 			'actions' => array(
