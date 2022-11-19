@@ -124,6 +124,14 @@ jQuery(function($){
 		ppomBQ.setMaskRangeInput();
 	});
 
+	$(document).on('ppom_new_field_created', (e, newField, fieldNo, fieldType)=>{
+		if( fieldType !== 'bulkquantity' ) {
+			return;
+		}
+
+		ppomBQ.setMaskRangeInput();
+	});
+
 	/**
         2- Add New Quantity Row 
     **/
