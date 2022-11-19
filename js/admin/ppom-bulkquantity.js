@@ -53,13 +53,13 @@ jQuery(function($){
 			for( const el of formData ) {
 				let range = el['Quantity Range']
 				let rangeVals = range.split('-');
-				let start = rangeVals[0];
-				let end = rangeVals[1];
+				let start = parseInt(rangeVals[0]);
+				let end = parseInt(rangeVals[1]);
 
 				// rule: check if there are any intersection with another range
 				for( const anotherRange of globalRanges ) {
-					let aStart = anotherRange.start;
-					let aEnd = anotherRange.end;
+					let aStart = parseInt(anotherRange.start);
+					let aEnd = parseInt(anotherRange.end);
 					let aRange = anotherRange.range;
 
 					if( ( start >= aStart && start <= aEnd ) || ( end >= aStart && end <= aEnd ) ) {
@@ -72,7 +72,7 @@ jQuery(function($){
 				}
 
 				// rule: start value should be lower than the end value
-				if( end < start ) {
+				if( end<start ) {
 					notification('end_bigger_than_start', {range})
 					return false;
 				}
