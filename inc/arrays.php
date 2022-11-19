@@ -853,7 +853,7 @@ function ppom_array_get_addons_details() {
 			),
 		),
 		array(
-			'title'   => __( 'Field Collapsed', 'woocommerce-product-addon' ),
+			'title'   => __( 'Collapse', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Field Collapsed Add-on is front-end design which groups field inside beautiful section. Like steps, and if your product has a large number of fields then it is the best add-on to a short length of your product page.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
@@ -925,8 +925,8 @@ function ppom_array_get_addons_details() {
 			),
 		),
 		array(
-			'title'   => __( 'Option Quantity', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM Option Quantity Add-on is simple ‘Number’ input type which can be used to accept option quantity BUT Price can also be set. Like for a Pizza Product, customer have a option to order more then one drink and each extra drink as price. Here this Option Quantity will do the trick.  This Add-on can be used as Name your Price.', 'woocommerce-product-addon' ),
+			'title'   => __( 'Quantity Option', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Quantity Option Add-on is simple ‘Number’ input type which can be used to accept option quantity BUT Price can also be set. Like for a Pizza Product, customer have a option to order more then one drink and each extra drink as price. Here this Option Quantity will do the trick.  This Add-on can be used as Name your Price.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
 					'title' => __( 'Demo', 'woocommerce-product-addon' ),
