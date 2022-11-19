@@ -54,7 +54,8 @@ class PPOM_Fields_Meta {
 				'validation'=>[
 					'end_bigger_than_start' => esc_html__('The end value of the range must be greater than the start value. (range: {range})', 'woocommerce-product-addon'),
 					'start_cannot_be_equal_with_end' => esc_html__('The start value cannot be equal to the end value. (range: {range})', 'woocommerce-product-addon'),
-					'range_intersection' => esc_html__( 'Values in two ranges intersect. Every range of numbers should be covered by only one range. Intersects ranges: {range1} AND {range2}', 'woocommerce-product-addon' )
+					'range_intersection' => esc_html__( 'Values in two ranges intersect. Every range of numbers should be covered by only one range. Intersects ranges: {range1} AND {range2}', 'woocommerce-product-addon' ),
+					'invalid_pattern' => esc_html__( 'Range format is invalid. (range: {range})', 'woocommerce-product-addon' )
 				]
 			]
 		] );

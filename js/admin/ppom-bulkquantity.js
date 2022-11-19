@@ -38,6 +38,7 @@ jQuery(function($){
 			});
 		},
 		formValidation(formData) {
+			const pattern = new RegExp('^([0-9]+)-([0-9]+)$');
 			const notification = (msgSlug, magicValues) => {
 				let msg = ppom_bq.i18n.validation[msgSlug];
 
@@ -51,7 +52,13 @@ jQuery(function($){
 			const globalRanges = [];
 
 			for( const el of formData ) {
-				let range = el['Quantity Range']
+				let range = el['Quantity Range'];
+
+				if( ! pattern.test(range) ) {
+					notification('invalid_pattern', {range});
+					return false;
+				}
+
 				let rangeVals = range.split('-');
 				let start = parseInt(rangeVals[0]);
 				let end = parseInt(rangeVals[1]);
