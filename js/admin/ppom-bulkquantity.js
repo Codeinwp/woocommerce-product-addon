@@ -28,6 +28,69 @@ jQuery(function($){
 	const ppomBQ = {
 		setMaskRangeInput() {
 			$('.ppom-bulk-qty-val-picker,.ppom-bulk-qty-val').inputmask('99-99');
+		},
+		formValidation(formData) {
+			const validationMessages = ppom_bq.i18n.validation;
+
+			const globalRanges = [];
+
+			for( const el of formData ) {
+				let range = el['Quantity Range']
+				let rangeVals = range.split('-');
+				let start = rangeVals[0];
+				let end = rangeVals[1];
+
+				// rule: check if there are any intersection with another range
+				for( const anotherRange of globalRanges ) {
+					let aStart = anotherRange.start;
+					let aEnd = anotherRange.end;
+					let aRange = anotherRange.range;
+
+					if( ( start >= aStart && start <= aEnd ) || ( end >= aStart && end <= aEnd ) ) {
+						alert(validationMessages['range_intersection'].replace('{range1}', range).replace('{range2}', aRange));
+						return false;
+					}
+				}
+
+				// rule: start value should be lower than the end value
+				if( end < start ) {
+					alert(validationMessages['end_bigger_than_start'].replace('{range}', range));
+					return false;
+				}
+
+				// rule: start cannot be equal to end
+				if( start === end ) {
+					alert(validationMessages['start_cannot_be_equal_with_end'].replace('{range}', range));
+					return false;
+				}
+
+				globalRanges.push({start, end, range});
+			}
+
+			return true;
+		},
+		showEditForm(el) {
+			var bulk_wrap = el.closest('.ppom-bulk-quantity-wrapper');
+			bulk_wrap.find('table').find('tbody tr td').each(function(index, el) {
+
+				var class_name = $(el).attr('id');
+				var td_wrap = $(this);
+				var cross_icon = '<span class="remove ppom-rm-bulk-qty"><i class="fa fa-times" aria-hidden="true"></i></span>';
+				if (class_name == 'ppom-bulkqty-adjust-cross') {
+					var input = ''+cross_icon+'<input type="text" class="form-control ppom-bulk-qty-val-picker" value="'+$(this).text()+'">';
+				}else{
+					var input = '<input type="text" class="form-control" value="'+$(this).text()+'">';
+				}
+
+				td_wrap.closest('td').html(input);
+			});
+
+			// show action
+			$(this).hide();
+			bulk_wrap.find('.ppom-bulk-action-wrap').show();
+			bulk_wrap.find('.ppom-save-bulk-json').show();
+
+			this.setMaskRangeInput();
 		}
 	}
 
@@ -114,14 +177,19 @@ jQuery(function($){
 	$('body').on('click', '.ppom-save-bulk-json', function(event) {
 	    event.preventDefault();
 
-	    var bulk_wrap = $(this).closest('.ppom-bulk-quantity-wrapper');
-	    bulk_wrap.find('table').find('input').each(function(index, el) {
-	    	// console.log($(this).val());
-	        var td_wrap = $(this);
-	        td_wrap.closest('td').html($(this).val());
+	    const bulk_wrap = $(this).closest('.ppom-bulk-quantity-wrapper');
+		bulk_wrap.find('table').find('input').each(function(index, el) {
+	        const td_wrap = $(this);
+	        td_wrap.closest('td').html(td_wrap.val());
 	    });
-	    var bulkData = bulk_wrap.find('table').tableToJSON();
-	    bulk_wrap.find('.ppom-saved-bulk-data').val(JSON.stringify(bulkData)); 
+	    const bulkData = bulk_wrap.find('table').tableToJSON();
+
+		if( ! ppomBQ.formValidation(bulkData) ) {
+			ppomBQ.showEditForm($(this));
+			return;
+		}
+
+	    bulk_wrap.find('.ppom-saved-bulk-data').val(JSON.stringify(bulkData));
 
 	    // hide action
 	    $(this).hide();
@@ -135,25 +203,7 @@ jQuery(function($){
     **/
 	$('body').on('click', '.ppom-edit-bulk-json', function(event) {
 	    event.preventDefault();
-	    var bulk_wrap = $(this).closest('.ppom-bulk-quantity-wrapper');
-	    bulk_wrap.find('table').find('tbody tr td').each(function(index, el) {
-
-	    	var class_name = $(el).attr('id');
-	        var td_wrap = $(this);
-	        var cross_icon = '<span class="remove ppom-rm-bulk-qty"><i class="fa fa-times" aria-hidden="true"></i></span>';
-	        if (class_name == 'ppom-bulkqty-adjust-cross') {
-	        	var input = ''+cross_icon+'<input type="text" class="form-control ppom-bulk-qty-val-picker" value="'+$(this).text()+'">';
-	        }else{
-	        	var input = '<input type="text" class="form-control" value="'+$(this).text()+'">';
-	        }
-
-	        td_wrap.closest('td').html(input);
-	    });
-
-	    // show action
-	    $(this).hide();
-	    bulk_wrap.find('.ppom-bulk-action-wrap').show();
-	    bulk_wrap.find('.ppom-save-bulk-json').show();
+		ppomBQ.showEditForm($(this));
 	});
 
 });

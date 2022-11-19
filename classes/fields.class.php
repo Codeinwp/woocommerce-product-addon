@@ -49,6 +49,16 @@ class PPOM_Fields_Meta {
 
 		// Bulk Quantity Addon JS File
 		wp_enqueue_script( 'ppom-bulkquantity', PPOM_URL . '/js/admin//ppom-bulkquantity.js', array( 'jquery' ), PPOM_VERSION, true );
+		wp_localize_script( 'ppom-bulkquantity', 'ppom_bq', [
+			'i18n'=>[
+				'validation'=>[
+					'end_bigger_than_start' => esc_html__('The end value of the range must be greater than the start value. (range: {range})', 'woocommerce-product-addon'),
+					'start_cannot_be_equal_with_end' => esc_html__('The start value cannot be equal to the end value. (range: {range})', 'woocommerce-product-addon'),
+					'range_intersection' => esc_html__( 'Values in two ranges intersect. Every range of numbers should be covered by only one range. Intersects ranges: {range1} AND {range2}', 'woocommerce-product-addon' )
+				]
+			]
+		] );
+
 		wp_enqueue_script( 'ppom-inputmask', PPOM_URL . '/js/inputmask/jquery.inputmask.min.js', array( 'jquery' ), '5.0.6', true );
 
 		// PPOM Meta Table File
