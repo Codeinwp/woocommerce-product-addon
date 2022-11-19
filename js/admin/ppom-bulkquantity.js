@@ -30,7 +30,15 @@ jQuery(function($){
 			$('.ppom-bulk-qty-val-picker,.ppom-bulk-qty-val').inputmask('99-99');
 		},
 		formValidation(formData) {
-			const validationMessages = ppom_bq.i18n.validation;
+			const notification = (msgSlug, magicValues) => {
+				let msg = ppom_bq.i18n.validation[msgSlug];
+
+				for(const [key, value] of Object.entries(magicValues)){
+					msg = msg.replace(`{${key}}`, value);
+				}
+
+				alert(msg);
+			}
 
 			const globalRanges = [];
 
@@ -47,20 +55,23 @@ jQuery(function($){
 					let aRange = anotherRange.range;
 
 					if( ( start >= aStart && start <= aEnd ) || ( end >= aStart && end <= aEnd ) ) {
-						alert(validationMessages['range_intersection'].replace('{range1}', range).replace('{range2}', aRange));
+						notification('range_intersection', {
+							range1:range,
+							range2:aRange
+						})
 						return false;
 					}
 				}
 
 				// rule: start value should be lower than the end value
 				if( end < start ) {
-					alert(validationMessages['end_bigger_than_start'].replace('{range}', range));
+					notification('end_bigger_than_start', {range})
 					return false;
 				}
 
 				// rule: start cannot be equal to end
 				if( start === end ) {
-					alert(validationMessages['start_cannot_be_equal_with_end'].replace('{range}', range));
+					notification('start_cannot_be_equal_with_end', {range})
 					return false;
 				}
 
