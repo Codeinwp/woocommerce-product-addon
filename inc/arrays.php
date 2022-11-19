@@ -799,24 +799,6 @@ function ppom_array_get_addons_details() {
 			),
 		),
 		array(
-			'title'   => __( 'UploadCare', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM UploadCare now can be used for image editing on WooCommerce Product pages for any web2print business. It has tons of options that we integrated with our PPOM Add-on.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#uploadcare',
-				),
-			),
-		),
-		array(
 			'title'   => __( 'Domain Checker', 'woocommerce-product-addon' ),
 			'desc'    => __( 'Domain Checker Addon will check any domain’s availability. Adds domain to cart if it’s not already registered. A simple solution to sell domains with WooCommerce PPOM. Customized messages for domain availability/not-availability. Ajax base script to check domain and show result.', 'woocommerce-product-addon' ),
 			'actions' => array(
