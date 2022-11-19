@@ -63,6 +63,18 @@ jQuery(function($){
 				let start = parseInt(rangeVals[0]);
 				let end = parseInt(rangeVals[1]);
 
+				// rule: start value should be lower than the end value
+				if( end<start ) {
+					notification('end_bigger_than_start', {range})
+					return false;
+				}
+
+				// rule: start cannot be equal to end
+				if( start === end ) {
+					notification('start_cannot_be_equal_with_end', {range})
+					return false;
+				}
+
 				// rule: check if there are any intersection with another range
 				for( const anotherRange of globalRanges ) {
 					let aStart = parseInt(anotherRange.start);
@@ -76,18 +88,6 @@ jQuery(function($){
 						})
 						return false;
 					}
-				}
-
-				// rule: start value should be lower than the end value
-				if( end<start ) {
-					notification('end_bigger_than_start', {range})
-					return false;
-				}
-
-				// rule: start cannot be equal to end
-				if( start === end ) {
-					notification('start_cannot_be_equal_with_end', {range})
-					return false;
 				}
 
 				globalRanges.push({start, end, range});
