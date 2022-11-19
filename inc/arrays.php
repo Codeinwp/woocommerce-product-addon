@@ -669,426 +669,425 @@ function ppom_array_all_inputs() {
  */
 function ppom_array_get_addons_details() {
 
-	$ppom_site_url = PPOM_UPGRADE_URL;
-
 	$addons = array(
 		array(
 			'title'   => __( 'Texter', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Texter Addon is the best and simple solution for web2print business using WooCommerce. Now define a fixed position and area for Text in your Templates like on Mug, T-shirt or Visiting Cards with preset font family, size. The client will fill the text with his all of its attributes and send to cart. It’s like a smart Product Designer. Multiple templates can also be attached to one product.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/design-shirt-with-ppom-texter/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#ppom-texter',
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#texter',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
-			'title'   => __( 'WooCommerce Package Price', 'woocommerce-product-addon' ),
+			'title'   => __( 'Fixed Price', 'woocommerce-product-addon' ),
 			'desc'    => __( 'Sometimes prices are very complex like for a printing company, they are selling their visiting cards in Packages.So Package Price Add-on allows admin to set prices against package. It’s usage is very simple, just add quantity (package) and it’s price. There is also option to set unit like you are selling visiting cards then unit may called as “cards”.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/patient-ninja/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#woocommercepackageprice',
-				),
-			),
+			'actions' => array(),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Fields PopUp', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Fields PopUp wrap all PPOM fields inside a popup. A product with large number of fields can now has simple button with customized label. To enable this PopUp just one click required in product edit page. ', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/ppom-fields-popup/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/309118167',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#fieldspopup',
-				),
-			),
+			'actions' => array(),
+			'type' => 'feature'
 		),
 		array(
-			'title'   => __( 'Google Font Map Picker', 'woocommerce-product-addon' ),
-			'desc'    => __( 'Google Font and Map Picker has two input fields. Font selector loads fonts from Google and client can pick font and can see live preview of font effect. Admin can also filter font families and set Custom Fonts. Google Map fetch coordinate based on address and show map.', 'woocommerce-product-addon' ),
+			'title'   => __( 'Font Picker', 'woocommerce-product-addon' ),
+			'desc'    => __( 'Font selector loads fonts from Google and client can pick font and can see live preview of font effect. Admin can also filter font families and set Custom Fonts.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/google-font-picker-ppom/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/377580122',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#googlefontandmappicker',
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#fonts-picker',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Image DropDown', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Image DropDown Addon show images inside a select box. The title, description, and prices can be added along with all images. It’s best when you have a long list of images and don’t want to use Image Type input.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/image-dropdown/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://najeebmedia.com/addon-image-drop-down/',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#imagedropdown',
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#image-dropdown',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Bulk Quantity Options', 'woocommerce-product-addon' ),
 			'desc'    => __( 'Bulk Quantity for Options Addon allow store admin to set discount prices for each options. This Addon is best tool for companies like Printin, designing and who looking to sale products with options with different prices.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/woo-logo-3/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#bulkquantity',
-				),
-			),
-		),
-		array(
-			'title'   => __( 'PriceTable', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM Price Table Add-on a completely new way to sell Packages, Plans, or products with a list of features. More than ten beautiful designs for the price tables available to sell plans in WooCommerce Store.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/price-table-add-on/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#pricetable',
-				),
-			),
+			'actions' => array(),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Cart Edit', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Cart Edit Addon allow clients to edit fields once these are added to cart on cart page. It has also option to show all meta fields in different column on cart page. Extra column can be disable from Settings -> PPOM Cart tab.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/happy-ninja/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/358618266',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#cartedit',
-				),
-			),
-		),
-		array(
-			'title'   => __( 'SVG ADDON', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM SVG Add-on is a new product designer plugin. Now you can create and upload your SVG template for complex designs with Google Fonts. The customer can select the design part to make the product as per his need.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#svg',
-				),
-			),
-		),
-		array(
-			'title'   => __( 'UploadCare', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM UploadCare now can be used for image editing on WooCommerce Product pages for any web2print business. It has tons of options that we integrated with our PPOM Add-on.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#uploadcare',
-				),
-			),
+			'actions' => array(),
+			'type' => 'feature'
 		),
 		array(
 			'title'   => __( 'Domain Checker', 'woocommerce-product-addon' ),
 			'desc'    => __( 'Domain Checker Addon will check any domain’s availability. Adds domain to cart if it’s not already registered. A simple solution to sell domains with WooCommerce PPOM. Customized messages for domain availability/not-availability. Ajax base script to check domain and show result.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/ppom-domain-checker-addon/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#domainchecker',
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#domain',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Quantities Pack', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Quantity Pack Add-on is a special input type which is very similar to Variation Quantities input but with a good difference. Like if you are want to sell some products with different options in specific quantities, not sure?', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://najeebmedia.com/blog/ppom-quantity-pack-addon/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#quantitypack',
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#quantities-pack',
 				),
 			),
-		),
-		array(
-			'title'   => __( 'Fancy Cropper', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM Fancy Cropper allows customers to upload images and crop before sending to cart. Admin can set different sizes and options for cropper. All cropped images are added to the cart and received in order meta for admin to download and process. For further order processing, WooConvo Revision Addon can be used.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/fancy-cropper-demo/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/416623997',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#fancycropper',
-				),
-			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Super List', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Super List addon contains many pre-defined lists to render as Select field on product page. It includes Countries, Currencies, Months etc. ', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/super-list-demo-copy/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#superlist',
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#super-list',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
-			'title'   => __( 'PDF Export', 'woocommerce-product-addon' ),
-			'desc'    => __(
-				'
-PPOM PDF Export Add-on will generate a PDF against each order including all PPOM Fields in a beautiful format. Header and Footer can also be set for PDF. This is an awesome feature when you need to print order details.',
-				'woocommerce-product-addon' 
-			),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/simple-t-shirt-design/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/326834403',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#pdfexport',
-				),
-			),
-		),
-		array(
-			'title'   => __( 'Event Calendar', 'woocommerce-product-addon' ),
-			'desc'    => __( 'WooCommerce Event Calendar enables clients to purchase tickets against different events from Product Page and checkout. This Event Calendar Add-on is very simple to use, manage Ticket Price, Stocks.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/multiple-event-calendar/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/349698112',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#eventcalendar',
-				),
-			),
-		),
-		array(
-			'title'   => __( 'Field Collapsed', 'woocommerce-product-addon' ),
+			'title'   => __( 'Collapse', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Field Collapsed Add-on is front-end design which groups field inside beautiful section. Like steps, and if your product has a large number of fields then it is the best add-on to a short length of your product page.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/ppom-collapsed-fields/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/284667121',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#fieldcollapes',
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#collapse',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Text Counter', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Text Counter Add-on is special type text input field. It can restrict a total number of words or character with nice info panel below. Each word or character can be changed and the price will be added to cart.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/ppom-text-counter-add-on/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/314283537',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#textcounter',
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#text-counter',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
 			'title'   => __( 'Enquiry Form', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Enquiry Form Add-on adds button on product page. A customer can ask the admin about any product with PPOM Field in email. All PPOM Meta Fields are sent with message typed by the customer. Multiple email recipients can be added for product enquiry.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/325028677',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#enquiryform',
-				),
-			),
-		),
-		array(
-			'title'   => __( 'AutoComplete/MultiSelect', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM AutoComplete/MultiSelect Add-on contain two special inputs. AutoComplete allows users to choose an option from the options list provided in settings. It’s like a Select input but values are filtered by keywords. It’s best to use when you have a long list of options', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/ppom-auto-complete-demo/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#autocompletemultiselect',
-				),
-			),
+			'actions' => array(),
+			'type' => 'feature'
 		),
 		array(
 			'title'   => __( 'Variation Quantity Matrix', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Variation Quantity Matrix Add-on is an advanced form of Variation Quantity Field. Variation Quantity Matrix is a super simple form when quantities need to be collected against multiple options. Like if you selling T-Shirt and need to collect Quantities against each Color of each Size, this Add-on can be used to render a Tabular/Grid. ', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/t-shirt-variations/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/391981516',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#variationquantitymatrix',
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#variation-matrix',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
-			'title'   => __( 'WooCommerce Variation Quantity', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM WooCommerce Variation Quantity Add-on turn default WC variations into variations quantities and each variations can be ordered with different quantities. In other words client can bulk order with WooCommerce Variations. It is very similar to PPOM Variation Quantity input but the only difference is that it use WooCommerce core variations.', 'woocommerce-product-addon' ),
+			'title'   => __( 'Quantity Option', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Quantity Option Add-on is simple ‘Number’ input type which can be used to accept option quantity BUT Price can also be set. Like for a Pizza Product, customer have a option to order more then one drink and each extra drink as price. Here this Option Quantity will do the trick.  This Add-on can be used as Name your Price.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/woocommerce-variation-quantity/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/402089812',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#woocemmrcevariationquantity',
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#quantity-option',
 				),
 			),
+			'type' => 'field'
 		),
 		array(
-			'title'   => __( 'Option Quantity', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM Option Quantity Add-on is simple ‘Number’ input type which can be used to accept option quantity BUT Price can also be set. Like for a Pizza Product, customer have a option to order more then one drink and each extra drink as price. Here this Option Quantity will do the trick.  This Add-on can be used as Name your Price.', 'woocommerce-product-addon' ),
+			'title'   => __( 'Emojis', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'The Emoji field adds emoji support to the input (can be textarea, text, dropdown.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://najeebmedia.com/blog/option-quantity-ppom-add-on-released/',
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#emojis',
 				),
 				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
+					'title' => __( 'Screenshot (Front)', 'woocommerce-product-addon' ),
+					'link'  => 'https://vertis.d.pr/i/vp3wRy',
 				),
 				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#optionquantity',
+					'title' => __( 'Screenshot (Admin)', 'woocommerce-product-addon' ),
+					'link'  => 'https://vertis.d.pr/i/9SaoOW',
 				),
 			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Phone Input', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'The Phone field provides a formatted text input field with a country selection dropdown.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#phone-input',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Chained Input', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'Allows to create chained dropdown options.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#chained-input',
+				),
+				array(
+					'title' => __( 'Screenshot (Front)', 'woocommerce-product-addon' ),
+					'link'  => 'https://vertis.d.pr/i/kFexj7',
+				),
+				array(
+					'title' => __( 'Screenshot (Admin)', 'woocommerce-product-addon' ),
+					'link'  => 'https://vertis.d.pr/i/j4ZiNf',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Conditional Images', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'That field is used to show dependent fields according to the selected image.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#conditional-images',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Select Option Quantity', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'This input allows you to display a dropdown with options along with their quantities.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#select-option',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Radio Switcher', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'The Radio Switcher input creates a more appealing view for the product page, and it allows different images for each option.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#radio-switcher',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Date Range Input', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'Date Range Picker allows clients to select dates, times, or from predefined ranges.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#date-range-picker',
+				),
+				array(
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
+					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-date-range-input/',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Color Picker', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'Color Picker allows the client to select a color. Palette colors can also be defined in settings.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#color-picker-input',
+				),
+				array(
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
+					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-color-picker/',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'File Input', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'File Input allows clients to upload files from their computers or mobile devices. Admin can set any file type and size.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#file-upload',
+				),
+				array(
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
+					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-file-upload-input/',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Image Cropper', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'Just like a File Upload but only supports images with a nice cropper using Croppie JS API.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#image-cropper',
+				),
+				array(
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
+					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-basic-image-cropping-input/',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Timezone Input', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'Timezone input is a unique form of Select Input, but it has a predefined list of all Time-zones. Different Time-zones can also be filtered with options.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#timezone-input',
+				),
+				array(
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
+					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-timezone-with-region/',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Variation Quantity', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'Variation Quantities allow clients to order different quantities against different options.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#variation-quantities',
+				),
+				array(
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
+					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-variation-quantities/',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Images', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'Image input is just like Radio/Checkbox, but images can be uploaded against each option. Price can also be set against each image option.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#image-option-input',
+				),
+				array(
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
+					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-images-options/',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Price Matrix', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'Price Matrix allows admin to offer client Less Price on Bulk/More quantities. More quantities will decrease the price set in the matrix.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#price-matrix',
+				),
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-price-matrix-discount/',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'HTML', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'It’s not input, just to add content/text or HTML. Added HTML is shown on product details.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#html-content',
+				),
+				array(
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
+					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-basic-html-with-content/',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Color Palettes', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'Display the variations of the products using the Color Palettes. You create the palette from the colors which you wish.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#color-palettes',
+				),
+				array(
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
+					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-color-palette/',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Audio / Video', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'Audio/Video input allows clients to select Audio/Video options uploaded by Admin in the media library. It’s similar to Image type input but with a different media type. Price can also be set against each option.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#audio-video-input',
+				),
+				array(
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
+					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-video-audio/',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Measure Input', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'Depending on the products that you provide, some of them could require some measurement specifications, and this can be done using Measure Input.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#measure-input',
+				),
+				array(
+					'title' => __( 'Demo', 'woocommerce-product-addon' ),
+					'link'  => 'https://demo-ppom-lite.vertisite.cloud/product/demo-for-measure-input/',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Divider', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'This input allows you to define each meta field better and to create a more attractive design for your products.', 'woocommerce-product-addon' ),
+			'actions' => array(
+				array(
+					'title' => __( 'Docs', 'woocommerce-product-addon' ),
+					'link'  => 'https://docs.themeisle.com/article/1702-ppom-pro-input-types#divider',
+				),
+			),
+			'type' => 'field'
+		),
+		array(
+			'title'   => __( 'Conditional Field Repeater', 'woocommerce-product-addon' ),
+			'desc'    => esc_html__( 'Conditional Field Repeater is a feature used to repeat a PPOM field by the value of another PPOM field (number field).', 'woocommerce-product-addon' ),
+			'actions' => array(),
+			'type' => 'feature'
 		),
 	);
 
