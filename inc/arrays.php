@@ -853,46 +853,6 @@ function ppom_array_get_addons_details() {
 			),
 		),
 		array(
-			'title'   => __( 'PDF Export', 'woocommerce-product-addon' ),
-			'desc'    => __(
-				'
-PPOM PDF Export Add-on will generate a PDF against each order including all PPOM Fields in a beautiful format. Header and Footer can also be set for PDF. This is an awesome feature when you need to print order details.',
-				'woocommerce-product-addon' 
-			),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/simple-t-shirt-design/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/326834403',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#pdfexport',
-				),
-			),
-		),
-		array(
-			'title'   => __( 'Event Calendar', 'woocommerce-product-addon' ),
-			'desc'    => __( 'WooCommerce Event Calendar enables clients to purchase tickets against different events from Product Page and checkout. This Event Calendar Add-on is very simple to use, manage Ticket Price, Stocks.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/multiple-event-calendar/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/349698112',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#eventcalendar',
-				),
-			),
-		),
-		array(
 			'title'   => __( 'Field Collapsed', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Field Collapsed Add-on is front-end design which groups field inside beautiful section. Like steps, and if your product has a large number of fields then it is the best add-on to a short length of your product page.', 'woocommerce-product-addon' ),
 			'actions' => array(
@@ -947,24 +907,6 @@ PPOM PDF Export Add-on will generate a PDF against each order including all PPOM
 			),
 		),
 		array(
-			'title'   => __( 'AutoComplete/MultiSelect', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM AutoComplete/MultiSelect Add-on contain two special inputs. AutoComplete allows users to choose an option from the options list provided in settings. It’s like a Select input but values are filtered by keywords. It’s best to use when you have a long list of options', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/ppom-auto-complete-demo/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => '',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#autocompletemultiselect',
-				),
-			),
-		),
-		array(
 			'title'   => __( 'Variation Quantity Matrix', 'woocommerce-product-addon' ),
 			'desc'    => __( 'PPOM Variation Quantity Matrix Add-on is an advanced form of Variation Quantity Field. Variation Quantity Matrix is a super simple form when quantities need to be collected against multiple options. Like if you selling T-Shirt and need to collect Quantities against each Color of each Size, this Add-on can be used to render a Tabular/Grid. ', 'woocommerce-product-addon' ),
 			'actions' => array(
@@ -979,24 +921,6 @@ PPOM PDF Export Add-on will generate a PDF against each order including all PPOM
 				array(
 					'title' => __( 'More Info', 'woocommerce-product-addon' ),
 					'link'  => $ppom_site_url . '#variationquantitymatrix',
-				),
-			),
-		),
-		array(
-			'title'   => __( 'WooCommerce Variation Quantity', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM WooCommerce Variation Quantity Add-on turn default WC variations into variations quantities and each variations can be ordered with different quantities. In other words client can bulk order with WooCommerce Variations. It is very similar to PPOM Variation Quantity input but the only difference is that it use WooCommerce core variations.', 'woocommerce-product-addon' ),
-			'actions' => array(
-				array(
-					'title' => __( 'Demo', 'woocommerce-product-addon' ),
-					'link'  => 'https://ppom.nmediahosting.com/product/woocommerce-variation-quantity/',
-				),
-				array(
-					'title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-					'link'  => 'https://vimeo.com/402089812',
-				),
-				array(
-					'title' => __( 'More Info', 'woocommerce-product-addon' ),
-					'link'  => $ppom_site_url . '#woocemmrcevariationquantity',
 				),
 			),
 		),
