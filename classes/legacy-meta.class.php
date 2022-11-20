@@ -165,6 +165,6 @@ class PPOM_Legacy_InputManager {
 			$classes[] = 'ppom-check-input';
 		}
 
-		return apply_filters( 'ppom_legacy_input_meta_classes', $classes, self::$input_meta );
+		return array_filter( apply_filters( 'ppom_legacy_input_meta_classes', $classes, self::$input_meta ) );
 	}
 }
