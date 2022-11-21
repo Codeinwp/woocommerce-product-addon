@@ -32,6 +32,9 @@ $version_types_map = [
 	'tweaks'=>esc_html__( 'Tweaks', 'woocommerce-product-addon' ),
 ];
 
+$ppom_settings_url = admin_url( "admin.php?page=wc-settings&tab=ppom_settings" );
+$ppom_fields_url = admin_url( "admin.php?page=ppom" );
+
 ?>
 <style type="text/css">
 
@@ -45,19 +48,27 @@ $version_types_map = [
 	}
 </style>
 <div class="ppom-admin-addons-wrapper">
-	<div class="ppom-admin-addons-header">
-		<div class="ppom-admin-addons-header-logo">
-			<h3><?php printf( esc_html__( '%s Changelog', 'woocommerce-product-addon' ), sprintf( '<span id="ppom-type-label">%s</span>', array_shift(array_values($changelogs))['label']) ); ?></h3>
+	<div id="ppom-admin-cl-header-wrapper">
+		<div id="ppom-admin-changelog-header-top">
+			<ul id="ppom-changelog-nav">
+				<li><a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($ppom_fields_url); ?>"> <?php esc_html_e( 'PPOM Fields', 'woocommerce-product-addon' ); ?></a></li>
+				<li><a href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'woocommerce-product-addon'); ?></a></li>
+			</ul>
 		</div>
-		<?php if(count($changelogs)>1){ ?>
-		<div class="ppom-admin-addons-header-search-input">
-			<select id="ppom-type">
-			<?php foreach( $changelogs as $type=>$meta ) { ?>
-				<option value="<?php echo esc_attr($type); ?>"><?php echo esc_html($meta['label']); ?></option>
+		<div class="ppom-admin-addons-header">
+			<div class="ppom-admin-addons-header-logo">
+				<h3><?php printf( esc_html__( '%s Changelog', 'woocommerce-product-addon' ), sprintf( '<span id="ppom-type-label">%s</span>', array_shift(array_values($changelogs))['label']) ); ?></h3>
+			</div>
+			<?php if(count($changelogs)>1){ ?>
+			<div class="ppom-admin-addons-header-search-input">
+				<select id="ppom-type">
+				<?php foreach( $changelogs as $type=>$meta ) { ?>
+					<option value="<?php echo esc_attr($type); ?>"><?php echo esc_html($meta['label']); ?></option>
+				<?php } ?>
+				</select>
+			</div>
 			<?php } ?>
-			</select>
 		</div>
-		<?php } ?>
 	</div>
 
 	<div class="ppom-admin-cl-wrapper">
