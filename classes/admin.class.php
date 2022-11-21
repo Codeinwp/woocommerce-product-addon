@@ -155,7 +155,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$ppom_settings_url = admin_url( "admin.php?page=wc-settings&tab=ppom_settings" );
 		$addons           = add_query_arg( array( 'view' => 'addons' ) );
 
-		if ( $action != 'new' && $do_meta != 'edit' && $do_meta != 'clone' && $view != 'addons' ) {
+		if ( $action != 'new' && $do_meta != 'edit' && $do_meta != 'clone' && $view != 'addons' && $view != 'changelog' ) {
 			?>
 			<div class="ppom-manage-fields-topbar d-flex">
 				<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'woocommerce-product-addon'); ?></h1>
@@ -176,6 +176,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		} elseif ( isset( $_REQUEST ['page'] ) && $_REQUEST ['page'] == 'ppom' && $view === 'addons' ) {
 
 			ppom_load_template( 'admin/addons-list.php' );
+		} elseif ( isset( $_REQUEST ['page'] ) && $_REQUEST ['page'] == 'ppom' && $view === 'changelog' ) {
+
+			require_once PPOM_PATH . '/backend/changelog_handler.php';
+			ppom_load_template( 'admin/changelog.php' );
 		} else {
 			do_action( 'ppom_pdf_setting_action' );
 			do_action( 'ppom_enquiryform_setting_action' );
@@ -184,7 +188,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		}
 
 		// existing meta group tables show only ppom main page
-		if ( $action != 'new' && $do_meta != 'edit' && $view != 'addons' ) {
+		if ( $action != 'new' && $do_meta != 'edit' && $view != 'addons' && $view != 'changelog' ) {
 			ppom_load_template( 'admin/existing-meta.php' );
 		}
 

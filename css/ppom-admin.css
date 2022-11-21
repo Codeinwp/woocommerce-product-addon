@@ -1115,3 +1115,31 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 .ppom-addon-type.badge {
     background-color: #1d7497;
 }
+
+.ppom-admin-cl-wrapper {
+    margin: 15px 30px;
+}
+
+.ppom-admin-cl-wrapper .ui-accordion .ui-accordion-header {
+    padding: 15px 0;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.ppom-admin-cl-wrapper ul {
+    list-style-type: disc;
+    font-size: 14px;
+    padding-left: 15px;
+}
+
+.ppom-admin-cl-wrapper .badge-features {
+    background-color: #6EB77A;
+}
+
+.ppom-admin-cl-wrapper .badge-fixes {
+    background-color: #EC7C7C;
+}
+
+.ppom-admin-cl-wrapper .badge-tweaks {
+    background-color: #6BC2DD;
+}

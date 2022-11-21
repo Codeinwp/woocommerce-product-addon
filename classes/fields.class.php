@@ -46,6 +46,12 @@ class PPOM_Fields_Meta {
 
 		// Bootstrap Files
 		wp_enqueue_style( 'ppom-bs', PPOM_URL . '/css/bootstrap/bootstrap.css' );
+		wp_enqueue_script( 'ppom-bs', PPOM_URL . '/js/bootstrap/bootstrap.min.js' );
+
+		if( isset($_GET['view']) && $_GET['view'] === 'changelog' ) {
+			wp_enqueue_script( 'ppom-jq-ui-ac', PPOM_URL . '/backend/assets/jquery-ui-accordion/jquery-ui.min.js', array('jquery'), '1.13.2', false );
+			wp_enqueue_style( 'ppom-jq-ui-ac', PPOM_URL . '/backend/assets/jquery-ui-accordion/jquery-ui.min.css', array(), '1.13.2' );
+		}
 
 		// Bulk Quantity Addon JS File
 		wp_enqueue_script( 'ppom-bulkquantity', PPOM_URL . '/js/admin//ppom-bulkquantity.js', array( 'jquery' ), PPOM_VERSION, true );
