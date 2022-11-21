@@ -162,7 +162,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'woocommerce-product-addon'); ?></h1>
 				<div class="ppom-top-nav">
 					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($addons); ?>">+ <?php esc_html_e( 'All Addons', 'woocommerce-product-addon' ); ?></a>
-					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($changelog_url); ?>">+ <?php esc_html_e( 'Changelog', 'woocommerce-product-addon' ); ?></a>
+					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($changelog_url); ?>"><?php esc_html_e( 'Changelog', 'woocommerce-product-addon' ); ?></a>
 					<a  href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'woocommerce-product-addon'); ?></a>
 				</div>
 			</div>
