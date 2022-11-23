@@ -374,6 +374,12 @@ height: 100px;*/
   padding: 0 5px!important;
 }
 
+.ppom-input-image_select .ppom-clear-imageselect {
+  font-size:11px;
+  padding: 1px 10px;
+  margin:2px 0;
+}
+
 /* pricematrix */
 
 .ppom-slider-container {

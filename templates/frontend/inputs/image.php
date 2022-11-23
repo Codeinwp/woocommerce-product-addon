@@ -21,6 +21,8 @@ $show_popup       = $fm->get_meta_value( 'show_popup' );
 
 $input_classes = $fm->input_classes();
 
+$required = array_key_exists('required', $field_meta) && $field_meta['required'] === 'on';
+
 $images = ppom_convert_options_to_key_val( $fm->images(), $field_meta, $product );
 // ppom_pa($images);
 
@@ -306,6 +308,9 @@ $custom_attr = array();
 			}
 			?>
 			<div style="clear:both"></div>
+			<?php if( $required ) { ?>
+				<button type="button" class="ppom-clear-imageselect"><?php esc_html_e( 'Clear selection', 'woocommerce-product-addon' ); ?></button>
+			<?php } ?>
 		</div> <!-- nm-boxes-outer -->
 		<?php
 	}
