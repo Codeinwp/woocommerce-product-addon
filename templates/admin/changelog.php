@@ -86,7 +86,7 @@ $ppom_fields_url = admin_url( "admin.php?page=ppom" );
 							<h4><span class="badge badge-secondary badge-<?php echo esc_attr($type); ?>"><?php echo esc_html( $label ); ?></span></h4>
 							<ul>
 								<?php foreach($version[$type] as $change){ ?>
-									<li><?php echo esc_html($change); ?></li>
+									<li><?php echo wp_kses($change, ['a'=>['href'=>[], 'title'=>[]]]); ?></li>
 								<?php } ?>
 							</ul>
 					<?php
