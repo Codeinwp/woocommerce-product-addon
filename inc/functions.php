@@ -681,7 +681,7 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 				$bq_value = $value['option'] . ' (' . $value['qty'] . ')';
 				// $ppom_meta[$key] = $value['option'].' ('.$value['qty'].')';
 				$meta_data = array(
-					'name'  => $key,
+					'name'  => $field_title,
 					'value' => $bq_value,
 				);
 				// A placeholder key to handle qunantity display in item meta data under myaccount

@@ -49,6 +49,18 @@ class PPOM_Fields_Meta {
 
 		// Bulk Quantity Addon JS File
 		wp_enqueue_script( 'ppom-bulkquantity', PPOM_URL . '/js/admin//ppom-bulkquantity.js', array( 'jquery' ), PPOM_VERSION, true );
+		wp_localize_script( 'ppom-bulkquantity', 'ppom_bq', [
+			'i18n'=>[
+				'validation'=>[
+					'end_bigger_than_start' => esc_html__('The end value of the range must be greater than the start value. (range: {range})', 'woocommerce-product-addon'),
+					'start_cannot_be_equal_with_end' => esc_html__('The start value cannot be equal to the end value. (range: {range})', 'woocommerce-product-addon'),
+					'range_intersection' => esc_html__( 'Values in two ranges intersect. Every range of numbers should be covered by only one range. Intersects ranges: {range1} AND {range2}', 'woocommerce-product-addon' ),
+					'invalid_pattern' => esc_html__( 'Range format is invalid. (range: {range})', 'woocommerce-product-addon' )
+				]
+			]
+		] );
+
+		wp_enqueue_script( 'ppom-inputmask', PPOM_URL . '/js/inputmask/jquery.inputmask.min.js', array( 'jquery' ), '5.0.6', true );
 
 		// PPOM Meta Table File
 		wp_enqueue_script( 'ppom-meta-table', PPOM_URL . '/js/admin/ppom-meta-table.js', array( 'jquery' ), PPOM_VERSION, true );
@@ -1088,8 +1100,8 @@ class PPOM_Fields_Meta {
 				$html_input .= '</table>';
 				$html_input .= '</div>';
 				$html_input .= '<div class="text-right">';
-				$html_input .= '<button class="btn btn-info ppom-save-bulk-json">Save Changing</button>';
-				$html_input .= '<button class="btn btn-success ppom-edit-bulk-json">Edit Changing</button>';
+				$html_input .= '<button class="btn btn-info ppom-save-bulk-json">'.esc_html__( 'Save Changing', 'woocommerce-product-addon' ).'</button> ';
+				$html_input .= '<button class="btn btn-success ppom-edit-bulk-json">'.esc_html__( 'Edit Changing', 'woocommerce-product-addon' ).'</button>';
 
 				if ( $values ) {
 					$html_input .= "<input type='hidden' name='ppom[" . esc_attr( $field_index ) . "][options]' class='ppom-saved-bulk-data ppom-meta-field' value='" . json_encode( $bulk_data ) . "' data-metatype='options'>";
