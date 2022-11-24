@@ -26,7 +26,7 @@ $ranges = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $product
 // If options empty
 if ( ! $ranges ) {
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please Add Some Option.', 'ppom' ) . '</p>';
+	echo '<p>' . __( 'Please Add Some Option.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return;

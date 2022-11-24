@@ -30,8 +30,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		*/
 		$this->menu_pages = array(
 			array(
-				'page_title'  => __( 'PPOM', 'ppom' ),
-				'menu_title'  => __( 'PPOM', 'ppom' ),
+				'page_title'  => __( 'PPOM', 'woocommerce-product-addon' ),
+				'menu_title'  => __( 'PPOM', 'woocommerce-product-addon' ),
 				'cap'         => 'manage_options',
 				'slug'        => 'ppom',
 				'callback'    => 'product_meta',
@@ -96,8 +96,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			if ( $page ['parent_slug'] == '' ) {
 
 				$menu = add_options_page(
-					__( 'PPOM Fields', 'ppom' ),
-					__( 'PPOM Fields', 'ppom' ),
+					__( 'PPOM Fields', 'woocommerce-product-addon' ),
+					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
 					$page ['slug'],
 					array(
@@ -111,8 +111,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 				$menu = add_submenu_page(
 					$page ['parent_slug'],
-					__( $page ['page_title'], 'ppom' ),
-					__( 'PPOM Fields', 'ppom' ),
+					__( $page ['page_title'], 'woocommerce-product-addon' ),
+					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
 					$page ['slug'],
 					array(
@@ -126,8 +126,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				$cap = 'ppom_options_page';
 				// Menu page for roles set by PPOM Permission Settings
 				add_menu_page(
-					__( $page ['page_title'], 'ppom' ),
-					__( 'PPOM Fields', 'ppom' ),
+					__( $page ['page_title'], 'woocommerce-product-addon' ),
+					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
 					$page ['slug'],
 					array(
@@ -154,18 +154,20 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$view    = ( isset( $_REQUEST ['view'] ) ? sanitize_text_field( $_REQUEST ['view'] ) : '' );
 		$ppom_settings_url = admin_url( "admin.php?page=wc-settings&tab=ppom_settings" );
 		$addons           = add_query_arg( array( 'view' => 'addons' ) );
+		$changelog_url           = add_query_arg( array( 'view' => 'changelog' ) );
 
-		if ( $action != 'new' && $do_meta != 'edit' && $do_meta != 'clone' && $view != 'addons' ) {
+		if ( $action != 'new' && $do_meta != 'edit' && $do_meta != 'clone' && $view != 'addons' && $view != 'changelog' ) {
 			?>
 			<div class="ppom-manage-fields-topbar d-flex">
-				<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'ppom'); ?></h1>
+				<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'woocommerce-product-addon'); ?></h1>
 				<div class="ppom-top-nav">
-					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($addons); ?>">+ <?php esc_html_e( 'All Addons', 'ppom' ); ?></a>
-					<a  href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'ppom'); ?></a>
+					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($addons); ?>">+ <?php esc_html_e( 'All Addons', 'woocommerce-product-addon' ); ?></a>
+					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($changelog_url); ?>"><?php esc_html_e( 'Changelog', 'woocommerce-product-addon' ); ?></a>
+					<a  href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'woocommerce-product-addon'); ?></a>
 				</div>
 			</div>
 			<?php
-			echo '<p>' . __( 'You can create different meta groups for different products.', 'ppom' ) . '</p>';
+			echo '<p>' . __( 'You can create different meta groups for different products.', 'woocommerce-product-addon' ) . '</p>';
 		}
 
 		if ( ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) || $action == 'new' ) {
@@ -176,6 +178,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		} elseif ( isset( $_REQUEST ['page'] ) && $_REQUEST ['page'] == 'ppom' && $view === 'addons' ) {
 
 			ppom_load_template( 'admin/addons-list.php' );
+		} elseif ( isset( $_REQUEST ['page'] ) && $_REQUEST ['page'] == 'ppom' && $view === 'changelog' ) {
+
+			require_once PPOM_PATH . '/backend/changelog_handler.php';
+			ppom_load_template( 'admin/changelog.php' );
 		} else {
 			do_action( 'ppom_pdf_setting_action' );
 			do_action( 'ppom_enquiryform_setting_action' );
@@ -184,7 +190,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		}
 
 		// existing meta group tables show only ppom main page
-		if ( $action != 'new' && $do_meta != 'edit' && $view != 'addons' ) {
+		if ( $action != 'new' && $do_meta != 'edit' && $view != 'addons' && $view != 'changelog' ) {
 			ppom_load_template( 'admin/existing-meta.php' );
 		}
 
@@ -197,7 +203,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	function get_products() {
 
 		if ( ! ppom_security_role() ) {
-			_e( 'Sorry, you are not allowed to perform this action', 'ppom' );
+			_e( 'Sorry, you are not allowed to perform this action', 'woocommerce-product-addon' );
 			die( 0 );
 		}
 
@@ -236,7 +242,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		) {
 			$response = array(
 				'status'  => 'error',
-				'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'ppom' ),
+				'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'woocommerce-product-addon' ),
 			);
 
 			wp_send_json( $response );
@@ -282,11 +288,11 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	function validate_plugin() {
 
 		echo '<div class="wrap">';
-		echo '<h2>' . __( 'Provide API key below:', 'ppom' ) . '</h2>';
-		echo '<p>' . __( 'If you don\'t know your API key, please login into your: <a target="_blank" href="http://wordpresspoets.com/member-area">Member area</a>', 'ppom' ) . '</p>';
+		echo '<h2>' . __( 'Provide API key below:', 'woocommerce-product-addon' ) . '</h2>';
+		echo '<p>' . __( 'If you don\'t know your API key, please login into your: <a target="_blank" href="http://wordpresspoets.com/member-area">Member area</a>', 'woocommerce-product-addon' ) . '</p>';
 
 		echo '<form onsubmit="return validate_api_wooproduct(this)">';
-		echo '<p><label id="plugin_api_key">' . __( 'Entery API key', 'ppom' ) . ':</label><br /><input type="text" name="plugin_api_key" id="plugin_api_key" /></p>';
+		echo '<p><label id="plugin_api_key">' . __( 'Entery API key', 'woocommerce-product-addon' ) . ':</label><br /><input type="text" name="plugin_api_key" id="plugin_api_key" /></p>';
 		wp_nonce_field();
 		echo '<p><input type="submit" class="button-primary button" name="plugin_api_key" /></p>';
 		echo '<p id="nm-sending-api"></p>';
@@ -297,7 +303,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 	public static function add_settings_tab( $settings_tabs ) {
 
-		$settings_tabs['ppom_settings'] = __( 'PPOM Settings', 'ppom' );
+		$settings_tabs['ppom_settings'] = __( 'PPOM Settings', 'woocommerce-product-addon' );
 
 		return $settings_tabs;
 	}
@@ -358,8 +364,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			</th>
 			<td class="forminp">
 				<select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="width:350px"
-						data-placeholder="<?php esc_attr_e( 'Choose Roles', 'ppom' ); ?>"
-						aria-label="<?php esc_attr_e( 'Roles', 'ppom' ); ?>" class="wc-enhanced-select">
+						data-placeholder="<?php esc_attr_e( 'Choose Roles', 'woocommerce-product-addon' ); ?>"
+						aria-label="<?php esc_attr_e( 'Roles', 'woocommerce-product-addon' ); ?>" class="wc-enhanced-select">
 					<?php
 					if ( ! empty( $selected_roles ) ) {
 						foreach ( $selected_roles as $key => $val ) {
@@ -367,8 +373,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 						}
 					}
 					?>
-				</select> <br/><a class="select_all button" href="#"><?php esc_html_e( 'Select all', 'ppom' ); ?></a> <a
-						class="select_none button" href="#"><?php esc_html_e( 'Select none', 'ppom' ); ?></a>
+				</select> <br/><a class="select_all button" href="#"><?php esc_html_e( 'Select all', 'woocommerce-product-addon' ); ?></a> <a
+						class="select_none button" href="#"><?php esc_html_e( 'Select none', 'woocommerce-product-addon' ); ?></a>
 			</td>
 		</tr>
 		<?php

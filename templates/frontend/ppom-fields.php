@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // check if duplicate ppom fields render
 if ( ! $form_obj::$ppom->has_unique_datanames() ) {
-	$duplicate_found = apply_filters( 'ppom_duplicate_datanames_text', __( 'Some of your fields has duplicated datanames, please fix it', 'ppom' ) );
+	$duplicate_found = apply_filters( 'ppom_duplicate_datanames_text', __( 'Some of your fields has duplicated datanames, please fix it', 'woocommerce-product-addon' ) );
 
 	echo '<div class="error">' . esc_html( $duplicate_found ) . '</div>';
 

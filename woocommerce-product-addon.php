@@ -10,7 +10,7 @@
  * Author URI: https://themeisle.com/
  *
  * WC requires at least: 3.0.0
- * WC tested up to: 6.9.4
+ * WC tested up to: 7.0
  *
  * WordPress Available:  yes
  * Requires License:     no
@@ -52,7 +52,7 @@ add_filter(
  */
 add_action( 'init', 'ppom_i18n_setup' );
 function ppom_i18n_setup() {
-	load_plugin_textdomain( 'ppom', false, basename( dirname( __FILE__ ) ) . '/languages' );
+	load_plugin_textdomain( 'woocommerce-product-addon', false, basename( dirname( __FILE__ ) ) . '/languages' );
 }
 
 
@@ -69,6 +69,7 @@ require_once PPOM_PATH . '/inc/prices.php';
 
 if( is_admin() ) {
 	require_once PPOM_PATH . '/classes/freemium.class.php';
+	PPOM_Freemium::get_instance();
 }
 
 
@@ -110,8 +111,8 @@ add_filter(
 	function ( $compatibilities ) {
 		$compatibilities['ppompro'] = [
 			'basefile'  => defined( 'PPOM_PRO_PATH' ) ? PPOM_PRO_PATH . '/ppom.php' : '',
-			'required'  => '23.9.1',
-			'tested_up' => '25.0',
+			'required'  => '24.0',
+			'tested_up' => '25.1',
 		];
 
 		return $compatibilities;

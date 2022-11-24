@@ -414,8 +414,6 @@ jQuery(function($) {
         var field_type = $(this).data('field-type');
         var clone_new_field = $(".ppom-field-" + field_type + ":last").clone();
 
-        $( document ).trigger( 'ppom_new_field_created', [ clone_new_field, field_no ] );
-
         // field attr name apply on all fields meta with ppom-meta-field class
         clone_new_field.find('.ppom-meta-field').each(function(i, meta_field) {
             var field_name = 'ppom[' + field_no + '][' + $(meta_field).attr('data-metatype') + ']';
@@ -477,6 +475,8 @@ jQuery(function($) {
         $('#ppom_field_model_' + field_no + '').fadeIn();
 
         field_no++;
+
+        $( document ).trigger( 'ppom_new_field_created', [ clone_new_field, field_no, field_type ] );
     });
 
 
@@ -646,7 +646,11 @@ jQuery(function($) {
         $(this).addClass('ppom-active-tab');
         var content_box = fields_wrap.find('.ppom-control-all-fields-tabs');
         content_box.hide();
-        fields_wrap.find('.ppom_handle_' + id).fadeIn(200);
+
+        const handler = fields_wrap.find('.ppom_handle_' + id);
+        handler.fadeIn(200);
+
+        $(fields_wrap).trigger('ppom_fields_tab_changed', [id, handler]);
     });
 
 
@@ -1284,4 +1288,16 @@ jQuery(function($) {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
+
+    $('div.row.ppom-tabs').on('ppom_fields_tab_changed', (e, id, tab)=>{
+        if( ppom_vars.i18n.freemiumCFRTab !== id ) {
+            return;
+        }
+
+        if( tab.find('.freemium-cfr-content').length > 0 ) {
+            return;
+        }
+
+        $(`<div class="form-group">${ppom_vars.i18n.freemiumCFRContent}</div>`).insertBefore( tab.find('.form-group') );
+    });
 });

@@ -1021,7 +1021,7 @@ ul.ppom-options-container li label {
 }
 
 .ppom_addons_model_card_content p {
-    min-height: 115px;
+    min-height: 135px;
 }
 
 a[data-modal-id="ppom-nm-plugins-modal"] {
@@ -1104,4 +1104,57 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 
 .ppom-top-nav {
     line-height:35px;
+}
+
+.ppom_addons_model_cards span.badge {
+    font-size:13px;
+    float:right;
+    background-color: #2c8de0;
+}
+
+.ppom-addon-type.badge {
+    background-color: #1d7497;
+}
+
+.ppom-admin-cl-wrapper {
+    margin: 15px 30px;
+}
+
+.ppom-admin-cl-wrapper .ui-accordion .ui-accordion-header {
+    padding: 15px 0;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.ppom-admin-cl-wrapper ul {
+    list-style-type: disc;
+    font-size: 14px;
+    padding-left: 15px;
+}
+
+.ppom-admin-cl-wrapper .badge-features {
+    background-color: #6EB77A;
+}
+
+.ppom-admin-cl-wrapper .badge-fixes {
+    background-color: #EC7C7C;
+}
+
+.ppom-admin-cl-wrapper .badge-tweaks {
+    background-color: #6BC2DD;
+}
+
+#ppom-admin-cl-header-wrapper {
+    background: #fff;
+}
+
+#ppom-changelog-nav {
+    list-style-type: none;
+    display:flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+#ppom-admin-changelog-header-top {
+    padding: 15px 30px 0 0;
 }

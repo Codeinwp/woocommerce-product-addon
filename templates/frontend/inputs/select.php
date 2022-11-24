@@ -26,7 +26,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 if ( ! $options ) {
 
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please add some options to render this input.', 'ppom' ) . '</p>';
+	echo '<p>' . __( 'Please add some options to render this input.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';

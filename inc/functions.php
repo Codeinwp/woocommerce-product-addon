@@ -369,7 +369,7 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 				}
 
 				if ( $total_qty > 0 ) {
-					$qty_values[] = sprintf( __( '<strong>Total = %d</strong>', 'ppom' ), $total_qty );
+					$qty_values[] = sprintf( __( '<strong>Total = %d</strong>', 'woocommerce-product-addon' ), $total_qty );
 					$meta_data    = array(
 						'name'  => $field_title,
 						'value' => implode( '<br>', $qty_values ),
@@ -393,7 +393,7 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 				}
 
 				if ( $total_qty > 0 ) {
-					$qty_values[] = sprintf( __( '<strong>Total = %d</strong>', 'ppom' ), $total_qty );
+					$qty_values[] = sprintf( __( '<strong>Total = %d</strong>', 'woocommerce-product-addon' ), $total_qty );
 					$meta_data    = array(
 						'name'  => $field_title,
 						'value' => implode( '<br>', $qty_values ),
@@ -418,7 +418,7 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 				}
 
 				if ( $total_qty > 0 ) {
-					$qty_values[] = sprintf( __( '<strong>Total = %d</strong>', 'ppom' ), $total_qty );
+					$qty_values[] = sprintf( __( '<strong>Total = %d</strong>', 'woocommerce-product-addon' ), $total_qty );
 					$meta_data    = array(
 						'name'  => $field_title,
 						'value' => implode( ',', $qty_values ),
@@ -480,7 +480,7 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 				}
 
 				if ( $total_qty > 0 ) {
-					$meta_display[] = sprintf( __( '<strong>Total = %d</strong>', 'ppom' ), $total_qty );
+					$meta_display[] = sprintf( __( '<strong>Total = %d</strong>', 'woocommerce-product-addon' ), $total_qty );
 					$meta_data      = array(
 						'name'    => $field_title,
 						'display' => implode( '<br>', $meta_display ),
@@ -535,14 +535,14 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 					$ppom_html .= '<td>';
 					$ppom_html .= '<a href="' . esc_url( $imageURL ) . '"><img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" src="' . esc_url( $imageURL ) . '" title="' . esc_attr( $fileName ) . '"></a>';
 					$ppom_html .= '</td>';
-					$ppom_html .= '<td>' . __( 'Original Image', 'ppom' ) . '</td>';
+					$ppom_html .= '<td>' . __( 'Original Image', 'woocommerce-product-addon' ) . '</td>';
 					$ppom_html .= '</tr>';
 
 					foreach ( $fomatted_data['cropped'] as $cropped_id => $cropped_meta ) {
 
 						$file_name = isset( $cropped_meta['croppedURL'] ) ? $cropped_meta['croppedURL'] : '';
 						$qty       = isset( $cropped_meta['qty'] ) ? $cropped_meta['qty'] : '';
-						$label     = ! empty( $cropped_meta['label'] ) ? $cropped_meta['label'] : __( 'Cropped', 'ppom' );
+						$label     = ! empty( $cropped_meta['label'] ) ? $cropped_meta['label'] : __( 'Cropped', 'woocommerce-product-addon' );
 
 						$qtylabel    = "{$label} x {$qty}";
 						$cropped_url = ppom_get_dir_url() . 'cropped/' . $file_name;
@@ -681,7 +681,7 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 				$bq_value = $value['option'] . ' (' . $value['qty'] . ')';
 				// $ppom_meta[$key] = $value['option'].' ('.$value['qty'].')';
 				$meta_data = array(
-					'name'  => $key,
+					'name'  => $field_title,
 					'value' => $bq_value,
 				);
 				// A placeholder key to handle qunantity display in item meta data under myaccount
@@ -990,7 +990,7 @@ function ppom_is_aviary_installed() {
 function ppom_settings_link( $links ) {
 	$ppom_setting_url = admin_url( 'admin.php?page=ppom' );
 
-	$links[] = sprintf( __( '<a href="%s">Add Fields</a>', 'ppom' ), esc_url( $ppom_setting_url ) );
+	$links[] = sprintf( __( '<a href="%s">Add Fields</a>', 'woocommerce-product-addon' ), esc_url( $ppom_setting_url ) );
 
 	return $links;
 }
@@ -1557,7 +1557,7 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 		// @since version 16.6
 		if ( is_admin() ) {
 			$order_html .= '<td><a class="button" href="' . esc_url( $ppom_file_url ) . '">';
-			$order_html .= __( 'Download File', 'ppom' );
+			$order_html .= __( 'Download File', 'woocommerce-product-addon' );
 			$order_html .= '</a></td>';
 		}
 		$order_html .= '</tr>';
@@ -1574,7 +1574,7 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 			// @since version 16.6
 			if ( is_admin() ) {
 				$order_html .= '<td><a class="button" href="' . esc_url( $cropped_url ) . '">';
-				$order_html .= __( 'Cropped', 'ppom' );
+				$order_html .= __( 'Cropped', 'woocommerce-product-addon' );
 				$order_html .= '</a></td>';
 			}
 			$order_html .= '</tr>';
@@ -1588,7 +1588,7 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 			$order_html    .= '<img style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" class="img-thumbnail" src="' . esc_url( $edit_thumb_url ) . '">';
 			$order_html    .= '</a></td>';
 			$order_html    .= '<td><a class="button" href="' . esc_url( $edit_url ) . '">';
-			$order_html    .= __( 'Edited', 'ppom' );
+			$order_html    .= __( 'Edited', 'woocommerce-product-addon' );
 			$order_html    .= '</a></td></tr>';
 		}
 	}

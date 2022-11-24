@@ -20,7 +20,7 @@ $fm = new PPOM_InputManager( $field_meta, 'quantities' );
 if ( isset( $fm->options()[0]['option'] ) && $fm->options()[0]['option'] == '' ) {
 
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please add some options to display variations.', 'ppom' ) . '</p>';
+	echo '<p>' . __( 'Please add some options to display variations.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';
@@ -36,9 +36,9 @@ $view_control = $fm->get_meta_value( 'view_control' );
 $product_id   = ppom_get_product_id( $product );
 $matrix_found = ppom_has_field_by_type( $product_id, 'pricematrix' );
 if ( ! empty( $matrix_found ) && ppom_is_field_has_price( $field_meta ) ) {
-	$error_msg = __( 'Quantities cannot be used with Price Matrix, Remove prices from quantities input.', 'ppom' );
+	$error_msg = __( 'Quantities cannot be used with Price Matrix, Remove prices from quantities input.', 'woocommerce-product-addon' );
 
-	return sprintf( __( '<div class="woocommerce-error">%s</div>', 'ppom' ), $error_msg );
+	return sprintf( __( '<div class="woocommerce-error">%s</div>', 'woocommerce-product-addon' ), $error_msg );
 }
 
 ?>

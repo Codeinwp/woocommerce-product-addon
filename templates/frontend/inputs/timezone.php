@@ -25,13 +25,13 @@ $first_option = $fm->get_meta_value( 'first_option' );
 $options      = ppom_array_get_timezone_list( $regions, $show_time );
 
 if ( ! empty( $first_option ) ) {
-	$options[''] = sprintf( __( '%s', 'ppom' ), $first_option );
+	$options[''] = sprintf( __( '%s', 'woocommerce-product-addon' ), $first_option );
 }
 
 if ( ! $options ) {
 
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'The timezone not found, please add different regions.', 'ppom' ) . '</p>';
+	echo '<p>' . __( 'The timezone not found, please add different regions.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';

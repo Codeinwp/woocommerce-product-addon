@@ -46,9 +46,27 @@ class PPOM_Fields_Meta {
 
 		// Bootstrap Files
 		wp_enqueue_style( 'ppom-bs', PPOM_URL . '/css/bootstrap/bootstrap.css' );
+		wp_enqueue_script( 'ppom-bs', PPOM_URL . '/js/bootstrap/bootstrap.min.js' );
+
+		if( isset($_GET['view']) && $_GET['view'] === 'changelog' ) {
+			wp_enqueue_script( 'ppom-jq-ui-ac', PPOM_URL . '/backend/assets/jquery-ui-accordion/jquery-ui.min.js', array('jquery'), '1.13.2', false );
+			wp_enqueue_style( 'ppom-jq-ui-ac', PPOM_URL . '/backend/assets/jquery-ui-accordion/jquery-ui.min.css', array(), '1.13.2' );
+		}
 
 		// Bulk Quantity Addon JS File
 		wp_enqueue_script( 'ppom-bulkquantity', PPOM_URL . '/js/admin//ppom-bulkquantity.js', array( 'jquery' ), PPOM_VERSION, true );
+		wp_localize_script( 'ppom-bulkquantity', 'ppom_bq', [
+			'i18n'=>[
+				'validation'=>[
+					'end_bigger_than_start' => esc_html__('The end value of the range must be greater than the start value. (range: {range})', 'woocommerce-product-addon'),
+					'start_cannot_be_equal_with_end' => esc_html__('The start value cannot be equal to the end value. (range: {range})', 'woocommerce-product-addon'),
+					'range_intersection' => esc_html__( 'Values in two ranges intersect. Every range of numbers should be covered by only one range. Intersects ranges: {range1} AND {range2}', 'woocommerce-product-addon' ),
+					'invalid_pattern' => esc_html__( 'Range format is invalid. (range: {range})', 'woocommerce-product-addon' )
+				]
+			]
+		] );
+
+		wp_enqueue_script( 'ppom-inputmask', PPOM_URL . '/js/inputmask/jquery.inputmask.min.js', array( 'jquery' ), '5.0.6', true );
 
 		// PPOM Meta Table File
 		wp_enqueue_script( 'ppom-meta-table', PPOM_URL . '/js/admin/ppom-meta-table.js', array( 'jquery' ), PPOM_VERSION, true );
@@ -140,13 +158,15 @@ class PPOM_Fields_Meta {
 			'ppomProActivated'=>ppom_pro_is_installed() ? 'yes' : 'no',
 			'i18n' => [
 				'addGroupUrl'=>add_query_arg( array( 'action' => 'new' ) ),
-				'addGroupLabel'=>esc_html__( 'Add New Group', 'ppom' ),
-				'bulkActionsLabel'=>esc_html__( 'Bulk Actions', 'ppom' ),
-				'deleteLabel'=>esc_html__( 'Delete', 'ppom' ),
-				'exportLabel'=>esc_html__( 'Export', 'ppom' ),
-				'exportLockedLabel'=>esc_html__( 'Export (PRO)', 'ppom' ),
-				'importLabel'=>esc_html__( 'Import Field Groups ', 'ppom' ),
-				'importLockedLabel'=>esc_html__( 'Import Field Groups (PRO)', 'ppom' )
+				'addGroupLabel'=>esc_html__( 'Add New Group', 'woocommerce-product-addon' ),
+				'bulkActionsLabel'=>esc_html__( 'Bulk Actions', 'woocommerce-product-addon' ),
+				'deleteLabel'=>esc_html__( 'Delete', 'woocommerce-product-addon' ),
+				'exportLabel'=>esc_html__( 'Export', 'woocommerce-product-addon' ),
+				'exportLockedLabel'=>esc_html__( 'Export (PRO)', 'woocommerce-product-addon' ),
+				'importLabel'=>esc_html__( 'Import Field Groups ', 'woocommerce-product-addon' ),
+				'importLockedLabel'=>esc_html__( 'Import Field Groups (PRO)', 'woocommerce-product-addon' ),
+				'freemiumCFRContent' => \PPOM_Freemium::get_instance()->get_freemium_cfr_content(),
+				'freemiumCFRTab' => \PPOM_Freemium::TAB_KEY_FREEMIUM_CFR
 			]
 		);
 
@@ -175,7 +195,7 @@ class PPOM_Fields_Meta {
 			// new model
 			$html .= '<div class="ppom-modal-box ppom-slider ppom-field-' . esc_attr( $fields_type ) . '">';
 			$html .= '<header>';
-			$html .= '<h3>' . sprintf( __( '%s', 'ppom' ), $field_title ) . '</h3>';
+			$html .= '<h3>' . sprintf( __( '%s', 'woocommerce-product-addon' ), $field_title ) . '</h3>';
 			$html .= '</header>';
 			$html .= '<div class="ppom-modal-body">';
 
@@ -184,8 +204,8 @@ class PPOM_Fields_Meta {
 			$html .= '</div>';
 			$html .= '<footer>';
 			$html .= '<span class="ppom-req-field-id"></span>';
-			$html .= '<button type="button" class="btn btn-default ppom-close-checker ppom-close-fields ppom-js-modal-close" style="margin-right: 5px;">' . esc_html__( 'close', 'ppom' ) . '</button>';
-			$html .= '<button type="button" class="btn btn-primary ppom-field-checker ppom-add-field" data-field-type="' . esc_attr( $field_title ) . '">' . esc_html__( 'Add Field', 'ppom' ) . '</button>';
+			$html .= '<button type="button" class="btn btn-default ppom-close-checker ppom-close-fields ppom-js-modal-close" style="margin-right: 5px;">' . esc_html__( 'close', 'woocommerce-product-addon' ) . '</button>';
+			$html .= '<button type="button" class="btn btn-primary ppom-field-checker ppom-add-field" data-field-type="' . esc_attr( $field_title ) . '">' . esc_html__( 'Add Field', 'woocommerce-product-addon' ) . '</button>';
 			$html .= '</footer>';
 			$html .= '</div>';
 		}
@@ -262,8 +282,8 @@ class PPOM_Fields_Meta {
 				$html .= '<div data-meta-id="' . esc_attr( $fields_meta_key ) . '" class="' . esc_attr( $panel_classes ) . '">';
 				$html .= '<div class="form-group">';
 
-				$html .= '<label>' . sprintf( __( '%s', 'ppom' ), $title ) . '';
-				$html .= '<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip" title="' . sprintf( __( '%s', 'ppom' ), $desc ) . '">';
+				$html .= '<label>' . sprintf( __( '%s', 'woocommerce-product-addon' ), $title ) . '';
+				$html .= '<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip" title="' . sprintf( __( '%s', 'woocommerce-product-addon' ), $desc ) . '">';
 				$html .= '<i class="dashicons dashicons-editor-help"></i>';
 				$html .= '</span>' . $link . '';
 				$html .= '</label>';
@@ -360,24 +380,24 @@ class PPOM_Fields_Meta {
 				break;
 
 			case 'paired':
-				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Option', 'ppom' );
-				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Price (optional)', 'ppom' );
+				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Option', 'woocommerce-product-addon' );
+				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Price (optional)', 'woocommerce-product-addon' );
 
 				$weight_unit  = get_option( 'woocommerce_weight_unit' );
-				$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Discount', 'ppom' );
-				$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Tooltip', 'ppom' );
-				$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (PRO only)", 'ppom' );
-				$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock (PRO only)', 'ppom' );
+				$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Discount', 'woocommerce-product-addon' );
+				$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Tooltip', 'woocommerce-product-addon' );
+				$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (PRO only)", 'woocommerce-product-addon' );
+				$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock (PRO only)', 'woocommerce-product-addon' );
 
 				if ( ppom_pro_is_installed() ) {
 
-					$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Discount', 'ppom' );
-					$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Tooltip', 'ppom' );
-					$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (optional)", 'ppom' );
-					$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock (optional)', 'ppom' );
+					$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Discount', 'woocommerce-product-addon' );
+					$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Tooltip', 'woocommerce-product-addon' );
+					$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (optional)", 'woocommerce-product-addon' );
+					$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock (optional)', 'woocommerce-product-addon' );
 				}
 
-				$plc_id = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Unique Option ID)', 'ppom' );
+				$plc_id = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Unique Option ID)', 'woocommerce-product-addon' );
 
 				$opt_index0  = 1;
 				$html_input .= '<ul class="ppom-options-container ppom-options-sortable">';
@@ -445,10 +465,10 @@ class PPOM_Fields_Meta {
 
 			case 'paired-palettes';
 			case 'paired-pricematrix':
-				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Option', 'ppom' );
-				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Price (optional)', 'ppom' );
-				$plc_label  = ( ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Label', 'ppom' );
-				$plc_id     = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Unique Option ID)', 'ppom' );
+				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Option', 'woocommerce-product-addon' );
+				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Price (optional)', 'woocommerce-product-addon' );
+				$plc_label  = ( ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Label', 'woocommerce-product-addon' );
+				$plc_id     = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Unique Option ID)', 'woocommerce-product-addon' );
 
 				$opt_index0  = 1;
 				$html_input .= '<ul class="ppom-options-container ppom-options-sortable ' . $type . '">';
@@ -469,7 +489,7 @@ class PPOM_Fields_Meta {
 						$html_input .= '<input type="text" class="option-price form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][price]" value="' . esc_attr( $option['price'] ) . '" placeholder="' . $plc_price . '" data-metatype="price" data-opt-index="' . esc_attr( $opt_index ) . '">';
 						$html_input .= '<input type="text" class="option-label form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][label]" value="' . esc_attr( $label ) . '" placeholder="' . $plc_label . '" data-metatype="label" data-opt-index="' . esc_attr( $opt_index ) . '">';
 						$html_input .= '<input type="text" class="option-id form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][id]" value="' . esc_attr( $option_id ) . '" placeholder="' . $plc_id . '" data-metatype="id" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<label for=""><input type="checkbox" class="option-isfixed ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][isfixed]" data-metatype="isfixed" ' . checked( $isfixed, 'on', false ) . ' data-opt-index="' . esc_attr( $opt_index ) . '">' . __( 'Fixed?', 'ppom' ) . '</labe>';
+						$html_input .= '<label for=""><input type="checkbox" class="option-isfixed ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][isfixed]" data-metatype="isfixed" ' . checked( $isfixed, 'on', false ) . ' data-opt-index="' . esc_attr( $opt_index ) . '">' . __( 'Fixed?', 'woocommerce-product-addon' ) . '</labe>';
 
 						$html_input .= '<button class="btn btn-success ppom-add-option" data-option-type="paired"><i class="fa fa-plus" aria-hidden="true"></i></button>';
 						$html_input .= '<button class="btn btn-danger ppom-remove-option"><i class="fa fa-minus" aria-hidden="true"></i></button>';
@@ -490,7 +510,7 @@ class PPOM_Fields_Meta {
 
 					$html_input .= '<input type="text" class="option-id form-control ppom-option-keys" placeholder="' . $plc_id . '" data-metatype="id">';
 
-					$html_input .= '<label for=""><input type="checkbox" class="option-isfixed ppom-option-keys" data-metatype="isfixed">' . __( 'Fixed?', 'ppom' ) . '</labe>';
+					$html_input .= '<label for=""><input type="checkbox" class="option-isfixed ppom-option-keys" data-metatype="isfixed">' . __( 'Fixed?', 'woocommerce-product-addon' ) . '</labe>';
 
 					$html_input .= '<button class="btn btn-success ppom-add-option" data-option-type="paired"><i class="fa fa-plus" aria-hidden="true"></i></button>';
 					$html_input .= '<button class="btn btn-danger ppom-remove-option"><i class="fa fa-minus" aria-hidden="true"></i></button>';
@@ -504,8 +524,8 @@ class PPOM_Fields_Meta {
 
 
 			case 'font_paired':
-				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Data Name', 'ppom' );
-				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Font Name', 'ppom' );
+				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Data Name', 'woocommerce-product-addon' );
+				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Font Name', 'woocommerce-product-addon' );
 
 				$opt_index0  = 1;
 				$html_input .= '<ul class="ppom-options-container ppom-options-sortable">';
@@ -560,13 +580,13 @@ class PPOM_Fields_Meta {
 
 						$html_input .= '<li class="data-options" style="display: flex;">';
 						$html_input .= '<span class="dashicons dashicons-move"></span>';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . __( 'option', 'ppom' ) . '" data-metatype="option" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][price]" value="' . esc_attr( $option['price'] ) . '" placeholder="' . __( 'price (if any)', 'ppom' ) . '" data-metatype="price" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][weight]" value="' . esc_attr( $weight ) . '" placeholder="' . __( 'weight (if any)', 'ppom' ) . '" data-metatype="weight" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][default]" value="' . esc_attr( $default ) . '" placeholder="' . __( 'Default. Qty', 'ppom' ) . '" data-metatype="default" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][min]" value="' . esc_attr( $option['min'] ) . '" placeholder="' . __( 'Min. Qty', 'ppom' ) . '" data-metatype="min" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][max]" value="' . esc_attr( $option['max'] ) . '" placeholder="' . __( 'Max. Qty', 'ppom' ) . '" data-metatype="max" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][stock]" value="' . esc_attr( $stock ) . '" placeholder="' . __( 'Stock', 'ppom' ) . '" data-metatype="stock" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . __( 'option', 'woocommerce-product-addon' ) . '" data-metatype="option" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][price]" value="' . esc_attr( $option['price'] ) . '" placeholder="' . __( 'price (if any)', 'woocommerce-product-addon' ) . '" data-metatype="price" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][weight]" value="' . esc_attr( $weight ) . '" placeholder="' . __( 'weight (if any)', 'woocommerce-product-addon' ) . '" data-metatype="weight" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][default]" value="' . esc_attr( $default ) . '" placeholder="' . __( 'Default. Qty', 'woocommerce-product-addon' ) . '" data-metatype="default" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][min]" value="' . esc_attr( $option['min'] ) . '" placeholder="' . __( 'Min. Qty', 'woocommerce-product-addon' ) . '" data-metatype="min" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][max]" value="' . esc_attr( $option['max'] ) . '" placeholder="' . __( 'Max. Qty', 'woocommerce-product-addon' ) . '" data-metatype="max" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" class="form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][stock]" value="' . esc_attr( $stock ) . '" placeholder="' . __( 'Stock', 'woocommerce-product-addon' ) . '" data-metatype="stock" data-opt-index="' . esc_attr( $opt_index ) . '">';
 
 						$html_input .= '<button class="btn btn-success ppom-add-option" data-option-type="paired-quantity"><i class="fa fa-plus" aria-hidden="true"></i></button>';
 						$html_input .= '<button class="btn btn-danger ppom-remove-option"><i class="fa fa-minus" aria-hidden="true"></i></button>';
@@ -579,13 +599,13 @@ class PPOM_Fields_Meta {
 				} else {
 					$html_input .= '<li class="data-options" style="display: flex;">';
 					$html_input .= '<span class="dashicons dashicons-move"></span>';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'option', 'ppom' ) . '" data-metatype="option">';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'price (if any)', 'ppom' ) . '" data-metatype="price">';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'weight (if any)', 'ppom' ) . '" data-metatype="weight">';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Default. Qty', 'ppom' ) . '" data-metatype="default">';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Min. Qty', 'ppom' ) . '" data-metatype="min">';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Max. Qty', 'ppom' ) . '" data-metatype="max">';
-					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Stock', 'ppom' ) . '" data-metatype="stock">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'option', 'woocommerce-product-addon' ) . '" data-metatype="option">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'price (if any)', 'woocommerce-product-addon' ) . '" data-metatype="price">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'weight (if any)', 'woocommerce-product-addon' ) . '" data-metatype="weight">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Default. Qty', 'woocommerce-product-addon' ) . '" data-metatype="default">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Min. Qty', 'woocommerce-product-addon' ) . '" data-metatype="min">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Max. Qty', 'woocommerce-product-addon' ) . '" data-metatype="max">';
+					$html_input .= '<input type="text" class="form-control ppom-option-keys" placeholder="' . __( 'Stock', 'woocommerce-product-addon' ) . '" data-metatype="stock">';
 
 					$html_input .= '<button class="btn btn-success ppom-add-option" data-option-type="paired-quantity"><i class="fa fa-plus" aria-hidden="true"></i></button>';
 					$html_input .= '<button class="btn btn-danger ppom-remove-option"><i class="fa fa-minus" aria-hidden="true"></i></button>';
@@ -603,7 +623,7 @@ class PPOM_Fields_Meta {
 
 				$add_option_img = $plugin_meta['url'] . '/images/plus.png';
 				$del_option_img = $plugin_meta['url'] . '/images/minus.png';
-				$plc_id         = ( ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Unique ID)', 'ppom' );
+				$plc_id         = ( ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Unique ID)', 'woocommerce-product-addon' );
 
 				if ( $value ) {
 					foreach ( $value as $option ) {
@@ -612,8 +632,8 @@ class PPOM_Fields_Meta {
 
 						$html_input .= '<li class="data-options">';
 						$html_input .= '<span class="dashicons dashicons-move"></span>';
-						$html_input .= '<input type="text" name="options[option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . __( 'Unit', 'ppom' ) . '">';
-						$html_input .= '<input type="text" name="options[price]" value="' . esc_attr( $option['price'] ) . '" placeholder="' . __( 'price (if any)', 'ppom' ) . '">';
+						$html_input .= '<input type="text" name="options[option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . __( 'Unit', 'woocommerce-product-addon' ) . '">';
+						$html_input .= '<input type="text" name="options[price]" value="' . esc_attr( $option['price'] ) . '" placeholder="' . __( 'price (if any)', 'woocommerce-product-addon' ) . '">';
 						$html_input .= '<input type="text" class="option-id" name="options[id]" value="' . esc_attr( $option_id ) . '" placeholder="' . $plc_id . '">';
 						$html_input .= '<img class="add_option" src="' . esc_url( $add_option_img ) . '" title="add rule" alt="add rule" style="cursor:pointer; margin:0 3px;">';
 						$html_input .= '<img class="remove_option" src="' . esc_url( $del_option_img ) . '" title="remove rule" alt="remove rule" style="cursor:pointer; margin:0 3px;">';
@@ -622,8 +642,8 @@ class PPOM_Fields_Meta {
 				} else {
 					$html_input .= '<li class="data-options">';
 					$html_input .= '<span class="dashicons dashicons-move"></span>';
-					$html_input .= '<input type="text" name="options[option]" placeholder="' . __( 'Unit', 'ppom' ) . '">';
-					$html_input .= '<input type="text" name="options[price]" placeholder="' . __( 'price (if any)', 'ppom' ) . '">';
+					$html_input .= '<input type="text" name="options[option]" placeholder="' . __( 'Unit', 'woocommerce-product-addon' ) . '">';
+					$html_input .= '<input type="text" name="options[price]" placeholder="' . __( 'price (if any)', 'woocommerce-product-addon' ) . '">';
 					$html_input .= '<input type="text" class="option-id" name="options[id]" placeholder="' . $plc_id . '">';
 					$html_input .= '<img class="add_option" src="' . esc_url( $add_option_img ) . '" title="add rule" alt="add rule" style="cursor:pointer; margin:0 3px;">';
 					$html_input .= '<img class="remove_option" src="' . esc_url( $del_option_img ) . '" title="remove rule" alt="remove rule" style="cursor:pointer; margin:0 3px;">';
@@ -647,10 +667,10 @@ class PPOM_Fields_Meta {
 
 						$html_input .= '<li class="data-options" style=display:flex;>';
 						$html_input .= '<span class="dashicons dashicons-move"></span>';
-						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . __( 'Label', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="option" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][width]" value="' . esc_attr( stripslashes( $option['width'] ) ) . '" placeholder="' . __( 'Width', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="width" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][height]" value="' . esc_attr( $option['height'] ) . '" placeholder="' . __( 'Height', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="height" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][price]" value="' . esc_attr( $price ) . '" placeholder="' . __( 'Price (optional)', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="price" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . __( 'Label', 'woocommerce-product-addon' ) . '" class="form-control ppom-option-keys" data-metatype="option" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][width]" value="' . esc_attr( stripslashes( $option['width'] ) ) . '" placeholder="' . __( 'Width', 'woocommerce-product-addon' ) . '" class="form-control ppom-option-keys" data-metatype="width" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][height]" value="' . esc_attr( $option['height'] ) . '" placeholder="' . __( 'Height', 'woocommerce-product-addon' ) . '" class="form-control ppom-option-keys" data-metatype="height" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="text" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][price]" value="' . esc_attr( $price ) . '" placeholder="' . __( 'Price (optional)', 'woocommerce-product-addon' ) . '" class="form-control ppom-option-keys" data-metatype="price" data-opt-index="' . esc_attr( $opt_index ) . '">';
 
 						$html_input .= '<button class="btn btn-success ppom-add-option" data-option-type="paired-cropper"><i class="fa fa-plus" aria-hidden="true"></i></button>';
 						$html_input .= '<button class="btn btn-danger ppom-remove-option"><i class="fa fa-minus" aria-hidden="true"></i></button>';
@@ -663,10 +683,10 @@ class PPOM_Fields_Meta {
 				} else {
 					$html_input .= '<li class="data-options" style=display:flex;>';
 					$html_input .= '<span class="dashicons dashicons-move"></span>';
-					$html_input .= '<input type="text" placeholder="' . __( 'option', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="option">';
-					$html_input .= '<input type="text" placeholder="' . __( 'Width', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="width">';
-					$html_input .= '<input type="text" placeholder="' . __( 'Height', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="height">';
-					$html_input .= '<input type="text" placeholder="' . __( 'Price (optional)', 'ppom' ) . '" class="form-control ppom-option-keys" data-metatype="price">';
+					$html_input .= '<input type="text" placeholder="' . __( 'option', 'woocommerce-product-addon' ) . '" class="form-control ppom-option-keys" data-metatype="option">';
+					$html_input .= '<input type="text" placeholder="' . __( 'Width', 'woocommerce-product-addon' ) . '" class="form-control ppom-option-keys" data-metatype="width">';
+					$html_input .= '<input type="text" placeholder="' . __( 'Height', 'woocommerce-product-addon' ) . '" class="form-control ppom-option-keys" data-metatype="height">';
+					$html_input .= '<input type="text" placeholder="' . __( 'Price (optional)', 'woocommerce-product-addon' ) . '" class="form-control ppom-option-keys" data-metatype="price">';
 
 					$html_input .= '<button class="btn btn-success ppom-add-option" data-option-type="paired-cropper"><i class="fa fa-plus" aria-hidden="true"></i></button>';
 					$html_input .= '<button class="btn btn-danger ppom-remove-option"><i class="fa fa-minus" aria-hidden="true"></i></button>';
@@ -679,6 +699,8 @@ class PPOM_Fields_Meta {
 				break;
 
 			case 'checkbox':
+				$disabled_attr = ( isset($data['disabled']) && $data['disabled'] === true ) ? 'disabled' : '';
+
 				if ( $options ) {
 					foreach ( $options as $key => $val ) {
 
@@ -702,7 +724,7 @@ class PPOM_Fields_Meta {
 						}
 						// $html_input .= '<option value="' . $key . '" ' . $selected . '>' . $val . '</option>';
 						$html_input .= '<label style="float:left;">';
-						$html_input .= '<input type="checkbox" value="' . $key . '" name="ppom[' . esc_attr( $field_index ) . '][' . esc_attr( $name ) . '][]" ' . $checked . '> ' . $val . '<br>';
+						$html_input .= '<input type="checkbox" '.$disabled_attr.' value="' . $key . '" name="ppom[' . esc_attr( $field_index ) . '][' . esc_attr( $name ) . '][]" ' . $checked . '> ' . $val . '<br>';
 						$html_input .= '<span></span>';
 						$html_input .= '</label>';
 					}
@@ -710,7 +732,7 @@ class PPOM_Fields_Meta {
 					$checked = ( ( isset( $values ) && $values != '' ) ? 'checked = "checked"' : '' );
 
 					$html_input .= '<label style="float:left;">';
-					$html_input .= '<input type="checkbox" class="ppom-meta-field" data-metatype="' . esc_attr( $name ) . '" ' . $checked . '';
+					$html_input .= '<input type="checkbox" '.$disabled_attr.' class="ppom-meta-field" data-metatype="' . esc_attr( $name ) . '" ' . $checked . '';
 
 					if ( $field_index != '' ) {
 
@@ -741,24 +763,24 @@ class PPOM_Fields_Meta {
 					$html_input  = '<div class="row ppom-condition-style-wrap">';
 					$html_input .= '<div class="col-md-3 col-sm-3">';
 					$html_input .= '<select name="ppom[' . esc_attr( $field_index ) . '][conditions][visibility]" class="form-control ppom-condition-visible-bound" data-metatype="visibility">';
-					$html_input .= '<option ' . $visibility_show . ' value="Show">' . __( 'Show', 'ppom' ) . '</option>';
-					$html_input .= '<option ' . $visibility_hide . ' value="Hide">' . __( 'Hide', 'ppom' ) . '</option>';
+					$html_input .= '<option ' . $visibility_show . ' value="Show">' . __( 'Show', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option ' . $visibility_hide . ' value="Hide">' . __( 'Hide', 'woocommerce-product-addon' ) . '</option>';
 					$html_input .= '</select>';
 					$html_input .= '</div>';
 
 					$html_input .= '<div class="col-md-2 col-sm-2">';
-					$html_input .= '<p>' . __( 'only if', 'ppom' ) . '</p>';
+					$html_input .= '<p>' . __( 'only if', 'woocommerce-product-addon' ) . '</p>';
 					$html_input .= '</div>';
 
 					$html_input .= '<div class="col-md-3 col-sm-3">';
 					$html_input .= '<select name="ppom[' . esc_attr( $field_index ) . '][conditions][bound]" class="form-control ppom-condition-visible-bound" data-metatype="bound">';
-					$html_input .= '<option ' . $bound_all . ' value="All">' . __( 'All', 'ppom' ) . '</option>';
-					$html_input .= '<option ' . $bound_any . ' value="Any">' . __( 'Any', 'ppom' ) . '</option>';
+					$html_input .= '<option ' . $bound_all . ' value="All">' . __( 'All', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option ' . $bound_any . ' value="Any">' . __( 'Any', 'woocommerce-product-addon' ) . '</option>';
 					$html_input .= '</select>';
 					$html_input .= '</div>';
 
 					$html_input .= '<div class="col-md-4 col-sm-4">';
-					$html_input .= '<p>' . __( 'of the following matches', 'ppom' ) . '</p>';
+					$html_input .= '<p>' . __( 'of the following matches', 'woocommerce-product-addon' ) . '</p>';
 					$html_input .= '</div>';
 					$html_input .= '</div>';
 
@@ -773,7 +795,7 @@ class PPOM_Fields_Meta {
 						$operator_less    = ( $condition['operators'] == 'less than' ) ? 'selected="selected"' : '';
 
 						$html_input .= '<div class="webcontact-rules" id="rule-box-' . esc_attr( $rule_i ) . '">';
-						$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule ', 'ppom' ) . $rule_i ++ . '</label></div>';
+						$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule ', 'woocommerce-product-addon' ) . $rule_i ++ . '</label></div>';
 
 						// conditional elements
 						$html_input .= '<div class="col-md-4 col-sm-4">';
@@ -786,10 +808,10 @@ class PPOM_Fields_Meta {
 						// is value meta
 						$html_input .= '<div class="col-md-2 col-sm-2">';
 						$html_input .= '<select name="ppom[' . esc_attr( $field_index ) . '][conditions][rules][' . esc_attr( $rule_index ) . '][operators]" class="form-control ppom-conditional-keys" data-metatype="operators">';
-						$html_input .= '<option ' . $operator_is . ' value="is">' . __( 'is', 'ppom' ) . '</option>';
-						$html_input .= '<option ' . $operator_not . ' value="not">' . __( 'not', 'ppom' ) . '</option>';
-						$html_input .= '<option ' . $operator_greater . ' value="greater than">' . __( 'greater than', 'ppom' ) . '</option>';
-						$html_input .= '<option ' . $operator_less . ' value="less than">' . __( 'less than', 'ppom' ) . '</option>';
+						$html_input .= '<option ' . $operator_is . ' value="is">' . __( 'is', 'woocommerce-product-addon' ) . '</option>';
+						$html_input .= '<option ' . $operator_not . ' value="not">' . __( 'not', 'woocommerce-product-addon' ) . '</option>';
+						$html_input .= '<option ' . $operator_greater . ' value="greater than">' . __( 'greater than', 'woocommerce-product-addon' ) . '</option>';
+						$html_input .= '<option ' . $operator_less . ' value="less than">' . __( 'less than', 'woocommerce-product-addon' ) . '</option>';
 						$html_input .= '</select> ';
 						$html_input .= '</div>';
 
@@ -819,24 +841,24 @@ class PPOM_Fields_Meta {
 					$html_input .= '<div class="row ppom-condition-style-wrap">';
 					$html_input .= '<div class="col-md-4 col-sm-4">';
 					$html_input .= '<select class="form-control ppom-condition-visible-bound" data-metatype="visibility">';
-					$html_input .= '<option value="Show">' . __( 'Show', 'ppom' ) . '</option>';
-					$html_input .= '<option value="Hide">' . __( 'Hide', 'ppom' ) . '</option>';
+					$html_input .= '<option value="Show">' . __( 'Show', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option value="Hide">' . __( 'Hide', 'woocommerce-product-addon' ) . '</option>';
 					$html_input .= '</select> ';
 					$html_input .= '</div>';
 					$html_input .= '<div class="col-md-4 col-sm-4">';
 					$html_input .= '<select class="form-control ppom-condition-visible-bound" data-metatype="bound">';
-					$html_input .= '<option value="All">' . __( 'All', 'ppom' ) . '</option>';
-					$html_input .= '<option value="Any">' . __( 'Any', 'ppom' ) . '</option>';
+					$html_input .= '<option value="All">' . __( 'All', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option value="Any">' . __( 'Any', 'woocommerce-product-addon' ) . '</option>';
 					$html_input .= '</select> ';
 					$html_input .= '</div>';
 					$html_input .= '<div class="col-md-4 col-sm-4">';
-					$html_input .= '<p>' . __( ' of the following matches', 'ppom' ) . '</p>';
+					$html_input .= '<p>' . __( ' of the following matches', 'woocommerce-product-addon' ) . '</p>';
 					$html_input .= '</div>';
 					$html_input .= '</div>';
 
 					$html_input .= '<div class="row ppom-condition-clone-js">';
 					$html_input .= '<div class="webcontact-rules" id="rule-box-' . esc_attr( $rule_i ) . '">';
-					$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule ', 'ppom' ) . $rule_i ++ . '</label></div>';
+					$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule ', 'woocommerce-product-addon' ) . $rule_i ++ . '</label></div>';
 
 					// conditional elements
 					$html_input .= '<div class="col-md-4 col-sm-4">';
@@ -846,10 +868,10 @@ class PPOM_Fields_Meta {
 					// is
 					$html_input .= '<div class="col-md-2 col-sm-2">';
 					$html_input .= '<select data-metatype="operators" class="ppom-conditional-keys form-control">';
-					$html_input .= '<option value="is">' . __( 'is', 'ppom' ) . '</option>';
-					$html_input .= '<option value="not">' . __( 'not', 'ppom' ) . '</option>';
-					$html_input .= '<option value="greater than">' . __( 'greater than', 'ppom' ) . '</option>';
-					$html_input .= '<option value="less than">' . __( 'less than', 'ppom' ) . '</option>';
+					$html_input .= '<option value="is">' . __( 'is', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option value="not">' . __( 'not', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option value="greater than">' . __( 'greater than', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option value="less than">' . __( 'less than', 'woocommerce-product-addon' ) . '</option>';
 					$html_input .= '</select> ';
 					$html_input .= '</div>';
 
@@ -877,7 +899,7 @@ class PPOM_Fields_Meta {
 			case 'pre-images':
 				$html_input .= '<div class="pre-upload-box table-responsive">';
 
-				$html_input .= '<button class="btn btn-info ppom-pre-upload-image-btn" data-metatype="images">' . __( 'Select/Upload Image', 'ppom' ) . '</button>';
+				$html_input .= '<button class="btn btn-info ppom-pre-upload-image-btn" data-metatype="images">' . __( 'Select/Upload Image', 'woocommerce-product-addon' ) . '</button>';
 				// ppom_pa($value);
 
 				$opt_index0  = 0;
@@ -927,7 +949,7 @@ class PPOM_Fields_Meta {
 			case 'imageselect':
 				$html_input .= '<div class="pre-upload-box table-responsive">';
 
-				$html_input .= '<button class="btn btn-info ppom-pre-upload-image-btn" data-metatype="imageselect">' . __( 'Select/Upload Image', 'ppom' ) . '</button>';
+				$html_input .= '<button class="btn btn-info ppom-pre-upload-image-btn" data-metatype="imageselect">' . __( 'Select/Upload Image', 'woocommerce-product-addon' ) . '</button>';
 
 				$opt_index0  = 0;
 				$html_input .= '<ul class="ppom-options-container">';
@@ -972,7 +994,7 @@ class PPOM_Fields_Meta {
 
 			case 'pre-audios':
 				$html_input .= '<div class="pre-upload-box">';
-				$html_input .= '<button class="btn btn-info ppom-pre-upload-image-btn" data-metatype="audio">' . __( 'Select Audio/Video', 'ppom' ) . '</button>';
+				$html_input .= '<button class="btn btn-info ppom-pre-upload-image-btn" data-metatype="audio">' . __( 'Select Audio/Video', 'woocommerce-product-addon' ) . '</button>';
 
 				$html_input .= '<ul class="ppom-options-container">';
 				$opt_index0  = 0;
@@ -1084,8 +1106,8 @@ class PPOM_Fields_Meta {
 				$html_input .= '</table>';
 				$html_input .= '</div>';
 				$html_input .= '<div class="text-right">';
-				$html_input .= '<button class="btn btn-info ppom-save-bulk-json">Save Changing</button>';
-				$html_input .= '<button class="btn btn-success ppom-edit-bulk-json">Edit Changing</button>';
+				$html_input .= '<button class="btn btn-info ppom-save-bulk-json">'.esc_html__( 'Save Changing', 'woocommerce-product-addon' ).'</button> ';
+				$html_input .= '<button class="btn btn-success ppom-edit-bulk-json">'.esc_html__( 'Edit Changing', 'woocommerce-product-addon' ).'</button>';
 
 				if ( $values ) {
 					$html_input .= "<input type='hidden' name='ppom[" . esc_attr( $field_index ) . "][options]' class='ppom-saved-bulk-data ppom-meta-field' value='" . json_encode( $bulk_data ) . "' data-metatype='options'>";
@@ -1112,18 +1134,18 @@ class PPOM_Fields_Meta {
 
 		$tabs = array(
 			'fields_tab'          => array(
-				'label'        => __( 'Fields', 'ppom' ),
+				'label'        => __( 'Fields', 'woocommerce-product-addon' ),
 				'class'        => array( 'ppom-tabs-label', 'ppom-active-tab' ),
 				'field_depend' => array( 'all' ),
 			),
 			'condition_tab'       => array(
-				'label'        => __( 'Conditions', 'ppom' ),
+				'label'        => __( 'Conditions', 'woocommerce-product-addon' ),
 				'class'        => array( 'ppom-tabs-label', 'ppom-condition-tab-js' ),
 				'field_depend' => array( 'all' ),
 				'not_allowed'  => array( 'hidden', 'koll' ),
 			),
 			'add_option_tab'      => array(
-				'label'        => __( 'Add Options', 'ppom' ),
+				'label'        => __( 'Add Options', 'woocommerce-product-addon' ),
 				'class'        => array( 'ppom-tabs-label' ),
 				'field_depend' => array(
 					'select',
@@ -1139,30 +1161,30 @@ class PPOM_Fields_Meta {
 				),
 			),
 			'add_images_tab'      => array(
-				'label'        => __( 'Add Images', 'ppom' ),
+				'label'        => __( 'Add Images', 'woocommerce-product-addon' ),
 				'class'        => array( 'ppom-tabs-label' ),
 				'field_depend' => array( 'image', 'imageselect' ),
 			),
 			'add_audio_video_tab' => array(
-				'label'        => __( 'Add Audio/Video', 'ppom' ),
+				'label'        => __( 'Add Audio/Video', 'woocommerce-product-addon' ),
 				'class'        => array( 'ppom-tabs-label' ),
 				'field_depend' => array( 'audio' ),
 			),
 
 			// Font Picker Addon tabs
 			'fonts_family_tab'    => array(
-				'label'        => __( 'Fonts Family', 'ppom' ),
+				'label'        => __( 'Fonts Family', 'woocommerce-product-addon' ),
 				'class'        => array( 'ppom-tabs-label' ),
 				'field_depend' => array( 'fonts' ),
 			),
 			'custom_fonts_tab'    => array(
-				'label'        => __( 'Custom Fonts', 'ppom' ),
+				'label'        => __( 'Custom Fonts', 'woocommerce-product-addon' ),
 				'class'        => array( 'ppom-tabs-label' ),
 				'field_depend' => array( 'fonts' ),
 			),
 
 			'image_dimension_tab' => array(
-				'label'        => __( 'Image Dimensions', 'ppom' ),
+				'label'        => __( 'Image Dimensions', 'woocommerce-product-addon' ),
 				'class'        => array( 'ppom-tabs-label' ),
 				'field_depend' => array( 'file' ),
 			),

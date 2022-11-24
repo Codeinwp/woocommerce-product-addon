@@ -26,9 +26,9 @@ class NM_Section_wooproduct extends PPOM_Inputs {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
 
-		$this->title    = __( 'HTML', 'ppom' );
-		$this->desc     = __( 'HTML content', 'ppom' );
-		$this->icon     = __( '<i class="fa fa-code" aria-hidden="true"></i>', 'ppom' );
+		$this->title    = __( 'HTML', 'woocommerce-product-addon' );
+		$this->desc     = __( 'HTML content', 'woocommerce-product-addon' );
+		$this->icon     = __( '<i class="fa fa-code" aria-hidden="true"></i>', 'woocommerce-product-addon' );
 		$this->settings = self::get_settings();
 
 	}
@@ -39,60 +39,60 @@ class NM_Section_wooproduct extends PPOM_Inputs {
 		$input_meta = array(
 			'data_name'       => array(
 				'type'  => 'text',
-				'title' => __( 'Data name', 'ppom' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'ppom' ),
+				'title' => __( 'Data name', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'width'           => array(
 				'type'    => 'select',
-				'title'   => __( 'Width', 'ppom' ),
-				'desc'    => __( 'Select width column.', 'ppom' ),
+				'title'   => __( 'Width', 'woocommerce-product-addon' ),
+				'desc'    => __( 'Select width column.', 'woocommerce-product-addon' ),
 				'options' => ppom_get_input_cols(),
 				'default' => 12,
 			),
 			'description'     => array(
 				'type'  => 'textarea',
-				'title' => __( 'Description', 'ppom' ),
-				'desc'  => __( 'Small description, it will be display near name title.', 'ppom' ),
+				'title' => __( 'Description', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Small description, it will be display near name title.', 'woocommerce-product-addon' ),
 			),
 			'html'            => array(
 				'type'  => 'textarea',
-				'title' => __( 'Content', 'ppom' ),
-				'desc'  => __( 'Add your text/HTML here.', 'ppom' ),
+				'title' => __( 'Content', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Add your text/HTML here.', 'woocommerce-product-addon' ),
 			),
 			'visibility'      => array(
 				'type'    => 'select',
-				'title'   => __( 'Visibility', 'ppom' ),
-				'desc'    => __( 'Set field visibility based on user.', 'ppom' ),
+				'title'   => __( 'Visibility', 'woocommerce-product-addon' ),
+				'desc'    => __( 'Set field visibility based on user.', 'woocommerce-product-addon' ),
 				'options' => ppom_field_visibility_options(),
 				'default' => 'everyone',
 			),
 			'visibility_role' => array(
 				'type'   => 'text',
-				'title'  => __( 'User Roles', 'ppom' ),
-				'desc'   => __( 'Role separated by comma.', 'ppom' ),
+				'title'  => __( 'User Roles', 'woocommerce-product-addon' ),
+				'desc'   => __( 'Role separated by comma.', 'woocommerce-product-addon' ),
 				'hidden' => true,
 			),
 			'desc_tooltip'    => array(
 				'type'        => 'checkbox',
-				'title'       => __( 'Show tooltip (PRO)', 'ppom' ),
-				'desc'        => __( 'Show Description in Tooltip with Help Icon', 'ppom' ),
+				'title'       => __( 'Show tooltip (PRO)', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Show Description in Tooltip with Help Icon', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'cart_display'    => array(
 				'type'        => 'checkbox',
-				'title'       => __( 'Show in Cart', 'ppom' ),
-				'desc'        => __( 'Display Field Value in Cart', 'ppom' ),
+				'title'       => __( 'Show in Cart', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Display Field Value in Cart', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'logic'           => array(
 				'type'  => 'checkbox',
-				'title' => __( 'Enable Conditions', 'ppom' ),
-				'desc'  => __( 'Tick it to turn conditional logic to work below', 'ppom' ),
+				'title' => __( 'Enable Conditions', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Tick it to turn conditional logic to work below', 'woocommerce-product-addon' ),
 			),
 			'conditions'      => array(
 				'type'  => 'html-conditions',
-				'title' => __( 'Conditions', 'ppom' ),
-				'desc'  => __( 'Tick it to turn conditional logic to work below', 'ppom' ),
+				'title' => __( 'Conditions', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Tick it to turn conditional logic to work below', 'woocommerce-product-addon' ),
 			),
 		);
 

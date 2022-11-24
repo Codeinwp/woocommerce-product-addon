@@ -27,7 +27,7 @@ $images = ppom_convert_options_to_key_val( $fm->images(), $field_meta, $product 
 // If Image empty
 if ( ! $images ) {
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Images are required, please add it.', 'ppom' ) . '</p>';
+	echo '<p>' . __( 'Images are required, please add it.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return;
