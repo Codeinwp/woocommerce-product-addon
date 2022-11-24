@@ -1,3 +1,18 @@
+##### [Version 32.0.2](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.1...v32.0.2) (2022-11-24)
+
+- [Fix] Unnecessary spaces in Text Area Field
+- WC 7.1 Compatibility Info updated.
+- [Fix] Use the correct text-domain in the translated string.
+- [Fix] Change on the Fixed Fee TAX Price Calculation: If WC prices include taxes; inconsistent TAX calculation was happening on the Fixed Fees between the product page/cart page, that's fixed. https://github.com/Codeinwp/ppom-pro/issues/41
+- [Fix] Change on the Fixed Fee TAX Price Calculation: Use the tax class of the dependent product for the fixed fee instead of the standard tax https://github.com/Codeinwp/ppom-pro/issues/82
+- [Fix] [PPOM Pro] If a Price Matrix field was shown according to the two or more conditional field dependencies; the price matrix price was passed to the cart as 0. That's fixed. https://github.com/Codeinwp/ppom-pro/issues/40
+- [Promote] Conditional Field Repeater freemium/locked tab
+- [PPOM Pro] Compatibility for PPOM PRO Bulk Quantity Field.
+- [Feat] New WP Filter Hook (ppom_legacy_input_meta_classes) was added. https://github.com/Codeinwp/woocommerce-product-addon/pull/78
+- [Fix] Some minor fixes on Frontend Input Classes https://github.com/Codeinwp/woocommerce-product-addon/pull/78
+- [Feat] Changelog viewer admin screen was created.
+- Compatibility support for PPOM Pro v25.1.0
+
 ##### [Version 32.0.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.0...v32.0.1) (2022-10-19)
 
 - [Fix] PPOM Field prices are not passed into the cart issue (affects only non-pro users) has been fixed. (that was a regression occurred after the v32.0.0 release)
