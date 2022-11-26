@@ -314,7 +314,7 @@ class PPOM_InputManager {
 			$classes[] = 'form-select';
 		}
 
-		$classes = apply_filters( 'ppom_input_meta_classes', $classes, self::$input_meta );
+		$classes = array_filter( apply_filters( 'ppom_input_meta_classes', $classes, self::$input_meta ) );
 
 		return $classes;
 	}

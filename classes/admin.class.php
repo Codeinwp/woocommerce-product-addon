@@ -154,13 +154,15 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$view    = ( isset( $_REQUEST ['view'] ) ? sanitize_text_field( $_REQUEST ['view'] ) : '' );
 		$ppom_settings_url = admin_url( "admin.php?page=wc-settings&tab=ppom_settings" );
 		$addons           = add_query_arg( array( 'view' => 'addons' ) );
+		$changelog_url           = add_query_arg( array( 'view' => 'changelog' ) );
 
-		if ( $action != 'new' && $do_meta != 'edit' && $do_meta != 'clone' && $view != 'addons' ) {
+		if ( $action != 'new' && $do_meta != 'edit' && $do_meta != 'clone' && $view != 'addons' && $view != 'changelog' ) {
 			?>
 			<div class="ppom-manage-fields-topbar d-flex">
 				<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'woocommerce-product-addon'); ?></h1>
 				<div class="ppom-top-nav">
 					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($addons); ?>">+ <?php esc_html_e( 'All Addons', 'woocommerce-product-addon' ); ?></a>
+					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($changelog_url); ?>"><?php esc_html_e( 'Changelog', 'woocommerce-product-addon' ); ?></a>
 					<a  href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'woocommerce-product-addon'); ?></a>
 				</div>
 			</div>
@@ -176,6 +178,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		} elseif ( isset( $_REQUEST ['page'] ) && $_REQUEST ['page'] == 'ppom' && $view === 'addons' ) {
 
 			ppom_load_template( 'admin/addons-list.php' );
+		} elseif ( isset( $_REQUEST ['page'] ) && $_REQUEST ['page'] == 'ppom' && $view === 'changelog' ) {
+
+			require_once PPOM_PATH . '/backend/changelog_handler.php';
+			ppom_load_template( 'admin/changelog.php' );
 		} else {
 			do_action( 'ppom_pdf_setting_action' );
 			do_action( 'ppom_enquiryform_setting_action' );
@@ -184,7 +190,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		}
 
 		// existing meta group tables show only ppom main page
-		if ( $action != 'new' && $do_meta != 'edit' && $view != 'addons' ) {
+		if ( $action != 'new' && $do_meta != 'edit' && $view != 'addons' && $view != 'changelog' ) {
 			ppom_load_template( 'admin/existing-meta.php' );
 		}
 

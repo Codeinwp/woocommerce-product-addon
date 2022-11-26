@@ -157,11 +157,14 @@ class PPOM_Legacy_InputManager {
 		}
 
 		if ( ( $this->input_type == 'radio' && ( $key = array_search( 'form-control', $classes ) ) !== false ) ||
-			 $this->input_type == 'checkbox' && ( $key = array_search( 'form-control', $classes ) ) !== false ) {
+			 ( $this->input_type == 'checkbox' && ( $key = array_search( 'form-control', $classes ) ) !== false ) ||
+			 ( $this->input_type == 'fixedprice' && self::$input_meta['view_type'] === 'radio' && ( $key = array_search( 'form-control', $classes ) ) !== false )
+		)
+		{
 			unset( $classes[ $key ] );
 			$classes[] = 'ppom-check-input';
 		}
 
-		return $classes;
+		return array_filter( apply_filters( 'ppom_legacy_input_meta_classes', $classes, self::$input_meta ) );
 	}
 }
