@@ -9,13 +9,6 @@
 var ppom_bulkquantity_meta = [];
 var ppom_pricematrix_discount_type = '';
 
-const PPOM_Input_Utility = {
-    imageselect_clear(){
-        const container = jQuery(this).parents('.ppom-field-wrapper').first();
-        console.log(container.find('input[type="radio"]').prop( 'checked', false ));
-    }
-}
-
 jQuery(function($) {
 
     // Tooltip Init
@@ -182,17 +175,6 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
 
                 // Data Tooltip
                 // $(".pre_upload_image").tooltip({container: 'body'});
-
-                jQuery('.ppom-clear-imageselect').click(PPOM_Input_Utility.imageselect_clear);
-
-                jQuery('.ppom-rendering-fields').on('ppom_repeated', ( e, cloned_fields ) => {
-                    const clearBtn = cloned_fields.find('.ppom-clear-imageselect');
-                    if( ! ( clearBtn.length > 0 ) ) {
-                        return;
-                    }
-
-                    clearBtn.click(PPOM_Input_Utility.imageselect_clear);
-                });
                 break;
                 // date_range
             case 'daterange':
