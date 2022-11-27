@@ -13,11 +13,11 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
 $fm               = new PPOM_InputManager( $field_meta, 'image' );
 $legacy_view      = $fm->get_meta_value( 'legacy_view' );
 $multiple_allowed = $fm->get_meta_value( 'multiple_allowed' );
 $show_popup       = $fm->get_meta_value( 'show_popup' );
+$required = isset($field_meta['required']) && $field_meta['required'] === 'on';
 
 $input_classes = $fm->input_classes();
 
@@ -225,6 +225,7 @@ $custom_attr = array();
 									value="<?php echo esc_attr( json_encode( $image ) ); ?>"
 									<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 									<?php if( $multiple_allowed ) { ?> data-allow-multiple="yes" <?php } ?>
+									<?php if( $required ) { ?>data-required="yes"<?php } ?>
 									<?php
 									if(!$multiple_allowed) { // backward compatibility for removed radio input ?>
 										data-type="image"

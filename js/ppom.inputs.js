@@ -180,6 +180,10 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                         return;
                     }
 
+                    if( jQuery(this).data('required') ) {
+                        jQuery(this).prop('checked', true);
+                    }
+
                     jQuery(this).parents('.ppom-image-select').find('input.ppom-input.image').not(this).prop('checked', false);
                 });
 
