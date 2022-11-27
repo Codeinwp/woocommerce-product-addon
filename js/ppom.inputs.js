@@ -173,6 +173,16 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                     jQuery('.ppom-zoom-' + img_id).imageTooltip();
                 }
 
+                jQuery('.ppom-image-select input.ppom-input.image').click(function(){
+                    const multiple = jQuery(this).data('allow-multiple');
+
+                    if( multiple ) {
+                        return;
+                    }
+
+                    jQuery(this).parents('.ppom-image-select').find('input.ppom-input.image').not(this).prop('checked', false);
+                });
+
                 // Data Tooltip
                 // $(".pre_upload_image").tooltip({container: 'body'});
                 break;

@@ -150,7 +150,7 @@ $custom_attr = array();
 		<?php
 	} else {
 		?>
-		<div class="nm-boxes-outer">
+		<div class="nm-boxes-outer ppom-image-select">
 			<?php
 			$img_index = 0;
 
@@ -211,41 +211,24 @@ $custom_attr = array();
 
 					<label class="ppom-palette-item">
 						<span class="pre_upload_image <?php echo esc_attr( $fm->input_classes() ); ?>">
-							
-							<?php if ( $multiple_allowed == 'on' ) { ?>
-								<input
-										type="checkbox"
-										name="<?php echo esc_attr( $fm->form_name() ); ?>[]"
-										id="<?php echo esc_attr( $option_id ); ?>"
-										data-price="<?php echo esc_attr( $image_price ); ?>"
-										data-label="<?php echo esc_attr( $image_title ); ?>"
-										class="<?php echo esc_attr( $option_class ); ?>"
-										data-percent="<?php echo esc_attr( $opt_percent ); ?>"
-										data-title="<?php echo esc_attr( $fm->title() ); ?>"
-										data-optionid="<?php echo esc_attr( $option_id ); ?>"
-										data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
-										value="<?php echo esc_attr( json_encode( $image ) ); ?>"
-										<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
-									<?php echo esc_attr( $checked_option ); ?>
-								>
-							<?php } else { ?>
-								<input
-										type="radio"
-										name="<?php echo esc_attr( $fm->form_name() ); ?>[]"
-										id="<?php echo esc_attr( $option_id ); ?>"
-										data-price="<?php echo esc_attr( $image_price ); ?>"
-										data-label="<?php echo esc_attr( $image_title ); ?>"
-										class="<?php echo esc_attr( $option_class ); ?>"
-										data-percent="<?php echo esc_attr( $opt_percent ); ?>"
-										data-title="<?php echo esc_attr( $fm->title() ); ?>"
+							<input
+									type="checkbox"
+									name="<?php echo esc_attr( $fm->form_name() ); ?>[]"
+									id="<?php echo esc_attr( $option_id ); ?>"
+									data-price="<?php echo esc_attr( $image_price ); ?>"
+									data-label="<?php echo esc_attr( $image_title ); ?>"
+									class="<?php echo esc_attr( $option_class ); ?>"
+									data-percent="<?php echo esc_attr( $opt_percent ); ?>"
+									data-title="<?php echo esc_attr( $fm->title() ); ?>"
+									data-optionid="<?php echo esc_attr( $option_id ); ?>"
+									data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
+									value="<?php echo esc_attr( json_encode( $image ) ); ?>"
+									<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+									<?php if( $multiple_allowed ) { ?> data-allow-multiple="yes" <?php } ?>
+									<?php
+									if(!$multiple_allowed) { // backward compatibility for removed radio input ?>
 										data-type="image"
-										data-optionid="<?php echo esc_attr( $option_id ); ?>"
-										data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 										data-builder="<?php echo esc_attr( $builder ); ?>"
-										value="<?php echo esc_attr( json_encode( $image ) ); ?>"
-										<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
-									<?php echo esc_attr( $checked_option ); ?>
-
 										<?php
 										// Add input extra attributes
 										if ( ! empty( $custom_attr ) ) {
@@ -253,10 +236,11 @@ $custom_attr = array();
 												echo $key . '="' . $val . '"';
 											}
 										}
-										?>
-								>
-								<?php 
-							}
+									}
+									?>
+								<?php echo esc_attr( $checked_option ); ?>
+							>
+							<?php
 
 							if ( $image['image_id'] != '' ) {
 								if ( isset( $image['url'] ) && $image['url'] != '' ) {
