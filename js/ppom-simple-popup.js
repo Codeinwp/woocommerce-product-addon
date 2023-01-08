@@ -66,6 +66,16 @@
 		var popup_id = $(this).attr('data-model-id');
 
 		$('#' + popup_id).megapopup($(this).data());
+
+		const instances = Object.values(uploaderInstances);
+
+        for( let i=0; i<instances.length; i++ ) {
+            if( typeof instances[i].refresh !== 'function' ) {
+                continue;
+            }
+
+            instances[i].refresh();
+        }
 	});
 
 	// Init Plugin
