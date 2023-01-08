@@ -69,13 +69,13 @@
 
 		const instances = Object.values(uploaderInstances);
 
-        for( let i=0; i<instances.length; i++ ) {
-            if( typeof instances[i].refresh !== 'function' ) {
-                continue;
-            }
+		for( let i=0; i<instances.length; i++ ) {
+			if( typeof instances[i].refresh !== 'function' ) {
+				continue;
+			}
 
-            instances[i].refresh();
-        }
+			instances[i].refresh();
+		}
 	});
 
 	// Init Plugin
