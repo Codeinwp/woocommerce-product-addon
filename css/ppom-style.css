@@ -89,6 +89,7 @@
   color: #c73c3c;
   transition: 0.5s all;
   -webkit-transition: 0.5s all;
+  box-shadow: 0 0 8px #d9d4d4;
 }
 
 .ppom-palettes label>input:checked+.ppom-single-palette {

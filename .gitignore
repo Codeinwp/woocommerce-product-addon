@@ -5,5 +5,5 @@ node_modules
 artifact
 dist
 vendor
-languages/ppom.pot
+languages/woocommerce-product-addon.pot
 *.log

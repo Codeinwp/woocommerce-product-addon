@@ -54,7 +54,7 @@ $addons_list = ppom_array_get_addons_details();
 							<div class="ppom_addons_model_heading_button_display">
 								<h4 class="ppom_addons_model_card_title"><?php echo $addon_title; ?></h4>
 								<span class="badge badge-secondary"><?php esc_html_e('PRO', 'woocommerce-product-addon'); ?></span>
-								<span style="margin-right:5px" class="ppom-addon-type badge badge-secondary"><?php esc_html_e( $type ); ?></span>
+								<span style="margin-right:5px" class="ppom-addon-type badge badge-secondary"><?php echo esc_html( $type ); ?></span>
 							</div>
 							<hr>
 							<p class="ppom_addons_model_card_text"><?php echo $addon_desc; ?></p>
@@ -62,7 +62,7 @@ $addons_list = ppom_array_get_addons_details();
 							<div class="ppom-admin-addons-actions">
 								<a class="ppom_addons_model_card_btn"
 								href="<?php echo tsdk_utmify( PPOM_UPGRADE_URL, sanitize_key( $addon_title ), 'alladdonspage' ); ?>"
-								target="_blank"><?php esc_html_e('Get Started', 'woocommerce-produc-addon'); ?></a>
+								target="_blank"><?php esc_html_e('Get Started', 'woocommerce-product-addon'); ?></a>
 								<?php
 									foreach ( $actions as $action ) {
 										$btn_title = isset( $action['title'] ) ? $action['title'] : '';

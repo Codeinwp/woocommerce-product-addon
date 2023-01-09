@@ -61,11 +61,28 @@
 	var pluginName = 'megapopup';
 	var prefix = 'ppom-popup';
 
+	function pluploadRefresh() {
+		if( ! uploaderInstances ) {
+			return;
+		}
+		const instances = Object.values(uploaderInstances);
+
+		for( let i=0; i<instances.length; i++ ) {
+			if( typeof instances[i].refresh !== 'function' ) {
+				continue;
+			}
+
+			instances[i].refresh();
+		}
+	}
+
 	$(document).on('click', '[data-model-id]', function(e) {
 		e.preventDefault();
 		var popup_id = $(this).attr('data-model-id');
 
 		$('#' + popup_id).megapopup($(this).data());
+
+		pluploadRefresh();
 	});
 
 	// Init Plugin
