@@ -138,15 +138,11 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                         if( input.past_dates === 'on' ){
                             InputSelector.datepicker('option', 'minDate', 0);
                         }
+                    }
 
-                        if ( typeof input.max_date !== 'undefined' ) {
-                            if ( input.past_dates !== 'max_date' ) {
-                                if ( input.past_dates.length > 0 ) {
-                                    var max_date = input.max_date.trim();
-                                    InputSelector.datepicker('option', 'maxDate', max_date);
-                                }
-                            }
-                        }
+                    if ( typeof input.max_date !== 'undefined' ) {
+                        var max_date = input.max_date.trim();
+                        InputSelector.datepicker('option', 'maxDate', max_date);
                     }
 
                     if ( typeof input.no_weekends !== 'undefined' && input.no_weekends === 'on' ) {
