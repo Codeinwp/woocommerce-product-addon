@@ -126,15 +126,13 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                         dateFormat: input.date_formats.ppom_js_stripSlashes(),
                         yearRange: input.year_range
                     });
-                    
-                    // console.log(input.min_date.trim().length);
+
                     if( typeof input.min_date !== 'undefined' && input.min_date.trim().length > 0){
-                        
                        var min_date = input.min_date.trim();
                         InputSelector.datepicker('option', 'minDate', min_date);
-                        
                     }
-                    else if ( typeof input.past_dates !== 'undefined' ) {
+
+                    if ( typeof input.past_dates !== 'undefined' ) {
                         if( input.past_dates === 'on' ){
                             InputSelector.datepicker('option', 'minDate', 0);
                         }

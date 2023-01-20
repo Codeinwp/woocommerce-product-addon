@@ -151,7 +151,7 @@ class NM_Date_wooproduct extends PPOM_Inputs {
 			'past_dates'        => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Disable Past Dates', 'woocommerce-product-addon' ),
-				'desc'        => __( '[ This feature requires jQuery datePicker ] Prevent selection of dates prior to today&rsquo;s date. NOTE: Will be ignored if a Min Date has been set.', 'woocommerce-product-addon' ),
+				'desc'        => __( '[ This feature requires jQuery datePicker ] Prevent selection of dates prior to today&rsquo;s date.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'desc_tooltip'      => array(
