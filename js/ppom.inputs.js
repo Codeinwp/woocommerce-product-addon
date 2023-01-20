@@ -152,6 +152,7 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                     if( typeof input.default_value !== 'undefined' && input.default_value.trim().length > 0 ){
                         var default_date = input.default_value.trim();
                         InputSelector.datepicker('option', 'defaultDate', default_date);
+                        InputSelector.datepicker('setDate', default_date);
                     }
 
                     if( typeof input.first_day_of_week !== 'undefined' && input.first_day_of_week.trim().length > 0 ){
