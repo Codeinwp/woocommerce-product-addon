@@ -74,5 +74,8 @@ $default_value = strip_tags( $default_value );
 				echo $key . '="' . $val . '"';
 			}
 			?>
+			<?php if( 'on' === $jquery_dp ) { ?>
+			readonly
+			<?php } ?>
 	>
 </div>
