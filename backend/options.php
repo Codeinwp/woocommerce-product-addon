@@ -103,7 +103,7 @@ $panel_meta = array(
 	'ppom_admin_core_settings' => array(
 		'id'          => 'ppom_admin_core_settings',
 		'title'       => 'General Settings',
-		'desc'        => __( 'It will render the general settings.', 'woocommerce-product-addon' ),
+		'desc'        => '',
 		'is_sabpanel' => true,
 		'active'      => 'yes',
 	),
