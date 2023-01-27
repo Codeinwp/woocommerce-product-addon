@@ -1300,4 +1300,51 @@ jQuery(function($) {
 
         $(`<div class="form-group">${ppom_vars.i18n.freemiumCFRContent}</div>`).insertBefore( tab.find('.form-group') );
     });
+
+    const toggleHandler = {
+        setDisabledFields: function(jQueryDP){
+            const on = jQueryDP.is(':checked');
+            const slider = jQueryDP.parents('.ppom-slider');
+
+            const JQUERY_DP_FIELD_MTYPES = [
+                'min_date',
+                'max_date',
+                'date_formats',
+                'default_value',
+                'first_day_of_week',
+                'year_range',
+                'no_weekends',
+                'past_dates'
+            ];
+
+            JQUERY_DP_FIELD_MTYPES.forEach(function(type){
+                slider.find('*[data-metatype="'+type+'"]').prop('disabled', !on);
+            });
+        },
+        activateHandler: function() {
+            toggleHandler.setDisabledFields($(this));
+        }
+    }
+
+    $('input[data-metatype="jquery_dp"]').change(toggleHandler.activateHandler);
+
+    $( document ).on( 'ppom_new_field_created', function(e, clone_new_field) {
+        $(clone_new_field).find('input[data-metatype="jquery_dp"]').change(toggleHandler.activateHandler);
+    } );
+
+    $(document).ready(function(){
+        $('.ppom-slider').each(function(i, item){
+            const itemEl = $(item);
+            const value = itemEl.find(
+                'input[data-metatype="data_name"]').val();
+
+            const type = itemEl.find('input[data-metatype="type"]').val();
+
+            if( $.trim( value ) === '' || type !== 'date' ) {
+                return;
+            }
+
+            toggleHandler.setDisabledFields(itemEl.find('input[data-metatype="jquery_dp"]'));
+        });
+    })
 });

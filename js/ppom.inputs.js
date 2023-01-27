@@ -126,27 +126,21 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                         dateFormat: input.date_formats.ppom_js_stripSlashes(),
                         yearRange: input.year_range
                     });
-                    
-                    // console.log(input.min_date.trim().length);
+
                     if( typeof input.min_date !== 'undefined' && input.min_date.trim().length > 0){
-                        
                        var min_date = input.min_date.trim();
                         InputSelector.datepicker('option', 'minDate', min_date);
-                        
                     }
-                    else if ( typeof input.past_dates !== 'undefined' ) {
+
+                    if ( typeof input.past_dates !== 'undefined' ) {
                         if( input.past_dates === 'on' ){
                             InputSelector.datepicker('option', 'minDate', 0);
                         }
+                    }
 
-                        if ( typeof input.max_date !== 'undefined' ) {
-                            if ( input.past_dates !== 'max_date' ) {
-                                if ( input.past_dates.length > 0 ) {
-                                    var max_date = input.max_date.trim();
-                                    InputSelector.datepicker('option', 'maxDate', max_date);
-                                }
-                            }
-                        }
+                    if ( typeof input.max_date !== 'undefined' ) {
+                        var max_date = input.max_date.trim();
+                        InputSelector.datepicker('option', 'maxDate', max_date);
                     }
 
                     if ( typeof input.no_weekends !== 'undefined' && input.no_weekends === 'on' ) {
@@ -156,6 +150,7 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                     if( typeof input.default_value !== 'undefined' && input.default_value.trim().length > 0 ){
                         var default_date = input.default_value.trim();
                         InputSelector.datepicker('option', 'defaultDate', default_date);
+                        InputSelector.datepicker('setDate', default_date);
                     }
 
                     if( typeof input.first_day_of_week !== 'undefined' && input.first_day_of_week.trim().length > 0 ){

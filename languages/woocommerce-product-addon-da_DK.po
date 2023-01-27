@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: N-Media WooCommerce PPOM\n"
 "POT-Creation-Date: 2020-02-02 14:26-0800\n"
-"PO-Revision-Date: 2023-01-22 20:27+0000\n"
+"PO-Revision-Date: 2023-01-22 21:11+0000\n"
 "Last-Translator: \n"
 "Language-Team: Danish\n"
 "Language: da_DK\n"
@@ -291,49 +291,55 @@ msgstr "fx: <strong>100</strong>"
 
 #: classes/inputs/input.date.php:111
 msgid ""
-"[ jQuery datePicker ] First day of the week to show on the popup calendar."
+"[ This feature requires jQuery datePicker ] First day of the week to show on "
+"the popup calendar."
 msgstr ""
 
 #: classes/inputs/input.date.php:148
-msgid "[ jQuery datePicker ] Prevent display &amp; selection of weekends."
+msgid ""
+"[ This feature requires jQuery datePicker ] Prevent display &amp; selection "
+"of weekends."
 msgstr ""
 
 #: classes/inputs/input.date.php:154
 msgid ""
-"[ jQuery datePicker ] Prevent selection of dates prior to today&rsquo;s date."
-" NOTE: Will be ignored if a Min Date has been set."
+"[ This feature requires jQuery datePicker ] Prevent selection of dates prior "
+"to today&rsquo;s date."
 msgstr ""
 
 #: classes/inputs/input.date.php:76
-msgid "[ jQuery datePicker ] Select your preferred date format."
+msgid ""
+"[ This feature requires jQuery datePicker ] Select your preferred date "
+"format."
 msgstr ""
 
 #: classes/inputs/input.date.php:83
 msgid ""
-"[ jQuery datePicker ] The default highlighted date if the date field is "
-"blank.  Enter a date or use shortcode (examples: +10d, +17d, +1m +7d). Full "
-"dates should follow the same date format you have selected for this field."
+"[ This feature requires jQuery datePicker ] The default highlighted date if "
+"the date field is blank.  Enter a date or use shortcode (examples: +10d, "
+"+17d, +1m +7d). Full dates should follow the same date format you have "
+"selected for this field."
 msgstr ""
 
 #: classes/inputs/input.date.php:90
 msgid ""
-"[ jQuery datePicker ] The earliest selectable date. Enter a date or use "
-"shortcode (examples: +10d, +17d, +1m +7d). Full dates should follow the same "
-"date format you have selected for this field."
+"[ This feature requires jQuery datePicker ] The earliest selectable date. "
+"Enter a date or use shortcode (examples: +10d, +17d, +1m +7d). Full dates "
+"should follow the same date format you have selected for this field."
 msgstr ""
 
 #: classes/inputs/input.date.php:97
 msgid ""
-"[ jQuery datePicker ] The maximum selectable date. Enter a date or use "
-"shortcode (examples: +10d, +17d, +1m +7d). Full dates should follow the same "
-"date format you have selected for this field."
+"[ This feature requires jQuery datePicker ] The maximum selectable date. "
+"Enter a date or use shortcode (examples: +10d, +17d, +1m +7d). Full dates "
+"should follow the same date format you have selected for this field."
 msgstr ""
 
 #: classes/inputs/input.date.php:104
 msgid ""
-"[ jQuery datePicker ] Years to allow date selections. Example: c-10:c+10. "
-"TIP: The letter \"c\" indicates the current year so \"c+1\" will indicate "
-"next year.  Thus c:c+1 will be %s:%s"
+"[ This feature requires jQuery datePicker ] Years to allow date selections. "
+"Example: c-10:c+10. TIP: The letter \"c\" indicates the current year so "
+"\"c+1\" will indicate next year.  Thus c:c+1 will be %s:%s"
 msgstr ""
 
 #: inc/arrays.php:375
@@ -1881,7 +1887,8 @@ msgstr ""
 
 #: classes/inputs/input.date.php:141
 #, fuzzy
-msgid "jQuery Datepicker"
+#| msgid "jQuery Datepicker"
+msgid "jQuery datePicker"
 msgstr "Brug jQuery Datepicker"
 
 #: classes/inputs/input.cropper.php:118 classes/inputs/input.select.php:68

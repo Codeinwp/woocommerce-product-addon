@@ -574,3 +574,7 @@ div.filelist .u_i_c_box {
 .ppom-cb-price {
     float: right;
 }
+
+.ppom-wrapper .ppom-input.date[readonly] {
+  background: #fff;
+}
