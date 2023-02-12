@@ -18,15 +18,15 @@ PPOM (Product Addons for WooCommerce) lets add extra custom fields and addons on
 * That's all
 
 == Input Types in Free Version ==
-* **Text** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
-* **Textarea** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
-* **Select Options (with price)** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
-* **Radio Options (with price)** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
-* **Checkbox Options (with price)** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
-* **Date** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
-* **Email** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
-* **Number** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/general-fields/)
-* **Hidden** - *Hidden input with a default value*
+* **Text** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-text-input/)
+* **Textarea** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-textarea-input/)
+* **Select Options (with price)** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-select-input/)
+* **Radio Options (with price)** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-radio-input/)
+* **Checkbox Options (with price)** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-checkbox-input/)
+* **Date** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-date-input/)
+* **Email** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-email-input/)
+* **Number** - [Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-number-input/)
+* **Hidden** - (Hidden input with a default value) - [Demo](https://demo-ppom-lite.vertisite.cloud/product/hidden-input/)
 
 == Features in Free Version  ==
 * **Prices can be added with options**
@@ -60,7 +60,28 @@ All inputs are [sanitized and escaped](https://developer.wordpress.org/themes/th
 * **[Price Matrix with Discount](https://demo-ppom-lite.vertisite.cloud/product/demo-for-price-matrix-discount/)** - *Set tiered or discount prices on bulk purchase*
 * **[Timezone](https://demo-ppom-lite.vertisite.cloud/product-category/timezone-input/)** - *Select timezone from pre defined list of timezone. Exclude/include timezones*
 * **[HTML Content](https://demo-ppom-lite.vertisite.cloud/product/demo-for-basic-html-with-content/)** - *Add HTML tags, like `p` or `h1` tags to add more details for your extra fields*
-
+* **[Bulk Quantity](https://demo-ppom-lite.vertisite.cloud/product/basic-bulk-quantity-input/)** - *Bulk Quantity allows the store admin to set discount prices for each option.*
+* **[Chained Input](https://demo-ppom-lite.vertisite.cloud/product/chained-input/)** - *PPOM renders chained input in the dropdown.*
+* **[Collapse Input](https://demo-ppom-lite.vertisite.cloud/product/collapse-input/)** - *This is a special input that acts like a parent block...*
+* **[Conditional Images Input](https://demo-ppom-lite.vertisite.cloud/product/conditional-images-input/?attach_id=325&ppom-meta=41,0)** - *This input allows you to display different info based on the chosen images.*
+* **[Basic Date Range Input](https://demo-ppom-lite.vertisite.cloud/product/demo-for-date-range-input/)** - *Allows selecting date ranges.*
+* **[Divider Input](https://demo-ppom-lite.vertisite.cloud/product/basic-divider-input/)**
+* **[Domain Input](https://demo-ppom-lite.vertisite.cloud/product/basic-domain-input/)** *Web domain availability*
+* **[Email Input](https://demo-ppom-lite.vertisite.cloud/product/basic-email-input/)**
+* **[Emojis Input](https://demo-ppom-lite.vertisite.cloud/product/basic-emoji-input/)**
+* **[Fixed Price Input](https://demo-ppom-lite.vertisite.cloud/product/fixed-price-input-with-add-option-first-option/)** *Fixed Price Input with Add Option / First Option*
+* **[Fonts Picker](https://demo-ppom-lite.vertisite.cloud/product/basic-fonts-picker/)**
+* **[Image Dropdown Input](https://demo-ppom-lite.vertisite.cloud/product/image-dropdown-input/)**
+* **[Images Options Input](https://demo-ppom-lite.vertisite.cloud/product/demo-for-images-options/)**
+* **[Phone Input](https://demo-ppom-lite.vertisite.cloud/product/basic-phone-input/)**
+* **[Quantities Pack Input](https://demo-ppom-lite.vertisite.cloud/product/quantities-pack-input/)**
+* **[Quantity Option Input](https://demo-ppom-lite.vertisite.cloud/product/quantity-option-input/)**
+* **[Radio Switcher Input](https://demo-ppom-lite.vertisite.cloud/product/radio-switcher-input/)**
+* **[Select Option Quantity Input](https://demo-ppom-lite.vertisite.cloud/product/select-quantity-option-input/)**
+* **[Superlist Input](https://demo-ppom-lite.vertisite.cloud/product/superlist-input/)**
+* **[Text Counter](https://demo-ppom-lite.vertisite.cloud/product/basic-text-counter/)**
+* **[Texter Input](https://demo-ppom-lite.vertisite.cloud/product/basic-texter-input/)**
+* **[Variation Matrix Input](https://demo-ppom-lite.vertisite.cloud/product/basic-variation-matrix-input/)**
 
 == PPOM PRO Features ==
 * **Tooltip** *Tooltip feature to show description*
