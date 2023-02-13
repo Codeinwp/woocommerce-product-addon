@@ -96,7 +96,7 @@ All inputs are [sanitized and escaped](https://developer.wordpress.org/themes/th
 * **Compatible with all WooCommerce themes.**
 
 
-[See All PRO Features](https://themeisle.com/plugins/ppom-pro/upgrade/?utm_source=themeisle&utm_medium=product&utm_campaign) - [Demos](https://demo-ppom-lite.vertisite.cloud/) - [Ask a Pre-sale Question](https://themeisle.com/contact/?utm_source=wordpress.org&utm_medium=product&utm_campaign=about-us)
+[See All PRO Features](https://themeisle.com/plugins/ppom-pro/upgrade/?utm_source=plugin-readme&utm_medium=ppomfree&utm_campaign=seeprofeatures) - [Demos](https://demo-ppom-lite.vertisite.cloud/)
 
 == Video Guide ==
 [youtube https://www.youtube.com/watch?v=wGQBOzyMF4U]
