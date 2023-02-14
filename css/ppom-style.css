@@ -578,3 +578,7 @@ div.filelist .u_i_c_box {
 .ppom-wrapper .ppom-input.date[readonly] {
   background: #fff;
 }
+
+.daterangepicker {
+  z-index: 99999 !important;
+}

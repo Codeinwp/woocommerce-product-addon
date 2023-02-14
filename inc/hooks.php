@@ -213,6 +213,7 @@ function ppom_hooks_load_input_scripts( $product, $ppom_id = null ) {
 		array(
 			'jquery',
 			'ppom-inputs',
+			'accounting',
 		),
 		PPOM_VERSION,
 		true 
