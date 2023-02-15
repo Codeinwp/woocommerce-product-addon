@@ -1019,8 +1019,14 @@ jQuery(function($) {
     function ppom_required_data_name($this) {
         var selector = $this.closest('.ppom-slider');
         var data_name = selector.find('[data-meta-id="data_name"] input[type="text"]').val();
+        var allDataName = $( 'table.ppom_field_table td.ppom_meta_field_id' ).map(function(){
+            return $.trim(jQuery(this).text());
+        }).get();
         if (data_name == '') {
             var msg = 'Data Name must be required';
+            var is_ok = false;
+        } else if ($.inArray(data_name, allDataName) != -1) {
+            var msg = 'Data Name already exists';
             var is_ok = false;
         }
         else {
