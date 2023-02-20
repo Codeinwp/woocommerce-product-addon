@@ -474,9 +474,9 @@ jQuery(function($) {
         ppom_close_popup();
         $('#ppom_field_model_' + field_no + '').fadeIn();
 
-        field_no++;
-
         $( document ).trigger( 'ppom_new_field_created', [ clone_new_field, field_no, field_type ] );
+
+        field_no++;
     });
 
 
