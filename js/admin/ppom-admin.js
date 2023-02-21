@@ -1020,7 +1020,11 @@ jQuery(function($) {
         var selector = $this.closest('.ppom-slider');
         var data_name = selector.find('[data-meta-id="data_name"] input[type="text"]').val();
         var allDataName = $( 'table.ppom_field_table td.ppom_meta_field_id' ).map(function(){
-            return $.trim(jQuery(this).text());
+            var metaFieldId = $.trim(jQuery(this).text());
+            if ( $this.hasClass( 'ppom-update-field' ) && data_name === metaFieldId ) {
+                return '';
+            }
+            return metaFieldId;
         }).get();
         if (data_name == '') {
             var msg = 'Data Name must be required';
