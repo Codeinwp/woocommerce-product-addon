@@ -579,6 +579,10 @@ div.filelist .u_i_c_box {
   background: #fff;
 }
 
+.daterangepicker {
+  z-index: 99999 !important;
+}
+
 .daterangepicker .calendar-table th, .daterangepicker .calendar-table td {
   padding: 0;
 }
