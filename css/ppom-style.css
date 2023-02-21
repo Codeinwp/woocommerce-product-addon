@@ -582,3 +582,11 @@ div.filelist .u_i_c_box {
 .daterangepicker {
   z-index: 99999 !important;
 }
+
+.daterangepicker .calendar-table th, .daterangepicker .calendar-table td {
+  padding: 0;
+}
+
+.daterangepicker .drp-calendar.right {
+  border-left: 1px solid #ddd;
+}
