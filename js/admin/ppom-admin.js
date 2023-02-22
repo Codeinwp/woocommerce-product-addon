@@ -277,7 +277,7 @@ jQuery(function($) {
         event.preventDefault();
 
         var $this = $(this);
-        var ui = ppom_required_data_name($this);
+        var ui = ppom_required_data_name($this, 'new', 0);
         if (ui == false) {
             return;
         }
@@ -361,15 +361,16 @@ jQuery(function($) {
     $(document).on('click', '.ppom-update-field', function(event) {
         event.preventDefault();
 
+        var id = $(this).attr('data-field-index');
+        id = Number(id);
+
         var $this = $(this);
-        var ui = ppom_required_data_name($this);
+        console.log(id);
+        var ui = ppom_required_data_name($this, 'update', id);
 
         if (ui == false) {
             return;
         }
-
-        var id = $(this).attr('data-field-index');
-        id = Number(id);
 
         var data_name = $('#ppom_field_model_' + id + '').find('[data-meta-id="data_name"] input').val();
         var title = $('#ppom_field_model_' + id + '').find('[data-meta-id="title"] input').val();
@@ -1016,16 +1017,17 @@ jQuery(function($) {
     /**
         24- Fields Dataname Must Be Required
     **/
-    function ppom_required_data_name($this) {
+    function ppom_required_data_name($this, context, id) {
         var selector = $this.closest('.ppom-slider');
         var data_name = selector.find('[data-meta-id="data_name"] input[type="text"]').val();
+
         var allDataName = $( 'table.ppom_field_table td.ppom_meta_field_id' ).map(function(){
             return $.trim(jQuery(this).text());
         }).get();
         if (data_name == '') {
             var msg = 'Data Name must be required';
             var is_ok = false;
-        } else if ($.inArray(data_name, allDataName) != -1) {
+        } else if (('new'===context || ( 'update'===context && selector.data('saved_dataname')!==data_name ) ) && console.log('here') && $.inArray(data_name, allDataName) != -1) {
             var msg = 'Data Name already exists';
             var is_ok = false;
         }

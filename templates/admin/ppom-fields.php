@@ -238,7 +238,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 						?>
 
 						<!-- New PPOM Model  -->
-						<div id="ppom_field_model_<?php echo esc_attr( $f_index ); ?>"
+						<div data-saved_dataname="<?php echo esc_attr($the_field_id); ?>" id="ppom_field_model_<?php echo esc_attr( $f_index ); ?>"
 							 class="ppom-modal-box ppom-slider ppom_sort_id_<?php echo esc_attr( $f_index ); ?>">
 							<div class="ppom-model-content">
 
