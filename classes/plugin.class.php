@@ -82,7 +82,7 @@ class NM_PersonalizedProduct {
 			// add_action ( 'woocommerce_before_calculate_totals', 'ppom_before_calculate_totals', 999, 1 );
 
 			// Above hook has issue so reverting back to old hook for prices
-			// add_filter( 'woocommerce_get_cart_item_from_session', 'ppom_price_controller', 10, 2 );
+			add_filter( 'woocommerce_get_cart_item_from_session', 'ppom_price_controller', 10, 2 );
 
 			add_action( 'woocommerce_cart_calculate_fees', 'ppom_price_cart_fee' );
 			// Calculating weights
