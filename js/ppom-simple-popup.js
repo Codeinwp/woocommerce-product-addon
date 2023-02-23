@@ -6,15 +6,16 @@
 
 (function($) {
 
-	// Tooltip Init
-	var tooltip_position = ppom_tooltip_vars.ppom_tooltip_position;
-	var tooltip_trigger = ppom_tooltip_vars.ppom_tooltip_trigger;
-	var tooltip_animation = ppom_tooltip_vars.ppom_tooltip_animation;
-	var tooltip_maxwidth = ppom_tooltip_vars.ppom_tooltip_maxwidth;
-	var tooltip_borderclr = ppom_tooltip_vars.ppom_tooltip_borderclr;
-	var tooltip_bgclr = ppom_tooltip_vars.ppom_tooltip_bgclr;
-	var tooltip_txtclr = ppom_tooltip_vars.ppom_tooltip_txtclr;
-	var tooltip_interactive = (ppom_tooltip_vars.ppom_tooltip_interactive == 'yes') ? true : false;
+	// Tooltip Init.
+	var tooltipConfig = 'undefined' !== typeof ppom_tooltip_vars ? ppom_tooltip_vars : {};
+	var tooltip_position = tooltipConfig.ppom_tooltip_position;
+	var tooltip_trigger = tooltipConfig.ppom_tooltip_trigger;
+	var tooltip_animation = tooltipConfig.ppom_tooltip_animation;
+	var tooltip_maxwidth = tooltipConfig.ppom_tooltip_maxwidth;
+	var tooltip_borderclr = tooltipConfig.ppom_tooltip_borderclr;
+	var tooltip_bgclr = tooltipConfig.ppom_tooltip_bgclr;
+	var tooltip_txtclr = tooltipConfig.ppom_tooltip_txtclr;
+	var tooltip_interactive = (tooltipConfig.ppom_tooltip_interactive == 'yes') ? true : false;
 
 	const tooltip_options = {
 		contentAsHTML: true,
@@ -54,18 +55,36 @@
 			tap: true,
 		};
 	}
-
-	$('[data-ppom-tooltip~=ppom_tooltip]').ppom_tooltipster(tooltip_options);
+	if ( $('[data-ppom-tooltip~=ppom_tooltip]').length > 0 ) {
+		$('[data-ppom-tooltip~=ppom_tooltip]').ppom_tooltipster(tooltip_options);
+	}
 
 	// Plugin name and prefix 
 	var pluginName = 'megapopup';
 	var prefix = 'ppom-popup';
+
+	function pluploadRefresh() {
+		if( ! uploaderInstances ) {
+			return;
+		}
+		const instances = Object.values(uploaderInstances);
+
+		for( let i=0; i<instances.length; i++ ) {
+			if( typeof instances[i].refresh !== 'function' ) {
+				continue;
+			}
+
+			instances[i].refresh();
+		}
+	}
 
 	$(document).on('click', '[data-model-id]', function(e) {
 		e.preventDefault();
 		var popup_id = $(this).attr('data-model-id');
 
 		$('#' + popup_id).megapopup($(this).data());
+
+		pluploadRefresh();
 	});
 
 	// Init Plugin

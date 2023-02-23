@@ -67,7 +67,6 @@ $default_value = strip_tags( $default_value );
 			data-taxable="<?php echo esc_attr( $taxable ); ?>"
 			data-without_tax="<?php echo esc_attr( $price_without_tax ); ?>"
 			<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
-			value="<?php echo esc_attr( $default_value ); ?>"
 
 			<?php
 			// Add input extra attributes
@@ -75,5 +74,8 @@ $default_value = strip_tags( $default_value );
 				echo $key . '="' . $val . '"';
 			}
 			?>
+			<?php if( 'on' === $jquery_dp ) { ?>
+			readonly
+			<?php } ?>
 	>
 </div>

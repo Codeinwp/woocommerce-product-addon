@@ -277,7 +277,7 @@ jQuery(function($) {
         event.preventDefault();
 
         var $this = $(this);
-        var ui = ppom_required_data_name($this);
+        var ui = ppom_required_data_name($this, 'new');
         if (ui == false) {
             return;
         }
@@ -361,15 +361,15 @@ jQuery(function($) {
     $(document).on('click', '.ppom-update-field', function(event) {
         event.preventDefault();
 
+        var id = $(this).attr('data-field-index');
+        id = Number(id);
+
         var $this = $(this);
-        var ui = ppom_required_data_name($this);
+        var ui = ppom_required_data_name($this, 'update');
 
         if (ui == false) {
             return;
         }
-
-        var id = $(this).attr('data-field-index');
-        id = Number(id);
 
         var data_name = $('#ppom_field_model_' + id + '').find('[data-meta-id="data_name"] input').val();
         var title = $('#ppom_field_model_' + id + '').find('[data-meta-id="title"] input').val();
@@ -474,9 +474,9 @@ jQuery(function($) {
         ppom_close_popup();
         $('#ppom_field_model_' + field_no + '').fadeIn();
 
-        field_no++;
-
         $( document ).trigger( 'ppom_new_field_created', [ clone_new_field, field_no, field_type ] );
+
+        field_no++;
     });
 
 
@@ -1016,11 +1016,18 @@ jQuery(function($) {
     /**
         24- Fields Dataname Must Be Required
     **/
-    function ppom_required_data_name($this) {
+    function ppom_required_data_name($this, context) {
         var selector = $this.closest('.ppom-slider');
         var data_name = selector.find('[data-meta-id="data_name"] input[type="text"]').val();
+
+        var allDataName = $( 'table.ppom_field_table td.ppom_meta_field_id' ).map(function(){
+            return $.trim(jQuery(this).text());
+        }).get();
         if (data_name == '') {
             var msg = 'Data Name must be required';
+            var is_ok = false;
+        } else if (('new'===context || ( 'update'===context && selector.data('saved_dataname')!==data_name ) ) && $.inArray(data_name, allDataName) != -1) {
+            var msg = 'Data Name already exists';
             var is_ok = false;
         }
         else {
@@ -1300,4 +1307,51 @@ jQuery(function($) {
 
         $(`<div class="form-group">${ppom_vars.i18n.freemiumCFRContent}</div>`).insertBefore( tab.find('.form-group') );
     });
+
+    const toggleHandler = {
+        setDisabledFields: function(jQueryDP){
+            const on = jQueryDP.is(':checked');
+            const slider = jQueryDP.parents('.ppom-slider');
+
+            const JQUERY_DP_FIELD_MTYPES = [
+                'min_date',
+                'max_date',
+                'date_formats',
+                'default_value',
+                'first_day_of_week',
+                'year_range',
+                'no_weekends',
+                'past_dates'
+            ];
+
+            JQUERY_DP_FIELD_MTYPES.forEach(function(type){
+                slider.find('*[data-metatype="'+type+'"]').prop('disabled', !on);
+            });
+        },
+        activateHandler: function() {
+            toggleHandler.setDisabledFields($(this));
+        }
+    }
+
+    $('input[data-metatype="jquery_dp"]').change(toggleHandler.activateHandler);
+
+    $( document ).on( 'ppom_new_field_created', function(e, clone_new_field) {
+        $(clone_new_field).find('input[data-metatype="jquery_dp"]').change(toggleHandler.activateHandler);
+    } );
+
+    $(document).ready(function(){
+        $('.ppom-slider').each(function(i, item){
+            const itemEl = $(item);
+            const value = itemEl.find(
+                'input[data-metatype="data_name"]').val();
+
+            const type = itemEl.find('input[data-metatype="type"]').val();
+
+            if( $.trim( value ) === '' || type !== 'date' ) {
+                return;
+            }
+
+            toggleHandler.setDisabledFields(itemEl.find('input[data-metatype="jquery_dp"]'));
+        });
+    })
 });

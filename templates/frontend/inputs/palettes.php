@@ -84,6 +84,7 @@ echo '</style>';
 			$without_tax  = $value['without_tax'];
 
 			$option_id = $value['option_id'];
+			$option_classes = sprintf('%s ppom-option-%s', $input_classes, $option_id);
 			$dom_id    = apply_filters( 'ppom_dom_option_id', $option_id, $field_meta );
 
 			// Checked value selected
@@ -111,7 +112,7 @@ echo '</style>';
 							type="checkbox"
 							name="<?php echo esc_attr( $fm->form_name() ); ?>[]"
 							id="<?php echo esc_attr( $dom_id ); ?>"
-							class="<?php echo esc_attr( $input_classes ); ?>"
+							class="<?php echo esc_attr( $option_classes ); ?>"
 							data-title="<?php echo esc_attr( $fm->title() ); ?>"
 							data-label="<?php echo esc_attr( $color_label ); ?>"
 							data-price="<?php echo esc_attr( $option_price ); ?>"
@@ -130,7 +131,7 @@ echo '</style>';
 							type="radio"
 							name="<?php echo esc_attr( $fm->form_name() ); ?>[]"
 							id="<?php echo esc_attr( $dom_id ); ?>"
-							class="<?php echo esc_attr( $input_classes ); ?>"
+							class="<?php echo esc_attr( $option_classes ); ?>"
 							data-title="<?php echo esc_attr( $fm->title() ); ?>"
 							data-label="<?php echo esc_attr( $color_label ); ?>"
 							data-price="<?php echo esc_attr( $option_price ); ?>"

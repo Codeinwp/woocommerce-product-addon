@@ -615,13 +615,6 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 						'name'  => $field_title,
 						'value' => $file_thumbs_html,
 					);
-					if ( ! $ratio_found ) {
-
-						$meta_data = array(
-							'name'  => $field_title,
-							'value' => $file_thumbs_html,
-						);
-					}
 				}
 				break;
 
