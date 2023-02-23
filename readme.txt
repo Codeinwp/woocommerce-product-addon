@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, woocommerce product addon
 Requires at least: 3.5
 Tested up to: 6.1
-Stable tag: 32.0.2
+Stable tag: 32.0.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 5.6
@@ -121,6 +121,27 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 9. PPOM General Settings
 
 == Changelog ==
+
+##### [Version 32.0.3](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.2...v32.0.3) (2023-02-23)
+
+- [Fix] Translations on some strings have been fixed.
+- [Fix] [PPOM Pro] Image Cropper field doesn't work if enabled with Popup in Safari browser on mobile
+- [Fix] [PPOM Pro] Added shadow to color palette choices to better visibility
+- [Tweak] Deselect Support for the ImageSelect Field
+- [Fix] Fixes on the PPOM Settings page.
+- [Fix] [Date Input] UI/UX improved to emphasize JQuery date picker is needed for some features (Min Date, Max Date, Date Formats, Default Value, First Day of Week, Year Range, Disable Weekends, Disable Past Dates) of PPOM Date Field.
+- [Fix] [Date Input] Max Date fixes (from now on, can be worked independently from disable past dates mode)
+- [Fix] [Date Input] Manual date entering by keyboard was disallowed for the JQuery date picker.
+- [Fix] [Date Input] Default date issue of the JQuery date picker has been fixed. (It was not working with relative values such as +5d or +1m 3d .)
+- [Fix] [Date Input] Fix on the Disable past dates feature (compatibility support with Min date feature)
+- [Fix] [PPOM Pro] Broken date range layout was fixed.
+- [Fix] Adding two fields with same name make them overwrite each other (data name validation was added for new fields)
+- [Fix] [PPOM Pro] Cart Edit is not working when Pop Up Edit is enabled
+- [Fix] [PPOM Pro] Empty Field Generation, which happens when PPOM Pro is activated, has been fixed.
+- Themeisle-SDK version was updated.
+
+
+
 
 ##### [Version 32.0.2](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.1...v32.0.2) (2022-11-24)
 
