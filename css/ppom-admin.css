@@ -581,7 +581,7 @@ ul.ppom-options-container li {
 
 .ppom-modal-box {
     position: fixed;
-    top: 0;
+    top: 30px;
     right: 0;
     max-height: 90%;
     left: 0;
