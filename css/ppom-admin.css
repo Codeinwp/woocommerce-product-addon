@@ -193,6 +193,12 @@ ul.ppom-options-container li {
     }
 }
 
+@media (max-width: 992px) {
+    .ppom-slider .row>div {
+        display: block;
+    }
+}
+
 /*
     2- Helper Icon With Desciption CSS
 */
