@@ -298,6 +298,7 @@ class PPOM_FRONTEND_SCRIPTS {
 					'ajaxurl'    => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
 					'plugin_url' => PPOM_URL,
 					'product_id' => $product_id,
+					'sp_force_display_block'  => apply_filters( 'ppom_sp_ac_force_css_display_block', true ) ? 'on' : 'off' // force display:block for add to cart form of the single product page
 				);
 
 				$decimal_palces = wc_get_price_decimals();

@@ -64,14 +64,13 @@ jQuery(function($) {
 
 // JS Init PPOM Inputs
 function ppom_init_js_for_ppom_fields(ppom_fields) {
-    
-    
-    //console.log(ppom_fields);
-    // Fixed the form button issue
-    if (ppom_fields && ppom_fields.length > 0) {
-        const css_type = jQuery('form.cart').css('display');
-        if (css_type === 'flex') {
-            jQuery('form.cart').addClass('ppom-flex-controller');
+    if( ppom_input_vars.sp_force_display_block === 'on' ){
+        // Fixed the form button issue
+        if (ppom_fields && ppom_fields.length > 0) {
+            const css_type = jQuery('form.cart').css('display');
+            if (css_type === 'flex') {
+                jQuery('form.cart').addClass('ppom-flex-controller');
+            }
         }
     }
 
