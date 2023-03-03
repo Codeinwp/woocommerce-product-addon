@@ -16,7 +16,7 @@
         "optimize-autoloader": true,
         "platform-check": false,
         "platform": {
-            "php": "7.0"
+            "php": "7.2"
         },
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
