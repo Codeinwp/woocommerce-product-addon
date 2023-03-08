@@ -11,7 +11,7 @@
  * Requires PHP: 7.2
  *
  * WC requires at least: 6.5
- * WC tested up to: 7.0
+ * WC tested up to: 7.4
  *
  * WordPress Available:  yes
  * Requires License:     no
