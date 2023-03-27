@@ -924,10 +924,9 @@ function ppom_has_posted_field_value( $posted_fields, $field ) {
 
 	if ( ! empty( $posted_fields ) ) {
 		foreach ( $posted_fields as $field_key => $value ) {
+			$field_key = explode( '__clone__', $field_key );
 
-
-			if ( $field_key == $data_name ) {
-
+			if ( in_array( $data_name, $field_key, true ) ) {
 
 				switch ( $type ) {
 
