@@ -1370,6 +1370,10 @@ function ppom_get_option_id( $option, $field_meta = null ) {
 		case 'image':
 			$the_option   = isset( $option['title'] ) ? $option['title'] : '';
 			$option['id'] = sanitize_key( $the_option );
+			if ( empty( $option['id'] ) && is_scalar( $the_option ) ) {
+				$the_option   = strtolower( $the_option );
+				$option['id'] = wp_hash( $the_option );
+			}
 			break;
 
 		case 'imageselect':
