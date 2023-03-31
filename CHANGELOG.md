@@ -1,3 +1,18 @@
+##### [Version 32.0.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.3...v32.0.4) (2023-03-31)
+
+- [Fix] The options of the meta field are not visible on smaller window size
+- [Fix] Layout conflict with Neve on product page on the quantity field and add to cart button
+- [Fix] [PPOM Pro] Editing created field throws an error
+- [Fix] [PPOM Pro] No alt text for image input type
+- [Fix] [PPOM Pro] Total price get 0 when the price matrix is used for discounts on higher quantities
+- [Fix] [PPOM Pro] File upload doesn't work with iOS Safari browser if field shows up based on condition
+- [Fix] [PPOM Pro] Conditional repeater prevents the product from being added to the cart
+- [Fix] [PPOM Pro] Images field cumulates price of all options if the labels are not in English
+- [Fix] [PPOM Pro] Image cropper doesn't work on PHP8
+- Themeisle SDK Update
+- Min PHP Version updated as 7.2
+- Minimum WooCommerce Version updated as 6.5
+
 ##### [Version 32.0.3](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.2...v32.0.3) (2023-02-23)
 
 - [Fix] Translations on some strings have been fixed.
