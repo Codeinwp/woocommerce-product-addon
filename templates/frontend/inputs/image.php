@@ -251,14 +251,18 @@ $custom_attr = array();
 									</a>
 									<?php
 								} else {
-									$image_url = wp_get_attachment_thumb_url( $image['image_id'] );
+									echo wp_get_attachment_image(
+										$image['image_id'],
+										'thumbnail',
+										false,
+										array(
+											'data-image-tooltip' => wp_get_attachment_url( $image['image_id'] ),
+											'class'              => 'img-thumbnail ppom-zoom-' . esc_attr( $fm->data_name() ),
+											'title'              => esc_attr( $image_label ),
+											'data-ppom-tooltip'  => 'ppom_tooltip',
+										)
+									);
 									?>
-									<img data-image-tooltip="<?php echo wp_get_attachment_url( $image['image_id'] ); ?>"
-										 src="<?php echo esc_url( $image_url ); ?>"
-										 class="img-thumbnail ppom-zoom-<?php echo esc_attr( $fm->data_name() ); ?>"
-										 title="<?php echo esc_attr( $image_label ); ?>"
-										 data-ppom-tooltip="ppom_tooltip">
-									<!--<label class="ppom-img-style1-label"> <?php echo $image_label; ?> </label>-->
 									<?php
 								}
 							} else {

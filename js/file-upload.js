@@ -343,7 +343,17 @@ function ppom_setup_file_upload_input(file_input) {
             PostInit: function() {
 
                 // $filelist_DIV[file_data_name].html('');
+                if ( ! $filelist_DIV[file_data_name].is(':visible') ) {
+                    jQuery(document).on('ppom_field_shown', function() {
+                        jQuery.each(ppom_input_vars.ppom_inputs, function(index, file_input) {
+                            if (file_input.type === 'file' || file_input.type === 'cropper') {
+                                var file_data_name = file_input.data_name;
+                                ppom_setup_file_upload_input(file_input);
+                            }
 
+                        });
+                    } );
+                }
                 /*$('#uploadfiles-'+file_data_name).bind('click', function() {
                 	upload_instance[file_data_name].start();
                 	return false;

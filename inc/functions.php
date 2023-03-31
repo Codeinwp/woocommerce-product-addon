@@ -924,10 +924,9 @@ function ppom_has_posted_field_value( $posted_fields, $field ) {
 
 	if ( ! empty( $posted_fields ) ) {
 		foreach ( $posted_fields as $field_key => $value ) {
+			$field_key = explode( '__clone__', $field_key );
 
-
-			if ( $field_key == $data_name ) {
-
+			if ( in_array( $data_name, $field_key, true ) ) {
 
 				switch ( $type ) {
 
@@ -1370,6 +1369,10 @@ function ppom_get_option_id( $option, $field_meta = null ) {
 		case 'image':
 			$the_option   = isset( $option['title'] ) ? $option['title'] : '';
 			$option['id'] = sanitize_key( $the_option );
+			if ( empty( $option['id'] ) && is_scalar( $the_option ) ) {
+				$the_option   = strtolower( $the_option );
+				$option['id'] = wp_hash( $the_option );
+			}
 			break;
 
 		case 'imageselect':

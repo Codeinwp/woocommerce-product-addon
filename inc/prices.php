@@ -1038,12 +1038,10 @@ function ppom_price_get_product_base(
 	$bulkquantities_found = ppom_price_get_total_bulkquantities( $ppom_field_prices, $product, $ppom_fields_post );
 	$fixedprice_found     = ppom_price_get_total_fixedprice( $ppom_field_prices );
 	$measure_found        = ppom_price_get_total_measure( $ppom_field_prices );
-
 	// If price matrix found
 	// ppom_pa($matrix_found);
 	if ( $matrix_found ) {
-
-		if ( isset( $matrix_found['matrix_price'] ) && $matrix_found['matrix_price'] != '' ) {
+		if ( $matrix_found['matrix_price'] > 0 ) {
 
 			$base_price = $matrix_found['matrix_price'];
 			$source     = 'matrix';

@@ -1019,14 +1019,18 @@ jQuery(function($) {
     function ppom_required_data_name($this, context) {
         var selector = $this.closest('.ppom-slider');
         var data_name = selector.find('[data-meta-id="data_name"] input[type="text"]').val();
-
-        var allDataName = $( 'table.ppom_field_table td.ppom_meta_field_id' ).map(function(){
-            return $.trim(jQuery(this).text());
+        var savedDataName = selector.find('[data-metatype="data_name"]').val();
+        var allDataName = $(document).find( 'table.ppom_field_table td.ppom_meta_field_id' ).map(function(){
+            var metaFieldId = $.trim(jQuery(this).text());
+            if ( $this.hasClass( 'ppom-update-field' ) && data_name === metaFieldId ) {
+                return '';
+            }
+            return metaFieldId;
         }).get();
         if (data_name == '') {
             var msg = 'Data Name must be required';
             var is_ok = false;
-        } else if (('new'===context || ( 'update'===context && selector.data('saved_dataname')!==data_name ) ) && $.inArray(data_name, allDataName) != -1) {
+        } else if (('new'===context || ( 'update'===context && savedDataName !== data_name ) ) && $.inArray(data_name, allDataName) != -1) {
             var msg = 'Data Name already exists';
             var is_ok = false;
         }

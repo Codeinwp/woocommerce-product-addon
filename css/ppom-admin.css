@@ -193,6 +193,12 @@ ul.ppom-options-container li {
     }
 }
 
+@media (max-width: 992px) {
+    .ppom-slider .row>div {
+        display: block;
+    }
+}
+
 /*
     2- Helper Icon With Desciption CSS
 */
@@ -575,7 +581,7 @@ ul.ppom-options-container li {
 
 .ppom-modal-box {
     position: fixed;
-    top: 0;
+    top: 30px;
     right: 0;
     max-height: 90%;
     left: 0;
