@@ -1299,7 +1299,9 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 				$edits_dir_path     = ppom_get_dir_path( 'edits' );
 
 				foreach ( $values as $file_id => $file_data ) {
-
+					if ( ! isset( $file_data['org'] ) ) {
+						continue;
+					}
 					$file_name    = $file_data['org'];
 					$file_cropped = isset( $file_data['cropped'] ) ? true : false;
 
