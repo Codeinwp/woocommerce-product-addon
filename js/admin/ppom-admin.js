@@ -386,11 +386,11 @@ jQuery(function($) {
 
         var row = $('.ppom_field_table tbody').find('.row_no_' + id);
 
-        row.find(".ppom_meta_field_title").html(title);
-        row.find(".ppom_meta_field_id").html(data_name);
-        row.find(".ppom_meta_field_type").html(type);
-        row.find(".ppom_meta_field_plchlder").html(placeholder);
-        row.find(".ppom_meta_field_req").html(_ok);
+        row.find(".ppom_meta_field_title").text(title);
+        row.find(".ppom_meta_field_id").text(data_name);
+        row.find(".ppom_meta_field_type").text(type);
+        row.find(".ppom_meta_field_plchlder").text(placeholder);
+        row.find(".ppom_meta_field_req").text(_ok);
 
         $(".ppom-modal-box, .ppom-modal-overlay").fadeOut('fast', function() {
             $(".ppom-modal-overlay").remove();
