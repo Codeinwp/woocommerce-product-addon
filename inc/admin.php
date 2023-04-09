@@ -565,7 +565,7 @@ function ppom_admin_delete_selected_meta() {
 	$del_ids = [];
 	$del_ids_ph = [];
 
-	// for the performance wise, prefer to use foreach instead of array_map-filter-implode-fill stack.
+	// for the performance wise, prefer to use foreach instead of array_map-array_filter-array_fill stack.
 	foreach( $_POST['productmeta_ids'] as $id ) {
 		$id = absint( $id );
 
