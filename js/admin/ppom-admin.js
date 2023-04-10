@@ -336,7 +336,7 @@ jQuery(function($) {
         html += '<button class="ppom-edit-field btn" id="' + id + '" data-modal-id="ppom_field_model_' + id + '"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
         html += '</td>';
         html += '</tr>';
-
+        html = $.parseHTML(html);
         // console.log(copy_model_id);
         if (copy_model_id != '' && copy_model_id != undefined) {
             $(html).find('.ppom_field_table tbody').end().insertAfter('#ppom_sort_id_' + copy_model_id + '');

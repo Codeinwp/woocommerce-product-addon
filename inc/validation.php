@@ -87,7 +87,7 @@ function ppom_sanitize_array_data( $array ) {
 			if ( in_array( $key, ppom_fields_with_html(), true ) ) {
 				$value = ppom_esc_html( $value );
 			} else {
-				$value = sanitize_text_field( wp_strip_all_tags( $value ) );
+				$value = sanitize_text_field( $value );
 			}
 		}
 	}
