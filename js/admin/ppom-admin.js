@@ -493,6 +493,7 @@ jQuery(function($) {
         // console.log(model_id_no);
 
         var clone_new_field = $('.ppom_save_fields_model #ppom_field_model_' + model_id_no + '').clone(true);
+        var dataTitleField = clone_new_field.find( '[data-metatype="title"]' );
         var dataNameField = clone_new_field.find( '[data-metatype="data_name"]' );
         var dataNameOldVal = dataNameField.val();
         var duplicateFields = jQuery(document).find('.ppom_field_table .ppom_meta_field_title:contains(' + dataTitleField.val() + ')');
