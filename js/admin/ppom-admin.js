@@ -336,7 +336,7 @@ jQuery(function($) {
         html += '<button class="ppom-edit-field btn" id="' + id + '" data-modal-id="ppom_field_model_' + id + '"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
         html += '</td>';
         html += '</tr>';
-
+        html = $.parseHTML(html);
         // console.log(copy_model_id);
         if (copy_model_id != '' && copy_model_id != undefined) {
             $(html).find('.ppom_field_table tbody').end().insertAfter('#ppom_sort_id_' + copy_model_id + '');
@@ -386,11 +386,11 @@ jQuery(function($) {
 
         var row = $('.ppom_field_table tbody').find('.row_no_' + id);
 
-        row.find(".ppom_meta_field_title").html(title);
-        row.find(".ppom_meta_field_id").html(data_name);
-        row.find(".ppom_meta_field_type").html(type);
-        row.find(".ppom_meta_field_plchlder").html(placeholder);
-        row.find(".ppom_meta_field_req").html(_ok);
+        row.find(".ppom_meta_field_title").text(title);
+        row.find(".ppom_meta_field_id").text(data_name);
+        row.find(".ppom_meta_field_type").text(type);
+        row.find(".ppom_meta_field_plchlder").text(placeholder);
+        row.find(".ppom_meta_field_req").text(_ok);
 
         $(".ppom-modal-box, .ppom-modal-overlay").fadeOut('fast', function() {
             $(".ppom-modal-overlay").remove();

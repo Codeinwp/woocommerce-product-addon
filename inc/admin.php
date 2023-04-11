@@ -472,7 +472,7 @@ function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 	global $wpdb;
 
 	$dt = array(
-		'the_meta' => json_encode( $ppom_meta ),
+		'the_meta' => wp_json_encode( ppom_sanitize_array_data( $ppom_meta ) ),
 	);
 
 	// ppom_pa($dt); exit;
