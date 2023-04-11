@@ -553,6 +553,8 @@ function ppom_admin_delete_selected_meta() {
 	if ( ! isset( $_POST['ppom_meta_nonce'] )
 		 || ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
 		 || ! ppom_security_role()
+		 || ! array_key_exists( 'productmeta_ids', $_POST )
+		 || ! is_array( $_POST['productmeta_ids'] )
 	) {
 		_e( 'Sorry, you are not allowed to perform this action', 'woocommerce-product-addon' );
 		die( 0 );
@@ -560,11 +562,26 @@ function ppom_admin_delete_selected_meta() {
 
 	global $wpdb;
 
-	extract( $_REQUEST );
-	$productmeta_ids = implode( ', ', $productmeta_ids );
+	$del_ids = [];
+	$del_ids_ph = [];
+
+	// for the performance wise, prefer to use foreach instead of array_map-array_filter-array_fill stack.
+	foreach( $_POST['productmeta_ids'] as $id ) {
+		$id = absint( $id );
+
+		if( 0 === $id ) {
+			continue;
+		}
+
+		$del_ids[] = $id;
+		$del_ids_ph[] = '%d';
+	}
+
+	$del_ids_ph = implode( ', ', $del_ids_ph );
+
 	$tbl_name        = $wpdb->prefix . PPOM_TABLE_META;
 
-	$res = $wpdb->query( $wpdb->prepare( "DELETE FROM {$tbl_name} WHERE productmeta_id IN ({$productmeta_ids})", $productmeta_ids ) );
+	$res = $wpdb->query( $wpdb->prepare( "DELETE FROM {$tbl_name} WHERE productmeta_id IN ({$del_ids_ph})", $del_ids ) );
 
 	if ( $res ) {
 		_e( 'Meta deleted successfully', 'woocommerce-product-addon' );
