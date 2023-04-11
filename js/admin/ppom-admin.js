@@ -493,6 +493,19 @@ jQuery(function($) {
         // console.log(model_id_no);
 
         var clone_new_field = $('.ppom_save_fields_model #ppom_field_model_' + model_id_no + '').clone(true);
+        var dataTitleField = clone_new_field.find( '[data-metatype="title"]' );
+        var dataNameField = clone_new_field.find( '[data-metatype="data_name"]' );
+        var dataNameOldVal = dataNameField.val();
+        var duplicateFields = jQuery(document).find('.ppom_field_table .ppom_meta_field_title:contains(' + dataTitleField.val() + ')');
+        var dataNameNewVal = '';
+        var reg = '/_copy_/';
+        if ( duplicateFields && duplicateFields.length >= 1 ) {
+            dataNameOldVal = dataNameOldVal.split( '_copy_' ).shift();
+            dataNameNewVal = dataNameOldVal + '_copy_' + duplicateFields.length++;
+        } else {
+            dataNameNewVal = dataNameOldVal + '_copy';
+        }
+        dataNameField.val( dataNameNewVal );
         // clone_new_field.find('.ppom_save_fields_model').end().appendTo('.ppom_save_fields_model').attr('id','ppom_field_model_'+field_no+'');
         clone_new_field.find('.ppom_save_fields_model').end().insertAfter('#ppom_field_model_' + model_id_no + '').attr('id', 'ppom_field_model_' + field_no + '');
         clone_new_field.find('.ppom-add-fields-js-action').attr('data-field-index', field_no);
