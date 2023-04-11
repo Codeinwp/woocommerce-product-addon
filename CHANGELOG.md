@@ -1,3 +1,11 @@
+##### [Version 32.0.5](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.4...v32.0.5) (2023-04-11)
+
+* [Fix] Implemented input sanitization for PPOM Field Input during the first save on PPOM Group creation.
+* [Fix] [PPOM Pro] Fixed issue where Cart Edit feature caused loss of field selections on product page.
+* [Fix] Fixed issue where duplicated button failed to copy field unless renamed and saved.
+* [Fix] Fixed issue with deleting PPOM groups causing PHP notice in WP Debug mode.
+* Themeisle SDK update
+
 ##### [Version 32.0.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.3...v32.0.4) (2023-03-31)
 
 - [Fix] The options of the meta field are not visible on smaller window size
