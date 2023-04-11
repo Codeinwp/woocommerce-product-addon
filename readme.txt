@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, woocommerce product addon
 Requires at least: 3.5
 Tested up to: 6.2
-Stable tag: 32.0.4
+Stable tag: 32.0.5
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -121,6 +121,17 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 9. PPOM General Settings
 
 == Changelog ==
+
+##### [Version 32.0.5](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.4...v32.0.5) (2023-04-11)
+
+* [Fix] Implemented input sanitization for PPOM Field Input during the first save on PPOM Group creation.
+* [Fix] [PPOM Pro] Fixed issue where Cart Edit feature caused loss of field selections on product page.
+* [Fix] Fixed issue where duplicated button failed to copy field unless renamed and saved.
+* [Fix] Fixed issue with deleting PPOM groups causing PHP notice in WP Debug mode.
+* Themeisle SDK update
+
+
+
 
 ##### [Version 32.0.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.3...v32.0.4) (2023-03-31)
 
