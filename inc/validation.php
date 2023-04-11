@@ -84,7 +84,7 @@ function ppom_sanitize_array_data( $array ) {
 		if ( is_array( $value ) ) {
 			$value = ppom_sanitize_array_data( $value );
 		} else {
-			if ( in_array( $key, ppom_fields_with_html() ) ) {
+			if ( in_array( $key, ppom_fields_with_html(), true ) ) {
 				$value = ppom_esc_html( $value );
 			} else {
 				$value = sanitize_text_field( $value );

@@ -497,7 +497,9 @@ function ppom_set_default_option(field_id) {
         case 'text':
         case 'date':
         case 'number':
-            jQuery("#" + field.data_name).val(field.default_value);
+            if ( '' === jQuery("#" + field.data_name).val() ) {
+                jQuery("#" + field.data_name).val(field.default_value);
+            }
             break;
     }
 }
