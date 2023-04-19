@@ -1,3 +1,9 @@
+##### [Version 32.0.6](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.5...v32.0.6) (2023-04-19)
+
+- [Fix] Resolved an issue where the Edit Cart feature was losing the value of certain fields based on conditional logic.
+- [Fix] Fixed a bug where the Edit Cart feature was not working when no changes were made to product options. (P.S.: PPOM Pro side of this issue was released with PPOM Pro v25.1.3)
+- [Fix] Implemented a security fix
+
 ##### [Version 32.0.5](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.4...v32.0.5) (2023-04-11)
 
 * [Fix] Implemented input sanitization for PPOM Field Input during the first save on PPOM Group creation.
