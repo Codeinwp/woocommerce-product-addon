@@ -460,7 +460,9 @@ function ppom_set_default_option(field_id) {
         break;
 
         case 'select':
-            jQuery("#" + field.data_name).val(field.selected);
+            if ( '' === jQuery("#" + field.data_name).val() ) {
+                jQuery("#" + field.data_name).val(field.selected);
+            }
             break;
 
         case 'image':
