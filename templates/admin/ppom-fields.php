@@ -376,7 +376,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 											<span class="onoffswitch-inner"></span>
 											<span class="onoffswitch-switch"></span>
 										</label>
-										<input type="hidden" value="<?php echo $field_status; ?>"
+										<input type="hidden" value="<?php echo esc_attr( $field_status ); ?>"
 											   name="ppom[<?php echo esc_attr( $f_index ); ?>][status]">
 									</div>
 								</td>
