@@ -26,7 +26,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 if ( ! $options ) {
 
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please add some options to render this input.', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . esc_html__( 'Please add some options to render this input.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';
@@ -41,8 +41,7 @@ $product_type = $product->get_type();
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 	<select
@@ -50,12 +49,12 @@ $product_type = $product->get_type();
 			name="<?php echo esc_attr( $fm->form_name() ); ?>"
 			class="<?php echo esc_attr( $fm->input_classes() ); ?>"
 			data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
-			<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+			<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 
 			<?php
 			// Add input extra attributes
 			foreach ( $input_attr as $key => $val ) {
-				echo $key . '="' . $val . '"';
+				echo wp_sprintf( '%s="%s"', esc_html( $key ), esc_html( $val ) );
 			}
 			?>
 	>
@@ -101,7 +100,7 @@ $product_type = $product->get_type();
 					data-without_tax="<?php echo esc_attr( $without_tax ); ?>"
 					data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 					data-option_weight="<?php echo esc_attr( $option_weight ); ?>"
-					<?php echo $selected_value; ?>
+					<?php echo esc_attr( $selected_value ); ?>
 			><?php echo esc_html( $option_label ); ?></option>
 
 			<?php

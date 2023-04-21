@@ -29,7 +29,8 @@ echo '<input type="hidden" name="ppom_cart_key" value="' . esc_attr( $cart_key )
 // Price placeholder, it will be cloned via js in ppom-price.js
 echo '<div id="ppom-price-cloner-wrapper">';
 echo '<span id="ppom-price-cloner">';
-printf( __( get_woocommerce_price_format(), 'woocommerce-product-addon' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' );
+// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+printf( esc_html__( get_woocommerce_price_format(), 'woocommerce-product-addon' ), esc_html( get_woocommerce_currency_symbol() ), '<span class="ppom-price"></span>' );
 echo '</span>';
 echo '</div>';
 
@@ -72,7 +73,8 @@ foreach ( $ppom_fields_meta as $meta ) {
 	}
 
 	if ( empty( $data_name ) ) {
-		printf( __( 'Please provide data name property for %s', 'woocommerce-product-addon' ), $title );
+		// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+		printf( esc_html__( 'Please provide data name property for %s', 'woocommerce-product-addon' ), esc_html( $title ) );
 		continue;
 	}
 
@@ -193,20 +195,20 @@ foreach ( $ppom_fields_meta as $meta ) {
 			echo '<div class="ppom-loop-fields" style="clear:both"></div>';
 
 			if ( $allow_nextprev == 'yes' ) {
-				echo '<div class="ppom-collapse-nextprev-btn" data-collapse-index="' . $ppom_collapse_counter . '">';
-				echo '<button class="ppom-collapse-prev">' . __( 'Prev', 'woocommerce-product-addon' ) . '</button>';
-				echo '<button class="ppom-collapse-next">' . __( 'Next', 'woocommerce-product-addon' ) . '</button>';
+				echo '<div class="ppom-collapse-nextprev-btn" data-collapse-index="' . esc_attr( $ppom_collapse_counter ) . '">';
+				echo '<button class="ppom-collapse-prev">' . esc_html__( 'Prev', 'woocommerce-product-addon' ) . '</button>';
+				echo '<button class="ppom-collapse-next">' . esc_html__( 'Next', 'woocommerce-product-addon' ) . '</button>';
 				echo '</div>';
 			}
 			echo '</div>';
 		}
 
-		if ( $collapse_type == 'end' ) {
+		if ( 'end' === $collapse_type ) {
 			echo '<div class="ppom-collapsed-child-end">';
 		}
 
-		if ( $collapse_type != 'end' ) {
-			echo '<h4 data-collapse-id="' . esc_attr( $data_name ) . '" class="ppom-collapsed-title">' . $title . '</h4>';
+		if ( 'end' !== $collapse_type ) {
+			echo '<h4 data-collapse-id="' . esc_attr( $data_name ) . '" class="ppom-collapsed-title">' . esc_html( $title ) . '</h4>';
 			echo '<div class="collapsed-child">';
 		}
 
@@ -223,7 +225,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 	$field_main_wrapper = 'ppom-field-wrapper ppom-col col-md-' . esc_attr( $col ) . ' ' . esc_attr( $input_wrapper_class );
 
 	$ppom_field_wrapper_div = '<div data-data_name=' . esc_attr( $data_name ) . ' ' . $ppom_cond_data . ' class="' . apply_filters( 'ppom_field_main_wapper_class', $field_main_wrapper, $meta ) . '">';
-	echo apply_filters( 'ppom_field_wrapper_div', $ppom_field_wrapper_div, $meta, $product );
+	echo ppom_esc_html( apply_filters( 'ppom_field_wrapper_div', $ppom_field_wrapper_div, $meta, $product ) );
 
 	// Text|Email|Date|Number
 	$ppom_field_attributes = apply_filters( 'ppom_field_attributes', $meta, $type );
@@ -272,7 +274,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta );
+			echo ppom_esc_html( apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta ) );
 			break;
 
 		case 'measure':
@@ -300,7 +302,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo NMForm()->Input( $ppom_field_setting, $default_value );
+			echo ppom_esc_html( NMForm()->Input( $ppom_field_setting, $default_value ) );
 			break;
 
 		case 'textarea':
@@ -329,7 +331,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			);
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta );
+			echo ppom_esc_html( apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta ) );
 			break;
 
 		case 'checkbox':
@@ -351,7 +353,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			);
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta );
+			echo ppom_esc_html( apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta ) );
 			break;
 
 		case 'select':
@@ -376,7 +378,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			);
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta );
+			echo ppom_esc_html( apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta ) );
 			break;
 
 		case 'radio':
@@ -398,7 +400,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			);
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta );
+			echo ppom_esc_html( apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta ) );
 			break;
 
 		case 'timezone':
@@ -425,7 +427,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			);
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo NMForm()->Input( $ppom_field_setting, $default_value );
+			echo ppom_esc_html( NMForm()->Input( $ppom_field_setting, $default_value ) );
 			break;
 
 		case 'palettes':
@@ -464,7 +466,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			);
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo NMForm()->Input( $ppom_field_setting, $default_value );
+			echo ppom_esc_html( NMForm()->Input( $ppom_field_setting, $default_value ) );
 			break;
 
 		case 'image':
@@ -515,7 +517,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			);
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo NMForm()->Input( $ppom_field_setting, $default_value );
+			echo ppom_esc_html( NMForm()->Input( $ppom_field_setting, $default_value ) );
 			break;
 
 		case 'pricematrix':
@@ -540,7 +542,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			);
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo NMForm()->Input( $ppom_field_setting );
+			echo ppom_esc_html( NMForm()->Input( $ppom_field_setting ) );
 			break;
 
 		case 'quantities':
@@ -573,7 +575,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			);
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo NMForm()->Input( $ppom_field_setting, $default_value );
+			echo ppom_esc_html( NMForm()->Input( $ppom_field_setting, $default_value ) );
 			break;
 
 		// Section or HTML
@@ -589,7 +591,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			);
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta );
+			echo ppom_esc_html( apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta ) );
 			break;
 
 		// Audio/videos
@@ -615,7 +617,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			);
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo NMForm()->Input( $ppom_field_setting, $default_value );
+			echo ppom_esc_html( NMForm()->Input( $ppom_field_setting, $default_value ) );
 			break;
 
 		// File upload
@@ -663,7 +665,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta );
+			echo ppom_esc_html( apply_filters( "ppom_field_html_{$type}", NMForm()->Input( $ppom_field_setting, $default_value ), $type, $meta ) );
 			break;
 
 		// Cropper
@@ -709,7 +711,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 
 			$ppom_field_setting = apply_filters( 'ppom_field_setting', $ppom_field_setting, $meta, $product );
-			echo NMForm()->Input( $ppom_field_setting, $default_value );
+			echo ppom_esc_html( NMForm()->Input( $ppom_field_setting, $default_value ) );
 			break;
 
 		// Fixed Price Addon

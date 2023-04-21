@@ -25,15 +25,15 @@ wp_nonce_field( 'ppom_attached_nonce_action', 'ppom_attached_nonce' );
 if ( count( $ppom_attached ) > 0 ) :
 	?>
 
-	<h3><?php _e( 'Already Attached', 'woocommerce-product-addon' ); ?></h3>
+	<h3><?php esc_html_e( 'Already Attached', 'woocommerce-product-addon' ); ?></h3>
 	<table id="ppom-already-attached-table" class="ppom-table table table-striped">
 		<thead>
 		<tr>
 			<th>
-				<strong><?php _e( 'Product Title', 'woocommerce-product-addon' ); ?></strong>
+				<strong><?php esc_html_e( 'Product Title', 'woocommerce-product-addon' ); ?></strong>
 			</th>
 			<th>
-				<strong><?php _e( 'PPOM Fields', 'woocommerce-product-addon' ); ?></strong>
+				<strong><?php esc_html_e( 'PPOM Fields', 'woocommerce-product-addon' ); ?></strong>
 			</th>
 		</tr>
 		</thead>
@@ -45,12 +45,12 @@ if ( count( $ppom_attached ) > 0 ) :
 			echo '<tr>';
 			echo '<td>';
 
-			echo $ppom_products->post_title;
+			echo esc_html( $ppom_products->post_title );
 
 			echo '</td>';
 
 			echo '<td>';
-			echo '<input type="checkbox" name="ppom_removed[]" value="' . $ppom_products->ID . '"> Remove';
+			echo '<input type="checkbox" name="ppom_removed[]" value="' . esc_attr( $ppom_products->ID ) . '"> ' . esc_html_e( 'Remove', 'woocommerce-product-addon' );
 			echo '</td>';
 
 
@@ -65,15 +65,15 @@ if ( count( $ppom_attached ) > 0 ) :
 endif;
 ?>
 
-<h3><?php _e( 'Attach', 'woocommerce-product-addon' ); ?></h3>
+<h3><?php esc_html_e( 'Attach', 'woocommerce-product-addon' ); ?></h3>
 <table id="ppom-product-table" class="ppom-table table table-striped">
 	<thead>
 	<tr>
 		<th>
-			<strong><?php _e( 'Product Title', 'woocommerce-product-addon' ); ?></strong>
+			<strong><?php esc_html_e( 'Product Title', 'woocommerce-product-addon' ); ?></strong>
 		</th>
 		<th>
-			<strong><?php _e( 'PPOM Fields', 'woocommerce-product-addon' ); ?></strong>
+			<strong><?php esc_html_e( 'PPOM Fields', 'woocommerce-product-addon' ); ?></strong>
 		</th>
 	</tr>
 	</thead>
@@ -85,12 +85,12 @@ endif;
 		echo '<tr>';
 		echo '<td>';
 
-		echo $product->post_title;
+		echo esc_html( $product->post_title );
 
 		echo '</td>';
 
 		echo '<td>';
-		echo '<input type="checkbox" name="ppom_attached[]" value="' . $product->ID . '"> Add';
+		echo '<input type="checkbox" name="ppom_attached[]" value="' . esc_attr( $product->ID ) . '"> Add';
 		echo '</td>';
 
 

@@ -1057,7 +1057,8 @@ function ppom_load_template( $file_name, $variables = array( '' ) ) {
 	if ( file_exists( $file_path ) ) {
 		include $file_path;
 	} else {
-		die( 'File not found' . $file_path );
+		// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+		die( wp_sprintf( esc_html__( 'File not found %s', 'woocommerce-product-addon' ), esc_html( $file_path ) ) );
 	}
 }
 
@@ -1088,7 +1089,8 @@ function ppom_load_input_templates( $template_path, $vars = array( '' ) ) {
 	if ( file_exists( $full_path ) ) {
 		include $full_path;
 	} else {
-		die( "File not found {$full_path}" );
+		// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+		die( wp_sprintf( esc_html__( 'File not found %s', 'woocommerce-product-addon' ), esc_html( $full_path ) ) );
 	}
 }
 
@@ -1113,7 +1115,8 @@ function ppom_load_file( $file_path, $variables = array( '' ) ) {
 	if ( file_exists( $file_path ) ) {
 		include $file_path;
 	} else {
-		die( 'File not found' . $file_path );
+		// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+		die( wp_sprintf( esc_html__( 'File not found %s', 'woocommerce-product-addon' ), esc_html( $file_path ) ) );
 	}
 }
 

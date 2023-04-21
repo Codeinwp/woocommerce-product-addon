@@ -76,7 +76,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 		?>
 		<div class="col-md-3 ppom-quantity-box-cols text-center">
 			<div class="ppom-quantity-label">
-				<label class="quantities-lable"> <?php echo stripslashes( trim( $opt['label'] ) ); ?></label>
+				<label class="quantities-lable"> <?php echo esc_html( stripslashes( trim( $opt['label'] ) ) ); ?></label>
 			</div>
 
 			<?php
@@ -87,7 +87,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 			<span class="ppom-quantity-qty-section">
 				<input
 						type="number"
-						name="<?php echo htmlentities( $name ); ?>"
+						name="<?php echo esc_attr( htmlentities( $name ) ); ?>"
 						id="<?php echo esc_attr( $dom_id ); ?>"
 						data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 						class="ppom-quantity"
@@ -101,7 +101,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 						data-includeprice="<?php echo esc_attr( $include_productprice ); ?>"
 						data-usebase_price="<?php echo esc_attr( $usebaseprice ); ?>"
 						data-unlink_qty="<?php echo esc_attr( $unlink_qty ); ?>"
-						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						data-price="<?php echo esc_attr( $the_price ); ?>"
 						value="<?php echo esc_attr( $selected_val ); ?>"
 					<?php echo esc_attr( $required ); ?>
@@ -109,7 +109,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 				>
 				
 				<?php
-				printf( __( '<span class="ppom-instock">%s</span>', 'woocommerce-product-addon' ), $in_stock );
+				printf( esc_html__( '<span class="ppom-instock">%s</span>', 'woocommerce-product-addon' ), esc_html( $in_stock ) );
 				?>
 			</span>
 		</div>

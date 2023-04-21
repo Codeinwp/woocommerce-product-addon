@@ -32,15 +32,15 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 		<table class="table table-bordered table-hover">
 			<thead>
 			<tr>
-				<th><?php _e( 'Options', 'woocommerce-product-addon' ); ?></th>
+				<th><?php esc_html_e( 'Options', 'woocommerce-product-addon' ); ?></th>
 				<?php foreach ( $options as $opt ) { ?>
 					<th>
-						<label class="quantities-lable"> <?php echo stripslashes( trim( $opt['option'] ) ); ?>
+						<label class="quantities-lable"> <?php echo esc_html( stripslashes( trim( $opt['option'] ) ) ); ?>
 
 							<?php
 							$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
 							if ( $the_price ) {
-								echo ' <span class="ppom-quantity-price-wrap">' . wc_price( $the_price ) . '</span>';
+								echo ' <span class="ppom-quantity-price-wrap">' . esc_html( wc_price( $the_price ) ) . '</span>';
 							}
 							?>
 						</label>
@@ -50,7 +50,7 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 			</thead>
 
 			<tr>
-				<th><?php _e( 'Quantity', 'woocommerce-product-addon' ); ?></th>
+				<th><?php esc_html_e( 'Quantity', 'woocommerce-product-addon' ); ?></th>
 				<?php foreach ( $options as $opt ) { ?>
 					<td>
 						<?php
@@ -91,7 +91,7 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 						$input_html .= 'data-usebase_price="' . esc_attr( $usebaseprice ) . '" ';
 						$input_html .= 'value="' . esc_attr( $selected_val ) . '" data-price="' . esc_attr( $the_price ) . '">';
 
-						echo $input_html;
+						echo ppom_esc_html( $input_html );
 						?>
 					</td>
 				<?php } ?>
@@ -133,14 +133,14 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 			<div class="col-md-3 ppom-quantity-box-cols text-center">
 				<div class="ppom-quantity-label">
 
-					<label class="quantities-lable"> <?php echo stripslashes( trim( $opt['option'] ) ); ?>
+					<label class="quantities-lable"> <?php echo esc_html( stripslashes( trim( $opt['option'] ) ) ); ?>
 
 					</label>
 
 					<?php
 					$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
 					if ( $the_price ) {
-						echo ' <span class="ppom-quantity-price-wrap">' . wc_price( $the_price ) . '</span>';
+						echo ' <span class="ppom-quantity-price-wrap">' . esc_html( wc_price( $the_price ) ) . '</span>';
 					}
 					?>
 				</div>
@@ -160,7 +160,7 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 					   data-max="<?php echo esc_attr( $args['max_qty'] ); ?>"
 					   data-label="<?php echo esc_attr( $label ); ?>"
 					   data-includeprice="<?php echo esc_attr( $include_productprice ); ?>"
-					   name="<?php echo htmlentities( $name ); ?>" type="number" class="ppom-quantity"
+					   name="<?php echo esc_html( htmlentities( $name ) ); ?>" type="number" class="ppom-quantity"
 					   data-usebase_price="<?php echo esc_attr( $usebaseprice ); ?>"
 					   value="<?php echo esc_attr( $selected_val ); ?>" placeholder="0"
 					   data-price="<?php echo esc_attr( $the_price ); ?>" <?php echo esc_attr( $required ); ?> style="width: 50%;">
@@ -173,19 +173,19 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 	<table class="table table-bordered table-hover">
 		<thead>
 		<tr>
-			<th><?php _e( 'Options', 'woocommerce-product-addon' ); ?></th>
-			<th><?php _e( 'Quantity', 'woocommerce-product-addon' ); ?></th>
+			<th><?php esc_html_e( 'Options', 'woocommerce-product-addon' ); ?></th>
+			<th><?php esc_html_e( 'Quantity', 'woocommerce-product-addon' ); ?></th>
 		</tr>
 		</thead>
 		<?php foreach ( $options as $opt ) { ?>
 			<tr>
 				<th>
-					<label class="quantities-lable"> <?php echo stripslashes( trim( $opt['option'] ) ); ?>
+					<label class="quantities-lable"> <?php echo esc_html( stripslashes( trim( $opt['option'] ) ) ); ?>
 
 						<?php
 						$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
 						if ( $the_price ) {
-							echo ' <span class="ppom-quantity-price-wrap">' . wc_price( $the_price ) . '</span>';
+							echo ' <span class="ppom-quantity-price-wrap">' . esc_html( wc_price( $the_price ) ) . '</span>';
 						}
 						?>
 
@@ -210,7 +210,7 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 					$selected_val = '';
 					if ( $default_value ) {
 						foreach ( $default_value as $k => $v ) {
-							if ( $k == $label ) {
+							if ( $k === $label ) {
 								$selected_val = $v;
 							}
 						}
@@ -230,7 +230,7 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 					$input_html .= 'data-usebase_price="' . esc_attr( $usebaseprice ) . '" ';
 					$input_html .= 'value="' . esc_attr( $selected_val ) . '" placeholder="0" data-price="' . esc_attr( $the_price ) . '">';
 
-					echo $input_html;
+					echo ppom_esc_html( $input_html );
 					?>
 				</td>
 			</tr>
@@ -242,21 +242,21 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 <div id="display-total-price">
 	<span style="display:none;font-weight:700" class="ppom-total-option-price">
 		<?php 
-		echo __( 'Options Total: ', 'woocommerce-product-addon' );
-		printf( __( get_woocommerce_price_format(), 'woocommerce-product-addon' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' ); 
+		esc_html_e( 'Options Total: ', 'woocommerce-product-addon' );
+		printf( esc_html__( get_woocommerce_price_format(), 'woocommerce-product-addon' ), esc_html( get_woocommerce_currency_symbol() ), '<span class="ppom-price"></span>' ); 
 		?>
 	</span><br>
 	<span style="display:none;font-weight:700" class="ppom-total-price">
 		<?php 
-		echo __( 'Product Total: ', 'woocommerce-product-addon' );
-		printf( __( get_woocommerce_price_format(), 'woocommerce-product-addon' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' ); 
+		esc_html_e( 'Product Total: ', 'woocommerce-product-addon' );
+		printf( esc_html__( get_woocommerce_price_format(), 'woocommerce-product-addon' ), esc_html( get_woocommerce_currency_symbol() ), '<span class="ppom-price"></span>' ); 
 		?>
 	</span>
 	<span style="display:none;font-weight:700" class="ppom-grand-total-price">
 	<hr style="margin: 0">
 		<?php 
-		echo __( 'Grand Total: ', 'woocommerce-product-addon' );
-		printf( __( get_woocommerce_price_format(), 'woocommerce-product-addon' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' ); 
+		esc_html_e( 'Grand Total: ', 'woocommerce-product-addon' );
+		printf( esc_html__( get_woocommerce_price_format(), 'woocommerce-product-addon' ), esc_html( get_woocommerce_currency_symbol() ), '<span class="ppom-price"></span>' ); 
 		?>
 	</span>
 </div>

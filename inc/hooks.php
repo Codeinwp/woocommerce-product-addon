@@ -823,7 +823,7 @@ function ppom_hooks_render_shortcode( $attr ) {
 
 		$product = wc_get_product( $params['product_id'] );
 		if ( ! $product ) {
-			echo __( 'Product ID is not valid', 'woocommerce-product-addon' );
+			esc_html_e( 'Product ID is not valid', 'woocommerce-product-addon' );
 
 			return ob_get_clean();
 		}

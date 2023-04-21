@@ -71,7 +71,7 @@ class PPOM_Freemium {
 
 			<p><?php printf( '<strong>%s</strong> %s', esc_html__( 'Use case example:', 'woocommerce-product-addon' ),  esc_html__( 'Get the number of players from another PPOM field, and repeat this field(let\'s say that\'s a text field representing the player name) across the number of players. That\'s pretty useful for dynamic repeating the PPOM field.', 'woocommerce-product-addon' ) ); ?></p>
 
-			<a target="_blank" class="btn btn-sm btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php echo __( 'Upgrade to Pro', 'woocommerce-product-addon' ); ?></a>
+			<a target="_blank" class="btn btn-sm btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php esc_html_e( 'Upgrade to Pro', 'woocommerce-product-addon' ); ?></a>
 		</div>
 		<?php
 		return ob_get_clean();

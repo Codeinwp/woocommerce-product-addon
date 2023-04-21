@@ -31,7 +31,7 @@ if ( ! empty( $first_option ) ) {
 if ( ! $options ) {
 
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'The timezone not found, please add different regions.', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . esc_html__( 'The timezone not found, please add different regions.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';
@@ -43,22 +43,20 @@ if ( ! $options ) {
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
-
 
 	<select
 			id="<?php echo esc_attr( $fm->data_name() ); ?>"
 			name="<?php echo esc_attr( $fm->form_name() ); ?>"
 			class="<?php echo esc_attr( $fm->input_classes() ); ?>"
 			data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
-			<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+			<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 
 			<?php
 			// Add input extra attributes
 			foreach ( $input_attr as $key => $val ) {
-				echo $key . '="' . $val . '"';
+				echo wp_sprintf( '%s="%s"', esc_html( $key ), esc_html( $val ) );
 			}
 			?>
 	>

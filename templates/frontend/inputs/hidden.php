@@ -23,6 +23,6 @@ $field_value = $fm->get_meta_value( 'field_value' );
 		type="hidden"
 		name="<?php echo esc_attr( $fm->form_name() ); ?>"
 		id="<?php echo esc_attr( $fm->data_name() ); ?>"
-		<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+		<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		value="<?php echo esc_attr( $field_value ); ?>"
 >

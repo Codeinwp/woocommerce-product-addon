@@ -442,8 +442,8 @@ class NM_PersonalizedProduct {
 				?>
 				<script type="text/javascript">
 					jQuery(document).ready(function () {
-						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'woocommerce-product-addon' ), $meta->productmeta_id ); ?>', "ppom").text('<?php _e( $meta->productmeta_name, 'woocommerce-product-addon' ); ?>').appendTo("select[name='action']");
-						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'woocommerce-product-addon' ), $meta->productmeta_id ); ?>').text('<?php _e( $meta->productmeta_name, 'woocommerce-product-addon' ); ?>').appendTo("select[name='action2']");
+						jQuery('<option>').val('<?php printf( esc_html__( 'nm_action_%d', 'woocommerce-product-addon' ), (int) $meta->productmeta_id ); ?>', "ppom").text('<?php echo esc_html( $meta->productmeta_name ); ?>').appendTo("select[name='action']");
+						jQuery('<option>').val('<?php printf( esc_html__( 'nm_action_%d', 'woocommerce-product-addon' ), (int) $meta->productmeta_id ); ?>').text('<?php echo esc_html( $meta->productmeta_name ); ?>').appendTo("select[name='action2']");
 					});
 				</script>
 				<?php
@@ -556,10 +556,10 @@ class NM_PersonalizedProduct {
 
 		if ( $pagenow == 'edit.php' && $post_type == 'product' && isset( $_REQUEST['nm_updated'] ) && (int) $_REQUEST['nm_updated'] ) {
 			$message = sprintf( _n( 'Product meta updated.', '%s Products meta updated.', $_REQUEST['nm_updated'], 'woocommerce-product-addon' ), number_format_i18n( $_REQUEST['nm_updated'] ) );
-			echo "<div class=\"updated\"><p>{$message}</p></div>";
+			echo '<div class="updated"><p>' . esc_html( $message ) . '</p></div>';
 		} elseif ( $pagenow == 'edit.php' && $post_type == 'product' && isset( $_REQUEST['nm_removed'] ) && (int) $_REQUEST['nm_removed'] ) {
 			$message = sprintf( _n( 'Product meta removed.', '%s Products meta removed.', $_REQUEST['nm_removed'], 'woocommerce-product-addon' ), number_format_i18n( $_REQUEST['nm_removed'] ) );
-			echo "<div class=\"updated\"><p>{$message}</p></div>";
+			echo '<div class="updated"><p>' . esc_html( $message ) . '</p></div>';
 		}
 	}
 
@@ -882,7 +882,7 @@ class NM_PersonalizedProduct {
 			'link_text' => 'Buy now',
 			'back_link' => true,
 		);
-		wp_die( 'Update to PRO Version for Export/Import', 'Update to PRO', $args );
+		wp_die( esc_html__( 'Update to PRO Version for Export/Import', 'woocommerce-product-addon' ), esc_html__( 'Update to PRO', 'woocommerce-product-addon' ), array_map( 'esc_html', $args ) );
 	}
 
 	function add_ppom_meta_tabs( $default_tabs ) {

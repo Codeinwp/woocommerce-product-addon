@@ -21,7 +21,7 @@ $multiple_allowed = $fm->get_meta_value( 'multiple_allowed' );
 // If audio/video empty
 if ( ! $fm->audio_video() ) {
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please Add Some Audio/Video', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . esc_html__( 'Please Add Some Audio/Video', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return;
@@ -32,8 +32,7 @@ if ( ! $fm->audio_video() ) {
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 	<div class="ppom_audio_box">
@@ -54,24 +53,24 @@ if ( ! $fm->audio_video() ) {
 				if ( is_array( $default_value ) ) {
 					foreach ( $default_value as $img_data ) {
 						if ( $audio_id == $img_data['id'] ) {
-							$checked_option = 'checked="checked"';
+							$checked_option = 'checked';
 						}
 					}
 				} else {
-					$checked_option = ( $audio_id == $default_value ? 'checked=checked' : '' );
+					$checked_option = ( $audio_id == $default_value ? 'checked' : '' );
 				}
 			}
 			?>
 			<div class="ppom_audio">
 				<?php
 				if ( ! empty( $audio_url ) ) {
-					echo apply_filters( 'the_content', $audio_url );
+					echo ppom_esc_html( apply_filters( 'the_content', $audio_url ) );
 				}
 				?>
 
 				<div class="input_image">
 
-					<?php if ( $multiple_allowed == 'on' ) { ?>
+					<?php if ( 'on' === $multiple_allowed ) { ?>
 						<input
 								type="checkbox"
 								name="<?php echo esc_attr( $fm->form_name() ); ?>[]"
@@ -81,8 +80,8 @@ if ( ! $fm->audio_video() ) {
 								data-label="<?php echo esc_attr( $audio_title ); ?>"
 								data-price="<?php echo esc_attr( $audio_price ); ?>"
 								value="<?php echo esc_attr( json_encode( $audio ) ); ?>"
-								<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
-								<?php echo $checked_option; ?>
+								<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+								<?php echo esc_attr( $checked_option ); ?>
 						>
 					<?php } else { ?>
 						<input
@@ -95,13 +94,13 @@ if ( ! $fm->audio_video() ) {
 								data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 								data-price="<?php echo esc_attr( $audio_price ); ?>"
 								value="<?php echo esc_attr( json_encode( $audio ) ); ?>"
-								<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
-								<?php echo $checked_option; ?>
+								<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+								<?php echo esc_attr( $checked_option ); ?>
 						>
 					<?php } ?>
 
 					<!-- Display Audio/video Price Label -->
-					<div class="p_u_i_name"><?php echo $audio_title_price; ?></div>
+					<div class="p_u_i_name"><?php echo esc_html( $audio_title_price ); ?></div>
 				</div> <!-- input_image -->
 			</div> <!-- ppom_audio -->
 			<?php

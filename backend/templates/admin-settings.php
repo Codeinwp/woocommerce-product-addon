@@ -51,13 +51,13 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 				<div class="row">
 					<div class="col-md-6 col-sm-6">
 						<h3>
-							<?php echo $class_ins->get_config( 'name' ); ?>
-							<span class="badge badge-dark"><?php echo $class_ins->get_config( 'version' ); ?></span>
+							<?php echo esc_html( $class_ins->get_config( 'name' ) ); ?>
+							<span class="badge badge-dark"><?php echo esc_html( $class_ins->get_config( 'version' ) ); ?></span>
 						</h3>
 					</div>
 					<div class="col-md-6 col-sm-6">
 						<a href="<?php echo esc_url( $migrate_url ); ?>"
-						   class="button button-primary button-large nmsf-migrate-back-btn"><?php echo _e( 'Switch to Legacy Settings', 'woocommerce-product-addon' ); ?></a>
+						   class="button button-primary button-large nmsf-migrate-back-btn"><?php esc_html_e( 'Switch to Legacy Settings', 'woocommerce-product-addon' ); ?></a>
 						<input type="submit" class="button button-primary button-large" value="Submit"/>
 					</div>
 				</div>
@@ -77,7 +77,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 
 							if ( $enable ) {
 								?>
-								<div class="<?php echo implode( ' ', $classes ); ?>"
+								<div class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>"
 									 data-tab-id="<?php echo esc_attr( $tab_id ); ?>">
 									<span class="nmsf-tabs-dot"></span>
 									<span><?php echo esc_html( $title ); ?></span>
@@ -98,7 +98,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 							$classes    = isset( $tab_meta['classes'] ) ? $tab_meta['classes'] : array();
 							?>
 
-							<div class="<?php echo implode( ' ', $classes ); ?> nmsf-panels-content"
+							<div class="<?php echo esc_attr( implode( ' ', $classes ) ); ?> nmsf-panels-content"
 								 data-panel-id="<?php echo esc_attr( $tab_id ); ?>">
 
 								<div class="nmsf-panels-content-inner">
@@ -159,13 +159,13 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 															<?php if ( $type == 'section' ) { ?>
 																<tr
 																		data-conditions="<?php echo esc_attr( json_encode( $conditions ) ); ?>"
-																		class="<?php echo $condition_class; ?>"
+																		class="<?php echo esc_attr( $condition_class ); ?>"
 																>
 																	<td class="nmsf-section-type" colspan="2">
 																		<h3>
 																			<?php echo esc_html( $title ); ?>
 																			<?php if ( ! empty( $desc ) ) { ?>
-																				<span class="nmsf-field-desc"><?php echo $desc; ?></span>
+																				<span class="nmsf-field-desc"><?php echo esc_html( $desc ); ?></span>
 																			<?php } ?>
 																		</h3>
 																	</td>
@@ -173,14 +173,14 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 															<?php } else { ?>
 																<tr
 																		data-conditions="<?php echo esc_attr( json_encode( $conditions ) ); ?>"
-																		class="<?php echo $condition_class; ?>"
+																		class="<?php echo esc_attr( $condition_class ); ?>"
 																>
 																	<th>
-																		<label for=""><?php echo $title; ?></label>
+																		<label for=""><?php echo esc_html( $title ); ?></label>
 
 																		<?php if ( $tooltip ) { ?>
 																			<span class="nmsf-tooltip"
-																				  title="<?php echo $desc; ?>">
+																				  title="<?php echo esc_html( $desc ); ?>">
 																			<i class="dashicons dashicons-editor-help"></i>
 																		</span>
 
@@ -191,7 +191,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																				<a href="<?php echo esc_url( $ref_link ); ?>"
 																				   target="_blank">
 																					<span class="dashicons dashicons-admin-links"></span>
-																					<?php echo $ref_title; ?>
+																					<?php echo esc_html( $ref_title ); ?>
 																				</a>
 																			<?php } ?>
 
@@ -199,14 +199,14 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																						<a class="nmsf-ref-video-popup"
 																						   video-url="<?php echo esc_url( $video_link ); ?>">
 																					<span class="dashicons dashicons-video-alt2"></span>
-																						<?php echo $video_title; ?>
+																						<?php echo esc_html( $video_title ); ?>
 																				</a>
 																					<?php } ?>
 																		</span>
 																			<?php } ?>
 
 																		<?php } else { ?>
-																			<span class="nmsf-field-desc"><?php echo $desc; ?></span>
+																			<span class="nmsf-field-desc"><?php echo esc_html( $desc ); ?></span>
 
 																			<?php if ( ! empty( $reference ) ) { ?>
 																				<span class="nmsf-ref-area">
@@ -214,7 +214,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																				<a href="<?php echo esc_url( $ref_link ); ?>"
 																				   target="_blank">
 																					<span class="dashicons dashicons-admin-links"></span>
-																					<?php echo $ref_title; ?>
+																					<?php echo esc_html( $ref_title ); ?>
 																				</a>
 																			<?php } ?>
 
@@ -222,7 +222,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																						<a class="nmsf-ref-video-popup"
 																						   video-url="<?php echo esc_url( $video_link ); ?>">
 																					<span class="dashicons dashicons-video-alt2"></span>
-																						<?php echo $video_title; ?>
+																						<?php echo esc_html( $video_title ); ?>
 																				</a>
 																					<?php } ?>
 																		</span>
@@ -236,7 +236,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 
 																		<?php if ( $hint != '' ) { ?>
 																			<span class="nmsf-hint-area">
-																			<span><?php echo _e( 'Hint: ', 'woocommerce-product-addon' ); ?></span>
+																			<span><?php esc_html_e( 'Hint: ', 'woocommerce-product-addon' ); ?></span>
 																			<?php echo esc_html( $hint ); ?>
 																		</span>
 																		<?php } ?>
@@ -253,7 +253,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 										} else {
 											?>
 											<div class="nmsf-panel-settings-area">
-												<span class="nmsf-panel-desc"><?php echo $desc; ?></span>
+												<span class="nmsf-panel-desc"><?php echo esc_html( $desc ); ?></span>
 												<table class="nmsf-panel-table">
 													<?php
 													if ( ! empty( $params ) ) {
@@ -267,8 +267,8 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 															?>
 															<tr>
 																<th>
-																	<label for=""><?php echo $title; ?></label>
-																	<span class=""><?php echo $desc; ?></span>
+																	<label for=""><?php echo esc_html( $title ); ?></label>
+																	<span class=""><?php echo esc_html( $desc ); ?></span>
 																</th>
 																<td><?php $class_ins->load_inputs( $input_meta ); ?></td>
 															</tr>
@@ -297,8 +297,8 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 				<div class="row">
 					<div class="col-md-6 col-sm-6">
 						<h3>
-							<?php echo $class_ins->get_config( 'plugin_name' ); ?>
-							<span class="badge badge-dark"><?php echo $class_ins->get_config( 'plugin_version' ); ?></span>
+							<?php echo esc_html( $class_ins->get_config( 'plugin_name' ) ); ?>
+							<span class="badge badge-dark"><?php echo esc_html( $class_ins->get_config( 'plugin_version' ) ); ?></span>
 						</h3>
 					</div>
 					<div class="col-md-6 col-sm-6">

@@ -32,7 +32,7 @@ $html_content = apply_filters( 'ppom_section_content', $html_content );
 
 <div class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
 
-	<?php echo stripslashes( $html_content ); ?>
+	<?php echo ppom_esc_html( stripslashes( $html_content ) ); ?>
 
 	<div style="clear: both"></div>
 

@@ -27,7 +27,7 @@ $images = ppom_convert_options_to_key_val( $fm->images(), $field_meta, $product 
 // If Image empty
 if ( ! $images ) {
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Images are required, please add it.', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . esc_html__( 'Images are required, please add it.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return;
@@ -43,8 +43,7 @@ $custom_attr = array();
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 	<!-- Legacy View -->
@@ -79,11 +78,11 @@ $custom_attr = array();
 					if ( is_array( $default_value ) ) {
 						foreach ( $default_value as $img_data ) {
 							if ( isset( $img_data['image_id'] ) && $image['image_id'] == $img_data['image_id'] ) {
-								$checked_option = 'checked="checked"';
+								$checked_option = 'checked';
 							}
 						}
 					} else {
-						$checked_option = ( $image['raw'] == $default_value ? 'checked=checked' : '' );
+						$checked_option = ( $image['raw'] == $default_value ? 'checked' : '' );
 					}
 				}
 
@@ -122,7 +121,7 @@ $custom_attr = array();
 									data-optionid="<?php echo esc_attr( $option_id ); ?>"
 									data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 									value="<?php echo esc_attr( json_encode( $image ) ); ?>"
-									<?php echo $checked_option; ?>
+									<?php echo esc_attr( $checked_option ); ?>
 							>
 						<?php } else { ?>
 							<input
@@ -137,10 +136,10 @@ $custom_attr = array();
 									data-optionid="<?php echo esc_attr( $option_id ); ?>"
 									data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 									value="<?php echo esc_attr( json_encode( $image ) ); ?>"
-									<?php echo $checked_option; ?>
+									<?php echo esc_attr( $checked_option ); ?>
 							>
 						<?php } ?>
-						<div class="p_u_i_name"><?php echo $image_label; ?></div>
+						<div class="p_u_i_name"><?php echo esc_html( $image_label ); ?></div>
 					</div> <!-- input_image -->
 				</div> <!-- pre_upload_image -->
 				<?php
@@ -171,7 +170,7 @@ $custom_attr = array();
 					$image_link = isset( $image['url'] ) ? $image['url'] : '';
 					$image_url  = apply_filters( 'ppom_image_input_url', wp_get_attachment_thumb_url( $image_id ), $image, $field_meta );
 
-					$ppom_has_percent = $opt_percent !== '' ? 'ppom-option-has-percent' : '';
+					$ppom_has_percent = '' !== $opt_percent ? 'ppom-option-has-percent' : '';
 					$option_class     = array(
 						"ppom-option-{$option_id}",
 						"ppom-{$product_type}-option",
@@ -223,7 +222,7 @@ $custom_attr = array();
 									data-optionid="<?php echo esc_attr( $option_id ); ?>"
 									data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 									value="<?php echo esc_attr( json_encode( $image ) ); ?>"
-									<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+									<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 									<?php if( $multiple_allowed ) { ?> data-allow-multiple="yes" <?php } ?>
 									<?php if( $required ) { ?>data-required="yes"<?php } ?>
 									<?php
@@ -234,7 +233,7 @@ $custom_attr = array();
 										// Add input extra attributes
 										if ( ! empty( $custom_attr ) ) {
 											foreach ( $custom_attr as $key => $val ) {
-												echo $key . '="' . $val . '"';
+												echo wp_sprintf( '%s="%s"', esc_html( $key ), esc_html( $val ) );
 											}
 										}
 									}
@@ -243,8 +242,8 @@ $custom_attr = array();
 							>
 							<?php
 
-							if ( $image['image_id'] != '' ) {
-								if ( isset( $image['url'] ) && $image['url'] != '' ) {
+							if ( '' !== $image['image_id'] ) {
+								if ( isset( $image['url'] ) && '' !== $image['url'] ) {
 									?>
 									<a href="<?php echo esc_url( $image_link ); ?>">
 										<img src="<?php echo esc_url( $image_url ); ?>">

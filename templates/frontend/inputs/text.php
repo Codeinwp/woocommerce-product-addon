@@ -50,8 +50,7 @@ $default_value = strip_tags( $default_value );
 
 	<!-- If title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ) ); ?></label>
 	<?php endif ?>
 
 	<input
@@ -68,14 +67,14 @@ $default_value = strip_tags( $default_value );
 			data-onetime="<?php echo esc_attr( $onetime ); ?>"
 			data-taxable="<?php echo esc_attr( $taxable ); ?>"
 			data-without_tax="<?php echo esc_attr( $price_without_tax ); ?>"
-			<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+			<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			value="<?php echo esc_attr( $default_value ); ?>"
-			<?php echo $inputmask; ?>
+			<?php echo esc_attr( $inputmask ); ?>
 
 			<?php
 			// Add input extra attributes
 			foreach ( $input_attr as $key => $val ) {
-				echo $key . '="' . $val . '"';
+				echo wp_sprintf( '%s="%s"', esc_html( $key ), esc_html( $val ) );
 			}
 			?>
 	>

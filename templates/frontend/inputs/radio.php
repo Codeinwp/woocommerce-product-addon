@@ -25,7 +25,7 @@ $taxable = $fm->get_meta_value( 'onetime_taxable' );
 if ( ! $options ) {
 
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please add some options to render this input.', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . esc_html__( 'Please add some options to render this input.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';
@@ -40,8 +40,7 @@ $product_type        = $product->get_type();
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 
@@ -92,11 +91,11 @@ $product_type        = $product->get_type();
 						data-onetime="<?php echo esc_attr( $onetime ); ?>"
 						data-taxable="<?php echo esc_attr( $taxable ); ?>"
 						data-without_tax="<?php echo esc_attr( $without_tax ); ?>"
-						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
-						<?php echo $checked_option; ?>
+						<?php echo esc_attr( $checked_option ); ?>
 				>
-				<span class="ppom-input-option-label ppom-label-radio"><?php echo $option_label; ?></span>
+				<span class="ppom-input-option-label ppom-label-radio"><?php echo esc_html( $option_label ); ?></span>
 			</label>
 		</div>
 

@@ -167,7 +167,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				</div>
 			</div>
 			<?php
-			echo '<p>' . __( 'You can create different meta groups for different products.', 'woocommerce-product-addon' ) . '</p>';
+			echo '<p>' . esc_html_e( 'You can create different meta groups for different products.', 'woocommerce-product-addon' ) . '</p>';
 		}
 
 		if ( ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) || $action == 'new' ) {
@@ -288,11 +288,11 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	function validate_plugin() {
 
 		echo '<div class="wrap">';
-		echo '<h2>' . __( 'Provide API key below:', 'woocommerce-product-addon' ) . '</h2>';
-		echo '<p>' . __( 'If you don\'t know your API key, please login into your: <a target="_blank" href="http://wordpresspoets.com/member-area">Member area</a>', 'woocommerce-product-addon' ) . '</p>';
+		echo '<h2>' . esc_html_e( 'Provide API key below:', 'woocommerce-product-addon' ) . '</h2>';
+		echo '<p>' . esc_html_e( 'If you don\'t know your API key, please login into your: <a target="_blank" href="http://wordpresspoets.com/member-area">Member area</a>', 'woocommerce-product-addon' ) . '</p>';
 
 		echo '<form onsubmit="return validate_api_wooproduct(this)">';
-		echo '<p><label id="plugin_api_key">' . __( 'Entery API key', 'woocommerce-product-addon' ) . ':</label><br /><input type="text" name="plugin_api_key" id="plugin_api_key" /></p>';
+		echo '<p><label id="plugin_api_key">' . esc_html_e( 'Entery API key', 'woocommerce-product-addon' ) . ':</label><br /><input type="text" name="plugin_api_key" id="plugin_api_key" /></p>';
 		wp_nonce_field();
 		echo '<p><input type="submit" class="button-primary button" name="plugin_api_key" /></p>';
 		echo '<p id="nm-sending-api"></p>';
@@ -360,7 +360,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		<tr valign="top">
 			<th scope="row" class="titledesc">
 				<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?> <span
-							class="woocommerce-help-tip" data-tip="<?php echo $value['desc']; ?>"></span></label>
+							class="woocommerce-help-tip" data-tip="<?php echo esc_attr( $value['desc'] ); ?>"></span></label>
 			</th>
 			<td class="forminp">
 				<select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="width:350px"
@@ -369,7 +369,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 					<?php
 					if ( ! empty( $selected_roles ) ) {
 						foreach ( $selected_roles as $key => $val ) {
-							echo '<option value="' . esc_attr( $key ) . '"' . wc_selected( $key, $selections ) . '>' . esc_html( $val ) . '</option>'; // WPCS: XSS ok.
+							echo '<option value="' . esc_attr( $key ) . '"' . wc_selected( $key, $selections ) . '>' . esc_html( $val ) . '</option>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						}
 					}
 					?>

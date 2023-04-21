@@ -34,8 +34,7 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 
 	<!-- if title of field exist -->
 	<?php if ( $field_label ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo sprintf( __( '%s', 'woocommerce-product-addon' ), $field_label ); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( sprintf( __( '%s', 'woocommerce-product-addon' ), $field_label ) ); ?></label>
 	<?php endif ?>
 
 
@@ -47,7 +46,7 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 		>
 			<?php echo esc_html( $btn_label ); ?>
 		</a>
-		<span class="ppom-dragdrop-text"><?php echo _e( 'Drag File Here', 'woocommerce-product-addon' ); ?></span>
+		<span class="ppom-dragdrop-text"><?php esc_html_e( 'Drag File Here', 'woocommerce-product-addon' ); ?></span>
 	</div> <!-- ppom-file-container -->
 
 	<div id="filelist-<?php echo esc_attr( $fm->data_name() ); ?>"
@@ -71,7 +70,7 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 				<div class="u_i_c_box" id="u_i_c_<?php echo esc_attr( $key ); ?>"
 					 data-fileid="<?php echo esc_attr( $key ); ?>">
 
-					<?php echo $file_preview; ?>
+					<?php echo ppom_esc_html( $file_preview ); ?>
 
 					<!-- Adding CB for data handling -->
 					<input
@@ -82,7 +81,7 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 							data-label="<?php echo esc_attr( $file_name ); ?>"
 							data-title="<?php echo esc_attr( $fm->title() ); ?>"
 							value="<?php echo esc_attr( $file_name ); ?>"
-							<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+							<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							checked="checked"
 					>
 				</div>

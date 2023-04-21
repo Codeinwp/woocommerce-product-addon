@@ -640,7 +640,8 @@ class PPOM_SettingsFramework {
 		if ( file_exists( $file_path ) ) {
 			include $file_path;
 		} else {
-			die( 'File not found' . $file_path );
+			// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+			die( wp_sprintf( esc_html__( 'File not found %s', 'woocommerce-product-addon' ), esc_html( $file_path ) ) );
 		}
 	}
 

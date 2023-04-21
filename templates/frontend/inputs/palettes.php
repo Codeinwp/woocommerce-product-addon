@@ -30,7 +30,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 // If options empty
 if ( ! $options ) {
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please Add Some Option', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . esc_html__( 'Please Add Some Option', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';
@@ -51,7 +51,7 @@ $custom_css .= '.ppom-palettes label>input:checked+.ppom-single-palette {
     }';
 
 echo '<style>';
-echo $custom_css;
+echo $custom_css; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 echo '</style>';
 ?>
 
@@ -59,8 +59,7 @@ echo '</style>';
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 	<!-- Palettes Box -->
@@ -121,9 +120,9 @@ echo '</style>';
 							data-taxable="<?php echo esc_attr( $taxable ); ?>"
 							data-without_tax="<?php echo esc_attr( $without_tax ); ?>"
 							data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
-							<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+							<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							value="<?php echo esc_attr( $raw_label ); ?>"
-							<?php echo $checked_option; ?>
+							<?php echo esc_attr( $checked_option ); ?>
 					>
 				<?php } else { ?>
 
@@ -141,7 +140,7 @@ echo '</style>';
 							data-without_tax="<?php echo esc_attr( $without_tax ); ?>"
 							data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 							value="<?php echo esc_attr( $raw_label ); ?>"
-							<?php echo $checked_option; ?>
+							<?php echo esc_attr( $checked_option ); ?>
 					>
 				<?php } ?>
 

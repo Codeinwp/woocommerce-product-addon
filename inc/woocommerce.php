@@ -38,8 +38,11 @@ function ppom_woocommerce_show_fields_on_product( $product_id, $args = null ) {
 
 	if ( ! $ppom->has_unique_datanames() ) {
 
-		printf( __( "<div class='error'>Some of your fields has duplicated datanames, please fix it</div>", 'woocommerce-product-addon' ), 'ppom' );
-
+		?>
+		<div class='error'>
+			<?php esc_html_e( 'Some of your fields has duplicated datanames, please fix it', 'woocommerce-product-addon' ); ?>
+		</div>
+		<?php
 		return;
 	}
 
@@ -70,7 +73,7 @@ function ppom_woocommerce_show_fields_on_product( $product_id, $args = null ) {
 	$ppom_html .= '<div style="clear:both"></div>';   // Clear fix
 	$ppom_html .= '</div>';   // Ends ppom-wrappper
 
-	echo apply_filters( 'ppom_fields_html', $ppom_html, $product );
+	echo ppom_esc_html( apply_filters( 'ppom_fields_html', $ppom_html, $product ) );
 }
 
 // Template Base Callback function
@@ -104,7 +107,7 @@ function ppom_woocommerce_template_base_inputs_rendering( $product_id, $args = n
 	ppom_load_input_templates( 'frontend/ppom-fields.php', $template_vars );
 	$ppom_html .= ob_get_clean();
 
-	echo apply_filters( 'ppom_fields_html', $ppom_html, $product );
+	echo ppom_esc_html( apply_filters( 'ppom_fields_html', $ppom_html, $product ) );
 }
 
 function ppom_woocommerce_load_scripts() {
@@ -608,7 +611,7 @@ function ppom_woocommerce_mini_cart_fixed_fee() {
 	$fixed_fee_html .= '<tr><td colspan="2">' . __( 'Total will be calculated in the cart', 'woocommerce-product-addon' ) . '</td></tr>';
 	$fixed_fee_html .= '</table>';
 
-	echo apply_filters( 'ppom_mini_cart_fixed_fee', $fixed_fee_html );
+	echo ppom_esc_html( apply_filters( 'ppom_mini_cart_fixed_fee', $fixed_fee_html ) );
 }
 
 function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
@@ -1324,7 +1327,8 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 					if ( file_exists( $source_file ) ) {
 
 						if ( ! rename( $source_file, $destination_path ) ) {
-							die( 'Error while re-naming order image ' . $source_file );
+							// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+							die( wp_sprintf( esc_html__( 'Error while re-naming order image %s', 'woocommerce-product-addon' ), esc_html( $source_file ) ) );
 						}
 					}
 
@@ -1337,7 +1341,8 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 
 						$destination_path_edit = $edits_dir_path . $new_filename;
 						if ( ! rename( $source_file_edit, $destination_path_edit ) ) {
-							die( 'Error while re-naming order image ' . $source_file_edit );
+							// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+							die( wp_sprintf( esc_html__( 'Error while re-naming order image %s', 'woocommerce-product-addon' ), esc_html( $source_file_edit ) ) );
 						} else {
 							$file_edited = true;
 						}

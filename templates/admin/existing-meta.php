@@ -80,13 +80,13 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 							</label>
 						</td>
 
-						<td><?php echo $productmeta->productmeta_id; ?></td>
+						<td><?php echo esc_html( $productmeta->productmeta_id ); ?></td>
 						<td>
 							<a href="<?php echo esc_url( $url_edit ); ?>">
-								<?php echo stripcslashes( $productmeta->productmeta_name ); ?>
+								<?php echo esc_html( stripcslashes( $productmeta->productmeta_name ) ); ?>
 							</a>
 						</td>
-						<td><?php echo ppom_admin_simplify_meta( $productmeta->the_meta ); ?></td>
+						<td><?php echo esc_html( ppom_admin_simplify_meta( $productmeta->the_meta ) ); ?></td>
 						<td>
 							<a class="btn btn-sm btn-secondary ppom-products-modal"
 							   data-ppom_id="<?php echo esc_attr( $productmeta->productmeta_id ); ?>"

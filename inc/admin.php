@@ -47,10 +47,10 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 							),
 							$ppom_settings_url 
 						);
-						echo sprintf( __( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), $url_edit, $meta_title );
+						echo sprintf( esc_html__( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), esc_html( $meta_title ) );
 						echo ', ';
 					} else {
-						echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), $ppom_settings_url, 'Add Fields' );
+						echo sprintf( esc_html__( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), esc_html_e( 'Add Fields', 'woocommerce-product-addon' ) );
 					}
 				}
 			} elseif ( $ppom->ppom_settings ) {
@@ -61,9 +61,9 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 					),
 					$ppom_settings_url 
 				);
-				echo sprintf( __( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), $url_edit, $ppom->meta_title );
+				echo sprintf( esc_html__( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), esc_html( $ppom->meta_title ) );
 			} else {
-				echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), $ppom_settings_url, 'Add Fields' );
+				echo sprintf( esc_html__( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), esc_html_e( 'Add Fields', 'woocommerce-product-addon' ) );
 			}
 
 			break;
@@ -127,7 +127,7 @@ function ppom_meta_list( $post ) {
 
 	$html .= sprintf( __( ' - <a href="%s" target="_blank">Create New Meta</a></p>', 'woocommerce-product-addon' ), $ppom_setting_url );
 
-	echo apply_filters( 'ppom_select_meta_in_product', $html, $ppom, $all_meta );
+	echo ppom_esc_html( apply_filters( 'ppom_select_meta_in_product', $html, $ppom, $all_meta ) );
 
 	echo '<div class="ppom_extra_options_panel">';
 	do_action( 'ppom_meta_box_after_list', $post );
@@ -709,6 +709,6 @@ function ppom_admin_update_pro_notice() {
 	$buy_paddle = tsdk_utmify( 'https://themeisle.com/plugins/ppom-pro/upgrade/', 'addmorefields', 'ppompage' );
 
     echo '<div class="ppom-more-plugins-block pb-5">';
-    echo '<a class="btn btn-sm btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . __( 'Add more field types', 'woocommerce-product-addon' ) . '</a>';
+    echo '<a class="btn btn-sm btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . esc_html__( 'Add more field types', 'woocommerce-product-addon' ) . '</a>';
     echo '</div>';
 }

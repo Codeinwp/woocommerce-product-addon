@@ -26,7 +26,7 @@ $ranges = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $product
 // If options empty
 if ( ! $ranges ) {
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please Add Some Option.', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . esc_html__( 'Please Add Some Option.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return;
@@ -38,8 +38,7 @@ if ( ! $ranges ) {
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 	<!-- Check if price matrix table is not hidden by settings -->
@@ -65,9 +64,8 @@ if ( ! $ranges ) {
 			}
 			?>
 			<div class="ppom-pricematrix-range ppom-range-<?php echo esc_attr( $range_id ); ?>">
-				<span class="pm-range"> <?php echo apply_filters( 'ppom_matrix_item_label', stripslashes( trim( $label ) ), $opt ); ?></span>
-				<span class="pm-price"
-					  style="float:right"><?php echo apply_filters( 'ppom_matrix_item_price', $price, $opt ); ?></span>
+				<span class="pm-range"> <?php echo esc_html( apply_filters( 'ppom_matrix_item_label', stripslashes( trim( $label ) ), $opt ) ); ?></span>
+				<span class="pm-price" style="float:right"><?php echo esc_html( apply_filters( 'ppom_matrix_item_price', $price, $opt ) ); ?></span>
 			</div>
 			<?php
 		}
@@ -111,7 +109,7 @@ if ( ! $ranges ) {
 						id="<?php echo esc_attr( $fm->data_name() ); ?>"
 						min="<?php echo esc_attr( $min_quantity ); ?>"
 						max="<?php echo esc_attr( $max_quantity ); ?>"
-						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						step="<?php echo esc_attr( $qty_step ); ?>"
 				>
 			<?php } ?>

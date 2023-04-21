@@ -40,10 +40,8 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 
 	<!-- if title of field exist -->
 	<?php if ( $field_label ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo sprintf( __( '%s', 'woocommerce-product-addon' ), $field_label ); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( sprintf( __( '%s', 'woocommerce-product-addon' ), esc_html( $field_label ) ) ); ?></label>
 	<?php endif ?>
-
 
 	<div class="ppom-file-container <?php echo esc_attr( $fm->data_name() ); ?> text-center" style="height: auto;">
 		<a
@@ -53,7 +51,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 		>
 			<?php echo esc_html( $btn_label ); ?>
 		</a>
-		<span class="ppom-dragdrop-text"><?php echo _e( 'Drag file/directory here', 'woocommerce-product-addon' ); ?></span>
+		<span class="ppom-dragdrop-text"><?php esc_html_e( 'Drag file/directory here', 'woocommerce-product-addon' ); ?></span>
 	</div> <!-- ppom-file-container -->
 
 	<div id="filelist-<?php echo esc_attr( $fm->data_name() ); ?>" class="filelist"></div>
@@ -74,14 +72,14 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 						name="<?php echo esc_attr( $fm->form_name() ); ?>[ratio]"
 						data-field_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 						data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
-						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						id="crop-size-<?php echo esc_attr( $fm->data_name() ); ?>"
 						disabled
 				>
 					<?php
 
 					if ( $first_option ) {
-						echo sprintf( __( '<option value="">%s</option>', 'woocommerce-product-addon' ), $first_option );
+						echo sprintf( esc_html__( '<option value="">%s</option>', 'woocommerce-product-addon' ), esc_html( $first_option ) );
 					}
 
 					foreach ( $options as $key => $size ) {
@@ -99,7 +97,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 						}
 						?>
 						<option
-								<?php echo $selected_opt; ?>
+								<?php echo esc_attr( $selected_opt ); ?>
 								value="<?php echo esc_attr( $option_id ); ?>"
 								data-price="<?php echo esc_attr( $option_price ); ?>"
 								data-label="<?php echo esc_attr( $raw_label ); ?>"
@@ -107,7 +105,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 								data-without_tax="<?php echo esc_attr( $without_tax ); ?>"
 								data-width="<?php echo esc_attr( $size['width'] ); ?>"
 								data-height="<?php echo esc_attr( $size['height'] ); ?>"
-						><?php echo $option_label; ?></option>
+						><?php echo esc_html( $option_label ); ?></option>
 					<?php } ?>
 
 				</select>

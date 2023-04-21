@@ -35,7 +35,7 @@ $taxable = $fm->get_meta_value( 'onetime_taxable' );
 if ( ! $options ) {
 
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please add some options to render this input.', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . esc_html__( 'Please add some options to render this input.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';
@@ -60,22 +60,13 @@ $wrapper_class = $has_discount ? 'form-check' : 'form-check-inline';
 $check_wrapper_class = apply_filters( 'ppom_checkbox_wrapper_class', $wrapper_class );
 $product_type        = $product->get_type();
 
-// change checkbox input form name 
-// add_filter('ppom_input_name_attr', function($form_name, $meta){
-// if( $meta['type'] == 'checkbox' ) {
-// $dataname = $meta['data_name'];
-// $form_name = "ppom[fields][".esc_attr($dataname)."][]";
-// }
-// return $form_name;
-// }, 11, 2);
 ?>
 
 <div class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 
@@ -122,8 +113,7 @@ $product_type        = $product->get_type();
 
 		?>
 		<div class="<?php echo esc_attr( $check_wrapper_class ); ?>">
-			<label class="<?php echo esc_attr( $fm->checkbox_label_classes() ); ?>"
-				   for="<?php echo esc_attr( $dom_id ); ?>">
+			<label class="<?php echo esc_attr( $fm->checkbox_label_classes() ); ?>" for="<?php echo esc_attr( $dom_id ); ?>">
 
 				<input
 						type="checkbox"
@@ -140,11 +130,11 @@ $product_type        = $product->get_type();
 						data-without_tax="<?php echo esc_attr( $without_tax ); ?>"
 						data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 						value="<?php echo esc_attr( $key ); ?>"
-						<?php echo $checked_option; ?>
+						<?php echo esc_attr( $checked_option ); ?>
 				>
 
 
-				<span class="ppom-input-option-label ppom-label-checkbox"><?php echo $option_label; ?></span>
+				<span class="ppom-input-option-label ppom-label-checkbox"><?php echo esc_html( $option_label ); ?></span>
 			</label>
 		</div>
 

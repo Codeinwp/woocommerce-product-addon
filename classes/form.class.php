@@ -123,7 +123,8 @@ class PPOM_Form {
 			}
 
 			if ( empty( $data_name ) ) {
-				printf( __( 'Please provide data name property for %s', 'woocommerce-product-addon' ), $title );
+				// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+				printf( esc_html__( 'Please provide data name property for %s', 'woocommerce-product-addon' ), esc_html( $title ) );
 				continue;
 			}
 
@@ -148,21 +149,21 @@ class PPOM_Form {
 
 					echo '<div class="ppom-loop-fields" style="clear:both"></div>';
 
-					if ( $allow_nextprev == 'yes' ) {
+					if ( 'yes' === $allow_nextprev ) {
 						echo '<div class="ppom-collapse-nextprev-btn" data-collapse-index="' . esc_attr( $ppom_collapse_counter ) . '">';
-						echo '<button class="ppom-collapse-prev">' . __( 'Prev', 'woocommerce-product-addon' ) . '</button>';
-						echo '<button class="ppom-collapse-next">' . __( 'Next', 'woocommerce-product-addon' ) . '</button>';
+						echo '<button class="ppom-collapse-prev">' . esc_html__( 'Prev', 'woocommerce-product-addon' ) . '</button>';
+						echo '<button class="ppom-collapse-next">' . esc_html__( 'Next', 'woocommerce-product-addon' ) . '</button>';
 						echo '</div>';
 					}
 					echo '</div>';
 				}
 
-				if ( $collapse_type == 'end' ) {
+				if ( 'end' === $collapse_type ) {
 					echo '<div class="ppom-collapsed-child-end">';
 				}
 
-				if ( $collapse_type != 'end' ) {
-					echo '<h4 data-collapse-id="' . esc_attr( $data_name ) . '" class="ppom-collapsed-title">' . $title . '</h4>';
+				if ( 'end' !== $collapse_type ) {
+					echo '<h4 data-collapse-id="' . esc_attr( $data_name ) . '" class="ppom-collapsed-title">' . esc_html( $title ) . '</h4>';
 					echo '<div class="collapsed-child">';
 				}
 
@@ -171,7 +172,7 @@ class PPOM_Form {
 			}
 
 			// skip collapse div
-			if ( $type == 'collapse' ) {
+			if ( 'collapse' === $type ) {
 				continue;
 			}
 
@@ -202,7 +203,6 @@ class PPOM_Form {
 			do_action( 'ppom_rendering_inputs', $meta, $data_name, $fm->input_classes_array(), $fm->field_label(), $fm->options() );
 			do_action( "ppom_rendering_inputs_{$type}", $meta, $default_value );
 
-
 			$field_html .= ob_get_clean();
 
 			$field_html .= '</div>';
@@ -213,7 +213,7 @@ class PPOM_Form {
 
 			// Filter: nmforms_input_htmls
 			// @TODO need to change with relevant name
-			echo apply_filters( 'nmforms_input_html', $field_html, $meta, $default_value );
+			echo ppom_esc_html( apply_filters( 'nmforms_input_html', $field_html, $meta, $default_value ) );
 
 		}
 	}
@@ -296,7 +296,7 @@ class PPOM_Form {
 			'frontend/component/form-data.php',
 			apply_filters( 'ppom_form_extra_contents', $template_vars, $this )
 		);
-		echo ob_get_clean();
+		echo ppom_esc_html( ob_get_clean() );
 	}
 
 	/**

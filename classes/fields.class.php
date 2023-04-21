@@ -211,7 +211,7 @@ class PPOM_Fields_Meta {
 		}
 
 		$html .= '</div>';
-		echo $html;
+		echo ppom_esc_html( $html );
 	}
 
 	/*

@@ -103,37 +103,37 @@ echo '</style>';
 	if ( $divider_styles == 'style1' ) {
 		if ( $fm->field_label() ) { 
 			?>
-			<h2 class="ppom-divider-with-txt ppom-divider-line ppom-divider-line-clr ppom-divider-txt"><?php echo sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ); ?></h2>
+			<h2 class="ppom-divider-with-txt ppom-divider-line ppom-divider-line-clr ppom-divider-txt"><?php echo esc_html( sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ) ); ?></h2>
 		<?php } else { ?>
 			<hr class="ppom-divider-<?php echo esc_attr( $style1_border ); ?>">
-			<?php 
+			<?php
 		}
 	} 
 	?>
 
 	<!--Style 2-->
-	<?php if ( $divider_styles == 'style2' ) { ?>
-		<h2 class="ppom-divider-with-txt ppom-divider-gradient ppom-divider-txt"><?php echo sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ); ?></h2>
+	<?php if ( 'style2' === $divider_styles ) { ?>
+		<h2 class="ppom-divider-with-txt ppom-divider-gradient ppom-divider-txt"><?php echo esc_html( sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ) ); ?></h2>
 	<?php } ?>
 
 	<!--Style 3-->
-	<?php if ( $divider_styles == 'style3' ) { ?>
-		<h2 class="ppom-divider-with-txt ppom-divider-donotcross ppom-divider-txt"><?php echo sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ); ?></h2>
+	<?php if ( 'style3' === $divider_styles ) { ?>
+		<h2 class="ppom-divider-with-txt ppom-divider-donotcross ppom-divider-txt"><?php echo esc_html( sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ) ); ?></h2>
 	<?php } ?>
 
 	<!--Style 4-->
-	<?php if ( $divider_styles == 'style4' ) { ?>
+	<?php if ( 'style4' === $divider_styles ) { ?>
 		<div class="ppom-divider-easy-shadow">
 			<span></span>
-			<span class="ppom-divider-txt"><?php echo sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ); ?></span>
+			<span class="ppom-divider-txt"><?php echo esc_html( sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ) ); ?></span>
 			<span></span>
 		</div>
 	<?php } ?>
 
 	<!--Style 5-->
-	<?php if ( $divider_styles == 'style5' ) { ?>
+	<?php if ( 'style5' === $divider_styles ) { ?>
 
-		<h1 class="ppom-divider-fancy-heading ppom-divider-txt"><?php echo sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ); ?></h1>
+		<h1 class="ppom-divider-fancy-heading ppom-divider-txt"><?php echo esc_html( sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ) ); ?></h1>
 		<div class="ppom-divider-fancy-line">
 			<span></span>
 		</div>
