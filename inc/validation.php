@@ -48,8 +48,6 @@ function ppom_esc_html( $content ) {
 	$allowedposttags['option']   = $allowed_atts;
 	$allowedposttags['textarea'] = $allowed_atts;
 	$allowedposttags['iframe']   = $allowed_atts;
-	$allowedposttags['script']   = $allowed_atts;
-	$allowedposttags['style']    = $allowed_atts;
 	$allowedposttags['strong']   = $allowed_atts;
 	$allowedposttags['small']    = $allowed_atts;
 	$allowedposttags['table']    = $allowed_atts;
