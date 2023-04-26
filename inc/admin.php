@@ -47,10 +47,10 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 							),
 							$ppom_settings_url 
 						);
-						echo sprintf( esc_html__( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), esc_html( $meta_title ) );
+						echo sprintf( wp_kses_post( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), esc_html( $meta_title ) );
 						echo ', ';
 					} else {
-						echo sprintf( esc_html__( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), esc_html_e( 'Add Fields', 'woocommerce-product-addon' ) );
+						echo sprintf( wp_kses_post( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), esc_html_e( 'Add Fields', 'woocommerce-product-addon' ) );
 					}
 				}
 			} elseif ( $ppom->ppom_settings ) {
@@ -61,9 +61,9 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 					),
 					$ppom_settings_url 
 				);
-				echo sprintf( esc_html__( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), esc_html( $ppom->meta_title ) );
+				echo sprintf( wp_kses_post( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), esc_html( $ppom->meta_title ) );
 			} else {
-				echo sprintf( esc_html__( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), esc_html_e( 'Add Fields', 'woocommerce-product-addon' ) );
+				echo sprintf( wp_kses_post( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), esc_html_e( 'Add Fields', 'woocommerce-product-addon' ) );
 			}
 
 			break;
