@@ -10,6 +10,7 @@ function ppom_esc_html( $content ) {
 	$allowed_atts                = array(
 		'align'      => array(),
 		'class'      => array(),
+		'data-*'     => true,
 		'type'       => array(),
 		'id'         => array(),
 		'dir'        => array(),
@@ -37,10 +38,14 @@ function ppom_esc_html( $content ) {
 		'onclick'    => array(),
 		'onchange'   => array(),
 		'onkeyup'    => array(),
+		'checked'    => array(),
+		'selected'   => array(),
 	);
 	$allowedposttags['form']     = $allowed_atts;
 	$allowedposttags['label']    = $allowed_atts;
 	$allowedposttags['input']    = $allowed_atts;
+	$allowedposttags['select']   = $allowed_atts;
+	$allowedposttags['option']   = $allowed_atts;
 	$allowedposttags['textarea'] = $allowed_atts;
 	$allowedposttags['iframe']   = $allowed_atts;
 	$allowedposttags['script']   = $allowed_atts;

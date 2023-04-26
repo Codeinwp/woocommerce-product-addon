@@ -86,7 +86,7 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 								<?php echo esc_html( stripcslashes( $productmeta->productmeta_name ) ); ?>
 							</a>
 						</td>
-						<td><?php echo esc_html( ppom_admin_simplify_meta( $productmeta->the_meta ) ); ?></td>
+						<td><?php echo ppom_esc_html( ppom_admin_simplify_meta( $productmeta->the_meta ) ); ?></td>
 						<td>
 							<a class="btn btn-sm btn-secondary ppom-products-modal"
 							   data-ppom_id="<?php echo esc_attr( $productmeta->productmeta_id ); ?>"

@@ -40,7 +40,7 @@ $product_type        = $product->get_type();
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo wp_kses_post( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 
@@ -93,7 +93,7 @@ $product_type        = $product->get_type();
 						data-without_tax="<?php echo esc_attr( $without_tax ); ?>"
 						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
-						<?php echo esc_attr( $checked_option ); ?>
+						<?php echo $checked_option // phpcs:ignore; ?>
 				>
 				<span class="ppom-input-option-label ppom-label-radio"><?php echo esc_html( $option_label ); ?></span>
 			</label>
