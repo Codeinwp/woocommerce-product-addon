@@ -77,7 +77,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : 0;
 						<li class="ppom_select_field list-group-item"
 							data-field-type="<?php echo esc_attr( $field_type ); ?>">
 							<span class="ppom-fields-icon">
-								<?php echo esc_html( $fields_icon ); ?>
+								<?php echo wp_kses_post( $fields_icon ); ?>
 							</span>
 							<span>
 								<?php echo esc_html( $fields_title ); ?>
@@ -93,7 +93,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : 0;
 						?>
 							<li onclick="return;" class="ppom_select_field list-group-item locked">
 								<span class="ppom-fields-icon">
-									<?php echo esc_html( $field['icon'] ); ?>
+									<?php echo wp_kses_post( $field['icon'] ); ?>
 								</span>
 								<span>
 									<?php echo esc_html( $field['title'] ); ?>
