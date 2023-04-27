@@ -198,8 +198,9 @@ class PPOM_Fields_Meta {
 			$html .= '<h3>' . sprintf( __( '%s', 'woocommerce-product-addon' ), $field_title ) . '</h3>';
 			$html .= '</header>';
 			$html .= '<div class="ppom-modal-body">';
-
-			$html .= $this->render_field_meta( $settings, $fields_type );
+			ob_start();
+			$this->render_field_meta( $settings, $fields_type );
+			$html .= ob_get_clean();
 
 			$html .= '</div>';
 			$html .= '<footer>';
@@ -297,7 +298,7 @@ class PPOM_Fields_Meta {
 
 		$html .= '</div>';
 
-		return $html;
+		echo ppom_esc_html( $html );
 	}
 
 
@@ -330,7 +331,7 @@ class PPOM_Fields_Meta {
 
 				if ( $field_index != '' ) {
 
-					$html_input .= $existing_name;
+					$html_input .= sprintf( ' %s', $existing_name );
 				}
 
 				$html_input .= '>';
@@ -342,7 +343,7 @@ class PPOM_Fields_Meta {
 
 				if ( $field_index != '' ) {
 
-					$html_input .= $existing_name;
+					$html_input .= sprintf( ' %s', $existing_name );
 				}
 
 				$html_input .= '>';
@@ -354,7 +355,7 @@ class PPOM_Fields_Meta {
 
 				if ( $field_index != '' ) {
 
-					$html_input .= $existing_name;
+					$html_input .= sprintf( ' %s', $existing_name );
 				}
 
 				$html_input .= '>' . esc_html( $values ) . '</textarea>';
@@ -366,7 +367,7 @@ class PPOM_Fields_Meta {
 
 				if ( $field_index != '' ) {
 
-					$html_input .= $existing_name;
+					$html_input .= sprintf( ' %s', $existing_name );
 				}
 
 				$html_input .= '>';

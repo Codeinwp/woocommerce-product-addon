@@ -248,7 +248,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : 0;
 								</header>
 								<div class="ppom-modal-body">
 									<?php
-										echo $form_meta->render_field_meta( $defualt_fields, $field_type, $f_index, $field_meta ); // phpcs:ignore
+										$form_meta->render_field_meta( $defualt_fields, $field_type, $f_index, $field_meta );
 									?>
 								</div>
 								<footer>

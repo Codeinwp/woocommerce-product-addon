@@ -9,7 +9,7 @@ function ppom_esc_html( $content ) {
 	global $allowedposttags;
 	$allowed_atts                = array(
 		'align'      => array(),
-		'class'      => array(),
+		'class'      => true,
 		'data-*'     => true,
 		'type'       => array(),
 		'id'         => array(),
