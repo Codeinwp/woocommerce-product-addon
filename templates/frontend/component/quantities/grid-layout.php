@@ -76,7 +76,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 		?>
 		<div class="col-md-3 ppom-quantity-box-cols text-center">
 			<div class="ppom-quantity-label">
-				<label class="quantities-lable"> <?php echo esc_html( stripslashes( trim( $opt['label'] ) ) ); ?></label>
+				<label class="quantities-lable"> <?php echo ppom_esc_html( stripslashes( trim( $opt['label'] ) ), 'span' ); ?></label>
 			</div>
 
 			<?php

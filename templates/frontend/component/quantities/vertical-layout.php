@@ -55,7 +55,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 		?>
 		<tr class="<?php echo esc_attr( $tr_class ); ?> quantities-row">
 			<th>
-				<label class="quantities-lable"> <?php echo esc_html( stripslashes( trim( $opt['label'] ) ) ); ?></label>
+				<label class="quantities-lable"> <?php echo ppom_esc_html( stripslashes( trim( $opt['label'] ) ), 'span' ); ?></label>
 			</th>
 
 			<td>
@@ -117,10 +117,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 						style="width: 50%;"
 				>
 
-
-				<?php
-				printf( esc_html__( '<span class="ppom-instock">%s</span>', 'woocommerce-product-addon' ), esc_html( $in_stock ) );
-				?>
+				<span class="ppom-instock"><?php echo esc_html( $in_stock ); ?></span>
 
 			</td>
 		</tr>

@@ -369,7 +369,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 					<?php
 					if ( ! empty( $selected_roles ) ) {
 						foreach ( $selected_roles as $key => $val ) {
-							echo '<option value="' . esc_attr( $key ) . '"' . wc_selected( $key, $selections ) . '>' . esc_html( $val ) . '</option>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+							?>
+							<?php
+							echo '<option value="' . esc_attr( $key ) . '"' . ppom_esc_attr( wc_selected( $key, $selections ) ) . '>' . esc_html( $val ) . '</option>';
 						}
 					}
 					?>

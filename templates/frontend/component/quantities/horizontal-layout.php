@@ -48,7 +48,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 				$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
 				?>
 				<th>
-					<label class="quantities-lable"> <?php echo esc_html( stripslashes( trim( $opt['label'] ) ) ); ?></label>
+					<label class="quantities-lable"> <?php echo ppom_esc_html( stripslashes( trim( $opt['label'] ) ), 'span' ); ?></label>
 				</th>
 			<?php } ?>
 		</tr>

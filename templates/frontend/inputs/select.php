@@ -54,7 +54,7 @@ $product_type = $product->get_type();
 			<?php
 			// Add input extra attributes
 			foreach ( $input_attr as $key => $val ) {
-				echo sprintf( '%s="%s"', esc_html( $key ), esc_html( $val ) );
+				echo sprintf( '%s="%s"', esc_attr( $key ), esc_attr( $val ) );
 			}
 			?>
 	>
@@ -100,7 +100,7 @@ $product_type = $product->get_type();
 					data-without_tax="<?php echo esc_attr( $without_tax ); ?>"
 					data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 					data-option_weight="<?php echo esc_attr( $option_weight ); ?>"
-					<?php echo esc_attr( $selected_value ); ?>
+					<?php echo ppom_esc_attr( $selected_value ); ?>
 			><?php echo esc_html( $option_label ); ?></option>
 
 			<?php

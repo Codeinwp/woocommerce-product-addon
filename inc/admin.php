@@ -44,6 +44,7 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 							array(
 								'productmeta_id' => $ppom_setting->productmeta_id,
 								'do_meta'        => 'edit',
+								'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 							),
 							$ppom_settings_url 
 						);
@@ -58,6 +59,7 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 					array(
 						'productmeta_id' => $ppom->meta_id,
 						'do_meta'        => 'edit',
+						'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 					),
 					$ppom_settings_url 
 				);
@@ -107,6 +109,7 @@ function ppom_meta_list( $post ) {
 			'productmeta_id' => $ppom->single_meta_id,
 			'do_meta'        => 'edit',
 			'product_id'     => $post->ID,
+			'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 		);
 
 		$url_edit = add_query_arg( $ppom_add_args, $ppom_setting );
@@ -282,6 +285,7 @@ function ppom_admin_save_form_meta() {
 			'page'           => 'ppom',
 			'productmeta_id' => $ppom_id,
 			'do_meta'        => 'edit',
+			'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 		);
 		$redirect_to = add_query_arg( $ppom_args, admin_url( 'admin.php' ) );
 	}
@@ -326,6 +330,7 @@ function ppom_admin_update_form_meta() {
 		'page'           => $return_page,
 		'productmeta_id' => $productmeta_id,
 		'do_meta'        => 'edit',
+		'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 	);
 	$redirect_to = add_query_arg( $ppom_args, admin_url( 'admin.php' ) );
 
@@ -440,6 +445,7 @@ function ppom_admin_update_form_meta() {
 		'page'           => $return_page,
 		'productmeta_id' => $productmeta_id,
 		'do_meta'        => 'edit',
+		'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 	);
 	$redirect_to = add_query_arg( $ppom_args, admin_url( 'admin.php' ) );
 
@@ -668,6 +674,7 @@ function ppom_admin_bar_menu() {
 			'page'           => 'ppom',
 			'productmeta_id' => $ppom->single_meta_id,
 			'do_meta'        => 'edit',
+			'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 		),
 		$ppom_setting_url
 	);

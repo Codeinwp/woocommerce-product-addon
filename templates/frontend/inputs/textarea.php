@@ -68,7 +68,7 @@ if ( $postid && is_numeric( $postid ) && $rich_editor != 'on' ) {
 		<?php
 		// Add input extra attributes
 		foreach ( $input_attr as $key => $val ) {
-			echo sprintf( '%s="%s"', esc_html( $key ), esc_html( $val ) );
+			echo sprintf( '%s="%s"', esc_attr( $key ), esc_attr( $val ) );
 		}
 		?>
 		><?php

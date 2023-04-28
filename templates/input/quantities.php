@@ -40,7 +40,7 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 							<?php
 							$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
 							if ( $the_price ) {
-								echo ' <span class="ppom-quantity-price-wrap">' . esc_html( wc_price( $the_price ) ) . '</span>';
+								echo ' <span class="ppom-quantity-price-wrap">' . wp_kses_post( wc_price( $the_price ) ) . '</span>';
 							}
 							?>
 						</label>
@@ -140,7 +140,7 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 					<?php
 					$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
 					if ( $the_price ) {
-						echo ' <span class="ppom-quantity-price-wrap">' . esc_html( wc_price( $the_price ) ) . '</span>';
+						echo ' <span class="ppom-quantity-price-wrap">' . wp_kses_post( wc_price( $the_price ) ) . '</span>';
 					}
 					?>
 				</div>

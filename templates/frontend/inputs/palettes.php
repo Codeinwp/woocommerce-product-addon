@@ -50,9 +50,7 @@ $custom_css .= '.ppom-palettes label>input:checked+.ppom-single-palette {
         border: 2px solid ' . $selected_palette_bclr . ' !important;
     }';
 
-echo '<style>';
-echo $custom_css; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-echo '</style>';
+wp_add_inline_style( 'ppom-main', $custom_css );
 ?>
 
 <div class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
