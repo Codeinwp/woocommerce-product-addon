@@ -160,7 +160,7 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 					   data-max="<?php echo esc_attr( $args['max_qty'] ); ?>"
 					   data-label="<?php echo esc_attr( $label ); ?>"
 					   data-includeprice="<?php echo esc_attr( $include_productprice ); ?>"
-					   name="<?php echo esc_html( htmlentities( $name ) ); ?>" type="number" class="ppom-quantity"
+					   name="<?php echo esc_attr( htmlentities( $name ) ); ?>" type="number" class="ppom-quantity"
 					   data-usebase_price="<?php echo esc_attr( $usebaseprice ); ?>"
 					   value="<?php echo esc_attr( $selected_val ); ?>" placeholder="0"
 					   data-price="<?php echo esc_attr( $the_price ); ?>" <?php echo esc_attr( $required ); ?> style="width: 50%;">
@@ -185,7 +185,7 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 						<?php
 						$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
 						if ( $the_price ) {
-							echo ' <span class="ppom-quantity-price-wrap">' . esc_html( wc_price( $the_price ) ) . '</span>';
+							echo ' <span class="ppom-quantity-price-wrap">' . wp_kses_post( wc_price( $the_price ) ) . '</span>';
 						}
 						?>
 

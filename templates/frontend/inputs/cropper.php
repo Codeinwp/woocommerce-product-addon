@@ -72,7 +72,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 						name="<?php echo esc_attr( $fm->form_name() ); ?>[ratio]"
 						data-field_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 						data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
-						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?php echo ppom_esc_attr( apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ) ); ?>
 						id="crop-size-<?php echo esc_attr( $fm->data_name() ); ?>"
 						disabled
 				>

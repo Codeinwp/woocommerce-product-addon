@@ -81,7 +81,7 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 							data-label="<?php echo esc_attr( $file_name ); ?>"
 							data-title="<?php echo esc_attr( $fm->title() ); ?>"
 							value="<?php echo esc_attr( $file_name ); ?>"
-							<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							<?php echo ppom_esc_attr( apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ) ); ?>
 							checked="checked"
 					>
 				</div>

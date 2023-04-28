@@ -26,10 +26,8 @@ $product_meta_id        = 0;
 $product_meta           = array();
 $ppom_field_index       = 1;
 
-// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-if ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) {
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$product_meta_id = intval( $_REQUEST ['productmeta_id'] );
+if ( ( isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'ppom_meta_edit' ) ) && ( isset( $_REQUEST ['do_meta'] ) && 'edit' === $_REQUEST ['do_meta'] ) ) {
+	$product_meta_id = isset( $_REQUEST ['productmeta_id'] ) ? intval( $_REQUEST ['productmeta_id'] ) : 0;
 	$ppom            = new PPOM_Meta();
 	$ppom_settings   = $ppom->get_settings_by_id( $product_meta_id );
 

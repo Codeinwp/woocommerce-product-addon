@@ -46,6 +46,7 @@
         <properties>
             <property name="customAutoEscapedFunctions" type="array">
                 <element value="ppom_esc_html"/>
+                <element value="ppom_esc_attr"/>
             </property>
         </properties>
     </rule>

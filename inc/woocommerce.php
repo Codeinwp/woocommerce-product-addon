@@ -1328,7 +1328,7 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 
 						if ( ! rename( $source_file, $destination_path ) ) {
 							// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
-							die( wp_sprintf( esc_html__( 'Error while re-naming order image %s', 'woocommerce-product-addon' ), esc_html( $source_file ) ) );
+							die( sprintf( esc_html__( 'Error while re-naming order image %s', 'woocommerce-product-addon' ), esc_html( $source_file ) ) );
 						}
 					}
 
@@ -1342,7 +1342,7 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 						$destination_path_edit = $edits_dir_path . $new_filename;
 						if ( ! rename( $source_file_edit, $destination_path_edit ) ) {
 							// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
-							die( wp_sprintf( esc_html__( 'Error while re-naming order image %s', 'woocommerce-product-addon' ), esc_html( $source_file_edit ) ) );
+							die( sprintf( esc_html__( 'Error while re-naming order image %s', 'woocommerce-product-addon' ), esc_html( $source_file_edit ) ) );
 						} else {
 							$file_edited = true;
 						}

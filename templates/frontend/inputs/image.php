@@ -43,7 +43,7 @@ $custom_attr = array();
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo wp_kses_post( $fm->field_label() ); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 	<!-- Legacy View -->
@@ -121,7 +121,7 @@ $custom_attr = array();
 									data-optionid="<?php echo esc_attr( $option_id ); ?>"
 									data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 									value="<?php echo esc_attr( json_encode( $image ) ); ?>"
-									<?php echo $checked_option // phpcs:ignore; ?>
+									<?php echo ppom_esc_attr( $checked_option ); ?>
 							>
 						<?php } else { ?>
 							<input
@@ -136,7 +136,7 @@ $custom_attr = array();
 									data-optionid="<?php echo esc_attr( $option_id ); ?>"
 									data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 									value="<?php echo esc_attr( json_encode( $image ) ); ?>"
-									<?php echo $checked_option // phpcs:ignore; ?>
+									<?php echo ppom_esc_attr( $checked_option ); ?>
 							>
 						<?php } ?>
 						<div class="p_u_i_name"><?php echo esc_html( $image_label ); ?></div>
@@ -222,7 +222,7 @@ $custom_attr = array();
 									data-optionid="<?php echo esc_attr( $option_id ); ?>"
 									data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 									value="<?php echo esc_attr( json_encode( $image ) ); ?>"
-									<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+									<?php echo ppom_esc_attr( apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ) ); ?>
 									<?php if( $multiple_allowed ) { ?> data-allow-multiple="yes" <?php } ?>
 									<?php if( $required ) { ?>data-required="yes"<?php } ?>
 									<?php
@@ -233,12 +233,12 @@ $custom_attr = array();
 										// Add input extra attributes
 										if ( ! empty( $custom_attr ) ) {
 											foreach ( $custom_attr as $key => $val ) {
-												echo wp_sprintf( '%s="%s"', esc_html( $key ), esc_html( $val ) );
+												echo sprintf( '%s="%s"', esc_html( $key ), esc_html( $val ) );
 											}
 										}
 									}
 									?>
-								<?php echo $checked_option // phpcs:ignore; ?>
+								<?php echo ppom_esc_attr( $checked_option ); ?>
 							>
 							<?php
 

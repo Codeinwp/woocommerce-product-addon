@@ -38,7 +38,7 @@ if ( ! $ranges ) {
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo wp_kses_post( $fm->field_label() ); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 	<!-- Check if price matrix table is not hidden by settings -->
@@ -109,7 +109,7 @@ if ( ! $ranges ) {
 						id="<?php echo esc_attr( $fm->data_name() ); ?>"
 						min="<?php echo esc_attr( $min_quantity ); ?>"
 						max="<?php echo esc_attr( $max_quantity ); ?>"
-						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?php echo ppom_esc_attr( apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ) ); ?>
 						step="<?php echo esc_attr( $qty_step ); ?>"
 				>
 			<?php } ?>

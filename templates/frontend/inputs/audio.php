@@ -32,7 +32,7 @@ if ( ! $fm->audio_video() ) {
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo wp_kses_post( $fm->field_label() ); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 	<div class="ppom_audio_box">
@@ -80,8 +80,8 @@ if ( ! $fm->audio_video() ) {
 								data-label="<?php echo esc_attr( $audio_title ); ?>"
 								data-price="<?php echo esc_attr( $audio_price ); ?>"
 								value="<?php echo esc_attr( json_encode( $audio ) ); ?>"
-								<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-								<?php echo $checked_option // phpcs:ignore; ?>
+								<?php echo ppom_esc_attr( apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ) ); ?>
+								<?php echo ppom_esc_attr( $checked_option ); ?>
 						>
 					<?php } else { ?>
 						<input
@@ -94,8 +94,8 @@ if ( ! $fm->audio_video() ) {
 								data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 								data-price="<?php echo esc_attr( $audio_price ); ?>"
 								value="<?php echo esc_attr( json_encode( $audio ) ); ?>"
-								<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-								<?php echo $checked_option // phpcs:ignore; ?>
+								<?php echo ppom_esc_attr( apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ) ); ?>
+								<?php echo ppom_esc_attr( $checked_option ); ?>
 						>
 					<?php } ?>
 

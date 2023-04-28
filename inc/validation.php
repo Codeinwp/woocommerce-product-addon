@@ -349,3 +349,28 @@ function ppom_get_product_limits( $product_id, $variation_id ) {
 	// ppom_pa($limits);
 	return $limits;
 }
+
+/**
+ * Escaping attribute.
+ *
+ * @param string $attributes HTML attributes.
+ * @return string
+ */
+function ppom_esc_attr( $attributes = '' ) {
+	if ( ! empty( $attributes ) ) {
+		$attributes = explode( ' ', $attributes );
+		$attributes = is_array( $attributes ) ? $attributes : array();
+		$attributes = array_filter(
+			$attributes,
+			function( $attr ) {
+				$attr = explode( '=', $attr );
+				if ( empty( $attr ) ) {
+					return '';
+				}
+				return sprintf( '%s="%s"', esc_attr( reset( $attr ) ), esc_attr( end( $attr ) ) );
+			}
+		);
+		$attributes = implode( ' ', $attributes );
+	}
+	return $attributes;
+}

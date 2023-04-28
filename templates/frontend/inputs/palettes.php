@@ -59,7 +59,7 @@ echo '</style>';
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo wp_kses_post( $fm->field_label() ); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 	<!-- Palettes Box -->
@@ -120,9 +120,9 @@ echo '</style>';
 							data-taxable="<?php echo esc_attr( $taxable ); ?>"
 							data-without_tax="<?php echo esc_attr( $without_tax ); ?>"
 							data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
-							<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							<?php echo ppom_esc_attr( apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ) ); ?>
 							value="<?php echo esc_attr( $raw_label ); ?>"
-							<?php echo $checked_option // phpcs:ignore; ?>
+							<?php echo ppom_esc_attr( $checked_option ); ?>
 					>
 				<?php } else { ?>
 
@@ -140,7 +140,7 @@ echo '</style>';
 							data-without_tax="<?php echo esc_attr( $without_tax ); ?>"
 							data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 							value="<?php echo esc_attr( $raw_label ); ?>"
-							<?php echo $checked_option // phpcs:ignore; ?>
+							<?php echo ppom_esc_attr( $checked_option ); ?>
 					>
 				<?php } ?>
 

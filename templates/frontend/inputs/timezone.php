@@ -43,7 +43,7 @@ if ( ! $options ) {
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo wp_kses_post( $fm->field_label() ); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 	<select
@@ -51,12 +51,12 @@ if ( ! $options ) {
 			name="<?php echo esc_attr( $fm->form_name() ); ?>"
 			class="<?php echo esc_attr( $fm->input_classes() ); ?>"
 			data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
-			<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php echo ppom_esc_attr( apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ) ); ?>
 
 			<?php
 			// Add input extra attributes
 			foreach ( $input_attr as $key => $val ) {
-				echo wp_sprintf( '%s="%s"', esc_html( $key ), esc_html( $val ) );
+				echo sprintf( '%s="%s"', esc_html( $key ), esc_html( $val ) );
 			}
 			?>
 	>

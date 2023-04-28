@@ -38,7 +38,7 @@ $input_classes = $input_classes . ' ppom-measure-input';
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo wp_kses_post( $fm->field_label() ); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 	<div class="ppom-measure">
@@ -56,7 +56,7 @@ $input_classes = $input_classes . ' ppom-measure-input';
 				data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 				data-optionid="<?php echo esc_attr( $option_id ); ?>"
 				data-qty="<?php echo esc_attr( $default_value ); ?>"
-				<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo ppom_esc_attr( apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ) ); ?>
 				style="display: none;"
 				checked
 		>
@@ -74,7 +74,7 @@ $input_classes = $input_classes . ' ppom-measure-input';
 				data-title="<?php echo esc_attr( $fm->field_label() ); ?>"
 				data-use_units="<?php echo esc_attr( $use_units ); ?>"
 				data-errormsg="<?php echo esc_attr( $fm->error_msg() ); ?>"
-				<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo ppom_esc_attr( apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ) ); ?>
 				max="<?php echo esc_attr( $maxlength ); ?>"
 				min="<?php echo esc_attr( $minlength ); ?>"
 				step="<?php echo esc_attr( $step ); ?>"
@@ -83,7 +83,7 @@ $input_classes = $input_classes . ' ppom-measure-input';
 				<?php
 				// Add input extra attributes
 				foreach ( $input_attr as $key => $val ) {
-					echo wp_sprintf( '%s="%s"', esc_html( $key ), esc_html( $val ) );
+					echo sprintf( '%s="%s"', esc_html( $key ), esc_html( $val ) );
 				}
 				?>
 		>
