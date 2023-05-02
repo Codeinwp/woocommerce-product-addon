@@ -40,7 +40,8 @@ function ppom_esc_html( $content, $tagname = '' ) {
 		'onkeyup'    => array(),
 		'checked'    => array(),
 		'selected'   => array(),
-		'preload'   => array(),
+		'preload'    => array(),
+		'colspan'    => true,
 	);
 	$allowedposttags['form']     = $allowed_atts;
 	$allowedposttags['style']    = $allowed_atts;
