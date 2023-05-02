@@ -40,6 +40,7 @@ function ppom_esc_html( $content, $tagname = '' ) {
 		'onkeyup'    => array(),
 		'checked'    => array(),
 		'selected'   => array(),
+		'preload'   => array(),
 	);
 	$allowedposttags['form']     = $allowed_atts;
 	$allowedposttags['style']    = $allowed_atts;
@@ -76,6 +77,9 @@ function ppom_esc_html( $content, $tagname = '' ) {
 	$allowedposttags['a']        = $allowed_atts;
 	$allowedposttags['b']        = $allowed_atts;
 	$allowedposttags['i']        = $allowed_atts;
+	$allowedposttags['video']    = $allowed_atts;
+	$allowedposttags['audio']    = $allowed_atts;
+	$allowedposttags['source']   = $allowed_atts;
 
 	if ( ! empty( $tagname ) ) {
 		$allowedposttags = array();
