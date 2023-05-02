@@ -1,4 +1,4 @@
-s<?php
+<?php
 /**
  * Checkbox Input Template
  *
