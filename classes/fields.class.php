@@ -157,7 +157,7 @@ class PPOM_Fields_Meta {
 			'loader'            => PPOM_URL . '/images/loading.gif',
 			'ppomProActivated'=>ppom_pro_is_installed() ? 'yes' : 'no',
 			'i18n' => [
-				'addGroupUrl'=>add_query_arg( array( 'action' => 'new' ) ),
+				'addGroupUrl' => esc_url( add_query_arg( array( 'action' => 'new' ) ) ),
 				'addGroupLabel'=>esc_html__( 'Add New Group', 'woocommerce-product-addon' ),
 				'bulkActionsLabel'=>esc_html__( 'Bulk Actions', 'woocommerce-product-addon' ),
 				'deleteLabel'=>esc_html__( 'Delete', 'woocommerce-product-addon' ),

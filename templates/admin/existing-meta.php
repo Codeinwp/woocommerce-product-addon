@@ -59,13 +59,13 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 						array(
 							'productmeta_id' => $productmeta->productmeta_id,
 							'do_meta'        => 'edit',
-						) 
+						)
 					);
 					$url_clone    = add_query_arg(
 						array(
 							'productmeta_id' => $productmeta->productmeta_id,
 							'do_meta'        => 'clone',
-						) 
+						)
 					);
 					$url_clone    = wp_nonce_url( $url_clone, 'ppom_clone_nonce_action', 'ppom_clone_nonce' );
 					$url_products = admin_url( 'edit.php?post_type=product', ( is_ssl() ? 'https' : 'http' ) );

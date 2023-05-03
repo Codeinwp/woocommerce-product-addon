@@ -468,7 +468,7 @@ class PPOM_SettingsFramework {
 		if ( $old_settings == 'yes' ) {
 			delete_option( 'ppom_settings_migration_done' );
 
-			wp_redirect( $ppom_settings_url );
+			wp_redirect( esc_url_raw( $ppom_settings_url ) );
 			exit;
 		} else {
 
@@ -484,7 +484,7 @@ class PPOM_SettingsFramework {
 
 			update_option( 'ppom_settings_migration_done', 1 );
 
-			wp_redirect( $ppom_settings_url );
+			wp_redirect( esc_url_raw( $ppom_settings_url ) );
 			exit;
 		}
 	}
