@@ -65,7 +65,7 @@ if ( ! $ranges ) {
 			?>
 			<div class="ppom-pricematrix-range ppom-range-<?php echo esc_attr( $range_id ); ?>">
 				<span class="pm-range"> <?php echo esc_html( apply_filters( 'ppom_matrix_item_label', stripslashes( trim( $label ) ), $opt ) ); ?></span>
-				<span class="pm-price" style="float:right"><?php echo esc_html( apply_filters( 'ppom_matrix_item_price', $price, $opt ) ); ?></span>
+				<span class="pm-price" style="float:right"><?php echo wp_kses_post( apply_filters( 'ppom_matrix_item_price', $price, $opt ) ); ?></span>
 			</div>
 			<?php
 		}

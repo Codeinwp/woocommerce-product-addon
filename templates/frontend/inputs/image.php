@@ -283,8 +283,7 @@ $custom_attr = array();
 								<?php
 							}
 							?>
-							
-							<!--<a href="#" class="ppom-image-overlay" data-model-id="modalImage<?php echo esc_attr( $image_id ); ?>">View</a>-->
+
 
 						</span> <!-- pre_upload_image -->
 					</label>

@@ -50,7 +50,7 @@ $default_value = strip_tags( $default_value );
 
 	<!-- If title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ) ); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo wp_kses_post( sprintf( __( '%s', 'woocommerce-product-addon' ), $fm->field_label() ) ); ?></label>
 	<?php endif ?>
 
 	<input
