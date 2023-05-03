@@ -542,7 +542,7 @@ class NM_PersonalizedProduct {
 					return;
 			}
 
-			wp_redirect( $sendback );
+			wp_redirect( esc_url( $sendback ) );
 
 			exit();
 		}
