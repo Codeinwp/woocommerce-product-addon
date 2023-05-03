@@ -299,7 +299,7 @@ function ppom_admin_save_form_meta() {
 			'message'        => __( 'Form added successfully', 'woocommerce-product-addon' ),
 			'status'         => 'success',
 			'productmeta_id' => $ppom_id,
-			'redirect_to'    => esc_url( $redirect_to ),
+			'redirect_to'    => esc_url_raw( $redirect_to ),
 		);
 	} else {
 
@@ -336,7 +336,7 @@ function ppom_admin_update_form_meta() {
 			'message'        => __( 'Since version 22.0, Database has some changes. Please Deactivate & then activate the PPOM plugin.', 'woocommerce-product-addon' ),
 			'status'         => 'error',
 			'productmeta_id' => $productmeta_id,
-			'redirect_to'    => esc_url( $redirect_to ),
+			'redirect_to'    => esc_url_raw( $redirect_to ),
 		);
 
 		wp_send_json( $resp );
@@ -450,7 +450,7 @@ function ppom_admin_update_form_meta() {
 			'message'        => __( 'Form updated successfully', 'woocommerce-product-addon' ),
 			'status'         => 'success',
 			'productmeta_id' => $productmeta_id,
-			'redirect_to'    => esc_url( $redirect_to ),
+			'redirect_to'    => esc_url_raw( $redirect_to ),
 		);
 	} else {
 
@@ -458,7 +458,7 @@ function ppom_admin_update_form_meta() {
 			'message'        => __( 'Form updated successfully.', 'woocommerce-product-addon' ),
 			'status'         => 'success',
 			'productmeta_id' => $productmeta_id,
-			'redirect_to'    => esc_url( $redirect_to ),
+			'redirect_to'    => esc_url_raw( $redirect_to ),
 		);
 	}
 
