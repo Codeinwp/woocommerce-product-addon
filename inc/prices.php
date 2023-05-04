@@ -1490,7 +1490,7 @@ function ppom_option_price_handle_vat( $option_price, $product ) {
 		return $option_price;
 	}
 
-	if ( ! is_product() && apply_filters( 'ppom_handle_option_price_vat_in_cart', true ) === true ) {
+	if ( $option_price >= 0 && ( ! is_product() && apply_filters( 'ppom_handle_option_price_vat_in_cart', true ) === true ) ) {
 		$vat_type = get_option( 'woocommerce_tax_display_cart' );
 		$args     = [
 			'price'    => $option_price,
@@ -1503,7 +1503,7 @@ function ppom_option_price_handle_vat( $option_price, $product ) {
 		}
 	}
 
-	if ( is_product() && apply_filters( 'ppom_handle_option_price_vat_in_product', true ) === true ) {
+	if ( $option_price >= 0 && ( is_product() && apply_filters( 'ppom_handle_option_price_vat_in_product', true ) === true ) ) {
 		$vat_type = get_option( 'woocommerce_tax_display_shop' );
 		$args     = [
 			'price'    => $option_price,
