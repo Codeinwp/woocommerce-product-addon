@@ -46,12 +46,11 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 								'do_meta'        => 'edit',
 								'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 							),
-							$ppom_settings_url 
+							$ppom_settings_url
 						);
+					} else {
 						echo sprintf( wp_kses_post( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), esc_html( $meta_title ) );
 						echo ', ';
-					} else {
-						echo sprintf( wp_kses_post( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), esc_html_e( 'Add Fields', 'woocommerce-product-addon' ) );
 					}
 				}
 			} elseif ( $ppom->ppom_settings ) {
@@ -61,11 +60,10 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 						'do_meta'        => 'edit',
 						'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 					),
-					$ppom_settings_url 
+					$ppom_settings_url
 				);
-				echo sprintf( wp_kses_post( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), esc_html( $ppom->meta_title ) );
 			} else {
-				echo sprintf( wp_kses_post( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), esc_html_e( 'Add Fields', 'woocommerce-product-addon' ) );
+				echo sprintf( wp_kses_post( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), esc_html( $ppom->meta_title ) );
 			}
 
 			break;
@@ -128,7 +126,7 @@ function ppom_meta_list( $post ) {
 	);
 	$ppom_setting_url = add_query_arg( $ppom_add_args, $ppom_setting );
 
-	$html .= sprintf( __( ' - <a href="%s" target="_blank">Create New Meta</a></p>', 'woocommerce-product-addon' ), $ppom_setting_url );
+	$html .= sprintf( __( ' - <a href="%s" target="_blank">Create New Meta</a></p>', 'woocommerce-product-addon' ), esc_url( $ppom_setting_url ) );
 
 	echo ppom_esc_html( apply_filters( 'ppom_select_meta_in_product', $html, $ppom, $all_meta ) );
 
@@ -303,7 +301,7 @@ function ppom_admin_save_form_meta() {
 			'message'        => __( 'Form added successfully', 'woocommerce-product-addon' ),
 			'status'         => 'success',
 			'productmeta_id' => $ppom_id,
-			'redirect_to'    => $redirect_to,
+			'redirect_to'    => esc_url_raw( $redirect_to ),
 		);
 	} else {
 
@@ -341,7 +339,7 @@ function ppom_admin_update_form_meta() {
 			'message'        => __( 'Since version 22.0, Database has some changes. Please Deactivate & then activate the PPOM plugin.', 'woocommerce-product-addon' ),
 			'status'         => 'error',
 			'productmeta_id' => $productmeta_id,
-			'redirect_to'    => $redirect_to,
+			'redirect_to'    => esc_url_raw( $redirect_to ),
 		);
 
 		wp_send_json( $resp );
@@ -456,7 +454,7 @@ function ppom_admin_update_form_meta() {
 			'message'        => __( 'Form updated successfully', 'woocommerce-product-addon' ),
 			'status'         => 'success',
 			'productmeta_id' => $productmeta_id,
-			'redirect_to'    => $redirect_to,
+			'redirect_to'    => esc_url_raw( $redirect_to ),
 		);
 	} else {
 
@@ -464,7 +462,7 @@ function ppom_admin_update_form_meta() {
 			'message'        => __( 'Form updated successfully.', 'woocommerce-product-addon' ),
 			'status'         => 'success',
 			'productmeta_id' => $productmeta_id,
-			'redirect_to'    => $redirect_to,
+			'redirect_to'    => esc_url_raw( $redirect_to ),
 		);
 	}
 
@@ -684,7 +682,7 @@ function ppom_admin_bar_menu() {
 		array(
 			'id'    => 'ppom-setting-bar',
 			'title' => sprintf( __( '%s', 'woocommerce-product-addon' ), $bar_title ),
-			'href'  => $ppom_setting_url,
+			'href'  => esc_url( $ppom_setting_url ),
 		) 
 	);
 
@@ -704,7 +702,7 @@ function ppom_admin_bar_menu() {
 			array(
 				'id'     => "ppom-setting-bar-{$meta->productmeta_id}",
 				'title'  => sprintf( __( '%s', 'woocommerce-product-addon' ), $bar_title ),
-				'href'   => $apply_link,
+				'href'   => esc_url( $apply_link ),
 				'parent' => 'ppom-setting-bar',
 			) 
 		);

@@ -51,7 +51,6 @@ $url_cancel = add_query_arg(
 );
 
 echo '<p><a class="btn btn-primary" href="' . esc_url( $url_cancel ) . '">' . esc_html__( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ) . '</a></p>';
-
 $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : 0;
 
 ?>

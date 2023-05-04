@@ -1,3 +1,7 @@
+##### [Version 32.0.7](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.6...v32.0.7) (2023-05-03)
+
+- Harden security
+
 ##### [Version 32.0.6](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.5...v32.0.6) (2023-04-19)
 
 - [Fix] Resolved an issue where the Edit Cart feature was losing the value of certain fields based on conditional logic.
