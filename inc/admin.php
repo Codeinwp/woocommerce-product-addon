@@ -211,6 +211,15 @@ function ppom_admin_save_form_meta() {
 	$show_cart_thumb      = 'NA';
 
 	$ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];
+
+	if ( empty( $ppom_meta ) ) {
+		$resp = array(
+			'message'        => __( 'No fields found.', 'woocommerce-product-addon' ),
+			'status'         => 'error',
+		);
+		wp_send_json( $resp );
+	}
+
 	$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );
 	$product_meta = ppom_sanitize_array_data( $product_meta );
 	$product_meta = json_encode( $product_meta );
