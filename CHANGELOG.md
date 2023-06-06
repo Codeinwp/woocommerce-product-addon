@@ -1,3 +1,8 @@
+##### [Version 32.0.8](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.7...v32.0.8) (2023-06-06)
+
+- Fix: group being duplicated
+- Fix: negative price not taken into consideration
+
 ##### [Version 32.0.7](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.6...v32.0.7) (2023-05-03)
 
 - Harden security
