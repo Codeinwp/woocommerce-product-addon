@@ -39,4 +39,4 @@ jobs:
                 id
               }
             }
-          }' -f project=${{ secrets.PROJECT_PLANNING_ID }} -f item=${{ steps.add_project.outputs.itemId }} -f status_field=${{ secrets.PLANNING_TEAM_FIELD_ID }} -f status_value=f0658f06 --silent
+          }' -f project=${{ secrets.PROJECT_PLANNING_ID }} -f item=${{ steps.add_project.outputs.itemId }} -f status_field=${{ secrets.PLANNING_TEAM_FIELD_ID }} -f status_value=ed46988b --silent
