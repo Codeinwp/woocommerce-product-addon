@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, woocommerce product addon
 Requires at least: 3.5
 Tested up to: 6.3
-Stable tag: 32.0.8
+Stable tag: 32.0.9
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -121,6 +121,14 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 9. PPOM General Settings
 
 == Changelog ==
+
+##### [Version 32.0.9](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.8...v32.0.9) (2023-08-31)
+
+- Fix: Do not enforce step min quantity if quantity is already set
+- Fixed compatibility issue with HPOS
+
+
+
 
 ##### [Version 32.0.8](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.7...v32.0.8) (2023-06-06)
 
