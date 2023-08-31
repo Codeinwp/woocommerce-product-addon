@@ -11,7 +11,7 @@
  * Requires PHP: 7.2
  *
  * WC requires at least: 6.5
- * WC tested up to: 7.4
+ * WC tested up to: 8.0
  *
  * WordPress Available:  yes
  * Requires License:     no
@@ -120,6 +120,15 @@ add_filter(
 	} 
 );
 add_action( 'woocommerce_init', 'PPOM' );
+
+add_action(
+	'before_woocommerce_init',
+	function () {
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	}
+);
 
 register_activation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'activate_plugin' ) );
 register_deactivation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'deactivate_plugin' ) );
