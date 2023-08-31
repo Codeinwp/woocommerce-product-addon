@@ -163,7 +163,7 @@ function ppom_validation_product_limits( $data, $product ) {
 		}
 	}
 
-	if ( empty( $limits['min_qty'] ) && ! $product->is_type( 'group' ) && $limits['step'] > 0 ) {
+	if ( empty( $limits['min_qty'] ) && ! $product->is_type( 'group' ) && $limits['step'] > 0 && $data['min_value'] <= 1 ) {
 		$data['min_value'] = $limits['step'];
 	}
 
@@ -227,7 +227,7 @@ function ppom_validation_variation_limits( $data, $product, $variation ) {
 		}
 	}
 
-	if ( empty( $limits['min_qty'] ) && ! $product->is_type( 'group' ) && $limits['step'] > 0 ) {
+	if ( empty( $limits['min_qty'] ) && ! $product->is_type( 'group' ) && $limits['step'] > 0 && $data['min_qty'] <= 1 ) {
 		$data['min_qty'] = $limits['step'];
 	}
 
