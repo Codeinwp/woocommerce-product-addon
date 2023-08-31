@@ -1,3 +1,8 @@
+##### [Version 32.0.9](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.8...v32.0.9) (2023-08-31)
+
+- Fix: Do not enforce step min quantity if quantity is already set
+- Fixed compatibility issue with HPOS
+
 ##### [Version 32.0.8](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.7...v32.0.8) (2023-06-06)
 
 - Fix: group being duplicated
