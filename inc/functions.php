@@ -313,8 +313,11 @@ function ppom_make_meta_data( $cart_item, $context = 'cart' ) {
  * @params: $ppom_meta_ids (if product_is not known)
  **/
 function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids = null, $context = 'cart', $variation_id = null ) {
-
 	$ppom_meta = array();
+	// Return the empty array if the cart is empty.
+	if ( ! $ppom_cart_items ) {
+		return $ppom_meta;
+	}
 
 	$ppom_cart_fields = $ppom_cart_items['fields'];
 
