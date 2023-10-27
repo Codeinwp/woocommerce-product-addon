@@ -175,8 +175,8 @@ class PPOM_Form {
 				continue;
 			}
 
-
-			$field_wrapper_div = '<div data-data_name=' . esc_attr( $data_name ) . ' ' . $ppom_cond_data . ' class="' . esc_attr( $field_wrapper_class ) . '">';
+			$is_cloned = ! empty( $meta['is_cloned'] ) ? 'true' : 'false';
+			$field_wrapper_div = '<div data-is_cloned="' . esc_attr( $is_cloned ) . '" data-data_name=' . esc_attr( $data_name ) . ' ' . $ppom_cond_data . ' class="' . esc_attr( $field_wrapper_class ) . '">';
 			$field_html       .= apply_filters( 'ppom_field_wrapper_div', $field_wrapper_div, $meta, $this->product );
 
 			/**
