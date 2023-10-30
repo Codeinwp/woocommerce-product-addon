@@ -81,11 +81,11 @@ class PPOM_Form {
 	}
 
 	/**
-	 * PPOM fields rendering callback
+	 * PPOM fields rendering callback.
 	 *
-	 * @return fields html
+	 * @param int $meta_id Meta ID.
 	 */
-	function ppom_fields_render() {
+	function ppom_fields_render( $meta_id = 0 ) {
 
 		$posted_values = '';
 
@@ -97,8 +97,13 @@ class PPOM_Form {
 		// posted value being
 		// used ppom-pro
 		$posted_values = apply_filters( 'ppom_default_values', $posted_values, $_POST, $this->product_id, self::$args );
-
-		foreach ( self::$ppom->fields as $meta ) {
+		$fields        = array_filter(
+			self::$ppom->fields,
+			function( $field ) use ( $meta_id ) {
+				return (int) $meta_id === (int) $field['ppom_id'];
+			}
+		);
+		foreach ( $fields as $meta ) {
 
 			$type      = isset( $meta['type'] ) ? $meta['type'] : '';
 			$title     = isset( $meta['title'] ) ? ppom_wpml_translate( $meta['title'], 'PPOM' ) : '';
@@ -175,8 +180,7 @@ class PPOM_Form {
 				continue;
 			}
 
-			$is_cloned = ! empty( $meta['is_cloned'] ) ? 'true' : 'false';
-			$field_wrapper_div = '<div data-is_cloned="' . esc_attr( $is_cloned ) . '" data-data_name=' . esc_attr( $data_name ) . ' ' . $ppom_cond_data . ' class="' . esc_attr( $field_wrapper_class ) . '">';
+			$field_wrapper_div = '<div data-data_name=' . esc_attr( $data_name ) . ' ' . $ppom_cond_data . ' class="' . esc_attr( $field_wrapper_class ) . '">';
 			$field_html       .= apply_filters( 'ppom_field_wrapper_div', $field_wrapper_div, $meta, $this->product );
 
 			/**

@@ -170,8 +170,16 @@ class PPOM_Meta {
 		}
 
 		global $wpdb;
-		$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
-		$meta_settings = $wpdb->get_row( $qry );
+		$meta_id       = implode( ',', $this->meta_id );
+		$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id IN($meta_id)";
+		$meta_settings = $wpdb->get_results( $qry );
+		$filter_meta   = array_filter(
+			$meta_settings,
+			function( $meta ) {
+				return 'on' === $meta->productmeta_validation ? $meta : false;
+			}
+		);
+		$meta_settings = ! empty( $filter_meta ) ? reset( $filter_meta ) : reset( $meta_settings );
 
 		$meta_settings = empty( $meta_settings ) ? null : $meta_settings;
 
