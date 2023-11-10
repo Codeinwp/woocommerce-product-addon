@@ -680,15 +680,20 @@ class NM_PersonalizedProduct {
 	 * Set PPOM Menu Access via Settings
 	 * */
 	public static function set_ppom_menu_permission() {
-
 		$ppom_roles = ppom_get_option( 'ppom_permission_mfields', array() );
-		foreach ( $ppom_roles as $r ) {
-
-			// if( $r == 'administrator' ) continue;
-
-			$wp_role = get_role( $r );
-			if ( $wp_role ) {
-				$wp_role->add_cap( 'ppom_options_page' );
+		$roles      = wp_roles();
+		foreach ( $roles->roles as $key => $r ) {
+			$wp_role = get_role( $key );
+			if ( in_array( $key, $ppom_roles, true ) ) {
+				if ( $wp_role ) {
+					if ( ! $wp_role->has_cap( 'ppom_options_page' ) ) {
+						$wp_role->add_cap( 'ppom_options_page' );
+					}
+				}
+			} else {
+				if ( $wp_role->has_cap( 'ppom_options_page' ) ) {
+					$wp_role->remove_cap( 'ppom_options_page' );
+				}
 			}
 		}
 	}

@@ -48,12 +48,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			) 
 		);
 
+		add_action( 'init', array( 'NM_PersonalizedProduct', 'set_ppom_menu_permission' ) );
+
 		// Getting products list
 		add_action( 'wp_ajax_ppom_get_products', array( $this, 'get_products' ) );
 		add_action( 'wp_ajax_ppom_attach_ppoms', array( $this, 'ppom_attach_ppoms' ) );
 
 		// Adding setting tab in WooCommerce
-		if ( ! ppom_settings_migrated() ) {
+		if ( ! ppom_settings_migrated() && current_user_can( 'manage_options' ) ) {
 			add_filter( 'woocommerce_settings_tabs_array', __CLASS__ . '::add_settings_tab', 50 );
 			// Display settings
 			add_action( 'woocommerce_settings_tabs_ppom_settings', array( $this, 'settings_tab' ) );
