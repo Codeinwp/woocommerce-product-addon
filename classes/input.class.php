@@ -24,6 +24,13 @@ class PPOM_Inputs {
 	 */
 	private static $ins = null;
 
+	/**
+	 * Icon.
+	 *
+	 * @var string $icon
+	 */
+	public $icon = '';
+
 
 	/**
 	 * __construct function.
