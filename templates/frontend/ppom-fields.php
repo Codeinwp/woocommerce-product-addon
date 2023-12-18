@@ -26,6 +26,7 @@ if ( ! $form_obj::$ppom->has_unique_datanames() ) {
 
 // ppom meta ids
 $ppom_wrapper_id = is_array( $form_obj::$ppom->meta_id ) ? implode( '-', $form_obj::$ppom->meta_id ) : $form_obj::$ppom->meta_id;
+$ppom_groups     = isset( $form_obj::$ppom->meta_id ) ? $form_obj::$ppom->meta_id : array();
 ?>
 
 <div id="ppom-box-<?php echo esc_attr( $ppom_wrapper_id ); ?>" class="ppom-wrapper">
@@ -40,27 +41,32 @@ $ppom_wrapper_id = is_array( $form_obj::$ppom->meta_id ) ? implode( '-', $form_o
 
 	<!-- Render hidden inputs -->
 	<?php $form_obj->form_contents(); ?>
-
-	<div class="<?php echo esc_attr( $form_obj->wrapper_inner_classes() ); ?>">
-
-		<?php
-		/*
-		** hook before ppom fields 
-		*/
-		do_action( 'ppom_before_ppom_fields', $form_obj );
+	<?php
+	foreach ( $ppom_groups as $meta_id ) :
+		$ppom            = new PPOM_Meta();
+		$ppom_settings   = $ppom->get_settings_by_id( $meta_id );
+		$form_obj::$ppom->ppom_settings = $ppom_settings;
 		?>
+		<div class="<?php echo esc_attr( $form_obj->wrapper_inner_classes() ); ?>">
 
-		<?php $form_obj->ppom_fields_render(); ?>
+			<?php
+			/**
+			 * Hook before ppom fields.
+			 */
+			do_action( 'ppom_before_ppom_fields', $form_obj );
+			?>
 
-		<?php
-		/*
-		** hook after ppom fields 
-		*/
-		do_action( 'ppom_after_ppom_fields', $form_obj );
-		?>
+			<?php $form_obj->ppom_fields_render( $meta_id ); ?>
 
-	</div> <!-- end form-row -->
+			<?php
+			/**
+			 * Hook after ppom fields.
+			 */
+			do_action( 'ppom_after_ppom_fields', $form_obj );
+			?>
 
+		</div>
+	<?php endforeach; ?> <!-- end form-row -->
 
 	<!-- Display price table after fields -->
 	<?php 
