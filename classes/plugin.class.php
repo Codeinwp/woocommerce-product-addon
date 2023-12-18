@@ -140,7 +140,7 @@ class NM_PersonalizedProduct {
 		}
 
 
-		// add_filter( 'woocommerce_cart_item_subtotal', 'ppom_woocommerce_item_subtotal', 10, 3);
+		add_filter( 'woocommerce_cart_item_subtotal', 'ppom_woocommerce_item_subtotal', 10, 3);
 		add_filter( 'woocommerce_checkout_cart_item_quantity', 'ppom_woocommerce_control_checkout_quantity', 10, 3 );
 		add_filter( 'woocommerce_order_item_quantity_html', 'ppom_woocommerce_control_oder_item_quantity', 10, 2 );
 		add_filter( 'woocommerce_email_order_item_quantity', 'ppom_woocommerce_control_email_item_quantity', 10, 2 );

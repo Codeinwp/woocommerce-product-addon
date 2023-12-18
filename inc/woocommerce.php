@@ -991,32 +991,44 @@ function ppom_woocommerce_control_cart_quantity( $quantity, $cart_item_key ) {
 	return $quantity;
 }
 
-// Control subtotal when quantities input used
-/*
-function ppom_woocommerce_item_subtotal( $item_subtotal, $cart_item, $cart_item_key) {
-	
-	if( !isset($cart_item['ppom']['ppom_option_price']) ) return $item_subtotal;
-	
-	// Getting option price
-	$option_prices = json_decode( stripslashes($cart_item['ppom']['ppom_option_price']), true);
-	if( empty($option_prices) ) return $item_subtotal;
-	
-	$ppom_has_quantities = 0;
-	foreach($option_prices as $option) {
-		
-		if( isset($option['quantity']) ) {
-			$ppom_has_quantities += intval( $option['quantity'] );
+// Control subtotal when quantities input used.
+function ppom_woocommerce_item_subtotal( $item_subtotal, $cart_item, $cart_item_key ) {
+
+	if ( ! isset( $cart_item['ppom']['ppom_option_price'] ) ) {
+		return $item_subtotal;
+	}
+
+	// Getting option price.
+	$option_prices = json_decode( stripslashes( $cart_item['ppom']['ppom_option_price'] ), true );
+
+	if ( empty( $option_prices ) ) {
+		return $item_subtotal;
+	}
+
+	$price = 0;
+	foreach ( $option_prices as $option ) {
+		$option       = ppom_translation_options( $option );
+		$option_price = isset( $option['price'] ) ? $option['price'] : 0;
+		if ( 0 === $option_price || ( ! isset( $option['apply'] ) || 'onetime' !== $option['apply'] ) ) {
+			continue;
+		}
+		$price = isset( $option['discount'] ) && $option['discount'] > 0 ? $option['discount'] : $option_price;
+		if ( ! empty( $price ) ) {
+			$price = apply_filters( 'ppom_option_price', $price );
+			$price = floatval( wp_strip_all_tags( $price ) );
 		}
 	}
-	
-	// If no quantity updated then return default
-	if( $ppom_has_quantities == 0 ) return $item_subtotal;
-	
-	$_product = $cart_item['data'];
-	$item_quantity = 1;
-	return WC()->cart->get_product_subtotal( $_product,  $item_quantity);
-	
-}*/
+
+	if ( 0 === $price ) {
+		return $item_subtotal;
+	}
+	$product_id    = $cart_item['product_id'];
+	$quantity      = $cart_item['quantity'];
+	$product_data  = new WC_Product( $product_id );
+	$product_price = floatval( $product_data->get_price() ) * $quantity;
+	$item_subtotal = $product_price + $price;
+	return ppom_price( $item_subtotal );
+}
 
 function ppom_woocommerce_control_checkout_quantity( $quantity, $cart_item, $cart_item_key ) {
 
