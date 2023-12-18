@@ -12,6 +12,90 @@ class PPOM_Meta {
 	private static $ins = null;
 	public static $product_id;
 
+	/**
+	 * Plugin category data.
+	 *
+	 * @var array $category_meta
+	 */
+	public $category_meta = array();
+
+	/**
+	 * Plugin category array.
+	 *
+	 * @var array $ppom_with_cat
+	 */
+	public $ppom_with_cat = array();
+
+	/**
+	 * Plugin settings.
+	 *
+	 * @var array $ppom_settings
+	 */
+	public $ppom_settings = array();
+
+	/**
+	 * Fields.
+	 *
+	 * @var bool $is_exists
+	 */
+	public $is_exists = false;
+
+	/**
+	 * Meta ID.
+	 *
+	 * @var int $single_meta_id
+	 */
+	public $single_meta_id = 0;
+
+	/**
+	 * Check has multiple meta.
+	 *
+	 * @var bool $has_multiple_meta
+	 */
+	public $has_multiple_meta = false;
+
+	/**
+	 * Check ajax validation enabled or not.
+	 *
+	 * @var bool $ajax_validation_enabled
+	 */
+	public $ajax_validation_enabled = false;
+
+	/**
+	 * Inline CSS.
+	 *
+	 * @var string $inline_css
+	 */
+	public $inline_css = '';
+
+	/**
+	 * Inline JS.
+	 *
+	 * @var string $inline_js
+	 */
+	public $inline_js = '';
+
+	/**
+	 * Price display.
+	 *
+	 * @var string $price_display
+	 */
+	public $price_display = '';
+
+	/**
+	 * Meta title.
+	 *
+	 * @var string $meta_title
+	 */
+	public $meta_title = '';
+
+	/**
+	 * Fields.
+	 *
+	 * @var string $fields
+	 */
+	public $fields = array();
+
 	// QM-5
 	var $meta_id;
 

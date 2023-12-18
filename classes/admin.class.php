@@ -14,6 +14,13 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 	var $menu_pages, $plugin_scripts_admin, $plugin_settings;
 
+	/**
+	 * Plugin meta data.
+	 *
+	 * @var string $plugin_meta
+	 */
+	public $plugin_meta = array();
+
 	function __construct() {
 
 		// setting plugin meta saved in config.php
