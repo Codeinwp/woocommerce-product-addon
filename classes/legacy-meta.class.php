@@ -70,7 +70,8 @@ class PPOM_Legacy_InputManager {
 		$desc = ppom_wpml_translate( $desc, 'PPOM' );
 
 		// old Filter
-		return apply_filters( 'ppom_description_content', $desc, self::$input_meta );
+		$desc = apply_filters( 'ppom_description_content', $desc, self::$input_meta );
+		return apply_filters( 'the_content', $desc );
 	}
 
 
