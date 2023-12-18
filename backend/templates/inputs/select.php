@@ -25,7 +25,7 @@ $selected_opt = $class_ins::get_saved_settings( $input_id );
 			id="<?php echo esc_attr( $input_id ); ?>"
 	>
 		<?php foreach ( $options as $key => $val ) { ?>
-			<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $selected_opt, $key, true ); ?>><?php echo $val; ?></option>
+			<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $selected_opt, $key, true ); ?>><?php echo esc_html( $val ); ?></option>
 		<?php } ?>
 	</select>
 <?php } else { ?>
@@ -42,10 +42,10 @@ $selected_opt = $class_ins::get_saved_settings( $input_id );
 			$selected = '';
 			foreach ( $options as $key => $val ) {
 				if ( ! empty( $selected_opt ) ) {
-					$selected = in_array( $key, $selected_opt ) ? 'selected="selected"' : '';
+					$selected = in_array( $key, $selected_opt ) ? 'selected' : '';
 				} 
 				?>
-				<option value="<?php echo esc_attr( $key ); ?>" <?php echo $selected; ?>><?php echo esc_html( $val ); ?></option>
+				<option value="<?php echo esc_attr( $key ); ?>" <?php echo esc_attr( $selected ); ?>><?php echo esc_html( $val ); ?></option>
 				<?php 
 			}
 		}

@@ -48,8 +48,7 @@ $default_value = strip_tags( $default_value );
 
 	<!-- If title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>" for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo wp_kses_post( $fm->field_label() ); ?></label>
 	<?php endif ?>
 
 	<input
@@ -66,12 +65,12 @@ $default_value = strip_tags( $default_value );
 			data-onetime="<?php echo esc_attr( $onetime ); ?>"
 			data-taxable="<?php echo esc_attr( $taxable ); ?>"
 			data-without_tax="<?php echo esc_attr( $price_without_tax ); ?>"
-			<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+			<?php echo ppom_esc_attr( apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ) ); ?>
 
 			<?php
 			// Add input extra attributes
 			foreach ( $input_attr as $key => $val ) {
-				echo $key . '="' . $val . '"';
+				echo sprintf( '%s="%s"', esc_attr( $key ), esc_attr( $val ) );
 			}
 			?>
 			<?php if( 'on' === $jquery_dp ) { ?>

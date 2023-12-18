@@ -4,47 +4,55 @@
  **/
 
 // esc html content before rendering
-function ppom_esc_html( $content ) {
+function ppom_esc_html( $content, $tagname = '' ) {
 
 	global $allowedposttags;
 	$allowed_atts                = array(
-		'align'      => array(),
-		'class'      => array(),
-		'type'       => array(),
-		'id'         => array(),
-		'dir'        => array(),
-		'lang'       => array(),
-		'style'      => array(),
-		'xml:lang'   => array(),
-		'src'        => array(),
-		'alt'        => array(),
-		'href'       => array(),
-		'rel'        => array(),
-		'rev'        => array(),
-		'target'     => array(),
-		'novalidate' => array(),
-		'type'       => array(),
-		'value'      => array(),
-		'name'       => array(),
-		'tabindex'   => array(),
-		'action'     => array(),
-		'method'     => array(),
-		'for'        => array(),
-		'width'      => array(),
-		'height'     => array(),
-		'data'       => array(),
-		'title'      => array(),
-		'onclick'    => array(),
-		'onchange'   => array(),
-		'onkeyup'    => array(),
+		'align'       => array(),
+		'class'       => true,
+		'data-*'      => true,
+		'type'        => array(),
+		'id'          => array(),
+		'dir'         => array(),
+		'lang'        => array(),
+		'style'       => array(),
+		'xml:lang'    => array(),
+		'src'         => array(),
+		'alt'         => array(),
+		'href'        => array(),
+		'rel'         => array(),
+		'rev'         => array(),
+		'target'      => array(),
+		'novalidate'  => array(),
+		'type'        => array(),
+		'value'       => array(),
+		'name'        => array(),
+		'tabindex'    => array(),
+		'action'      => array(),
+		'method'      => array(),
+		'for'         => array(),
+		'width'       => array(),
+		'height'      => array(),
+		'data'        => array(),
+		'title'       => array(),
+		'onclick'     => array(),
+		'onchange'    => array(),
+		'onkeyup'     => array(),
+		'checked'     => array(),
+		'selected'    => array(),
+		'preload'     => array(),
+		'colspan'     => true,
+		'placeholder' => true,
+		'required'    => true,
 	);
 	$allowedposttags['form']     = $allowed_atts;
+	$allowedposttags['style']    = $allowed_atts;
 	$allowedposttags['label']    = $allowed_atts;
 	$allowedposttags['input']    = $allowed_atts;
+	$allowedposttags['select']   = $allowed_atts;
+	$allowedposttags['option']   = $allowed_atts;
 	$allowedposttags['textarea'] = $allowed_atts;
 	$allowedposttags['iframe']   = $allowed_atts;
-	$allowedposttags['script']   = $allowed_atts;
-	$allowedposttags['style']    = $allowed_atts;
 	$allowedposttags['strong']   = $allowed_atts;
 	$allowedposttags['small']    = $allowed_atts;
 	$allowedposttags['table']    = $allowed_atts;
@@ -72,6 +80,17 @@ function ppom_esc_html( $content ) {
 	$allowedposttags['a']        = $allowed_atts;
 	$allowedposttags['b']        = $allowed_atts;
 	$allowedposttags['i']        = $allowed_atts;
+	$allowedposttags['video']    = $allowed_atts;
+	$allowedposttags['audio']    = $allowed_atts;
+	$allowedposttags['source']   = $allowed_atts;
+
+	if ( ! empty( $tagname ) ) {
+		$allowedposttags = array();
+		$tagname         = explode( ',', $tagname );
+		foreach ( $tagname as $tag ) {
+			$allowedposttags[ $tag ] = $allowed_atts;
+		}
+	}
 
 	$allowed_tags = wp_kses_allowed_html( 'post' );
 
@@ -345,4 +364,29 @@ function ppom_get_product_limits( $product_id, $variation_id ) {
 
 	// ppom_pa($limits);
 	return $limits;
+}
+
+/**
+ * Escaping attribute.
+ *
+ * @param string $attributes HTML attributes.
+ * @return string
+ */
+function ppom_esc_attr( $attributes = '' ) {
+	if ( ! empty( $attributes ) ) {
+		$attributes = explode( ' ', $attributes );
+		$attributes = is_array( $attributes ) ? $attributes : array();
+		$attributes = array_map(
+			function( $attr ) {
+				$attr = explode( '=', $attr );
+				if ( empty( $attr ) ) {
+					return '';
+				}
+				return sprintf( '%s="%s"', esc_attr( reset( $attr ) ), esc_attr( end( $attr ) ) );
+			},
+			$attributes
+		);
+		$attributes = implode( ' ', $attributes );
+	}
+	return $attributes;
 }

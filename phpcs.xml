@@ -45,7 +45,8 @@
     <rule ref="WordPress.Security.EscapeOutput">
         <properties>
             <property name="customAutoEscapedFunctions" type="array">
-                <element value="neve_kses_svg"/>
+                <element value="ppom_esc_html"/>
+                <element value="ppom_esc_attr"/>
             </property>
         </properties>
     </rule>

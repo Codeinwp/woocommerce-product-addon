@@ -44,13 +44,13 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 							array(
 								'productmeta_id' => $ppom_setting->productmeta_id,
 								'do_meta'        => 'edit',
+								'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 							),
-							$ppom_settings_url 
+							$ppom_settings_url
 						);
-						echo sprintf( __( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), $meta_title );
-						echo ', ';
 					} else {
-						echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), 'Add Fields' );
+						echo sprintf( wp_kses_post( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), esc_html( $meta_title ) );
+						echo ', ';
 					}
 				}
 			} elseif ( $ppom->ppom_settings ) {
@@ -58,12 +58,12 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 					array(
 						'productmeta_id' => $ppom->meta_id,
 						'do_meta'        => 'edit',
+						'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 					),
-					$ppom_settings_url 
+					$ppom_settings_url
 				);
-				echo sprintf( __( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), $ppom->meta_title );
 			} else {
-				echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), 'Add Fields' );
+				echo sprintf( wp_kses_post( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), esc_html( $ppom->meta_title ) );
 			}
 
 			break;
@@ -107,6 +107,7 @@ function ppom_meta_list( $post ) {
 			'productmeta_id' => $ppom->single_meta_id,
 			'do_meta'        => 'edit',
 			'product_id'     => $post->ID,
+			'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 		);
 
 		$url_edit = add_query_arg( $ppom_add_args, $ppom_setting );
@@ -127,7 +128,7 @@ function ppom_meta_list( $post ) {
 
 	$html .= sprintf( __( ' - <a href="%s" target="_blank">Create New Meta</a></p>', 'woocommerce-product-addon' ), esc_url( $ppom_setting_url ) );
 
-	echo apply_filters( 'ppom_select_meta_in_product', $html, $ppom, $all_meta );
+	echo ppom_esc_html( apply_filters( 'ppom_select_meta_in_product', $html, $ppom, $all_meta ) );
 
 	echo '<div class="ppom_extra_options_panel">';
 	do_action( 'ppom_meta_box_after_list', $post );
@@ -291,6 +292,7 @@ function ppom_admin_save_form_meta() {
 			'page'           => 'ppom',
 			'productmeta_id' => $ppom_id,
 			'do_meta'        => 'edit',
+			'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 		);
 		$redirect_to = add_query_arg( $ppom_args, admin_url( 'admin.php' ) );
 	}
@@ -335,6 +337,7 @@ function ppom_admin_update_form_meta() {
 		'page'           => $return_page,
 		'productmeta_id' => $productmeta_id,
 		'do_meta'        => 'edit',
+		'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 	);
 	$redirect_to = add_query_arg( $ppom_args, admin_url( 'admin.php' ) );
 
@@ -449,6 +452,7 @@ function ppom_admin_update_form_meta() {
 		'page'           => $return_page,
 		'productmeta_id' => $productmeta_id,
 		'do_meta'        => 'edit',
+		'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 	);
 	$redirect_to = add_query_arg( $ppom_args, admin_url( 'admin.php' ) );
 
@@ -677,6 +681,7 @@ function ppom_admin_bar_menu() {
 			'page'           => 'ppom',
 			'productmeta_id' => $ppom->single_meta_id,
 			'do_meta'        => 'edit',
+			'_wpnonce'       => wp_create_nonce( 'ppom_meta_edit' ),
 		),
 		$ppom_setting_url
 	);
@@ -718,6 +723,6 @@ function ppom_admin_update_pro_notice() {
 	$buy_paddle = tsdk_utmify( 'https://themeisle.com/plugins/ppom-pro/upgrade/', 'addmorefields', 'ppompage' );
 
     echo '<div class="ppom-more-plugins-block pb-5">';
-    echo '<a class="btn btn-sm btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . __( 'Add more field types', 'woocommerce-product-addon' ) . '</a>';
+    echo '<a class="btn btn-sm btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . esc_html__( 'Add more field types', 'woocommerce-product-addon' ) . '</a>';
     echo '</div>';
 }

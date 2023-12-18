@@ -55,7 +55,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 		?>
 		<tr class="<?php echo esc_attr( $tr_class ); ?> quantities-row">
 			<th>
-				<label class="quantities-lable"> <?php echo stripslashes( trim( $opt['label'] ) ); ?></label>
+				<label class="quantities-lable"> <?php echo ppom_esc_html( stripslashes( trim( $opt['label'] ) ), 'span' ); ?></label>
 			</th>
 
 			<td>
@@ -95,7 +95,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 
 				<input
 						type="number"
-						name="<?php echo htmlentities( $name ); ?>"
+						name="<?php echo esc_attr( htmlentities( $name ) ); ?>"
 						id="<?php echo esc_attr( $dom_id ); ?>"
 						data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 						class="ppom-quantity"
@@ -110,17 +110,14 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 						data-usebase_price="<?php echo esc_attr( $usebaseprice ); ?>"
 						data-unlink_qty="<?php echo esc_attr( $unlink_qty ); ?>"
 						data-price="<?php echo esc_attr( $the_price ); ?>"
-						<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+						<?php echo ppom_esc_attr( apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ) ); ?>
 						value="<?php echo esc_attr( $selected_val ); ?>"
 						<?php echo esc_attr( $required ); ?>
 						<?php echo esc_attr( $disabled ); ?>
 						style="width: 50%;"
 				>
 
-
-				<?php
-				printf( __( '<span class="ppom-instock">%s</span>', 'woocommerce-product-addon' ), $in_stock );
-				?>
+				<span class="ppom-instock"><?php echo esc_html( $in_stock ); ?></span>
 
 			</td>
 		</tr>

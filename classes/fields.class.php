@@ -198,8 +198,9 @@ class PPOM_Fields_Meta {
 			$html .= '<h3>' . sprintf( __( '%s', 'woocommerce-product-addon' ), $field_title ) . '</h3>';
 			$html .= '</header>';
 			$html .= '<div class="ppom-modal-body">';
-
-			$html .= $this->render_field_meta( $settings, $fields_type );
+			ob_start();
+			$this->render_field_meta( $settings, $fields_type );
+			$html .= ob_get_clean();
 
 			$html .= '</div>';
 			$html .= '<footer>';
@@ -211,7 +212,7 @@ class PPOM_Fields_Meta {
 		}
 
 		$html .= '</div>';
-		echo $html;
+		echo ppom_esc_html( $html );
 	}
 
 	/*
@@ -297,7 +298,7 @@ class PPOM_Fields_Meta {
 
 		$html .= '</div>';
 
-		return $html;
+		echo ppom_esc_html( $html );
 	}
 
 
@@ -330,7 +331,7 @@ class PPOM_Fields_Meta {
 
 				if ( $field_index != '' ) {
 
-					$html_input .= $existing_name;
+					$html_input .= sprintf( ' %s', $existing_name );
 				}
 
 				$html_input .= '>';
@@ -342,7 +343,7 @@ class PPOM_Fields_Meta {
 
 				if ( $field_index != '' ) {
 
-					$html_input .= $existing_name;
+					$html_input .= sprintf( ' %s', $existing_name );
 				}
 
 				$html_input .= '>';
@@ -354,7 +355,7 @@ class PPOM_Fields_Meta {
 
 				if ( $field_index != '' ) {
 
-					$html_input .= $existing_name;
+					$html_input .= sprintf( ' %s', $existing_name );
 				}
 
 				$html_input .= '>' . esc_html( $values ) . '</textarea>';
@@ -366,7 +367,7 @@ class PPOM_Fields_Meta {
 
 				if ( $field_index != '' ) {
 
-					$html_input .= $existing_name;
+					$html_input .= sprintf( ' %s', $existing_name );
 				}
 
 				$html_input .= '>';
@@ -920,7 +921,7 @@ class PPOM_Fields_Meta {
 						$html_input .= '<li class="data-options" data-condition-type="image_options">';
 						$html_input .= '<span class="dashicons dashicons-move" style="margin-bottom: 7px;margin-top: 2px;"></span>';
 						$html_input .= '<span class="ppom-uploader-img-title">' . $image_name . '</span>';
-						$html_input .= '<div style="display: flex;">';
+						$html_input .= '<div class="data-options-wrap">';
 						$html_input .= '<div class="ppom-uploader-img-center">';
 						$html_input .= '<img width="60" src="' . esc_url( $image_link ) . '" style="width: 34px;">';
 						$html_input .= '</div>';
@@ -968,7 +969,7 @@ class PPOM_Fields_Meta {
 						$html_input .= '<li class="data-options" data-condition-type="image_options">';
 						$html_input .= '<span class="dashicons dashicons-move" style="margin-bottom: 7px;margin-top: 2px;"></span>';
 						$html_input .= '<span class="ppom-uploader-img-title">' . $image_name . '</span>';
-						$html_input .= '<div style="display: flex;">';
+						$html_input .= '<div class="data-options-wrap">';
 						$html_input .= '<div class="ppom-uploader-img-center">';
 						$html_input .= '<img width="60" src="' . esc_url( $image_link ) . '" style="width: 34px;">';
 						$html_input .= '</div>';
@@ -1011,7 +1012,7 @@ class PPOM_Fields_Meta {
 
 						$html_input .= '<li class="data-options">';
 						$html_input .= '<span class="dashicons dashicons-move" style="margin-bottom: 7px;margin-top: 2px;"></span>';
-						$html_input .= '<div style="display: flex;">';
+						$html_input .= '<div class="data-options-wrap">';
 						$html_input .= '<div class="ppom-uploader-img-center">';
 						$html_input .= '<span class="dashicons dashicons-admin-media" style="margin-top: 5px;"></span>';
 						$html_input .= '</div>';

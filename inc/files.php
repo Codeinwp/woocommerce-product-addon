@@ -345,7 +345,8 @@ function ppom_delete_file() {
 	$ppom_nonce        = $_REQUEST['ppom_nonce'];
 	$file_nonce_action = 'ppom_deleting_file_action';
 	if ( ! wp_verify_nonce( $ppom_nonce, $file_nonce_action ) ) {
-		printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_name );
+		// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+		printf( esc_html__( 'Error while deleting file %s', 'woocommerce-product-addon' ), esc_html( $file_name ) );
 		die( 0 );
 	}
 
@@ -371,10 +372,12 @@ function ppom_delete_file() {
 		if ( ! file_exists( $file_path ) ) {
 			_e( 'File removed', 'woocommerce-product-addon' );
 		} else {
-			printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
-		}   
+			// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+			printf( esc_html__( 'Error while deleting file %s', 'woocommerce-product-addon' ), esc_html( $file_path ) );
+		}
 	} else {
-		printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
+		// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+		printf( esc_html__( 'Error while deleting file %s', 'woocommerce-product-addon' ), esc_html( $file_path ) );
 	}
 
 	die( 0 );

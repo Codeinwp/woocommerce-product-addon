@@ -34,8 +34,8 @@ $ppom_groups     = isset( $form_obj::$ppom->meta_id ) ? $form_obj::$ppom->meta_i
 
 	<!-- Display price table before fields -->
 	<?php 
-	if ( ppom_get_price_table_location() === 'before' ) {
-		echo $form_obj->render_price_table_html();
+	if ( 'before' === ppom_get_price_table_location() ) {
+		echo ppom_esc_html( $form_obj->render_price_table_html() );
 	} 
 	?>
 
@@ -71,7 +71,7 @@ $ppom_groups     = isset( $form_obj::$ppom->meta_id ) ? $form_obj::$ppom->meta_i
 	<!-- Display price table after fields -->
 	<?php 
 	if ( ppom_get_price_table_location() === 'after' ) {
-		echo $form_obj->render_price_table_html();
+		echo ppom_esc_html( $form_obj->render_price_table_html() );
 	} 
 	?>
 

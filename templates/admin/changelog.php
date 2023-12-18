@@ -57,7 +57,12 @@ $ppom_fields_url = admin_url( "admin.php?page=ppom" );
 		</div>
 		<div class="ppom-admin-addons-header">
 			<div class="ppom-admin-addons-header-logo">
-				<h3><?php printf( esc_html__( '%s Changelog', 'woocommerce-product-addon' ), sprintf( '<span id="ppom-type-label">%s</span>', array_values($changelogs)[0]['label']) ); ?></h3>
+				<h3>
+					<?php
+						$label = ! empty( $changelogs ) ? reset( $changelogs ) : array();
+						printf( esc_html__( '%s Changelog', 'woocommerce-product-addon' ), sprintf( '<span id="ppom-type-label">%s</span>', esc_html( $label['label'] ) ) );
+					?>
+				</h3>
 			</div>
 			<?php if(count($changelogs)>1){ ?>
 			<div class="ppom-admin-addons-header-search-input">
@@ -76,7 +81,7 @@ $ppom_fields_url = admin_url( "admin.php?page=ppom" );
 			<?php $id = sprintf( 'accordion-%s', $type ); ?>
 			<div class="accordion-container" id="<?php echo esc_attr( $id ); ?>" <?php if( $type !== 'free' ) { ?> style="display:none"<?php } ?>>
 			<?php foreach( $meta['items'] as $version ) { ?>
-				<h3><?php printf( esc_html( 'v%s - %s' ), $version['version'], $version['date'] ); ?></h3>
+				<h3><?php printf( esc_html( 'v%s - %s' ), esc_html( $version['version'] ), esc_html( $version['date'] ) ); ?></h3>
 				<div>
 					<?php
 						foreach( $version_types_map as $type=>$label )
