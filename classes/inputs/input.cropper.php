@@ -128,7 +128,7 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 				'title'       => __( 'Viewport type', 'woocommerce-product-addon' ),
 				'desc'        => __( 'Select Squar or circle, see help', 'woocommerce-product-addon' ),
 				'options'     => array(
-					'square' => 'Squar',
+					'square' => 'Square',
 					'circle' => 'Circle',
 				),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
