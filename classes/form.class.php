@@ -7,8 +7,8 @@
  * @version  1.0
  */
 
-/* 
-**========== Block direct access =========== 
+/*
+**========== Block direct access ===========
 */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -37,7 +37,7 @@ class PPOM_Form {
 	 *
 	 * @var object
 	 */
-	// public static $product;
+	public $product;
 
 	/**
 	 * Return templates args
@@ -47,7 +47,6 @@ class PPOM_Form {
 	public static $args;
 
 	function __construct( $product, $args ) {
-
 
 		$this->product = $product;
 
@@ -364,7 +363,7 @@ class PPOM_Form {
 				default:
 					$default_value = $posted_values[ $data_name ];
 					break;
-			}       
+			}
 		} elseif ( isset( $_GET[ $data_name ] ) ) {
 			// When Cart Edit addon used.
 			$edit_data = isset( $_GET[ $data_name ] ) ? $_GET[ $data_name ] : '';

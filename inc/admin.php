@@ -45,7 +45,7 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 								'productmeta_id' => $ppom_setting->productmeta_id,
 								'do_meta'        => 'edit',
 							),
-							$ppom_settings_url 
+							$ppom_settings_url
 						);
 						echo sprintf( __( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), $meta_title );
 						echo ', ';
@@ -59,7 +59,7 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 						'productmeta_id' => $ppom->meta_id,
 						'do_meta'        => 'edit',
 					),
-					$ppom_settings_url 
+					$ppom_settings_url
 				);
 				echo sprintf( __( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), $ppom->meta_title );
 			} else {
@@ -149,7 +149,7 @@ function ppom_admin_process_product_meta( $post_id ) {
 		$ppom_meta_selected = intval( $ppom_meta_selected );
 	}
 
-	// ppom_pa($ppom_meta_selected); exit; 
+	// ppom_pa($ppom_meta_selected); exit;
 	update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $ppom_meta_selected );
 
 	do_action( 'ppom_proccess_meta', $post_id );
@@ -210,7 +210,7 @@ function ppom_admin_save_form_meta() {
 	$aviary_api_key       = 'NA';
 	$show_cart_thumb      = 'NA';
 
-	$ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];
+	$ppom_meta    = ( isset($_REQUEST['ppom_meta']) ? $_REQUEST['ppom_meta'] : isset($_REQUEST['ppom']) ) ? $_REQUEST['ppom'] : '';
 
 	if ( empty( $ppom_meta ) ) {
 		$resp = array(
@@ -257,7 +257,7 @@ function ppom_admin_save_form_meta() {
 			'productmeta_categories' => $productmeta_categories,
 			'the_meta'               => $product_meta,
 			'productmeta_created'    => current_time( 'mysql' ),
-		) 
+		)
 	);
 
 
@@ -413,7 +413,7 @@ function ppom_admin_update_form_meta() {
 			'productmeta_categories' => $productmeta_categories,
 			'the_meta'               => $product_meta,
 		),
-		$productmeta_id 
+		$productmeta_id
 	);
 
 	// wp_send_json($dt);
@@ -687,7 +687,7 @@ function ppom_admin_bar_menu() {
 			'id'    => 'ppom-setting-bar',
 			'title' => sprintf( __( '%s', 'woocommerce-product-addon' ), $bar_title ),
 			'href'  => esc_url( $ppom_setting_url ),
-		) 
+		)
 	);
 
 	$all_meta = PPOM()->get_product_meta_all();
@@ -708,7 +708,7 @@ function ppom_admin_bar_menu() {
 				'title'  => sprintf( __( '%s', 'woocommerce-product-addon' ), $bar_title ),
 				'href'   => esc_url( $apply_link ),
 				'parent' => 'ppom-setting-bar',
-			) 
+			)
 		);
 	}
 }

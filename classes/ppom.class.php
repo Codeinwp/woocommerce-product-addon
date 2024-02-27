@@ -189,14 +189,14 @@ class PPOM_Meta {
 							$ppom_product_id = array_merge( $ppom_in_category, $ppom_product_id );
 						} else {
 							$ppom_product_id = array_merge( $ppom_product_id, $ppom_in_category );
-						}                   
+						}
 					} elseif ( ! $ppom_product_id ) { // If no meta groups attached to products
 
 						$ppom_product_id = $ppom_in_category;
 					}
 					break;
 
-			}       
+			}
 		}
 
 		return apply_filters( 'ppom_product_meta_id', $ppom_product_id, $product_id );
@@ -254,7 +254,11 @@ class PPOM_Meta {
 		}
 
 		global $wpdb;
-		$meta_id       = implode( ',', $this->meta_id );
+
+		if ( is_array( $meta_id ) ) {
+			$meta_id = implode( ',', $meta_id );
+		}
+
 		$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id IN($meta_id)";
 		$meta_settings = $wpdb->get_results( $qry );
 		$filter_meta   = array_filter(
@@ -308,7 +312,7 @@ class PPOM_Meta {
 			(array) $meta_fields,
 			function ( $field ) {
 				return ! isset( $field['status'] ) || $field['status'] == 'on';
-			} 
+			}
 		);
 
 		// ppom_pa($meta_fields);
@@ -338,14 +342,14 @@ class PPOM_Meta {
 			$meta_fields,
 			function ( $field ) {
 				return ! isset( $field['status'] ) || $field['status'] == 'on';
-			} 
+			}
 		);
 
 		$meta_fields = array_filter(
 			$meta_fields,
 			function ( $field ) {
 				return ! isset( $field['status'] ) || $field['status'] == 'on';
-			} 
+			}
 		);
 
 		// if( empty($meta_fields) ) return null;
@@ -380,7 +384,7 @@ class PPOM_Meta {
 								$meta_found[] = $meta_cats->productmeta_id;
 							}
 						}
-					}               
+					}
 				}
 			}
 		}
