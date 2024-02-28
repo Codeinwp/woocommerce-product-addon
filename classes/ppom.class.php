@@ -12,6 +12,90 @@ class PPOM_Meta {
 	private static $ins = null;
 	public static $product_id;
 
+	/**
+	 * Plugin category data.
+	 *
+	 * @var array $category_meta
+	 */
+	public $category_meta = array();
+
+	/**
+	 * Plugin category array.
+	 *
+	 * @var array $ppom_with_cat
+	 */
+	public $ppom_with_cat = array();
+
+	/**
+	 * Plugin settings.
+	 *
+	 * @var array $ppom_settings
+	 */
+	public $ppom_settings = array();
+
+	/**
+	 * Fields.
+	 *
+	 * @var bool $is_exists
+	 */
+	public $is_exists = false;
+
+	/**
+	 * Meta ID.
+	 *
+	 * @var int $single_meta_id
+	 */
+	public $single_meta_id = 0;
+
+	/**
+	 * Check has multiple meta.
+	 *
+	 * @var bool $has_multiple_meta
+	 */
+	public $has_multiple_meta = false;
+
+	/**
+	 * Check ajax validation enabled or not.
+	 *
+	 * @var bool $ajax_validation_enabled
+	 */
+	public $ajax_validation_enabled = false;
+
+	/**
+	 * Inline CSS.
+	 *
+	 * @var string $inline_css
+	 */
+	public $inline_css = '';
+
+	/**
+	 * Inline JS.
+	 *
+	 * @var string $inline_js
+	 */
+	public $inline_js = '';
+
+	/**
+	 * Price display.
+	 *
+	 * @var string $price_display
+	 */
+	public $price_display = '';
+
+	/**
+	 * Meta title.
+	 *
+	 * @var string $meta_title
+	 */
+	public $meta_title = '';
+
+	/**
+	 * Fields.
+	 *
+	 * @var string $fields
+	 */
+	public $fields = array();
+
 	// QM-5
 	var $meta_id;
 
@@ -105,14 +189,14 @@ class PPOM_Meta {
 							$ppom_product_id = array_merge( $ppom_in_category, $ppom_product_id );
 						} else {
 							$ppom_product_id = array_merge( $ppom_product_id, $ppom_in_category );
-						}                   
+						}
 					} elseif ( ! $ppom_product_id ) { // If no meta groups attached to products
 
 						$ppom_product_id = $ppom_in_category;
 					}
 					break;
 
-			}       
+			}
 		}
 
 		return apply_filters( 'ppom_product_meta_id', $ppom_product_id, $product_id );
@@ -170,8 +254,20 @@ class PPOM_Meta {
 		}
 
 		global $wpdb;
-		$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
-		$meta_settings = $wpdb->get_row( $qry );
+
+		if ( is_array( $meta_id ) ) {
+			$meta_id = implode( ',', $meta_id );
+		}
+
+		$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id IN($meta_id)";
+		$meta_settings = $wpdb->get_results( $qry );
+		$filter_meta   = array_filter(
+			$meta_settings,
+			function( $meta ) {
+				return 'on' === $meta->productmeta_validation ? $meta : false;
+			}
+		);
+		$meta_settings = ! empty( $filter_meta ) ? reset( $filter_meta ) : reset( $meta_settings );
 
 		$meta_settings = empty( $meta_settings ) ? null : $meta_settings;
 
@@ -216,7 +312,7 @@ class PPOM_Meta {
 			(array) $meta_fields,
 			function ( $field ) {
 				return ! isset( $field['status'] ) || $field['status'] == 'on';
-			} 
+			}
 		);
 
 		// ppom_pa($meta_fields);
@@ -246,14 +342,14 @@ class PPOM_Meta {
 			$meta_fields,
 			function ( $field ) {
 				return ! isset( $field['status'] ) || $field['status'] == 'on';
-			} 
+			}
 		);
 
 		$meta_fields = array_filter(
 			$meta_fields,
 			function ( $field ) {
 				return ! isset( $field['status'] ) || $field['status'] == 'on';
-			} 
+			}
 		);
 
 		// if( empty($meta_fields) ) return null;
@@ -288,7 +384,7 @@ class PPOM_Meta {
 								$meta_found[] = $meta_cats->productmeta_id;
 							}
 						}
-					}               
+					}
 				}
 			}
 		}

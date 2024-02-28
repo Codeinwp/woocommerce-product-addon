@@ -142,16 +142,16 @@ function ppom_array_get_timezone_list( $selected_regions, $show_time ) {
 		$offset_prefix    = $offset < 0 ? '-' : '+';
 		$offset_formatted = gmdate( 'H:i', abs( $offset ) );
 
-		$pretty_offset = "UTC${offset_prefix}${offset_formatted}";
+		$pretty_offset = "UTC$offset_prefix$offset_formatted";
 
 		$t            = new DateTimeZone( $timezone );
 		$c            = new DateTime( null, $t );
 		$current_time = $c->format( 'g:i A' );
 
 		if ( $show_time == 'on' ) {
-			$timezone_list[ $timezone ] = "(${pretty_offset}) $timezone - $current_time";
+			$timezone_list[ $timezone ] = "($pretty_offset) $timezone - $current_time";
 		} else {
-			$timezone_list[ $timezone ] = "(${pretty_offset}) $timezone";
+			$timezone_list[ $timezone ] = "($pretty_offset) $timezone";
 		}
 	}
 
