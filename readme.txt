@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, woocommerce product addon
 Requires at least: 3.5
 Tested up to: 6.4
-Stable tag: 32.0.9
+Stable tag: 32.0.10
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -121,6 +121,26 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 9. PPOM General Settings
 
 == Changelog ==
+
+##### [Version 32.0.10](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.9...v32.0.10) (2024-02-28)
+
+### Bug Fixes
+- [PHP 8.2] Fixed deprecation notices
+- Fixed the choose file issue
+- Fixed REST API compatibility issue with PHP8
+- Fixed edit cart issue
+- Fixed repeater fields issue
+- Fixed user permission issue
+- Fixed texter popup height/width issue
+- Added shortcode rendering support in the field description
+- Fixed cart subtotal issue checkbox fixed fee option
+- Fixed date looses issue
+- Fixed typo for Square name in Image Cropper
+- Updated dependencies
+- Enhanced security
+
+
+
 
 ##### [Version 32.0.9](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.8...v32.0.9) (2023-08-31)
 
