@@ -1,3 +1,20 @@
+##### [Version 32.0.10](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.9...v32.0.10) (2024-02-28)
+
+### Bug Fixes
+- [PHP 8.2] Fixed deprecation notices
+- Fixed the choose file issue
+- Fixed REST API compatibility issue with PHP8
+- Fixed edit cart issue
+- Fixed repeater fields issue
+- Fixed user permission issue
+- Fixed texter popup height/width issue
+- Added shortcode rendering support in the field description
+- Fixed cart subtotal issue checkbox fixed fee option
+- Fixed date looses issue
+- Fixed typo for Square name in Image Cropper
+- Updated dependencies
+- Enhanced security
+
 ##### [Version 32.0.9](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.8...v32.0.9) (2023-08-31)
 
 - Fix: Do not enforce step min quantity if quantity is already set
