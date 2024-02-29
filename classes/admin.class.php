@@ -4,7 +4,7 @@
  */
 
 /*
-**========== Direct access not allowed ===========
+**========== Direct access not allowed ============
 */
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed' );
