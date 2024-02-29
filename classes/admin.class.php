@@ -3,8 +3,8 @@
  * working behind the seen
  */
 
-/* 
-**========== Direct access not allowed =========== 
+/*
+**========== Direct access not allowed ===========
 */
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed' );
@@ -52,7 +52,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			array(
 				$this,
 				'add_menu_pages',
-			) 
+			)
 		);
 
 		add_action( 'init', array( 'NM_PersonalizedProduct', 'set_ppom_menu_permission' ) );
@@ -62,7 +62,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		add_action( 'wp_ajax_ppom_attach_ppoms', array( $this, 'ppom_attach_ppoms' ) );
 
 		// Adding setting tab in WooCommerce
-		if ( ! ppom_settings_migrated() && current_user_can( 'manage_options' ) ) {
+		if ( ! ppom_settings_migrated() ) {
 			add_filter( 'woocommerce_settings_tabs_array', __CLASS__ . '::add_settings_tab', 50 );
 			// Display settings
 			add_action( 'woocommerce_settings_tabs_ppom_settings', array( $this, 'settings_tab' ) );
@@ -83,7 +83,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				'ppom_multi_select_role_setting',
 			),
 			2,
-			10 
+			10
 		);
 
 	}
@@ -114,7 +114,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 						$page ['callback'],
 					),
 					$this->plugin_meta ['logo'],
-					$this->plugin_meta ['menu_position'] 
+					$this->plugin_meta ['menu_position']
 				);
 			} else {
 
@@ -127,7 +127,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 					array(
 						$this,
 						$page ['callback'],
-					) 
+					)
 				);
 			}
 
@@ -142,9 +142,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 					array(
 						$this,
 						$page ['callback'],
-					) 
+					)
 				);
-			}       
+			}
 		}
 	}
 
@@ -312,20 +312,26 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 	public static function add_settings_tab( $settings_tabs ) {
 
-		$settings_tabs['ppom_settings'] = __( 'PPOM Settings', 'woocommerce-product-addon' );
+		if ( current_user_can( 'manage_options' ) ) {
+			$settings_tabs['ppom_settings'] = __('PPOM Settings', 'woocommerce-product-addon');
+		}
 
 		return $settings_tabs;
 	}
 
 	function settings_tab() {
 
-		woocommerce_admin_fields( ppom_array_settings() );
+		if ( current_user_can( 'manage_options' ) ) {
+			woocommerce_admin_fields(ppom_array_settings());
+		}
 
 	}
 
 	function save_settings() {
 
-		woocommerce_update_options( ppom_array_settings() );
+		if ( current_user_can( 'manage_options' ) ) {
+			woocommerce_update_options(ppom_array_settings());
+		}
 	}
 
 	function ppom_setting_wpml( $value, $option, $raw_value ) {
