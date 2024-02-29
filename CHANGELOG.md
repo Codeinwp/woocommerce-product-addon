@@ -1,3 +1,8 @@
+##### [Version 32.0.11](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.10...v32.0.11) (2024-02-29)
+
+### Bug Fixes
+- Fixed error with the latest version related to current_user_can check
+
 ##### [Version 32.0.10](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.9...v32.0.10) (2024-02-28)
 
 ### Bug Fixes
