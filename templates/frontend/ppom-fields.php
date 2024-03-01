@@ -7,8 +7,8 @@
  * @version 1.0
  **/
 
-/* 
-**========== Block direct access =========== 
+/*
+**========== Block direct access ===========
 */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -26,17 +26,23 @@ if ( ! $form_obj::$ppom->has_unique_datanames() ) {
 
 // ppom meta ids
 $ppom_wrapper_id = is_array( $form_obj::$ppom->meta_id ) ? implode( '-', $form_obj::$ppom->meta_id ) : $form_obj::$ppom->meta_id;
-$ppom_groups     = isset( $form_obj::$ppom->meta_id ) ? $form_obj::$ppom->meta_id : array();
+
+if ( isset( $form_obj::$ppom->meta_id ) ) {
+    $ppom_groups = is_array($form_obj::$ppom->meta_id) ? $form_obj::$ppom->meta_id : array($form_obj::$ppom->meta_id);
+} else {
+    $ppom_groups = array();
+}
+
 ?>
 
 <div id="ppom-box-<?php echo esc_attr( $ppom_wrapper_id ); ?>" class="ppom-wrapper">
 
 
 	<!-- Display price table before fields -->
-	<?php 
+	<?php
 	if ( ppom_get_price_table_location() === 'before' ) {
 		echo $form_obj->render_price_table_html();
-	} 
+	}
 	?>
 
 	<!-- Render hidden inputs -->
@@ -69,10 +75,10 @@ $ppom_groups     = isset( $form_obj::$ppom->meta_id ) ? $form_obj::$ppom->meta_i
 	<?php endforeach; ?> <!-- end form-row -->
 
 	<!-- Display price table after fields -->
-	<?php 
+	<?php
 	if ( ppom_get_price_table_location() === 'after' ) {
 		echo $form_obj->render_price_table_html();
-	} 
+	}
 	?>
 
 
