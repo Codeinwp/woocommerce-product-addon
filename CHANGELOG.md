@@ -1,3 +1,9 @@
+##### [Version 32.0.12](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.11...v32.0.12) (2024-03-01)
+
+### Fixes
+- Fixed the issue with fields not appearing on the front-end with the latest release
+- Updated logo
+
 ##### [Version 32.0.11](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.10...v32.0.11) (2024-02-29)
 
 ### Bug Fixes
