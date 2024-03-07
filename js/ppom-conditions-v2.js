@@ -339,13 +339,13 @@ function ppom_check_conditions(data_name, callback) {
                     jQuery(this).addClass(`ppom-locked-${data_name} ppom-c-hide`);
                 }
 
-                if (typeof callback == "function" && 'undefined' !== typeof ppom_type)
+                if (typeof callback == "function")
                     callback(element_data_name, event_type);
             } else {
 
                 jQuery(this).removeClass(`ppom-locked-${data_name} ppom-c-hide`);
                 // console.log('event_type', event_type);
-                if (typeof callback == "function" && 'undefined' !== typeof ppom_type)
+                if (typeof callback == "function")
                     callback(element_data_name, event_type);
             }
         }
