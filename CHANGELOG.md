@@ -1,3 +1,9 @@
+##### [Version 32.0.13](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.12...v32.0.13) (2024-03-07)
+
+### Bug Fixes
+- Conditional fields not displaying in the cart
+- Predefined values not working with conditions
+
 ##### [Version 32.0.12](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.11...v32.0.12) (2024-03-01)
 
 ### Fixes

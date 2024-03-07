@@ -1,6 +1,6 @@
 {
   "name": "woocommerce-product-addon",
-  "version": "32.0.12",
+  "version": "32.0.13",
   "description": "PPOM for WooCommerce",
   "main": "index.js",
   "repository": "https://github.com/Codeinwp/woocommerce-product-addon",
