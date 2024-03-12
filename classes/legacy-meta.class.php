@@ -7,8 +7,8 @@
  * @version  21.2
  */
 
-/* 
-**========== Block direct access =========== 
+/*
+**========== Block direct access ===========
 */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -71,7 +71,7 @@ class PPOM_Legacy_InputManager {
 
 		// old Filter
 		$desc = apply_filters( 'ppom_description_content', $desc, self::$input_meta );
-		return apply_filters( 'the_content', $desc );
+		return do_shortcode($desc);
 	}
 
 
