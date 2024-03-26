@@ -370,7 +370,7 @@ class PPOM_Form {
 			$default_value = is_array( $edit_data ) ? map_deep( $edit_data, 'sanitize_text_field' ) : sanitize_text_field( $_GET[ $data_name ] );
 		} elseif ( isset( $_POST['ppom']['fields'][ $data_name ] ) && apply_filters( 'ppom_retain_after_add_to_cart', true ) ) {
 			$edit_data = isset( $_POST['ppom']['fields'][ $data_name ] ) ? $_POST['ppom']['fields'][ $data_name ] : '';
-			$default_value = is_array( $edit_data ) ? map_deep( $edit_data, 'sanitize_text_field' ) : sanitize_text_field( $_GET[ $data_name ] );
+			$default_value = is_array( $edit_data ) ? map_deep( $edit_data, 'sanitize_text_field' ) : sanitize_text_field( $_POST['ppom']['fields'][ $data_name ] );
 		} else {
 			// Default values in settings
 			switch ( $type ) {
