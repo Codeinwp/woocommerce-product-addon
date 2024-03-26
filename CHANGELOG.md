@@ -1,3 +1,10 @@
+##### [Version 32.0.14](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.13...v32.0.14) (2024-03-26)
+
+### Bug Fixes
+- Fixed conflict with WP Customer Reviews
+- Fixed issue when fields not displayed on product pages
+- Fixed file upload issue using a Select button
+
 ##### [Version 32.0.13](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.12...v32.0.13) (2024-03-07)
 
 ### Bug Fixes
