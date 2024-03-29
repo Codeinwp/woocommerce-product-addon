@@ -1,3 +1,9 @@
+##### [Version 32.0.15](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.14...v32.0.15) (2024-03-29)
+
+### Fixes
+- Fixed file input type matching on the frontend that was causing issues with file upload
+- Updated internal dependencies
+
 ##### [Version 32.0.14](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.13...v32.0.14) (2024-03-26)
 
 ### Bug Fixes
