@@ -275,10 +275,9 @@ function ppom_check_conditions(data_name, callback) {
 
     let is_matched = false;
     const ppom_type = jQuery(`.ppom-input[data-data_name="${data_name}"]`).data('type');
-
+    const is_file  = jQuery("a.file.ppom-input").length > 0;
     let event_type, element_data_name;
-    // const field_val = ppom_get_element_value(data_name);
-    // console.log('data_name',data_name);
+
     jQuery(`div.ppom-cond-${data_name}`).each(function() {
         // return this.data('cond-val1').match(/\w*-Back/);
         // console.log(jQuery(this));
@@ -326,7 +325,7 @@ function ppom_check_conditions(data_name, callback) {
                     }
                 });
 
-                if (typeof callback == "function" && ( 'undefined' !== typeof ppom_type || element_data_name !== 'file') )
+                if (typeof callback == "function" && ( 'undefined' !== typeof ppom_type || !is_file ) )
                     callback(element_data_name, event_type);
                 // return is_matched;
             }
@@ -340,13 +339,14 @@ function ppom_check_conditions(data_name, callback) {
                     jQuery(this).addClass(`ppom-locked-${data_name} ppom-c-hide`);
                 }
 
-                if (typeof callback == "function" && ( 'undefined' !== typeof ppom_type || element_data_name !== 'file') )
+                if (typeof callback == "function" && ( 'undefined' !== typeof ppom_type || !is_file) )
                     callback(element_data_name, event_type);
             } else {
 
                 jQuery(this).removeClass(`ppom-locked-${data_name} ppom-c-hide`);
                 // console.log('event_type', event_type);
-                if (typeof callback == "function" && ( 'undefined' !== typeof ppom_type || element_data_name !== 'file') )
+
+                if (typeof callback == "function" && ( 'undefined' !== typeof ppom_type || !is_file) )
                     callback(element_data_name, event_type);
             }
         }
