@@ -1,3 +1,8 @@
+##### [Version 32.0.17](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.16...v32.0.17) (2024-04-03)
+
+### Fixes
+- Resolved an issue where uploaded files were not displayed in the cart, checkout, or order dashboard.
+
 ##### [Version 32.0.16](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.15...v32.0.16) (2024-04-01)
 
 ### Improvements
