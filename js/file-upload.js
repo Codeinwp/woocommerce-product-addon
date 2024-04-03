@@ -156,7 +156,7 @@ jQuery(function($) {
 
 }); //	jQuery(function($){});
 
-// generate thumbbox 
+// generate thumbbox
 function add_thumb_box(file, $filelist_DIV) {
 
     var inner_html = '<div class="u_i_c_thumb"><div class="progress_bar"><span class="progress_bar_runner"></span><span class="progress_bar_number">(' + plupload.formatSize(file.size) + ')<span></div></div>';
@@ -223,7 +223,7 @@ function ppom_show_cropped_preview(file_name, image_url, image_id) {
         .addClass('ppom-croppie-preview-' + image_id)
         .attr('data-image_id', image_id)
         .appendTo(cropp_preview_container);
-        
+
     var change_image = jQuery('<a/>')
         .addClass('btn ' + image_id)
         .attr('href', '#')
@@ -233,17 +233,17 @@ function ppom_show_cropped_preview(file_name, image_url, image_id) {
             e.preventDefault();
             location.reload();
         });
-        
+
 
     // $filelist_DIV[file_name]['croppie']     = cropp_preview_container.find('.ppom-croppie-preview');
-    
+
     jQuery(croppie_container).on('update.croppie', function(ev, cropData) {
             // console.log(cropData);
             // croppie_container.croppie('result', 'rawcanvas').then(function(canvas) {
             // console.log(canvas);
-            
+
             ppom_generate_cropper_data_for_cart(file_name);
-            
+
             jQuery.event.trigger({
                 type: 'ppom_croppie_update',
                 img_id: image_id,
@@ -252,9 +252,9 @@ function ppom_show_cropped_preview(file_name, image_url, image_id) {
                 dataname: file_name,
                 time: new Date()
             });
-            
+
     });
-    
+
     $filelist_DIV[file_name]['croppie'][image_id] = croppie_container;
     $filelist_DIV[file_name]['image_id'] = image_id;
     $filelist_DIV[file_name]['image_url'] = image_url;
@@ -345,10 +345,16 @@ function ppom_setup_file_upload_input(file_input) {
                 // $filelist_DIV[file_data_name].html('');
                 if ( ! $filelist_DIV[file_data_name].is(':visible') ) {
                     jQuery(document).on('ppom_field_shown', function() {
+
                         jQuery.each(ppom_input_vars.ppom_inputs, function(index, file_input) {
-                            if (file_input.type === 'file' || file_input.type === 'cropper') {
-                                var file_data_name = file_input.data_name;
-                                ppom_setup_file_upload_input(file_input);
+                            if (file_input && (file_input.type === 'file' || file_input.type === 'cropper')) {
+                                if (file_input.data_name
+                                    && file_input.files_allowed
+                                    && file_input.file_size
+                                    && file_input.files_allowed) {
+                                    var file_data_name = file_input.data_name;
+                                    ppom_setup_file_upload_input(file_input);
+                                }
                             }
 
                         });
@@ -407,7 +413,7 @@ function ppom_setup_file_upload_input(file_input) {
                 else {
 
                     plupload.each(files, function(file) {
-                        
+
                         if (file.type.indexOf("image") !== -1 && file.type !== 'image/photoshop') {
 
                             var img = new mOxie.Image;
@@ -654,7 +660,7 @@ function ppom_generate_cropper_data_for_cart(field_name) {
             //console.log(image_url);
             // remove first
             jQuery(`input[name="ppom[fields][${field_name}][${image_id}][cropped]"`).remove();
-            
+
             var fileCheck = jQuery('<input checked="checked" name="ppom[fields][' + field_name + '][' + image_id + '][cropped]" type="checkbox"/>')
                 .val(image_url)
                 .css('display', 'none')
