@@ -1,3 +1,8 @@
+##### [Version 32.0.18](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.17...v32.0.18) (2024-04-17)
+
+### Improvements
+- **Updated internal dependencies:** Enhanced performance and security.
+
 ##### [Version 32.0.17](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.16...v32.0.17) (2024-04-03)
 
 ### Fixes
