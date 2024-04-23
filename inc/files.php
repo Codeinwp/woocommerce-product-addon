@@ -94,7 +94,7 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 		$edited_thumb_path = ppom_get_dir_path() . 'edits/thumbs/' . $file_name;
 		if ( file_exists( $edited_thumb_path ) ) {
 			$file_thumb_url = ppom_get_dir_url() . 'edits/thumbs/' . $file_name;
-		}   
+		}
 	} elseif ( file_exists( $file_dir_path ) && $post_type == 'shop_order' ) {
 		$file_link = $file_thumb_url;
 	} else {
@@ -177,7 +177,7 @@ function ppom_upload_file() {
 	$restricted_type    = ppom_get_option( 'ppom_restricted_file_type', $default_restricted );
 	$restricted_type    = explode( ',', $restricted_type );
 
-	if ( in_array( strtolower( $extension ), $restricted_type ) ) {
+	if ( empty( $extension ) || in_array( strtolower( $extension ), $restricted_type ) ) {
 		$response ['status']  = 'error';
 		$response ['message'] = __( 'File type not valid - ' . $extension, 'woocommerce-product-addon' );
 		wp_send_json( $response );
@@ -372,7 +372,7 @@ function ppom_delete_file() {
 			_e( 'File removed', 'woocommerce-product-addon' );
 		} else {
 			printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
-		}   
+		}
 	} else {
 		printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
 	}
