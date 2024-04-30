@@ -169,7 +169,7 @@ function ppom_upload_file() {
 	$file_name = apply_filters( 'ppom_uploaded_filename', $file_name );
 
 	/* ========== Invalid File type checking ========== */
-	$file_type = wp_check_filetype_and_ext( $file_dir_path, $file_name );
+	$file_type = wp_check_filetype_and_ext( $file_dir_path . $file_name, $file_name );
 	$extension = $file_type['ext'];
 
 
