@@ -134,8 +134,6 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 
 function ppom_upload_file() {
 
-    var_dump( 'ppom_upload_file');
-    error_log( print_r( 'ppom_upload_file', true ) );
 	header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
 	header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 	header( 'Cache-Control: no-store, no-cache, must-revalidate' );
