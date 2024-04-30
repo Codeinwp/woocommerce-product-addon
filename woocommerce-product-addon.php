@@ -34,7 +34,7 @@ define( 'PPOM_UPLOAD_DIR_NAME', 'ppom_files' );
 define( 'PPOM_UPGRADE_URL', 'https://themeisle.com/plugins/ppom-pro/upgrade/' );
 define( 'PPOM_COMPATIBILITY_FEATURES', [
 	'pro_cond_field_repeat' => true, // Compatibility for Conditional Field Repeater feature
-	'pgfbdfm_wp_filter_param_fix' => true // Fix for the wrong params of the ppom_get_field_by_dataname__field_meta WP filter.
+	'pgfbdfm_wp_filter_param_fix' => true // Fix for the wrong params of the ppom_get_field_by_dataname__field_meta WP filter .
 ] );
 
 require PPOM_PATH . '/vendor/autoload.php';
@@ -49,7 +49,7 @@ add_filter(
 );
 
 /*
- * plugin localization being initiated here 
+ * plugin localization being initiated here
  */
 add_action( 'init', 'ppom_i18n_setup' );
 function ppom_i18n_setup() {
@@ -117,7 +117,7 @@ add_filter(
 		];
 
 		return $compatibilities;
-	} 
+	}
 );
 add_action( 'woocommerce_init', 'PPOM' );
 
