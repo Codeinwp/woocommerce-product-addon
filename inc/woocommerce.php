@@ -132,8 +132,6 @@ function ppom_woocommerce_load_scripts() {
 
 function ppom_woocommerce_validate_product( $passed, $product_id, $qty ) {
 
-    error_log('ppom_woocommerce_validate_product');
-    error_log(print_r($_POST, true));
 	$ppom = new PPOM_Meta( $product_id );
 	if ( ! $ppom->ajax_validation_enabled ) {
 		$passed = ppom_check_validation( $product_id, $_POST );
@@ -157,7 +155,6 @@ function ppom_woocommerce_validate_product( $passed, $product_id, $qty ) {
 
 function ppom_woocommerce_ajax_validate() {
 
-    error_log('ppom_woocommerce_ajax_validate');
 	// ppom_pa($_POST); exit;
 	$ppom_nonce            = $_REQUEST['ppom_nonce'];
 	$validate_nonce_action = 'ppom_validating_action';
@@ -1152,7 +1149,6 @@ function ppom_woocommerce_cart_update_validate( $cart_validated, $cart_item_key,
 
 function ppom_woocommerce_order_item_meta( $item, $cart_item_key, $values, $order ) {
 
-    error_log('ppom_woocommerce_order_item_meta');
 	if ( ! isset( $values ['ppom']['fields'] ) ) {
 		return;
 	}
