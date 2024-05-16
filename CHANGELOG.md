@@ -1,3 +1,7 @@
+##### [Version 32.0.21](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.20...v32.0.21) (2024-05-16)
+
+- Enhanced security
+
 ##### [Version 32.0.20](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.19...v32.0.20) (2024-04-30)
 
 - Fixed File Input not working
