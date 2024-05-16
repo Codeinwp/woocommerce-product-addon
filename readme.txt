@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, woocommerce product addon
 Requires at least: 3.5
 Tested up to: 6.5
-Stable tag: 32.0.20
+Stable tag: 32.0.21
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -121,6 +121,13 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 9. PPOM General Settings
 
 == Changelog ==
+
+##### [Version 32.0.21](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.20...v32.0.21) (2024-05-16)
+
+- Enhanced security
+
+
+
 
 ##### [Version 32.0.20](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.19...v32.0.20) (2024-04-30)
 
