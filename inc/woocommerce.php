@@ -230,16 +230,24 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 
 		$passed = apply_filters( 'ppom_before_fields_validation', $passed, $field, $post_data, $product_id );
 
-		if ( empty( $field['data_name'] ) || empty( $field['required'] )
-											 && ( empty( $field['min_checked'] ) && empty( $field['max_checked'] ) )
-		) {
+		if (  empty( $field['data_name'] )  ) {
 			continue;
 		}
 
 		$data_name = sanitize_key( $field['data_name'] );
+
+		if ( ! empty($ppom_posted_fields[$data_name]) && $ppom_posted_fields[$data_name] !== strip_tags( $ppom_posted_fields[$data_name] ) ) {
+			$passed = false;
+		}
+
+		if ( empty( $field['required'] ) && ( empty( $field['min_checked'] ) && empty( $field['max_checked'] ) )
+		) {
+			continue;
+		}
+
+
 		$title     = isset( $field['title'] ) ? $field['title'] : '';
 		$type      = isset( $field['type'] ) ? $field['type'] : '';
-
 
 		// var_dump($data_name, ppom_is_field_hidden_by_condition($data_name));
 		// Check if field is required by hidden by condition
@@ -257,7 +265,7 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 			$error_message = stripslashes( $error_message );
 			ppom_wc_add_notice( $error_message );
 			$passed = false;
-		}   
+		}
 	}
 
 	// ppom_pa($post_data); exit;
@@ -341,7 +349,7 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 			if ( $option['apply'] == 'quantities' ) {
 				$ppom_total_quantities += $option['quantity'];
 				$ppom_item_order_qty    = $ppom_total_quantities;
-			}       
+			}
 		}
 	}
 
@@ -444,7 +452,7 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 					$new_weight = $wc_product->get_weight() + $option_weight;
 					$wc_product->set_weight( $new_weight );
 				}
-			}       
+			}
 		}
 	}
 
@@ -637,7 +645,7 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 		}
 
 
-		// If no value		
+		// If no value
 		if ( ! $display ) {
 			continue;
 		}
@@ -666,7 +674,7 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 				'hidden'  => $hidden,
 				'display' => $display,
 			);
-		}   
+		}
 	}
 
 	return $item_meta;
@@ -712,7 +720,7 @@ function ppom_woocommerce_alter_price( $price, $product ) {
 
 				$options = $meta['options'];
 				$ranges  = ppom_convert_options_to_key_val( $options, $meta, $product );
-				// ppom_pa($ranges);	
+				// ppom_pa($ranges);
 
 				if ( isset( $meta['discount'] ) && $meta['discount'] == 'on' ) {
 
@@ -742,7 +750,7 @@ function ppom_woocommerce_alter_price( $price, $product ) {
 					}
 				}
 			}
-		}   
+		}
 	}
 
 	return apply_filters( 'ppom_loop_matrix_price', $price, $from_pice, $to_price );
@@ -750,16 +758,16 @@ function ppom_woocommerce_alter_price( $price, $product ) {
 
 /*
 function ppom_hide_variation_price_html($show, $parent, $variation) {
-	
+
 	$product_id = $parent->get_id();
 	$ppom		= new PPOM_Meta( $product_id );
-	
+
 	if( $ppom->is_exists && $ppom->price_display != 'hide' ) {
 		$show = false;
 	}
-	
+
 	return $show;
-	
+
 }*/
 
 // Set default quantity for price matrix
@@ -1389,9 +1397,9 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 function ppom_wc_order_again_compatibility( $cart_item_data, $item, $order ) {
 	$ppom_data = $item->get_meta('_ppom_fields');
 
-    if( is_array($ppom_data) && array_key_exists( 'fields', $ppom_data ) ) {
-        $cart_item_data['ppom'] = $ppom_data;
-    }
+	if( is_array($ppom_data) && array_key_exists( 'fields', $ppom_data ) ) {
+		$cart_item_data['ppom'] = $ppom_data;
+	}
 
 	return $cart_item_data;
 }
