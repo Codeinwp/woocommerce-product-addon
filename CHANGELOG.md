@@ -1,3 +1,7 @@
+##### [Version 32.0.22](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.21...v32.0.22) (2024-05-20)
+
+- Fixed error when products with PPOM fields are not added to the cart
+
 ##### [Version 32.0.21](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.20...v32.0.21) (2024-05-16)
 
 - Enhanced security
