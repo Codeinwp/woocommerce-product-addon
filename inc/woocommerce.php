@@ -236,7 +236,7 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 
 		$data_name = sanitize_key( $field['data_name'] );
 
-		if ( ! empty($ppom_posted_fields[$data_name]) && $ppom_posted_fields[$data_name] !== strip_tags( $ppom_posted_fields[$data_name] ) ) {
+		if ( ! empty($ppom_posted_fields[$data_name]) && is_string( $ppom_posted_fields[$data_name] ) && $ppom_posted_fields[$data_name] !== strip_tags( $ppom_posted_fields[$data_name] ) ) {
 			$passed = false;
 		}
 
