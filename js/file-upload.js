@@ -293,7 +293,10 @@ function ppom_reset_cropping_preview(file_name) {
 // Attach FILE API with DOM
 function ppom_setup_file_upload_input(file_input) {
 
-    var file_data_name = file_input.data_name;
+    const file_data_name = file_input.data_name;
+    if ( plupload_instances[file_data_name] !== undefined ) {
+        return;
+    }
 
     file_count[file_data_name] = 0;
     $filelist_DIV[file_data_name] = jQuery('#filelist-' + file_data_name);
