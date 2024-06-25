@@ -230,24 +230,18 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 
 		$passed = apply_filters( 'ppom_before_fields_validation', $passed, $field, $post_data, $product_id );
 
-		if (  empty( $field['data_name'] )  ) {
+		if (
+			empty( $field['data_name'] ) &&
+			empty( $field['required'] ) &&
+			empty( $field['min_checked'] ) &&
+			empty( $field['max_checked'] )
+		) {
 			continue;
 		}
 
 		$data_name = sanitize_key( $field['data_name'] );
 
-		if ( ! empty($ppom_posted_fields[$data_name]) && is_string( $ppom_posted_fields[$data_name] ) && $ppom_posted_fields[$data_name] !== strip_tags( $ppom_posted_fields[$data_name] ) ) {
-			$passed = false;
-		}
-
-		if ( empty( $field['required'] ) && ( empty( $field['min_checked'] ) && empty( $field['max_checked'] ) )
-		) {
-			continue;
-		}
-
-
-		$title     = isset( $field['title'] ) ? $field['title'] : '';
-		$type      = isset( $field['type'] ) ? $field['type'] : '';
+		$title = isset( $field['title'] ) ? $field['title'] : '';
 
 		// var_dump($data_name, ppom_is_field_hidden_by_condition($data_name));
 		// Check if field is required by hidden by condition

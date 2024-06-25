@@ -249,12 +249,12 @@ function ppom_get_product_regular_price( $product ) {
 	/*
 	if( has_filter('woocs_exchange_value') ) {
 		global $WOOCS;
-		
+
 		if($WOOCS->current_currency != $WOOCS->default_currency ) {
 			if($WOOCS->is_multiple_allowed) {
 				$product_price = apply_filters('woocs_raw_woocommerce_price', $product_price);
 			} else {
-				
+
 				$product_price = apply_filters('woocs_exchange_value', $product_price);
 			}
 		}
@@ -273,6 +273,26 @@ function ppom_get_product_regular_price( $product ) {
 }
 
 /**
+ * Sanitize the input fields.
+ *
+ * @param mixed $field_value Field value to sanitize.
+ * @return mixed|string Sanitized field value.
+ */
+function ppom_recursive_sanitization( $field_value ) {
+	if ( is_string( $field_value ) ) {
+		$field_value = sanitize_textarea_field( wp_strip_all_tags( $field_value ) );
+	}
+
+	if ( is_array( $field_value ) ) {
+		foreach ($field_value as $key => $val ) {
+			$field_value[ $key ] = ppom_recursive_sanitization( $val );
+		}
+	}
+
+	return $field_value;
+}
+
+/**
  * adding cart items to order
  *
  * @since 8.2
@@ -282,6 +302,7 @@ function ppom_make_meta_data( $cart_item, $context = 'cart' ) {
 	if ( ! isset( $cart_item['ppom']['fields'] ) ) {
 		return $cart_item;
 	}
+
 	$ppom_meta_ids = '';
 	// removing id field
 	if ( ! empty( $cart_item ['ppom'] ['fields']['id'] ) ) {
@@ -296,6 +317,16 @@ function ppom_make_meta_data( $cart_item, $context = 'cart' ) {
 	}
 
 	$product_id       = ppom_get_product_id( $cart_item['data'] );
+
+	// Fields sanitization.
+	$ppom = new PPOM_Meta( $product_id );
+	foreach( $ppom->fields as $field ) {
+		$data_name = sanitize_key( $field['data_name'] );
+		if ( isset( $cart_item['ppom']['fields'][$data_name] ) ) {
+			$cart_item['ppom']['fields'][$data_name] = ppom_recursive_sanitization( $cart_item['ppom']['fields'][$data_name] );
+		}
+	}
+
 	$ppom_meta        = array();
 	$ppom_cart_fields = $cart_item ['ppom'];
 	$ppom_meta_ids    = apply_filters( 'ppom_meta_ids_in_cart', null, $cart_item );
@@ -477,7 +508,7 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 							if ( ! empty( $quantity ) ) {
 								$meta_display[] = "{$ticket_variations} = {$quantity}";
 								$total_qty     += intval( $quantity );
-							}                       
+							}
 						}
 					}
 				}
@@ -1177,7 +1208,7 @@ function ppom_convert_options_to_key_val( $options, $meta, $product ) {
 				'imageselect',
 				'image',
 				'audio',
-			) 
+			)
 		);
 		if ( in_array( $meta_type, $option_with_titles_keys ) ) {
 
@@ -1235,9 +1266,9 @@ function ppom_convert_options_to_key_val( $options, $meta, $product ) {
 			// $show_option_price = apply_filters('ppom_show_option_price', $show_price, $meta);
 			/*
 			if( !empty($option_price) ) {
-				
+
 				// $option_price = $option['price'];
-				
+
 				// check if price in percent
 				if(strpos($option_price,'%') !== false){
 					$option_price = ppom_get_amount_after_percentage($product_price, $option_price);
@@ -1249,7 +1280,7 @@ function ppom_convert_options_to_key_val( $options, $meta, $product ) {
 					$option_label	= ppom_generate_option_label($option, $option_price, $meta);
 					$option_percent = $option['price'];
 				} else {
-					
+
 					// check if price is fixed and taxable
 					if(isset($meta['onetime']) && $meta['onetime'] == 'on' && isset($meta['onetime_taxable']) && $meta['onetime_taxable'] == 'on') {
 						$option_price_without_tax = $option_price;
@@ -1257,7 +1288,7 @@ function ppom_convert_options_to_key_val( $options, $meta, $product ) {
 					}
 					$option_label = ppom_generate_option_label($option, $option_price, $meta);
 				}
-				
+
 			}*/
 
 			// ppom_pa($option);
@@ -1341,7 +1372,7 @@ function ppom_generate_option_label( $option, $price, $meta ) {
 
 		switch ( $meta_type ) {
 
-			// No span/html in Select DOM	
+			// No span/html in Select DOM
 			case 'selectqty':
 			case 'select':
 			case 'multiple_select':
