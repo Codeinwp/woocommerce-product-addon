@@ -2,14 +2,13 @@
  * file upload js
  * @since 8.4
  **/
-
-var isCartBlock = false;
-var upload_instance = Array();
-var file_count = Array();
-var $filelist_DIV = Array();
+let isCartBlock = false;
+const plupload_instances = Array();
+const field_file_count = Array();
+const file_list_preview_containers = Array();
 var ppom_file_progress = '';
 var featherEditor = '';
-var uploaderInstances = {};
+const uploaderInstances = {};
 var Cropped_Data_Captured = false;
 
 jQuery(function($) {
@@ -84,7 +83,7 @@ jQuery(function($) {
 
             var image_id = jQuery(croppie_dom).attr('data-image_id');
             $(croppie_dom).croppie('destroy');
-            var viewport = { 'width': v_width, 'height': v_height };
+            const viewport = {'width': v_width, 'height': v_height};
             ppom_set_croppie_options(data_name, viewport, image_id);
         });
 
@@ -101,9 +100,9 @@ jQuery(function($) {
             var fileid = $(this).closest('.ppom-file-wrapper').attr("data-fileid");
             var file_data_name = $(this).closest('div.ppom-field-wrapper').attr("data-data_name");
             // console.log(fileid);
-            file_count[file_data_name] = 0;
+            field_file_count[file_data_name] = 0;
 
-            upload_instance[file_data_name].removeFile(fileid);
+            plupload_instances[file_data_name].removeFile(fileid);
 
             var filename = $('input:checkbox[name="ppom[fields][' + file_data_name + '][' + fileid + '][org]"]').val();
 
@@ -136,7 +135,7 @@ jQuery(function($) {
                     time: new Date()
                 });
 
-                file_count[file_data_name] -= 1;
+                field_file_count[file_data_name] -= 1;
             });
         }
     });
@@ -147,7 +146,6 @@ jQuery(function($) {
         if (file_input.type === 'file' || file_input.type === 'cropper') {
 
             var file_data_name = file_input.data_name;
-
             ppom_setup_file_upload_input(file_input);
         }
 
@@ -159,7 +157,7 @@ jQuery(function($) {
 // generate thumbbox
 function add_thumb_box(file, $filelist_DIV) {
 
-    var inner_html = '<div class="u_i_c_thumb"><div class="progress_bar"><span class="progress_bar_runner"></span><span class="progress_bar_number">(' + plupload.formatSize(file.size) + ')<span></div></div>';
+    let inner_html = '<div class="u_i_c_thumb"><div class="progress_bar"><span class="progress_bar_runner"></span><span class="progress_bar_number">(' + plupload.formatSize(file.size) + ')<span></div></div>';
     inner_html += '<div class="u_i_c_name"><strong>' + file.name + '</strong></div>';
 
     jQuery('<div />', {
@@ -219,12 +217,13 @@ function ppom_show_cropped_preview(file_name, image_url, image_id) {
     cropp_preview_container.find('.ppom-cropping-size').prop('disabled', false);
     cropp_preview_container.find('.ppom-cropping-size').show();
 
-    var croppie_container = jQuery('<div/>')
+    const croppie_container = jQuery('<div/>')
         .addClass('ppom-croppie-preview-' + image_id)
         .attr('data-image_id', image_id)
         .appendTo(cropp_preview_container);
 
-    var change_image = jQuery('<a/>')
+    // Change preview image
+    jQuery('<a/>')
         .addClass('btn ' + image_id)
         .attr('href', '#')
         .html('Change image')
@@ -235,7 +234,7 @@ function ppom_show_cropped_preview(file_name, image_url, image_id) {
         });
 
 
-    // $filelist_DIV[file_name]['croppie']     = cropp_preview_container.find('.ppom-croppie-preview');
+    // file_list_preview_containers[file_name]['croppie'] = cropp_preview_container.find('.ppom-croppie-preview');
 
     jQuery(croppie_container).on('update.croppie', function(ev, cropData) {
             // console.log(cropData);
@@ -255,29 +254,28 @@ function ppom_show_cropped_preview(file_name, image_url, image_id) {
 
     });
 
-    $filelist_DIV[file_name]['croppie'][image_id] = croppie_container;
-    $filelist_DIV[file_name]['image_id'] = image_id;
-    $filelist_DIV[file_name]['image_url'] = image_url;
+    file_list_preview_containers[file_name]['croppie'][image_id] = croppie_container;
+    file_list_preview_containers[file_name]['image_id'] = image_id;
+    file_list_preview_containers[file_name]['image_url'] = image_url;
 
-    var viewport = undefined;
-    ppom_set_croppie_options(file_name, viewport, image_id);
+    ppom_set_croppie_options(file_name, undefined, image_id);
 }
 
 function ppom_set_croppie_options(file_name, viewport, image_id) {
 
-    var croppie_options = ppom_file_vars.croppie_options;
+    const croppie_options = ppom_file_vars.croppie_options;
     jQuery.each(croppie_options, function(field_name, option) {
 
         if (file_name === field_name) {
 
-            option.url = $filelist_DIV[file_name]['image_url'];
+            option.url = file_list_preview_containers[file_name]['image_url'];
             if (viewport !== undefined) {
                 viewport.type = option.viewport.type;
                 option.viewport = viewport;
             }
 
             // console.log($filelist_DIV[file_name]['croppie'][image_id]);
-            $filelist_DIV[file_name]['croppie'][image_id].croppie(option);
+            file_list_preview_containers[file_name]['croppie'][image_id].croppie(option);
         }
     });
 }
@@ -293,35 +291,30 @@ function ppom_reset_cropping_preview(file_name) {
 // Attach FILE API with DOM
 function ppom_setup_file_upload_input(file_input) {
 
-    var file_data_name = file_input.data_name;
-
-    file_count[file_data_name] = 0;
-    $filelist_DIV[file_data_name] = jQuery('#filelist-' + file_data_name);
-
-
-    if (upload_instance[file_data_name] !== undefined) {
-        upload_instance[file_data_name].destroy();
+    const file_data_name = file_input.data_name;
+    if ( plupload_instances[file_data_name] !== undefined ) {
+        return;
     }
-    // console.log('file_input.img_dimension_error', file_input.img_dimension_error);
+
+    field_file_count[file_data_name] = 0;
+    file_list_preview_containers[file_data_name] = jQuery('#filelist-' + file_data_name);
 
     // Energy pack
-    var bar = document.getElementById(`ppom-progressbar-${file_data_name}`) || undefined;
+    const bar = window.document.getElementById(`ppom-progressbar-${file_data_name}`);
 
-    var ppom_file_data = {
+    const ppom_file_data = {
         'action': 'ppom_upload_file',
         'data_name': file_data_name,
         'ppom_nonce': ppom_file_vars.ppom_file_upload_nonce,
         'product_id': ppom_file_vars.product_id,
-    }
+    };
 
-    var img_dim_errormsg = 'Please upload correct image dimension';
+    let img_dim_errormsg = 'Please upload correct image dimension';
     if (file_input.img_dimension_error) {
         img_dim_errormsg = file_input.img_dimension_error;
     }
 
-    // console.log('running file', upload_instance[file_data_name]);
-
-    upload_instance[file_data_name] = new plupload.Uploader({
+    plupload_instances[file_data_name] = new plupload.Uploader({
         runtimes: ppom_file_vars.plupload_runtime,
         browse_button: 'selectfiles-' + file_data_name, // you can pass in id...
         container: 'ppom-file-container-' + file_data_name, // ... or DOM Element itself
@@ -342,17 +335,18 @@ function ppom_setup_file_upload_input(file_input) {
         init: {
             PostInit: function() {
 
-                // $filelist_DIV[file_data_name].html('');
-                if ( ! $filelist_DIV[file_data_name].is(':visible') ) {
+                // file_list_preview_containers[file_data_name].html('');
+                if ( ! file_list_preview_containers[file_data_name].is(':visible') ) {
                     jQuery(document).on('ppom_field_shown', function() {
 
                         jQuery.each(ppom_input_vars.ppom_inputs, function(index, file_input) {
                             if (file_input && (file_input.type === 'file' || file_input.type === 'cropper')) {
-                                if (file_input.data_name
-                                    && file_input.files_allowed
-                                    && file_input.file_size
-                                    && file_input.files_allowed) {
-                                    var file_data_name = file_input.data_name;
+                                if (
+                                    file_input.data_name &&
+                                    file_input.files_allowed &&
+                                    file_input.file_size &&
+                                    file_input.files_allowed
+                                ) {
                                     ppom_setup_file_upload_input(file_input);
                                 }
                             }
@@ -364,19 +358,18 @@ function ppom_setup_file_upload_input(file_input) {
                 	upload_instance[file_data_name].start();
                 	return false;
                 });*/
-                // console.log('init');
             },
 
             FilesAdded: function(up, files) {
 
                 // Adding progress bar
-                var file_pb = jQuery('<div/>')
+                const file_pb = jQuery('<div/>')
                     .addClass('progress')
-                    .css('width','100%')
-                    .css('clear','both')
-                    .css('margin','5px auto')
-                    .appendTo($filelist_DIV[file_data_name]);
-                var file_pb_runner = jQuery('<div/>')
+                    .css('width', '100%')
+                    .css('clear', 'both')
+                    .css('margin', '5px auto')
+                    .appendTo(file_list_preview_containers[file_data_name]);
+                const file_pb_runner = jQuery('<div/>')
                     .addClass('progress-bar')
                     .attr('role', 'progressbar')
                     .attr('aria-valuenow', 0)
@@ -386,8 +379,7 @@ function ppom_setup_file_upload_input(file_input) {
                     .css('width', 0)
                     .appendTo(file_pb);
 
-                var files_added = files.length;
-                var max_count_error = false;
+                const files_added = files.length;
                 // return;
 
                 // console.log('image w bac', files);
@@ -407,8 +399,8 @@ function ppom_setup_file_upload_input(file_input) {
                 //     img.load(file.getSource());
                 // });
 
-                if ((file_count[file_data_name] + files_added) > upload_instance[file_data_name].settings.max_file_count) {
-                    alert(upload_instance[file_data_name].settings.max_file_count + ppom_file_vars.mesage_max_files_limit);
+                if ((field_file_count[file_data_name] + files_added) > plupload_instances[file_data_name].settings.max_file_count) {
+                    alert(plupload_instances[file_data_name].settings.max_file_count + ppom_file_vars.mesage_max_files_limit);
                 }
                 else {
 
@@ -416,43 +408,43 @@ function ppom_setup_file_upload_input(file_input) {
 
                         if (file.type.indexOf("image") !== -1 && file.type !== 'image/photoshop') {
 
-                            var img = new mOxie.Image;
+                            const img = new mOxie.Image;
                             img.onload = function() {
 
-                                var img_height = this.height;
-                                var img_width = this.width;
+                                const img_height = this.height;
+                                const img_width = this.width;
 
                                 let aspect_ratio = Math.max(img_width, img_height) / Math.min(img_width, img_height);
 
                                 if (img_width >= parseFloat(file_input.max_img_w) || img_width <= parseFloat(file_input.min_img_w)) {
-                                    upload_instance[file_data_name].stop();
-                                    upload_instance[file_data_name].removeFile(file);
+                                    plupload_instances[file_data_name].stop();
+                                    plupload_instances[file_data_name].removeFile(file);
                                     alert(img_dim_errormsg);
                                 }
                                 else if (img_height >= parseFloat(file_input.max_img_h) || img_height <= parseFloat(file_input.min_img_h)) {
-                                    upload_instance[file_data_name].stop();
-                                    upload_instance[file_data_name].removeFile(file);
+                                    plupload_instances[file_data_name].stop();
+                                    plupload_instances[file_data_name].removeFile(file);
                                     alert(img_dim_errormsg);
                                 }
                                 else {
-                                    file_count[file_data_name]++;
+                                    field_file_count[file_data_name]++;
                                     // Code to add pending file details, if you want
-                                    add_thumb_box(file, $filelist_DIV[file_data_name], up);
-                                    setTimeout('upload_instance[\'' + file_data_name + '\'].start()', 100);
+                                    add_thumb_box(file, file_list_preview_containers[file_data_name], up);
+                                    setTimeout('plupload_instances[\'' + file_data_name + '\'].start()', 100);
                                 }
                             };
                             img.load(file.getSource());
                         }
                         else {
-                            file_count[file_data_name]++;
+                            field_file_count[file_data_name]++;
                             // Code to add pending file details, if you want
-                            add_thumb_box(file, $filelist_DIV[file_data_name], up);
-                            setTimeout('upload_instance[\'' + file_data_name + '\'].start()', 100);
+                            add_thumb_box(file, file_list_preview_containers[file_data_name], up);
+                            setTimeout('plupload_instances[\'' + file_data_name + '\'].start()', 100);
                         }
 
 
                         // Energy pack
-                        if (bar !== undefined) {
+                        if ( bar ) {
                             bar.removeAttribute('hidden');
                             bar.max = file.size;
                             bar.value = file.loaded;
@@ -466,51 +458,47 @@ function ppom_setup_file_upload_input(file_input) {
             FileUploaded: function(up, file, info) {
 
 
-                var obj_resp = jQuery.parseJSON(info.response);
+                const obj_resp = jQuery.parseJSON(info.response);
 
                 if (obj_resp.file_name === 'ThumbNotFound') {
 
-                    upload_instance[file_data_name].removeFile(file.id);
+                    plupload_instances[file_data_name].removeFile(file.id);
                     jQuery("#u_i_c_" + file.id).hide(500).remove();
-                    file_count[file_data_name]--;
+                    field_file_count[file_data_name]--;
 
                     alert('There is some error please try again');
                     return;
 
                 }
-                else if (obj_resp.status == 'error') {
+                else if (obj_resp.status === 'error') {
 
-                    upload_instance[file_data_name].removeFile(file.id);
+                    plupload_instances[file_data_name].removeFile(file.id);
 
                     jQuery("#u_i_c_" + file.id).hide(500).remove();
 
-                    file_count[file_data_name]--;
+                    field_file_count[file_data_name]--;
                     alert(obj_resp.message);
                     return;
                 };
 
-                var img_w = obj_resp.file_w
-                var img_h = obj_resp.file_h
-
+                // var img_w = obj_resp.file_w
+                // var img_h = obj_resp.file_h
                 // if (img_w > parseFloat(file_input.max_img_w)) {
-
                 //     upload_instance[file_data_name].removeFile(file.id);
-
                 //     jQuery("#u_i_c_" + file.id).hide(500).remove();
-
                 //     file_count[file_data_name]--;
                 //     alert('Image Dimension Error');
                 //     jQuery('form.cart').unblock();
                 //     return;
                 // }
 
-                var file_thumb = '';
+                let file_thumb = '';
 
                 /*if( file_input.file_cost != "" ) {
                     jQuery('input[name="woo_file_cost"]').val( file_input.file_cost );
                 }*/
 
-                $filelist_DIV[file_data_name].find('#u_i_c_' + file.id).html(obj_resp.html)
+                file_list_preview_containers[file_data_name].find('#u_i_c_' + file.id).html(obj_resp.html)
                     .trigger({
                         type: "ppom_image_ready",
                         image: file,
@@ -523,43 +511,43 @@ function ppom_setup_file_upload_input(file_input) {
 
 
                 // checking if uploaded file is thumb
-                ext = obj_resp.file_name.substring(obj_resp.file_name.lastIndexOf('.') + 1);
-                ext = ext.toLowerCase();
+                const ext = obj_resp.file_name.substring(obj_resp.file_name.lastIndexOf('.') + 1).toLowerCase();
 
-                if (ext == 'png' || ext == 'gif' || ext == 'jpg' || ext == 'jpeg') {
-
-
-                    var file_full = ppom_file_vars.file_upload_path + obj_resp.file_name;
+                if (
+                    ext === 'png' ||
+                    ext === 'gif' ||
+                    ext === 'jpg' ||
+                    ext === 'jpeg'
+                ) {
+                    const file_full = ppom_file_vars.file_upload_path + obj_resp.file_name;
                     // thumb thickbox only shown if it is image
-                    $filelist_DIV[file_data_name]
+                    file_list_preview_containers[file_data_name]
                         .find('#u_i_c_' + file.id)
                         .find('.u_i_c_thumb')
                         .append('<div style="display:none" id="u_i_c_big' + file.id + '"><img src="' + file_full + '" /></div>');
 
                     // Aviary editing tools
                     if (file_input.photo_editing === 'on' && ppom_file_vars.aviary_api_key !== '') {
-                        var editing_tools = file_input.editing_tools;
-                        $filelist_DIV[file_data_name]
+                        const editing_tools = file_input.editing_tools;
+                        file_list_preview_containers[file_data_name]
                             .find('#u_i_c_' + file.id)
                             .find('.u_i_c_tools_edit')
                             .append('<a onclick="return   (\'thumb_' + file.id + '\', \'' + file_full + '\', \'' + obj_resp.file_name + '\', \'' + editing_tools + '\')" href="javascript:;" title="Edit"><img width="15" src="' + ppom_file_vars.plugin_url + '/images/edit.png" /></a>');
                     }
-
-                    is_image = true;
-                }
-                else {
+                } else {
                     file_thumb = ppom_file_vars.plugin_url + '/images/file.png';
-                    $filelist_DIV[file_data_name].find('#u_i_c_' + file.id)
+                    file_list_preview_containers[file_data_name].find('#u_i_c_' + file.id)
                         .find('.u_i_c_thumb')
                         .html('<img src="' + file_thumb + '" id="thumb_' + file.id + '" />')
-                    is_image = false;
                 }
 
                 // adding checkbox input to Hold uploaded file name as array
-                var file_container = $filelist_DIV[file_data_name].find('#u_i_c_' + file.id);
-                var input_class = 'ppom-input'
+                const file_container = file_list_preview_containers[file_data_name].find('#u_i_c_' + file.id);
+                let input_class = 'ppom-input';
                 input_class += file_input.required === 'on' ? ' ppom-required' : '';
-                var fileCheck = jQuery('<input checked="checked" name="ppom[fields][' + file_data_name + '][' + file.id + '][org]" type="checkbox"/>')
+
+                // Add file check
+                jQuery('<input checked="checked" name="ppom[fields][' + file_data_name + '][' + file.id + '][org]" type="checkbox"/>')
                     .attr('data-price', file_input.file_cost)
                     .attr('data-label', obj_resp.file_name)
                     .attr('data-data_name', file_input.data_name)
@@ -579,9 +567,9 @@ function ppom_setup_file_upload_input(file_input) {
                 isCartBlock = false;
 
                 // Removing progressbar
-                $filelist_DIV[file_data_name].find('.progress').remove();
+                file_list_preview_containers[file_data_name].find('.progress').remove();
 
-                if (bar !== undefined) {
+                if ( bar ) {
                     setTimeout(function() {
                         bar.setAttribute('hidden', 'hidden');
                     }, 1000);
@@ -602,12 +590,12 @@ function ppom_setup_file_upload_input(file_input) {
             UploadProgress: function(up, file) {
 
                 // Energy pack
-                if (bar !== undefined) {
+                if ( bar ) {
                     bar.max = file.size;
                     bar.value = file.loaded;
                 }
 
-                $filelist_DIV[file_data_name].find('.progress-bar').css('width', file.percent + '%');
+                file_list_preview_containers[file_data_name].find('.progress-bar').css('width', file.percent + '%');
 
                 //disabling add to cart button for a while
                 if (!isCartBlock) {
@@ -634,37 +622,34 @@ function ppom_setup_file_upload_input(file_input) {
     });
 
     // console.log('running file', upload_instance[file_data_name]);
-    upload_instance[file_data_name].init();
-    uploaderInstances[file_data_name] = upload_instance[file_data_name];
-}
-
-function gcd(a, b) {
-    return (b == 0) ? a : gcd(b, a % b);
+    plupload_instances[file_data_name].init();
+    uploaderInstances[file_data_name] = plupload_instances[file_data_name];
 }
 
 // Generate Cropped image data for cart
 function ppom_generate_cropper_data_for_cart(field_name) {
 
-    var cropp_preview_container = jQuery(".ppom-croppie-wrapper-" + field_name);
+    const cropp_preview_container = jQuery(".ppom-croppie-wrapper-" + field_name);
 
     cropp_preview_container.find('.croppie-container').each(function(i, croppie_dom) {
 
-        var image_id = jQuery(croppie_dom).attr('data-image_id');
+        const image_id = jQuery(croppie_dom).attr('data-image_id');
         jQuery(croppie_dom).croppie('result', {
             type: 'rawcanvas',
             // size: { width: 300, height: 300 },
             size: 'original',
             format: 'png'
         }).then(function(canvas) {
-            var image_url = canvas.toDataURL();
+            const image_url = canvas.toDataURL();
             //console.log(image_url);
             // remove first
             jQuery(`input[name="ppom[fields][${field_name}][${image_id}][cropped]"`).remove();
 
-            var fileCheck = jQuery('<input checked="checked" name="ppom[fields][' + field_name + '][' + image_id + '][cropped]" type="checkbox"/>')
+            // Add file check
+           jQuery('<input checked="checked" name="ppom[fields][' + field_name + '][' + image_id + '][cropped]" type="checkbox"/>')
                 .val(image_url)
                 .css('display', 'none')
-                .appendTo($filelist_DIV[field_name]);
+                .appendTo(file_list_preview_containers[field_name]);
 
         });
     });
