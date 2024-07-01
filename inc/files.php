@@ -168,8 +168,13 @@ function ppom_upload_file() {
 
 	$file_name = apply_filters( 'ppom_uploaded_filename', $file_name );
 
+	$additional_mime_types = apply_filters( 'ppom_custom_allowed_mime_types', array( 'ai' => 'application/postscript' ) );
+
+	$allowed_mime_types = array_merge( get_allowed_mime_types(), $additional_mime_types );
+
 	/* ========== Invalid File type checking ========== */
-	$file_type = wp_check_filetype_and_ext( $file_dir_path . $file_name, $file_name );
+	$file_type = wp_check_filetype_and_ext( $file_dir_path . $file_name, $file_name, $allowed_mime_types );
+
 	$extension = $file_type['ext'];
 
 
