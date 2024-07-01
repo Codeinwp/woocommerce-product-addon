@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, woocommerce product addon
 Requires at least: 3.5
 Tested up to: 6.5
-Stable tag: 32.0.22
+Stable tag: 32.0.23
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -121,6 +121,15 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 9. PPOM General Settings
 
 == Changelog ==
+
+##### [Version 32.0.23](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.22...v32.0.23) (2024-07-01)
+
+- Fixed hard rejection of cart items when HTML is present in the input value
+- Fixed infinite popup for file uploads under visibility conditions
+- Fixed .ai files to be allowed for upload
+
+
+
 
 ##### [Version 32.0.22](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.21...v32.0.22) (2024-05-20)
 

@@ -1,3 +1,9 @@
+##### [Version 32.0.23](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.22...v32.0.23) (2024-07-01)
+
+- Fixed hard rejection of cart items when HTML is present in the input value
+- Fixed infinite popup for file uploads under visibility conditions
+- Fixed .ai files to be allowed for upload
+
 ##### [Version 32.0.22](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.21...v32.0.22) (2024-05-20)
 
 - Fixed error when products with PPOM fields are not added to the cart
