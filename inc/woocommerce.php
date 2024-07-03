@@ -230,7 +230,7 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 
 		$passed = apply_filters( 'ppom_before_fields_validation', $passed, $field, $post_data, $product_id );
 
-		if ( $passed && ! isset( $field['required'] ) || 'on' !== $field['required'] ) {
+		if ( $passed && ( ! isset( $field['required'] ) || 'on' !== $field['required'] ) ) {
 			continue;
 		}
 
