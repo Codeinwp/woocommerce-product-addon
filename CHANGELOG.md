@@ -1,3 +1,7 @@
+##### [Version 32.0.24](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.23...v32.0.24) (2024-07-03)
+
+- Fixed required field error message showing up when the field is not required
+
 ##### [Version 32.0.23](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.22...v32.0.23) (2024-07-01)
 
 - Fixed hard rejection of cart items when HTML is present in the input value
