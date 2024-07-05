@@ -162,12 +162,12 @@ class PPOM_Form {
 				}
 
 				if ( $collapse_type == 'end' ) {
-					echo '<div class="ppom-collapsed-child-end">';
+					echo '<div class="ppom-collapsed-child-end"></div>';
 				}
 
 				if ( $collapse_type != 'end' ) {
 					echo '<h4 data-collapse-id="' . esc_attr( $data_name ) . '" class="ppom-collapsed-title">' . $title . '</h4>';
-					echo '<div class="collapsed-child">';
+					echo '<div class="collapsed-child"></div>';
 				}
 
 				$section_started = true;
