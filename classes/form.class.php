@@ -102,6 +102,13 @@ class PPOM_Form {
 				return (int) $meta_id === (int) $field['ppom_id'];
 			}
 		);
+		$collapse_fields = array_filter(
+			$fields,
+			function( $collapse_field ) {
+				return isset( $collapse_field['type'] ) && 'collapse' === $collapse_field['type'];
+			}
+		);
+
 		foreach ( $fields as $meta ) {
 
 			$type      = isset( $meta['type'] ) ? $meta['type'] : '';
@@ -143,7 +150,6 @@ class PPOM_Form {
 
 			$field_wrapper_class = $this->field_main_wrapper_classes( $meta );
 
-
 			// Collapse Fields Section
 			if ( $type == 'collapse' ) {
 				$collapse_type = isset( $meta['collapse_type'] ) ? $meta['collapse_type'] : '';
@@ -162,12 +168,12 @@ class PPOM_Form {
 				}
 
 				if ( $collapse_type == 'end' ) {
-					echo '<div class="ppom-collapsed-child-end"></div>';
+					echo '<div class="ppom-collapsed-child-end">';
 				}
 
 				if ( $collapse_type != 'end' ) {
 					echo '<h4 data-collapse-id="' . esc_attr( $data_name ) . '" class="ppom-collapsed-title">' . $title . '</h4>';
-					echo '<div class="collapsed-child"></div>';
+					echo '<div class="collapsed-child">';
 				}
 
 				$section_started = true;
@@ -194,7 +200,6 @@ class PPOM_Form {
 			 */
 			ob_start();
 
-
 			$all_inputs  = ppom_array_all_inputs();
 			$core_inputs = $all_inputs['core'];
 
@@ -205,12 +210,11 @@ class PPOM_Form {
 			do_action( 'ppom_rendering_inputs', $meta, $data_name, $fm->input_classes_array(), $fm->field_label(), $fm->options() );
 			do_action( "ppom_rendering_inputs_{$type}", $meta, $default_value );
 
-
 			$field_html .= ob_get_clean();
 
 			$field_html .= '</div>';
 
-			if ( count( self::$ppom->fields ) == $ppom_field_counter && $section_started ) {
+			if ( count( $collapse_fields ) === $ppom_collapse_counter && $section_started ) {
 				$field_html .= '</div>';
 			}
 
