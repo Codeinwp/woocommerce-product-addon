@@ -49,6 +49,13 @@ $ppom_field_counter    = 0;
 $ppom_collapse_counter = 0;
 $allow_nextprev        = ppom_get_option( 'ppom-collapse-nextprev' );
 
+$collapse_fields = array_filter(
+	$ppom_fields_meta,
+	function( $collapse_field ) {
+		return isset( $collapse_field['type'] ) && 'collapse' === $collapse_field['type'];
+	}
+);
+
 foreach ( $ppom_fields_meta as $meta ) {
 
 	$type          = ( isset( $meta['type'] ) ? $meta ['type'] : '' );
@@ -734,7 +741,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 	echo '</div>';  // col-lg-*
 
-	if ( count( $ppom_fields_meta ) == $ppom_field_counter && $section_started ) {
+	if ( count( $collapse_fields ) === $ppom_collapse_counter && $section_started ) {
 		echo '</div>';
 	}
 }
