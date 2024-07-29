@@ -1,3 +1,7 @@
+##### [Version 32.0.26](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.25...v32.0.26) (2024-07-29)
+
+- Fixed issue with default settings on collapse field and when using multiple collapse fields
+
 ##### [Version 32.0.25](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.24...v32.0.25) (2024-07-10)
 
 - Fixed an issue with the collapse field and compatibility with the Avada builder
