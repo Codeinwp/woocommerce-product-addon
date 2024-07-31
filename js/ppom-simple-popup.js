@@ -55,7 +55,7 @@
 			tap: true,
 		};
 	}
-	if ( $('[data-ppom-tooltip~=ppom_tooltip]').length > 0 ) {
+	if ( $('[data-ppom-tooltip~=ppom_tooltip]').length > 0 && 'function' === typeof ppom_tooltipster ) {
 		$('[data-ppom-tooltip~=ppom_tooltip]').ppom_tooltipster(tooltip_options);
 	}
 
@@ -64,7 +64,7 @@
 	var prefix = 'ppom-popup';
 
 	function pluploadRefresh() {
-		if( ! uploaderInstances ) {
+		if( ! 'object' !== typeof uploaderInstances ) {
 			return;
 		}
 		const instances = Object.values(uploaderInstances);
