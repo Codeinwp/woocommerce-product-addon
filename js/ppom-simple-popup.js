@@ -55,8 +55,8 @@
 			tap: true,
 		};
 	}
-	if ( $('[data-ppom-tooltip~=ppom_tooltip]').length > 0 && 'function' === typeof ppom_tooltipster ) {
-		$('[data-ppom-tooltip~=ppom_tooltip]').ppom_tooltipster(tooltip_options);
+	if ( $('[data-ppom-tooltip~=ppom_tooltip]').length > 0 ) {
+		$('[data-ppom-tooltip~=ppom_tooltip]').ppom_tooltipster?.(tooltip_options);
 	}
 
 	// Plugin name and prefix 
