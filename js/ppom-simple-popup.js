@@ -64,7 +64,7 @@
 	var prefix = 'ppom-popup';
 
 	function pluploadRefresh() {
-		if( ! 'object' !== typeof uploaderInstances ) {
+		if( typeof uploaderInstances !== 'object' ) {
 			return;
 		}
 		const instances = Object.values(uploaderInstances);
