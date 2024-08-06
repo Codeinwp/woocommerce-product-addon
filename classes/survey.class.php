@@ -2,7 +2,7 @@
 /**
  * Class PPOM_Survey file.
  *
- * @package WPCF7_Redirect
+ * @package PPOM_Survey
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -45,7 +45,7 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 		 * @see survey.js
 		 */
 		public function get_survey_metadata() {
-			$license_data = get_option( 'feedzy_rss_feeds_pro_license_data', array() );
+			$license_data = get_option( 'ppom_pro_license_data', array() );
 			$attributes   = array();
 			$user_id      = 'ppom_' . ( ! empty( $license_data->key ) ? $license_data->key : preg_replace( '/[^\w\d]*/', '', get_site_url() ) ); // Use a normalized version of the site URL as a user ID for free users.
 
