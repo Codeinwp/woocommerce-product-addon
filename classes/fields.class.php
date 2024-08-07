@@ -1040,7 +1040,7 @@ class PPOM_Fields_Meta {
 			 * @since 7.1
 			 */
 			case 'bulk-quantity':
-				$bulk_data = json_decode( $values, true );
+				$bulk_data = is_string( $values ) ? json_decode( $values, true ) : (array) $values;
 				// ppom_pa($bulk_data[0]);
 				$html_input .= '<div class="ppom-bulk-quantity-wrapper">';
 				$html_input .= '<div class="table-content">';
