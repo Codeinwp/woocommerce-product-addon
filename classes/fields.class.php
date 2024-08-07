@@ -1059,7 +1059,7 @@ class PPOM_Fields_Meta {
 				$html_input .= '<thead>';
 				$html_input .= '<tr>';
 
-				if ( $values ) {
+				if ( ! empty( $bulk_data ) ) {
 					foreach ( $bulk_data[0] as $title => $value ) {
 						$deleteIcon  = ( $title != 'Quantity Range' && $title != 'Base Price' ) ? '<span class="remove ppom-rm-bulk-variation"><i class="fa fa-times" aria-hidden="true"></i></span>' : '';
 						$html_input .= '<th>' . $title . ' ' . $deleteIcon . '</th>';
@@ -1073,7 +1073,7 @@ class PPOM_Fields_Meta {
 				$html_input .= '</thead>';
 				$html_input .= '<tbody>';
 
-				if ( $values ) {
+				if ( ! empty( $bulk_data ) ) {
 					foreach ( $bulk_data as $row => $data ) {
 						$html_input .= '<tr>';
 						foreach ( $data as $key => $value ) {
@@ -1109,8 +1109,8 @@ class PPOM_Fields_Meta {
 				$html_input .= '<button class="btn btn-info ppom-save-bulk-json">'.esc_html__( 'Save Changing', 'woocommerce-product-addon' ).'</button> ';
 				$html_input .= '<button class="btn btn-success ppom-edit-bulk-json">'.esc_html__( 'Edit Changing', 'woocommerce-product-addon' ).'</button>';
 
-				if ( $values ) {
-					$html_input .= "<input type='hidden' name='ppom[" . esc_attr( $field_index ) . "][options]' class='ppom-saved-bulk-data ppom-meta-field' value='" . json_encode( $bulk_data ) . "' data-metatype='options'>";
+				if ( ! empty( $bulk_data ) ) {
+					$html_input .= "<input type='hidden' name='ppom[" . esc_attr( $field_index ) . "][options]' class='ppom-saved-bulk-data ppom-meta-field' value='" . wp_json_encode( $bulk_data ) . "' data-metatype='options'>";
 				} else {
 					$html_input .= "<input type='hidden' class='ppom-saved-bulk-data ppom-meta-field' data-metatype='options'>";
 				}
