@@ -274,21 +274,27 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                 	wc_price_DOM = $('form.cart').closest('div').find('.price');
                 }*/
                 
-                const fixedPrices = input?.fixed_prices;
-                if (fixedPrices) {
-                    const fixedPricesList = fixedPrices.split(',').map(item => item.split('|').map(v => v.trim()));
+                const fixedPricesMap = input?.fixed_prices
+                ?.split(',')
+                ?.map(
+                    item => item.split('|').map(v => v.trim())
+                )?.reduce((obj, [variationName, variationPrice]) => {
+                    obj[variationName] = variationPrice;
+                    return obj;
+                }, {});
 
-                    if (fixedPricesList.length > 0) {
-                        const fixedPricesListObject = fixedPricesList.reduce((obj, item) => {
-                            obj[item[0].trim()] = item[1].trim();
-                            return obj;
-                        }, {});
-
-                        let options = JSON.parse(input.options);
+                // Override existing prices with their fixed version.
+                if (fixedPricesMap) {
+                    try {
+                        options = JSON.parse(input.options)?.map(obj => ({
+                            ...obj,
+                            ...fixedPricesMap
+                        }));
                         if (options) {
-                            options = options.map(obj => ({ ...obj, ...fixedPricesListObject }));
                             input.options = JSON.stringify(options);
                         }
+                    } catch (e) {
+                        console.error(e);
                     }
                 }
                 
