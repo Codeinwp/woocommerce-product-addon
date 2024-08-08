@@ -134,7 +134,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			if ( ! current_user_can( 'administrator' ) ) {
 				$cap = 'ppom_options_page';
 				// Menu page for roles set by PPOM Permission Settings
-				add_menu_page(
+				$menu = add_menu_page(
 					__( $page ['page_title'], 'woocommerce-product-addon' ),
 					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
@@ -145,6 +145,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 					)
 				);
 			}
+
+			add_action( "load-$menu", array( $this, 'load_admin_menu' ) );
 		}
 	}
 
@@ -394,6 +396,15 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		</tr>
 		<?php
 
+	}
+
+	/**
+	 * Load admin menu page.
+	 */
+	public function load_admin_menu() {
+		// Call survey class.
+		include_once PPOM_PATH . '/classes/survey.class.php';
+		PPOM_Survey::get_instance()->init();
 	}
 
 
