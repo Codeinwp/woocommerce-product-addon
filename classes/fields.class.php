@@ -1112,7 +1112,7 @@ class PPOM_Fields_Meta {
 				if ( ! empty( $bulk_data ) ) {
 					$html_input .= "<input type='hidden' name='ppom[" . esc_attr( $field_index ) . "][options]' class='ppom-saved-bulk-data ppom-meta-field' value='" . wp_json_encode( $bulk_data ) . "' data-metatype='options'>";
 				} else {
-					$html_input .= "<input type='hidden' class='ppom-saved-bulk-data ppom-meta-field' data-metatype='options'>";
+					$html_input .= "<input type='hidden' name='ppom[" . esc_attr( $field_index ) . "][options]' class='ppom-saved-bulk-data ppom-meta-field' data-metatype='options'>";
 				}
 
 

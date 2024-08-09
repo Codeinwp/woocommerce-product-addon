@@ -273,7 +273,29 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                 /*if ($('form.cart').closest('div').find('.price').length > 0){
                 	wc_price_DOM = $('form.cart').closest('div').find('.price');
                 }*/
+                
+                const fixedPricesMap = (input?.fixed_prices ?? '').split(',')
+                    .reduce((obj, item) => {
+                        const [variationName, variationPrice] = item.split('|').map(v => v.trim());
+                        obj[variationName] = variationPrice;
+                        return obj;
+                    }, {});
 
+                // Override existing prices with their fixed version.
+                if (fixedPricesMap) {
+                    try {
+                        const options = JSON.parse(input.options)?.map(obj => ({
+                            ...obj,
+                            ...fixedPricesMap
+                        }));
+                        if (options) {
+                            input.options = JSON.stringify(options);
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+                
                 ppom_bulkquantity_meta[input.data_name] = input.options;
 
                 var min_quantity_value = jQuery(`.ppom-bulkquantity-qty.${input.data_name}`).val();
