@@ -58,8 +58,8 @@ class PPOM_Changelog_Handler {
 				preg_match( '/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/', $changelog_line, $found_v );
 				preg_match( '/[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/', $changelog_line, $found_d );
 				$releases[ $release_count ] = array(
-					'version' => $found_v[0],
-					'date'    => $found_d[0],
+					'version' => ! empty( $found_v ) ? $found_v[0] : '',
+					'date'    => ! empty( $found_d ) ? $found_d[0] : '',
 				);
 				continue;
 			}
