@@ -284,7 +284,7 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                 // Override existing prices with their fixed version.
                 if (fixedPricesMap) {
                     try {
-                        options = JSON.parse(input.options)?.map(obj => ({
+                        const options = JSON.parse(input.options)?.map(obj => ({
                             ...obj,
                             ...fixedPricesMap
                         }));
