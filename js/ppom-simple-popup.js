@@ -56,7 +56,7 @@
 		};
 	}
 	if ( $('[data-ppom-tooltip~=ppom_tooltip]').length > 0 ) {
-		$('[data-ppom-tooltip~=ppom_tooltip]').ppom_tooltipster(tooltip_options);
+		$('[data-ppom-tooltip~=ppom_tooltip]').ppom_tooltipster?.(tooltip_options);
 	}
 
 	// Plugin name and prefix 
@@ -64,7 +64,7 @@
 	var prefix = 'ppom-popup';
 
 	function pluploadRefresh() {
-		if( ! uploaderInstances ) {
+		if( typeof uploaderInstances !== 'object' ) {
 			return;
 		}
 		const instances = Object.values(uploaderInstances);

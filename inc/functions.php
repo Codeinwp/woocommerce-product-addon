@@ -2313,6 +2313,13 @@ function ppom_get_conditional_data_attributes( $meta ) {
 		$bound      = isset( $conditions['bound'] ) ? ppom_wpml_translate( $conditions['bound'], 'PPOM' ) : '';
 		$visibility = isset( $conditions['visibility'] ) ? ppom_wpml_translate( $conditions['visibility'], 'PPOM' ) : '';
 
+		$conditions['rules'] = array_filter(
+			$conditions['rules'],
+			function( $rule ) {
+				return ! empty( $rule['element_values'] );
+			}
+		);
+
 		$attr_html .= ' data-cond="1"';
 		$attr_html .= ' data-cond-total="' . esc_attr( count( $conditions['rules'] ) ) . '"';
 		$attr_html .= ' data-cond-bind="' . esc_attr( $bound ) . '"';
