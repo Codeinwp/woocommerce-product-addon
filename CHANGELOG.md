@@ -1,3 +1,12 @@
+##### [Version 32.0.27](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.26...v32.0.27) (2024-08-13)
+
+- Fixed PHP fatal error that was occurring when editing imported group of fields
+- Fixed PHP warnings on the changelog page
+- Fixed console error that was blocking the editing/updating of the image in the popup
+- Fixed conditional loading
+- Fixed repeater field issue with multiple groups
+- Implemented a user satisfaction survey
+
 ##### [Version 32.0.26](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.25...v32.0.26) (2024-07-29)
 
 - Fixed issue with default settings on collapse field and when using multiple collapse fields
