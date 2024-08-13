@@ -133,6 +133,11 @@ class PPOM_Meta {
 			}
 		}
 
+		// Retrieve fields with the repeater enabled.
+		$is_cloned = is_array( $this->fields ) ? array_filter( array_column( $this->fields, 'is_cloned' ) ) : array();
+		if ( isset( $this->ppom_settings->productmeta_validation ) && ! empty( $is_cloned ) ) {
+			$this->ppom_settings->productmeta_validation = 'on';
+		}
 	}
 
 	public static function get_instance( $product_id ) {
