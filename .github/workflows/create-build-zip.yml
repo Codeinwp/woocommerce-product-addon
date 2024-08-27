@@ -2,7 +2,7 @@ name: Build and publish the ZIP build file
 
 on:
   pull_request:
-    types: [ opened, synchronize, ready_for_review ]
+    types: [opened, synchronize, ready_for_review]
     branches-ignore:
       - "update_dependencies"
 concurrency:
@@ -18,7 +18,7 @@ jobs:
       git-sha-8: ${{ steps.retrieve-git-sha-8.outputs.sha8 }}
     steps:
       - name: Check out source files
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Get Composer Cache Directory
         id: composer-cache
         run: |
@@ -36,6 +36,12 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build files
         run: yarn run build
+      - name: Bump the plugin version
+        run: |
+          CURRENT_VERSION=$(node -p -e "require('./package.json').version")
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          DEV_VERSION="${CURRENT_VERSION}-dev.${COMMIT_HASH}"
+          npm run grunt version::${DEV_VERSION}
       - name: Create zip
         run: yarn run dist
       - name: Retrieve branch name
