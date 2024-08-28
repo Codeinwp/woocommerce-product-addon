@@ -211,29 +211,27 @@ jQuery(function($) {
         var check_field = $('.ppom-check-one-field input[type="checkbox"]:checked');
 
         if (check_field.length > 0) {
-            swal.fire({
-                title: "Are you sure",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55 ",
-                cancelButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-            }).then( (result ) => {
-                    if (!result.isConfirmed) return;
+            window?.ppomPopup?.open({
+                title: window?.ppom_vars?.i18n.popup.confirmTitle,
+                onConfirmation: () => {
+                    $('.ppom_field_table').find('.ppom-check-one-field input').each(function(i, meta_field) {
 
-                $('.ppom_field_table').find('.ppom-check-one-field input').each(function(i, meta_field) {
-
-                    if (this.checked) {
-                        var field_id = $(meta_field).val();
-                        // console.log(field_id)
-                        $(meta_field).parent().parent().parent('.row_no_' + field_id + '').remove();
-                    }
-                    $('.ppom_save_fields_model').find('#ppom_field_model_' + field_id + '').remove();
-                });
-            });
+                        const field_id = $(meta_field).val();
+                        if (this.checked) {
+                            // console.log(field_id)
+                            $(meta_field).parent().parent().parent('.row_no_' + field_id + '').remove();
+                        }
+                        $('.ppom_save_fields_model').find('#ppom_field_model_' + field_id + '').remove();
+                    });
+                }
+            })
         }
         else {
-            swal.fire("Please at least check one field!", "", "error");
+            window?.ppomPopup?.open({
+                title: window.ppom_vars.i18n.popup.checkFieldTitle,
+                type: "error",
+                hideCloseBtn: true
+            })
         }
     });
 
