@@ -85,7 +85,6 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			2,
 			10
 		);
-
 	}
 
 
@@ -356,6 +355,17 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			th.column-ppom_meta {
 				width: 10% !important;
 			}
+
+			/* PPOM File Upload uploaded files display */
+			td.ppom-files-display {
+				display: flex;
+				flex-direction: column;
+				gap: 3px;
+			}
+			
+			td.ppom-files-display a.button {
+				text-align: center;
+			}
 		</style>
 		<?php
 	}
@@ -406,6 +416,4 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		include_once PPOM_PATH . '/classes/survey.class.php';
 		PPOM_Survey::get_instance()->init();
 	}
-
-
 }
