@@ -155,7 +155,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * CALLBACKS
 	*/
 	function product_meta() {
-
+		//hide this on PPOM page since is conflicting with floating widget.
+		add_filter( 'update_footer', '__return_empty_string' );
 		echo '<div id="ppom-pre-loading"></div>';
 
 		echo '<div class="ppom-admin-wrap woocommerce ppom-wrapper" style="display:none">';
@@ -174,6 +175,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				<div class="ppom-top-nav">
 					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($addons); ?>">+ <?php esc_html_e( 'All Addons', 'woocommerce-product-addon' ); ?></a>
 					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($changelog_url); ?>"><?php esc_html_e( 'Changelog', 'woocommerce-product-addon' ); ?></a>
+                    <a  class="mr-3" href="<?php echo esc_url( admin_url( '/admin.php?page=ti-about-woocommerce_product_addon' ) ); ?>"><?php esc_html_e('About Us', 'woocommerce-product-addon'); ?></a>
 					<a  href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'woocommerce-product-addon'); ?></a>
 				</div>
 			</div>
