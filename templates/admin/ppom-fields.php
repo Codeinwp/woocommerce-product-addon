@@ -21,16 +21,17 @@ $show_cart_thumb        = '';
 $aviary_api_key         = '';
 $productmeta_style      = '';
 $productmeta_js         = '';
-$productmeta_categories = '';
 $product_meta_id        = 0;
 $product_meta           = array();
 $ppom_field_index       = 1;
+$is_edit_screen         = false;
 
 if ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) {
 
 	$product_meta_id = intval( $_REQUEST ['productmeta_id'] );
 	$ppom            = new PPOM_Meta();
 	$ppom_settings   = $ppom->get_settings_by_id( $product_meta_id );
+	$is_edit_screen  = true;
 
 	$productmeta_name       = ( isset( $ppom_settings->productmeta_name ) ? stripslashes( $ppom_settings->productmeta_name ) : '' );
 	$dynamic_price_hide     = ( isset( $ppom_settings->dynamic_price_display ) ? $ppom_settings->dynamic_price_display : '' );
@@ -39,7 +40,6 @@ if ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) 
 	$aviary_api_key         = ( isset( $ppom_settings->aviary_api_key ) ? $ppom_settings->aviary_api_key : '' );
 	$productmeta_style      = ! empty( $ppom_settings->productmeta_style ) ? $ppom_settings->productmeta_style : "selector {\n}\n";
 	$productmeta_js         = ( isset( $ppom_settings->productmeta_js ) ? $ppom_settings->productmeta_js : '' );
-	$productmeta_categories = ( isset( $ppom_settings->productmeta_categories ) ? $ppom_settings->productmeta_categories : '' );
 	$product_meta           = json_decode( $ppom_settings->the_meta, true );
 }
 
@@ -510,17 +510,15 @@ $fields_groups = [
 										<option value="all_option" <?php selected( $dynamic_price_hide, 'all_option' ); ?>><?php _e( "Show Each Option's Price", 'woocommerce-product-addon' ); ?></option>
 									</select>
 								</div>
-							</div>
-							<div class="col-md-6 col-sm-12">
-								<div class="form-group">
-									<label><?php _e( 'Apply for Categories', 'woocommerce-product-addon' ); ?>
-										<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip"
-											  title="<?php _e( 'If you want to apply this meta against categories, type here each category SLUG per line. For All type: All. Leave blank for default.', 'woocommerce-product-addon' ); ?>"><i
-													class="dashicons dashicons-editor-help"></i></span>
-									</label>
-									<textarea class="form-control"
-											  name="productmeta_categories"><?php echo stripslashes( $productmeta_categories ); ?></textarea>
-								</div>
+
+								<?php if ( $is_edit_screen ) { ?>
+                                <a class="btn btn-sm btn-secondary ppom-products-modal"
+                                   data-ppom_id="<?php echo esc_attr( $product_meta_id ); ?>"
+                                   data-formmodal-id="ppom-product-modal"
+								>
+									<?php _e( 'Attach to Products', 'woocommerce-product-addon' ); ?>
+								</a>
+								<?php } ?>
 							</div>
 						</div>
 						<?php
@@ -800,3 +798,8 @@ $fields_groups = [
 <div class="checker">
 	<?php $form_meta->render_field_settings(); ?>
 </div>
+
+<?php
+
+ppom_load_template( 'admin/product-modal.php' );
+?>

@@ -613,8 +613,7 @@ class NM_PersonalizedProduct {
 		return $res;
 	}
 
-
-	public static function activate_plugin() {
+	public static function upgrade_database() {
 		global $wpdb;
 
 		/*
@@ -635,6 +634,7 @@ class NM_PersonalizedProduct {
 		productmeta_style MEDIUMTEXT,
 		productmeta_js MEDIUMTEXT,
 		productmeta_categories MEDIUMTEXT,
+		productmeta_tags LONGTEXT,
 		the_meta MEDIUMTEXT NOT NULL,
 		productmeta_created DATETIME NOT NULL,
 		PRIMARY KEY  (productmeta_id)
@@ -644,7 +644,29 @@ class NM_PersonalizedProduct {
 		dbDelta( $sql );
 
 		update_option( 'personalizedproduct_db_version', PPOM_DB_VERSION );
+	}
 
+	public static function check_for_plugin_update( $upgrader, $hook_extra ) {
+		if (
+			isset( $hook_extra['action'] ) && 'update' === $hook_extra['action'] &&
+			isset( $hook_extra['type'] ) && 'plugin' === $hook_extra['type'] &&
+			isset( $hook_extra['plugins'] ) && is_array( $hook_extra['plugins'] )
+		) {
+			$updated_plugins = $hook_extra['plugins'];
+			$plugin_name = basename(PPOM_PATH);
+
+			foreach( $updated_plugins as $updated_plugin_path ) {
+				if ( false !== str_contains( $updated_plugin_path, $plugin_name ) ) {
+					self::upgrade_database();
+					break;
+				}
+			}
+		}
+	}
+
+	public static function activate_plugin() {
+		
+		self::upgrade_database();
 		// this is to remove un-confirmed files daily
 
 		$delete_frequency = ppom_get_option( 'ppom_remove_unused_images_schedule' );
