@@ -9,20 +9,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed.' );
 }
 
-// adding column in product list
+/**
+ * Adding column in product list.
+ *
+ * @param array $columns Product list table columns.
+ *
+ * @return array
+ */
 function ppom_admin_show_product_meta( $columns ) {
-
-	unset( $columns['date'] );
-	unset( $columns['product_tag'] );
-	$columns['ppom_meta'] = __( 'PPOM', 'woocommerce-product-addon' );
-	$columns['date']      = __( 'Date', 'woocommerce-product-addon' );
-
+	$last_column_key             = array_key_last( $columns );
+	$last_column                 = array_pop( $columns );
+	$columns['ppom_meta']        = __( 'PPOM', 'woocommerce-product-addon' );
+	$columns[ $last_column_key ] = $last_column;
 	return $columns;
-
-	return array_merge(
-		$columns,
-		array( 'ppom_meta' => __( 'PPOM', 'woocommerce-product-addon' ) )
-	);
 }
 
 function ppom_admin_product_meta_column( $column, $post_id ) {
