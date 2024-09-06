@@ -163,48 +163,5 @@ add_action(
 	}
 );
 
-/**
- * Plugin activation.
- *
- * @param bool $network_wide Whether the plugin is network deactivated or not.
- */
-function ppom_activation( $network_wide ) {
-	if ( is_multisite() && $network_wide ) {
-		$site_ids = get_sites(
-			array(
-				'fields' => 'ids',
-			)
-		);
-		foreach ( $site_ids as $site_id ) {
-			switch_to_blog( $site_id );
-			NM_PersonalizedProduct::activate_plugin();
-			restore_current_blog();
-		}
-	} else {
-		NM_PersonalizedProduct::activate_plugin();
-	}
-}
-register_activation_hook( __FILE__, 'ppom_activation' );
-
-/**
- * Plugin deactivation.
- *
- * @param bool $network_wide Whether the plugin is network deactivated or not.
- */
-function ppom_deactivation( $network_wide ) {
-	if ( is_multisite() && $network_wide ) {
-		$site_ids = get_sites(
-			array(
-				'fields' => 'ids',
-			)
-		);
-		foreach ( $site_ids as $site_id ) {
-			switch_to_blog( $site_id );
-			NM_PersonalizedProduct::deactivate_plugin();
-			restore_current_blog();
-		}
-	} else {
-		NM_PersonalizedProduct::deactivate_plugin();
-	}
-}
-register_deactivation_hook( __FILE__, 'ppom_deactivation' );
+register_activation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'activate_plugin' ) );
+register_deactivation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'deactivate_plugin' ) );
