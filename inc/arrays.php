@@ -671,8 +671,8 @@ function ppom_array_get_addons_details() {
 
 	$addons = array(
 		array(
-			'title'   => __( 'Texter', 'woocommerce-product-addon' ),
-			'desc'    => __( 'PPOM Texter Addon is the best and simple solution for web2print business using WooCommerce. Now define a fixed position and area for Text in your Templates like on Mug, T-shirt or Visiting Cards with preset font family, size. The client will fill the text with his all of its attributes and send to cart. It’s like a smart Product Designer. Multiple templates can also be attached to one product.', 'woocommerce-product-addon' ),
+			'title'   => __( 'Personalization Preview', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Personalization Preview Addon is the best and simple solution for web2print business using WooCommerce. Now define a fixed position and area for Text in your Templates like on Mug, T-shirt or Visiting Cards with preset font family, size. The client will fill the text with his all of its attributes and send to cart. It’s like a smart Product Designer. Multiple templates can also be attached to one product.', 'woocommerce-product-addon' ),
 			'actions' => array(
 				array(
 					'title' => __( 'Docs', 'woocommerce-product-addon' ),
