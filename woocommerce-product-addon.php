@@ -119,19 +119,6 @@ add_filter(
 		return $compatibilities;
 	}
 );
-add_action( 'woocommerce_init', 'PPOM' );
-
-add_action(
-	'before_woocommerce_init',
-	function () {
-		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
-		}
-	}
-);
-
-register_activation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'activate_plugin' ) );
-register_deactivation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'deactivate_plugin' ) );
 add_filter( 'woocommerce_product_addon_about_us_metadata', function () {
 	return [
 		'location' => 'ppom',
@@ -156,6 +143,25 @@ add_filter( 'woocommerce_product_addon_welcome_metadata', function () {
 		'is_enabled' => ! defined( 'PPOM_PRO_PATH' ),
 		'pro_name'   => 'PPOM PRO',
 		'logo'       => PPOM_URL . '/images/logo.jpg',
-		'cta_link'   => 'https://rviv.ly/US4LuF'
+		'cta_link'   => 'https://rviv.ly/fJhjZN'
 	];
 } );
+add_filter(
+	'woocommerce_product_addon_welcome_upsell_message',
+	function() {
+		return '<p>You\'ve been using <b>{product}</b> for 7 days now and we appreciate your loyalty! We also want to make sure you\'re getting the most out of our product. That\'s why we\'re offering you a special deal - upgrade to <b>{pro_product}</b> in the next 5 days and receive a discount of <b>up to 55%</b>. <a href="{cta_link}" target="_blank">Upgrade now</a> and unlock all the amazing features of <b>{pro_product}</b>!</p>';
+	}
+);
+add_action( 'woocommerce_init', 'PPOM' );
+
+add_action(
+	'before_woocommerce_init',
+	function () {
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	}
+);
+
+register_activation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'activate_plugin' ) );
+register_deactivation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'deactivate_plugin' ) );
