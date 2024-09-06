@@ -132,7 +132,7 @@ class PPOM_Freemium {
 				'icon'  => '<i class="fa fa-font" aria-hidden="true"></i>',
 			],
 			[
-				'title' => __( 'Texter', 'woocommerce-product-addon' ),
+				'title' => __( 'Personalization Preview', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-keyboard-o" aria-hidden="true"></i>',
 			],
 			[
