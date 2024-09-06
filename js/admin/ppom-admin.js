@@ -1313,7 +1313,7 @@ jQuery(function($) {
             .replace(/'/g, "&#039;");
     }
 
-    $('div.row.ppom-tabs').on('ppom_fields_tab_changed', (e, id, tab)=>{
+    $(document).on('ppom_fields_tab_changed', 'div.row.ppom-tabs', (e, id, tab)=>{
         if( ppom_vars.i18n.freemiumCFRTab !== id ) {
             return;
         }
