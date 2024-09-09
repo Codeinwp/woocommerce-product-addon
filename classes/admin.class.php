@@ -109,7 +109,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 							'utm_medium'   => 'plugins',
 							'utm_campaign' => 'rowaction',
 						),
-						PPOM_UPGRADE_URL
+						tsdk_translate_link( PPOM_UPGRADE_URL )
 					) . '" title="' . __( 'More Features', 'woocommerce-product-addon' ) . '"  target="_blank" rel="noopener noreferrer" style="color: #009E29; font-weight: 700;" onmouseover="this.style.color=\'#008a20\';" onmouseout="this.style.color=\'#009528\';" >' . __( 'Get Pro', 'woocommerce-product-addon' ) . '</a>',
 			),
 			$actions

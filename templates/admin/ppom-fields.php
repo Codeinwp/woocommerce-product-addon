@@ -101,7 +101,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 									<i class="fa fa-lock" aria-hidden="true"></i>
 								</span>
 								<span class="upsell-btn-wrapper">
-									<a target="_blank" href="<?php echo esc_url( tsdk_utmify(PPOM_UPGRADE_URL,'lockedfields') ); ?>">Get Pro</a>
+									<a target="_blank" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ),'lockedfields') ); ?>">Get Pro</a>
 								</span>
 							</li>
 						<?php
