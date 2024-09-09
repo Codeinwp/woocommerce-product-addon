@@ -1356,6 +1356,29 @@ jQuery(function($) {
         $(clone_new_field).find('input[data-metatype="jquery_dp"]').change(toggleHandler.activateHandler);
     } );
 
+    // Unsaved form exit confirmation.
+      var unsaved = false;
+      $( ':input' ).change(function () {
+        if ( $( this ).parents( '.ppom-checkboxe-style' )?.length > 0 ) {
+            unsaved = false;
+            return;
+        }    
+        unsaved = true;
+      });
+      $( '.ppom-submit-btn input.btn, button.ppom_copy_field' ).on( 'click', function() {
+        if ( $(this).hasClass('ppom_copy_field') ) {
+            unsaved = true;
+            return;
+        }
+        unsaved = false;
+      } );
+      window.addEventListener( 'beforeunload', function( e ) {
+        if ( unsaved ) {
+          e.preventDefault();
+          e.returnValue = '';
+        }
+      });
+
     $(document).ready(function(){
         $('.ppom-slider').each(function(i, item){
             const itemEl = $(item);
