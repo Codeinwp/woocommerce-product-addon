@@ -1365,8 +1365,8 @@ jQuery(function($) {
         }    
         unsaved = true;
       });
-      $( '.ppom-submit-btn input.btn, button.ppom_copy_field' ).on( 'click', function() {
-        if ( $(this).hasClass('ppom_copy_field') ) {
+      $( document ).on( 'click', '.ppom-submit-btn input.btn, button.ppom_copy_field, button.ppom-add-fields-js-action', function() {
+        if ( $(this).hasClass('ppom_copy_field') || $(this).hasClass( 'ppom-add-fields-js-action' ) ) {
             unsaved = true;
             return;
         }
