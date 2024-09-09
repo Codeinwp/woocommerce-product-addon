@@ -51,7 +51,7 @@ $url_cancel = add_query_arg(
 	)
 );
 
-echo '<p><a class="btn btn-primary" href="' . esc_url( $url_cancel ) . '">' . __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ) . '</a></p>';
+echo '<p><a href="' . esc_url( $url_cancel ) . '">' . __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ) . '</a></p>';
 
 $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 
@@ -411,10 +411,6 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 		</form>
 	</div>
 </div>
-
-<br><p><a class="btn btn-primary"
-		  href="<?php echo esc_url( $url_cancel ); ?>"><?php echo __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ); ?></a>
-</p>
 
 <div class="checker">
 	<?php $form_meta->render_field_settings(); ?>
