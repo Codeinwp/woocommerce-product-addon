@@ -88,6 +88,34 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 	}
 
+	/**
+	 * Add upgrade to pro plugin action link.
+	 *
+	 * @param array  $actions Plugin actions.
+	 * @param string $plugin_file Path to the plugin file relative to the plugins directory.
+	 *
+	 * @return array
+	 */
+	public function upgrade_to_pro_plugin_action( $actions, $plugin_file ) {
+		if ( apply_filters( 'product_ppom_license_status', '' ) === 'valid' || apply_filters( 'product_ppom_license_status', '' ) === 'active_expired' ) {
+			return $actions;
+		}
+
+		return array_merge(
+			array(
+				'upgrade_link' => '<a href="' . add_query_arg(
+						array(
+							'utm_source'   => 'wpadmin',
+							'utm_medium'   => 'plugins',
+							'utm_campaign' => 'rowaction',
+						),
+						PPOM_UPGRADE_URL
+					) . '" title="' . __( 'More Features', 'woocommerce-product-addon' ) . '"  target="_blank" rel="noopener noreferrer" style="color: #009E29; font-weight: 700;" onmouseover="this.style.color=\'#008a20\';" onmouseout="this.style.color=\'#009528\';" >' . __( 'Get Pro', 'woocommerce-product-addon' ) . '</a>',
+			),
+			$actions
+		);
+
+	}
 
 	/*
 	 * creating menu page for this plugin

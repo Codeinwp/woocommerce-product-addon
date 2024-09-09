@@ -101,6 +101,7 @@ if ( is_admin() ) {
 	$ppom_admin    = new NM_PersonalizedProduct_Admin();
 	$ppom_basename = plugin_basename( __FILE__ );
 	add_filter( "plugin_action_links_{$ppom_basename}", 'ppom_settings_link', 10 );
+	add_filter( "plugin_action_links_{$ppom_basename}", [ $ppom_admin, 'upgrade_to_pro_plugin_action' ], 10, 2 );
 }
 
 function PPOM() {
