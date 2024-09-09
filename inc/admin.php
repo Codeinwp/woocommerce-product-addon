@@ -243,22 +243,23 @@ function ppom_admin_save_form_meta() {
 		wp_send_json( $resp );
 	}
 
-	$dt = apply_filters(
-		'ppom_settings_meta_data_new',
-		array(
-			'productmeta_name'       => $productmeta_name,
-			'dynamic_price_display'  => $dynamic_price_hide,
-			'send_file_attachment'   => $send_file_attachment,
-			'show_cart_thumb'        => $show_cart_thumb,
-			'aviary_api_key'         => trim( $aviary_api_key ),
-			'productmeta_style'      => $productmeta_style,
-			'productmeta_js'         => $productmeta_js,
-			'productmeta_categories' => $productmeta_categories,
-			'the_meta'               => $product_meta,
-			'productmeta_created'    => current_time( 'mysql' ),
-		)
+	$ppom_settings_meta_data = array(
+		'productmeta_name'       => $productmeta_name,
+		'dynamic_price_display'  => $dynamic_price_hide,
+		'send_file_attachment'   => $send_file_attachment,
+		'show_cart_thumb'        => $show_cart_thumb,
+		'aviary_api_key'         => trim( $aviary_api_key ),
+		'productmeta_categories' => $productmeta_categories,
+		'the_meta'               => $product_meta,
+		'productmeta_created'    => current_time( 'mysql' ),
 	);
 
+	if ( ! ppom_is_legacy_user() ) {
+		$ppom_settings_meta_data['productmeta_style'] = $productmeta_style;
+		$ppom_settings_meta_data['productmeta_js']    = $productmeta_js;
+	}
+
+	$dt = apply_filters( 'ppom_settings_meta_data_new', $ppom_settings_meta_data );
 
 	// wp_send_json($dt);
 
@@ -398,22 +399,21 @@ function ppom_admin_update_form_meta() {
 		wp_send_json( $resp );
 	}
 
-
-	$dt = $dt = apply_filters(
-		'ppom_settings_meta_data_update',
-		array(
-			'productmeta_name'       => $productmeta_name,
-			'dynamic_price_display'  => $dynamic_price_hide,
-			'send_file_attachment'   => $send_file_attachment,
-			'show_cart_thumb'        => $show_cart_thumb,
-			'aviary_api_key'         => trim( $aviary_api_key ),
-			'productmeta_style'      => $productmeta_style,
-			'productmeta_js'         => $productmeta_js,
-			'productmeta_categories' => $productmeta_categories,
-			'the_meta'               => $product_meta,
-		),
-		$productmeta_id
+	$ppom_settings_meta_data = array(
+		'productmeta_name'       => $productmeta_name,
+		'dynamic_price_display'  => $dynamic_price_hide,
+		'send_file_attachment'   => $send_file_attachment,
+		'show_cart_thumb'        => $show_cart_thumb,
+		'aviary_api_key'         => trim( $aviary_api_key ),
+		'productmeta_categories' => $productmeta_categories,
+		'the_meta'               => $product_meta,
 	);
+	if ( ! ppom_is_legacy_user() ) {
+		$ppom_settings_meta_data['productmeta_style'] = $productmeta_style;
+		$ppom_settings_meta_data['productmeta_js']    = $productmeta_js;
+	}
+
+	$dt = apply_filters( 'ppom_settings_meta_data_update', $ppom_settings_meta_data, $productmeta_id );
 
 	// wp_send_json($dt);
 

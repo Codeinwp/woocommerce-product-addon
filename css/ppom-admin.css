@@ -1164,3 +1164,11 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 #ppom-admin-changelog-header-top {
     padding: 15px 30px 0 0;
 }
+
+.ppom-admin-tabs-css .ppom-admin-tab-content .notice-info {
+    margin: 10px 0;
+    padding: 10px 5px;
+}
+.ppom-admin-tabs-css .ppom-admin-tab-content .notice-info p {
+    margin: 0;
+}

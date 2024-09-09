@@ -189,6 +189,15 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 					<input type="radio" name="css-tabs" id="ppom-style-tab">
 					<label for="ppom-style-tab" class="ppom-tab-label">Style</label>
 					<div class="ppom-admin-tab-content">
+						<?php if ( ppom_is_legacy_user() ) : ?>
+							<div class="row">
+								<div class="col-md-12 col-sm-12">
+									<div class="notice notice-info">
+										<p><?php echo sprintf( __( 'Custom CSS and JS customization is not available on your current plan. <a href="%s" target="_blank">Upgrade to the Pro</a> plan to unlock the ability to fully customize your fields\' appearance and functionality.', 'woocommerce-product-addon' ), esc_url( tsdk_utmify( PPOM_UPGRADE_URL, 'customstyle' ) ) ); ?></p>
+									</div>
+								</div>
+							</div>
+						<?php endif; ?>
 						<div class="row">
 							<div class="col-md-6 col-sm-12">
 								<div class="form-group">

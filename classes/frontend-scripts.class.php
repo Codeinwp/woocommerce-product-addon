@@ -404,10 +404,10 @@ class PPOM_FRONTEND_SCRIPTS {
 								break;
 
 							case 'bulkquantity':
-								$fields_meta['options'] = stripslashes( $fields_meta['options'] );
+								$fields_meta['options'] = isset( $fields_meta['options'] ) ? stripslashes( $fields_meta['options'] ) : '';
 
 								// To make bulkquantity option WOOCS ready
-								$bulkquantities_options     = json_decode( $fields_meta['options'], true );
+								$bulkquantities_options     = ! empty( $fields_meta['options'] ) ? json_decode( $fields_meta['options'], true ) : array();
 								$bulkquantities_new_options = array();
 								foreach ( $bulkquantities_options as $bq_opt ) {
 									$bq_array = array();
