@@ -1256,3 +1256,38 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 .ppom-wrapper label {
     cursor: auto;
 }
+
+#ppom-import-upsell{
+    text-align: center;
+    width: 600px;
+}
+#ppom-import-upsell .ppom-modal-body{
+    position: relative;
+    padding: 30px;
+}
+#ppom-import-upsell button.close-model {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    font-size: 20px;
+}
+
+#ppom-import-upsell .ppom-lock-icon {
+    padding-bottom: 30px;
+}
+
+#ppom-import-upsell .ppom-lock-icon .dashicons {
+    width: 48px;
+    height: 48px;
+    font-size: 48px;
+}
+
+#ppom-import-upsell p {
+    font-size: 16px;
+    text-align: left;
+    padding-bottom: 10px;
+    padding-top: 20px;
+}

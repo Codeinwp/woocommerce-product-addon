@@ -117,6 +117,10 @@ jQuery(function($) {
     **/
     $('.ppom-import-export-btn').on('click', function(event) {
         event.preventDefault();
+        if ( $(".ppom-import-export-block").length === 0 ) {
+            $('#ppom-import-upsell').fadeIn();
+            return;
+        }
         $('.ppom-more-plugins-block').hide();
         $(".ppom-import-export-block").show();
         $(".ppom-product-meta-block").hide();

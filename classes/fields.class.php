@@ -163,7 +163,6 @@ class PPOM_Fields_Meta {
 				'exportLabel'=>esc_html__( 'Export', 'woocommerce-product-addon' ),
 				'exportLockedLabel'=>esc_html__( 'Export (PRO)', 'woocommerce-product-addon' ),
 				'importLabel'=>esc_html__( 'Import Field Groups ', 'woocommerce-product-addon' ),
-				'importLockedLabel'=>esc_html__( 'Import Field Groups (PRO)', 'woocommerce-product-addon' ),
 				'freemiumCFRContent' => \PPOM_Freemium::get_instance()->get_freemium_cfr_content(),
 				'freemiumCFRTab' => \PPOM_Freemium::TAB_KEY_FREEMIUM_CFR,
 				'popup' => [
