@@ -59,6 +59,7 @@ jQuery(function($) {
         e.preventDefault();
         $("body").append(append_overly_model);
         var modalBox = $(this).attr('data-modal-id');
+        lockedDataName = false;
         $('#' + modalBox).fadeIn();
     });
 
