@@ -1164,3 +1164,6 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 #ppom-admin-changelog-header-top {
     padding: 15px 30px 0 0;
 }
+.ppom-wrapper label {
+    cursor: auto;
+}
