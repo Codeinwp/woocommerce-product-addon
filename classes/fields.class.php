@@ -68,17 +68,16 @@ class PPOM_Fields_Meta {
 
 		wp_enqueue_script( 'ppom-inputmask', PPOM_URL . '/js/inputmask/jquery.inputmask.min.js', array( 'jquery' ), '5.0.6', true );
 
+		// Popup
+		wp_enqueue_script( 'ppom-popup', PPOM_URL . '/js/popup.js', [], PPOM_VERSION, true );
+
 		// PPOM Meta Table File
-		wp_enqueue_script( 'ppom-meta-table', PPOM_URL . '/js/admin/ppom-meta-table.js', array( 'jquery' ), PPOM_VERSION, true );
+		wp_enqueue_script( 'ppom-meta-table', PPOM_URL . '/js/admin/ppom-meta-table.js', array( 'jquery', 'ppom-popup' ), PPOM_VERSION, true );
 
 		// Font-awesome File
 		if ( ppom_load_fontawesome() ) {
 			wp_enqueue_style( 'ppom-fontawsome', PPOM_URL . '/css/font-awesome/css/font-awesome.min.css' );
 		}
-
-		// Swal Files
-		wp_enqueue_style( 'ppom-swal', PPOM_URL . '/js/sweetalert/sweetalert2.min.css' );
-		wp_enqueue_script( 'ppom-swal', PPOM_URL . '/js/sweetalert/sweetalert2.js', [], PPOM_VERSION, true );
 
 		// Select2 Files
 		wp_enqueue_style( 'ppom-select2', PPOM_URL . '/css/select2.css' );
@@ -136,7 +135,7 @@ class PPOM_Fields_Meta {
 			'ppom-field',
 			PPOM_URL . '/js/admin/ppom-admin.js',
 			array(
-				'ppom-swal',
+				'ppom-popup',
 				'ppom-select2',
 				'ppom-tabletojson',
 				'ppom-datatables',
@@ -166,7 +165,15 @@ class PPOM_Fields_Meta {
 				'importLabel'=>esc_html__( 'Import Field Groups ', 'woocommerce-product-addon' ),
 				'importLockedLabel'=>esc_html__( 'Import Field Groups (PRO)', 'woocommerce-product-addon' ),
 				'freemiumCFRContent' => \PPOM_Freemium::get_instance()->get_freemium_cfr_content(),
-				'freemiumCFRTab' => \PPOM_Freemium::TAB_KEY_FREEMIUM_CFR
+				'freemiumCFRTab' => \PPOM_Freemium::TAB_KEY_FREEMIUM_CFR,
+				'popup' => [
+					'confirmTitle' => __( 'Are you sure?', 'woocommerce-product-addon' ),
+					'confirmationBtn' => __( 'Confirm', 'woocommerce-product-addon' ),
+					'cancelBtn' => __( 'Cancel', 'woocommerce-product-addon' ),
+					'finishTitle' => __( 'Done', 'woocommerce-product-addon' ),
+					'errorTitle' => __( 'Error', 'woocommerce-product-addon' ),
+					'checkFieldTitle' => __( 'Please at least check one field!', 'woocommerce-product-addon' ),
+				]
 			]
 		);
 
