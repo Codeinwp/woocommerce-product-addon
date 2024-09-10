@@ -59,6 +59,7 @@ jQuery(function($) {
         e.preventDefault();
         $("body").append(append_overly_model);
         var modalBox = $(this).attr('data-modal-id');
+        lockedDataName = false;
         $('#' + modalBox).fadeIn();
     });
 
@@ -264,11 +265,13 @@ jQuery(function($) {
     /**
         9- Edit Existing Fields
     **/
+    var lockedDataName = false;
     $(document).on('click', '.ppom-edit-field', function(event) {
         event.preventDefault();
 
         var the_id = $(this).attr('id');
-        $('#ppom_field_model_' + the_id + '').find('.ppom-close-checker').removeClass('ppom-close-fields');
+        $('#ppom_field_model_' + the_id).find('.ppom-close-checker').removeClass('ppom-close-fields');
+        lockedDataName = true;
     });
 
 
@@ -992,7 +995,10 @@ jQuery(function($) {
         if (wp_field == 'shipping_fields' || wp_field == 'billing_fields') {
             return;
         }
-        selector.find('[data-meta-id="data_name"] input[type="text"]').val(field_id);
+        if ( true === lockedDataName ) {
+            return;
+        }
+        selector.find('[data-meta-id="data_name"] input[type="text"]:not([readonly])').val(field_id);
     });
 
 
