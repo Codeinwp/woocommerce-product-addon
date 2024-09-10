@@ -1164,6 +1164,12 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 #ppom-admin-changelog-header-top {
     padding: 15px 30px 0 0;
 }
+
+.ppom-disabled-overlay {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
 .ppom-wrapper label {
     cursor: auto;
 }
