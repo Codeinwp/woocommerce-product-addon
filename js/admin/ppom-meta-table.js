@@ -185,7 +185,7 @@ jQuery(function($){
 
 	const exportOption = ppom_vars.ppomProActivated === 'yes' ? `<option value="export">${ppom_vars.i18n.exportLabel}</option>` : `<option disabled value="export">${ppom_vars.i18n.exportLockedLabel}</option>`;
 
-	const importBtn = ppom_vars.ppomProActivated === 'yes' ? `<a class="btn btn-secondary btn-sm ml-4 ppom-import-export-btn" href=""><span class="dashicons dashicons-download"></span>${ppom_vars.i18n.importLabel}</a>` : `<a disabled class="btn btn-secondary btn-sm ml-4 disabled" href=""><span class="dashicons dashicons-download"></span>${ppom_vars.i18n.importLockedLabel}</a>`;
+	const importBtn = `<a class="btn btn-secondary btn-sm ml-4 ppom-import-export-btn" href=""><span class="dashicons dashicons-${ppom_vars.ppomProActivated === 'yes' ? 'download' : 'lock' }"></span>${ppom_vars.i18n.importLabel}</a>`;
 
 	const bulkActions = `<select id="ppom-bulk-actions">
 			<option value="-1">${ppom_vars.i18n.bulkActionsLabel}</option>

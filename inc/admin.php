@@ -711,12 +711,3 @@ function ppom_admin_bar_menu() {
 		);
 	}
 }
-
-function ppom_admin_update_pro_notice() {
-
-	$buy_paddle = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'addmorefields', 'ppompage' );
-
-    echo '<div class="ppom-more-plugins-block pb-5">';
-    echo '<a class="btn btn-sm btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . __( 'Add more field types', 'woocommerce-product-addon' ) . '</a>';
-    echo '</div>';
-}
