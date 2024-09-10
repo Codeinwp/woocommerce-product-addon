@@ -1248,3 +1248,11 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 .ppom-hide {
     display: none;
 }
+.ppom-disabled-overlay {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.ppom-wrapper label {
+    cursor: auto;
+}

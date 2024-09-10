@@ -1311,7 +1311,7 @@ jQuery(function($) {
             .replace(/'/g, "&#039;");
     }
 
-    $('div.row.ppom-tabs').on('ppom_fields_tab_changed', (e, id, tab)=>{
+    $(document).on('ppom_fields_tab_changed', 'div.row.ppom-tabs', (e, id, tab)=>{
         if( ppom_vars.i18n.freemiumCFRTab !== id ) {
             return;
         }
@@ -1352,6 +1352,46 @@ jQuery(function($) {
 
     $( document ).on( 'ppom_new_field_created', function(e, clone_new_field) {
         $(clone_new_field).find('input[data-metatype="jquery_dp"]').change(toggleHandler.activateHandler);
+    } );
+
+    // Unsaved form exit confirmation.
+    var unsaved = false;
+    $( ':input' ).change(function () {
+        if ( $( this ).parents( '.ppom-checkboxe-style' )?.length > 0 ) {
+            unsaved = false;
+            return;
+        }    
+        unsaved = true;
+    });
+    $( document ).on( 'click', '.ppom-submit-btn input.btn, button.ppom_copy_field, button.ppom-add-fields-js-action', function() {
+        if ( $(this).hasClass('ppom_copy_field') || $(this).hasClass( 'ppom-add-fields-js-action' ) ) {
+            unsaved = true;
+            return;
+        }
+        unsaved = false;
+    } );
+    window.addEventListener( 'beforeunload', function( e ) {
+        if ( unsaved ) {
+          e.preventDefault();
+          e.returnValue = '';
+      }
+    });
+
+    $( document ).on( 'ppom_fields_tab_changed', function(e, id, tab) {
+        if ( 'condition_tab' !== id ) {
+            return;
+        }
+
+        if ( ! $('input[data-metatype="logic"]', tab?.first() )?.is(':checked') ) {
+            tab?.last()?.addClass( 'ppom-disabled-overlay' );
+        }
+    } );
+
+    $( document ).on( 'change', 'input[data-metatype="logic"]:visible', function() {
+        $(this)
+        .parents('.ppom_handle_condition_tab')
+        .next('.ppom_handle_condition_tab')
+        .toggleClass('ppom-disabled-overlay');
     } );
 
     $(document).ready(function(){

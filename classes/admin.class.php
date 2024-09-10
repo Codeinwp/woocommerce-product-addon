@@ -88,6 +88,34 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 	}
 
+	/**
+	 * Add upgrade to pro plugin action link.
+	 *
+	 * @param array  $actions Plugin actions.
+	 * @param string $plugin_file Path to the plugin file relative to the plugins directory.
+	 *
+	 * @return array
+	 */
+	public function upgrade_to_pro_plugin_action( $actions, $plugin_file ) {
+		if ( apply_filters( 'product_ppom_license_status', '' ) === 'valid' || apply_filters( 'product_ppom_license_status', '' ) === 'active_expired' ) {
+			return $actions;
+		}
+
+		return array_merge(
+			array(
+				'upgrade_link' => '<a href="' . add_query_arg(
+						array(
+							'utm_source'   => 'wpadmin',
+							'utm_medium'   => 'plugins',
+							'utm_campaign' => 'rowaction',
+						),
+						tsdk_translate_link( PPOM_UPGRADE_URL )
+					) . '" title="' . __( 'More Features', 'woocommerce-product-addon' ) . '"  target="_blank" rel="noopener noreferrer" style="color: #009E29; font-weight: 700;" onmouseover="this.style.color=\'#008a20\';" onmouseout="this.style.color=\'#009528\';" >' . __( 'Get Pro', 'woocommerce-product-addon' ) . '</a>',
+			),
+			$actions
+		);
+
+	}
 
 	/*
 	 * creating menu page for this plugin
@@ -155,7 +183,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * CALLBACKS
 	*/
 	function product_meta() {
-
+		//hide this on PPOM page since is conflicting with floating widget.
+		add_filter( 'update_footer', '__return_empty_string' );
 		echo '<div id="ppom-pre-loading"></div>';
 
 		echo '<div class="ppom-admin-wrap woocommerce ppom-wrapper" style="display:none">';
@@ -174,7 +203,11 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				<div class="ppom-top-nav">
 					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($addons); ?>">+ <?php esc_html_e( 'All Addons', 'woocommerce-product-addon' ); ?></a>
 					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($changelog_url); ?>"><?php esc_html_e( 'Changelog', 'woocommerce-product-addon' ); ?></a>
-					<a  href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'woocommerce-product-addon'); ?></a>
+                    <a  class="mr-3" href="<?php echo esc_url( admin_url( '/admin.php?page=ti-about-woocommerce_product_addon' ) ); ?>"><?php esc_html_e('About Us', 'woocommerce-product-addon'); ?></a>
+					<a href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'woocommerce-product-addon'); ?></a>
+					<?php if ( ppom_pro_is_installed() && class_exists( 'PPOM_Pro\Addons\Texter\Texter' ) ) : ?>
+						<a class="ml-3" href="<?php echo esc_url( add_query_arg( 'post_type', 'nm_ppom_texter', admin_url( 'edit.php' ) ) ); ?>"><?php esc_html_e( 'Manage Personalization Previews', 'woocommerce-product-addon' ); ?></a>
+					<?php endif; ?>
 				</div>
 			</div>
 			<?php

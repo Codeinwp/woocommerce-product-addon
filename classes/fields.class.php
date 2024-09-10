@@ -83,7 +83,7 @@ class PPOM_Fields_Meta {
 		wp_enqueue_style( 'ppom-select2', PPOM_URL . '/css/select2.css' );
 		wp_enqueue_script( 'ppom-select2', PPOM_URL . '/js/select2.js', array( 'jquery' ), PPOM_VERSION, true );
 
-		if ( isset( $_GET['do_meta'] ) && $_GET['do_meta'] == 'edit' ) {
+		if ( ( isset( $_GET['do_meta'] ) && 'edit' === $_GET['do_meta'] ) || ( isset( $_GET['action'] ) && 'new' === $_GET['action'] ) ) {
 
 			// CSS Code Editor Files
 			wp_enqueue_style( 'ppom-codemirror-theme', PPOM_URL . '/css/codemirror-theme.css' );

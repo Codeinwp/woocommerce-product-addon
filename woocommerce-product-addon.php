@@ -31,7 +31,6 @@ define( 'PPOM_DB_VERSION', '30.1.0' );
 define( 'PPOM_PRODUCT_META_KEY', '_product_meta_id' );
 define( 'PPOM_TABLE_META', 'nm_personalized' );
 define( 'PPOM_UPLOAD_DIR_NAME', 'ppom_files' );
-define( 'PPOM_UPGRADE_URL', 'https://themeisle.com/plugins/ppom-pro/upgrade/' );
 define( 'PPOM_COMPATIBILITY_FEATURES', [
 	'pro_cond_field_repeat' => true, // Compatibility for Conditional Field Repeater feature
 	'pgfbdfm_wp_filter_param_fix' => true // Fix for the wrong params of the ppom_get_field_by_dataname__field_meta WP filter .
@@ -39,6 +38,7 @@ define( 'PPOM_COMPATIBILITY_FEATURES', [
 
 require PPOM_PATH . '/vendor/autoload.php';
 
+define( 'PPOM_UPGRADE_URL', 'https://themeisle.com/plugins/ppom-pro/upgrade/' );
 add_filter(
 	'themeisle_sdk_products',
 	function ( $products ) {
@@ -101,6 +101,7 @@ if ( is_admin() ) {
 	$ppom_admin    = new NM_PersonalizedProduct_Admin();
 	$ppom_basename = plugin_basename( __FILE__ );
 	add_filter( "plugin_action_links_{$ppom_basename}", 'ppom_settings_link', 10 );
+	add_filter( "plugin_action_links_{$ppom_basename}", [ $ppom_admin, 'upgrade_to_pro_plugin_action' ], 10, 2 );
 }
 
 function PPOM() {
@@ -112,11 +113,44 @@ add_filter(
 	function ( $compatibilities ) {
 		$compatibilities['ppompro'] = [
 			'basefile'  => defined( 'PPOM_PRO_PATH' ) ? PPOM_PRO_PATH . '/ppom.php' : '',
-			'required'  => '24.0',
-			'tested_up' => '25.1',
+			'required'  => '25.0',
+			'tested_up' => '25.2',
 		];
 
 		return $compatibilities;
+	}
+);
+add_filter( 'woocommerce_product_addon_about_us_metadata', function () {
+	return [
+		'location' => 'ppom',
+		'logo'     => PPOM_URL . '/images/logo.jpg',
+	];
+} );
+add_filter('woocommerce_product_addon_float_widget_metadata', function(){
+	return [
+		'logo'                 => PPOM_URL . '/images/help.svg',
+		'nice_name'            => 'PPOM',
+		'primary_color'        => '#313350', // optional
+		'pages'                => [ 'woocommerce_page_ppom' ], //pages where the float widget should be displayed
+		'has_upgrade_menu'     => ! defined( 'PPOM_PRO_PATH' ),
+		'upgrade_link'         => tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'float_widget' ),
+		'documentation_link'   => 'https://rviv.ly/C1cmSQ',
+		'premium_support_link' => defined( 'PPOM_PRO_PATH' ) ? tsdk_translate_link( tsdk_support_link( PPOM_PRO_PATH . '/ppom.php' ) ) : '',
+		'feature_request_link' => tsdk_translate_link( 'https://store.themeisle.com/suggest-a-feature/' ),
+	];
+});
+add_filter( 'woocommerce_product_addon_welcome_metadata', function () {
+	return [
+		'is_enabled' => ! defined( 'PPOM_PRO_PATH' ),
+		'pro_name'   => 'PPOM PRO',
+		'logo'       => PPOM_URL . '/images/logo.jpg',
+		'cta_link'   => 'https://rviv.ly/fJhjZN'
+	];
+} );
+add_filter(
+	'woocommerce_product_addon_welcome_upsell_message',
+	function() {
+		return '<p>You\'ve been using <b>{product}</b> for 7 days now and we appreciate your loyalty! We also want to make sure you\'re getting the most out of our product. That\'s why we\'re offering you a special deal - upgrade to <b>{pro_product}</b> in the next 5 days and receive a discount of <b>up to 55%</b>. <a href="{cta_link}" target="_blank">Upgrade now</a> and unlock all the amazing features of <b>{pro_product}</b>!</p>';
 	}
 );
 add_action( 'woocommerce_init', 'PPOM' );

@@ -9,20 +9,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed.' );
 }
 
-// adding column in product list
+/**
+ * Adding column in product list.
+ *
+ * @param array $columns Product list table columns.
+ *
+ * @return array
+ */
 function ppom_admin_show_product_meta( $columns ) {
-
-	unset( $columns['date'] );
-	unset( $columns['product_tag'] );
-	$columns['ppom_meta'] = __( 'PPOM', 'woocommerce-product-addon' );
-	$columns['date']      = __( 'Date', 'woocommerce-product-addon' );
-
+	$last_column_key             = array_key_last( $columns );
+	$last_column                 = array_pop( $columns );
+	$columns['ppom_meta']        = __( 'PPOM', 'woocommerce-product-addon' );
+	$columns[ $last_column_key ] = $last_column;
 	return $columns;
-
-	return array_merge(
-		$columns,
-		array( 'ppom_meta' => __( 'PPOM', 'woocommerce-product-addon' ) )
-	);
 }
 
 function ppom_admin_product_meta_column( $column, $post_id ) {
@@ -715,7 +714,7 @@ function ppom_admin_bar_menu() {
 
 function ppom_admin_update_pro_notice() {
 
-	$buy_paddle = tsdk_utmify( 'https://themeisle.com/plugins/ppom-pro/upgrade/', 'addmorefields', 'ppompage' );
+	$buy_paddle = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'addmorefields', 'ppompage' );
 
     echo '<div class="ppom-more-plugins-block pb-5">';
     echo '<a class="btn btn-sm btn-primary ppom-nm-plugins" href="' . esc_url( $buy_paddle ) . '">' . __( 'Add more field types', 'woocommerce-product-addon' ) . '</a>';

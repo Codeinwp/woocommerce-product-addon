@@ -61,7 +61,7 @@ $addons_list = ppom_array_get_addons_details();
 							<hr>
 							<div class="ppom-admin-addons-actions">
 								<a class="ppom_addons_model_card_btn"
-								href="<?php echo tsdk_utmify( PPOM_UPGRADE_URL, sanitize_key( $addon_title ), 'alladdonspage' ); ?>"
+								href="<?php echo tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), sanitize_key( $addon_title ), 'alladdonspage' ); ?>"
 								target="_blank"><?php esc_html_e('Get Started', 'woocommerce-product-addon'); ?></a>
 								<?php
 									foreach ( $actions as $action ) {

@@ -51,7 +51,7 @@ $url_cancel = add_query_arg(
 	)
 );
 
-echo '<p><a class="btn btn-primary" href="' . esc_url( $url_cancel ) . '">' . __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ) . '</a></p>';
+echo '<p><a href="' . esc_url( $url_cancel ) . '">' . __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ) . '</a></p>';
 
 $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 
@@ -101,7 +101,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 									<i class="fa fa-lock" aria-hidden="true"></i>
 								</span>
 								<span class="upsell-btn-wrapper">
-									<a target="_blank" href="<?php echo esc_url( tsdk_utmify('https://themeisle.com/plugins/ppom-pro/upgrade/','lockedfields') ); ?>">Get Pro</a>
+									<a target="_blank" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ),'lockedfields') ); ?>">Get Pro</a>
 								</span>
 							</li>
 						<?php
@@ -411,10 +411,6 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 		</form>
 	</div>
 </div>
-
-<br><p><a class="btn btn-primary"
-		  href="<?php echo esc_url( $url_cancel ); ?>"><?php echo __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ); ?></a>
-</p>
 
 <div class="checker">
 	<?php $form_meta->render_field_settings(); ?>
