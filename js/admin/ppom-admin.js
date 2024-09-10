@@ -266,7 +266,8 @@ jQuery(function($) {
         event.preventDefault();
 
         var the_id = $(this).attr('id');
-        $('#ppom_field_model_' + the_id + '').find('.ppom-close-checker').removeClass('ppom-close-fields');
+        $('#ppom_field_model_' + the_id).find('.ppom-close-checker').removeClass('ppom-close-fields');
+        $('#ppom_field_model_' + the_id).find('input[data-metatype="data_name"]').attr('readonly', true);
     });
 
 
@@ -990,7 +991,7 @@ jQuery(function($) {
         if (wp_field == 'shipping_fields' || wp_field == 'billing_fields') {
             return;
         }
-        selector.find('[data-meta-id="data_name"] input[type="text"]').val(field_id);
+        selector.find('[data-meta-id="data_name"] input[type="text"]:not([readonly])').val(field_id);
     });
 
 
