@@ -1169,3 +1169,7 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
     opacity: 0.6;
     pointer-events: none;
 }
+
+.ppom-wrapper label {
+    cursor: auto;
+}
