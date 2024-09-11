@@ -52,7 +52,7 @@ class PPOM_Changelog_Handler {
 			if ( strpos( $changelog_line, '**Changes:**' ) !== false || empty( $changelog_line ) ) {
 				continue;
 			}
-			if ( substr( ltrim( $changelog_line ), 0, 3 ) === '###' ) {
+			if ( substr( ltrim( $changelog_line ), 0, 4 ) === '####' ) {
 				$release_count ++;
 
 				preg_match( '/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/', $changelog_line, $found_v );
@@ -63,7 +63,10 @@ class PPOM_Changelog_Handler {
 				);
 				continue;
 			}
-			if ( preg_match( '/[*|-]?\s?(\[fix]|\[Fix]|fix|Fix)[:]?\s?(\b|(?=\[))/', $changelog_line ) ) {
+			if ( substr( ltrim( $changelog_line ), 0, 3 ) === '###' ) {
+				continue;
+			}
+			if ( preg_match( '/[*|-]?\s?(\[fix]|\[Fix]|fix|Fix|Fixed)[:]?\s?(\b|(?=\[))/', $changelog_line ) ) {
 				$changelog_line                        = preg_replace( '/[*|-]?\s?(\[fix]|\[Fix]|fix|Fix)[:]?\s?(\b|(?=\[))/', '', $changelog_line );
 				$releases[ $release_count ]['fixes'][] = $this->parse_md_and_clean( $changelog_line );
 				continue;
