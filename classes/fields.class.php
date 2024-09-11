@@ -834,7 +834,12 @@ class PPOM_Fields_Meta {
 
 						// Add and remove btn
 						$html_input .= '<div class="col-md-2 col-sm-2">';
-						$html_input .= '<button class="btn btn-success ppom-add-rule" data-index="5"><i class="fa fa-plus" aria-hidden="true"></i></button>';
+						if ( $last_array_id === $rule_index ) {
+							$html_input .= '<button class="btn btn-success ppom-add-rule" data-index="5"><i class="fa fa-plus" aria-hidden="true"></i></button>';
+						}
+						if ( $last_array_id > 0 ) {
+							$html_input .= '<button class="btn btn-danger ppom-remove-rule ml-1" data-index="5"><i class="fa fa-minus" aria-hidden="true"></i></button>';
+						}
 						$html_input .= '</div>';
 						$html_input .= '</div>';
 
