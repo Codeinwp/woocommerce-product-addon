@@ -1178,13 +1178,15 @@ function ppom_convert_options_to_key_val( $options, $meta, $product ) {
 		return $options;
 	}
 
+	if ( is_string( $options ) ) {
+		$options = json_decode( $options, true );
+	}
 
 	if ( ! apply_filters( 'ppom_is_option_convertable', true, $meta ) ) {
 		return $options;
 	}
 
 	$meta_type = isset( $meta['type'] ) ? $meta['type'] : '';
-
 
 	// Do not change options for cropper
 	// if( $meta['type'] == 'cropper' ) return $options;
