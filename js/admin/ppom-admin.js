@@ -1384,7 +1384,7 @@ jQuery(function($) {
 
     // Unsaved form exit confirmation.
     var unsaved = false;
-    $( ':input' ).change(function () {
+    $( '.ppom-main-field-wrapper :input' ).change(function () {
         if ( $( this ).parents( '.ppom-checkboxe-style' )?.length > 0 ) {
             unsaved = false;
             return;
