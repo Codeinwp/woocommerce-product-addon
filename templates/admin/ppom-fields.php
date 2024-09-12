@@ -37,7 +37,7 @@ if ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) 
 	$send_file_attachment   = ( isset( $ppom_settings->send_file_attachment ) ? $ppom_settings->send_file_attachment : '' );
 	$show_cart_thumb        = ( isset( $ppom_settings->show_cart_thumb ) ? $ppom_settings->show_cart_thumb : '' );
 	$aviary_api_key         = ( isset( $ppom_settings->aviary_api_key ) ? $ppom_settings->aviary_api_key : '' );
-	$productmeta_style      = ! empty( $ppom_settings->productmeta_style ) ? $ppom_settings->productmeta_style : ".ppom-id-$product_meta_id {\n}\n";
+	$productmeta_style      = ! empty( $ppom_settings->productmeta_style ) ? $ppom_settings->productmeta_style : "selector {\n}\n";
 	$productmeta_js         = ( isset( $ppom_settings->productmeta_js ) ? $ppom_settings->productmeta_js : '' );
 	$productmeta_categories = ( isset( $ppom_settings->productmeta_categories ) ? $ppom_settings->productmeta_categories : '' );
 	$product_meta           = json_decode( $ppom_settings->the_meta, true );
@@ -199,9 +199,9 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 									</label>
 									<textarea id="ppom-css-editor" class="form-control" name="productmeta_style"><?php echo wp_unslash( $productmeta_style ); ?></textarea>
 									<br>
-									<p><?php esc_html_e( 'Use', 'woocommerce-product-addon' ); ?> <code>.ppom-id-<?php echo (int) $product_meta_id; ?></code> <?php esc_html_e( 'to target block wrapper.', 'woocommerce-product-addon' ); ?></p>
+									<p><?php esc_html_e( 'Use', 'woocommerce-product-addon' ); ?> <code>selector</code> <?php esc_html_e( 'to target block wrapper.', 'woocommerce-product-addon' ); ?></p>
 									<p><?php esc_html_e( 'Example:', 'woocommerce-product-addon' ); ?></p>
-									<pre className="ppom-css-editor-help"><?php echo esc_html( ".ppom-id-$product_meta_id {\n    background: #000;\n}\n.ppom-id-$product_meta_id img {\n    border-radius: 100%;\n}" ); ?></pre>
+									<pre className="ppom-css-editor-help"><?php echo esc_html( "selector {\n    background: #000;\n}\nselector img {\n    border-radius: 100%;\n}" ); ?></pre>
 									<p><?php esc_html_e( 'You can also use other CSS syntax here, such as media queries.', 'woocommerce-product-addon' ); ?></p>
 								</div>
 							</div>
