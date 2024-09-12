@@ -1,6 +1,6 @@
 /*---------------------------------
     * Admin Settings Panel CSS
-    
+
     * It included following css
     -> Inputs CSS
     -> Tooltip CSS
@@ -45,11 +45,6 @@
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.nmsf-wrapper input[type="submit"] {
-    background: #f95700 !important;
-    border-color: #f95700 !important;
-    border-radius: 0 !important;
-}
 
 .nmsf-migrate-back-btn {
     border-radius: 0 !important;
@@ -289,15 +284,6 @@
 
 /*Admin Settings Panel*/
 
-.nmsf-wrapper {
-    position: relative;
-    border: 1px solid #f957002b;
-    margin-right: 15px;
-    margin-top: 22px;
-    background-color: #eaeaea;
-    padding: 10px;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 24%);
-}
 
 .nmsf-wrapper .nmsf-tabs-content div {
     padding: 15px 20px 15px 40px;
@@ -355,6 +341,7 @@ div.nmsf-panels-area {
     margin: 0;
     padding: 0;
     transition: 0.5s all cubic-bezier(0.075, 0.82, 0.165, 1);
+    margin-left: 30px;
 }
 
 div.nmsf-panels-area .nmsf-panels-content {
@@ -410,10 +397,10 @@ div.nmsf-panels-area .nmsf-panels-content p {
     padding: 8px 10px;
     margin-right: 2px;
     cursor: pointer;
-    background: #3985b7;
     font-weight: bold;
     transition: background ease 0.2s;
-    color: #fff;
+    border: 1px solid #c3c4c7;
+    background: #dcdcde;
 }
 
 .nmsf-panels-content-inner .nmsf-panel-settings-area {
@@ -421,8 +408,6 @@ div.nmsf-panels-area .nmsf-panels-content p {
     flex-grow: 1;
     width: 100%;
     display: none;
-    padding: 1rem;
-    background: #fff;
 }
 
 .nmsf-panels-content-inner input[type=radio] {
@@ -430,9 +415,10 @@ div.nmsf-panels-area .nmsf-panels-content p {
 }
 
 .nmsf-panels-content-inner input[type=radio]:checked+label {
-    background: #fff;
-    border-top: 2px solid #f95700;
-    color: #030303;
+
+    border-bottom: 1px solid #f0f0f1;
+    background: #f0f0f1;
+    color: #000;
 }
 
 .nmsf-panels-content-inner input[type=radio]:checked+label+.nmsf-panel-settings-area {
@@ -453,15 +439,10 @@ div.nmsf-panels-area .nmsf-panels-content p {
     background-color: transparent;
 }
 
-.nmsf-panel-table tr {
-    border-top: 1px solid #f9570094;
-    border-bottom: 1px solid #f9570094;
-}
-
 .nmsf-panel-table td,
 .nmsf-panel-table th {
-    padding: .75rem;
-    vertical-align: top;
+    vertical-align: middle;
+    padding-left: 0px;
 }
 
 .nmsf-panel-table th {
@@ -605,13 +586,9 @@ div.nmsf-panels-area .nmsf-panels-content p {
 }
 
 .nmsf-section-type h3 {
-    background-color: #F6F6F6;
-    margin: 0;
-    font-weight: 600;
-    font-family: 'Titillium Web', sans-serif;
-    font-size: 18px;
-    padding: 10px;
-    color: #0473AA;
+    color: #1d2327;
+    font-size: 1.3em;
+    margin: 1em 0;
 }
 
 .nmsf-hint-area {
@@ -653,3 +630,25 @@ div.nmsf-panels-area .nmsf-panels-content p {
     color: #fff;
     background-color: #343a40;
 }
+.ppom-is-locked-section{
+    opacity: 0.7;
+}
+.ppom-is-locked-field .ppom-notice-upsell{
+    font-style: italic;
+    font-weight: 500;
+}
+.ppom-is-locked-panel .ppom-notice-upsell {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-left-width: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+    border-left-color: #72aee6;
+    padding: 12px;
+    margin-top: 15px;
+}
+.ppom-is-locked-panel .nmsf-panel-desc, .ppom-is-locked-panel .nmsf-panel-table, .ppom-is-locked-field > * > *:not(.ppom-notice-upsell){ opacity: 0.6; cursor: not-allowed; }
+.ppom-is-locked-panel input,
+.ppom-is-locked-field input,
+.ppom-is-locked-field select,
+.ppom-is-locked-panel select{   cursor: not-allowed;
+    pointer-events: none; }
