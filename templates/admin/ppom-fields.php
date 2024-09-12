@@ -197,8 +197,12 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 											  title="<?php _e( 'Add your own CSS.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
-									<textarea id="ppom-css-editor" class="form-control"
-											  name="productmeta_style"><?php echo wp_unslash( $productmeta_style ); ?></textarea>
+									<textarea id="ppom-css-editor" class="form-control" name="productmeta_style" placeholder="<?php echo esc_attr( "selector {\n}\n" ); ?>"><?php echo wp_unslash( $productmeta_style ); ?></textarea>
+									<br>
+									<p><?php esc_html_e( 'Use', 'woocommerce-product-addon' ); ?> <code>selector</code> <?php esc_html_e( 'to target block wrapper.', 'woocommerce-product-addon' ); ?></p>
+									<p><?php esc_html_e( 'Example:', 'woocommerce-product-addon' ); ?></p>
+									<pre className="ppom-css-editor-help"><?php echo esc_html( "selector {\n    background: #000;\n}\nselector img {\n    border-radius: 100%;\n}" ); ?></pre>
+									<p><?php esc_html_e( 'You can also use other CSS syntax here, such as media queries.', 'woocommerce-product-addon' ); ?></p>
 								</div>
 							</div>
 							<div class="col-md-6 col-sm-12">
