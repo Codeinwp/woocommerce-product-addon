@@ -864,7 +864,7 @@ jQuery(function($) {
         var option_index = parseInt(div.find('.ppom-condition-last-id').val());
         div.find('.ppom-condition-last-id').val(option_index + 1);
 
-        var field_index = div.find('.ppom-fields-actions').attr('data-field-no');
+        var field_index = div.parents('.ppom-slider').find('.ppom-fields-actions').attr('data-field-no');
         var cloneElement = $('.webcontact-rules:last', div);
         var condition_clone = cloneElement.clone();
 
