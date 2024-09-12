@@ -444,6 +444,7 @@ class PPOM_Meta {
 
 		if ( $this->ppom_settings->productmeta_style != '' ) {
 			$inline_css = stripslashes( strip_tags( $this->ppom_settings->productmeta_style ) );
+			$inline_css = str_replace( 'selector', ".ppom-id-$this->meta_id", $inline_css );
 		}
 
 		return apply_filters( 'ppom_inline_css', $inline_css, $this );
