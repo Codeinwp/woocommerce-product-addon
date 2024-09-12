@@ -1541,10 +1541,16 @@ function ppom_extract_matrix_by_quantity( $quantities_field, $product, $quantity
 	return $matrix;
 }
 
-// Return thumbs size
-function ppom_get_thumbs_size() {
+/**
+ * Thumbnail image size.
+ *
+ * @param int $size Image size.
+ *
+ * @return string
+ */
+function ppom_get_thumbs_size( $size = 150 ) {
 
-	return apply_filters( 'ppom_thumbs_size', '150px' );
+	return apply_filters( 'ppom_thumbs_size', sprintf( '%dpx', absint( $size ) ) );
 }
 
 // Return file size in kb
@@ -1638,7 +1644,7 @@ function ppom_generate_html_for_images( $images ) {
 		$images_meta = json_decode( stripslashes( $images_meta ), true );
 		$image_url   = stripslashes( $images_meta['link'] );
 		$image_label = isset( $images_meta['raw'] ) ? $images_meta['raw'] : '';
-		$image_html  = '<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" src="' . esc_url( $image_url ) . '" title="' . esc_attr( $image_label ) . '">';
+		$image_html  = '<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size( 75 ) ) . '" src="' . esc_url( $image_url ) . '" title="' . esc_attr( $image_label ) . '">';
 
 		$ppom_html .= '<tr><td><a href="' . esc_url( $image_url ) . '" class="lightbox" itemprop="image" title="' . esc_attr( $image_label ) . '">' . $image_html . '</a></td>';
 		$ppom_html .= '<td>' . esc_attr( ppom_files_trim_name( $image_label ) ) . '</td>';
