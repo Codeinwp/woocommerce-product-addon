@@ -27,13 +27,13 @@ $core_settings = array(
 	'ppom_disable_bootstrap'              => array(
 		'type'  => 'checkbox',
 		'title' => __( 'Disable Bootstrap', 'woocommerce-product-addon' ),
-		'desc'  => __( 'Bootstrap JS is being loaded from CDN, it will disable if your site already loading it.', 'woocommerce-product-addon' ),
+		'desc'  => __( 'Bootstrap JS is loaded from a CDN by default. You can disable it if your site is already loading it.', 'woocommerce-product-addon' ),
 		'label' => __( 'Yes', 'woocommerce-product-addon' ),
 	),
 	'ppom_enable_legacy_inputs_rendering' => array(
 		'type'  => 'checkbox',
 		'title' => __( 'Legacy Inputs Rendering', 'woocommerce-product-addon' ),
-		'desc'  => __( 'PPOM Version 22.0 is major update, if some issues occur you can revert back to old version by this.', 'woocommerce-product-addon' ),
+		'desc'  => __( 'PPOM Version 22.0 is a major update. If any issues occur, you can revert to the previous version using this option.', 'woocommerce-product-addon' ),
 	),
 	'ppom_new_conditions'                 => array(
 		'type'  => 'checkbox',
@@ -43,17 +43,12 @@ $core_settings = array(
 	'ppom_legacy_price'                   => array(
 		'type'  => 'checkbox',
 		'title' => __( 'Enable Legacy Price Calculations', 'woocommerce-product-addon' ),
-// 'reference' => array(
-// 'ref_title' => __( 'See reference', 'woocommerce-product-addon' ),
-// 'ref_link'  => 'https://najeebmedia.com/blog/ppom-version-18-0-better-price-manipulation-currency-switcher/',
-			// 'ref_video_title' => __( 'Quick Video', 'woocommerce-product-addon' ),
-			// 'ref_video_link'  => 'https://www.youtube.com/watch?v=0wCC3aLXdOw',
-// ),
+		'desc'	=> __( 'Enable this option to use the legacy method for price calculations.', 'woocommerce-product-addon' ),
 	),
 	'ppom_permission_mfields'             => array(
 		'type'        => 'select',
 		'title'       => __( 'PPOM Permissions', 'woocommerce-product-addon' ),
-		'desc'        => __( 'You can set permissions here so PPOM fields can be managed by different roles', 'woocommerce-product-addon' ),
+		'desc'        => __( 'You can set permissions here to allow different roles to manage PPOM fields.', 'woocommerce-product-addon' ),
 		'default'     => 'administrator',
 		'placeholder' => __( 'choose role', 'woocommerce-product-addon' ),
 		'options'     => ppom_get_all_editable_roles(),
@@ -61,7 +56,8 @@ $core_settings = array(
 	),
 	'ppom_restricted_file_type'           => array(
 		'type'    => 'text',
-		'title'   => __( 'Restricted file types here', 'woocommerce-product-addon' ),
+		'title'   => __( 'Restricted File Types', 'woocommerce-product-addon' ),
+		'desc'    => __( 'Specify the file types that are restricted from being uploaded in this section.', 'woocommerce-product-addon' ),
 		'default' => __( 'php,php4,php5,php6,php7,phtml,exe,shtml', 'woocommerce-product-addon' ),
 	),
 	'ppom_general_section2'               => array(
@@ -70,7 +66,7 @@ $core_settings = array(
 	),
 	'ppom_label_option_total'             => array(
 		'type'    => 'text',
-		'title'   => __( 'Option Total Label inside Price Table', 'woocommerce-product-addon' ),
+		'title'   => __( 'Option Total Label Inside Price Table', 'woocommerce-product-addon' ),
 		'default' => __( 'Option Total', 'woocommerce-product-addon' ),
 	),
 	'ppom_label_product_price'            => array(
@@ -85,13 +81,13 @@ $core_settings = array(
 	),
 	'ppom_label_total_discount'           => array(
 		'type'    => 'text',
-		'title'   => __( 'Total Discount Label inside Price Table', 'woocommerce-product-addon' ),
+		'title'   => __( 'Total Discount Label Inside Price Table', 'woocommerce-product-addon' ),
 		'default' => __( 'Total Discount', 'woocommerce-product-addon' ),
 	),
 	'ppom_label_option_total_suffex'      => array(
 		'type'  => 'text',
 		'title' => __( 'Option Total Suffix', 'woocommerce-product-addon' ),
-		'desc'  => __( 'E.g for Tax/Va info like. Vat included', 'woocommerce-product-addon' ),
+		'desc'  => __( 'Specify the label to display tax or VAT information, such as \'VAT Included\' or \'Tax Applied,\' inside the price table.', 'woocommerce-product-addon' ),
 	),
 );
 
