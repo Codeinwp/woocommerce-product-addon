@@ -55,7 +55,7 @@ jQuery(function($) {
     **/
     var append_overly_model = ("<div class='ppom-modal-overlay ppom-js-modal-close'></div>");
 
-    $(document).on('click', '[data-modal-id]', function(e) {
+    $(document).on('click', '[data-modal-id]:not(.ppom-is-pro-field)', function(e) {
         e.preventDefault();
         $("body").append(append_overly_model);
         var modalBox = $(this).attr('data-modal-id');
@@ -266,7 +266,7 @@ jQuery(function($) {
         9- Edit Existing Fields
     **/
     var lockedDataName = false;
-    $(document).on('click', '.ppom-edit-field', function(event) {
+    $(document).on('click', '.ppom-edit-field:not(.ppom-is-pro-field)', function(event) {
         event.preventDefault();
 
         var the_id = $(this).attr('id');
@@ -1366,7 +1366,7 @@ jQuery(function($) {
 
     // Unsaved form exit confirmation.
     var unsaved = false;
-    $( ':input' ).change(function () {
+    $( '.ppom-main-field-wrapper :input' ).change(function () {
         if ( $( this ).parents( '.ppom-checkboxe-style' )?.length > 0 ) {
             unsaved = false;
             return;
@@ -1402,6 +1402,11 @@ jQuery(function($) {
         .parents('.ppom_handle_condition_tab')
         .next('.ppom_handle_condition_tab')
         .toggleClass('ppom-disabled-overlay');
+    } );
+
+    $( document ).on( 'click', 'button.ppom-edit-field.ppom-is-pro-field', function() {
+        $('#ppom-lock-fields-upsell').fadeIn();
+       return false;
     } );
 
     $(document).ready(function(){

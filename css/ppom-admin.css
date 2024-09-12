@@ -1258,15 +1258,15 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
     cursor: auto;
 }
 
-#ppom-import-upsell{
+.ppom-upsell-modal{
     text-align: center;
     width: 600px;
 }
-#ppom-import-upsell .ppom-modal-body{
+.ppom-upsell-modal .ppom-modal-body{
     position: relative;
     padding: 30px;
 }
-#ppom-import-upsell button.close-model {
+.ppom-upsell-modal button.close-model {
     position: absolute;
     right: 10px;
     top: 10px;
@@ -1276,19 +1276,23 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
     font-size: 20px;
 }
 
-#ppom-import-upsell .ppom-lock-icon {
+.ppom-upsell-modal .ppom-lock-icon {
     padding-bottom: 30px;
 }
 
-#ppom-import-upsell .ppom-lock-icon .dashicons {
+.ppom-upsell-modal .ppom-lock-icon .dashicons {
     width: 48px;
     height: 48px;
     font-size: 48px;
 }
 
-#ppom-import-upsell p {
+.ppom-upsell-modal p {
     font-size: 16px;
     text-align: left;
     padding-bottom: 10px;
     padding-top: 20px;
+}
+
+#ppom-lock-fields-upsell.ppom-upsell-modal h3 {
+    color: #F00;
 }

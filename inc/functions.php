@@ -1877,6 +1877,15 @@ function ppom_pro_is_installed() {
 	return class_exists( 'PPOM_PRO' );
 }
 
+/**
+ * Check is valid license activated.
+ *
+ * @return bool
+ */
+function ppom_pro_is_valid_license() {
+	return ppom_pro_is_installed() && apply_filters( 'product_ppom_license_status', '' ) === 'valid';
+}
+
 // Check if PPOM API is enable
 function ppom_is_api_enable() {
 
