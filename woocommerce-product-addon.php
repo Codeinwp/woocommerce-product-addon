@@ -40,6 +40,7 @@ define( 'PPOM_COMPATIBILITY_FEATURES', [
 require PPOM_PATH . '/vendor/autoload.php';
 
 define( 'PPOM_UPGRADE_URL', 'https://themeisle.com/plugins/ppom-pro/upgrade/' );
+define( 'PPOM_STORE_URL', 'https://store.themeisle.com' );
 add_filter(
 	'themeisle_sdk_products',
 	function ( $products ) {
