@@ -65,31 +65,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 
 			<!--Tabs & Panel Sections-->
 			<div class="row">
-				<div class="nmsf-tabs-area nmsf-cols col-md-2">
-					<div class="nmsf-tabs-content">
-						<?php 
-						foreach ( $tabs as $tab_id => $tab ) {
-							$title   = isset( $tab['title'] ) ? $tab['title'] : '';
-							$desc    = isset( $tab['desc'] ) ? $tab['desc'] : '';
-							$icon    = isset( $tab['icon'] ) ? $tab['icon'] : '';
-							$enable  = isset( $tab['enable'] ) ? $tab['enable'] : '';
-							$classes = isset( $tab['classes'] ) ? $tab['classes'] : array();
-
-							if ( $enable ) {
-								?>
-								<div class="<?php echo implode( ' ', $classes ); ?>"
-									 data-tab-id="<?php echo esc_attr( $tab_id ); ?>">
-									<span class="nmsf-tabs-dot"></span>
-									<span><?php echo esc_html( $title ); ?></span>
-								</div>
-
-								<?php 
-							}
-						} 
-						?>
-					</div>
-				</div>
-				<div class="nmsf-cols col-md-10">
+				<div class="nmsf-cols col-md-12">
 					<div class="nmsf-panels-area">
 
 						<?php
