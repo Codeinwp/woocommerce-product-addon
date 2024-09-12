@@ -1001,7 +1001,7 @@ ul.ppom-options-container li label {
 .ppom_addons_model_cards_item {
     display: flex;
     padding: 1rem;
-    width: 33%;
+    width: 50%;
 }
 
 @media only screen and (max-width: 600px) {
@@ -1018,6 +1018,7 @@ ul.ppom-options-container li label {
     display: flex;
     flex-direction: column;
     min-height: 240px;
+    width: 100%;
 
     overflow: hidden;
 }
