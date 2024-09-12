@@ -15,6 +15,7 @@
  *
  * WordPress Available:  yes
  * Requires License:     no
+ * Requires Plugins: woocommerce
  */
 
 // @since 6.1
