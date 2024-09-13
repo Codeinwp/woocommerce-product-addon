@@ -228,11 +228,11 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 			continue;
 		}
 
-		$passed = apply_filters( 'ppom_before_fields_validation', $passed, $field, $post_data, $product_id );
-
-		if ( $passed && ( ! isset( $field['required'] ) || 'on' !== $field['required'] ) ) {
+		if ( ! isset( $field['required'] ) || 'on' !== $field['required'] ) {
 			continue;
 		}
+
+		$passed = apply_filters( 'ppom_before_fields_validation', $passed, $field, $post_data, $product_id );
 
 		if (
 			empty( $field['data_name'] ) &&
