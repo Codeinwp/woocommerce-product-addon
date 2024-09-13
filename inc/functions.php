@@ -1583,7 +1583,8 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 
 		// Making file thumb download with new path
 		$ppom_file_url       = ppom_get_file_download_url( $file_name, $item->get_order_id(), $item->get_product_id() );
-		$ppom_file_thumb_url = ppom_is_file_image( $file_name ) ? ppom_get_dir_url( true ) . $file_name : PPOM_URL . '/images/file.png';
+		$file_path           = ppom_get_dir_url( true ) . $file_name;
+		$ppom_file_thumb_url = ppom_is_file_image( $file_path ) ? $file_path : PPOM_URL . '/images/file.png';
 		$order_html         .= '<tr><td><a href="' . esc_url( $ppom_file_url ) . '">';
 		$order_html         .= '<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" src="' . esc_url( $ppom_file_thumb_url ) . '">';
 		$order_html         .= '</a></td>';
@@ -2250,7 +2251,8 @@ function ppom_get_confirmed_dir_thumbs( $order_id, $file_name, $product_id, $thu
 
 	$file = '';
 	if ( $thumb ) {
-		$file = ppom_is_file_image( $file_name ) ? ppom_get_dir_url() . $confirm_dir . '/' . $file_name : PPOM_URL . '/images/file.png';
+		$file_path = ppom_get_dir_url() . $confirm_dir . '/' . $file_name;
+		$file      = ppom_is_file_image( $file_path ) ? $file_path : PPOM_URL . '/images/file.png';
 	} else {
 		$file = ppom_get_dir_path( $confirm_dir ) . $file_name;
 	}
