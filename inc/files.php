@@ -49,15 +49,15 @@ function ppom_get_dir_url( $thumb = false ) {
 	return apply_filters( 'ppom_dir_url', set_url_scheme( $return_url ) );
 }
 
-// Check if given filenameis image
-function ppom_is_file_image( $file_name ) {
-
-	$type = strtolower( substr( strrchr( $file_name, '.' ), 1 ) );
-	if ( ( $type == 'gif' ) || ( $type == 'jpeg' ) || ( $type == 'png' ) || ( $type == 'pjpeg' ) || ( $type == 'jpg' ) ) {
-		return true;
-	} else {
-		return false;
-	}
+/**
+ * Check if given filenameis image.
+ *
+ * @param string $file_path File full path.
+ *
+ * @return bool
+ */
+function ppom_is_file_image( $file_path ) {
+	return wp_get_image_mime( $file_path );
 }
 
 // return html for file thumb
@@ -77,8 +77,8 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 		$file_dir_path  = ppom_get_confirmed_dir_thumbs( $order_id, $file_name, $product_id, $thumb = false );
 	} else {
 
-		$file_thumb_url = ppom_is_file_image( $file_name ) ? ppom_get_dir_url( true ) . $file_name : PPOM_URL . '/images/file.png';
 		$file_dir_path  = ppom_get_dir_path() . $file_name;
+		$file_thumb_url = ppom_is_file_image( $file_dir_path ) ? ppom_get_dir_url( true ) . $file_name : PPOM_URL . '/images/file.png';
 	}
 
 
@@ -309,7 +309,7 @@ function ppom_upload_file() {
 
 
 		// making thumb if images
-		if ( ppom_is_file_image( $file_name ) ) {
+		if ( ppom_is_file_image( $file_path ) ) {
 
 			$thumb_size     = ppom_get_thumbs_size();
 			$thumb_dir_path = ppom_create_image_thumb( $file_dir_path, $file_name, $thumb_size );
@@ -357,10 +357,10 @@ function ppom_delete_file() {
 	$dir_path = ppom_get_dir_path();
 
 	$file_path = $dir_path . $file_name;
-
+	$is_image  = ppom_is_file_image( $file_path );
 	if ( file_exists( $file_path ) && unlink( $file_path ) ) {
 
-		if ( ppom_is_file_image( $file_name ) ) {
+		if ( $is_image ) {
 			$thumb_path = $dir_path . 'thumbs/' . $file_name;
 			if ( file_exists( $thumb_path ) ) {
 				unlink( $thumb_path );
@@ -444,7 +444,7 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 		return '';
 	}
 
-	$is_image = ppom_is_file_image( $file_name );
+	$is_image = ppom_is_file_image( $file_path );
 
 	$thumb_url = $file_meta = $file_tools = $html = '';
 
@@ -491,7 +491,7 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 		$file_meta .= __( 'Size: ', 'woocommerce-product-addon' ) . ppom_get_filesize_in_kb( $file_name );
 		$thumb_url  = PPOM_URL . '/images/file.png';
 
-		$file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '"><span class="fa fa-times"></span></a>';    // delete icon
+		$file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '">' . __( 'Delete', 'woocommerce-product-addon' ) . '</a>';    // delete icon
 		// $file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="'.__('Remove', "woocommerce-product-addon").'">Delete</a>';	//delete icon
 	}
 

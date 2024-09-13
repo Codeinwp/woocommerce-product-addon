@@ -407,9 +407,8 @@ function ppom_setup_file_upload_input(file_input) {
                     plupload.each(files, function(file) {
 
                         if (file.type.indexOf("image") !== -1 && file.type !== 'image/photoshop') {
-
-                            const img = new mOxie.Image;
-                            img.onload = function() {
+                            const img = new moxie.image.Image();
+                            img.load = function() {
 
                                 const img_height = this.height;
                                 const img_width = this.width;
