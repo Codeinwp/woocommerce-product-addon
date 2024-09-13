@@ -324,7 +324,9 @@ class PPOM_Fields_Meta {
 		$html_input  = '';
 
 		if ( ! is_array( $values ) ) {
-			$values = stripslashes( $values );
+			$values        = stripslashes( $values );
+			$decode_values = json_decode( $values, true );
+			$values        = is_array( $decode_values ) ? $decode_values : $values;
 		}
 
 		switch ( $type ) {
