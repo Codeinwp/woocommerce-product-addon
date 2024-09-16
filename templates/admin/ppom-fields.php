@@ -418,7 +418,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 	$license     = get_option( 'ppom_pro_license_data', 'free' );
 	$license_key = '';
 	$download_id = '';
-	if ( ! empty( $license ) && is_object( $license ) ) {
+	if ( ! empty( $license ) && ( is_object( $license ) && isset( $license->download_id ) ) ) {
 		$license_key = $license->key;
 		$download_id = $license->download_id;
 	}
