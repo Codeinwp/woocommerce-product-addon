@@ -21,10 +21,6 @@ class PPOM_Freemium {
 	 */
 	private function __construct()
 	{
-		if( ppom_pro_is_installed() ) {
-			return;
-		}
-
 		add_filter( 'ppom_fields_tabs_show', array( $this, 'add_locked_cfr_tab' ), 10, 1 );
 		add_filter( 'ppom_all_inputs', array( $this, 'locked_cfr_register_form_elements' ), PHP_INT_MAX );
 	}
@@ -49,6 +45,9 @@ class PPOM_Freemium {
 	 * @return array
 	 */
 	public function add_locked_cfr_tab( $tabs ) {
+		if ( ppom_pro_is_installed() && PPOM()->ppom_is_license_of_type( 'plus' ) ) {
+			return $tabs;
+		}
 		$tabs[self::TAB_KEY_FREEMIUM_CFR] = array(
 			'label' => __( 'Conditional Repeater (PRO)', 'woocommerce-product-addon' ),
 			'class' => array( 'ppom-tabs-label' ),
@@ -63,6 +62,9 @@ class PPOM_Freemium {
 	 * @return string
 	 */
 	public function get_freemium_cfr_content() {
+		if ( ppom_pro_is_installed() && PPOM()->ppom_is_license_of_type( 'plus' ) ) {
+			return '';
+		}
 		ob_start();
 		$upgrade_url = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'lockedconditionalfield', 'ppompage' );
 		?>
