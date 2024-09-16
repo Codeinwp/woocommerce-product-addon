@@ -1296,3 +1296,18 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 #ppom-lock-fields-upsell.ppom-upsell-modal h3 {
     color: #F00;
 }
+
+#ppom-lock-fields-upsell:before {
+  content: "";
+  background: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+}
+#ppom-lock-fields-upsell .ppom-modal-body {
+  z-index: 10;
+  background-color: #ffffff
+}
