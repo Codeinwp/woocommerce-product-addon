@@ -217,7 +217,11 @@ class PPOM_InputManager {
 	function images() {
 
 		$images = isset( self::$input_meta['images'] ) ? self::$input_meta['images'] : array();
-
+		if ( ! is_array( $images ) ) {
+			$images        = stripslashes( $images );
+			$decode_images = json_decode( $images, true );
+			$images        = is_array( $decode_images ) ? $decode_images : $images;
+		}
 		return apply_filters( 'ppom_input_meta_images', $images, self::$input_meta );
 	}
 
@@ -229,9 +233,12 @@ class PPOM_InputManager {
 	 */
 	function audio_video() {
 
-		$audios        = isset( self::$input_meta['audio'] ) ? self::$input_meta['audio'] : array();
-		$decode_values = json_decode( $audios, true );
-		$audios        = is_array( $decode_values ) ? $decode_values : $audios;
+		$audios = isset( self::$input_meta['audio'] ) ? self::$input_meta['audio'] : array();
+		if ( ! is_array( $audios ) ) {
+			$audios        = stripslashes( $audios );
+			$decode_values = json_decode( $audios, true );
+			$audios        = is_array( $decode_values ) ? $decode_values : $audios;
+		}
 		return apply_filters( 'ppom_input_meta_audio', $audios, self::$input_meta );
 	}
 
