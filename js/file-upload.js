@@ -325,6 +325,7 @@ function ppom_setup_file_upload_input(file_input) {
         max_file_count: parseInt(file_input.files_allowed),
         unique_names: ppom_file_vars.enable_file_rename,
         chunk_size: '2mb',
+        unique_names: false,
 
         filters: {
             mime_types: [
