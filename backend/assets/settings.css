@@ -637,7 +637,7 @@ div.nmsf-panels-area .nmsf-panels-content p {
     font-style: italic;
     font-weight: 500;
 }
-.ppom-is-locked-panel .ppom-notice-upsell {
+.ppom-is-locked-panel .ppom-notice-upsell, .ppom-is-locked-field .ppom-notice-upsell {
     background: #fff;
     border: 1px solid #c3c4c7;
     border-left-width: 4px;

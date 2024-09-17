@@ -69,11 +69,12 @@ class PPOM_Freemium {
 		$upgrade_url = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'lockedconditionalfield', 'ppompage' );
 		?>
 		<div class="freemium-cfr-content">
-			<p><?php esc_html_e( 'Conditional Field Repeater allows repeating this field across a value of another PPOM field. Conditional Field Repeater feature is the part of the PPOM Pro.', 'woocommerce-product-addon' ); ?></p>
+			<p><?php esc_html_e( 'The Conditional Field Repeater enables you to repeat specific fields based on the value of another PPOM field, such as Number, Variation Quantity, or Quantities Pack. It dynamically generates additional fields based on user input. For example, when applied to a number input field, if you enter “3”, it will display three additional text fields to collect more information, such as names.', 'woocommerce-product-addon' ); ?></p>
 
-			<p><?php printf( '<strong>%s</strong> %s', esc_html__( 'Use case example:', 'woocommerce-product-addon' ),  esc_html__( 'Get the number of players from another PPOM field, and repeat this field(let\'s say that\'s a text field representing the player name) across the number of players. That\'s pretty useful for dynamic repeating the PPOM field.', 'woocommerce-product-addon' ) ); ?></p>
+			<p><?php esc_html_e( 'This feature is available in the PPOM Pro version.', 'woocommerce-product-addon' ); ?></p>
 
 			<a target="_blank" class="btn btn-sm btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php echo __( 'Upgrade to Pro', 'woocommerce-product-addon' ); ?></a>
+			<a target="_blank" class="btn btn-sm btn-primary ml-2" href="https://docs.themeisle.com/article/1700-personalized-product-meta-manager#conditional-repeater"><?php echo __( 'Read more', 'woocommerce-product-addon' ); ?></a>
 		</div>
 		<?php
 		return ob_get_clean();
