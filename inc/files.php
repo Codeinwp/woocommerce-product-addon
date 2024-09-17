@@ -168,7 +168,7 @@ function ppom_upload_file() {
 
 	$file_name = apply_filters( 'ppom_uploaded_filename', $file_name );
 
-	$additional_mime_types = apply_filters( 'ppom_custom_allowed_mime_types', array( 'ai' => 'application/postscript' ) );
+	$additional_mime_types = apply_filters( 'ppom_custom_allowed_mime_types', array( 'ai' => 'application/postscript', 'eps' => 'application/postscript' ) );
 
 	$allowed_mime_types = array_merge( get_allowed_mime_types(), $additional_mime_types );
 
@@ -176,7 +176,6 @@ function ppom_upload_file() {
 	$file_type = wp_check_filetype_and_ext( $file_dir_path . $file_name, $file_name, $allowed_mime_types );
 
 	$extension = $file_type['ext'];
-
 
 	$default_restricted = 'php,php4,php5,php6,php7,phtml,exe,shtml';
 	$restricted_type    = ppom_get_option( 'ppom_restricted_file_type', $default_restricted );
