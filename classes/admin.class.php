@@ -12,6 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
+	public const LICENSE_PLAN_FREE = -1;
+	public const LICENSE_PLAN_1    = 1; // Essential.
+	public const LICENSE_PLAN_2    = 2; // Plus.
+	public const LICENSE_PLAN_3    = 3; // VIP.
+
 	var $menu_pages, $plugin_scripts_admin, $plugin_settings;
 
 	/**
@@ -492,6 +497,28 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		// Call survey class.
 		include_once PPOM_PATH . '/classes/survey.class.php';
 		PPOM_Survey::get_instance()->init();
+	}
+
+	/**
+	 * Get the license category (Essential, Plus, VIP).
+	 * 
+	 * @param number Plan ID.
+	 * @return number The associated category.
+	 */
+	public static function get_license_category( $license_plan ) {
+		$license_categories = array(
+			self::LICENSE_PLAN_1 => array( 1, 4, 9 ),
+			self::LICENSE_PLAN_2 => array( 2, 5, 8 ),
+			self::LICENSE_PLAN_3 => array( 3, 6, 7, 10 ),
+		);
+
+		foreach ( $license_categories as $category => $plans ) {
+			if ( in_array( $license_plan, $plans ) ) {
+				return $category;
+			}
+		}
+
+		return self::LICENSE_PLAN_FREE;
 	}
 
 	/**
