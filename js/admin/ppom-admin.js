@@ -870,8 +870,8 @@ jQuery(function($) {
 
         var append_item = div.find('.ppom-condition-clone-js');
         condition_clone.find(append_item).end().appendTo(append_item);
-        $('.webcontact-rules:last', div )
-        .attr('id', 'rule-box-' + option_index + 1)
+        
+        ppom_rename_rules_name();
 
         var field_type = '';
         var add_cond_selector = condition_clone.find('.ppom-conditional-keys');
@@ -908,6 +908,7 @@ jQuery(function($) {
             .attr( 'selected', false )
             .prop( 'selected', false );
             $(this).remove();
+            ppom_rename_rules_name();
             return false;
         }
         removeButton.parents('.webcontact-rules:first').remove();
@@ -921,6 +922,7 @@ jQuery(function($) {
             .html('<i class="fa fa-plus" aria-hidden="true"></i>');
             cloneButton.insertBefore(lastRow?.find('.ppom-remove-rule'));
         }
+        ppom_rename_rules_name();
         e.preventDefault();
         return false;
     });
@@ -1168,6 +1170,17 @@ jQuery(function($) {
             var date = $(meta_field).attr('data-date');
             var field_name = 'ppom[' + opt_field_no + '][calendar][' + date + '][' + $(meta_field).attr('data-metatype') + ']';
             $(meta_field).attr('name', field_name);
+        });
+    }
+
+    // Rename rules name.
+    function ppom_rename_rules_name() {
+        $('.webcontact-rules:visible' ).each(function( index, item ){
+            $(this).attr('id', 'rule-box-' + parseInt(index + 1))
+            .find('label')
+            .text(function(i,txt) {
+                return txt.replace(/\d+/, parseInt(index + 1));
+            });
         });
     }
 

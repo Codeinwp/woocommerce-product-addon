@@ -1291,3 +1291,13 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
     padding-bottom: 10px;
     padding-top: 20px;
 }
+
+.ppom-condition-clone-js .webcontact-rules:not(:last-child) select {
+    margin-bottom: 0.5rem;
+}
+.ppom-condition-style-wrap .ppom-only-if, .ppom-condition-style-wrap .ppom-only-if + div {
+    width: auto;
+}
+.ppom-condition-style-wrap .ppom-only-if + div .ppom-condition-visible-bound {
+    width: 120px;
+}
