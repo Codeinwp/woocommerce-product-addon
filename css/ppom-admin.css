@@ -1293,6 +1293,34 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
     padding-top: 20px;
 }
 
-.ppom_handle_locked_conditional_field_repeater .form-group:last-child {
+.ppom_handle_locked_conditional_field_repeater .form-group:first-child {
     opacity: 0.6;
+}
+
+.freemium-cfr-content .notice-info, .freemium-cfr-content .notice-info p {
+    margin: 0;
+}
+
+.freemium-cfr-content .notice-info {
+    border: none;
+    border-left: 2px solid #E7632A;
+}
+
+a.ppom-repeater-learn-more, a.ppom-repeater-learn-more:hover {
+    color: #E7632A;
+    text-decoration: none;
+}
+a.ppom-repeater-learn-more:focus {
+    box-shadow: 0 0 0 2px #E7632A;
+}
+
+.freemium-cfr-content a.btn-primary, .freemium-cfr-content a.btn-primary:hover {
+    background: #E7632A;
+    border-color: #E7632A;
+}
+
+.freemium-cfr-content a.btn-secondary, .freemium-cfr-content a.btn-secondary:hover {
+    background: none;
+    color: #E7632A;
+    border-color: #E7632A;
 }

@@ -259,6 +259,7 @@ class PPOM_Fields_Meta {
 				$desc   = isset( $meta['desc'] ) ? $meta['desc'] : '';
 				$type   = isset( $meta['type'] ) ? $meta['type'] : '';
 				$link   = isset( $meta['link'] ) ? $meta['link'] : '';
+				$learn_more = isset( $meta['learn_more'] ) ? $meta['learn_more'] : array();
 				$values = isset( $save_meta[ $fields_meta_key ] ) ? $save_meta[ $fields_meta_key ] : '';
 
 				$default_value = isset( $meta ['default'] ) ? $meta ['default'] : '';
@@ -289,8 +290,12 @@ class PPOM_Fields_Meta {
 				$html .= '<div class="form-group">';
 
 				$html .= '<label>' . sprintf( __( '%s', 'woocommerce-product-addon' ), $title ) . '';
-				$html .= '<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip" title="' . sprintf( __( '%s', 'woocommerce-product-addon' ), $desc ) . '">';
-				$html .= '<i class="dashicons dashicons-editor-help"></i>';
+				if ( ! empty( $learn_more['link'] ) ) {
+					$html .= '. <a href="' . esc_url( $learn_more['link'] ) . '" class="ppom-repeater-learn-more" target="_blank">' . $learn_more['text'] .  '<span class="dashicons dashicons-external"></span></a>';
+				} else if( ! empty( $desc ) ) {
+					$html .= '<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip" title="' . sprintf( __( '%s', 'woocommerce-product-addon' ), $desc ) . '">';
+					$html .= '<i class="dashicons dashicons-editor-help"></i>';
+				}
 				$html .= '</span>' . $link . '';
 				$html .= '</label>';
 				$html .= $this->render_all_input_types( $fields_meta_key, $meta, $fields_type, $field_index, $values );
