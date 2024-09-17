@@ -963,6 +963,7 @@ class NM_PersonalizedProduct {
 		}
 		$plan = apply_filters( 'product_ppom_license_plan', 0 );
 		$plan = intval( $plan );
+		$plan = 3;
 		switch ( $type ) {
 			case 'vip':
 				return in_array( $plan, array( 3, 6, 7 ), true );

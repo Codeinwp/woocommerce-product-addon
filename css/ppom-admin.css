@@ -1080,7 +1080,7 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 }
 
 /* Freemium */
-.ppom-fields-name-model .ppom-modal-body ul li.locked {
+.ppom-fields-name-model .ppom-modal-body ul li.locked span:not(.upsell-btn-wrapper) {
     opacity: 0.4;
     color:#000;
 }
@@ -1291,4 +1291,8 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
     text-align: left;
     padding-bottom: 10px;
     padding-top: 20px;
+}
+
+.ppom_handle_locked_conditional_field_repeater .form-group:last-child {
+    opacity: 0.6;
 }
