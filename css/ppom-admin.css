@@ -1315,12 +1315,24 @@ a.ppom-repeater-learn-more:focus {
 }
 
 .freemium-cfr-content a.btn-primary, .freemium-cfr-content a.btn-primary:hover {
-    background: #E7632A;
-    border-color: #E7632A;
+    background: #E7632A !important;
+    border-color: #E7632A !important;
+}
+
+.freemium-cfr-content a.btn-primary:focus {
+    box-shadow: 0 0 0 0.2rem rgba(231, 99, 42, 0.5) !important;
 }
 
 .freemium-cfr-content a.btn-secondary, .freemium-cfr-content a.btn-secondary:hover {
-    background: none;
-    color: #E7632A;
-    border-color: #E7632A;
+    background: none !important;
+    color: #E7632A !important;
+    border-color: #E7632A !important;
+}
+
+.freemium-cfr-content a.btn-secondary:focus {
+    box-shadow: 0 0 0 0.2rem rgba(231, 99, 42, 0.5) !important;
+}
+
+.ppom_handle_locked_conditional_field_repeater .form-group {
+    margin-left: 15px;
 }
