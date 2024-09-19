@@ -691,7 +691,9 @@ $fields_groups = [
 						<th><?php _e( 'Actions', 'woocommerce-product-addon' ); ?></th>
 					</tr>
 					</thead>
+
 					<tfoot>
+					<?php if ( $product_meta && is_array( $product_meta) && 8 < count( $product_meta ) ) { ?>
 					<tr class="ppom-thead-bg">
 						<th></th>
 						<th class="ppom-check-all-field ppom-checkboxe-style">
@@ -708,6 +710,7 @@ $fields_groups = [
 						<th><?php _e( 'Required', 'woocommerce-product-addon' ); ?></th>
 						<th><?php _e( 'Actions', 'woocommerce-product-addon' ); ?></th>
 					</tr>
+					<?php } ?>
 					<tr>
 						<th colspan="12">
 							<div class="ppom-submit-btn text-right">
