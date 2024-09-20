@@ -46,52 +46,17 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 			<input type="hidden" name="nmsf_version"
 				   value="<?php echo esc_attr( $class_ins->get_config( 'version' ) ); ?>"/>
 
-			<!--Header Section-->
-			<div class="nmsf-header-area">
-				<div class="row">
-					<div class="col-md-6 col-sm-6">
-						<h3>
-							<?php echo $class_ins->get_config( 'name' ); ?>
-							<span class="badge badge-dark"><?php echo $class_ins->get_config( 'version' ); ?></span>
-						</h3>
-					</div>
-					<div class="col-md-6 col-sm-6">
-						<a href="<?php echo esc_url( $migrate_url ); ?>"
-						   class="button button-primary button-large nmsf-migrate-back-btn"><?php echo _e( 'Switch to Legacy Settings', 'woocommerce-product-addon' ); ?></a>
-						<input type="submit" class="button button-primary button-large" value="Submit"/>
-					</div>
-				</div>
-			</div>
 
 			<!--Tabs & Panel Sections-->
 			<div class="row">
-				<div class="nmsf-tabs-area nmsf-cols col-md-2">
-					<div class="nmsf-tabs-content">
-						<?php 
-						foreach ( $tabs as $tab_id => $tab ) {
-							$title   = isset( $tab['title'] ) ? $tab['title'] : '';
-							$desc    = isset( $tab['desc'] ) ? $tab['desc'] : '';
-							$icon    = isset( $tab['icon'] ) ? $tab['icon'] : '';
-							$enable  = isset( $tab['enable'] ) ? $tab['enable'] : '';
-							$classes = isset( $tab['classes'] ) ? $tab['classes'] : array();
-
-							if ( $enable ) {
-								?>
-								<div class="<?php echo implode( ' ', $classes ); ?>"
-									 data-tab-id="<?php echo esc_attr( $tab_id ); ?>">
-									<span class="nmsf-tabs-dot"></span>
-									<span><?php echo esc_html( $title ); ?></span>
-								</div>
-
-								<?php 
-							}
-						} 
-						?>
-					</div>
-				</div>
-				<div class="nmsf-cols col-md-10">
+				<div class="nmsf-cols col-md-12">
 					<div class="nmsf-panels-area">
-
+                        <p class="submit">
+                            <a href="<?php echo esc_url( $migrate_url ); ?>"
+                               class="woocommerce-save-button components-button is-primary nmsf-migrate-back-btn"><?php echo _e( 'Switch to Legacy Settings', 'woocommerce-product-addon' ); ?></a>
+                            <input type="submit" class="woocommerce-save-button components-button is-primary"
+                                   value="<?php _e( 'Save changes', 'woocommerce-product-addon' ); ?>"/>
+                        </p>
 						<?php
 						foreach ( $tabs as $tab_id => $tab_meta ) {
 							$panel_meta = isset( $tab_meta['panels'] ) ? $tab_meta['panels'] : array();
@@ -109,6 +74,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 										$id          = isset( $subtab_meta['id'] ) ? $subtab_meta['id'] : '';
 										$title       = isset( $subtab_meta['title'] ) ? $subtab_meta['title'] : '';
 										$desc        = isset( $subtab_meta['desc'] ) ? $subtab_meta['desc'] : '';
+										$is_available = isset( $subtab_meta['is_available'] ) ? $subtab_meta['is_available'] : true;
 										$active      = isset( $subtab_meta['active'] ) ? $subtab_meta['active'] : '';
 										$is_sabpanel = isset( $subtab_meta['is_sabpanel'] ) ? $subtab_meta['is_sabpanel'] : '';
 										$params      = isset( $subtab_meta['settings'] ) ? $subtab_meta['settings'] : array();
@@ -127,8 +93,18 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 												   class="nmsf-panel-handler"
 												   id="nmsf-<?php echo esc_attr( $panel_id ); ?>" <?php echo esc_attr( $is_checked ); ?>>
 											<label for="nmsf-<?php echo esc_attr( $panel_id ); ?>"
-												   class="nmsf-label"><?php echo esc_html( $title ); ?></label>
-											<div class="nmsf-panel-settings-area">
+												   class="nmsf-label <?php  echo ! $is_available ? 'ppom-is-locked-section' : ''; ?>">
+												<?php if ( ! $is_available ): ?>
+                                                    <span class="dashicons dashicons-lock"></span>
+												<?php endif; ?>
+                                                <?php  echo esc_html( $title ); ?></label>
+											<div class="nmsf-panel-settings-area <?php  echo ! $is_available ? 'ppom-is-locked-panel' : ''; ?>"">
+                                                <?php if ( ! $is_available ): ?>
+                                                    <div class="ppom-notice-upsell"><p>
+                                                            <?php echo sprintf( __( '%s customization is not available on your current plan. %sUpgrade to the Pro%s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ), esc_html( $title ), sprintf( '<a href="%s" target="_blank">', esc_url( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ), '</a>' ); ?>
+                                                        </p>
+                                                    </div>
+                                                <?php endif; ?>
 												<span class="nmsf-panel-desc"><?php echo esc_html( $desc ); ?></span>
 												<table class="nmsf-panel-table form-table">
 													<?php
@@ -148,10 +124,14 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 															$video_title            = isset( $reference['ref_video_title'] ) ? $reference['ref_video_title'] : '';
 															$video_link             = isset( $reference['ref_video_link'] ) ? $reference['ref_video_link'] : '';
 															$input_meta['input_id'] = $id;
-
 															$condition_class = '';
+															$is_input_available = isset( $input_meta['is_available'] ) ? $input_meta['is_available'] : $is_available;
+															if ( ! $is_input_available ) {
+																$condition_class .= 'ppom-is-locked-field';
+																$input_meta['input_id'] = '_locked' . $input_meta['input_id'];
+															}
 															if ( ! empty( $conditions ) ) {
-																$condition_class = 'nmsf-panel-conditional-field';
+																$condition_class .= 'nmsf-panel-conditional-field';
 															}
 
 															?>
@@ -162,6 +142,12 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																		class="<?php echo $condition_class; ?>"
 																>
 																	<td class="nmsf-section-type" colspan="2">
+																		<?php if ( $is_available && !$is_input_available ): ?>
+                                                                            <div class="ppom-notice-upsell"><p>
+																					<?php echo sprintf( __( '%s customization is not available on your current plan. %sUpgrade to the Pro%s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ), esc_html( $title ), sprintf( '<a href="%s" target="_blank">', esc_url( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ), '</a>' ); ?>
+                                                                                </p>
+                                                                            </div>
+																		<?php endif; ?>
 																		<h3>
 																			<?php echo esc_html( $title ); ?>
 																			<?php if ( ! empty( $desc ) ) { ?>
@@ -226,9 +212,9 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																				</a>
 																					<?php } ?>
 																		</span>
-																				<?php 
+																				<?php
 																			}
-																		} 
+																		}
 																		?>
 																	</th>
 																	<td>
@@ -285,27 +271,17 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 
 								</div>
 							</div>
-							<?php 
+							<?php
 						}
 						?>
+                        <p class="submit">
+                            <input type="submit" class="woocommerce-save-button components-button is-primary"
+                                   value="<?php _e( 'Save changes', 'woocommerce-product-addon' ); ?>"/>
+                        </p>
 					</div>
 				</div>
 			</div>
 
-			<!--Footer Section-->
-			<div class="nmsf-footer-area">
-				<div class="row">
-					<div class="col-md-6 col-sm-6">
-						<h3>
-							<?php echo $class_ins->get_config( 'plugin_name' ); ?>
-							<span class="badge badge-dark"><?php echo $class_ins->get_config( 'plugin_version' ); ?></span>
-						</h3>
-					</div>
-					<div class="col-md-6 col-sm-6">
-						<input type="submit" class="button button-primary button-large" value="Submit"/>
-					</div>
-				</div>
-			</div>
 
 			<?php if ( $class_ins->get_config( 'form_tag' ) ) { ?>
 		</form>

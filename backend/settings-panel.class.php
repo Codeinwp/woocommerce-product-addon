@@ -204,6 +204,7 @@ class PPOM_SettingsFramework {
 	public function register_panel( $tab_id, $panels ) {
 
 
+		$panels = apply_filters( 'ppom_register_panel', $panels );
 		// only used for store all Panels on single array
 		$this->panels = array_merge( $this->panels, $panels );
 
@@ -219,6 +220,7 @@ class PPOM_SettingsFramework {
 	 */
 	public function register_setting( $panel_id, $settings ) {
 
+		$settings = apply_filters( 'ppom_register_settings', $settings );
 		// only used for store all settings on single array
 		$this->settings_array = array_merge( $this->settings_array, $settings );
 
@@ -312,7 +314,9 @@ class PPOM_SettingsFramework {
 
 		$response = array();
 		if ( isset( $_REQUEST[ self::$save_key ] ) ) {
-
+			$_REQUEST[ self::$save_key ]  = array_filter( $_REQUEST[ self::$save_key ] , function ( $key ) {
+				return strpos( $key, '_locked' ) === false;
+			}, ARRAY_FILTER_USE_KEY );
 			// $settings_meta = $_REQUEST[self::$save_key];
 			$settings_meta = array_map(
 				function ( $setting ) {
@@ -323,7 +327,6 @@ class PPOM_SettingsFramework {
 				},
 				$_REQUEST[ self::$save_key ] 
 			);
-
 
 			// Generate and saved css
 			$this->generate_css( $settings_meta );

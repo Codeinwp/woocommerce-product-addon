@@ -37,7 +37,7 @@ if ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) 
 	$send_file_attachment   = ( isset( $ppom_settings->send_file_attachment ) ? $ppom_settings->send_file_attachment : '' );
 	$show_cart_thumb        = ( isset( $ppom_settings->show_cart_thumb ) ? $ppom_settings->show_cart_thumb : '' );
 	$aviary_api_key         = ( isset( $ppom_settings->aviary_api_key ) ? $ppom_settings->aviary_api_key : '' );
-	$productmeta_style      = ( isset( $ppom_settings->productmeta_style ) ? $ppom_settings->productmeta_style : '' );
+	$productmeta_style      = ! empty( $ppom_settings->productmeta_style ) ? $ppom_settings->productmeta_style : "selector {\n}\n";
 	$productmeta_js         = ( isset( $ppom_settings->productmeta_js ) ? $ppom_settings->productmeta_js : '' );
 	$productmeta_categories = ( isset( $ppom_settings->productmeta_categories ) ? $ppom_settings->productmeta_categories : '' );
 	$product_meta           = json_decode( $ppom_settings->the_meta, true );
@@ -51,7 +51,7 @@ $url_cancel = add_query_arg(
 	)
 );
 
-echo '<p><a class="btn btn-primary" href="' . esc_url( $url_cancel ) . '">' . __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ) . '</a></p>';
+echo '<p><a href="' . esc_url( $url_cancel ) . '">' . __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ) . '</a></p>';
 
 $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 
@@ -101,7 +101,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 									<i class="fa fa-lock" aria-hidden="true"></i>
 								</span>
 								<span class="upsell-btn-wrapper">
-									<a target="_blank" href="<?php echo esc_url( tsdk_utmify(PPOM_UPGRADE_URL,'lockedfields') ); ?>">Get Pro</a>
+									<a target="_blank" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ),'lockedfields') ); ?>">Get Pro</a>
 								</span>
 							</li>
 						<?php
@@ -197,8 +197,12 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 											  title="<?php _e( 'Add your own CSS.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
-									<textarea id="ppom-css-editor" class="form-control"
-											  name="productmeta_style"><?php echo wp_unslash( $productmeta_style ); ?></textarea>
+									<textarea id="ppom-css-editor" class="form-control" name="productmeta_style"><?php echo wp_unslash( $productmeta_style ); ?></textarea>
+									<br>
+									<p><?php esc_html_e( 'Use', 'woocommerce-product-addon' ); ?> <code>selector</code> <?php esc_html_e( 'to target block wrapper.', 'woocommerce-product-addon' ); ?></p>
+									<p><?php esc_html_e( 'Example:', 'woocommerce-product-addon' ); ?></p>
+									<pre className="ppom-css-editor-help"><?php echo esc_html( "selector {\n    background: #000;\n}\nselector img {\n    border-radius: 100%;\n}" ); ?></pre>
+									<p><?php esc_html_e( 'You can also use other CSS syntax here, such as media queries.', 'woocommerce-product-addon' ); ?></p>
 								</div>
 							</div>
 							<div class="col-md-6 col-sm-12">
@@ -411,10 +415,6 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 		</form>
 	</div>
 </div>
-
-<br><p><a class="btn btn-primary"
-		  href="<?php echo esc_url( $url_cancel ); ?>"><?php echo __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ); ?></a>
-</p>
 
 <div class="checker">
 	<?php $form_meta->render_field_settings(); ?>

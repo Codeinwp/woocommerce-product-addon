@@ -59,6 +59,7 @@ jQuery(function($) {
         e.preventDefault();
         $("body").append(append_overly_model);
         var modalBox = $(this).attr('data-modal-id');
+        lockedDataName = false;
         $('#' + modalBox).fadeIn();
     });
 
@@ -117,6 +118,10 @@ jQuery(function($) {
     **/
     $('.ppom-import-export-btn').on('click', function(event) {
         event.preventDefault();
+        if ( $(".ppom-import-export-block").length === 0 ) {
+            $('#ppom-import-upsell').fadeIn();
+            return;
+        }
         $('.ppom-more-plugins-block').hide();
         $(".ppom-import-export-block").show();
         $(".ppom-product-meta-block").hide();
@@ -211,29 +216,27 @@ jQuery(function($) {
         var check_field = $('.ppom-check-one-field input[type="checkbox"]:checked');
 
         if (check_field.length > 0) {
-            swal.fire({
-                title: "Are you sure",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55 ",
-                cancelButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-            }).then( (result ) => {
-                    if (!result.isConfirmed) return;
+            window?.ppomPopup?.open({
+                title: window?.ppom_vars?.i18n.popup.confirmTitle,
+                onConfirmation: () => {
+                    $('.ppom_field_table').find('.ppom-check-one-field input').each(function(i, meta_field) {
 
-                $('.ppom_field_table').find('.ppom-check-one-field input').each(function(i, meta_field) {
-
-                    if (this.checked) {
-                        var field_id = $(meta_field).val();
-                        // console.log(field_id)
-                        $(meta_field).parent().parent().parent('.row_no_' + field_id + '').remove();
-                    }
-                    $('.ppom_save_fields_model').find('#ppom_field_model_' + field_id + '').remove();
-                });
-            });
+                        const field_id = $(meta_field).val();
+                        if (this.checked) {
+                            // console.log(field_id)
+                            $(meta_field).parent().parent().parent('.row_no_' + field_id + '').remove();
+                        }
+                        $('.ppom_save_fields_model').find('#ppom_field_model_' + field_id + '').remove();
+                    });
+                }
+            })
         }
         else {
-            swal.fire("Please at least check one field!", "", "error");
+            window?.ppomPopup?.open({
+                title: window.ppom_vars.i18n.popup.checkFieldTitle,
+                type: "error",
+                hideCloseBtn: true
+            })
         }
     });
 
@@ -262,11 +265,13 @@ jQuery(function($) {
     /**
         9- Edit Existing Fields
     **/
+    var lockedDataName = false;
     $(document).on('click', '.ppom-edit-field', function(event) {
         event.preventDefault();
 
         var the_id = $(this).attr('id');
-        $('#ppom_field_model_' + the_id + '').find('.ppom-close-checker').removeClass('ppom-close-fields');
+        $('#ppom_field_model_' + the_id).find('.ppom-close-checker').removeClass('ppom-close-fields');
+        lockedDataName = true;
     });
 
 
@@ -990,7 +995,10 @@ jQuery(function($) {
         if (wp_field == 'shipping_fields' || wp_field == 'billing_fields') {
             return;
         }
-        selector.find('[data-meta-id="data_name"] input[type="text"]').val(field_id);
+        if ( true === lockedDataName ) {
+            return;
+        }
+        selector.find('[data-meta-id="data_name"] input[type="text"]:not([readonly])').val(field_id);
     });
 
 
@@ -1354,6 +1362,46 @@ jQuery(function($) {
 
     $( document ).on( 'ppom_new_field_created', function(e, clone_new_field) {
         $(clone_new_field).find('input[data-metatype="jquery_dp"]').change(toggleHandler.activateHandler);
+    } );
+
+    // Unsaved form exit confirmation.
+    var unsaved = false;
+    $( ':input' ).change(function () {
+        if ( $( this ).parents( '.ppom-checkboxe-style' )?.length > 0 ) {
+            unsaved = false;
+            return;
+        }    
+        unsaved = true;
+    });
+    $( document ).on( 'click', '.ppom-submit-btn input.btn, button.ppom_copy_field, button.ppom-add-fields-js-action', function() {
+        if ( $(this).hasClass('ppom_copy_field') || $(this).hasClass( 'ppom-add-fields-js-action' ) ) {
+            unsaved = true;
+            return;
+        }
+        unsaved = false;
+    } );
+    window.addEventListener( 'beforeunload', function( e ) {
+        if ( unsaved ) {
+          e.preventDefault();
+          e.returnValue = '';
+      }
+    });
+
+    $( document ).on( 'ppom_fields_tab_changed', function(e, id, tab) {
+        if ( 'condition_tab' !== id ) {
+            return;
+        }
+
+        if ( ! $('input[data-metatype="logic"]', tab?.first() )?.is(':checked') ) {
+            tab?.last()?.addClass( 'ppom-disabled-overlay' );
+        }
+    } );
+
+    $( document ).on( 'change', 'input[data-metatype="logic"]:visible', function() {
+        $(this)
+        .parents('.ppom_handle_condition_tab')
+        .next('.ppom_handle_condition_tab')
+        .toggleClass('ppom-disabled-overlay');
     } );
 
     $(document).ready(function(){

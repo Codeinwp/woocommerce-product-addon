@@ -109,7 +109,7 @@ class NM_Number_wooproduct extends PPOM_Inputs {
 			),
 			'desc_tooltip'    => array(
 				'type'        => 'checkbox',
-				'title'       => __( 'Show tooltip (PRO)', 'woocommerce-product-addon' ),
+				'title'       => __( 'Show tooltip', 'woocommerce-product-addon' ),
 				'desc'        => __( 'Show Description in Tooltip with Help Icon', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),

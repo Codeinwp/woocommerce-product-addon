@@ -133,3 +133,18 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 		</footer>
 	</form>
 </div>
+
+<!-- Upgrade to pro modal -->
+<div id="ppom-import-upsell" class="ppom-modal-box" style="display: none;">
+	<div class="ppom-modal-body">
+		<button type="button" aria-label="close" class="close-model ppom-js-modal-close"><span class="dashicons dashicons-no-alt"></span></button>
+		<div class="ppom-lock-icon">
+			<span class="dashicons dashicons-lock"></span>		
+		</div>
+		<h3><?php esc_html_e( 'Importing fields is a PRO feature', 'woocommerce-product-addon' ); ?></h3>
+		<p>
+			<?php esc_html_e( 'We\'re sorry, importing fields is not available on your plan. Please upgrade to the Pro plan to unlock all these features and enhance your product fields management capabilities.', 'woocommerce-product-addon' ); ?>
+		</p>
+		<a class="btn btn-success" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'lockedimport' ) ); ?>" target="_blank"><?php esc_html_e( 'Upgrade to PRO', 'woocommerce-product-addon' ); ?></a>
+	</div>
+</div>
