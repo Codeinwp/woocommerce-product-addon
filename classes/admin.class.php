@@ -398,6 +398,48 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			td.ppom-files-display a.button {
 				text-align: center;
 			}
+
+			.ppom-settings-container {
+				display: flex;
+				flex-direction: column;
+				gap: 15px;
+				margin: 10px 15px;
+			}
+
+			.ppom-settings-container-item {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			label.ppom-settings-container-item {
+				width: 100%;
+				max-width: 600px;
+				margin: unset;
+			}
+
+			.ppom-settings-container .ppom-upsell-link {
+				display: inline-flex;
+				align-items: center;
+				padding: 0.5rem 1rem;
+				font-size: 0.875rem;
+				font-weight: 500;
+				color: #2563eb;
+				background-color: #eff6ff;
+				border: 1px solid #bfdbfe;
+				border-radius: 0.375rem;
+				text-decoration: none;
+				transition: all 150ms ease-in-out;
+			}
+
+			.ppom-settings-container .ppom-upsell-link:hover {
+				background-color: #dbeafe;
+				color: #1d4ed8;
+			}
+
+			.ppom-settings-container .ppom-disabled-text {
+				color: #8d8d8d;
+			}
 		</style>
 		<?php
 	}
