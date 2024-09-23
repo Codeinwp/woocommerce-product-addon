@@ -740,12 +740,14 @@ class NM_PersonalizedProduct {
 
 		$sql = "INSERT INTO $forms_table_name
 		(productmeta_name, aviary_api_key, productmeta_style,productmeta_categories, the_meta, productmeta_created) 
-		SELECT productmeta_name, aviary_api_key, productmeta_style,productmeta_categories, the_meta, productmeta_created 
+		SELECT CONCAT(productmeta_name, ' (clone)'), aviary_api_key, productmeta_style,productmeta_categories, the_meta, productmeta_created 
 		FROM $forms_table_name 
 		WHERE productmeta_id = %d;";
 
 		$result = $wpdb->query( $wpdb->prepare( $sql, array( $meta_id ) ) );
 
+		wp_safe_redirect( admin_url( 'admin.php?page=ppom&productmeta_id=' . intval( $wpdb->insert_id ) . '&do_meta=edit' ) );
+        die();
 		/*
 		 var_dump($result);
 		
