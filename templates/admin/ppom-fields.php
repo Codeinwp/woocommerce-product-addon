@@ -67,21 +67,51 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 		<div class="ppom-modal-body">
 			<ul class="list-group list-inline">
 				<?php
+				$free_fields = PPOM()->ppom_free_inputs();
 				foreach ( PPOM()->inputs as $field_type => $meta ) {
-
 					if ( $meta != null ) {
 						$fields_title = isset( $meta->title ) ? $meta->title : null;
 						$fields_icon  = isset( $meta->icon ) ? $meta->icon : null;
-						?>
-						<li class="ppom_select_field list-group-item"
-							data-field-type="<?php echo esc_attr( $field_type ); ?>">
-							<span class="ppom-fields-icon">
-								<?php echo $fields_icon; ?>
-							</span>
-							<span>
-								<?php echo $fields_title; ?>
-							</span>
-						</li>
+
+						$is_locked = false;
+						if ( ppom_pro_is_installed() ) {
+							if ( ! PPOM()->ppom_is_license_of_type( 'pro' ) && ! array_key_exists( $field_type, $free_fields ) ) {
+								$is_locked = true;
+							}
+							if ( ! PPOM()->ppom_is_license_of_type( 'plus' ) && in_array( $field_type, array( 'qtypack' ), true ) ) {
+								$is_locked = true;
+							}
+							if ( ! PPOM()->ppom_is_license_of_type( 'vip' ) && in_array( $field_type, array( 'domain', 'vqmatrix' ), true ) ) {
+								$is_locked = true;
+							}
+						}
+						if ( ! $is_locked ) :
+							?>
+							<li class="ppom_select_field list-group-item"
+								data-field-type="<?php echo esc_attr( $field_type ); ?>">
+								<span class="ppom-fields-icon">
+									<?php echo $fields_icon; ?>
+								</span>
+								<span>
+									<?php echo $fields_title; ?>
+								</span>
+							</li>
+						<?php else : ?>
+							<li onclick="return;" class="ppom_select_field list-group-item locked">
+								<span class="ppom-fields-icon">
+									<?php echo $fields_icon; ?>
+								</span>
+								<span>
+									<?php echo $fields_title; ?>
+								</span>
+								<span>
+									<i class="fa fa-lock" aria-hidden="true"></i>
+								</span>
+								<span class="upsell-btn-wrapper">
+									<a target="_blank" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ),'lockedfields') ); ?>"><?php esc_html_e( 'Get Pro', 'woocommerce-product-addon' ); ?></a>
+								</span>
+							</li>
+						<?php endif; ?>
 						<?php
 					}
 				}
@@ -101,7 +131,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 									<i class="fa fa-lock" aria-hidden="true"></i>
 								</span>
 								<span class="upsell-btn-wrapper">
-									<a target="_blank" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ),'lockedfields') ); ?>">Get Pro</a>
+									<a target="_blank" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ),'lockedfields') ); ?>"><?php esc_html_e( 'Get Pro', 'woocommerce-product-addon' ); ?></a>
 								</span>
 							</li>
 						<?php

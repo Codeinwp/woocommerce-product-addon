@@ -21,10 +21,6 @@ class PPOM_Freemium {
 	 */
 	private function __construct()
 	{
-		if( ppom_pro_is_installed() ) {
-			return;
-		}
-
 		add_filter( 'ppom_fields_tabs_show', array( $this, 'add_locked_cfr_tab' ), 10, 1 );
 		add_filter( 'ppom_all_inputs', array( $this, 'locked_cfr_register_form_elements' ), PHP_INT_MAX );
 	}
@@ -49,6 +45,9 @@ class PPOM_Freemium {
 	 * @return array
 	 */
 	public function add_locked_cfr_tab( $tabs ) {
+		if ( ppom_pro_is_installed() && PPOM()->ppom_is_license_of_type( 'plus' ) ) {
+			return $tabs;
+		}
 		$tabs[self::TAB_KEY_FREEMIUM_CFR] = array(
 			'label' => __( 'Conditional Repeater (PRO)', 'woocommerce-product-addon' ),
 			'class' => array( 'ppom-tabs-label' ),
@@ -63,14 +62,19 @@ class PPOM_Freemium {
 	 * @return string
 	 */
 	public function get_freemium_cfr_content() {
+		if ( ppom_pro_is_installed() && PPOM()->ppom_is_license_of_type( 'plus' ) ) {
+			return '';
+		}
 		ob_start();
 		$upgrade_url = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'lockedconditionalfield', 'ppompage' );
 		?>
 		<div class="freemium-cfr-content">
-			<p><?php esc_html_e( 'Conditional Field Repeater allows repeating this field across a value of another PPOM field. Conditional Field Repeater feature is the part of the PPOM Pro.', 'woocommerce-product-addon' ); ?></p>
+			<p><?php esc_html_e( 'The Conditional Repeater allows fields to be automatically repeated based on the value entered in another field, such as a Number, Variation Quantity, or Quantity Pack field. For example, if a user enters "2," two corresponding fields will appear. This feature is part of the PPOM Pro plugin.', 'woocommerce-product-addon' ); ?></p>
+			<div class="notice notice-info mb-3">
+				<p><strong><?php esc_html_e( 'Use Case:', 'woocommerce-product-addon' ); ?></strong> <?php esc_html_e( 'Selling personalized caps? With the Conditional Repeater, customers can select the number of caps (e.g., 5), and the feature will automatically generate 5 fields to enter unique names for each cap. This makes it simple to personalize multiple caps in one go!', 'woocommerce-product-addon' ); ?> <a href="https://demo-ppom-lite.vertisite.cloud/product/personalized-caps-using-conditional-repeater/" class="ppom-repeater-learn-more" target="_blank"><?php esc_html_e( 'View Demo', 'woocommerce-product-addon' ); ?> <span class="dashicons dashicons-external"></span></a></p>
+			</div>
 
-			<p><?php printf( '<strong>%s</strong> %s', esc_html__( 'Use case example:', 'woocommerce-product-addon' ),  esc_html__( 'Get the number of players from another PPOM field, and repeat this field(let\'s say that\'s a text field representing the player name) across the number of players. That\'s pretty useful for dynamic repeating the PPOM field.', 'woocommerce-product-addon' ) ); ?></p>
-
+			<a target="_blank" class="btn btn-sm btn-secondary mr-2" href="https://docs.themeisle.com/article/1700-personalized-product-meta-manager#conditional-repeater"><?php echo __( 'Check Documentation', 'woocommerce-product-addon' ); ?></a>
 			<a target="_blank" class="btn btn-sm btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php echo __( 'Upgrade to Pro', 'woocommerce-product-addon' ); ?></a>
 		</div>
 		<?php
@@ -93,7 +97,7 @@ class PPOM_Freemium {
                 'type' => 'checkbox',
                 'title' => __( 'Enable Conditional Repeat', 'woocommerce-product-addon' ),
 				'disabled' => true,
-                'desc' => __( 'This control turns on the Conditional Field Repeater mode for this field, in this way, this field is repeated by the selected field(selected in the Origin setting) below', 'woocommerce-product-addon' ),
+                'desc' => '',
 				'tabs_class' => array( 'ppom_handle_' . self::TAB_KEY_FREEMIUM_CFR )
             );
 

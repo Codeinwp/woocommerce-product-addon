@@ -138,6 +138,17 @@ jQuery(function($) {
     **/
     $('.nmsf-multiselect-js').select2();
 
+    /**
+     * Disabled submit button.
+     */
+    $(document).on('click', '.nmsf-panels-content-inner .nmsf-label', function(){
+        var isLocked = $(this).hasClass('ppom-is-locked-section');
+        $(this)
+        .parents('.nmsf-panels-area')
+        .find('.woocommerce-save-button')
+        .attr('disabled', isLocked);
+    });
+
     const permissionField = $('#ppom_permission_mfields');
 
     $(document).ready(function(){

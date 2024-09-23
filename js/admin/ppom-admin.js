@@ -1372,7 +1372,7 @@ jQuery(function($) {
             return;
         }
 
-        $(`<div class="form-group">${ppom_vars.i18n.freemiumCFRContent}</div>`).insertBefore( tab.find('.form-group') );
+        $(`<div class="form-group">${ppom_vars.i18n.freemiumCFRContent}</div>`).insertAfter( tab.find('.form-group') );
     });
 
     const toggleHandler = {

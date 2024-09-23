@@ -637,7 +637,7 @@ div.nmsf-panels-area .nmsf-panels-content p {
     font-style: italic;
     font-weight: 500;
 }
-.ppom-is-locked-panel .ppom-notice-upsell {
+.ppom-is-locked-panel .ppom-notice-upsell, .ppom-is-locked-field .ppom-notice-upsell {
     background: #fff;
     border: 1px solid #c3c4c7;
     border-left-width: 4px;
@@ -646,7 +646,7 @@ div.nmsf-panels-area .nmsf-panels-content p {
     padding: 12px;
     margin-top: 15px;
 }
-.ppom-is-locked-panel .nmsf-panel-desc, .ppom-is-locked-panel .nmsf-panel-table, .ppom-is-locked-field > * > *:not(.ppom-notice-upsell){ opacity: 0.6; cursor: not-allowed; }
+.ppom-is-locked-panel .nmsf-panel-desc, .ppom-is-locked-panel .nmsf-panel-table, .ppom-is-locked-field > * > *:not(.ppom-notice-upsell){ opacity: 0.6; cursor: not-allowed; pointer-events: none; }
 .ppom-is-locked-panel input,
 .ppom-is-locked-field input,
 .ppom-is-locked-field select,
