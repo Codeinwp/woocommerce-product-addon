@@ -514,27 +514,17 @@ function ppom_update_option_prices() {
         ppom_show_base_price = false;
 
         ppom_measure_input_found = true;
+       
+        const multiplier = parseFloat(option?.price_multiplier ?? '1' );
+        const priceMultiplier = ! Number.isNaN(multiplier) ? multiplier : 1;
 
         if (option.use_units === 'no') {
-
-            var option_qty = option.qty == '' ? 0 : parseFloat(option.qty);
-            ppom_measure_quantity = option_qty * ppom_measure_quantity;
+            const option_qty = option.qty == '' ? 0 : parseFloat(option.qty);
+            ppom_measure_quantity = option_qty * ppom_measure_quantity * priceMultiplier;
         }
         else {
-
-            ppom_total_price += parseFloat(option.price) * parseFloat(option.qty) * ppom_get_order_quantity();
+            ppom_total_price += parseFloat(option.price) * priceMultiplier * parseFloat(option.qty) * ppom_get_order_quantity();
         }
-        // console.log(ppom_measure_quantity);
-
-        // total_price_label += ' '+ ppom_get_wc_price(ppom_total_price).html()+'x'+option_measure;
-
-        /*var option_price_with_qty = ppom_get_order_quantity() * parseFloat(option.price);
-        var option_label_with_qty = option.label+' x ' + ppom_get_order_quantity();
-        
-        var formatted_option_price  = ppom_get_wc_price( option_price_with_qty );
-        ppom_add_price_item_in_table( option_label_with_qty, formatted_option_price);*/
-
-        // var produc_total = ppom_calculate_totals(ppom_total_discount, productBasePrice, ppom_option_total);
     });
 
     // If measured input has quantities
@@ -745,6 +735,7 @@ function ppom_update_get_prices() {
             if (checked_option_apply === 'measure') {
                 option_price.qty = jQuery(this).attr('data-qty');
                 option_price.use_units = jQuery(this).attr('data-use_units');
+                option_price.price_multiplier = jQuery(this).attr('data-price-multiplier');
             }
             
             // console.log(option_price);

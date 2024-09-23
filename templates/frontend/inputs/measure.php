@@ -59,6 +59,7 @@ $input_classes = $input_classes . ' ppom-measure-input';
 				data-qty="<?php echo esc_attr( $default_value ); ?>"
 				<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 				style="display: none;"
+				data-price-multiplier="<?php echo esc_attr( $fm->get_meta_value( 'price-multiplier' ) ); ?>"
 				checked
 		>
 
