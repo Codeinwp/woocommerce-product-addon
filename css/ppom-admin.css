@@ -660,8 +660,16 @@ table#ppom-meta-table.dataTable th:nth-of-type(4) {
     11- Wordpress 5.3.1 CSS
 */
 
+.ppom-existing-meta-wrapper td.ppom-admin-meta-actions-colunm a:hover {
+    text-decoration: none;
+    background: #2271b1;
+    color: white;
+}
 .ppom-existing-meta-wrapper td.ppom-admin-meta-actions-colunm a {
     line-height: 26px !important;
+    padding: 3px;
+    border: none;
+    background: none;
 }
 
 #ppom-product-table tbody tr input[type="checkbox"],
