@@ -1178,13 +1178,15 @@ function ppom_convert_options_to_key_val( $options, $meta, $product ) {
 		return $options;
 	}
 
+	if ( is_string( $options ) ) {
+		$options = json_decode( $options, true );
+	}
 
 	if ( ! apply_filters( 'ppom_is_option_convertable', true, $meta ) ) {
 		return $options;
 	}
 
 	$meta_type = isset( $meta['type'] ) ? $meta['type'] : '';
-
 
 	// Do not change options for cropper
 	// if( $meta['type'] == 'cropper' ) return $options;
@@ -1580,36 +1582,45 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 	foreach ( $file_name_array as $file_name ) {
 
 		$file_edit_path = ppom_get_dir_path( 'edits' ) . ppom_file_get_name( $file_name, $item->get_product_id() );
-
 		// Making file thumb download with new path
 		$ppom_file_url       = ppom_get_file_download_url( $file_name, $item->get_order_id(), $item->get_product_id() );
-		$ppom_file_thumb_url = ppom_is_file_image( $file_name ) ? ppom_get_dir_url( true ) . $file_name : PPOM_URL . '/images/file.png';
-		$order_html         .= '<tr><td><a href="' . esc_url( $ppom_file_url ) . '">';
-		$order_html         .= '<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" src="' . esc_url( $ppom_file_thumb_url ) . '">';
-		$order_html         .= '</a></td>';
+		$is_image_file       = ppom_is_file_image( $file_name );
+		$ppom_file_thumb_url = $is_image_file ? ppom_get_dir_url( true ) . $file_name : PPOM_URL . '/images/file.png';
+		$order_html         .= '<tr><td class="ppom-files-display">';
 
+		if ( $is_image_file ) {
+			$order_html .= '<a target="_blank" href="' . esc_url( $ppom_file_url ) . '">';
+		}
+		
+		$order_html .= '<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" src="' . esc_url( $ppom_file_thumb_url ) . '">';
+
+		if ( $is_image_file ) {
+			$order_html .= '</a>';
+		}
 
 		// Requested by Kevin, hiding downloading file button after order on thank you page
 		// @since version 16.6
 		if ( is_admin() ) {
-			$order_html .= '<td><a class="button" href="' . esc_url( $ppom_file_url ) . '">';
+			$order_html .= '<a class="button" href="' . esc_url( $ppom_file_url ) . '" download>';
 			$order_html .= __( 'Download File', 'woocommerce-product-addon' );
-			$order_html .= '</a></td>';
+			$order_html .= '</a>';
 		}
+
+		$order_html .= '</td>';
 		$order_html .= '</tr>';
 
 		if ( $input_type == 'cropper' ) {
 
 			$cropped_file_name = ppom_file_get_name( $file_name, $item->get_product_id() );
 			$cropped_url       = ppom_get_dir_url() . 'cropped/' . $cropped_file_name;
-			$order_html       .= '<tr><td><a href="' . esc_url( $cropped_url ) . '">';
+			$order_html       .= '<tr><td><a target="_blank" href="' . esc_url( $cropped_url ) . '">';
 			$order_html       .= '<img style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" class="img-thumbnail" src="' . esc_url( $cropped_url ) . '">';
 			$order_html       .= '</a></td>';
 
 			// Requested by Kevin, hiding downloading file button after order on thank you page
 			// @since version 16.6
 			if ( is_admin() ) {
-				$order_html .= '<td><a class="button" href="' . esc_url( $cropped_url ) . '">';
+				$order_html .= '<td><a target="_blank" class="button" href="' . esc_url( $cropped_url ) . '">';
 				$order_html .= __( 'Cropped', 'woocommerce-product-addon' );
 				$order_html .= '</a></td>';
 			}
@@ -1620,7 +1631,7 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 			$edit_file_name = ppom_file_get_name( $file_name, $item->get_product_id() );
 			$edit_url       = ppom_get_dir_url() . 'edits/' . $edit_file_name;
 			$edit_thumb_url = ppom_get_dir_url() . 'edits/thumbs/' . $file_name;
-			$order_html    .= '<tr><td><a href="' . esc_url( $edit_url ) . '">';
+			$order_html    .= '<tr><td><a target="_blank"  href="' . esc_url( $edit_url ) . '">';
 			$order_html    .= '<img style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" class="img-thumbnail" src="' . esc_url( $edit_thumb_url ) . '">';
 			$order_html    .= '</a></td>';
 			$order_html    .= '<td><a class="button" href="' . esc_url( $edit_url ) . '">';
@@ -2403,4 +2414,16 @@ function ppom_check_pro_compatibility($feature_slug) {
 	}
 
 	return isset( PPOM_PRO_COMPATIBILITY_FEATURES[ $feature_slug ] ) && PPOM_PRO_COMPATIBILITY_FEATURES[ $feature_slug ];
+}
+
+/**
+ * Check is legacy user.
+ *
+ * @return bool
+ */
+function ppom_is_legacy_user() {
+	if ( ppom_pro_is_installed() && ( function_exists( '\PPOM_Pro\get_license_status' ) && 'valid' === \PPOM_Pro\get_license_status( false ) ) ) {
+		return false;
+	}
+	return 'no' === get_option( 'ppom_legacy_user', '' );
 }

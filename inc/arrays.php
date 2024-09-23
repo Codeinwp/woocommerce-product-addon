@@ -255,7 +255,7 @@ function ppom_array_settings() {
 			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_disable_bootstrap',
-			'desc'    => __( 'Bootstrap JS is being loaded from CDN, it will disable if your site already loading it.', 'woocommerce-product-addon' ),
+			'desc'    => __( 'Bootstrap JS is loaded from a CDN by default. You can disable it if your site is already loading it.', 'woocommerce-product-addon' ),
 		),
 
 		array(
@@ -264,7 +264,7 @@ function ppom_array_settings() {
 			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_enable_legacy_inputs_rendering',
-			'desc'    => __( 'PPOM Version 22.0 is major update, if some issues occur you can revert back to old version by this.', 'woocommerce-product-addon' ),
+			'desc'    => __( 'PPOM Version 22.0 is a major update. If any issues occur, you can revert to the previous version using this option.', 'woocommerce-product-addon' ),
 		),
 
 		array(
@@ -281,6 +281,7 @@ function ppom_array_settings() {
 			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_legacy_price',
+			'desc'	  => __( 'Enable this option to use the legacy method for price calculations.', 'woocommerce-product-addon' ),
 		),
 		array(
 			'title'       => __( 'PPOM Permissions', 'woocommerce-product-addon' ),
@@ -290,7 +291,7 @@ function ppom_array_settings() {
 			'placeholder' => 'choose role',
 			'options'     => ppom_get_all_editable_roles(),
 			'id'          => 'ppom_permission_mfields',
-			'desc'        => __( 'You can set permissions here so PPOM fields can be managed by different roles', 'woocommerce-product-addon' ),
+			'desc'        => __( 'You can set permissions here to allow different roles to manage PPOM fields.', 'woocommerce-product-addon' ),
 			'desc_tip'    => true,
 		),
 
@@ -363,7 +364,7 @@ function ppom_array_settings() {
 			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_api_enable',
-			'desc'    => __( 'Check this option to enable PPOM REST API', 'woocommerce-product-addon' ),
+			'desc'    => __( 'Check this option to enable PPOM REST API.', 'woocommerce-product-addon' ),
 		),
 
 		array(

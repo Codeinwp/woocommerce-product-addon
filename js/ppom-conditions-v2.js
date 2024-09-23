@@ -291,7 +291,7 @@ function ppom_check_conditions(data_name, callback) {
         let cond_elements = [];
         for (var t = 1; t <= total_cond; t++) {
 
-            const cond_element = jQuery(this).data(`cond-input${t}`);
+            const cond_element = jQuery(this).data(`cond-input${t}`)?.toString()?.toLowerCase();
             const cond_val = jQuery(this).data(`cond-val${t}`).toString();
             const operator = jQuery(this).data(`cond-operator${t}`);
             const field_val = ppom_get_element_value(cond_element);

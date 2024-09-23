@@ -37,7 +37,7 @@ if ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) 
 	$send_file_attachment   = ( isset( $ppom_settings->send_file_attachment ) ? $ppom_settings->send_file_attachment : '' );
 	$show_cart_thumb        = ( isset( $ppom_settings->show_cart_thumb ) ? $ppom_settings->show_cart_thumb : '' );
 	$aviary_api_key         = ( isset( $ppom_settings->aviary_api_key ) ? $ppom_settings->aviary_api_key : '' );
-	$productmeta_style      = ( isset( $ppom_settings->productmeta_style ) ? $ppom_settings->productmeta_style : '' );
+	$productmeta_style      = ! empty( $ppom_settings->productmeta_style ) ? $ppom_settings->productmeta_style : "selector {\n}\n";
 	$productmeta_js         = ( isset( $ppom_settings->productmeta_js ) ? $ppom_settings->productmeta_js : '' );
 	$productmeta_categories = ( isset( $ppom_settings->productmeta_categories ) ? $ppom_settings->productmeta_categories : '' );
 	$product_meta           = json_decode( $ppom_settings->the_meta, true );
@@ -189,6 +189,15 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 					<input type="radio" name="css-tabs" id="ppom-style-tab">
 					<label for="ppom-style-tab" class="ppom-tab-label">Style</label>
 					<div class="ppom-admin-tab-content">
+						<?php if ( ppom_is_legacy_user() ) : ?>
+							<div class="row">
+								<div class="col-md-12 col-sm-12">
+									<div class="notice notice-info">
+										<p><?php echo sprintf( __( 'Custom CSS and JS customization is not available on your current plan. <a href="%s" target="_blank">Upgrade to the Pro</a> plan to unlock the ability to fully customize your fields\' appearance and functionality.', 'woocommerce-product-addon' ), esc_url( tsdk_utmify( PPOM_UPGRADE_URL, 'customstyle' ) ) ); ?></p>
+									</div>
+								</div>
+							</div>
+						<?php endif; ?>
 						<div class="row">
 							<div class="col-md-6 col-sm-12">
 								<div class="form-group">
@@ -197,8 +206,12 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 											  title="<?php _e( 'Add your own CSS.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
-									<textarea id="ppom-css-editor" class="form-control"
-											  name="productmeta_style"><?php echo wp_unslash( $productmeta_style ); ?></textarea>
+									<textarea id="ppom-css-editor" class="form-control" name="productmeta_style"><?php echo wp_unslash( $productmeta_style ); ?></textarea>
+									<br>
+									<p><?php esc_html_e( 'Use', 'woocommerce-product-addon' ); ?> <code>selector</code> <?php esc_html_e( 'to target block wrapper.', 'woocommerce-product-addon' ); ?></p>
+									<p><?php esc_html_e( 'Example:', 'woocommerce-product-addon' ); ?></p>
+									<pre className="ppom-css-editor-help"><?php echo esc_html( "selector {\n    background: #000;\n}\nselector img {\n    border-radius: 100%;\n}" ); ?></pre>
+									<p><?php esc_html_e( 'You can also use other CSS syntax here, such as media queries.', 'woocommerce-product-addon' ); ?></p>
 								</div>
 							</div>
 							<div class="col-md-6 col-sm-12">
