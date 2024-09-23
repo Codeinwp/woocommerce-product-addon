@@ -15,6 +15,7 @@
  *
  * WordPress Available:  yes
  * Requires License:     no
+ * Requires Plugins: woocommerce
  */
 
 // @since 6.1
@@ -38,7 +39,7 @@ define( 'PPOM_COMPATIBILITY_FEATURES', [
 
 require PPOM_PATH . '/vendor/autoload.php';
 
-define( 'PPOM_UPGRADE_URL', tsdk_translate_link('https://themeisle.com/plugins/ppom-pro/upgrade/' ));
+define( 'PPOM_UPGRADE_URL', 'https://themeisle.com/plugins/ppom-pro/upgrade/' );
 add_filter(
 	'themeisle_sdk_products',
 	function ( $products ) {
@@ -101,6 +102,7 @@ if ( is_admin() ) {
 	$ppom_admin    = new NM_PersonalizedProduct_Admin();
 	$ppom_basename = plugin_basename( __FILE__ );
 	add_filter( "plugin_action_links_{$ppom_basename}", 'ppom_settings_link', 10 );
+	add_filter( "plugin_action_links_{$ppom_basename}", [ $ppom_admin, 'upgrade_to_pro_plugin_action' ], 10, 2 );
 }
 
 function PPOM() {
@@ -132,7 +134,7 @@ add_filter('woocommerce_product_addon_float_widget_metadata', function(){
 		'primary_color'        => '#313350', // optional
 		'pages'                => [ 'woocommerce_page_ppom' ], //pages where the float widget should be displayed
 		'has_upgrade_menu'     => ! defined( 'PPOM_PRO_PATH' ),
-		'upgrade_link'         => tsdk_utmify( PPOM_UPGRADE_URL, 'float_widget' ),
+		'upgrade_link'         => tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'float_widget' ),
 		'documentation_link'   => 'https://rviv.ly/C1cmSQ',
 		'premium_support_link' => defined( 'PPOM_PRO_PATH' ) ? tsdk_translate_link( tsdk_support_link( PPOM_PRO_PATH . '/ppom.php' ) ) : '',
 		'feature_request_link' => tsdk_translate_link( 'https://store.themeisle.com/suggest-a-feature/' ),

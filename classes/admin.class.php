@@ -72,7 +72,6 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		// adding wpml support for PPOM Settings
 		add_filter( 'woocommerce_admin_settings_sanitize_option', array( $this, 'ppom_setting_wpml' ), 10, 3 );
-		add_action( 'ppom_pdf_setting_action', 'ppom_admin_update_pro_notice', 10 );
 
 		add_action( 'admin_head', array( $this, 'ppom_tabs_custom_style' ) );
 
@@ -87,9 +86,37 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		);
 
 		add_action( 'admin_init', array( $this, 'set_legacy_user' ) );
-
+		add_action( 'admin_init', array( $this, 'ppom_create_db_tables' ) );
 	}
 
+	/**
+	 * Add upgrade to pro plugin action link.
+	 *
+	 * @param array  $actions Plugin actions.
+	 * @param string $plugin_file Path to the plugin file relative to the plugins directory.
+	 *
+	 * @return array
+	 */
+	public function upgrade_to_pro_plugin_action( $actions, $plugin_file ) {
+		if ( apply_filters( 'product_ppom_license_status', '' ) === 'valid' || apply_filters( 'product_ppom_license_status', '' ) === 'active_expired' ) {
+			return $actions;
+		}
+
+		return array_merge(
+			array(
+				'upgrade_link' => '<a href="' . add_query_arg(
+						array(
+							'utm_source'   => 'wpadmin',
+							'utm_medium'   => 'plugins',
+							'utm_campaign' => 'rowaction',
+						),
+						tsdk_translate_link( PPOM_UPGRADE_URL )
+					) . '" title="' . __( 'More Features', 'woocommerce-product-addon' ) . '"  target="_blank" rel="noopener noreferrer" style="color: #009E29; font-weight: 700;" onmouseover="this.style.color=\'#008a20\';" onmouseout="this.style.color=\'#009528\';" >' . __( 'Get Pro', 'woocommerce-product-addon' ) . '</a>',
+			),
+			$actions
+		);
+
+	}
 
 	/*
 	 * creating menu page for this plugin
@@ -363,6 +390,59 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			th.column-ppom_meta {
 				width: 10% !important;
 			}
+
+			/* PPOM File Upload uploaded files display */
+			td.ppom-files-display {
+				display: flex;
+				flex-direction: column;
+				gap: 3px;
+			}
+			
+			td.ppom-files-display a.button {
+				text-align: center;
+			}
+
+			.ppom-settings-container {
+				display: flex;
+				flex-direction: column;
+				gap: 15px;
+				margin: 10px 15px;
+			}
+
+			.ppom-settings-container-item {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			label.ppom-settings-container-item {
+				width: 100%;
+				max-width: 600px;
+				margin: unset;
+			}
+
+			.ppom-settings-container .ppom-upsell-link {
+				display: inline-flex;
+				align-items: center;
+				padding: 0.5rem 1rem;
+				font-size: 0.875rem;
+				font-weight: 500;
+				color: #2563eb;
+				background-color: #eff6ff;
+				border: 1px solid #bfdbfe;
+				border-radius: 0.375rem;
+				text-decoration: none;
+				transition: all 150ms ease-in-out;
+			}
+
+			.ppom-settings-container .ppom-upsell-link:hover {
+				background-color: #dbeafe;
+				color: #1d4ed8;
+			}
+
+			.ppom-settings-container .ppom-disabled-text {
+				color: #8d8d8d;
+			}
 		</style>
 		<?php
 	}
@@ -430,4 +510,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 
+	/**
+	 * Create database tables.
+	 */
+	public function ppom_create_db_tables() {
+		if ( ! empty( get_option( 'personalizedproduct_db_version' ) ) ) {
+			return;
+		}
+
+		NM_PersonalizedProduct::activate_plugin();
+	}
 }

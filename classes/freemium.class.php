@@ -64,7 +64,7 @@ class PPOM_Freemium {
 	 */
 	public function get_freemium_cfr_content() {
 		ob_start();
-		$upgrade_url = tsdk_utmify( PPOM_UPGRADE_URL, 'lockedconditionalfield', 'ppompage' );
+		$upgrade_url = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'lockedconditionalfield', 'ppompage' );
 		?>
 		<div class="freemium-cfr-content">
 			<p><?php esc_html_e( 'Conditional Field Repeater allows repeating this field across a value of another PPOM field. Conditional Field Repeater feature is the part of the PPOM Pro.', 'woocommerce-product-addon' ); ?></p>

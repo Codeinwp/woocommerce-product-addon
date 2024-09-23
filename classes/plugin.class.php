@@ -884,7 +884,7 @@ class NM_PersonalizedProduct {
 	function ppom_export_meta() {
 
 		// if( ppom_pro_is_installed() ) return '';
-		$buy_pro = tsdk_utmify( PPOM_UPGRADE_URL, 'export-import', 'tryexport' );
+		$buy_pro = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'export-import', 'tryexport' );
 		$args    = array(
 			'link_url'  => $buy_pro,
 			'link_text' => 'Buy now',
