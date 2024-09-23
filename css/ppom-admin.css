@@ -1001,7 +1001,7 @@ ul.ppom-options-container li label {
 .ppom_addons_model_cards_item {
     display: flex;
     padding: 1rem;
-    width: 33%;
+    width: 50%;
 }
 
 @media only screen and (max-width: 600px) {
@@ -1018,6 +1018,7 @@ ul.ppom-options-container li label {
     display: flex;
     flex-direction: column;
     min-height: 240px;
+    width: 100%;
 
     overflow: hidden;
 }
@@ -1165,6 +1166,10 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
     padding: 15px 30px 0 0;
 }
 
+.ppom-admin-tabs-css .ppom-admin-tab-content .notice-info {
+    margin: 10px 0;
+    padding: 10px 5px;
+}
 /* CSS for popup.js */
 .ppom-popup-overlay {
     position: fixed;
@@ -1300,4 +1305,7 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 }
 .ppom-condition-style-wrap .ppom-only-if + div .ppom-condition-visible-bound {
     width: 120px;
+}
+.ppom-admin-tabs-css .ppom-admin-tab-content .notice-info p {
+    margin: 0;
 }

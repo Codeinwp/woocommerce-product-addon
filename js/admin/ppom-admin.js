@@ -419,7 +419,18 @@ jQuery(function($) {
 
         var field_model_id = 'ppom_field_model_' + field_no + '';
 
-        clone_new_field.find('.ppom_save_fields_model').end().appendTo('.ppom_save_fields_model').attr('id', field_model_id);
+        clone_new_field.find('.ppom_save_fields_model')
+        .end()
+        .appendTo('.ppom_save_fields_model')
+        .attr('id', field_model_id)
+        .find( '.ppom-tabs-header label.ppom-tabs-label' )
+        .each( function( index, item ) {
+            var tabId = $(item).attr('id');
+            var hasTabOptions = $( '#' + field_model_id, document )?.find( '.ppom_handle_' + tabId )?.length > 0;
+            if ( ! hasTabOptions ) {
+                $(item).hide();
+            }
+        } );
         clone_new_field.find('.ppom-field-checker').attr('data-field-index', field_no);
         clone_new_field.find('.ppom-field-checker').addClass('ppom-add-fields-js-action');
 
