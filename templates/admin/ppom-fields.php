@@ -3,8 +3,8 @@
 ** PPOM New Form Meta
 */
 
-/* 
-**========== Direct access not allowed =========== 
+/*
+**========== Direct access not allowed ===========
 */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -55,90 +55,396 @@ echo '<p><a href="' . esc_url( $url_cancel ) . '">' . __( '&laquo; Existing Prod
 
 $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 
+$license_data      = get_option( 'ppom_pro_license_data', array() );
+$plan_category     = NM_PersonalizedProduct_Admin::LICENSE_PLAN_FREE;
+$is_pro_installed  = ppom_pro_is_installed();
+$license_status    = $is_pro_installed && ! empty( $license_data->license ) ? $license_data->license : 'invalid';
+
+if ( $is_pro_installed && isset( $license_data->plan ) && is_numeric( $license_data->plan ) ) {
+	$plan_category = NM_PersonalizedProduct_Admin::get_license_category( intval( $license_data->plan ) );
+}
+
+$fields_groups = [
+	'text-group' => [
+		'label' => __( 'Text Inputs', 'woocommerce-product-addon' ),
+		'fields' => [
+			[
+				'slug'        => 'text',
+				'title'       => __( 'Text Input', 'woocommerce-product-addon' ),
+				'description' => __( 'Simple text field', 'woocommerce-product-addon' ),
+				'icon'        => 'fa-pencil-square-o'
+			],
+			[
+				'slug'        => 'textarea',
+				'title'       => __( 'Textarea Input', 'woocommerce-product-addon' ),
+				'description' => __( 'Simple area field', 'woocommerce-product-addon' ),
+				'icon'        => 'fa-file-text-o'
+			],
+			[
+				'slug'        => 'email',
+				'title'       => __( 'Email Input', 'woocommerce-product-addon' ),
+				'description' => __( 'Simple email field', 'woocommerce-product-addon' ),
+				'icon'        => 'fa-user-plus'
+			],
+			[
+				'slug'        => 'hidden',
+				'title'       => __( 'Hidden Input', 'woocommerce-product-addon' ),
+				'description' => __( 'Simple hidden field', 'woocommerce-product-addon' ),
+				'icon'        => 'fa-hashtag'
+			],
+			[
+				'slug'        => 'phone',
+				'title'       => __( 'Phone Input', 'woocommerce-product-addon' ),
+				'description' => __( 'Simple Phone field', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-check',
+			],
+			[
+				'slug'        => 'chained',
+				'title'       => __( 'Chained Input', 'woocommerce-product-addon' ),
+				'description' => __( 'Chained input field', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-check',
+			],
+			[
+				'slug'        => 'textcounter',
+				'title'       => __( 'Text Counter', 'woocommerce-product-addon' ),
+				'description' => __( 'Character count for input fields', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-comments-o',
+			]
+		]
+	],
+	'choices' => [
+		'label' => __( 'Choices', 'woocommerce-product-addon' ),
+		'fields' => [
+			[
+				'slug'        => 'checkbox',
+				'title'       => __( 'Checkbox', 'woocommerce-product-addon' ),
+				'description' => __( 'Checkbox Input', 'woocommerce-product-addon' ),
+				'icon'        => 'fa-check-square-o',
+			],
+			[
+				'slug'        => 'radio',
+				'title'       => __( 'Radio', 'woocommerce-product-addon' ),
+				'description' => __( 'Radio Input', 'woocommerce-product-addon' ),
+				'icon'        => 'fa-dot-circle-o',
+			],
+			[
+				'slug'        => 'select',
+				'title'       => __( 'Select', 'woocommerce-product-addon' ),
+				'description' => __( 'Select Input', 'woocommerce-product-addon' ),
+				'icon'        => 'fa-check',
+			],
+			[
+				'slug'        => 'switcher',
+				'title'       => __( 'Radio Switcher', 'woocommerce-product-addon' ),
+				'description' => __( 'Radio button switcher', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-dot-circle-o',
+			],
+			[
+				'slug'        => 'superlist',
+				'title'       => __( 'Super List', 'woocommerce-product-addon' ),
+				'description' => __( 'Advanced list input', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-check',
+			],
+		]
+	],
+	'visual-group' => [
+		'label' => __( 'Visual Inputs', 'woocommerce-product-addon' ),
+		'fields' => [
+			[
+				'slug'        => 'collapse',
+				'title'       => __( 'Collapse', 'woocommerce-product-addon' ),
+				'description' => __( 'Collapsible sections', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-money',
+			],
+			[
+				'slug'        => 'emojis',
+				'title'       => __( 'Emojis', 'woocommerce-product-addon' ),
+				'description' => __( 'Emoji picker for input fields', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-user-plus',
+			],
+			[
+				'slug'        => 'conditional_meta',
+				'title'       => __( 'Conditional Images', 'woocommerce-product-addon' ),
+				'description' => __( 'Images that change based on input conditions', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-picture-o',
+			],
+			[
+				'slug'        => 'imageselect',
+				'title'       => __( 'Image DropDown', 'woocommerce-product-addon' ),
+				'description' => __( 'Dropdown with image selections', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-file-image-o',
+			],
+			[
+				'slug'        => 'cropper',
+				'title'       => __( 'Image Cropper', 'woocommerce-product-addon' ),
+				'description' => __( 'Image cropping tool', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-crop',
+			],
+			[
+				'slug'        => 'texter',
+				'title'       => __( 'Personalization Preview', 'woocommerce-product-addon' ),
+				'description' => __( 'Preview for personalized products', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-keyboard-o',
+			],
+			[
+				'slug'        => 'color',
+				'title'       => __( 'Color Picker', 'woocommerce-product-addon' ),
+				'description' => __( 'Color picker input field', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-modx',
+			],
+			[
+				'slug'        => 'palettes',
+				'title'       => __( 'Color Palettes', 'woocommerce-product-addon' ),
+				'description' => __( 'Color palette selection', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-user-plus',
+			],
+		]
+	],
+	'advanced-group' => [
+		'label' => __( 'Advanced Inputs', 'woocommerce-product-addon' ),
+		'fields' => [
+			[
+				'slug'        => 'date',
+				'title'       => __( 'Date', 'woocommerce-product-addon' ),
+				'description' => __( 'Date input field', 'woocommerce-product-addon' ),
+				'icon'        => 'fa-calendar',
+			],
+			[
+				'slug'        => 'domain',
+				'title'       => __( 'Domain', 'woocommerce-product-addon' ),
+				'description' => __( 'Domain input field', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_3,
+				'icon'        => 'fa-server',
+			],
+			[
+				'slug'        => 'timezone',
+				'title'       => __( 'Timezone Input', 'woocommerce-product-addon' ),
+				'description' => __( 'Timezone selector for input fields', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-clock-o',
+			],
+			[
+				'slug'        => 'file',
+				'title'       => __( 'File Input', 'woocommerce-product-addon' ),
+				'description' => __( 'File upload field', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-file',
+			],
+			[
+				'slug'        => 'section',
+				'title'       => __( 'HTML', 'woocommerce-product-addon' ),
+				'description' => __( 'Custom HTML input field', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-code',
+			],
+			[
+				'slug'        => 'daterange',
+				'title'       => __( 'DateRange Input', 'woocommerce-product-addon' ),
+				'description' => __( 'Date range input field', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-table',
+			],
+			[
+				'slug'        => 'audio',
+				'title'       => __( 'Audio / Video', 'woocommerce-product-addon' ),
+				'description' => __( 'Audio and video input field', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-file-video-o',
+			],
+			[
+				'slug'        => 'fonts',
+				'title'       => __( 'Fonts Picker', 'woocommerce-product-addon' ),
+				'description' => __( 'Font selection tool', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-font',
+			],
+		]
+	],
+	'pricing-group' => [
+		'label' => __( 'Pricing & Quantity Inputs', 'woocommerce-product-addon' ),
+		'fields' => [
+			[
+				'slug'        => 'number',
+				'title'       => __( 'Number', 'woocommerce-product-addon' ),
+				'description' => __( 'Number Input', 'woocommerce-product-addon' ),
+				'icon'        => 'fa-hashtag',
+			],
+			[
+				'slug'        => 'fixedprice',
+				'title'       => __( 'Fixed Price', 'woocommerce-product-addon' ),
+				'description' => __( 'Fixed pricing options', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-money',
+			],
+			[
+				'slug'        => 'quantities',
+				'title'       => __( 'Select Option Quantity', 'woocommerce-product-addon' ),
+				'description' => __( 'Quantity selection with options', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_2,
+				'icon'        => 'fa-list-ol',
+			],
+			[
+				'slug'        => 'pricematrix',
+				'title'       => __( 'Price Matrix', 'woocommerce-product-addon' ),
+				'description' => __( 'Matrix-based pricing', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-usd',
+			],
+			[
+				'slug'        => 'qtypack',
+				'title'       => __( 'Quantities Pack', 'woocommerce-product-addon' ),
+				'description' => __( 'Pack-based quantity options', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-list-alt',
+			],
+			[
+				'slug'        => 'vqmatrix',
+				'title'       => __( 'Variation Quantity', 'woocommerce-product-addon' ),
+				'description' => __( 'Quantity selector for variations', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_3,
+				'icon'        => 'fa-list-ol',
+			],
+			[
+				'slug'        => 'measure',
+				'title'       => __( 'Measure Input', 'woocommerce-product-addon' ),
+				'description' => __( 'Measurement input field', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-building-o',
+			],
+			[
+				'slug'        => 'quantityoption',
+				'title'       => __( 'Quantity Option', 'woocommerce-product-addon' ),
+				'description' => __( 'Quantity selection options', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-money',
+			],
+		]
+	]
+];
+
 ?>
 
 <div class="ppom-admin-fields-wrapper">
 
 	<!-- All fields inputs name show -->
 	<div id="ppom_fields_model_id" class="ppom-modal-box ppom-fields-name-model">
-		<header>
+		<header class="ppom-modal-header">
 			<h3><?php _e( 'Select Field', 'woocommerce-product-addon' ); ?></h3>
+			<div class="ppom-search-container">
+				<input type="text" name="ppom-search-field" placeholder="<?php _e( 'Search Fields', 'woocommerce-product-addon' )?>" />
+				<span class="ppom-search-icon">
+					<i class="fa fa-search" aria-hidden="true"></i>
+				</span>
+			</div>
 		</header>
-		<div class="ppom-modal-body">
-			<ul class="list-group list-inline">
-				<?php
-				$free_fields = PPOM()->ppom_free_inputs();
-				foreach ( PPOM()->inputs as $field_type => $meta ) {
-					if ( $meta != null ) {
-						$fields_title = isset( $meta->title ) ? $meta->title : null;
-						$fields_icon  = isset( $meta->icon ) ? $meta->icon : null;
-
-						$is_locked = false;
-						if ( ppom_pro_is_installed() ) {
-							if ( ! PPOM()->ppom_is_license_of_type( 'pro' ) && ! array_key_exists( $field_type, $free_fields ) ) {
-								$is_locked = true;
-							}
-							if ( ! PPOM()->ppom_is_license_of_type( 'plus' ) && in_array( $field_type, array( 'qtypack' ), true ) ) {
-								$is_locked = true;
-							}
-							if ( ! PPOM()->ppom_is_license_of_type( 'vip' ) && in_array( $field_type, array( 'domain', 'vqmatrix' ), true ) ) {
-								$is_locked = true;
-							}
-						}
-						if ( ! $is_locked ) :
-							?>
-							<li class="ppom_select_field list-group-item"
-								data-field-type="<?php echo esc_attr( $field_type ); ?>">
-								<span class="ppom-fields-icon">
-									<?php echo $fields_icon; ?>
-								</span>
-								<span>
-									<?php echo $fields_title; ?>
-								</span>
-							</li>
-						<?php else : ?>
-							<li onclick="return;" class="ppom_select_field list-group-item locked">
-								<span class="ppom-fields-icon">
-									<?php echo $fields_icon; ?>
-								</span>
-								<span>
-									<?php echo $fields_title; ?>
-								</span>
-								<span>
-									<i class="fa fa-lock" aria-hidden="true"></i>
-								</span>
-								<span class="upsell-btn-wrapper">
-									<a target="_blank" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ),'lockedfields') ); ?>"><?php esc_html_e( 'Get Pro', 'woocommerce-product-addon' ); ?></a>
-								</span>
-							</li>
-						<?php endif; ?>
-						<?php
+		<div class="ppom-modal-body ppom-modal-add-field">
+			<div class="ppom-fields">
+				<div class="ppom-modal-shortcuts">
+					<?php
+					foreach( $fields_groups as $group_id => $group ) {
+					?>
+						<a
+							href="#<?php echo esc_attr( $group_id ) ?>"
+						>
+						<?php echo esc_html( $group['label'] ) ?>
+						</a>
+					<?php
 					}
-				}
-
-				// show only if pro is not activated.
-				if( ! ppom_pro_is_installed() ) {
-					foreach( PPOM_Freemium::get_instance()->get_pro_fields() as $field ) {
+					?>
+				</div>
+				<div class="ppom-fields-sections">
+					<?php
+					foreach( $fields_groups as $group_id => $group ) {
 						?>
-							<li onclick="return;" class="ppom_select_field list-group-item locked">
-								<span class="ppom-fields-icon">
-									<?php echo $field['icon']; ?>
-								</span>
-								<span>
-									<?php echo $field['title']; ?>
-								</span>
-								<span>
-									<i class="fa fa-lock" aria-hidden="true"></i>
-								</span>
-								<span class="upsell-btn-wrapper">
-									<a target="_blank" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ),'lockedfields') ); ?>"><?php esc_html_e( 'Get Pro', 'woocommerce-product-addon' ); ?></a>
-								</span>
-							</li>
+						<div class="ppom-fields-section">
+							<div class="ppom-fields-section-title">
+								<h5
+									id="<?php echo esc_attr( $group_id ) ?>"
+								>
+									<?php echo esc_html( $group['label'] ) ?>
+								</h5>
+							</div>
+							<div
+								class="ppom-fields-grid"
+							>
+								<?php
+								foreach( $group['fields'] as $field ) {
+									$is_locked = isset( $field['plan'] ) && $plan_category < $field['plan'];
+								?>
+									<button
+										class="ppom_select_field ppom-field-item <?php echo ( $is_locked ) ? 'ppom-locked-field' : ''; ?>"
+										data-field-type="<?php echo esc_attr( $field['slug'] ); ?>"
+									>
+										<span class="ppom-fields-icon">
+											<i class="fa <?php echo $field['icon']; ?>" aria-hidden="true"></i>
+										</span>
+										<span>
+											<?php echo esc_html( $field['title'] ); ?>
+										</span>
+										<?php
+										if ( $is_locked ) {
+										?>
+										<span class="upsell-btn-wrapper">
+											<a target="_blank" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ),'lockedfields') ); ?>">
+												<i class="fa fa-lock" aria-hidden="true"></i>
+												<?php _e( 'PRO', 'woocommerce-product-addon' ) ?>
+											</a>
+										</span>
+										<div class="upsell-tooltip">
+											<?php echo esc_html( $field['description'] ); ?>
+											<a target="_blank" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ),'lockedfields') ); ?>">
+												<?php _e( 'Unlock with PRO', 'woocommerce-product-addon' ) ?>
+											</a>
+										</div>
+										<?php
+										}
+										?>
+									</button>
+								<?php
+								}
+								?>
+							</div>
+						</div>
 						<?php
 					}
-				}
-				?>
-			</ul>
+					?>
+				</div>
+			</div>
+			<?php
+			if ( 'valid' !== $license_status ) {
+			?>
+			<div class="ppom-sidebar-upsell">
+				<div class="ppom-sidebar-upsell-header">
+					<i class="dashicons dashicons-lock"></i>
+					<h2><?php _e( 'Unlock all Features!', 'woocommerce-product-addon' ) ?></h2>
+				</div>
+				<div class="ppom-sidebar-upsell-content">
+					<p><?php _e( 'Upgrade to the Pro plan to unlock all features and enhance your product fields management capabilities:', 'woocommerce-product-addon' ) ?></p>
+					<div class="ppom-sidebar-upsell-features-grid">
+						<div><?php _e( 'Unlock 20+ input fields', 'woocommerce-product-addon' ) ?></div>
+						<div><?php _e( 'Meta Fields Repeater', 'woocommerce-product-addon' ) ?></div>
+						<div><?php _e( 'Cart Edit', 'woocommerce-product-addon' ) ?></div>
+						<div><?php _e( 'Quantities Pack', 'woocommerce-product-addon' ) ?></div>
+					</div>
+				</div>
+				<a target="_blank" href="<?php echo tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'add-field-modal', 'ppompage' ); ?>" class="cta-button">Get started!</a>
+			</div>
+			<?php
+			}
+			?>
 		</div>
 		<footer>
 			<button type="button"

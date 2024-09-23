@@ -386,7 +386,7 @@ jQuery(function($) {
     **/
     var option_index = 0;
     $(document).on('click', '.ppom_select_field', function(event) {
-        if( $(this).hasClass('locked') ) {
+        if( $(this).hasClass('ppom-locked-field') ) {
             return;
         }
 
@@ -1466,4 +1466,35 @@ jQuery(function($) {
             toggleHandler.setDisabledFields(itemEl.find('input[data-metatype="jquery_dp"]'));
         });
     })
+});
+
+/**
+ * Search Field for Add Field modal.
+ */
+document.querySelector('input[name="ppom-search-field"]')?.addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const sections = document.querySelectorAll('.ppom-fields-section');
+
+    sections.forEach(section => {
+        const buttons = section.querySelectorAll('.ppom-field-item');
+        let hasVisibleButton = false;
+
+        buttons.forEach(button => {
+            const text = button.textContent.toLowerCase();
+
+            if ( text.includes( query ) ) {
+                button.style.display = 'flex';
+                hasVisibleButton = true;
+            } else {
+                button.style.display = 'none';
+            }
+        });
+
+        // If no buttons in this section are visible, hide the section
+        if ( hasVisibleButton ) {
+            section.style.display = 'flex';
+        } else {
+            section.style.display = 'none';
+        }
+    });
 });
