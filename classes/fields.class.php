@@ -88,10 +88,14 @@ class PPOM_Fields_Meta {
 			// CSS Code Editor Files
 			wp_enqueue_style( 'ppom-codemirror-theme', PPOM_URL . '/css/codemirror-theme.css' );
 			$css_code_editor = wp_enqueue_code_editor( array( 'type' => 'text/css' ) );
+			$legacy_user     = ppom_is_legacy_user();
 			// ppom_pa($css_code_editor); exit;
 			if ( false !== $css_code_editor ) {
 				$css_code_editor['codemirror']['autoRefresh'] = true;
-				$css_code_editor['codemirror']['theme']       = 'darcula';
+				if ( $legacy_user ) {
+					$css_code_editor['codemirror']['readOnly'] = 'nocursor';
+				}
+				$css_code_editor['codemirror']['theme'] = 'darcula';
 				wp_add_inline_script(
 					'code-editor',
 					sprintf(
@@ -105,7 +109,10 @@ class PPOM_Fields_Meta {
 			$js_code_editor = wp_enqueue_code_editor( array( 'type' => 'text/javascript' ) );
 			if ( false !== $js_code_editor ) {
 				$js_code_editor['codemirror']['autoRefresh'] = true;
-				$js_code_editor['codemirror']['theme']       = 'darcula';
+				if ( $legacy_user ) {
+					$js_code_editor['codemirror']['readOnly'] = 'nocursor';
+				}
+				$js_code_editor['codemirror']['theme'] = 'darcula';
 				wp_add_inline_script(
 					'code-editor',
 					sprintf(

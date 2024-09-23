@@ -2404,3 +2404,15 @@ function ppom_check_pro_compatibility($feature_slug) {
 
 	return isset( PPOM_PRO_COMPATIBILITY_FEATURES[ $feature_slug ] ) && PPOM_PRO_COMPATIBILITY_FEATURES[ $feature_slug ];
 }
+
+/**
+ * Check is legacy user.
+ *
+ * @return bool
+ */
+function ppom_is_legacy_user() {
+	if ( ppom_pro_is_installed() && ( function_exists( '\PPOM_Pro\get_license_status' ) && 'valid' === \PPOM_Pro\get_license_status( false ) ) ) {
+		return false;
+	}
+	return 'no' === get_option( 'ppom_legacy_user', '' );
+}

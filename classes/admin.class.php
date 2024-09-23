@@ -85,6 +85,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			10
 		);
 
+		add_action( 'admin_init', array( $this, 'set_legacy_user' ) );
 		add_action( 'admin_init', array( $this, 'ppom_create_db_tables' ) );
 	}
 
@@ -492,6 +493,22 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		include_once PPOM_PATH . '/classes/survey.class.php';
 		PPOM_Survey::get_instance()->init();
 	}
+
+	/**
+	 * Set legacy user flag.
+	 */
+	public function set_legacy_user() {
+		if ( ! empty( get_option( 'ppom_legacy_user', '' ) ) ) {
+			return;
+		}
+
+		global $wpdb;
+		$ppom_meta_table = $wpdb->prefix . PPOM_TABLE_META;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$res = $wpdb->get_results( "SELECT * FROM `$ppom_meta_table` WHERE `productmeta_js` != '' OR `productmeta_style` != ''" );
+		update_option( 'ppom_legacy_user', ! empty( $res ) ? 'yes' : 'no' );
+	}
+
 
 	/**
 	 * Create database tables.
