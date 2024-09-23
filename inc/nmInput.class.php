@@ -303,13 +303,12 @@ class NM_Form {
 		$html .= 'data-price="' . esc_attr( ppom_get_product_price( $product ) ) . '" ';
 		$html .= 'data-title="' . esc_attr( $label ) . '" '; // Input main label/title
 		$html .= 'data-use_units="' . esc_attr( $use_units ) . '" '; // Input main label/title
-		// $html .= '<input type="text" class="form-control" aria-label="Text input with dropdown button">';
 
 		// Values
 		if ( $default_value != '' ) {
 			$html .= 'value="' . esc_attr( $default_value ) . '" ';
 		}
-
+		
 		// Attributes
 		foreach ( $attributes as $attr => $value ) {
 

@@ -430,10 +430,11 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 					break;
 
 				case 'measure':
-					$measer_qty   = isset( $option['qty'] ) ? intval( $option['qty'] ) : 0;
+					$measer_qty       = isset( $option['qty'] ) ? intval( $option['qty'] ) : 0;
+					$price_multiplier = isset( $option['price_multiplier'] ) ? floatval( $option['price_multiplier'] ) : 1;
 					$option_price = $option['price'];
 
-					$ppomm_measures *= $measer_qty;
+					$ppomm_measures *= $measer_qty * $price_multiplier;
 
 
 					break;
