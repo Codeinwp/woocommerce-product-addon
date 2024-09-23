@@ -207,7 +207,7 @@ function ppom_upload_file() {
 	$file_name       = strtolower( $file_name );
 	$file_path       = $file_dir_path . $file_name;
 	$file_ext        = pathinfo( $file_name, PATHINFO_EXTENSION );
-	$unique_hash     = md5( microtime() );
+	$unique_hash     = substr( hash( 'sha256', wp_generate_password( 8, false, false ) ), 0, 8 );
 	$file_name       = str_replace( ".$file_ext", ".$unique_hash.$file_ext", $file_name );
 	// var_dump($file_path); exit;
 
