@@ -344,17 +344,20 @@ function ppom_upload_file() {
 // Deleting file
 function ppom_delete_file() {
 
-	$file_name = sanitize_file_name( $_REQUEST ['file_name'] );
-
-	$ppom_nonce        = $_REQUEST['ppom_nonce'];
-	$file_nonce_action = 'ppom_deleting_file_action';
-	if ( ! wp_verify_nonce( $ppom_nonce, $file_nonce_action ) ) {
-		printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_name );
+	if ( ! isset( $_REQUEST ['file_name'] ) || ! isset( $_REQUEST['ppom_nonce'] ) ) {
+		echo __( 'Missing data.', 'woocommerce-product-addon' );
 		die( 0 );
 	}
 
-	$dir_path = ppom_get_dir_path();
+	$file_name         = sanitize_file_name( $_REQUEST ['file_name'] );
+	$ppom_nonce        = sanitize_key( $_REQUEST['ppom_nonce'] );
+	$file_nonce_action = 'ppom_deleting_file_action';
+	if ( ! wp_verify_nonce( $ppom_nonce, $file_nonce_action ) ) {
+		printf( __( 'Verification failed for file: %s', 'woocommerce-product-addon' ), $file_name );
+		die( 0 );
+	}
 
+	$dir_path  = ppom_get_dir_path();
 	$file_path = $dir_path . $file_name;
 	$is_image  = ppom_is_file_image( $file_path );
 	if ( file_exists( $file_path ) && unlink( $file_path ) ) {
@@ -378,7 +381,7 @@ function ppom_delete_file() {
 			printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
 		}
 	} else {
-		printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
+		printf( __( 'The file %s does not exists.', 'woocommerce-product-addon' ), $file_path );
 	}
 
 	die( 0 );
@@ -476,7 +479,7 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 		// Tools group
 		$file_tools .= '<div class="btn-group" role="group" aria-label="Tools" style="text-align: center; display: block;">';
 		// $file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="'.__('Remove', "woocommerce-product-addon").'"><span class="fa fa-times"></span></a>';
-		$file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '">' . __( 'Delete', 'woocommerce-product-addon' ) . '</span></a>';
+		$file_tools .= '<button class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '">' . __( 'Delete', 'woocommerce-product-addon' ) . '</button>';
 
 		if ( apply_filters( 'ppom_show_image_popup', false ) ) {
 			$file_tools .= '<a href="#" data-toggle="modal" data-target="#modalFile' . esc_attr( $file_id ) . '" class="btn btn-primary"><span class="fa fa-expand"></span></a>';
@@ -490,8 +493,10 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 		$file_meta .= __( 'Size: ', 'woocommerce-product-addon' ) . ppom_get_filesize_in_kb( $file_name );
 		$thumb_url  = PPOM_URL . '/images/file.png';
 
-		$file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '">' . __( 'Delete', 'woocommerce-product-addon' ) . '</a>';    // delete icon
-		// $file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="'.__('Remove', "woocommerce-product-addon").'">Delete</a>';	//delete icon
+		// Tools group
+		$file_tools .= '<div class="btn-group" role="group" aria-label="Tools" style="text-align: center; display: block;">';
+		$file_tools .= '<button class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '">' . __( 'Delete', 'woocommerce-product-addon' ) . '</button>';
+		$file_tools .= '</div>';
 	}
 
 

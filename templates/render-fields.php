@@ -743,6 +743,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 	if ( count( $collapse_fields ) === $ppom_collapse_counter && $section_started ) {
 		echo '</div>';
+		$section_started = false;
 	}
 }
 

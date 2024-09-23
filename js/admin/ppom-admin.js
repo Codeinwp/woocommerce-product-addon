@@ -55,7 +55,7 @@ jQuery(function($) {
     **/
     var append_overly_model = ("<div class='ppom-modal-overlay ppom-js-modal-close'></div>");
 
-    $(document).on('click', '[data-modal-id]', function(e) {
+    $(document).on('click', '[data-modal-id]:not(.ppom-is-pro-field)', function(e) {
         e.preventDefault();
         $("body").append(append_overly_model);
         var modalBox = $(this).attr('data-modal-id');
@@ -240,33 +240,11 @@ jQuery(function($) {
         }
     });
 
-
-    /**
-        8- On Fields Options Handle Add Option Last
-    **/
-    $('.webcontact-rules').each(function(i, meta_field) {
-
-        var selector_btn = $(this).closest('.ppom-slider');
-        selector_btn.find('.ppom-add-rule').not(':last').removeClass('ppom-add-rule').addClass('ppom-remove-rule')
-            .removeClass('btn-success').addClass('btn-danger')
-            .html('<i class="fa fa-minus" aria-hidden="true"></i>');
-
-    });
-    // $('.data-options').each(function(i, meta_field){
-
-    //     var selector_btn = $(this).closest('.ppom-slider');
-    //     selector_btn.find('.ppom-add-option').not(':last').removeClass('ppom-add-option').addClass('ppom-remove-option')
-    //    .removeClass('btn-success').addClass('btn-danger')
-    //    .html('<i class="fa fa-minus" aria-hidden="true"></i>');
-
-    // });
-
-
     /**
         9- Edit Existing Fields
     **/
     var lockedDataName = false;
-    $(document).on('click', '.ppom-edit-field', function(event) {
+    $(document).on('click', '.ppom-edit-field:not(.ppom-is-pro-field)', function(event) {
         event.preventDefault();
 
         var the_id = $(this).attr('id');
@@ -441,7 +419,18 @@ jQuery(function($) {
 
         var field_model_id = 'ppom_field_model_' + field_no + '';
 
-        clone_new_field.find('.ppom_save_fields_model').end().appendTo('.ppom_save_fields_model').attr('id', field_model_id);
+        clone_new_field.find('.ppom_save_fields_model')
+        .end()
+        .appendTo('.ppom_save_fields_model')
+        .attr('id', field_model_id)
+        .find( '.ppom-tabs-header label.ppom-tabs-label' )
+        .each( function( index, item ) {
+            var tabId = $(item).attr('id');
+            var hasTabOptions = $( '#' + field_model_id, document )?.find( '.ppom_handle_' + tabId )?.length > 0;
+            if ( ! hasTabOptions ) {
+                $(item).hide();
+            }
+        } );
         clone_new_field.find('.ppom-field-checker').attr('data-field-index', field_no);
         clone_new_field.find('.ppom-field-checker').addClass('ppom-add-fields-js-action');
 
@@ -882,27 +871,69 @@ jQuery(function($) {
 
         e.preventDefault();
 
-        var div = $(this).closest('.ppom-slider');
+        var div = $(this).parents('.form-group');
         var option_index = parseInt(div.find('.ppom-condition-last-id').val());
         div.find('.ppom-condition-last-id').val(option_index + 1);
 
-        var field_index = div.find('.ppom-fields-actions').attr('data-field-no');
-        var condition_clone = $('.webcontact-rules:last').clone();
+        var field_index = div.parents('.ppom-slider').find('.ppom-fields-actions').attr('data-field-no');
+        var cloneElement = $('.webcontact-rules:last', div);
+        var condition_clone = cloneElement.clone();
 
         var append_item = div.find('.ppom-condition-clone-js');
         condition_clone.find(append_item).end().appendTo(append_item);
+        
+        ppom_rename_rules_name();
 
         var field_type = '';
         var add_cond_selector = condition_clone.find('.ppom-conditional-keys');
         ppom_add_condition_set_index(add_cond_selector, field_index, field_type, option_index);
 
-        $('.ppom-slider').find('.webcontact-rules:not(:last) .ppom-add-rule')
-            .removeClass('ppom-add-rule').addClass('ppom-remove-rule')
+        if ( $(this).next('.ppom-remove-rule')?.length > 0 ) {
+            $(this).remove();
+            return;
+        }
+        $('.ppom-add-rule', cloneElement)
+        .removeClass('ppom-add-rule').addClass('ppom-remove-rule')
+        .removeClass('btn-success').addClass('btn-danger')
+        .html('<i class="fa fa-minus" aria-hidden="true"></i>');
+
+        // Last row.
+        var lastRow = jQuery('.webcontact-rules:visible:last');
+        if ( lastRow?.find('.ppom-remove-rule')?.length === 0 ) {
+            var cloneButton = lastRow?.find('.ppom-add-rule').clone();
+            cloneButton
+            .removeClass('ppom-add-rule').addClass('ppom-remove-rule ml-1')
             .removeClass('btn-success').addClass('btn-danger')
             .html('<i class="fa fa-minus" aria-hidden="true"></i>');
-    }).on('click', '.ppom-remove-rule', function(e) {
+            cloneButton.insertAfter(lastRow?.find('.ppom-add-rule'));
+        }
 
-        $(this).parents('.webcontact-rules:first').remove();
+    }).on('click', '.ppom-remove-rule', function(e) {
+        var removeButton = $(this );
+        if (removeButton.parents('.ppom-condition-clone-js')?.find('.webcontact-rules')?.length === 1) {
+            removeButton
+            .parents('.ppom-condition-clone-js')
+            .find('.webcontact-rules')
+            .find('select')
+            .val('')
+            .attr( 'selected', false )
+            .prop( 'selected', false );
+            $(this).remove();
+            ppom_rename_rules_name();
+            return false;
+        }
+        removeButton.parents('.webcontact-rules:first').remove();
+        // Last row.
+        var lastRow = jQuery('.webcontact-rules:visible:last');
+        if ( lastRow?.find('.ppom-add-rule')?.length === 0 ) {
+            var cloneButton = lastRow?.find('.ppom-remove-rule').clone();
+            cloneButton
+            .removeClass('ppom-remove-rule').addClass('ppom-add-rule')
+            .removeClass('btn-danger').addClass('btn-success')
+            .html('<i class="fa fa-plus" aria-hidden="true"></i>');
+            cloneButton.insertBefore(lastRow?.find('.ppom-remove-rule'));
+        }
+        ppom_rename_rules_name();
         e.preventDefault();
         return false;
     });
@@ -1153,6 +1184,17 @@ jQuery(function($) {
         });
     }
 
+    // Rename rules name.
+    function ppom_rename_rules_name() {
+        $('.webcontact-rules:visible' ).each(function( index, item ){
+            $(this).attr('id', 'rule-box-' + parseInt(index + 1))
+            .find('label')
+            .text(function(i,txt) {
+                return txt.replace(/\d+/, parseInt(index + 1));
+            });
+        });
+    }
+
 
     /**
         27- Get All Fields Title On Condition Element Value After Click On Condition Tab
@@ -1366,14 +1408,14 @@ jQuery(function($) {
 
     // Unsaved form exit confirmation.
     var unsaved = false;
-    $( ':input' ).change(function () {
+    $( '.ppom-main-field-wrapper :input' ).change(function () {
         if ( $( this ).parents( '.ppom-checkboxe-style' )?.length > 0 ) {
             unsaved = false;
             return;
         }    
         unsaved = true;
     });
-    $( document ).on( 'click', '.ppom-submit-btn input.btn, button.ppom_copy_field, button.ppom-add-fields-js-action', function() {
+    $( document ).on( 'click', '.ppom-submit-btn input.btn, button.ppom_copy_field, button.ppom-add-fields-js-action, button.ppom-js-modal-close', function() {
         if ( $(this).hasClass('ppom_copy_field') || $(this).hasClass( 'ppom-add-fields-js-action' ) ) {
             unsaved = true;
             return;
@@ -1402,6 +1444,11 @@ jQuery(function($) {
         .parents('.ppom_handle_condition_tab')
         .next('.ppom_handle_condition_tab')
         .toggleClass('ppom-disabled-overlay');
+    } );
+
+    $( document ).on( 'click', 'button.ppom-edit-field.ppom-is-pro-field', function() {
+        $('#ppom-lock-fields-upsell').fadeIn();
+       return false;
     } );
 
     $(document).ready(function(){

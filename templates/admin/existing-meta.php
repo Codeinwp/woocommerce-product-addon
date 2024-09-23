@@ -135,7 +135,7 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 </div>
 
 <!-- Upgrade to pro modal -->
-<div id="ppom-import-upsell" class="ppom-modal-box" style="display: none;">
+<div id="ppom-import-upsell" class="ppom-modal-box ppom-upsell-modal" style="display: none;">
 	<div class="ppom-modal-body">
 		<button type="button" aria-label="close" class="close-model ppom-js-modal-close"><span class="dashicons dashicons-no-alt"></span></button>
 		<div class="ppom-lock-icon">

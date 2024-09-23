@@ -80,51 +80,113 @@ function ppom_meta_list( $post ) {
 	$ppom         = new PPOM_Meta( $post->ID );
 	$all_meta     = PPOM()->get_product_meta_all();
 	$ppom_setting = admin_url( 'admin.php?page=ppom' );
+	
+	$html  = '<div class="options_group ppom-settings-container" style="max-height:375px; overflow:auto;">';
+	
+	// UP-SELL
+	$html .= '<a class="ppom-upsell-link" target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'product-edit', 'metabox' ) . '">';
+	$html .= '<span class="dashicons dashicons-external"></span> ';
+	$html .= __( 'Using multiple PPOM Fields on the same product is available in PRO.', 'woocommerce-product-addon' );
+	$html .= '</a>';
 
-	$html  = '<div class="options_group">';
-	$html .= '<p>' . __( 'Select Meta to Show Fields on this product', 'woocommerce-product-addon' );
-	// $html .= __(' Or <a target="_blank" class="button" href="'.esc_url($ppom_setting).'">Create New Meta</a>', 'woocommerce-product-addon');
-	$html .= '</p>';
+	// PPOM Fields select table.
+	$html .= '<table id="ppom_meta_sortable" class="wp-list-table widefat fixed striped">';
 
-	$html .= '<p>';
-	$html .= '<select name="ppom_product_meta" id="ppom_product_meta" class="select">';
-	$html .= '<option selected="selected"> ' . __( 'None', 'woocommerce-product-addon' ) . '</option>';
-
-	foreach ( $all_meta as $meta ) {
-
-		$html .= '<option value="' . esc_attr( $meta->productmeta_id ) . '" ';
-		$html .= selected( $ppom->single_meta_id, $meta->productmeta_id, false );
-		$html .= 'id="select_meta_group-' . $meta->productmeta_id . '">';
-		$html .= stripslashes( $meta->productmeta_name );
-		$html .= '</option>';
-	}
-	$html .= '</select>';
-
-	if ( $ppom->single_meta_id != 'None' ) {
-
-		$ppom_add_args = array(
-			'productmeta_id' => $ppom->single_meta_id,
-			'do_meta'        => 'edit',
-			'product_id'     => $post->ID,
-		);
-
-		$url_edit = add_query_arg( $ppom_add_args, $ppom_setting );
-		$html    .= ' <a class="button" href="' . esc_url( $url_edit ) . '" title="Edit"><span class="dashicons dashicons-edit"></span></a>';
-	}
-
-	// $html .= '<hr>';
-	// $html .= ' <a class="button button-primary" href="'.esc_url($ppom_setting).'">Create New Meta</a>';
-
-	$html .= '</p>';
+	$html .= '<div class="ppom-search-meta" style="text-align: right;">';
+	$html .= '<input type="text" class="ppom-search-meta-js" placeholder="' . __( 'Search Meta', 'woocommerce-product-addon' ) . '">';
+	$html .= '<a target="_blank" class="button button-primary" href="' . esc_url( $ppom_setting ) . '">' . __( 'Create New Meta', 'woocommerce-product-addon' ) . '</a>';
 	$html .= '</div>';
 
-	$ppom_add_args    = array(
-		'action'     => 'new',
-		'product_id' => $post->ID,
-	);
-	$ppom_setting_url = add_query_arg( $ppom_add_args, $ppom_setting );
+	$html .= '<thead><tr>';
+	$html .= '<th>' . __( 'Select Meta', 'woocommerce-product-addon' ) . '</th>';
+	$html .= '<th>' . __( 'Meta ID', 'woocommerce-product-addon' ) . '</th>';
+	$html .= '<th>' . __( 'Meta Name', 'woocommerce-product-addon' ) . '</th>';
+	$html .= '<th>' . __( 'Edit', 'woocommerce-product-addon' ) . '</th>';
+	$html .= '</tr></thead>';
+	
+	foreach ( $all_meta as $meta ) {
+		$html .= '<tr data-ppom-search="' . esc_attr( sanitize_key( $meta->productmeta_name ) ) . '" style="cursor: move;">';
 
-	$html .= sprintf( __( ' - <a href="%s" target="_blank">Create New Meta</a></p>', 'woocommerce-product-addon' ), esc_url( $ppom_setting_url ) );
+		// Select/Checkbox
+		$html .= '<td width="5%">';
+		$html .= '<input name="ppom_product_meta" type="radio" style="cursor:auto;-webkit-appearance:checkbox" value="' . esc_attr( $meta->productmeta_id ) . '" ';
+		if (
+			isset( $ppom->meta_id ) &&
+			(
+				(
+					is_array( $ppom->meta_id ) &&
+					in_array( $meta->productmeta_id, $ppom->meta_id )
+				) ||
+				(
+					is_numeric( $ppom->meta_id ) &&
+					$ppom->meta_id === $meta->productmeta_id
+				)
+			)
+		) {
+			$html .= ' checked ';
+		}
+		$html .= 'id="ppom-' . esc_attr( $meta->productmeta_id ) . '">';
+		$html .= '</td>';
+
+		// ID Column
+		$html .= '<td width="5%">' . $meta->productmeta_id . '</td>';
+
+		// Meta Name Column
+		$html .= '<td width="50%">' . stripslashes( $meta->productmeta_name ) . '</td>';
+
+		// Edit Meta Shortcut Column
+		$url_edit = add_query_arg(
+			array(
+				'productmeta_id' => $meta->productmeta_id,
+				'do_meta'        => 'edit',
+			),
+			$ppom_setting
+		);
+
+		$html .= '<td width="5%">';
+		$html .= '<a target="_blank" style="font-weight:600; color:#0073aa" href="' . esc_url( $url_edit ) . '"><span class="dashicons dashicons-edit"></span></a>';
+		$html .= '</td>';
+
+		$html .= '</tr>';
+	}
+
+	$html .= '</table>';
+	$html .= '</div>';
+
+	$html .= '<hr>';
+    $html  .= '<div class="ppom-settings-container">';
+    $html .= '<strong>' . __( 'PPOM PopUp Settings', 'woocommerce-product-addon' ) . ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' . '</strong>';
+    $html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input type="checkbox" disabled>' . __( 'Enable PopUp', 'woocommerce-product-addon' ) . '</label>';
+    $html .= '<label class="ppom-settings-container-item ppom-disabled-text">' . __( 'PopUp Button Label', 'woocommerce-product-addon' );
+    $html .= '<input type="text" disabled></label>';
+    $html .= '</div>';
+
+    $html .= '<hr>';
+    $html .= '<div class="ppom-settings-container">';
+    $html .= '<strong>' . __( 'PPOM Enquiry Form Settings', 'woocommerce-product-addon' ) . ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' . '</strong>';
+    $html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input disabled type="checkbox">' . __( 'Enable Enquiry Form', 'woocommerce-product-addon' ) . '</label>';
+    $html .= '</div>';
+
+	?>
+	<script type="text/javascript">
+		jQuery(function ($) {
+			jQuery(document).on('keyup', '.ppom-search-meta-js', function (e) {
+				e.preventDefault();
+
+				var div = $(this).parent().parent();
+				var search_val = $(this).val().toLowerCase();
+				if (search_val != '') {
+					div.find('#ppom_meta_sortable tbody tr').hide();
+					div.find('#ppom_meta_sortable tbody tr[data-ppom-search*="' + search_val + '"]').show();
+				} else {
+					div.find('#ppom_meta_sortable tbody tr:hidden').show();
+				}
+			});
+
+			$("#ppom_meta_sortable tbody").sortable();
+		});
+	</script>
+	<?php
 
 	echo apply_filters( 'ppom_select_meta_in_product', $html, $ppom, $all_meta );
 
@@ -243,22 +305,23 @@ function ppom_admin_save_form_meta() {
 		wp_send_json( $resp );
 	}
 
-	$dt = apply_filters(
-		'ppom_settings_meta_data_new',
-		array(
-			'productmeta_name'       => $productmeta_name,
-			'dynamic_price_display'  => $dynamic_price_hide,
-			'send_file_attachment'   => $send_file_attachment,
-			'show_cart_thumb'        => $show_cart_thumb,
-			'aviary_api_key'         => trim( $aviary_api_key ),
-			'productmeta_style'      => $productmeta_style,
-			'productmeta_js'         => $productmeta_js,
-			'productmeta_categories' => $productmeta_categories,
-			'the_meta'               => $product_meta,
-			'productmeta_created'    => current_time( 'mysql' ),
-		)
+	$ppom_settings_meta_data = array(
+		'productmeta_name'       => $productmeta_name,
+		'dynamic_price_display'  => $dynamic_price_hide,
+		'send_file_attachment'   => $send_file_attachment,
+		'show_cart_thumb'        => $show_cart_thumb,
+		'aviary_api_key'         => trim( $aviary_api_key ),
+		'productmeta_categories' => $productmeta_categories,
+		'the_meta'               => $product_meta,
+		'productmeta_created'    => current_time( 'mysql' ),
 	);
 
+	if ( ! ppom_is_legacy_user() ) {
+		$ppom_settings_meta_data['productmeta_style'] = $productmeta_style;
+		$ppom_settings_meta_data['productmeta_js']    = $productmeta_js;
+	}
+
+	$dt = apply_filters( 'ppom_settings_meta_data_new', $ppom_settings_meta_data );
 
 	// wp_send_json($dt);
 
@@ -398,22 +461,21 @@ function ppom_admin_update_form_meta() {
 		wp_send_json( $resp );
 	}
 
-
-	$dt = $dt = apply_filters(
-		'ppom_settings_meta_data_update',
-		array(
-			'productmeta_name'       => $productmeta_name,
-			'dynamic_price_display'  => $dynamic_price_hide,
-			'send_file_attachment'   => $send_file_attachment,
-			'show_cart_thumb'        => $show_cart_thumb,
-			'aviary_api_key'         => trim( $aviary_api_key ),
-			'productmeta_style'      => $productmeta_style,
-			'productmeta_js'         => $productmeta_js,
-			'productmeta_categories' => $productmeta_categories,
-			'the_meta'               => $product_meta,
-		),
-		$productmeta_id
+	$ppom_settings_meta_data = array(
+		'productmeta_name'       => $productmeta_name,
+		'dynamic_price_display'  => $dynamic_price_hide,
+		'send_file_attachment'   => $send_file_attachment,
+		'show_cart_thumb'        => $show_cart_thumb,
+		'aviary_api_key'         => trim( $aviary_api_key ),
+		'productmeta_categories' => $productmeta_categories,
+		'the_meta'               => $product_meta,
 	);
+	if ( ! ppom_is_legacy_user() ) {
+		$ppom_settings_meta_data['productmeta_style'] = $productmeta_style;
+		$ppom_settings_meta_data['productmeta_js']    = $productmeta_js;
+	}
+
+	$dt = apply_filters( 'ppom_settings_meta_data_update', $ppom_settings_meta_data, $productmeta_id );
 
 	// wp_send_json($dt);
 

@@ -1178,13 +1178,15 @@ function ppom_convert_options_to_key_val( $options, $meta, $product ) {
 		return $options;
 	}
 
+	if ( is_string( $options ) ) {
+		$options = json_decode( $options, true );
+	}
 
 	if ( ! apply_filters( 'ppom_is_option_convertable', true, $meta ) ) {
 		return $options;
 	}
 
 	$meta_type = isset( $meta['type'] ) ? $meta['type'] : '';
-
 
 	// Do not change options for cropper
 	// if( $meta['type'] == 'cropper' ) return $options;
@@ -1894,6 +1896,15 @@ function ppom_pro_is_installed() {
 	return class_exists( 'PPOM_PRO' );
 }
 
+/**
+ * Check is valid license activated.
+ *
+ * @return bool
+ */
+function ppom_pro_is_valid_license() {
+	return ppom_pro_is_installed() && apply_filters( 'product_ppom_license_status', '' ) === 'valid';
+}
+
 // Check if PPOM API is enable
 function ppom_is_api_enable() {
 
@@ -2412,4 +2423,16 @@ function ppom_check_pro_compatibility($feature_slug) {
 	}
 
 	return isset( PPOM_PRO_COMPATIBILITY_FEATURES[ $feature_slug ] ) && PPOM_PRO_COMPATIBILITY_FEATURES[ $feature_slug ];
+}
+
+/**
+ * Check is legacy user.
+ *
+ * @return bool
+ */
+function ppom_is_legacy_user() {
+	if ( ppom_pro_is_installed() && ( function_exists( '\PPOM_Pro\get_license_status' ) && 'valid' === \PPOM_Pro\get_license_status( false ) ) ) {
+		return false;
+	}
+	return 'no' === get_option( 'ppom_legacy_user', '' );
 }

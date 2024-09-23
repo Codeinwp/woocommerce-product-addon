@@ -84,6 +84,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			2,
 			10
 		);
+
+		add_action( 'admin_init', array( $this, 'set_legacy_user' ) );
+		add_action( 'admin_init', array( $this, 'ppom_create_db_tables' ) );
 	}
 
 	/**
@@ -398,6 +401,48 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			td.ppom-files-display a.button {
 				text-align: center;
 			}
+
+			.ppom-settings-container {
+				display: flex;
+				flex-direction: column;
+				gap: 15px;
+				margin: 10px 15px;
+			}
+
+			.ppom-settings-container-item {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			label.ppom-settings-container-item {
+				width: 100%;
+				max-width: 600px;
+				margin: unset;
+			}
+
+			.ppom-settings-container .ppom-upsell-link {
+				display: inline-flex;
+				align-items: center;
+				padding: 0.5rem 1rem;
+				font-size: 0.875rem;
+				font-weight: 500;
+				color: #2563eb;
+				background-color: #eff6ff;
+				border: 1px solid #bfdbfe;
+				border-radius: 0.375rem;
+				text-decoration: none;
+				transition: all 150ms ease-in-out;
+			}
+
+			.ppom-settings-container .ppom-upsell-link:hover {
+				background-color: #dbeafe;
+				color: #1d4ed8;
+			}
+
+			.ppom-settings-container .ppom-disabled-text {
+				color: #8d8d8d;
+			}
 		</style>
 		<?php
 	}
@@ -447,5 +492,32 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		// Call survey class.
 		include_once PPOM_PATH . '/classes/survey.class.php';
 		PPOM_Survey::get_instance()->init();
+	}
+
+	/**
+	 * Set legacy user flag.
+	 */
+	public function set_legacy_user() {
+		if ( ! empty( get_option( 'ppom_legacy_user', '' ) ) ) {
+			return;
+		}
+
+		global $wpdb;
+		$ppom_meta_table = $wpdb->prefix . PPOM_TABLE_META;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$res = $wpdb->get_results( "SELECT * FROM `$ppom_meta_table` WHERE `productmeta_js` != '' OR `productmeta_style` != ''" );
+		update_option( 'ppom_legacy_user', ! empty( $res ) ? 'yes' : 'no' );
+	}
+
+
+	/**
+	 * Create database tables.
+	 */
+	public function ppom_create_db_tables() {
+		if ( ! empty( get_option( 'personalizedproduct_db_version' ) ) ) {
+			return;
+		}
+
+		NM_PersonalizedProduct::activate_plugin();
 	}
 }

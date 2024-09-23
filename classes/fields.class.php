@@ -88,10 +88,14 @@ class PPOM_Fields_Meta {
 			// CSS Code Editor Files
 			wp_enqueue_style( 'ppom-codemirror-theme', PPOM_URL . '/css/codemirror-theme.css' );
 			$css_code_editor = wp_enqueue_code_editor( array( 'type' => 'text/css' ) );
+			$legacy_user     = ppom_is_legacy_user();
 			// ppom_pa($css_code_editor); exit;
 			if ( false !== $css_code_editor ) {
 				$css_code_editor['codemirror']['autoRefresh'] = true;
-				$css_code_editor['codemirror']['theme']       = 'darcula';
+				if ( $legacy_user ) {
+					$css_code_editor['codemirror']['readOnly'] = 'nocursor';
+				}
+				$css_code_editor['codemirror']['theme'] = 'darcula';
 				wp_add_inline_script(
 					'code-editor',
 					sprintf(
@@ -105,7 +109,10 @@ class PPOM_Fields_Meta {
 			$js_code_editor = wp_enqueue_code_editor( array( 'type' => 'text/javascript' ) );
 			if ( false !== $js_code_editor ) {
 				$js_code_editor['codemirror']['autoRefresh'] = true;
-				$js_code_editor['codemirror']['theme']       = 'darcula';
+				if ( $legacy_user ) {
+					$js_code_editor['codemirror']['readOnly'] = 'nocursor';
+				}
+				$js_code_editor['codemirror']['theme'] = 'darcula';
 				wp_add_inline_script(
 					'code-editor',
 					sprintf(
@@ -324,7 +331,9 @@ class PPOM_Fields_Meta {
 		$html_input  = '';
 
 		if ( ! is_array( $values ) ) {
-			$values = stripslashes( $values );
+			$values        = stripslashes( $values );
+			$decode_values = json_decode( $values, true );
+			$values        = is_array( $decode_values ) ? $decode_values : $values;
 		}
 
 		switch ( $type ) {
@@ -774,7 +783,7 @@ class PPOM_Fields_Meta {
 					$html_input .= '</select>';
 					$html_input .= '</div>';
 
-					$html_input .= '<div class="col-md-2 col-sm-2">';
+					$html_input .= '<div class="col-md-2 col-sm-2 ppom-only-if">';
 					$html_input .= '<p>' . __( 'only if', 'woocommerce-product-addon' ) . '</p>';
 					$html_input .= '</div>';
 
@@ -834,7 +843,12 @@ class PPOM_Fields_Meta {
 
 						// Add and remove btn
 						$html_input .= '<div class="col-md-2 col-sm-2">';
-						$html_input .= '<button class="btn btn-success ppom-add-rule" data-index="5"><i class="fa fa-plus" aria-hidden="true"></i></button>';
+						if ( $last_array_id === $rule_index ) {
+							$html_input .= '<button class="btn btn-success ppom-add-rule" data-index="5"><i class="fa fa-plus" aria-hidden="true"></i></button>';
+						}
+						if ( $last_array_id > 0 ) {
+							$html_input .= '<button class="btn btn-danger ppom-remove-rule ml-1" data-index="5"><i class="fa fa-minus" aria-hidden="true"></i></button>';
+						}
 						$html_input .= '</div>';
 						$html_input .= '</div>';
 

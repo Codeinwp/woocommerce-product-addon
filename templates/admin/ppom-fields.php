@@ -189,6 +189,15 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 					<input type="radio" name="css-tabs" id="ppom-style-tab">
 					<label for="ppom-style-tab" class="ppom-tab-label">Style</label>
 					<div class="ppom-admin-tab-content">
+						<?php if ( ppom_is_legacy_user() ) : ?>
+							<div class="row">
+								<div class="col-md-12 col-sm-12">
+									<div class="notice notice-info">
+										<p><?php echo sprintf( __( 'Custom CSS and JS customization is not available on your current plan. <a href="%s" target="_blank">Upgrade to the Pro</a> plan to unlock the ability to fully customize your fields\' appearance and functionality.', 'woocommerce-product-addon' ), esc_url( tsdk_utmify( PPOM_UPGRADE_URL, 'customstyle' ) ) ); ?></p>
+									</div>
+								</div>
+							</div>
+						<?php endif; ?>
 						<div class="row">
 							<div class="col-md-6 col-sm-12">
 								<div class="form-group">
@@ -395,7 +404,7 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 											title="<?php _e( 'Copy Field', 'woocommerce-product-addon' ); ?>"
 											id="<?php echo esc_attr( $f_index ); ?>"><span
 												class="dashicons dashicons-admin-page"></span></span></i></button>
-									<button class="btn ppom-edit-field"
+									<button class="btn ppom-edit-field<?php echo ! ppom_pro_is_valid_license() && ! isset( PPOM()->inputs[ $field_type ] ) ? ' ppom-is-pro-field' : ''; ?>"
 											data-modal-id="ppom_field_model_<?php echo esc_attr( $f_index ); ?>"
 											id="<?php echo esc_attr( $f_index ); ?>"
 											title="<?php _e( 'Edit Field', 'woocommerce-product-addon' ); ?>"><span
@@ -413,6 +422,35 @@ $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 				</table>
 			</div>
 		</form>
+	</div>
+</div>
+
+<!-- Upgrade to pro modal -->
+<div id="ppom-lock-fields-upsell" class="ppom-modal-box ppom-upsell-modal" style="display: none;">
+	<?php
+	$license     = get_option( 'ppom_pro_license_data', 'free' );
+	$license_key = '';
+	$download_id = '';
+	if ( ! empty( $license ) && ( is_object( $license ) && isset( $license->download_id ) ) ) {
+		$license_key = $license->key;
+		$download_id = $license->download_id;
+	}
+	$admin_license_url = admin_url( 'options-general.php#ppom_pro_license' );
+	$renew_license_url = tsdk_utmify( PPOM_STORE_URL . '?edd_license_key=' . $license_key . '&download_id=' . $download_id, 'ppom_license_block' );
+	?>
+	<div class="ppom-modal-body">
+		<button type="button" aria-label="close" class="close-model ppom-js-modal-close"><span class="dashicons dashicons-no-alt"></span></button>
+		<div class="ppom-lock-icon">
+			<span class="dashicons dashicons-lock"></span>		
+		</div>
+		<h3><?php esc_html_e( 'Alert!', 'woocommerce-product-addon' ); ?></h3>
+		<p>
+			<?php esc_html_e( 'In order to edit premium fields, benefit from updates and support for PPOM Premium plugin, please renew your license code or activate it.', 'woocommerce-product-addon' ); ?>
+		</p>
+		<div class="ppom-upsell-button">
+			<a class="btn btn-info mr-3" href="<?php echo esc_url( $renew_license_url ); ?>" target="_blank"><span class="dashicons dashicons-cart"></span> <?php esc_html_e( 'Renew License', 'woocommerce-product-addon' ); ?></a>
+			<a class="btn btn-success" href="<?php echo esc_url( $admin_license_url ); ?>" target="_blank"><span class="dashicons dashicons-unlock"></span> <?php esc_html_e( 'Activate License', 'woocommerce-product-addon' ); ?></a>
+		</div>
 	</div>
 </div>
 
