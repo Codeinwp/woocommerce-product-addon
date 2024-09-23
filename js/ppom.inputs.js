@@ -167,18 +167,46 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                     jQuery('.ppom-zoom-' + img_id).imageTooltip();
                 }
 
-                jQuery('.ppom-image-select input.ppom-input.image').click(function(){
-                    const multiple = jQuery(this).data('allow-multiple');
+                document.querySelectorAll('.ppom-image-select').forEach( ( /** @type{HTMLDivElement} */ container ) => {
 
-                    if( multiple ) {
-                        return;
-                    }
+                    /**
+                     * @type {HTMLInputElement[]} Holds the selected images.
+                     */
+                    const selectedImgs = [];
 
-                    if( jQuery(this).data('required') ) {
-                        jQuery(this).prop('checked', true);
-                    }
+                    container.querySelectorAll('.pre_upload_image').forEach( (/** @type{HTMLDivElement} */ inputContainer) => {
+                        const input = inputContainer.querySelector('input');
+                        if ( ! input ) {
+                            return;
+                        }
+                        
+                        const multiple = input.dataset.allowMultiple;
+    
+                        if ( ! multiple ) {
+                            if (input.dataset.required) {
+                                input.checked = true;
+                            }
+    
+                            const siblings = Array.from(input.parentNode.parentNode.querySelectorAll('input.ppom-input.image'));
+                            siblings.filter(sibling => sibling !== input).forEach(sibling => sibling.checked = false);
+                        } else {
+                            const maxImgSelection = parseInt( input.dataset?.maxSelection ?? '0' );
+                            if ( maxImgSelection ) {
+                                inputContainer.querySelector('img')?.addEventListener( 'click', () => {
+                                    selectedImgs.push( input );
 
-                    jQuery(this).parents('.ppom-image-select').find('input.ppom-input.image').not(this).prop('checked', false);
+                                    while( selectedImgs.length > maxImgSelection ) {
+                                        const oldestImgSelected = selectedImgs.shift();
+                                        if ( oldestImgSelected ) {
+                                            oldestImgSelected.checked = false;
+                                        }
+                                    }
+                                })
+
+                            }
+                        }
+                        
+                    });
                 });
 
                 // Data Tooltip

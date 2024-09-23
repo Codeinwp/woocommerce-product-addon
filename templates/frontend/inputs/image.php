@@ -13,10 +13,11 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-$fm               = new PPOM_InputManager( $field_meta, 'image' );
-$legacy_view      = $fm->get_meta_value( 'legacy_view' );
-$multiple_allowed = $fm->get_meta_value( 'multiple_allowed' );
-$show_popup       = $fm->get_meta_value( 'show_popup' );
+$fm                = new PPOM_InputManager( $field_meta, 'image' );
+$legacy_view       = $fm->get_meta_value( 'legacy_view' );
+$multiple_allowed  = $fm->get_meta_value( 'multiple_allowed' );
+$show_popup        = $fm->get_meta_value( 'show_popup' );
+$max_img_selection = $fm->get_meta_value( 'max_checked' );
 $required = isset($field_meta['required']) && $field_meta['required'] === 'on';
 
 $input_classes = $fm->input_classes();
@@ -122,6 +123,7 @@ $custom_attr = array();
 									data-optionid="<?php echo esc_attr( $option_id ); ?>"
 									data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 									value="<?php echo esc_attr( json_encode( $image ) ); ?>"
+									data-max-selected="<?php echo esc_attr( $max_img_selection ); ?>"
 									<?php echo $checked_option; ?>
 							>
 						<?php } else { ?>
@@ -223,6 +225,7 @@ $custom_attr = array();
 									data-optionid="<?php echo esc_attr( $option_id ); ?>"
 									data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 									value="<?php echo esc_attr( json_encode( $image ) ); ?>"
+									<?php if( $max_img_selection ) { ?> data-max-selection="<?php echo esc_attr( $max_img_selection ); ?>" <?php } ?>
 									<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 									<?php if( $multiple_allowed ) { ?> data-allow-multiple="yes" <?php } ?>
 									<?php if( $required ) { ?>data-required="yes"<?php } ?>
