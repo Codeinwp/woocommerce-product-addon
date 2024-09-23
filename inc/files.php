@@ -107,7 +107,7 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 
 	$ppom_html  = '<table class="table table-bordered">';
 	$ppom_html .= '<tr><td><a href="' . esc_url( $file_link ) . '" class="lightbox et_pb_lightbox_image" itemprop="image" title="' . esc_attr( $file_name ) . '">' . $thumb_html . '</a></td>';
-	$ppom_html .= '<td>' . esc_attr( ppom_files_trim_name( $file_name ) ) . '</td>';
+	$ppom_html .= '<td style="max-width:300px;text-align:left;">' . esc_attr( ppom_files_trim_name( $file_name ) ) . '</td>';
 	$ppom_html .= '</tr>';
 
 	// Checking if cropped file existing
@@ -206,7 +206,9 @@ function ppom_upload_file() {
 	$file_name       = wp_unique_filename( $file_path_thumb, $file_name );
 	$file_name       = strtolower( $file_name );
 	$file_path       = $file_dir_path . $file_name;
-
+	$file_ext        = pathinfo( $file_name, PATHINFO_EXTENSION );
+	$unique_hash     = md5( microtime() );
+	$file_name       = str_replace( ".$file_ext", ".$unique_hash.$file_ext", $file_name );
 	// var_dump($file_path); exit;
 
 	// Make sure the fileName is unique but only if chunking is disabled
@@ -523,23 +525,15 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 	return apply_filters( 'ppom_file_preview_html', $html, $file_name, $settings );
 }
 
-// Trim long filename to short
+/**
+ * File name.
+ *
+ * @param string $file_name File name.
+ *
+ * @return string
+ */
 function ppom_files_trim_name( $file_name ) {
-
-	$text_length = strlen( $file_name );
-
-	// for different language string
-	$string_utf8 = strlen( utf8_decode( $file_name ) );
-
-	$max_chars = apply_filters( 'ppom_trim_file_maxchar', 20 );
-
-	if ( $text_length > $max_chars && $text_length == $string_utf8 ) {
-		$trimmed_filename = substr_replace( $file_name, '...', $max_chars / 2, $text_length - $max_chars );
-	} else {
-		$trimmed_filename = $file_name;
-	}
-
-	return $trimmed_filename;
+	return $file_name;
 }
 
 
