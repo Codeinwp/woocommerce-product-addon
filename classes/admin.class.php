@@ -84,6 +84,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			2,
 			10
 		);
+
+		add_action( 'admin_init', array( $this, 'ppom_create_db_tables' ) );
 	}
 
 	/**
@@ -489,5 +491,16 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		// Call survey class.
 		include_once PPOM_PATH . '/classes/survey.class.php';
 		PPOM_Survey::get_instance()->init();
+	}
+
+	/**
+	 * Create database tables.
+	 */
+	public function ppom_create_db_tables() {
+		if ( ! empty( get_option( 'personalizedproduct_db_version' ) ) ) {
+			return;
+		}
+
+		NM_PersonalizedProduct::activate_plugin();
 	}
 }
