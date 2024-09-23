@@ -158,7 +158,7 @@ class NM_Image_wooproduct extends PPOM_Inputs {
 			'conditions'               => array(
 				'type'  => 'html-conditions',
 				'title' => __( 'Conditions', 'woocommerce-product-addon' ),
-				'desc'  => __( 'Tick it to turn conditional logic to work below', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Set rules to show or hide the field based on specific conditions', 'woocommerce-product-addon' ),
 			),
 		);
 

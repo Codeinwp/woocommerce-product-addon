@@ -90,53 +90,100 @@ jQuery(function($) {
     });
 
     // Deleting File
-    $(".ppom-wrapper").on('click', '.u_i_c_tools_del', function(e) {
+    document.querySelector('.ppom-wrapper')?.addEventListener('click', async function(e) {
+        if (
+            ! e.target.classList.contains('u_i_c_tools_del') ||
+            ! plupload_instances
+        ) {
+            return;
+        }
+
         e.preventDefault();
 
-        var del_message = ppom_file_vars.delete_file_msg;
-        var a = confirm(del_message);
-        if (a) {
-            // it is removing from uploader instance
-            var fileid = $(this).closest('.ppom-file-wrapper').attr("data-fileid");
-            var file_data_name = $(this).closest('div.ppom-field-wrapper').attr("data-data_name");
-            // console.log(fileid);
-            field_file_count[file_data_name] = 0;
+        const delMessage = ppom_file_vars.delete_file_msg;
+        if ( ! confirm( delMessage ) ) return;
 
-            plupload_instances[file_data_name].removeFile(fileid);
+        const ppomFileWrapper = e.target.closest('.ppom-file-wrapper');
+        const fileId = ppomFileWrapper?.getAttribute("data-fileid");
+        const ppomFieldWrapper = e.target.closest('div.ppom-field-wrapper');
+        const fileDataName = ppomFieldWrapper?.getAttribute("data-data_name");
 
-            var filename = $('input:checkbox[name="ppom[fields][' + file_data_name + '][' + fileid + '][org]"]').val();
+        if ( !fileId || !fileDataName ) return;
 
-            // it is removing physically if uploaded
-            $("#u_i_c_" + fileid).find('img').attr('src', ppom_file_vars.plugin_url + '/images/loading.gif');
+        field_file_count[fileDataName] = 0;
 
-            // console.log('filename ppom[fields][<?php echo ]$args['id']?>['+fileid+']');
-            var data = { action: 'ppom_delete_file', file_name: filename, 'ppom_nonce': ppom_file_vars.ppom_file_delete_nonce };
+        const uploaderInstance = plupload_instances[fileDataName];
+        if ( uploaderInstance ) {
+            uploaderInstance.removeFile(fileId);
+        }
 
-            $.post(ppom_file_vars.ajaxurl, data, function(resp) {
-                alert(resp);
-                $("#u_i_c_" + fileid).hide(500).remove();
+        const checkbox = document.querySelector(`input[name="ppom[fields][${fileDataName}][${fileId}][org]"]`);
+        const fileName = checkbox?.value;
 
-                // it is removing for input Holder
-                $('input:checkbox[name="ppom[fields][' + file_data_name + '][' + fileid + '][org]"]').remove();
+        if ( ! fileName ) return;
 
-                // Removing file container
-                $(this).closest('.u_i_c_box').remove();
+        // Delete animation.
+        const imageElement = document.querySelector(`#u_i_c_${fileId} img`);
+        if ( imageElement ) {
+            imageElement.src = `${ppom_file_vars.plugin_url}/images/loading.gif`;
+        }
 
-                // Removing cropper dom
-                if ($(".ppom-croppie-preview-" + fileid).length > 0) {
-                    $(".ppom-croppie-preview-" + fileid).remove();
+        const data = new URLSearchParams({
+            action: 'ppom_delete_file',
+            file_name: fileName,
+            ppom_nonce: ppom_file_vars.ppom_file_delete_nonce
+        });
+
+        try {
+            const response = await fetch(ppom_file_vars.ajaxurl, {
+                method: 'POST',
+                body: data,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
-
-                // Trigger
-                $.event.trigger({
-                    type: "ppom_uploaded_file_removed",
-                    field_name: file_data_name,
-                    fileid: fileid,
-                    time: new Date()
-                });
-
-                field_file_count[file_data_name] -= 1;
             });
+
+            const responseText = await response.text();
+            if ( ! response.ok ) {
+                confirm(`Error: ${responseText}`);
+                return;
+            }
+
+            // Update UI
+            const fileContainer = document.querySelector(`#u_i_c_${fileId}`);
+            if ( fileContainer ) {
+                fileContainer.remove();
+            }
+
+            if ( checkbox ) {
+                checkbox.remove();
+            }
+
+            const parentBox = e.target.closest('.u_i_c_box');
+            if ( parentBox ) {
+                parentBox.remove();
+            }
+
+            const croppiePreview = document.querySelector(`.ppom-croppie-preview-${fileId}`);
+            if ( croppiePreview ) {
+                croppiePreview.remove();
+            }
+
+            // Send action to PPOM_Validate
+            document.dispatchEvent(new CustomEvent("ppom_uploaded_file_removed", {
+                detail: {
+                    field_name: fileDataName,
+                    fileid: fileId,
+                    time: new Date()
+                }
+            }));
+
+            // Decrease file count
+            field_file_count[fileDataName] -= 1;
+
+        } catch (error) {
+            confirm(`Error: ${error.message}`);
         }
     });
 
@@ -407,9 +454,8 @@ function ppom_setup_file_upload_input(file_input) {
                     plupload.each(files, function(file) {
 
                         if (file.type.indexOf("image") !== -1 && file.type !== 'image/photoshop') {
-
-                            const img = new mOxie.Image;
-                            img.onload = function() {
+                            const img = new moxie.image.Image();
+                            img.load = function() {
 
                                 const img_height = this.height;
                                 const img_width = this.width;
