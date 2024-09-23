@@ -82,25 +82,29 @@ function ppom_meta_list( $post ) {
 	$ppom_setting = admin_url( 'admin.php?page=ppom' );
 	
 	$html  = '<div class="options_group ppom-settings-container" style="max-height:375px; overflow:auto;">';
-	
-	// UP-SELL
-	$html .= '<a class="ppom-upsell-link" target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'product-edit', 'metabox' ) . '">';
-	$html .= '<span class="dashicons dashicons-external"></span> ';
-	$html .= __( 'Using multiple PPOM Fields on the same product is available in PRO.', 'woocommerce-product-addon' );
-	$html .= '</a>';
 
+	if ( count( $all_meta ) > 1 ) {
+		// UP-SELL
+		$html .= '<a class="ppom-upsell-link" target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'product-edit', 'metabox' ) . '">';
+		$html .= '<span class="dashicons dashicons-external"></span> ';
+		$html .= __( 'Using multiple PPOM field groups on the same product is available in PRO.', 'woocommerce-product-addon' );
+		$html .= '</a>';
+	}
 	// PPOM Fields select table.
 	$html .= '<table id="ppom_meta_sortable" class="wp-list-table widefat fixed striped">';
+	//Hide search if we don't have many metas
 
 	$html .= '<div class="ppom-search-meta" style="text-align: right;">';
-	$html .= '<input type="text" class="ppom-search-meta-js" placeholder="' . __( 'Search Meta', 'woocommerce-product-addon' ) . '">';
-	$html .= '<a target="_blank" class="button button-primary" href="' . esc_url( $ppom_setting ) . '">' . __( 'Create New Meta', 'woocommerce-product-addon' ) . '</a>';
+	if ( count( $all_meta ) > 3 ) {
+		$html .= '<input type="text" class="ppom-search-meta-js" placeholder="' . __( 'Search Group', 'woocommerce-product-addon' ) . '">';
+	}
+	$html .= '<a target="_blank" class="button button-primary" href="' . esc_url( $ppom_setting ) . '">' . __( 'Create New Field Group', 'woocommerce-product-addon' ) . '</a>';
 	$html .= '</div>';
 
 	$html .= '<thead><tr>';
-	$html .= '<th>' . __( 'Select Meta', 'woocommerce-product-addon' ) . '</th>';
-	$html .= '<th>' . __( 'Meta ID', 'woocommerce-product-addon' ) . '</th>';
-	$html .= '<th>' . __( 'Meta Name', 'woocommerce-product-addon' ) . '</th>';
+	$html .= '<th>' . __( 'Select a Field Group', 'woocommerce-product-addon' ) . '</th>';
+	$html .= '<th>' . __( 'Group ID', 'woocommerce-product-addon' ) . '</th>';
+	$html .= '<th>' . __( 'Group Name', 'woocommerce-product-addon' ) . '</th>';
 	$html .= '<th>' . __( 'Edit', 'woocommerce-product-addon' ) . '</th>';
 	$html .= '</tr></thead>';
 	
@@ -109,7 +113,7 @@ function ppom_meta_list( $post ) {
 
 		// Select/Checkbox
 		$html .= '<td width="5%">';
-		$html .= '<input name="ppom_product_meta" type="radio" style="cursor:auto;-webkit-appearance:checkbox" value="' . esc_attr( $meta->productmeta_id ) . '" ';
+		$html .= '<input name="ppom_product_meta" type="radio" style="cursor:auto;" value="' . esc_attr( $meta->productmeta_id ) . '" ';
 		if (
 			isset( $ppom->meta_id ) &&
 			(
@@ -154,18 +158,14 @@ function ppom_meta_list( $post ) {
 	$html .= '</div>';
 
 	$html .= '<hr>';
-    $html  .= '<div class="ppom-settings-container">';
-    $html .= '<strong>' . __( 'PPOM PopUp Settings', 'woocommerce-product-addon' ) . ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' . '</strong>';
-    $html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input type="checkbox" disabled>' . __( 'Enable PopUp', 'woocommerce-product-addon' ) . '</label>';
-    $html .= '<label class="ppom-settings-container-item ppom-disabled-text">' . __( 'PopUp Button Label', 'woocommerce-product-addon' );
-    $html .= '<input type="text" disabled></label>';
-    $html .= '</div>';
+	$html .= '<div class="ppom-settings-container">';
+	$html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input type="checkbox" disabled>' . __( 'Enable Pop-up.', 'woocommerce-product-addon' ) . '<span class="woocommerce-help-tip" data-tip="' . __( 'Enable this option to display product fields in a popup instead of directly on the product page.' ) . '"></span><i>' . sprintf( __( 'Available in the %sPremium%s version.', 'woocommerce-product-addon' ), '<a  target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'enable-popup', 'metabox' ) . '">', '</a>' ) . '</i></label>';
+	$html .= '</div>';
 
-    $html .= '<hr>';
-    $html .= '<div class="ppom-settings-container">';
-    $html .= '<strong>' . __( 'PPOM Enquiry Form Settings', 'woocommerce-product-addon' ) . ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' . '</strong>';
-    $html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input disabled type="checkbox">' . __( 'Enable Enquiry Form', 'woocommerce-product-addon' ) . '</label>';
-    $html .= '</div>';
+	$html .= '<hr>';
+	$html .= '<div class="ppom-settings-container">';
+	$html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input disabled type="checkbox">' . __( 'Enable Enquiry Form', 'woocommerce-product-addon' ) . '<span class="woocommerce-help-tip" data-tip="' . __( 'Enhances your product pages by adding a customizable enquiry button. It allows customers to send inquiries directly to the admin about products with PPOM Fields via email.' ) . '"></span><i>' . sprintf( __( 'Available in the %sPremium%s version.', 'woocommerce-product-addon' ), '<a  target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'enable-enquiry', 'metabox' ) . '">', '</a>' ) . '</i></label>';
+	$html .= '</div>';
 
 	?>
 	<script type="text/javascript">
