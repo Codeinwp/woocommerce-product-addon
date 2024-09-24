@@ -45,11 +45,6 @@
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-
-.nmsf-migrate-back-btn {
-    border-radius: 0 !important;
-}
-
 .nmsf-wrapper textarea {
     min-height: 105px;
     max-height: 105px;
