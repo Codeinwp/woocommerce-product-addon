@@ -66,7 +66,7 @@ if ( $is_pro_installed && isset( $license_data->plan ) && is_numeric( $license_d
 
 $fields_groups = [
 	'text-group' => [
-		'label' => __( 'Text Inputs', 'woocommerce-product-addon' ),
+		'label' => __( 'Text', 'woocommerce-product-addon' ),
 		'fields' => [
 			[
 				'slug'        => 'text',
@@ -87,6 +87,12 @@ $fields_groups = [
 				'icon'        => 'fa-user-plus'
 			],
 			[
+				'slug'        => 'number',
+				'title'       => __( 'Number', 'woocommerce-product-addon' ),
+				'description' => __( 'Number Input', 'woocommerce-product-addon' ),
+				'icon'        => 'fa-hashtag',
+			],
+			[
 				'slug'        => 'hidden',
 				'title'       => __( 'Hidden Input', 'woocommerce-product-addon' ),
 				'description' => __( 'Simple hidden field', 'woocommerce-product-addon' ),
@@ -98,20 +104,6 @@ $fields_groups = [
 				'description' => __( 'Simple Phone field', 'woocommerce-product-addon' ),
 				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
 				'icon'        => 'fa-check',
-			],
-			[
-				'slug'        => 'chained',
-				'title'       => __( 'Chained Input', 'woocommerce-product-addon' ),
-				'description' => __( 'Chained input field', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
-				'icon'        => 'fa-check',
-			],
-			[
-				'slug'        => 'textcounter',
-				'title'       => __( 'Text Counter', 'woocommerce-product-addon' ),
-				'description' => __( 'Character count for input fields', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
-				'icon'        => 'fa-comments-o',
 			]
 		]
 	],
@@ -150,17 +142,25 @@ $fields_groups = [
 				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
 				'icon'        => 'fa-check',
 			],
+			[
+				'slug'        => 'chained',
+				'title'       => __( 'Chained Input', 'woocommerce-product-addon' ),
+				'description' => __( 'Linked dropdown selections where choices in one field depend on previous selections.', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-check',
+			],
 		]
 	],
 	'visual-group' => [
-		'label' => __( 'Visual Inputs', 'woocommerce-product-addon' ),
+		'label' => __( 'Media', 'woocommerce-product-addon' ),
 		'fields' => [
+
 			[
-				'slug'        => 'collapse',
-				'title'       => __( 'Collapse', 'woocommerce-product-addon' ),
-				'description' => __( 'Collapsible sections', 'woocommerce-product-addon' ),
+				'slug'        => 'file',
+				'title'       => __( 'File Input', 'woocommerce-product-addon' ),
+				'description' => __( 'File upload field', 'woocommerce-product-addon' ),
 				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
-				'icon'        => 'fa-money',
+				'icon'        => 'fa-file',
 			],
 			[
 				'slug'        => 'emojis',
@@ -184,6 +184,13 @@ $fields_groups = [
 				'icon'        => 'fa-file-image-o',
 			],
 			[
+				'slug'        => 'audio',
+				'title'       => __( 'Audio / Video', 'woocommerce-product-addon' ),
+				'description' => __( 'Audio and video input field', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-file-video-o',
+			],
+			[
 				'slug'        => 'cropper',
 				'title'       => __( 'Image Cropper', 'woocommerce-product-addon' ),
 				'description' => __( 'Image cropping tool', 'woocommerce-product-addon' ),
@@ -196,7 +203,41 @@ $fields_groups = [
 				'description' => __( 'Preview for personalized products', 'woocommerce-product-addon' ),
 				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
 				'icon'        => 'fa-keyboard-o',
+			]
+		]
+	],
+	'advanced-group' => [
+		'label' => __( 'Special Format', 'woocommerce-product-addon' ),
+		'fields' => [
+			[
+				'slug'        => 'date',
+				'title'       => __( 'Date', 'woocommerce-product-addon' ),
+				'description' => __( 'Date input field', 'woocommerce-product-addon' ),
+				'icon'        => 'fa-calendar',
 			],
+			[
+				'slug'        => 'timezone',
+				'title'       => __( 'Timezone Input', 'woocommerce-product-addon' ),
+				'description' => __( 'Timezone selector for input fields', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-clock-o',
+			],
+
+			[
+				'slug'        => 'daterange',
+				'title'       => __( 'DateRange Input', 'woocommerce-product-addon' ),
+				'description' => __( 'Date range input field', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-table',
+			],
+			[
+				'slug'        => 'section',
+				'title'       => __( 'HTML', 'woocommerce-product-addon' ),
+				'description' => __( 'Custom HTML input field', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-code',
+			],
+
 			[
 				'slug'        => 'color',
 				'title'       => __( 'Color Picker', 'woocommerce-product-addon' ),
@@ -211,17 +252,14 @@ $fields_groups = [
 				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
 				'icon'        => 'fa-user-plus',
 			],
-		]
-	],
-	'advanced-group' => [
-		'label' => __( 'Advanced Inputs', 'woocommerce-product-addon' ),
-		'fields' => [
 			[
-				'slug'        => 'date',
-				'title'       => __( 'Date', 'woocommerce-product-addon' ),
-				'description' => __( 'Date input field', 'woocommerce-product-addon' ),
-				'icon'        => 'fa-calendar',
+				'slug'        => 'fonts',
+				'title'       => __( 'Fonts Picker', 'woocommerce-product-addon' ),
+				'description' => __( 'Font selection tool', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-font',
 			],
+
 			[
 				'slug'        => 'domain',
 				'title'       => __( 'Domain', 'woocommerce-product-addon' ),
@@ -230,58 +268,24 @@ $fields_groups = [
 				'icon'        => 'fa-server',
 			],
 			[
-				'slug'        => 'timezone',
-				'title'       => __( 'Timezone Input', 'woocommerce-product-addon' ),
-				'description' => __( 'Timezone selector for input fields', 'woocommerce-product-addon' ),
+				'slug'        => 'textcounter',
+				'title'       => __( 'Text Counter', 'woocommerce-product-addon' ),
+				'description' => __( 'Character count for input fields', 'woocommerce-product-addon' ),
 				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
-				'icon'        => 'fa-clock-o',
+				'icon'        => 'fa-comments-o',
 			],
 			[
-				'slug'        => 'file',
-				'title'       => __( 'File Input', 'woocommerce-product-addon' ),
-				'description' => __( 'File upload field', 'woocommerce-product-addon' ),
+				'slug'        => 'collapse',
+				'title'       => __( 'Collapse', 'woocommerce-product-addon' ),
+				'description' => __( 'Group and toggle other input fields within a collapsible section, helping to organize long forms more efficiently.', 'woocommerce-product-addon' ),
 				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
-				'icon'        => 'fa-file',
-			],
-			[
-				'slug'        => 'section',
-				'title'       => __( 'HTML', 'woocommerce-product-addon' ),
-				'description' => __( 'Custom HTML input field', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
-				'icon'        => 'fa-code',
-			],
-			[
-				'slug'        => 'daterange',
-				'title'       => __( 'DateRange Input', 'woocommerce-product-addon' ),
-				'description' => __( 'Date range input field', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
-				'icon'        => 'fa-table',
-			],
-			[
-				'slug'        => 'audio',
-				'title'       => __( 'Audio / Video', 'woocommerce-product-addon' ),
-				'description' => __( 'Audio and video input field', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
-				'icon'        => 'fa-file-video-o',
-			],
-			[
-				'slug'        => 'fonts',
-				'title'       => __( 'Fonts Picker', 'woocommerce-product-addon' ),
-				'description' => __( 'Font selection tool', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
-				'icon'        => 'fa-font',
+				'icon'        => 'fa-money',
 			],
 		]
 	],
 	'pricing-group' => [
-		'label' => __( 'Pricing & Quantity Inputs', 'woocommerce-product-addon' ),
+		'label' => __( 'Pricing & Quantity', 'woocommerce-product-addon' ),
 		'fields' => [
-			[
-				'slug'        => 'number',
-				'title'       => __( 'Number', 'woocommerce-product-addon' ),
-				'description' => __( 'Number Input', 'woocommerce-product-addon' ),
-				'icon'        => 'fa-hashtag',
-			],
 			[
 				'slug'        => 'fixedprice',
 				'title'       => __( 'Fixed Price', 'woocommerce-product-addon' ),
@@ -342,7 +346,7 @@ $fields_groups = [
 	<!-- All fields inputs name show -->
 	<div id="ppom_fields_model_id" class="ppom-modal-box ppom-fields-name-model">
 		<header class="ppom-modal-header">
-			<h3><?php _e( 'Select Field', 'woocommerce-product-addon' ); ?></h3>
+			<h3><?php _e( 'Select Field Type', 'woocommerce-product-addon' ); ?></h3>
 			<div class="ppom-search-container">
 				<input type="text" name="ppom-search-field" placeholder="<?php _e( 'Search Fields', 'woocommerce-product-addon' )?>" />
 				<span class="ppom-search-icon">
@@ -353,7 +357,11 @@ $fields_groups = [
 		<div class="ppom-modal-body ppom-modal-add-field">
 			<div class="ppom-fields">
 				<div class="ppom-modal-shortcuts">
+                    <a  href="#all">
+						<?php echo __( 'All', 'woocommerce-product-addon' ) ?>
+                    </a>
 					<?php
+
 					foreach( $fields_groups as $group_id => $group ) {
 					?>
 						<a
@@ -369,7 +377,7 @@ $fields_groups = [
 					<?php
 					foreach( $fields_groups as $group_id => $group ) {
 						?>
-						<div class="ppom-fields-section">
+						<div class="ppom-fields-section" id="<?php echo esc_attr( $group_id ) ?>-ppom-fields">
 							<div class="ppom-fields-section-title">
 								<h5
 									id="<?php echo esc_attr( $group_id ) ?>"
@@ -398,20 +406,19 @@ $fields_groups = [
 										if ( $is_locked ) {
 										?>
 										<span class="upsell-btn-wrapper">
-											<a target="_blank" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ),'lockedfields') ); ?>">
+											<a target="_blank" href="#">
 												<i class="fa fa-lock" aria-hidden="true"></i>
 												<?php _e( 'PRO', 'woocommerce-product-addon' ) ?>
 											</a>
 										</span>
-										<div class="upsell-tooltip">
-											<?php echo esc_html( $field['description'] ); ?>
-											<a target="_blank" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ),'lockedfields') ); ?>">
-												<?php _e( 'Unlock with PRO', 'woocommerce-product-addon' ) ?>
-											</a>
-										</div>
 										<?php
 										}
+
 										?>
+
+                                        <p class="upsell-tooltip">
+											<?php echo esc_html( $field['description'] ); ?>
+                                        </p>
 									</button>
 								<?php
 								}
@@ -434,7 +441,7 @@ $fields_groups = [
 				<div class="ppom-sidebar-upsell-content">
 					<p><?php _e( 'Upgrade to the Pro plan to unlock all features and enhance your product fields management capabilities:', 'woocommerce-product-addon' ) ?></p>
 					<div class="ppom-sidebar-upsell-features-grid">
-						<div><?php _e( 'Unlock 20+ input fields', 'woocommerce-product-addon' ) ?></div>
+						<div><?php _e( 'Unlock 30+ input fields', 'woocommerce-product-addon' ) ?></div>
 						<div><?php _e( 'Meta Fields Repeater', 'woocommerce-product-addon' ) ?></div>
 						<div><?php _e( 'Cart Edit', 'woocommerce-product-addon' ) ?></div>
 						<div><?php _e( 'Quantities Pack', 'woocommerce-product-addon' ) ?></div>

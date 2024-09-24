@@ -584,10 +584,9 @@ ul.ppom-options-container li {
 }
 
 .ppom-modal-box {
-    position: fixed;
+    position: absolute;
     top: 30px;
     right: 0;
-    max-height: 90%;
     left: 0;
     z-index: 1050;
     display: none;
@@ -1111,12 +1110,11 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 
 .ppom-fields-name-model .upsell-btn-wrapper {
     background: #28A745;
-    padding: 4px 8px 4px 8px;
+    padding: 2px 6px 2px 6px;
     top: 0;
     position: absolute;
     right: 0px;
     border-radius: 3px;
-    height: 24px;
 }
 
 .ppom-fields-name-model .upsell-btn-wrapper a {
@@ -1408,7 +1406,7 @@ header.ppom-modal-header {
 /* ADD FIELD MODAL */
 .ppom-fields-grid {
     display: grid;
-    grid-template-columns: repeat( 3, 280px );
+    grid-template-columns: repeat( 3, 230px );
     gap: 15px;
 }
 
@@ -1418,19 +1416,16 @@ header.ppom-modal-header {
     align-items: center;
     justify-content: flex-start;
     gap: 10px;
-    
-    padding: 16px;
-    font-size: 15px;
+    padding: 8px;
+    font-size: 12px;
     border-radius: 5px;
     border: 1px solid #0069DB;
-    font-weight: bolder;
-
+    /* font-weight: bolder; */
     color: white;
     background-color: #027BFF;
 }
 
 .ppom-field-item .ppom-fields-icon i {
-    font-size: 24px;
     width: 24px;
 }
 
@@ -1438,13 +1433,14 @@ header.ppom-modal-header {
     font-weight: 400;
     color: #6C6F72;
     background-color: #FAFAFA;
+    cursor: not-allowed;
     border-color: #EFEFEF;
 }
 
 .ppom-fields-sections {
     display: flex;
     flex-direction: column;
-    gap: 50px;
+    gap: 30px;
     max-height: 600px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -1457,7 +1453,6 @@ header.ppom-modal-header {
 }
 
 .ppom-fields-sections .ppom-fields-section-title h5 {
-    font-size: 22px;
     font-weight: 600;
 }
 
@@ -1473,9 +1468,7 @@ header.ppom-modal-header {
 }
 
 .ppom-modal-shortcuts {
-    margin: 0;
-    margin-bottom: 30px;
-
+    margin: 0 0 20px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -1516,9 +1509,7 @@ header.ppom-modal-header {
 }
 
 .ppom-fields:has(.ppom-fields-sections) {
-    padding: 40px;
-    padding-right: 10px;
-    padding-bottom: 0;
+    padding: 10px 10px 20px 40px;
 }
 
 .ppom-search-container input::placeholder {
@@ -1625,25 +1616,23 @@ header.ppom-modal-header {
     display: flex;
     align-items: center;
     gap: 5px;
-
-    font-size: 12px;
+    font-size: 80%;
+    text-decoration: none;
 }
 
-.ppom-field-item .upsell-btn-wrapper i {
-    font-size: 16px;
-}
 
 /* UP-SELL TOOLTIP */
 
 .upsell-tooltip {
-    width: 280px;
     position: absolute;
-    bottom: 113%;
+    bottom: 75%;
     left: 50%;
     transform: translateX(-50%);
     background-color: black;
     color: white;
-    padding: 16px;
+    max-width: 230px;
+    width: max-content;
+    padding: 7px 10px;
     border-radius: 5px;
     font-size: 13px;
     text-align: center;
@@ -1668,7 +1657,7 @@ header.ppom-modal-header {
     border-width: 5px;
     border-style: solid;
     border-color: black transparent transparent transparent;
-  }
+}
 
 .ppom-field-item:hover .upsell-tooltip {
     visibility: visible;

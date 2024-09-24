@@ -1467,7 +1467,29 @@ jQuery(function($) {
         });
     })
 });
+document.querySelectorAll('.ppom-modal-shortcuts a')?.forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Get the href attribute and use it as the ID to display the corresponding section
+        const targetId = this.getAttribute('href');
+        if (targetId === '#all') {
+            // Show all sections
+            document.querySelectorAll('.ppom-fields-section').forEach(section => {
+                section.style.display = 'block';
+            });
+        } else {
+            // Hide all sections with the class 'ppom-fields-section'
+            document.querySelectorAll('.ppom-fields-section').forEach(section => {
+                section.style.display = 'none';
+            });
 
+            const targetSection = document.querySelector(targetId + '-ppom-fields');
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+        }
+    });
+});
 /**
  * Search Field for Add Field modal.
  */
