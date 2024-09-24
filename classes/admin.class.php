@@ -257,24 +257,253 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			die( 0 );
 		}
 
-		global $wpdb;
+		if ( ! isset( $_GET['ppom_id'] ) ) {
+			_e( 'Input Field is missing.', 'woocommerce-product-addon' );
+			die( 0 );
+		}
 
-		$all_product_data = $wpdb->get_results( 'SELECT ID,post_title FROM `' . $wpdb->prefix . "posts` where post_type='product' and post_status = 'publish'" );
+		$ppom_id             = intval( $_GET['ppom_id'] );
+		$has_pro_active      = 'valid' === apply_filters( 'product_ppom_license_status', '' );
+		$current_saved_value = $this->get_db_field( $ppom_id );
 
-		$ppom_id = intval( $_GET['ppom_id'] );
+		$select_products_id_component = (new \PPOM\Attach\SelectComponent())
+			->set_id( 'attach-to-products' )
+			->set_title( __( 'Display on Specific Products', 'woocommerce-product-addon') )
+			->set_description( __( 'Select the product(s) where you want these product fields to appear.', 'woocommerce-product-addon') )
+			->set_select(
+				array_merge(
+					array(
+						'label'    => __( 'Choose Products:', 'woocommerce-product-addon'),
+						'name'     => 'ppom-attach-to-products[]',
+						'multiple' => $has_pro_active,
+						'is_used'  => true
+					),
+					$this->get_wc_products( $ppom_id )
+				)
+			);
+
+		$attach_to_categories_component = (new \PPOM\Attach\SelectComponent())
+			->set_id( 'attach-to-categories' )
+			->set_title( __( 'Display in Specific Product Categories', 'woocommerce-product-addon') )
+			->set_description( __( 'Select the product categories where you want these product fields to appear.', 'woocommerce-product-addon') )
+			->set_select(
+				array_merge(
+					array(
+						'label'    => __( 'Choose Categories:', 'woocommerce-product-addon'),
+						'name'     => 'ppom-attach-to-categories[]',
+						'multiple' => true
+					),
+					$this->get_wc_categories( $ppom_id, $current_saved_value )
+				)
+			);
+
+		$attach_to_tags_component = (new \PPOM\Attach\SelectComponent())
+			->set_id( 'attach-to-tags' )
+			->set_title( __( 'Display in Specific Product Tags', 'woocommerce-product-addon') )
+			->set_description( __( 'Select the product tags where you want these product fields to appear.', 'woocommerce-product-addon') )
+			->set_select(
+				array_merge(
+					array(
+						'label'    => __( 'Choose tags:', 'woocommerce-product-addon'),
+						'name'     => 'ppom-attach-to-tags[]',
+						'multiple' => true
+					),
+					$this->get_wc_tags( $ppom_id, $current_saved_value )
+				)
+			);
+
+		$popup_components = array(
+			new \PPOM\Attach\ContainerItem( $select_products_id_component->get_id(), $select_products_id_component ),
+			new \PPOM\Attach\ContainerItem( $attach_to_categories_component->get_id(), $attach_to_categories_component ),
+			new \PPOM\Attach\ContainerItem( $attach_to_tags_component->get_id(), $attach_to_tags_component )
+		);
+		$popup_components = apply_filters( 'pppom_popup_components', $popup_components, $ppom_id );
+
+		add_filter('ppom_render_attach_popup', function( $html_content ) use ( $popup_components ) {
+			if ( empty( $popup_components ) || ! is_array( $popup_components ) ) {
+				return $html_content;
+			}
+
+			foreach ( $popup_components as $component ) {
+				if ( ! $component instanceof \PPOM\Attach\ContainerItem ) {
+					continue;
+				}
+				$html_content .= $component->get_renderer()->render();
+			}
+
+			return $html_content;
+		});
 
 		ob_start();
 		$vars = array(
-			'product_list' => $all_product_data,
 			'ppom_id'      => $ppom_id,
 		);
 		ppom_load_template( 'admin/products-list.php', $vars );
 
 		$list_html = ob_get_clean();
 
-		echo ppom_esc_html( $list_html );
+		echo $list_html;
 
 		die( 0 );
+	}
+
+	function get_wc_products( $ppom_id ) {
+		$result = array(
+			'options' => array(),
+			'is_used' => true
+		);
+
+		if ( 'valid' === apply_filters( 'product_ppom_license_status', '' ) ) {
+			$result['options'][]= array(
+				'value'    => '-1',
+				'selected' => false,
+				'label'    => __( 'Select a product', 'woocommerce-product-addon'),
+				'disabled' => true
+			);
+		}
+
+		$query = new WP_Query(
+			array(
+				'post_type'      => 'product',
+				'posts_per_page' => -1, // Get all products
+				'post_status'    => 'publish'
+			)
+		);
+
+		if ( ! $query->have_posts() ) {
+			return $result;
+		}
+
+		while ( $query->have_posts() ) {
+			$query->the_post();
+
+			$is_used       = false;
+			$product_id    = get_the_ID();
+			$attached_meta = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
+
+			if ( is_array( $attached_meta ) ) {
+				$is_used = in_array( $ppom_id, $attached_meta );
+			} else if ( is_numeric( $attached_meta ) ) {
+				$is_used = $product_id === $attached_meta; // Note: Legacy format.
+			}
+
+			if ( $is_used ) {
+				$result['is_used'] = true;
+			}
+
+			$result['options'][]= array(
+				'value'    => $product_id,
+				'selected' => $is_used,
+				'label'    => get_the_title()
+			);
+		}
+
+		wp_reset_postdata();
+		return $result;
+	}
+
+	public function get_wc_categories( $ppom_id, $current_values ) {
+		$result = array(
+			'options' => array(),
+			'is_used' => false
+		);
+
+		$product_categories = get_terms(
+			array(
+				'taxonomy'   => 'product_cat', // WooCommerce product categories
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+				'hide_empty' => false, // Show all categories, even if empty
+			)
+		);
+
+		// Check if there are categories
+		if ( empty( $product_categories ) || is_wp_error( $product_categories ) ) {
+			return $result;
+		}
+
+		$used_categories = array();
+		if ( ! empty( $current_values['productmeta_categories'] ) ) {
+			$used_categories = explode( "\n", $current_values['productmeta_categories'] );
+		}
+
+		foreach ( $product_categories as $category ) {
+			$category_slug = $category->slug;
+			$is_used = in_array( $category_slug, $used_categories );
+
+			if( $is_used ) {
+				$result['is_used'] = true;
+			}
+
+			$result['options'][]= array(
+				'value'    => $category_slug,
+				'selected' => $is_used,
+				'label'    => $category->name
+			);
+		}
+
+		return $result;
+	}
+
+	function get_wc_tags( $ppom_id, $current_values ) {
+		$result = array(
+			'options' => array(),
+			'is_used' => false
+		);
+
+		$product_tags = get_terms(
+			array(
+				'taxonomy'   => 'product_tag',
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+				'hide_empty' => false, // Show all tags, even if empty
+			)
+		);
+
+		// Check if there are tags
+		if ( empty( $product_tags ) || is_wp_error( $product_tags ) ) {
+			return $result;
+		}
+
+		$used_tags = array();
+
+		if ( ! empty( $current_values['productmeta_tags'] ) ) {
+			$used_tags = maybe_unserialize( $current_values['productmeta_tags'] );
+			if ( ! is_array( $used_tags ) ) {
+				$used_tags = array();
+			}
+		}
+
+		foreach ( $product_tags as $tag ) {
+			$tag_slug = $tag->slug;
+			$is_used = in_array( $tag_slug, $used_tags );
+
+			if ( $is_used ) {
+				$result['is_used'] = true;
+			}
+
+			$result['options'][]= array(
+				'value'    => $tag_slug,
+				'selected' => $is_used,
+				'label'    => $tag->name
+			);
+		}
+
+		return $result;
+	}
+
+	function get_db_field( $ppom_field_id ) {
+		global $wpdb;
+		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT productmeta_categories, productmeta_tags FROM $ppom_table WHERE productmeta_id = %d",
+				$ppom_field_id
+			),
+			ARRAY_A
+		);
+
+		return 0 < count( $rows ) && ! empty( $rows[0] ) ? $rows[0] : array();
 	}
 
 	/**
@@ -285,7 +514,6 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @return void
 	 */
 	function ppom_attach_ppoms() {
-
 		if ( ! isset( $_POST['ppom_attached_nonce'] )
 			 || ! wp_verify_nonce( $_POST['ppom_attached_nonce'], 'ppom_attached_nonce_action' )
 			 || ! ppom_security_role()
@@ -298,33 +526,83 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			wp_send_json( $response );
 		}
 
-		// wp_send_json($_POST);
-		$response = array();
+		$ppom_id          = intval( $_POST['ppom_id'] );
+		$is_pro_user      = 'valid' === apply_filters( 'product_ppom_license_status', '' );
 
-		$ppom_id = intval( $_POST['ppom_id'] );
+		// +----- Attach Field to Product -----+
+		$products_to_attach         = isset( $_POST['ppom-attach-to-products'] ) && is_array( $_POST['ppom-attach-to-products'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-products'] ) : array();
+		$products_to_attach_initial = isset( $_POST['ppom-attach-to-products-initial'] ) && is_string( $_POST['ppom-attach-to-products-initial'] ) ? sanitize_text_field( $_POST['ppom-attach-to-products-initial'] ) : '';
+		$products_to_attach_initial = array_filter( explode( ',' , $products_to_attach_initial ) );
 
-		$ppom_udpated = 0;
-		// Reset
-		if ( isset( $_POST['ppom_removed'] ) ) {
+		$products_to_add = array_diff( $products_to_attach, $products_to_attach_initial );
+		foreach ( $products_to_add as $product_to_add ) {
 
-			foreach ( $_POST['ppom_removed'] as $product_id ) {
+			// NOTE: PRO users can add the field to multiple products.
+			if ( $is_pro_user ) {
+				$current_attached_fields = get_post_meta( $product_to_add, PPOM_PRODUCT_META_KEY, true );
 
-				delete_post_meta( intval( $product_id ), PPOM_PRODUCT_META_KEY );
-				$ppom_udpated ++;
+				if ( is_array( $current_attached_fields ) ) {
+					$current_attached_fields[]= $ppom_id;
+					$current_attached_fields  = array_unique( $current_attached_fields );
+				} else if ( is_numeric( $current_attached_fields ) ) {
+					// NOTE: Backward compatibility.
+					$current_attached_fields = array( $current_attached_fields, $ppom_id );
+				} else {
+					$current_attached_fields = array( $ppom_id );
+				}
+
+				$current_attached_fields = array_filter( $current_attached_fields, 'is_numeric' );
+				update_post_meta( $product_to_add , PPOM_PRODUCT_META_KEY, $current_attached_fields );
+			} else {
+				update_post_meta( $product_to_add , PPOM_PRODUCT_META_KEY, array( $ppom_id ) );
 			}
 		}
 
-		if ( isset( $_POST['ppom_attached'] ) ) {
+		$products_to_remove = array_diff( $products_to_attach_initial, $products_to_attach );
+		foreach ( $products_to_remove as $product_to_remove ) {
+			$should_delete           = true;
+			$current_attached_fields = get_post_meta( $product_to_remove, PPOM_PRODUCT_META_KEY, true );
+			if ( is_array( $current_attached_fields ) ) {
+				$key = array_search($ppom_id, $current_attached_fields);
+				if ( false !== $key ) {
+					unset( $current_attached_fields[$key] );
+					if ( ! empty( $current_attached_fields ) ) {
+						$should_delete = false;
+						update_post_meta( $product_to_remove , PPOM_PRODUCT_META_KEY, $current_attached_fields );
+					}
+				}
+			}
 
-			foreach ( $_POST['ppom_attached'] as $product_id ) {
-
-				update_post_meta( intval( $product_id ), PPOM_PRODUCT_META_KEY, $ppom_id );
-				$ppom_udpated ++;
+			if ( $should_delete ) {
+				delete_post_meta( $product_to_remove, PPOM_PRODUCT_META_KEY );
 			}
 		}
+
+		$updated_products = count( $products_to_add ) + count( $products_to_remove );
+
+		// +----- Attach Field to Categories -----+
+		$categories_to_attach = isset( $_POST['ppom-attach-to-categories'] ) && is_array( $_POST['ppom-attach-to-categories'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-categories'] ) : array();
+		$updated_cat          = count( $categories_to_attach );
+
+		// +----- Attach Field to Tags -----+
+		$categories_to_tags = isset( $_POST['ppom-attach-to-tags'] ) && is_array( $_POST['ppom-attach-to-tags'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-tags'] ) : array();
+		$updated_tags       = count( $categories_to_tags );
+
+		global $wpdb;
+		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
+		$wpdb->update(
+			$ppom_table,
+			array(
+				'productmeta_categories' => implode( "\n", $categories_to_attach ), // NOTE: Keep the backward compatible format.
+				'productmeta_tags'       => serialize( $categories_to_tags )
+			), // Data to update
+			array( 'productmeta_id' => $ppom_id ), // Where clause
+			array( '%s' ), // Data format
+			array( '%d' )  // Where format
+		);
 
 		$response = array(
-			'message' => "PPOM updated for {$ppom_udpated} Products",
+			'message' => "PPOM updated for {$updated_products} Products, {$updated_cat} Categories and {$updated_tags} Tags.",
 			'status'  => 'success',
 		);
 
@@ -402,7 +680,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				flex-direction: column;
 				gap: 3px;
 			}
-			
+
 			td.ppom-files-display a.button {
 				text-align: center;
 			}

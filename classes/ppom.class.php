@@ -22,9 +22,9 @@ class PPOM_Meta {
 	/**
 	 * Plugin category array.
 	 *
-	 * @var array $ppom_with_cat
+	 * @var array $ppom_categories_and_tags_row
 	 */
-	public $ppom_with_cat = array();
+	public $ppom_categories_and_tags_row = array();
 
 	/**
 	 * Plugin settings.
@@ -92,7 +92,7 @@ class PPOM_Meta {
 	/**
 	 * Fields.
 	 *
-	 * @var string $fields
+	 * @var array $fields
 	 */
 	public $fields = array();
 
@@ -102,11 +102,11 @@ class PPOM_Meta {
 	// $product_id can be null if get instance to get data by meta_id
 	function __construct( $product_id = null ) {
 
-		self::$wc_product    = wc_get_product( $product_id );
-		$this->category_meta = [];
-		$this->ppom_with_cat = $this->all_ppom_with_categories();
-		$this->meta_id       = $this->get_meta_id( $product_id );
-		self::$product_id    = $product_id;
+		self::$wc_product                   = wc_get_product( $product_id );
+		$this->category_meta                = [];
+		$this->ppom_categories_and_tags_row = $this->all_ppom_with_categories();
+		$this->meta_id                      = $this->get_meta_id( $product_id );
+		self::$product_id                   = $product_id;
 
 
 		$this->ppom_settings = $this->settings();
@@ -120,7 +120,7 @@ class PPOM_Meta {
 			'get_fields_by_id',
 			'settings',
 			'all_ppom_with_categories',
-			'ppom_has_category_meta',
+			'ppom_has_category_or_tag_meta',
 			'get_meta_id',
 			'get_fields',
 			'has_unique_datanames',
@@ -161,7 +161,7 @@ class PPOM_Meta {
 
 
 		// Checking if PPOM attached in category
-		$ppom_in_category = $this->ppom_has_category_meta( $product_id );
+		$ppom_in_category = $this->ppom_has_category_or_tag_meta( $product_id );
 		// if( $ppom_in_category && ! is_admin() ){
 		if ( $ppom_in_category ) {
 
@@ -224,14 +224,10 @@ class PPOM_Meta {
 	// QM-5
 	function single_meta_id() {
 
-		$single_meta = $this->meta_id;
+		$single_meta = ( $this->meta_id == 0 || $this->meta_id == 'None' || empty( $this->meta_id ) ) ? null : $this->meta_id;
 
-		if ( $this->has_multiple_meta() ) {
-			$single_meta = $this->meta_id[0];
-		}
-
-		if ( $this->meta_id == 0 || $this->meta_id == 'None' ) {
-			$single_meta = null;
+		if ( is_array( $single_meta) && 0 < count( $single_meta ) ) {
+			$single_meta =  $single_meta[0];
 		}
 
 		return $single_meta;
@@ -362,32 +358,33 @@ class PPOM_Meta {
 		return apply_filters( 'ppom_meta_fields_by_id', $meta_fields, $ppom_ids, $this );
 	}
 
-	function ppom_has_category_meta( $product_id ) {
+	function ppom_has_category_or_tag_meta( $product_id ) {
 
-		$p_categories = get_the_terms( $product_id, 'product_cat' );
-
-		// ppom_pa($p_categories);
-		// ppom_pa($this->ppom_with_cat);
+		$product_categories = get_the_terms( $product_id, 'product_cat' );
+		$product_tags       = get_the_terms( $product_id, 'product_tag' );
 
 		$meta_found = array();
-		if ( $p_categories ) {
+		if ( $product_categories && $product_tags && $this->ppom_categories_and_tags_row ) {
+			foreach ( $this->ppom_categories_and_tags_row as $row ) {
+				
+				if ( $row->productmeta_categories === 'All' ) {
+					$meta_found[] = $row->productmeta_id;
+				} else {
+					// making array of meta cats
+					$meta_cat_array = explode( "\r\n", $row->productmeta_categories );
+					// Now iterating the product_categories to check it's slug in meta cats
+					foreach ( $product_categories as $cat ) {
+						if ( in_array( $cat->slug, $meta_cat_array ) ) {
+							$meta_found[] = $row->productmeta_id;
+						}
+					}
+				}
 
-			if ( $this->ppom_with_cat ) {
-				foreach ( $this->ppom_with_cat as $meta_cats ) {
-
-					// if( $meta_found )   //if we found any meta so dont need to loop again
-					// continue;
-
-					if ( $meta_cats->productmeta_categories == 'All' ) {
-						$meta_found[] = $meta_cats->productmeta_id;
-					} else {
-						// making array of meta cats
-						$meta_cat_array = explode( "\r\n", $meta_cats->productmeta_categories );
-						// Now iterating the p_categories to check it's slug in meta cats
-						foreach ( $p_categories as $cat ) {
-							if ( in_array( $cat->slug, $meta_cat_array ) ) {
-								$meta_found[] = $meta_cats->productmeta_id;
-							}
+				$attached_tags = maybe_unserialize( $row->productmeta_tags );
+				if ( is_array( $attached_tags ) ) {
+					foreach( $product_tags as $product_tag ) {
+						if ( in_array( $product_tag->slug, $attached_tags ) ) {
+							$meta_found[] = $row->productmeta_id;
 						}
 					}
 				}
@@ -404,11 +401,9 @@ class PPOM_Meta {
 		global $wpdb;
 		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
 
-		$qry            = "SELECT productmeta_id,  productmeta_categories FROM {$ppom_table}";
-		$qry           .= " WHERE productmeta_categories != ''";
-		$meta_with_cats = $wpdb->get_results( $qry );
+		$qry = "SELECT productmeta_id, productmeta_categories, productmeta_tags FROM {$ppom_table} WHERE productmeta_categories != '' OR productmeta_tags != ''";
 
-		return $meta_with_cats;
+		return $wpdb->get_results( $qry );
 	}
 
 	// check meta settings: ajax validation
@@ -441,11 +436,21 @@ class PPOM_Meta {
 		if ( ! $this->ppom_settings ) {
 			return null;
 		}
-
-		if ( $this->ppom_settings->productmeta_style != '' ) {
-			$inline_css = stripslashes( strip_tags( $this->ppom_settings->productmeta_style ) );
-			$id = $this->meta_id[0];
-			$inline_css = str_replace( 'selector', ".ppom-id-$id", $inline_css );
+		
+		if (
+			isset( $this->ppom_settings->productmeta_style ) &&
+			is_string( $this->ppom_settings->productmeta_style ) &&
+			$this->ppom_settings->productmeta_style !== ''
+		) {
+			if ( is_array( $this->meta_id ) ) {
+				$template = stripslashes( strip_tags( $this->ppom_settings->productmeta_style ) );
+				foreach( $this->meta_id as $field_id ) {
+					$inline_css .= str_replace( 'selector', ".ppom-id-$field_id", $template );
+				}
+			} else if ( is_numeric( $this->meta_id ) ) {
+				$inline_css = stripslashes( strip_tags( $this->ppom_settings->productmeta_style ) );
+				$inline_css = str_replace( 'selector', ".ppom-id-$this->meta_id", $inline_css );
+			}
 		}
 
 		return apply_filters( 'ppom_inline_css', $inline_css, $this );

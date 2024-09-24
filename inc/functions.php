@@ -320,10 +320,12 @@ function ppom_make_meta_data( $cart_item, $context = 'cart' ) {
 
 	// Fields sanitization.
 	$ppom = new PPOM_Meta( $product_id );
-	foreach( $ppom->fields as $field ) {
-		$data_name = sanitize_key( $field['data_name'] );
-		if ( isset( $cart_item['ppom']['fields'][$data_name] ) ) {
-			$cart_item['ppom']['fields'][$data_name] = ppom_recursive_sanitization( $cart_item['ppom']['fields'][$data_name] );
+	if ( is_array( $ppom->fields ) ) {
+		foreach( $ppom->fields as $field ) {
+			$data_name = sanitize_key( $field['data_name'] );
+			if ( isset( $cart_item['ppom']['fields'][$data_name] ) ) {
+				$cart_item['ppom']['fields'][$data_name] = ppom_recursive_sanitization( $cart_item['ppom']['fields'][$data_name] );
+			}
 		}
 	}
 

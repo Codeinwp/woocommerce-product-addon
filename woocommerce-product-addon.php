@@ -58,7 +58,6 @@ function ppom_i18n_setup() {
 	load_plugin_textdomain( 'woocommerce-product-addon', false, basename( dirname( __FILE__ ) ) . '/languages' );
 }
 
-
 require_once PPOM_PATH . '/inc/functions.php';
 require_once PPOM_PATH . '/inc/validation.php';
 require_once PPOM_PATH . '/inc/deprecated.php';
@@ -78,6 +77,10 @@ if( is_admin() ) {
 
 /*
  ======= For now we are including class file, we will replace  =========== */
+require_once PPOM_PATH . '/classes/attach-popup/container-item.class.php';
+require_once PPOM_PATH . '/classes/attach-popup/container-view.class.php';
+require_once PPOM_PATH . '/classes/attach-popup/select-component.class.php';
+
 // include_once PPOM_PATH . "/classes/nm-framework.php";
 require_once PPOM_PATH . '/classes/input.class.php';
 require_once PPOM_PATH . '/classes/fields.class.php';
@@ -168,3 +171,5 @@ add_action(
 
 register_activation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'activate_plugin' ) );
 register_deactivation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'deactivate_plugin' ) );
+
+add_action('upgrader_process_complete', array( 'NM_PersonalizedProduct', 'check_for_plugin_update' ), 10, 2);

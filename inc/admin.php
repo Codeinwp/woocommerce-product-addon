@@ -201,15 +201,16 @@ function ppom_meta_list( $post ) {
 function ppom_admin_process_product_meta( $post_id ) {
 
 
-	$ppom_meta_selected = isset( $_POST ['ppom_product_meta'] ) ? $_POST ['ppom_product_meta'] : '';
-
-	// sanitization
-	if ( is_array( $ppom_meta_selected ) ) {
-		$ppom_meta_selected = array_map( 'intval', $ppom_meta_selected );
-	} else {
-		$ppom_meta_selected = intval( $ppom_meta_selected );
+	$ppom_meta_selected = isset( $_POST ['ppom_product_meta'] ) ? $_POST ['ppom_product_meta'] : array();
+	
+	if ( is_numeric( $ppom_meta_selected ) ) {
+		$ppom_meta_selected = array( $ppom_meta_selected );
+	} else if ( ! is_array( $ppom_meta_selected ) ) {
+		$ppom_meta_selected = array();
 	}
-
+	
+	$ppom_meta_selected = array_map( 'intval', $ppom_meta_selected );
+	
 	// ppom_pa($ppom_meta_selected); exit;
 	update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $ppom_meta_selected );
 

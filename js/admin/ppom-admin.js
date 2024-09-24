@@ -16,7 +16,7 @@ jQuery(function($) {
 
 
     /*-------------------------------------------------------
-        
+
         ------ Its Include Following Function -----
 
         1- Submit PPOM Form Fields
@@ -513,7 +513,7 @@ jQuery(function($) {
         clone_new_field.removeClass('ppom_sort_id_' + model_id_no + '');
         clone_new_field.addClass('ppom_sort_id_' + field_no + '');
 
-        // field attr name apply on all fields meta with ppom-meta-field class 
+        // field attr name apply on all fields meta with ppom-meta-field class
         clone_new_field.find('.ppom-meta-field').each(function(i, meta_field) {
             var field_name = 'ppom[' + field_no + '][' + $(meta_field).attr('data-metatype') + ']';
             $(meta_field).attr('name', field_name);
@@ -600,44 +600,36 @@ jQuery(function($) {
     /**
         14- Saving PPOM IDs In Existing Meta File
     **/
-    $("#ppom-product-form").on('submit', function(ev) {
 
-        //@Fayaz: Add blockui here
-        ev.preventDefault();
+    /**
+     * @type {HTMLFormElement}
+     */
+    const popupForm = document.querySelector('#ppom-product-form');
+    popupForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-        var dataTable = $(".ppom-table").DataTable();
+        const formContent = new FormData( document.querySelector('#ppom-product-form') );
 
-        var attached_cb = [];
-        var removed_cb = [];
+        formContent.append( 'action','ppom_attach_ppoms' );
+        formContent.append( 'ppom_id', $("#ppom_id").val() );
 
-        dataTable.rows().nodes().to$().find('input[type="checkbox"]').each(function() {
-            if (this.checked && this.name == 'ppom_attached[]') {
-                attached_cb.push($(this).val());
-            }
+        fetch( ajaxurl, {
+            method: 'POST',
+            body: formContent
+        })
+            .then(response => response.json())
+            .then(resp => {
+                alert(resp.message);
 
-            if (this.checked && this.name == 'ppom_removed[]') {
-                removed_cb.push($(this).val());
-            }
-        });
-        
-        
-        var data = {
-            'action': 'ppom_attach_ppoms',
-            'ppom_attached': attached_cb,
-            'ppom_removed': removed_cb,
-            'ppom_id': $("#ppom_id").val(),
-            'ppom_attached_nonce':$("#ppom_attached_nonce").val()
-        };
-
-        // return;
-        $.post(ajaxurl, data, function(resp) {
-
-            alert(resp.message);
-            window.location.reload();
-
-        }, 'json');
-    });
-
+                const openModalBtn = document.querySelector('.ppom-products-modal');
+                if ( openModalBtn && openModalBtn.dataset?.reload ) {
+                    window.location.reload();
+                } else {
+                    document.querySelector('.ppom-js-modal-close').dispatchEvent(new Event('click'));
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    })
 
     /**
         16- Handle Fields Tabs
@@ -1466,6 +1458,10 @@ jQuery(function($) {
             toggleHandler.setDisabledFields(itemEl.find('input[data-metatype="jquery_dp"]'));
         });
     })
+    $(document).on('click', '.postbox-header', function() {
+        var postbox = $(this).closest('.postbox');
+        postbox.toggleClass('closed');
+    });
 });
 document.querySelectorAll('.ppom-modal-shortcuts a')?.forEach(anchor => {
     anchor.addEventListener('click', function(e) {

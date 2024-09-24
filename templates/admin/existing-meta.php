@@ -90,7 +90,11 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 						<td>
 							<a class="btn btn-sm btn-secondary ppom-products-modal"
 							   data-ppom_id="<?php echo esc_attr( $productmeta->productmeta_id ); ?>"
-							   data-formmodal-id="ppom-product-modal"><?php _e( 'Attach to Products', 'woocommerce-product-addon' ); ?></a>
+							   data-formmodal-id="ppom-product-modal"
+							   data-reload="true"
+							>
+								<?php _e( 'Attach to Products', 'woocommerce-product-addon' ); ?>
+							</a>
 						</td>
 						<td class="ppom-admin-meta-actions-colunm">
 							<a id="del-file-<?php echo esc_attr( $productmeta->productmeta_id ); ?>" href="#"
@@ -111,28 +115,10 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 		</div>
 	</form>
 </div>
+<?php
 
-<!-- Product Modal -->
-<div id="ppom-product-modal" class="ppom-modal-box" style="display: none;">
-	<form id="ppom-product-form">
-		<input type="hidden" name="action" value="ppom_attach_ppoms"/>
-		<input type="hidden" name="ppom_id" id="ppom_id">
-
-		<header>
-			<h3><?php _e( 'WooCommerce Products', 'woocommerce-product-addon' ); ?></h3>
-		</header>
-
-		<div class="ppom-modal-body">
-
-		</div>
-
-		<footer>
-			<button type="button"
-					class="btn btn-default close-model ppom-js-modal-close"><?php _e( 'Close', 'woocommerce-product-addon' ); ?></button>
-			<button type="submit" class="btn btn-info"><?php _e( 'Save', 'woocommerce-product-addon' ); ?></button>
-		</footer>
-	</form>
-</div>
+ppom_load_template( 'admin/product-modal.php' );
+?>
 
 <!-- Upgrade to pro modal -->
 <div id="ppom-import-upsell" class="ppom-modal-box ppom-upsell-modal" style="display: none;">
