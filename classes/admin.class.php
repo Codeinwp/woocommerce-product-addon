@@ -263,7 +263,6 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		}
 
 		$ppom_id             = intval( $_GET['ppom_id'] );
-		$has_pro_active      = 'valid' === apply_filters( 'product_ppom_license_status', '' );
 		$current_saved_value = $this->get_db_field( $ppom_id );
 
 		$select_products_id_component = (new \PPOM\Attach\SelectComponent())
@@ -275,7 +274,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 					array(
 						'label'    => __( 'Choose Products:', 'woocommerce-product-addon'),
 						'name'     => 'ppom-attach-to-products[]',
-						'multiple' => $has_pro_active,
+						'multiple' => true,
 						'is_used'  => true
 					),
 					$this->get_wc_products( $ppom_id )
