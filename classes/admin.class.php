@@ -263,6 +263,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		}
 
 		$ppom_id             = intval( $_GET['ppom_id'] );
+		$license_status      = apply_filters( 'product_ppom_license_status', '' );
 		$current_saved_value = $this->get_db_field( $ppom_id );
 
 		$select_products_id_component = (new \PPOM\Attach\SelectComponent())
@@ -292,22 +293,23 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 						'name'     => 'ppom-attach-to-categories[]',
 						'multiple' => true
 					),
-					$this->get_wc_categories( $ppom_id, $current_saved_value )
+					$this->get_wc_categories( $current_saved_value )
 				)
 			);
 
 		$attach_to_tags_component = (new \PPOM\Attach\SelectComponent())
+			->set_status( $license_status )
 			->set_id( 'attach-to-tags' )
-			->set_title( __( 'Display in Specific Product Tags', 'woocommerce-product-addon') )
+			->set_title( __( 'Display in Specific Product Tags', 'woocommerce-product-addon') . ( 'valid' !== $license_status ? ' (' . __( 'PRO' ) . ')' : '') )
 			->set_description( __( 'Select the product tags where you want these product fields to appear.', 'woocommerce-product-addon') )
 			->set_select(
 				array_merge(
 					array(
 						'label'    => __( 'Choose tags:', 'woocommerce-product-addon'),
 						'name'     => 'ppom-attach-to-tags[]',
-						'multiple' => true
+						'multiple' => true,
 					),
-					$this->get_wc_tags( $ppom_id, $current_saved_value )
+					$this->get_wc_tags( $current_saved_value )
 				)
 			);
 
@@ -346,6 +348,12 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		die( 0 );
 	}
 
+	/**
+	 * Retrieves WooCommerce products and checks if they are associated with a given PPOM ID.
+	 *
+	 * @param int $ppom_id The PPOM ID to check against the products.
+	 * @return array An array containing the product options and a flag indicating if any product is used.
+	 */
 	function get_wc_products( $ppom_id ) {
 		$result = array(
 			'options' => array(),
@@ -401,7 +409,13 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		return $result;
 	}
 
-	public function get_wc_categories( $ppom_id, $current_values ) {
+	/**
+	 * Retrieves WooCommerce product categories and checks if they are used in the current values.
+	 *
+	 * @param array $current_values The current values containing product meta categories.
+	 * @return array An array containing the options of product categories and a flag indicating if any category is used.
+	 */
+	public function get_wc_categories( $current_values ) {
 		$result = array(
 			'options' => array(),
 			'is_used' => false
@@ -444,7 +458,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		return $result;
 	}
 
-	function get_wc_tags( $ppom_id, $current_values ) {
+	/**
+	 * Retrieves WooCommerce product tags and checks if they are used in the current values.
+	 *
+	 * @param array $current_values The current values to check against.
+	 * 
+	 * @return array An array containing the options of product tags and a flag indicating if any category is used.
+	 */
+	function get_wc_tags( $current_values ) {
 		$result = array(
 			'options' => array(),
 			'is_used' => false
@@ -491,6 +512,15 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		return $result;
 	}
 
+	/**
+	 * Retrieves the database fields for a given PPOM field ID.
+	 *
+	 * This function queries the database to fetch the `productmeta_categories` and `productmeta_tags`
+	 * for the specified PPOM field ID from the PPOM meta table.
+	 *
+	 * @param int $ppom_field_id The ID of the PPOM field to retrieve data for.
+	 * @return array
+	 */
 	function get_db_field( $ppom_field_id ) {
 		global $wpdb;
 		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;

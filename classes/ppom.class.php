@@ -361,10 +361,9 @@ class PPOM_Meta {
 	function ppom_has_category_or_tag_meta( $product_id ) {
 
 		$product_categories = get_the_terms( $product_id, 'product_cat' );
-		$product_tags       = get_the_terms( $product_id, 'product_tag' );
 
 		$meta_found = array();
-		if ( $product_categories && $product_tags && $this->ppom_categories_and_tags_row ) {
+		if ( $product_categories && $this->ppom_categories_and_tags_row ) {
 			foreach ( $this->ppom_categories_and_tags_row as $row ) {
 				
 				if ( $row->productmeta_categories === 'All' ) {
@@ -379,17 +378,10 @@ class PPOM_Meta {
 						}
 					}
 				}
-
-				$attached_tags = maybe_unserialize( $row->productmeta_tags );
-				if ( is_array( $attached_tags ) ) {
-					foreach( $product_tags as $product_tag ) {
-						if ( in_array( $product_tag->slug, $attached_tags ) ) {
-							$meta_found[] = $row->productmeta_id;
-						}
-					}
-				}
 			}
 		}
+
+		$meta_found = apply_filters( 'ppom_pro_fields_to_display_on_product', $meta_found, $product_id, $this->ppom_categories_and_tags_row );
 
 		$this->category_meta = $meta_found;
 
