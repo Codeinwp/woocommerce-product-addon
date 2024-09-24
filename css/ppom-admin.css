@@ -1740,6 +1740,8 @@ header.ppom-modal-header {
 .ppom-field-item:hover .upsell-tooltip {
     visibility: visible;
     opacity: 1;
+}
+
 .ppom-attach-container-item .closed .dashicon-ppom-status:before{
     content: "\f343";
 }
