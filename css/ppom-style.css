@@ -592,6 +592,6 @@ div.filelist .u_i_c_box {
 }
 
 [data-remodal-id^="ppom_textbox_model_"] {
-  max-width: 700px !important;
+  max-width: inherit;
   min-height: 0 !important;
 }
