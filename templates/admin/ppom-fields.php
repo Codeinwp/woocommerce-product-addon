@@ -25,7 +25,9 @@ $product_meta_id        = 0;
 $product_meta           = array();
 $ppom_field_index       = 1;
 $is_edit_screen         = false;
-
+if ( $_REQUEST ['action'] == 'new' ) {
+	$is_edit_screen = true;
+}
 if ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) {
 
 	$product_meta_id = intval( $_REQUEST ['productmeta_id'] );
