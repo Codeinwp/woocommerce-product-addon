@@ -104,7 +104,9 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 							<a href="<?php echo esc_url( $url_edit ); ?>" title="<?php _e( 'Edit', 'woocommerce-product-addon' ); ?>"
 							   class="button"><span class="dashicons dashicons-edit"></span></a>
 							<a href="<?php echo esc_url( $url_clone ); ?>" title="<?php _e( 'Clone', 'woocommerce-product-addon' ); ?>"
-							   class="button"><span class="dashicons dashicons-image-rotate-right"></span></a>
+							   class="button">
+							   <i class="fa fa-clone"></i>
+							</a>
 						</td>
 					</tr>
 					<?php

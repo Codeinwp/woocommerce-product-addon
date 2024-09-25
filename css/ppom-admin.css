@@ -90,7 +90,20 @@
 }
 
 .ppom-thead-bg {
-    background-color: #a4c1da8c;
+    background-color: #313350;
+    color: #FFFFFF;
+}
+
+thead .ppom-thead-bg th.ppom-checkboxe-style {
+    filter: brightness(0) invert(1);
+}
+
+#ppom-all-select-products-head-btn + span {
+    color: white;
+}
+
+#ppom-all-select-products-foot-btn + span {
+    color: white;
 }
 
 .ppom_field_table tbody {
@@ -399,10 +412,10 @@ ul.ppom-options-container li {
     padding-bottom: 9px;
     border-bottom: 2px solid #f957006e;
     justify-content: space-between;
+    margin-bottom: 10px;
 }
 
 .ppom-wrapper h1.ppom-heading-style {
-    font-family: roboto;
     font-size:23px;
     display: inline;
     /*font-size: 30px;*/
@@ -663,6 +676,24 @@ table#ppom-meta-table.dataTable th:nth-of-type(4) {
     width: 60%;
 }
 
+@media screen and (max-width: 1500px) {
+    table#ppom-meta-table.dataTable th:nth-of-type(4) {
+        width: 50%;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    table#ppom-meta-table.dataTable th:nth-of-type(4) {
+        width: 40%;
+    }
+}
+
+@media screen and (max-width: 950px) {
+    table#ppom-meta-table.dataTable th:nth-of-type(4) {
+        width: 30%;
+    }
+}
+
 /*
     11- Wordpress 5.3.1 CSS
 */
@@ -816,7 +847,7 @@ select {
     padding: 12px 30px;
     margin-right: 0.2rem;
     cursor: pointer;
-    background: #90CAF9;
+    background: #DCDCDE;
     font-weight: bold;
     transition: background ease 0.2s;
     margin: 0 !important;
