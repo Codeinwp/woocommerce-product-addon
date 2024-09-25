@@ -52,8 +52,6 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 				<div class="nmsf-cols col-md-12">
 					<div class="nmsf-panels-area">
                         <p class="submit">
-                            <a href="<?php echo esc_url( $migrate_url ); ?>"
-                               class="woocommerce-save-button components-button is-primary nmsf-migrate-back-btn"><?php echo _e( 'Switch to Legacy Settings', 'woocommerce-product-addon' ); ?></a>
                             <input type="submit" class="woocommerce-save-button components-button is-primary"
                                    value="<?php _e( 'Save changes', 'woocommerce-product-addon' ); ?>"/>
                         </p>

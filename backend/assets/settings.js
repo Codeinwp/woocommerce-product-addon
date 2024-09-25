@@ -74,23 +74,6 @@ jQuery(function($) {
         }
     });
 
-
-    /**
-        Migration Event
-    **/
-    $(document).on("click", ".nmsf-migrate-back-btn", function(e) {
-
-        if (!confirm(nmsf_vars.migrate_back_msg)) {
-
-            e.preventDefault();
-            return false;
-        }
-        else {
-            return true;
-        }
-    });
-
-
     /**
         Add Conditional Settings Fields
     **/
