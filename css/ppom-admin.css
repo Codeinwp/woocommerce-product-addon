@@ -94,7 +94,7 @@
     color: #FFFFFF;
 }
 
-thead .ppom-thead-bg th.ppom-checkboxe-style {
+.ppom-thead-bg th.ppom-checkboxe-style {
     filter: brightness(0) invert(1);
 }
 
