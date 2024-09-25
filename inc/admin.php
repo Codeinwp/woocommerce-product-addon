@@ -427,23 +427,20 @@ function ppom_admin_update_form_meta() {
 		wp_send_json( $resp );
 	}
 
-
 	global $wpdb;
 
 	$ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];
 	$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );
 	$product_meta = ppom_sanitize_array_data( $product_meta );
 	// Remove the meta row if the type or data_name is empty.
-	$product_meta = array_map(
+	$product_meta = array_filter(
+		$product_meta,
 		function( $pm ) {
-			return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] ) ? $pm : false;
-		},
-		$product_meta
+			return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] ) && ! empty( $pm['ppom_id'] );
+		}
 	);
-	$product_meta = array_filter( $product_meta );
 	$product_meta = json_encode( $product_meta );
-	// ppom_pa($product_meta); exit;
-
+	
 	$productmeta_name       = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
 	$dynamic_price_hide     = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
 	$send_file_attachment   = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
