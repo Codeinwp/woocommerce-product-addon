@@ -284,6 +284,12 @@ function ppom_admin_save_form_meta() {
 
 	$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );
 	$product_meta = ppom_sanitize_array_data( $product_meta );
+	$product_meta = array_filter(
+		$product_meta,
+		function( $pm ) {
+			return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] );
+		}
+	);
 	$product_meta = json_encode( $product_meta );
 
 	// sanitize
@@ -344,6 +350,14 @@ function ppom_admin_save_form_meta() {
 	$ppom_id = $wpdb->insert_id;
 
 	$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom, $ppom_id );
+	$product_meta = ppom_sanitize_array_data( $product_meta );
+	$product_meta = array_filter(
+		$product_meta,
+		function( $pm ) {
+			return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] );
+		}
+	);
+	
 	// Updating PPOM Meta with ppom_id in each meta array
 	ppom_admin_update_ppom_meta_only( $ppom_id, $product_meta );
 
