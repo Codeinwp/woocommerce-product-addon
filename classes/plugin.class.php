@@ -324,6 +324,7 @@ class NM_PersonalizedProduct {
 		// Show description tooltip.
 		add_filter( 'ppom_field_description', array( $this, 'show_tooltip' ), 15, 2 );
 
+		$this->should_migrate_database();
 	}
 
 	/*
@@ -662,6 +663,21 @@ class NM_PersonalizedProduct {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Checks if the database needs to be migrated and performs the migration if necessary.
+	 *
+	 * @return void
+	 */
+	public function should_migrate_database() {
+		$last_version_upgrade = get_option( 'ppom_last_version_db_upgrade', false );
+		if ( false !== $last_version_upgrade ) {
+			return;
+		}
+
+		self::upgrade_database();
+		update_option( 'ppom_last_version_db_upgrade', PPOM_DB_VERSION );
 	}
 
 	public static function activate_plugin() {
