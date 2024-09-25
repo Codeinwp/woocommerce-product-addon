@@ -292,9 +292,13 @@ class PPOM_Meta {
 		if ( $this->has_multiple_meta() ) {
 
 			foreach ( $this->meta_id as $meta_id ) {
-
 				$qry    = 'SELECT the_meta FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
 				$fields = $wpdb->get_var( $qry );
+
+				if ( ! is_string( $fields ) || empty( $fields ) ) {
+					continue;
+				}
+
 				$fields = json_decode( $fields, true );
 
 				if ( is_array( $fields ) ) {
