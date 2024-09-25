@@ -623,10 +623,14 @@ ul.ppom-options-container li {
     flex: 1;
 }
 
-.ppom-modal-box .ppom-modal-body:not(.ppom-modal-add-field) {
-    padding: 1em 2.5em;
+#ppom-product-form .ppom-modal-body{
+
     background: #f0f0f1;
 }
+.ppom-modal-box .ppom-modal-body:not(.ppom-modal-add-field) {
+    padding: 1em 2.5em;
+}
+
 
 .ppom-modal-box footer {
     background-color: #FAFAFA;
