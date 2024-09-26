@@ -97,7 +97,7 @@ class SelectComponent extends ContainerView {
                     </span>
 	                <?php if ( 'valid' !== $this->get_status() ) { ?>
                             <span class="ppom-field-filter-pro-available">
-                                <?php echo sprintf( esc_html__( 'Filtering by tags is available in %sPRO%s', 'woocommerce-product-addon' ), '<a target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'tags-fields' ) . '">', '</a>' ); ?>
+                                <?php echo sprintf( esc_html__( 'Available in %sPRO%s', 'woocommerce-product-addon' ), '<a target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'tags-fields' ) . '">', '</a>' ); ?>
                             </span>
                     <?php } ?>
 					<input
