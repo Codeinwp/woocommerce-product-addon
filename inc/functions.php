@@ -2353,6 +2353,10 @@ function ppom_get_conditional_data_attributes( $meta ) {
 		$conditions['rules'] = array_filter(
 			$conditions['rules'],
 			function( $rule ) {
+				if ( empty( $rule['operators'] ) || ! is_string( $rule['operators'] )  ) {
+					return ! empty( $rule['element_values'] );
+				}
+
 				if ( in_array( $rule['operators'], array( 'any', 'empty', 'even-number', 'odd-number', 'regex') ) ) {
 					return true;
 				}

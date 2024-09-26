@@ -120,7 +120,7 @@ class PPOM_Meta {
 			'get_fields_by_id',
 			'settings',
 			'all_ppom_with_categories',
-			'ppom_has_category_or_tag_meta',
+			'ppom_has_category_meta',
 			'get_meta_id',
 			'get_fields',
 			'has_unique_datanames',
