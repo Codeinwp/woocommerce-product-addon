@@ -30,7 +30,7 @@ class PPOM_Form {
 	 *
 	 * @var number
 	 */
-	// public static $product_id;
+	public $product_id;
 
 	/**
 	 * Return wc product object
