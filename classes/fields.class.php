@@ -161,7 +161,7 @@ class PPOM_Fields_Meta {
 		$ppom_admin_meta = array(
 			'plugin_admin_page' => admin_url( 'admin.php?page=ppom' ),
 			'loader'            => PPOM_URL . '/images/loading.gif',
-			'ppomProActivated'=>ppom_pro_is_installed() && PPOM()->ppom_is_license_of_type( 'pro' ) ? 'yes' : 'no',
+			'ppomProActivated'=>ppom_pro_is_installed() && PPOM()->is_license_of_type( 'pro' ) ? 'yes' : 'no',
 			'i18n' => [
 				'addGroupUrl' => esc_url( add_query_arg( array( 'action' => 'new' ) ) ),
 				'addGroupLabel'=>esc_html__( 'Add New Group', 'woocommerce-product-addon' ),

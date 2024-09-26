@@ -995,7 +995,7 @@ class NM_PersonalizedProduct {
 	 * @access  public
 	 * @return bool
 	 */
-	public function ppom_is_license_of_type( $type ) {
+	public function is_license_of_type( $type ) {
 		// proceed to check the plan only if the license is active.
 		$status = apply_filters( 'product_ppom_license_status', false );
 		if ( 'valid' !== $status ) {

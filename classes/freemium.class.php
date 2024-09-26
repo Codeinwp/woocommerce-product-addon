@@ -45,7 +45,7 @@ class PPOM_Freemium {
 	 * @return array
 	 */
 	public function add_locked_cfr_tab( $tabs ) {
-		if ( ppom_pro_is_installed() && PPOM()->ppom_is_license_of_type( 'plus' ) ) {
+		if ( ppom_pro_is_installed() && PPOM()->is_license_of_type( 'plus' ) ) {
 			return $tabs;
 		}
 		$tabs[self::TAB_KEY_FREEMIUM_CFR] = array(
@@ -62,7 +62,7 @@ class PPOM_Freemium {
 	 * @return string
 	 */
 	public function get_freemium_cfr_content() {
-		if ( ppom_pro_is_installed() && PPOM()->ppom_is_license_of_type( 'plus' ) ) {
+		if ( ppom_pro_is_installed() && PPOM()->is_license_of_type( 'plus' ) ) {
 			return '';
 		}
 		ob_start();
