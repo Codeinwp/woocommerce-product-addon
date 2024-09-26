@@ -1788,6 +1788,11 @@ header.ppom-modal-header {
 .ppom-attach-container-item .closed .dashicon-ppom-status:before{
     content: "\f343";
 }
+.ppom-attach-container-item  .dashicons.dashicons-lock{
+
+    position: absolute;
+    font-size: 110%;
+}
 .ppom-attach-container-item  .dashicons{
     font-size: 75%;
     vertical-align: unset;
@@ -1815,6 +1820,7 @@ header.ppom-modal-header {
     display: block;
     position: absolute;
     right: 20px;
+
 }
 .ppom-hide-element {
     display: none !important;

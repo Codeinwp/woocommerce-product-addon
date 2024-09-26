@@ -64,7 +64,9 @@ class SelectComponent extends ContainerView {
             <div class="postbox <?php echo $is_used ? '' : 'closed'  ?>">
 
                 <div class="postbox-header ">
-                    <h6 > <span class="dashicons dashicon-ppom-status"></span><?php echo esc_html( $this->get_title() ) ?></h6>
+                    <h6>
+                        <span class="dashicons dashicon-ppom-status"></span><?php echo esc_html( $this->get_title() ) ?> <?php if ( 'valid' !== $this->get_status() ) { ?>
+                            <span class="dashicons dashicons-lock"></span><?php } ?></h6>
                 </div>
                 <div class="inside">
                     <div class="ppom-attach-container-input">
@@ -96,9 +98,9 @@ class SelectComponent extends ContainerView {
                         <?php echo wp_kses_post( $this->get_description() ) ?>
                     </span>
 	                <?php if ( 'valid' !== $this->get_status() ) { ?>
-                            <span class="ppom-field-filter-pro-available">
-                                <?php echo sprintf( esc_html__( 'Available in %sPRO%s', 'woocommerce-product-addon' ), '<a target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'tags-fields' ) . '">', '</a>' ); ?>
-                            </span>
+
+                                <?php echo '<a class="ppom-field-filter-pro-available" target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'tags-fields' ) . '">' . esc_html__( 'Available in PRO', 'woocommerce-product-addon' ) . '</a>'; ?>
+
                     <?php } ?>
 					<input
 						name="<?php echo esc_attr( str_replace( '[]', '', $select_name ) ) . '-initial' ?>"
