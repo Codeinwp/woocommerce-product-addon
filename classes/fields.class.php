@@ -914,7 +914,7 @@ class PPOM_Fields_Meta {
 					$html_input .= '<div>';
 					$html_input .= '<p>' . __( 'only if', 'woocommerce-product-addon' ) . '</p>';
 					$html_input .= '</div>';
-					$html_input .= '<div class="col-md-4 col-sm-4">';
+					$html_input .= '<div class="col-md-3 col-sm-3">';
 					$html_input .= '<select class="form-control ppom-condition-visible-bound" data-metatype="bound">';
 					$html_input .= '<option value="All">' . __( 'All', 'woocommerce-product-addon' ) . '</option>';
 					$html_input .= '<option value="Any">' . __( 'Any', 'woocommerce-product-addon' ) . '</option>';
