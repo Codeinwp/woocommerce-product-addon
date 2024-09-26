@@ -2349,10 +2349,30 @@ function ppom_get_conditional_data_attributes( $meta ) {
 
 		$bound      = isset( $conditions['bound'] ) ? ppom_wpml_translate( $conditions['bound'], 'PPOM' ) : '';
 		$visibility = isset( $conditions['visibility'] ) ? ppom_wpml_translate( $conditions['visibility'], 'PPOM' ) : '';
-
+		
 		$conditions['rules'] = array_filter(
 			$conditions['rules'],
 			function( $rule ) {
+				if ( in_array( $rule['operators'], array( 'any', 'empty', 'even-number', 'odd-number', 'regex') ) ) {
+					return true;
+				}
+
+				if ( in_array( $rule['operators'], array( 'number-multiplier', 'regex', 'contains', 'not-contains') ) ) {
+					return ! empty( $rule['element_constant'] );
+				}
+
+				if ( in_array( $rule['operators'], array( 'greater than', 'less than', 'is', 'not' ) ) ) {
+					return ! empty( $rule['element_constant'] ) || ! empty( $rule['element_values'] );
+				}
+
+				if ( 'between' === $rule['operators'] ) {
+					return (
+						! empty( $rule['cond-between-interval']) && is_array( $rule['cond-between-interval'] )
+						&& isset( $rule['cond-between-interval']['to'] )
+						&& isset( $rule['cond-between-interval']['from'] )
+					);
+				}
+
 				return ! empty( $rule['element_values'] );
 			}
 		);
@@ -2362,19 +2382,32 @@ function ppom_get_conditional_data_attributes( $meta ) {
 		$attr_html .= ' data-cond-bind="' . esc_attr( $bound ) . '"';
 		$attr_html .= ' data-cond-visibility="' . esc_attr( strtolower( $visibility ) ) . '"';
 
-		$index = 0;
+		$index       = 0;
+		$pro_enabled = ppom_pro_is_installed() && 'valid' === apply_filters( 'product_ppom_license_status', '' );
+
 		foreach ( $conditions['rules'] as $rule ) {
 
-			$counter     = ++ $index;
-			$input       = 'input' . $counter;
-			$value       = 'val' . $counter;
-			$opr         = 'operator' . $counter;
-			$element     = isset( $rule['elements'] ) ? ppom_wpml_translate( $rule['elements'], 'PPOM' ) : '';
-			$element_val = isset( $rule['element_values'] ) ? ppom_wpml_translate( $rule['element_values'], 'PPOM' ) : '';
-			$operator    = isset( $rule['operators'] ) ? ppom_wpml_translate( $rule['operators'], 'PPOM' ) : '';
-			$attr_html  .= ' data-cond-' . $input . '="' . esc_attr( $element ) . '"';
-			$attr_html  .= ' data-cond-' . $value . '="' . esc_attr( $element_val ) . '"';
-			$attr_html  .= ' data-cond-' . $opr . '="' . esc_attr( $operator ) . '"';
+			$counter      = ++ $index;
+			$input        = 'input' . $counter;
+			$value        = 'val' . $counter;
+			$opr          = 'operator' . $counter;
+			$element      = isset( $rule['elements'] ) ? ppom_wpml_translate( $rule['elements'], 'PPOM' ) : '';
+			$element_val  = isset( $rule['element_values'] ) ? ppom_wpml_translate( $rule['element_values'], 'PPOM' ) : '';
+			$constant_val = isset( $rule['element_constant'] ) ? ppom_wpml_translate( $rule['element_constant'], 'PPOM' ) : '';
+			$operator     = isset( $rule['operators'] ) ? ppom_wpml_translate( $rule['operators'], 'PPOM' ) : '';
+
+			$attr_html .= ' data-cond-' . $input . '="' . esc_attr( $element ) . '"';
+			$attr_html .= ' data-cond-' . $value . '="' . esc_attr( $element_val ) . '"';
+			$attr_html .= ' data-cond-' . $opr . '="' . esc_attr( $operator ) . '"';
+
+			if ( $pro_enabled && ! empty( $constant_val ) ) {
+				$attr_html .= ' data-cond-constant-val-' . $counter . '="' . esc_attr( $constant_val ) . '"';
+			}
+
+			if ( $pro_enabled && 'between' === $operator && isset( $rule['cond-between-interval'] ) ) {
+				$attr_html .= ' data-cond-between-from-' . $counter . '="' . esc_attr( $rule['cond-between-interval']['from'] ) . '"';
+				$attr_html .= ' data-cond-between-to-' . $counter . '="' . esc_attr( $rule['cond-between-interval']['to'] ) . '"';
+			}
 		}
 	}
 

@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * PPOM Conditional Version 2
  * More Fast and Optimized
@@ -48,38 +50,37 @@ jQuery(function($) {
     }, 100);
 
     // $('form.cart').on('change', 'select, input[type="radio"], input[type="checkbox"]', function(ev) {
-
-    $(".ppom-wrapper").on('change', 'select,input:radio,input:checkbox', function(e) {
-
+        
+    function trigger_check_conditions( modifiedElement ) {
         let value = null;
-        if (($(this).is(':radio') || $(this).is(':checkbox'))) {
-            value = this.checked ? $(this).val() : null;
-        }
-        else {
-
-            value = $(this).val();
+        if (modifiedElement.type === 'radio' || modifiedElement.type === 'checkbox') {
+            value = modifiedElement.checked ? modifiedElement.value : null;
+        } else {
+            value = modifiedElement.value;
         }
 
-        const data_name = $(this).data('data_name');
-        // console.log("Checking condition for ", data_name);
-
-        ppom_check_conditions(data_name, function(element_dataname, event_type) {
-            // console.log(`${element_dataname} ===> ${event_type}`);
-            $.event.trigger({
-                type: event_type,
-                field: element_dataname,
-                time: new Date()
+        const data_name = modifiedElement.dataset?.data_name;
+        ppom_check_conditions(data_name, (element_dataname, event_type) => {
+            const event = new CustomEvent(event_type, {
+                detail: {
+                    field: element_dataname,
+                    time: new Date()
+                }
             });
+            document.dispatchEvent(event);
         });
+    }
+    
+    $(".ppom-wrapper").on('change', 'select, input:radio, input:checkbox, input[type="date"]', function(_e) {
+        trigger_check_conditions( this );
+    });
+
+    $(".ppom-wrapper").on('keyup', 'input:text, input[type="number"], input[type="email"]', function(_e) {
+        trigger_check_conditions( this );
     });
 
     $(document).on('ppom_hidden_fields_updated', function(e) {
         ppom_fields_hidden_conditionally();
-
-        // $("#conditionally_hidden").val(ppom_hidden_fields);
-        // console.log(` hiddend field updated ==> ${e.field}`);
-        // $("#conditionally_hidden").val(ppom_hidden_fields);
-        // ppom_update_option_prices();
     });
 
 
@@ -274,10 +275,8 @@ jQuery(function($) {
 function ppom_check_conditions(data_name, callback) {
 
     let is_matched = false;
-    const ppom_type = jQuery(`.ppom-input[data-data_name="${data_name}"]`).data('type');
-    const is_file  = jQuery("a.file.ppom-input").length > 0;
     let event_type, element_data_name;
-
+   
     jQuery(`div.ppom-cond-${data_name}`).each(function() {
         // return this.data('cond-val1').match(/\w*-Back/);
         // console.log(jQuery(this));
@@ -290,21 +289,30 @@ function ppom_check_conditions(data_name, callback) {
         var matched_conditions = [];
         let cond_elements = [];
         for (var t = 1; t <= total_cond; t++) {
+            const targetFieldToCompare = jQuery(this).data(`cond-input${t}`)?.toString()?.toLowerCase()
+            const targetFieldValue = ppom_get_element_value(targetFieldToCompare);
 
-            const cond_element = jQuery(this).data(`cond-input${t}`)?.toString()?.toLowerCase();
-            const cond_val = jQuery(this).data(`cond-val${t}`).toString();
+            const selectOptionValue = jQuery(this).data(`cond-val${t}`)?.toString();
             const operator = jQuery(this).data(`cond-operator${t}`);
-            const field_val = ppom_get_element_value(cond_element);
+            const constantValue = jQuery(this).data(`cond-constant-val-${t}`)?.toString();
+            const betweenValueTo = jQuery(this).data(`cond-between-to-${t}`);
+            const betweenValueFrom = jQuery(this).data(`cond-between-from-${t}`);
 
-            // const field_val = ppom_get_field_type(field_obj);
-            // console.log(cond_element,field_val,cond_val);
-            // if (cond_element !== data_name) continue;
-            is_matched = ppom_compare_values(field_val, cond_val, operator);
-            // console.log(`${data_name} TRIGGERS :: ${t} ***** ${element_data_name} ==> field value ${field_val} || cond_valu ${cond_val} || operator ${operator} || Binding ${binding} is_matched=>${is_matched}`);
+         
+            is_matched = ppom_compare_values({
+                valueToCompare: targetFieldValue,
+                selectOptionToCompare: selectOptionValue,
+                constantValueToCompare: constantValue,
+                betweenValueInterval: {
+                    from: betweenValueFrom,
+                    to: betweenValueTo
+                },
+                operator
+            });
 
-            if(is_matched) {
+            if ( is_matched ) {
                 matched = ++matched;
-                cond_elements.push(cond_element);
+                cond_elements.push(targetFieldToCompare);
             }
 
             matched_conditions[element_data_name] = matched;
@@ -325,9 +333,9 @@ function ppom_check_conditions(data_name, callback) {
                     }
                 });
 
-                if ( typeof callback == "function" )
+                if ( typeof callback == "function" ) {
                     callback(element_data_name, event_type);
-                // return is_matched;
+                }
             }
             else if ( ! is_matched || matched_conditions[element_data_name] !== total_cond) {
 
@@ -350,9 +358,6 @@ function ppom_check_conditions(data_name, callback) {
                     callback(element_data_name, event_type);
             }
         }
-
-        // return is_matched;
-        // return jQuery(this).data('cond-val1') === jQuery(this).val();
     });
 }
 
@@ -408,26 +413,98 @@ function ppom_get_element_value(data_name) {
     return element_value;
 }
 
-function ppom_compare_values(v1, v2, operator) {
-
+/**
+ * Compares values based on the provided operator.
+ *
+ * @param {Object} args - The arguments object containing comparison parameters.
+ * @param {string} args.valueToCompare - The target value to compare.
+ * @param {string} args.selectOptionToCompare - The select option value to compare.
+ * @param {string} args.constantValueToCompare - The constant value to compare.
+ * @param {{to: string, from: string}} args.betweenValueInterval - The between interval.
+ * @param {string} args.operator - The operator used for comparison.
+ * @returns {boolean} - The result of the comparison.
+ */
+function ppom_compare_values( args ) {
+    const { valueToCompare, selectOptionToCompare, constantValueToCompare, operator, betweenValueInterval } = args;
     let result = false;
     switch (operator) {
         case 'is':
-            if( Array.isArray(v1) ) {
-                result = jQuery.inArray(v2, v1) !== -1 ? true : false;
-            }else{
-                result = v1 === v2 ? true : false;
+            if ( Array.isArray(valueToCompare) ) {
+                result = valueToCompare.includes(selectOptionToCompare);;
+            } else {
+                result = valueToCompare === selectOptionToCompare;
+                if ( !selectOptionToCompare && constantValueToCompare ) {
+                    result = valueToCompare === constantValueToCompare
+                }
             }
             break;
+
         case 'not':
-            result = v1 !== v2 ? true : false;
+            if ( Array.isArray(valueToCompare) ) {
+                result = !valueToCompare.includes(selectOptionToCompare);;
+            } else {
+                result = valueToCompare !== selectOptionToCompare;
+                if ( !selectOptionToCompare && constantValueToCompare ) {
+                    result = valueToCompare !== constantValueToCompare
+                }
+            }
             break;
 
         case 'greater than':
-            result = parseFloat(v1) > parseFloat(v2) ? true : false;
+            result = parseFloat(valueToCompare) > parseFloat(selectOptionToCompare);
+            if ( !selectOptionToCompare && constantValueToCompare ) {
+                result = parseFloat(valueToCompare) > parseFloat(constantValueToCompare)
+            }
             break;
+
         case 'less than':
-            result = parseFloat(v1) < parseFloat(v2) ? true : false;
+            result = parseFloat(valueToCompare) < parseFloat(selectOptionToCompare);
+            if ( !selectOptionToCompare && constantValueToCompare ) {
+                result = parseFloat(valueToCompare) < parseFloat(constantValueToCompare)
+            }
+            break;
+
+        case 'any':
+            result = valueToCompare !== undefined && valueToCompare !== null && valueToCompare !== '';
+            break;
+    
+        case 'empty':
+            result = valueToCompare === undefined || valueToCompare === null || valueToCompare === '';
+            break;
+    
+        case 'between':
+            result = (
+                parseFloat(valueToCompare) >= parseFloat( betweenValueInterval.from ) &&
+                parseFloat(valueToCompare) <= parseFloat( betweenValueInterval.to )
+            );
+            break;
+    
+        case 'number-multiplier':
+            result = parseFloat(valueToCompare) % parseFloat(constantValueToCompare) === 0;
+            break;
+    
+        case 'even-number':
+            result = parseFloat(valueToCompare) % 2 === 0;
+            break;
+    
+        case 'odd-number':
+            result = parseFloat(valueToCompare) % 2 !== 0;
+            break;
+
+        case 'contains':
+            result = valueToCompare?.includes(constantValueToCompare);
+            break;
+
+        case 'not contains':
+            result = !valueToCompare?.includes(constantValueToCompare);
+            break;
+
+        case 'regex':
+            if ( typeof constantValueToCompare === 'string' ) {
+                const [_, pattern, flags] = constantValueToCompare.split('/');
+                const regex = new RegExp(pattern || constantValueToCompare, flags);
+                result = regex.test(valueToCompare);
+            }
             break;
 
         default:

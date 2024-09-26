@@ -1,4 +1,39 @@
+// @ts-check
 "use strict";
+
+const FIELD_COMPATIBLE_WITH_SELECT_OPTIONS = [ 'select', 'radio', 'switcher' ];
+const OPERATOR_COMPARISON_VALUE_FIELD_TYPE = {
+    'select': FIELD_COMPATIBLE_WITH_SELECT_OPTIONS,
+}
+const COMPARISON_VALUE_CAN_USE_SELECT = [ 'is', 'not', 'greater than', 'less than' ];
+const HIDE_COMPARISON_INPUT_FIELD = ['any', 'empty', 'odd-number', 'even-number'];
+const FIELDS_COMPATIBLE_WITH_TEXT = [ 'text', 'textarea', 'date', 'email' ]
+const FIELDS_COMPATIBLE_WITH_NUMBERS = [ ...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, 'number' ];
+const OPERATORS_FIELD_COMPATIBILITY = {
+    'is': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT, ...FIELDS_COMPATIBLE_WITH_NUMBERS, 'checkbox',],
+    'not': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT, ...FIELDS_COMPATIBLE_WITH_NUMBERS, 'checkbox'],
+    'greater than': FIELDS_COMPATIBLE_WITH_NUMBERS,
+    'less than': FIELDS_COMPATIBLE_WITH_NUMBERS,
+    'even-number': FIELDS_COMPATIBLE_WITH_NUMBERS,
+    'odd-number': FIELDS_COMPATIBLE_WITH_NUMBERS,
+    'between': FIELDS_COMPATIBLE_WITH_NUMBERS,
+    'number-multiplier': FIELDS_COMPATIBLE_WITH_NUMBERS,
+    'any': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT, ...FIELDS_COMPATIBLE_WITH_NUMBERS],
+    'empty': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT, ...FIELDS_COMPATIBLE_WITH_NUMBERS],
+    'contains': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT],
+    'not-contains': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT],
+    'regex': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT]
+}
+
+const proOperatorOptionsToLock = new Set();
+
+/**
+ * An array to store available condition targets.
+ * 
+ * @type {Array<{fieldLabel?: string, fieldId?: string, fieldType?: string, canUse: boolean}>}
+ */
+const availableConditionTargets = [];
+
 jQuery(function($) {
 
     var loader = new ImageLoader(ppom_vars.loader);
@@ -1187,56 +1222,212 @@ jQuery(function($) {
         });
     }
 
+    /**
+     * Filter the operator options list based on the target type field.
+     * 
+     * @param {string?} fieldType The PPOM field type.
+     * @param {HTMLSelectElement} operatorSelectField The select input for condition operator.
+     * @returns 
+     */
+    function toggleOperatorFieldByTargetType( fieldType, operatorSelectField ) {
+        if ( ! operatorSelectField ) {
+            return;
+        }
+
+        let shouldHideSelectInput = true;
+        const currentValue = operatorSelectField?.value;
+
+        operatorSelectField.querySelectorAll('optgroup').forEach( optgroup => {
+            let shouldHideGroup = true;
+            optgroup.querySelectorAll('option').forEach( option => {
+                const isAvailable = option?.value && OPERATORS_FIELD_COMPATIBILITY[option.value] ? OPERATORS_FIELD_COMPATIBILITY[option.value].includes(fieldType) : option?.value;
+                if ( shouldHideGroup && isAvailable ) {
+                    shouldHideGroup = false;
+                }
+
+                if ( option.value === currentValue && !isAvailable ) {
+                    operatorSelectField.value = 'any'; // NOTE: Default to 'any' if the current select value is unavailable.
+                }
+
+                option.classList.toggle('ppom-hide-element', !isAvailable );
+            });
+
+            if ( ! shouldHideGroup ) {
+                shouldHideSelectInput = false;
+            }
+
+            optgroup.classList.toggle( 'ppom-hide-element', shouldHideGroup );
+        });
+
+        operatorSelectField.classList.toggle( 'ppom-invisible-element', shouldHideSelectInput );
+        tryToggleConditionInputFields( operatorSelectField );
+    }
 
     /**
-        27- Get All Fields Title On Condition Element Value After Click On Condition Tab
+        27- Refresh the condition comparison option list for PPOM field target that are of type select.
     **/
-    // populate_conditional_elements();
+    function updateTargetComparisonValueSelect( targetSelect, conditionContainer, initialSelectedValue ) {
+        /** @type {string?} */
+        const targetElementNameToPullOptions = targetSelect.value;
 
-    $(document).on('change', 'select[data-metatype="elements"]', function(e) {
-        e.preventDefault();
+        /** @type {HTMLDivElement?} */
+        conditionContainer ??= targetSelect.closest('.webcontact-rules');
+        const targetSelectOptions = conditionContainer?.querySelector('select[data-metatype="element_values"]');
 
-        var element_name = $(this).val();
-        var div = $(this).closest('.ppom-slider');
+        if ( !conditionContainer || !targetSelectOptions ) {
+            return;
+        }
 
-        var selected_rule_box = $(this).closest('.webcontact-rules');
-        var element_value_box = selected_rule_box.find('select[data-metatype="element_values"]');
+        document.querySelectorAll('.ppom-slider').forEach(sliderItem => {
 
-        $(".ppom-slider").each(function(i, item) {
-
-            var data_name = $(item).find('input[data-metatype="data_name"]').val();
-
-            if (data_name == element_name) {
-
-                // resetting
-                jQuery(element_value_box).html('');
-
-                $(item).find('.data-options').each(function(i, condition_val) {
-
-                    var condition_type = $(condition_val).attr('data-condition-type');
-                    if (condition_type == 'simple_options') {
-                        var con_val = $(condition_val).find('input[data-metatype="option"]').val();
-                    }
-                    else if (condition_type == 'image_options') {
-                        var con_val = $(condition_val).find('.ppom-image-option-title').val();
-                    }
-
-                    if ($.trim(con_val) !== '') {
-
-
-                        var val_id = $.trim(con_val);
-
-                        var $html = '';
-                        $html += '<option value="' +
-                            ppom_escape_html(val_id) + '">' +
-                            con_val +
-                            '</option>';
-
-                        $($html).appendTo(element_value_box);
-                    }
-                });
+            const targetElementFieldId = sliderItem.querySelector('input[data-metatype="data_name"]')?.value;
+            if ( targetElementFieldId !== targetElementNameToPullOptions ) {
+                return;
             }
+
+            const operatorsInput = conditionContainer.querySelector('[data-metatype="operators"]');
+            if ( ! operatorsInput ) {
+                return;
+            }
+            
+            // Reset the options lists based on the new selection.
+            const newOptions = [];
+
+            sliderItem.querySelectorAll('.data-options').forEach(/** @type {HTMLDivElement} */conditionValueContainer => {
+                const condition_type = conditionValueContainer.getAttribute('data-condition-type');
+
+                const conditionValueId = conditionValueContainer
+                    .querySelector(
+                        condition_type === 'simple_options' 
+                        ? 'input[data-metatype="option"]' 
+                        : '.ppom-image-option-title'
+                    )?.value?.trim();
+
+                if ( ! conditionValueId ) {
+                    return;
+                }
+
+                const optionElement = document.createElement('option');
+                optionElement.value = ppom_escape_html(conditionValueId);
+                optionElement.textContent = conditionValueId;
+                
+                newOptions.push( optionElement );
+            });
+            targetSelectOptions.replaceChildren(...newOptions);
         });
+
+        if ( initialSelectedValue ) {
+            targetSelectOptions.value = initialSelectedValue;
+        }
+    }
+    /**
+     * Toggle the visibility for input fields type based on operator current value.
+     * 
+     * @param {HTMLSelectElement?} conditionOperatorInput 
+     * @returns 
+     */
+    function tryToggleConditionInputFields( conditionOperatorInput ) {
+        if ( ! conditionOperatorInput ) {
+            return;
+        }
+
+        const selectedOperator = conditionOperatorInput?.value;
+
+         /**
+         * @type {HTMLDivElement|null}
+         */
+        const container = conditionOperatorInput?.closest('.webcontact-rules');
+        if ( !container) {
+            return;
+        }
+
+        /**
+         * @type {HTMLSelectElement|null}
+         */
+        const conditionTargetSelectOptionsInput = container.querySelector( 'select[data-metatype="element_values"]' );
+
+        /**
+         * @type {HTMLInputElement|null}
+         */
+        const conditionConstantInput = container.querySelector( '[data-metatype="element_constant"]' );
+
+        /**
+         * @type {HTMLSelectElement|null}
+         */
+        const conditionTargetSelectInput = container.querySelector( '[data-metatype="elements"]' );
+
+        if ( !conditionConstantInput || !conditionTargetSelectOptionsInput || !conditionTargetSelectInput ) {
+            return;
+        }
+   
+        /**
+         * @type {HTMLDivElement|null}
+         */
+        const betweenInputs = container.querySelector('.ppom-between-input-container');
+       
+        let shouldHideSelectInput = false;
+        let shouldHideTextInput = false;
+        let shouldHideBetweenInputs = false;
+        let shouldHideUpsell = true;
+        
+        if ( proOperatorOptionsToLock.has( selectedOperator ) ) {
+            shouldHideSelectInput = true;
+            shouldHideTextInput = true;
+            shouldHideBetweenInputs = true;
+            shouldHideUpsell = false;
+        }
+        else if ( 'between' === selectedOperator ) {
+            shouldHideSelectInput = true;
+            shouldHideTextInput = true;
+            shouldHideBetweenInputs = false;
+        }
+        else if ( HIDE_COMPARISON_INPUT_FIELD.includes( selectedOperator ) ) {
+            shouldHideSelectInput = true;
+            shouldHideTextInput = true;
+            shouldHideBetweenInputs = true;
+        } else {
+            shouldHideSelectInput = true;
+            shouldHideBetweenInputs = true;
+
+            /**
+             * @type {HTMLOptionElement|null}
+             */
+            const targetFieldTypeInput = conditionTargetSelectInput.querySelector(`option[value="${conditionTargetSelectInput.value}"]`);
+            if (
+                COMPARISON_VALUE_CAN_USE_SELECT.includes( selectedOperator ) &&
+                targetFieldTypeInput?.dataset?.fieldtype &&
+                OPERATOR_COMPARISON_VALUE_FIELD_TYPE['select'].includes( targetFieldTypeInput.dataset.fieldtype )
+            ) {
+                shouldHideTextInput = true;
+                shouldHideSelectInput = false;
+            }
+        }
+
+        if ( shouldHideSelectInput && shouldHideTextInput && shouldHideBetweenInputs && shouldHideUpsell ) {
+            conditionConstantInput.parentNode?.classList.add('ppom-invisible-element'); // NOTE: Make the entire container visible to preserve the space.
+        } else {
+            conditionTargetSelectOptionsInput.classList.toggle("ppom-hide-element", shouldHideSelectInput );
+            conditionConstantInput.classList.toggle("ppom-hide-element", shouldHideTextInput );
+            betweenInputs?.classList.toggle("ppom-hide-element", shouldHideBetweenInputs );
+            container.querySelector('.ppom-upsell-condition')?.classList.toggle("ppom-hide-element", shouldHideUpsell);
+
+            conditionConstantInput.parentNode?.classList.remove('ppom-invisible-element');
+        }
+    }
+     
+     // Apply actions on initialization based on operator value.
+    document.querySelectorAll('select[data-metatype="operators"]').forEach( conditionOperatorInput => {
+        tryToggleConditionInputFields( conditionOperatorInput );
+    });
+
+    // Apply actions when operator value changes.
+    document.addEventListener('change', function (e) {
+        if ( ! e.target.matches('select[data-metatype="operators"]') ) {
+            return;
+        }
+       
+        e.preventDefault();
+        tryToggleConditionInputFields( e.target );
     });
 
     $(document).on('change', '[data-meta-id="conditions"] select[data-metatype="element_values"]', function(e) {
@@ -1248,79 +1439,164 @@ jQuery(function($) {
 
     $(document).on('click', '.ppom-condition-tab-js', function(e) {
         e.preventDefault();
-
-        var div = $(this).closest('.ppom-slider');
-        var elements = div.find('select[data-metatype="elements"]');
-
-        elements.each(function(i, item) {
-
-            var conditional_elements = item.value;
-            var exiting_meta = $(item).attr('data-existingvalue', conditional_elements);
-        });
-
-        populate_conditional_elements(elements);
-
+        populate_conditional_elements();
     });
 
-    function populate_conditional_elements(elements) {
+    /**
+     * Populate the condition target select with eligible options based on the operator.
+     * 
+     * @param {HTMLSelectElement?} selectInput 
+     * @param {string?} conditionOperator
+     * @param {string[]} excludeIds
+     * @returns 
+     */
+    function populate_condition_target( selectInput, conditionOperator, excludeIds = [] ) {
+        if ( !selectInput ) {
+            return;
+        }
 
-        // resetting
-        jQuery('select[data-metatype="elements"]').html('');
-
-        jQuery(".ppom-slider").each(function(i, item) {
-
-            var conditional_elements = jQuery(item).find(
-                'input[data-metatype="title"]').val();
-            var conditional_elements_value = jQuery(item).find(
-                'input[data-metatype="data_name"]').val();
-
-            if ($.trim(conditional_elements_value) !== '') {
-
-                var $html = '';
-                $html += '<option value="' +
-                    conditional_elements_value + '">' +
-                    conditional_elements +
-                    '</option>';
-
-                $($html).appendTo('select[data-metatype="elements"]');
-            }
-
-        });
-
-        // setting the existing conditional elements
-        $(".ppom-slider").each(function(i, item) {
-
-            $(item).find('select[data-metatype="elements"]').each(function(i, condition_element) {
-
-                var existing_value1 = $(condition_element).attr("data-existingvalue");
-
-                if ($.trim(existing_value1) !== '') {
-                    jQuery(condition_element).val(existing_value1);
-                }
-
+        const newOptions = availableConditionTargets
+            .filter( ({ fieldId, canUse }) => canUse && !excludeIds.includes( fieldId) )
+            .map( target => {
+               
+                const option = document.createElement('option');
+                option.value = target.fieldId;
+                option.textContent = target.fieldLabel;
+                option.dataset.fieldtype = target.fieldType;
+                
+                return option;
             });
-        });
 
-
-
-        // setting the existing conditional elements values
-        $(".ppom-slider").each(function(i, item) {
-
-            $(item).find('select[data-metatype="element_values"]').each(function(i, condition_element) {
-
-                var div = $(this).closest('.webcontact-rules');
-                var existing_value1 = $(condition_element).attr("data-existingvalue");
-
-                div.find('select[data-metatype="elements"]').trigger('change');
-                if ($.trim(existing_value1) !== '') {
-                    jQuery(condition_element).val(existing_value1);
-                }
-            });
-        });
-
+        selectInput.replaceChildren( ...newOptions );
     }
 
+    function findFieldTypeById( fieldId ) {
+        if ( !fieldId ) {
+            return undefined;
+        }
 
+        for ( const target of availableConditionTargets ) {
+            if ( target.fieldId === fieldId ) {
+                return target.fieldType;
+            }
+        }
+
+        return undefined;
+    }
+
+    function can_use_field_type( fieldType ) {
+        if ( ! fieldType?.length ) {
+            return false;
+        }
+
+        for ( const operatorCompatibleFields of Object.values( OPERATORS_FIELD_COMPATIBILITY ) ) {
+            if ( operatorCompatibleFields.includes( fieldType ) ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Populate the condition target select with eligible options based on the operator on initialization and value change.
+     * 
+     */
+    function populate_conditional_elements() {
+
+        // Get all available PPOM fields.
+        availableConditionTargets.splice(0, availableConditionTargets.length);
+        document.querySelectorAll(".ppom-slider").forEach(item => {
+            const fieldLabel = item.querySelector('input[data-metatype="title"]')?.value;
+            const fieldId = item.querySelector('input[data-metatype="data_name"]')?.value?.trim();
+            const fieldType = item.querySelector('input[data-metatype="type"]')?.value;
+            const canUse = can_use_field_type( fieldType );
+
+            if ( !fieldLabel || !fieldId || !fieldType ) {
+                return;
+            }
+
+            availableConditionTargets.push({ fieldLabel, fieldId, fieldType, canUse });
+        });
+      
+        // Change the target options for all the rules.
+        document.querySelectorAll(".ppom-slider").forEach(item => {
+            if ( ! item.id ) {
+                return;
+            }
+            const conditionContainers = item.querySelector('div[data-meta-id="conditions"]')?.querySelectorAll('.webcontact-rules');
+            
+            conditionContainers?.forEach(conditionContainer => {
+                const conditionTargetsSelect = conditionContainer.querySelector('[data-metatype="elements"]');
+                if ( ! conditionTargetsSelect ) {
+                    return;
+                }
+
+                const conditionOperatorSelect = conditionContainer.querySelector('[data-metatype="operators"]');
+                const fieldId = item.querySelector('input[data-metatype="data_name"]')?.value?.trim();
+
+                populate_condition_target( conditionTargetsSelect, conditionOperatorSelect?.value, [fieldId] );
+
+                if ( conditionTargetsSelect?.dataset?.existingvalue ) {
+                    conditionTargetsSelect.value = conditionTargetsSelect?.dataset?.existingvalue;
+                }
+                
+                // NOTE: Get all the locked operators. Unlock them to be eligible to show the upsell.
+                conditionOperatorSelect?.querySelectorAll( 'option' ).forEach( option => {
+                    if ( ! option.disabled ) {
+                        return;
+                    }
+
+                    proOperatorOptionsToLock.add( option.value );
+                    option.disabled = false;
+                });
+               
+                toggleOperatorFieldByTargetType( findFieldTypeById( conditionTargetsSelect?.value ), conditionOperatorSelect  ); 
+                
+                const optionsInput = conditionContainer.querySelector('[data-metatype="element_values"]');
+
+                updateTargetComparisonValueSelect( 
+                    conditionTargetsSelect,
+                    conditionContainer,
+                    optionsInput?.dataset?.existingvalue
+                );
+            });
+        });
+    }
+
+    /**
+     * Update the values of the operators selector and the comparison fields.
+     * 
+     * NOTE: We are using a global listener since some node are dinamically created/cloned.
+     */
+    document.addEventListener('change', function(e) {
+        if ( ! e.target.matches('select[data-metatype="elements"]') ) {
+            return;
+        }
+
+        e.preventDefault();
+        const conditionContainer = e.target.closest('.webcontact-rules');
+        const conditionOperatorSelect = conditionContainer?.querySelector('[data-metatype="operators"]');
+        if ( ! conditionContainer || ! conditionOperatorSelect ) {
+            return;
+        }
+        
+        toggleOperatorFieldByTargetType( findFieldTypeById(e.target?.value), conditionOperatorSelect  );
+        updateTargetComparisonValueSelect( e.target, conditionContainer );
+
+        const optionsInput = conditionContainer.querySelector('[data-metatype="element_values"]');
+        const constantInput = conditionContainer.querySelector('[data-metatype="element_constant"]');
+        
+        // Reset values.
+        if ( constantInput ) {
+            constantInput.value = '';
+        }
+
+        if ( optionsInput ) {
+            optionsInput.value = '';
+        }
+    });
+    
     /**
         28- validate API WooCommerce Product
     **/

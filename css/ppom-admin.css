@@ -144,6 +144,7 @@ ul.ppom-options-container li {
 
 .ppom-condition-style-wrap p {
     font-size: 15px;
+    margin: 0px;
 }
 
 /*.ppom-slider select.form-control {*/
@@ -767,6 +768,11 @@ select {
 
 .ppom-wrapper .row {
     display: block;
+}
+
+.row.ppom-condition-style-wrap {
+    display: flex;
+    align-items: center;
 }
 
 @media (min-width: 992px) {
@@ -1809,4 +1815,30 @@ header.ppom-modal-header {
     display: block;
     position: absolute;
     right: 20px;
+}
+.ppom-hide-element {
+    display: none !important;
+}
+
+.ppom-invisible-element {
+    visibility: hidden;
+}
+
+.ppom-between-input-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.ppom-between-input-container span {
+    font-size: 16px;
+}
+
+.ppom-upsell-condition {
+    font-size: 16px;
+    padding: 9px;
+    display: flex;
+    align-items: center;
 }
