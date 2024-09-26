@@ -127,7 +127,7 @@ class NM_Text_wooproduct extends PPOM_Inputs {
 			),
 			'use_regex'       => array(
 				'type'        => 'checkbox',
-				'title'       => __( 'Enable Regex for Input Mask', 'woocommerce-product-addon' ),
+				'title'       => __( 'Enable Regex Mask', 'woocommerce-product-addon' ),
 				'desc'        => __( 'Enabling this option allows the input mask field to interpret the provided pattern as a regular expression (regex).', 'woocommerce-product-addon' ),
 				'link'        => __( '<a target="_blank" href="' . esc_url( $regex_help_url ) . '">See More</a>', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
