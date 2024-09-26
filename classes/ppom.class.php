@@ -438,15 +438,19 @@ class PPOM_Meta {
 			is_string( $this->ppom_settings->productmeta_style ) &&
 			$this->ppom_settings->productmeta_style !== ''
 		) {
+			$selector = '';
+			$template = stripslashes( strip_tags( $this->ppom_settings->productmeta_style ) );
+
 			if ( is_array( $this->meta_id ) ) {
-				$template = stripslashes( strip_tags( $this->ppom_settings->productmeta_style ) );
+				$field_selector = [];
 				foreach( $this->meta_id as $field_id ) {
-					$inline_css .= str_replace( 'selector', ".ppom-id-$field_id", $template );
+					$field_selector[] = ".ppom-id-" . $field_id;
 				}
+				$selector = ':where(' . implode( ', ', $field_selector ) . ')';
 			} else if ( is_numeric( $this->meta_id ) ) {
-				$inline_css = stripslashes( strip_tags( $this->ppom_settings->productmeta_style ) );
-				$inline_css = str_replace( 'selector', ".ppom-id-$this->meta_id", $inline_css );
+				$selector = ".ppom-id-" . $this->meta_id;
 			}
+			$inline_css = str_replace( 'selector', $selector, $template );
 		}
 
 		return apply_filters( 'ppom_inline_css', $inline_css, $this );
