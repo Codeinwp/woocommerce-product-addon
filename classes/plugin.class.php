@@ -1031,11 +1031,11 @@ class NM_PersonalizedProduct {
 		$plan = intval( $plan );
 		switch ( $type ) {
 			case 'vip':
-				return self::get_license_category( $plan ) === 3;
+				return self::get_license_category( $plan ) >= self::LICENSE_PLAN_3;
 			case 'plus':
-				return self::get_license_category( $plan ) === 2;
+				return self::get_license_category( $plan ) >= self::LICENSE_PLAN_2;
 			case 'pro':
-				return  self::get_license_category( $plan ) === 1;
+				return  self::get_license_category( $plan ) >= self::LICENSE_PLAN_1;
 		}
 
 		return false;
