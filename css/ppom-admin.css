@@ -1793,3 +1793,7 @@ header.ppom-modal-header {
     cursor: pointer;
     padding: 10px 0 1px 10px;
 }
+
+.ppom-attach-container .ppom-settings-container {
+    margin: 10px 0;
+}
