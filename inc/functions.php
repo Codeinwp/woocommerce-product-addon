@@ -2353,26 +2353,24 @@ function ppom_get_conditional_data_attributes( $meta ) {
 		$conditions['rules'] = array_filter(
 			$conditions['rules'],
 			function( $rule ) {
-				if ( isset( $rule['operators'] ) ) {
-					if ( in_array( $rule['operators'], array( 'any', 'empty', 'even-number', 'odd-number', 'regex') ) ) {
-						return true;
-					}
-	
-					if ( in_array( $rule['operators'], array( 'number-multiplier', 'regex', 'contains', 'not-contains') ) ) {
-						return ! empty( $rule['element_constant'] );
-					}
-	
-					if ( in_array( $rule['operators'], array( 'greater than', 'less than', 'is', 'not' ) ) ) {
-						return ! empty( $rule['element_constant'] ) || ! empty( $rule['element_values'] );
-					}
-	
-					if ( 'between' === $rule['operators'] ) {
-						return (
-							! empty( $rule['cond-between-interval']) && is_array( $rule['cond-between-interval'] )
-							&& isset( $rule['cond-between-interval']['to'] )
-							&& isset( $rule['cond-between-interval']['from'] )
-						);
-					}
+				if ( in_array( $rule['operators'], array( 'any', 'empty', 'even-number', 'odd-number', 'regex') ) ) {
+					return true;
+				}
+
+				if ( in_array( $rule['operators'], array( 'number-multiplier', 'regex', 'contains', 'not-contains') ) ) {
+					return ! empty( $rule['element_constant'] );
+				}
+
+				if ( in_array( $rule['operators'], array( 'greater than', 'less than', 'is', 'not' ) ) ) {
+					return ! empty( $rule['element_constant'] ) || ! empty( $rule['element_values'] );
+				}
+
+				if ( 'between' === $rule['operators'] ) {
+					return (
+						! empty( $rule['cond-between-interval']) && is_array( $rule['cond-between-interval'] )
+						&& isset( $rule['cond-between-interval']['to'] )
+						&& isset( $rule['cond-between-interval']['from'] )
+					);
 				}
 
 				return ! empty( $rule['element_values'] );
