@@ -1005,11 +1005,11 @@ class NM_PersonalizedProduct {
 		$plan = intval( $plan );
 		switch ( $type ) {
 			case 'vip':
-				return in_array( $plan, array( 3, 6, 7 ), true );
+				return NM_PersonalizedProduct_Admin::get_license_category( $plan ) === 3;
 			case 'plus':
-				return in_array( $plan, array( 2, 3, 5, 6, 7, 8 ), true );
+				return NM_PersonalizedProduct_Admin::get_license_category( $plan ) === 2;
 			case 'pro':
-				return ( $plan > 0 );
+				return NM_PersonalizedProduct_Admin::get_license_category( $plan ) === 1;
 		}
 
 		return false;
