@@ -25,12 +25,13 @@ $product_meta_id        = 0;
 $product_meta           = array();
 $ppom_field_index       = 1;
 $is_edit_screen         = false;
-if ( $_REQUEST ['action'] == 'new' ) {
+
+if ( isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'new' ) {
 	$is_edit_screen = true;
 }
-if ( isset( $_REQUEST ['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) {
+if ( isset( $_REQUEST['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) {
 
-	$product_meta_id = intval( $_REQUEST ['productmeta_id'] );
+	$product_meta_id = intval( $_REQUEST['productmeta_id'] );
 	$ppom            = new PPOM_Meta();
 	$ppom_settings   = $ppom->get_settings_by_id( $product_meta_id );
 	$is_edit_screen  = true;
@@ -179,6 +180,13 @@ $fields_groups = [
 				'icon'        => 'fa-picture-o',
 			],
 			[
+				'slug'        => 'image',
+				'title'       => __( 'Images', 'woocommerce-product-addon' ),
+				'description' => __( 'Select images.', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-picture-o',
+			],
+			[
 				'slug'        => 'imageselect',
 				'title'       => __( 'Image DropDown', 'woocommerce-product-addon' ),
 				'description' => __( 'Dropdown with image selections', 'woocommerce-product-addon' ),
@@ -283,6 +291,13 @@ $fields_groups = [
 				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
 				'icon'        => 'fa-money',
 			],
+			[
+				'slug'        => 'divider',
+				'title'       => __( 'Divider', 'woocommerce-product-addon' ),
+				'description' => __( 'Add a visual separator.', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-pencil-square-o',
+			]
 		]
 	],
 	'pricing-group' => [
@@ -297,7 +312,7 @@ $fields_groups = [
 			],
 			[
 				'slug'        => 'quantities',
-				'title'       => __( 'Select Option Quantity', 'woocommerce-product-addon' ),
+				'title'       => __( 'Variation Quantity ', 'woocommerce-product-addon' ),
 				'description' => __( 'Quantity selection with options', 'woocommerce-product-addon' ),
 				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_2,
 				'icon'        => 'fa-list-ol',
@@ -318,7 +333,7 @@ $fields_groups = [
 			],
 			[
 				'slug'        => 'vqmatrix',
-				'title'       => __( 'Variation Quantity', 'woocommerce-product-addon' ),
+				'title'       => __( 'Variation Matrix', 'woocommerce-product-addon' ),
 				'description' => __( 'Quantity selector for variations', 'woocommerce-product-addon' ),
 				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_3,
 				'icon'        => 'fa-list-ol',
@@ -336,6 +351,20 @@ $fields_groups = [
 				'description' => __( 'Quantity selection options', 'woocommerce-product-addon' ),
 				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
 				'icon'        => 'fa-money',
+			],
+			[
+				'slug'        => 'bulkquantity',
+				'title'       => __( 'Bulk Quantity', 'woocommerce-product-addon' ),
+				'description' => __( 'Bulk quantity selection for products', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-columns',
+			],
+			[
+				'slug'        => 'selectqty',
+				'title'       => __( 'Select Option Quantity', 'woocommerce-product-addon' ),
+				'description' => __( 'Select option\'s quantity', 'woocommerce-product-addon' ),
+				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'icon'        => 'fa-list-ol',
 			],
 		]
 	]
