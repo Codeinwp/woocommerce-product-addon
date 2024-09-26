@@ -287,7 +287,7 @@ function ppom_admin_save_form_meta() {
 	$product_meta = array_filter(
 		$product_meta,
 		function( $pm ) {
-			return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] );
+			return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] );
 		}
 	);
 	$product_meta = json_encode( $product_meta );
@@ -450,7 +450,7 @@ function ppom_admin_update_form_meta() {
 	$product_meta = array_filter(
 		$product_meta,
 		function( $pm ) {
-			return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] ) && ! empty( $pm['ppom_id'] );
+			return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] );
 		}
 	);
 	$product_meta = json_encode( $product_meta );
