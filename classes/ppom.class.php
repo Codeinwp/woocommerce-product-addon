@@ -161,7 +161,7 @@ class PPOM_Meta {
 
 
 		// Checking if PPOM attached in category
-		$ppom_in_category = $this->ppom_has_category_or_tag_meta( $product_id );
+		$ppom_in_category = $this->ppom_has_category_meta( $product_id );
 		// if( $ppom_in_category && ! is_admin() ){
 		if ( $ppom_in_category ) {
 
@@ -362,14 +362,14 @@ class PPOM_Meta {
 		return apply_filters( 'ppom_meta_fields_by_id', $meta_fields, $ppom_ids, $this );
 	}
 
-	function ppom_has_category_or_tag_meta( $product_id ) {
+	function ppom_has_category_meta($product_id ) {
 
 		$product_categories = get_the_terms( $product_id, 'product_cat' );
 
 		$meta_found = array();
 		if ( $product_categories && $this->ppom_categories_and_tags_row ) {
 			foreach ( $this->ppom_categories_and_tags_row as $row ) {
-				
+
 				if ( $row->productmeta_categories === 'All' ) {
 					$meta_found[] = $row->productmeta_id;
 				} else {
@@ -432,7 +432,7 @@ class PPOM_Meta {
 		if ( ! $this->ppom_settings ) {
 			return null;
 		}
-		
+
 		if (
 			isset( $this->ppom_settings->productmeta_style ) &&
 			is_string( $this->ppom_settings->productmeta_style ) &&
