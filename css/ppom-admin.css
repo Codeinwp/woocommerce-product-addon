@@ -1797,3 +1797,16 @@ header.ppom-modal-header {
 .ppom-attach-container .ppom-settings-container {
     margin: 10px 0;
 }
+.ppom-fields-status-disabled .inside{
+    cursor: not-allowed;
+}
+.ppom-fields-status-disabled .postbox-header ,
+.ppom-fields-status-disabled .ppom-attach-container-input,
+.ppom-fields-status-disabled .ppom-attach-description{
+    opacity: 0.5;
+}
+.ppom-field-filter-pro-available{
+    display: block;
+    position: absolute;
+    right: 20px;
+}

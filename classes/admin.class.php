@@ -262,18 +262,18 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			die( 0 );
 		}
 
-		$ppom_id             = intval( $_GET['ppom_id'] );
-		$license_status      = apply_filters( 'product_ppom_license_status', '' );
-		$current_saved_value = $this->get_db_field( $ppom_id );
-
-		$select_products_id_component = (new \PPOM\Attach\SelectComponent())
+		$ppom_id                      = intval( $_GET['ppom_id'] );
+		$license_status               = apply_filters( 'product_ppom_license_status', '' );
+		$current_saved_value          = $this->get_db_field( $ppom_id );
+		$pro_multiple_fields          = ! ppom_pro_is_installed() || 'valid' !== $license_status ? '</br><i style="font-size: 90%">' . sprintf( __( 'Your current plan supports adding one group of fields per product. To add multiple groups to the same product, please %supgrade%s your plan!', 'woocommerce-product-addon' ), '<a target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'multiple-fields' ) . '">', '</a>' ) . '</i>' : '';
+		$select_products_id_component = ( new \PPOM\Attach\SelectComponent() )
 			->set_id( 'attach-to-products' )
-			->set_title( __( 'Display on Specific Products', 'woocommerce-product-addon') )
-			->set_description( __( 'Select the product(s) where you want these product fields to appear.', 'woocommerce-product-addon') )
+			->set_title( __( 'Display on Specific Products', 'woocommerce-product-addon' ) )
+			->set_description( __( 'Select the product(s) where you want these product fields to appear.', 'woocommerce-product-addon' ) . $pro_multiple_fields )
 			->set_select(
 				array_merge(
 					array(
-						'label'    => __( 'Choose Products:', 'woocommerce-product-addon'),
+						'label'    => __( 'Choose Products:', 'woocommerce-product-addon' ),
 						'name'     => 'ppom-attach-to-products[]',
 						'multiple' => true,
 						'is_used'  => true
@@ -282,14 +282,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				)
 			);
 
-		$attach_to_categories_component = (new \PPOM\Attach\SelectComponent())
+		$attach_to_categories_component = ( new \PPOM\Attach\SelectComponent() )
 			->set_id( 'attach-to-categories' )
-			->set_title( __( 'Display in Specific Product Categories', 'woocommerce-product-addon') )
-			->set_description( __( 'Select the product categories where you want these product fields to appear.', 'woocommerce-product-addon') )
+			->set_title( __( 'Display in Specific Product Categories', 'woocommerce-product-addon' ) )
+			->set_description( __( 'Select the product categories where you want these product fields to appear.', 'woocommerce-product-addon' ) )
 			->set_select(
 				array_merge(
 					array(
-						'label'    => __( 'Choose Categories:', 'woocommerce-product-addon'),
+						'label'    => __( 'Choose Categories:', 'woocommerce-product-addon' ),
 						'name'     => 'ppom-attach-to-categories[]',
 						'multiple' => true
 					),
@@ -297,30 +297,40 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				)
 			);
 
-		$attach_to_tags_component = (new \PPOM\Attach\SelectComponent())
-			->set_status( $license_status )
-			->set_id( 'attach-to-tags' )
-			->set_title( __( 'Display in Specific Product Tags', 'woocommerce-product-addon') . ( 'valid' !== $license_status ? ' (' . __( 'PRO' ) . ')' : '') )
-			->set_description( __( 'Select the product tags where you want these product fields to appear.', 'woocommerce-product-addon') )
-			->set_select(
-				array_merge(
-					array(
-						'label'    => __( 'Choose tags:', 'woocommerce-product-addon'),
-						'name'     => 'ppom-attach-to-tags[]',
-						'multiple' => true,
-					),
-					$this->get_wc_tags( $current_saved_value )
-				)
-			);
 
 		$popup_components = array(
 			new \PPOM\Attach\ContainerItem( $select_products_id_component->get_id(), $select_products_id_component ),
-			new \PPOM\Attach\ContainerItem( $attach_to_categories_component->get_id(), $attach_to_categories_component ),
-			new \PPOM\Attach\ContainerItem( $attach_to_tags_component->get_id(), $attach_to_tags_component )
+			new \PPOM\Attach\ContainerItem( $attach_to_categories_component->get_id(), $attach_to_categories_component )
 		);
+
+		$tags = $this->get_wc_tags( $current_saved_value );
+		if ( ! empty( $tags['options'] ) ) {
+			$attach_to_tags_component = ( new \PPOM\Attach\SelectComponent() )
+				->set_status( $license_status )
+				->set_id( 'attach-to-tags' )
+				->set_title( __( 'Display in Specific Product Tags', 'woocommerce-product-addon' ) )
+				->set_description( __( 'Select the product tags where you want these product fields to appear.', 'woocommerce-product-addon' ) )
+				->set_select(
+					array_merge(
+						array(
+							'label'    => __( 'Choose tags:', 'woocommerce-product-addon' ),
+							'name'     => 'ppom-attach-to-tags[]',
+							'multiple' => true,
+						),
+						$this->get_wc_tags( $current_saved_value )
+					)
+				);
+			if('valid' !== $license_status ){
+				$attach_to_tags_component = $attach_to_tags_component->set_status( 'invalid' );
+			}
+			$popup_components[]       =
+				new \PPOM\Attach\ContainerItem( $attach_to_tags_component->get_id(), $attach_to_tags_component );
+		}
+
+
 		$popup_components = apply_filters( 'pppom_popup_components', $popup_components, $ppom_id );
 
-		add_filter('ppom_render_attach_popup', function( $html_content ) use ( $popup_components ) {
+		add_filter( 'ppom_render_attach_popup', function ( $html_content ) use ( $popup_components ) {
 			if ( empty( $popup_components ) || ! is_array( $popup_components ) ) {
 				return $html_content;
 			}
@@ -333,11 +343,11 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			}
 
 			return $html_content;
-		});
+		} );
 
 		ob_start();
 		$vars = array(
-			'ppom_id'      => $ppom_id,
+			'ppom_id' => $ppom_id,
 		);
 		ppom_load_template( 'admin/products-list.php', $vars );
 
@@ -670,7 +680,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	function settings_tab() {
 
 		if ( current_user_can( 'manage_options' ) ) {
-			woocommerce_admin_fields(ppom_array_settings());
+			woocommerce_admin_fields( ppom_array_settings() );
 		}
 
 	}
@@ -678,7 +688,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	function save_settings() {
 
 		if ( current_user_can( 'manage_options' ) ) {
-			woocommerce_update_options(ppom_array_settings());
+			woocommerce_update_options( ppom_array_settings() );
 		}
 	}
 
@@ -693,69 +703,69 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 	function ppom_tabs_custom_style() {
 		?>
-		<style>
-			#woocommerce-product-data .ppom_extra_options_panel label {
-				margin: 0 !important;
-			}
+        <style>
+            #woocommerce-product-data .ppom_extra_options_panel label {
+                margin: 0 !important;
+            }
 
-			/* PPOM Meta in column */
-			th.column-ppom_meta {
-				width: 10% !important;
-			}
+            /* PPOM Meta in column */
+            th.column-ppom_meta {
+                width: 10% !important;
+            }
 
-			/* PPOM File Upload uploaded files display */
-			td.ppom-files-display {
-				display: flex;
-				flex-direction: column;
-				gap: 3px;
-			}
+            /* PPOM File Upload uploaded files display */
+            td.ppom-files-display {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+            }
 
-			td.ppom-files-display a.button {
-				text-align: center;
-			}
+            td.ppom-files-display a.button {
+                text-align: center;
+            }
 
-			.ppom-settings-container {
-				display: flex;
-				flex-direction: column;
-				gap: 15px;
-				margin: 10px 15px;
-			}
+            .ppom-settings-container {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                margin: 10px 15px;
+            }
 
-			.ppom-settings-container-item {
-				display: flex;
-				align-items: center;
-				gap: 10px;
-			}
+            .ppom-settings-container-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
 
-			label.ppom-settings-container-item {
-				width: 100%;
-				max-width: 600px;
-				margin: unset;
-			}
+            label.ppom-settings-container-item {
+                width: 100%;
+                max-width: 600px;
+                margin: unset;
+            }
 
-			.ppom-settings-container .ppom-upsell-link {
-				display: inline-flex;
-				align-items: center;
-				padding: 0.5rem 1rem;
-				font-size: 0.875rem;
-				font-weight: 500;
-				color: #2563eb;
-				background-color: #eff6ff;
-				border: 1px solid #bfdbfe;
-				border-radius: 0.375rem;
-				text-decoration: none;
-				transition: all 150ms ease-in-out;
-			}
+            .ppom-settings-container .ppom-upsell-link {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: #2563eb;
+                background-color: #eff6ff;
+                border: 1px solid #bfdbfe;
+                border-radius: 0.375rem;
+                text-decoration: none;
+                transition: all 150ms ease-in-out;
+            }
 
-			.ppom-settings-container .ppom-upsell-link:hover {
-				background-color: #dbeafe;
-				color: #1d4ed8;
-			}
+            .ppom-settings-container .ppom-upsell-link:hover {
+                background-color: #dbeafe;
+                color: #1d4ed8;
+            }
 
-			.ppom-settings-container .ppom-disabled-text {
-				color: #8d8d8d;
-			}
-		</style>
+            .ppom-settings-container .ppom-disabled-text {
+                color: #8d8d8d;
+            }
+        </style>
 		<?php
 	}
 
@@ -773,15 +783,16 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 
 		?>
-		<tr valign="top">
-			<th scope="row" class="titledesc">
-				<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?> <span
-							class="woocommerce-help-tip" data-tip="<?php echo $value['desc']; ?>"></span></label>
-			</th>
-			<td class="forminp">
-				<select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="width:350px"
-						data-placeholder="<?php esc_attr_e( 'Choose Roles', 'woocommerce-product-addon' ); ?>"
-						aria-label="<?php esc_attr_e( 'Roles', 'woocommerce-product-addon' ); ?>" class="wc-enhanced-select">
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                <label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?> <span
+                            class="woocommerce-help-tip" data-tip="<?php echo $value['desc']; ?>"></span></label>
+            </th>
+            <td class="forminp">
+                <select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="width:350px"
+                        data-placeholder="<?php esc_attr_e( 'Choose Roles', 'woocommerce-product-addon' ); ?>"
+                        aria-label="<?php esc_attr_e( 'Roles', 'woocommerce-product-addon' ); ?>"
+                        class="wc-enhanced-select">
 					<?php
 					if ( ! empty( $selected_roles ) ) {
 						foreach ( $selected_roles as $key => $val ) {
@@ -789,10 +800,12 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 						}
 					}
 					?>
-				</select> <br/><a class="select_all button" href="#"><?php esc_html_e( 'Select all', 'woocommerce-product-addon' ); ?></a> <a
-						class="select_none button" href="#"><?php esc_html_e( 'Select none', 'woocommerce-product-addon' ); ?></a>
-			</td>
-		</tr>
+                </select> <br/><a class="select_all button"
+                                  href="#"><?php esc_html_e( 'Select all', 'woocommerce-product-addon' ); ?></a> <a
+                        class="select_none button"
+                        href="#"><?php esc_html_e( 'Select none', 'woocommerce-product-addon' ); ?></a>
+            </td>
+        </tr>
 		<?php
 
 	}
@@ -808,8 +821,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 	/**
 	 * Get the license category (Essential, Plus, VIP).
-	 * 
+	 *
 	 * @param number Plan ID.
+	 *
 	 * @return number The associated category.
 	 */
 	public static function get_license_category( $license_plan ) {
