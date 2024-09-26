@@ -6,6 +6,10 @@
 
 class NM_PersonalizedProduct {
 
+	public const LICENSE_PLAN_FREE = -1;
+	public const LICENSE_PLAN_1    = 1; // Essential.
+	public const LICENSE_PLAN_2    = 2; // Plus.
+	public const LICENSE_PLAN_3    = 3; // VIP.
 	static $tbl_productmeta = 'nm_personalized';
 
 
@@ -988,6 +992,28 @@ class NM_PersonalizedProduct {
 	}
 
 	/**
+	 * Get the license category (Essential, Plus, VIP).
+	 *
+	 * @param number Plan ID.
+	 *
+	 * @return number The associated category.
+	 */
+	public static function get_license_category( $license_plan ) {
+		$license_categories = array(
+			self::LICENSE_PLAN_1 => array( 1, 4, 9 ),
+			self::LICENSE_PLAN_2 => array( 2, 5, 8 ),
+			self::LICENSE_PLAN_3 => array( 3, 6, 7, 10 ),
+		);
+
+		foreach ( $license_categories as $category => $plans ) {
+			if ( in_array( $license_plan, $plans ) ) {
+				return $category;
+			}
+		}
+
+		return self::LICENSE_PLAN_FREE;
+	}
+	/**
 	 * Method to return the type of licence.
 	 *
 	 * @param string $type Licence type.
@@ -1005,11 +1031,11 @@ class NM_PersonalizedProduct {
 		$plan = intval( $plan );
 		switch ( $type ) {
 			case 'vip':
-				return NM_PersonalizedProduct_Admin::get_license_category( $plan ) === 3;
+				return self::get_license_category( $plan ) === 3;
 			case 'plus':
-				return NM_PersonalizedProduct_Admin::get_license_category( $plan ) === 2;
+				return self::get_license_category( $plan ) === 2;
 			case 'pro':
-				return NM_PersonalizedProduct_Admin::get_license_category( $plan ) === 1;
+				return  self::get_license_category( $plan ) === 1;
 		}
 
 		return false;

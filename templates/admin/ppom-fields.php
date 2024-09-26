@@ -59,12 +59,12 @@ echo '<p><a href="' . esc_url( $url_cancel ) . '">' . __( '&laquo; Existing Prod
 $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 
 $license_data      = get_option( 'ppom_pro_license_data', array() );
-$plan_category     = NM_PersonalizedProduct_Admin::LICENSE_PLAN_FREE;
+$plan_category     = NM_PersonalizedProduct::LICENSE_PLAN_FREE;
 $is_pro_installed  = ppom_pro_is_installed();
 $license_status    = $is_pro_installed && ! empty( $license_data->license ) ? $license_data->license : 'invalid';
 
 if ( $is_pro_installed && isset( $license_data->plan ) && is_numeric( $license_data->plan ) ) {
-	$plan_category = NM_PersonalizedProduct_Admin::get_license_category( intval( $license_data->plan ) );
+	$plan_category = NM_PersonalizedProduct::get_license_category( intval( $license_data->plan ) );
 }
 
 $fields_groups = [
@@ -105,7 +105,7 @@ $fields_groups = [
 				'slug'        => 'phone',
 				'title'       => __( 'Phone Input', 'woocommerce-product-addon' ),
 				'description' => __( 'Simple Phone field', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-check',
 			]
 		]
@@ -135,21 +135,21 @@ $fields_groups = [
 				'slug'        => 'switcher',
 				'title'       => __( 'Radio Switcher', 'woocommerce-product-addon' ),
 				'description' => __( 'Radio button switcher', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-dot-circle-o',
 			],
 			[
 				'slug'        => 'superlist',
 				'title'       => __( 'Super List', 'woocommerce-product-addon' ),
 				'description' => __( 'Advanced list input', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-check',
 			],
 			[
 				'slug'        => 'chained',
 				'title'       => __( 'Chained Input', 'woocommerce-product-addon' ),
 				'description' => __( 'Linked dropdown selections where choices in one field depend on previous selections.', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-check',
 			],
 		]
@@ -162,56 +162,56 @@ $fields_groups = [
 				'slug'        => 'file',
 				'title'       => __( 'File Input', 'woocommerce-product-addon' ),
 				'description' => __( 'File upload field', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-file',
 			],
 			[
 				'slug'        => 'emojis',
 				'title'       => __( 'Emojis', 'woocommerce-product-addon' ),
 				'description' => __( 'Emoji picker for input fields', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-user-plus',
 			],
 			[
 				'slug'        => 'conditional_meta',
 				'title'       => __( 'Conditional Images', 'woocommerce-product-addon' ),
 				'description' => __( 'Images that change based on input conditions', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-picture-o',
 			],
 			[
 				'slug'        => 'image',
 				'title'       => __( 'Images', 'woocommerce-product-addon' ),
 				'description' => __( 'Select images.', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-picture-o',
 			],
 			[
 				'slug'        => 'imageselect',
 				'title'       => __( 'Image DropDown', 'woocommerce-product-addon' ),
 				'description' => __( 'Dropdown with image selections', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-file-image-o',
 			],
 			[
 				'slug'        => 'audio',
 				'title'       => __( 'Audio / Video', 'woocommerce-product-addon' ),
 				'description' => __( 'Audio and video input field', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-file-video-o',
 			],
 			[
 				'slug'        => 'cropper',
 				'title'       => __( 'Image Cropper', 'woocommerce-product-addon' ),
 				'description' => __( 'Image cropping tool', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-crop',
 			],
 			[
 				'slug'        => 'texter',
 				'title'       => __( 'Personalization Preview', 'woocommerce-product-addon' ),
 				'description' => __( 'Preview for personalized products', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-keyboard-o',
 			]
 		]
@@ -229,7 +229,7 @@ $fields_groups = [
 				'slug'        => 'timezone',
 				'title'       => __( 'Timezone Input', 'woocommerce-product-addon' ),
 				'description' => __( 'Timezone selector for input fields', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-clock-o',
 			],
 
@@ -237,14 +237,14 @@ $fields_groups = [
 				'slug'        => 'daterange',
 				'title'       => __( 'DateRange Input', 'woocommerce-product-addon' ),
 				'description' => __( 'Date range input field', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-table',
 			],
 			[
 				'slug'        => 'section',
 				'title'       => __( 'HTML', 'woocommerce-product-addon' ),
 				'description' => __( 'Custom HTML input field', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-code',
 			],
 
@@ -252,21 +252,21 @@ $fields_groups = [
 				'slug'        => 'color',
 				'title'       => __( 'Color Picker', 'woocommerce-product-addon' ),
 				'description' => __( 'Color picker input field', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-modx',
 			],
 			[
 				'slug'        => 'palettes',
 				'title'       => __( 'Color Palettes', 'woocommerce-product-addon' ),
 				'description' => __( 'Color palette selection', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-user-plus',
 			],
 			[
 				'slug'        => 'fonts',
 				'title'       => __( 'Fonts Picker', 'woocommerce-product-addon' ),
 				'description' => __( 'Font selection tool', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-font',
 			],
 
@@ -274,28 +274,28 @@ $fields_groups = [
 				'slug'        => 'domain',
 				'title'       => __( 'Domain', 'woocommerce-product-addon' ),
 				'description' => __( 'Domain input field', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_3,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_3,
 				'icon'        => 'fa-server',
 			],
 			[
 				'slug'        => 'textcounter',
 				'title'       => __( 'Text Counter', 'woocommerce-product-addon' ),
 				'description' => __( 'Character count for input fields', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-comments-o',
 			],
 			[
 				'slug'        => 'collapse',
 				'title'       => __( 'Collapse', 'woocommerce-product-addon' ),
 				'description' => __( 'Group and toggle other input fields within a collapsible section, helping to organize long forms more efficiently.', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-money',
 			],
 			[
 				'slug'        => 'divider',
 				'title'       => __( 'Divider', 'woocommerce-product-addon' ),
 				'description' => __( 'Add a visual separator.', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-pencil-square-o',
 			]
 		]
@@ -307,63 +307,63 @@ $fields_groups = [
 				'slug'        => 'fixedprice',
 				'title'       => __( 'Fixed Price', 'woocommerce-product-addon' ),
 				'description' => __( 'Fixed pricing options', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-money',
 			],
 			[
 				'slug'        => 'quantities',
 				'title'       => __( 'Variation Quantity ', 'woocommerce-product-addon' ),
 				'description' => __( 'Quantity selection with options', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_2,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_2,
 				'icon'        => 'fa-list-ol',
 			],
 			[
 				'slug'        => 'pricematrix',
 				'title'       => __( 'Price Matrix', 'woocommerce-product-addon' ),
 				'description' => __( 'Matrix-based pricing', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-usd',
 			],
 			[
 				'slug'        => 'qtypack',
 				'title'       => __( 'Quantities Pack', 'woocommerce-product-addon' ),
 				'description' => __( 'Pack-based quantity options', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-list-alt',
 			],
 			[
 				'slug'        => 'vqmatrix',
 				'title'       => __( 'Variation Matrix', 'woocommerce-product-addon' ),
 				'description' => __( 'Quantity selector for variations', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_3,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_3,
 				'icon'        => 'fa-list-ol',
 			],
 			[
 				'slug'        => 'measure',
 				'title'       => __( 'Measure Input', 'woocommerce-product-addon' ),
 				'description' => __( 'Measurement input field', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-building-o',
 			],
 			[
 				'slug'        => 'quantityoption',
 				'title'       => __( 'Quantity Option', 'woocommerce-product-addon' ),
 				'description' => __( 'Quantity selection options', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-money',
 			],
 			[
 				'slug'        => 'bulkquantity',
 				'title'       => __( 'Bulk Quantity', 'woocommerce-product-addon' ),
 				'description' => __( 'Bulk quantity selection for products', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-columns',
 			],
 			[
 				'slug'        => 'selectqty',
 				'title'       => __( 'Select Option Quantity', 'woocommerce-product-addon' ),
 				'description' => __( 'Select option\'s quantity', 'woocommerce-product-addon' ),
-				'plan'        => NM_PersonalizedProduct_Admin::LICENSE_PLAN_1,
+				'plan'        => NM_PersonalizedProduct::LICENSE_PLAN_1,
 				'icon'        => 'fa-list-ol',
 			],
 		]
