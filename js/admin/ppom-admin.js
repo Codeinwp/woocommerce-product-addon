@@ -513,7 +513,7 @@ jQuery(function($) {
         13- Clone Existing Fields
     **/
     var copy_no = 0;
-    $('.ppom-main-field-wrapper').on('click', '.ppom_copy_field', function(e) {
+    $('.ppom-main-field-wrapper').on('click', '.ppom_copy_field:not(.ppom-is-pro-field)', function(e) {
         e.preventDefault();
 
         var model_id_no = $(this).attr('id');
@@ -1714,7 +1714,7 @@ jQuery(function($) {
         .toggleClass('ppom-disabled-overlay');
     } );
 
-    $( document ).on( 'click', 'button.ppom-edit-field.ppom-is-pro-field', function() {
+    $( document ).on( 'click', 'button.ppom-edit-field.ppom-is-pro-field, button.ppom_copy_field.ppom-is-pro-field', function() {
         $('#ppom-lock-fields-upsell').fadeIn();
        return false;
     } );

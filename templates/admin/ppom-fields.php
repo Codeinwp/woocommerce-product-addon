@@ -774,12 +774,12 @@ $fields_groups = [
 								<td class="ppom_meta_field_plchlder"><?php echo $the_placeholder; ?></td>
 								<td class="ppom_meta_field_req"><?php echo $_ok; ?></td>
 								<td>
-									<button class="btn  ppom_copy_field"
+									<button class="btn  ppom_copy_field <?php echo ! ppom_pro_is_valid_license() && ! isset( PPOM()->inputs[ $field_type ] ) ? 'ppom-is-pro-field' : ''; ?>"
 											data-field-type="<?php echo esc_attr( $field_type ); ?>"
 											title="<?php _e( 'Copy Field', 'woocommerce-product-addon' ); ?>"
 											id="<?php echo esc_attr( $f_index ); ?>"><span
 												class="dashicons dashicons-admin-page"></span></span></i></button>
-									<button class="btn ppom-edit-field<?php echo ! ppom_pro_is_valid_license() && ! isset( PPOM()->inputs[ $field_type ] ) ? ' ppom-is-pro-field' : ''; ?>"
+									<button class="btn ppom-edit-field <?php echo ! ppom_pro_is_valid_license() && ! isset( PPOM()->inputs[ $field_type ] ) ? 'ppom-is-pro-field' : ''; ?>"
 											data-modal-id="ppom_field_model_<?php echo esc_attr( $f_index ); ?>"
 											id="<?php echo esc_attr( $f_index ); ?>"
 											title="<?php _e( 'Edit Field', 'woocommerce-product-addon' ); ?>"><span
