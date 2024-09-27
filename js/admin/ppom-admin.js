@@ -247,21 +247,17 @@ jQuery(function($) {
     **/
     $('.ppom-main-field-wrapper').on('click', '.ppom_remove_field', function(e) {
         e.preventDefault();
+      
+        const inputsToRemove = document.querySelectorAll('.ppom_field_table .ppom-check-one-field input:checked');
 
-        var check_field = $('.ppom-check-one-field input[type="checkbox"]:checked');
-
-        if (check_field.length > 0) {
+        if ( inputsToRemove.length > 0 ) {
             window?.ppomPopup?.open({
                 title: window?.ppom_vars?.i18n.popup.confirmTitle,
                 onConfirmation: () => {
-                    $('.ppom_field_table').find('.ppom-check-one-field input').each(function(i, meta_field) {
-
-                        const field_id = $(meta_field).val();
-                        if (this.checked) {
-                            // console.log(field_id)
-                            $(meta_field).parent().parent().parent('.row_no_' + field_id + '').remove();
-                        }
-                        $('.ppom_save_fields_model').find('#ppom_field_model_' + field_id + '').remove();
+                    inputsToRemove.forEach(( meta_field ) => {
+                        const field_id = meta_field.value;
+                        meta_field.closest(`.row_no_${field_id}`)?.remove();
+                        document.querySelector(`#ppom_field_model_${field_id}`)?.remove();
                     });
                 }
             })
