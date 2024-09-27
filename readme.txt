@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, woocommerce product addon
 Requires at least: 3.5
 Tested up to: 6.6
-Stable tag: 32.0.27
+Stable tag: 33.0.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -121,6 +121,63 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 9. PPOM General Settings
 
 == Changelog ==
+
+#### [Version 33.0.0](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.27...v33.0.0) (2024-09-27)
+
+**New Features**
+- [PRO] Added conditional logic categories for text and numeric fields with new operators: contains, does not contain, matches regex, between, multiple of a number, and odd or even.
+- [PRO] Added an option to attach fields to products by their tags.
+- [PRO] Added the ability to use the selector keyword in custom CSS for better scoping.
+- Combined the PPOM Texter and font picker previews, allowing users to preview custom fonts directly within the Texter for a more integrated experience.
+- Added Price Multiplier support for the measurement input, allowing users to adjust pricing based on different units of measurement (e.g., converting cm to m), with a default multiplier value of 1 for accurate price calculation.
+- Added tooltips support for fields for all users.
+
+**Improvements**
+- Unified the product metabox UI/flow for both Free and Pro versions with improved layout and group management.
+- Enhanced the field-adding experience by decluttering the layout and categorizing fields with a search function.
+- Unified the process for attaching products or categories.
+- Reviewed Admin UI for colors and contrasts.
+- A warning for unsaved changes was added in the field editor.
+- Added the Requires Plugins header tag.
+- Removed Sweetalert2 dependency and replaced it with a simpler internal implementation.
+- Internalized some JS dependencies.
+- Removed legacy switcher settings as they are no longer relevant.
+- Updated settings descriptions to improve clarity and helpfulness.
+- Moved the Texter post type under Settings as Manage Personalization Preview and renamed the Texter field to Personalization Preview.
+- Added a visual cue by graying out the conditions when Enable Conditions is unchecked to prevent confusion when adding conditions.
+- Revamped the PPOM settings page, aligning it with WooCommerce's default core style and simplifying the layout.
+- Reviewed and updated helpful tips on Texter image setup.
+
+**Fixes**
+- Fixed issues with the file input in PPOM, where spaces in extensions caused errors, improved file deletion handling, and resolved a blurry delete button icon for zip files.
+- Fixed the Download File button in the orders dashboard to trigger file downloads instead of opening them.
+- Fixed padding on the Enquire Form to prevent it from being hidden under the header and enabled closing the form by clicking outside the modal.
+- Fixed padding on the PPOM popup.
+- Fixed text alignment buttons on the frontend for Texter images.
+- Fixed an issue where import was not working on a multisite.
+- Fixed compatibility for PPOM file input with SVG, WEBP, or EPS extensions.
+- Fixed an issue in the conditions tab where the last condition couldn't be deleted; a dedicated button now allows deletion.
+- Fixed orphan section screens for fields like Emoji, Phone Input, and Divider by ensuring settings load correctly or hiding unsupported condition tabs.
+- Fixed the layout issue on the Orders page by reducing the size of images selected via PPOM to prevent breaking the table layout. A lightbox feature was added for larger image previews.
+- Fixed the consistency in behavior when using the Attach to Product option.
+- Fixed an issue where default demo fields were not displayed on the frontend after first activating PPOM.
+- Fixed an issue where importing a CSV file with leading new lines caused an error.
+- Fixed the Texter texts placement on large images.
+- Fixed the PPOM column, which was replacing the Product Tags column.
+- Fixed the maximum image selection limit not being enforced, allowing users to add more images than configured.
+- Fixed validation for conditional fields using non-English characters.
+- Fixed an issue in the Variation Quantity Matrix where leaving a label blank resulted in an empty row or column.
+
+**Miscellaneous**
+- Fixed the changelog page.
+- Fixed conditional repeater description not showing for new fields.
+- Fixed Syntax Highlighter issues for certain field groups.
+- Disabled the mouse pointer from the group options.
+- Implemented a solution to retain the original file name of uploaded files in the cart.
+- Allowed images and media files to be exported along with product fields.
+
+
+
 
 ##### [Version 32.0.27](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.26...v32.0.27) (2024-08-13)
 
