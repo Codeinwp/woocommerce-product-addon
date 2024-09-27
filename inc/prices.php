@@ -700,9 +700,15 @@ function ppom_get_field_prices( $ppom_fields_post, $product_id, &$product_quanti
 
 			case 'measure':
 				// var_dump($value);
-				$product_quantity = $value;
-				$unit_price       = 0;
-				$field_prices[]   = ppom_generate_field_price( $unit_price, $field_meta, $charge, $options, $product_quantity );
+				$product_quantity    = $value;
+				$unit_price          = 0;
+				$measure_price_field = ppom_generate_field_price( $unit_price, $field_meta, $charge, $options, $product_quantity );
+
+				if ( isset( $field_meta['price-multiplier'] ) && is_numeric( $field_meta['price-multiplier'] ) ) {
+					$measure_price_field['price-multiplier'] = floatval( $field_meta['price-multiplier'] );
+				} 
+
+				$field_prices[]   = $measure_price_field;
 				break;
 
 			case 'eventcalendar':
@@ -988,18 +994,23 @@ function ppom_price_get_total_fixedprice( $price_array ) {
 
 // Get total fixedprice
 function ppom_price_get_total_measure( $price_array ) {
-
 	$total_measure = 0;
 
 	if ( $price_array ) {
 		foreach ( $price_array as $price ) {
+			if ( $price['type'] !== 'measure' ) {
+				continue;
+			}
 
-			if ( $price['type'] == 'measure' ) {
-				if ( $total_measure == 0 ) {
-					$total_measure = $price['quantity'];
-				} else {
-					$total_measure *= $price['quantity'];
-				}
+			$measure = $price['quantity'];
+			if ( isset( $price['price-multiplier'] ) && is_numeric( $price['price-multiplier'] ) ) {
+				$measure *= floatval( $price['price-multiplier'] );
+			}
+			
+			if ( $total_measure == 0 ) {
+				$total_measure = $measure;
+			} else {
+				$total_measure *= $measure;
 			}
 		}
 	}

@@ -6,6 +6,10 @@
 
 class NM_PersonalizedProduct {
 
+	public const LICENSE_PLAN_FREE = -1;
+	public const LICENSE_PLAN_1    = 1; // Essential.
+	public const LICENSE_PLAN_2    = 2; // Plus.
+	public const LICENSE_PLAN_3    = 3; // VIP.
 	static $tbl_productmeta = 'nm_personalized';
 
 
@@ -321,6 +325,8 @@ class NM_PersonalizedProduct {
 		add_action( 'in_admin_header', 'ppom_hooks_remove_admin_notices', 99 );
 
 		add_filter( 'woocommerce_order_again_cart_item_data', 'ppom_wc_order_again_compatibility', 10, 3 );
+		// Show description tooltip.
+		add_filter( 'ppom_field_description', array( $this, 'show_tooltip' ), 15, 2 );
 	}
 
 	/*
@@ -610,8 +616,7 @@ class NM_PersonalizedProduct {
 		return $res;
 	}
 
-
-	public static function activate_plugin() {
+	public static function upgrade_database() {
 		global $wpdb;
 
 		/*
@@ -632,6 +637,7 @@ class NM_PersonalizedProduct {
 		productmeta_style MEDIUMTEXT,
 		productmeta_js MEDIUMTEXT,
 		productmeta_categories MEDIUMTEXT,
+		productmeta_tags LONGTEXT,
 		the_meta MEDIUMTEXT NOT NULL,
 		productmeta_created DATETIME NOT NULL,
 		PRIMARY KEY  (productmeta_id)
@@ -641,7 +647,11 @@ class NM_PersonalizedProduct {
 		dbDelta( $sql );
 
 		update_option( 'personalizedproduct_db_version', PPOM_DB_VERSION );
+	}
 
+	public static function activate_plugin() {
+		
+		self::upgrade_database();
 		// this is to remove un-confirmed files daily
 
 		$delete_frequency = ppom_get_option( 'ppom_remove_unused_images_schedule' );
@@ -737,12 +747,14 @@ class NM_PersonalizedProduct {
 
 		$sql = "INSERT INTO $forms_table_name
 		(productmeta_name, aviary_api_key, productmeta_style,productmeta_categories, the_meta, productmeta_created) 
-		SELECT productmeta_name, aviary_api_key, productmeta_style,productmeta_categories, the_meta, productmeta_created 
+		SELECT CONCAT(productmeta_name, ' (clone)'), aviary_api_key, productmeta_style,productmeta_categories, the_meta, productmeta_created 
 		FROM $forms_table_name 
 		WHERE productmeta_id = %d;";
 
 		$result = $wpdb->query( $wpdb->prepare( $sql, array( $meta_id ) ) );
 
+		wp_safe_redirect( admin_url( 'admin.php?page=ppom&productmeta_id=' . intval( $wpdb->insert_id ) . '&do_meta=edit' ) );
+        die();
 		/*
 		 var_dump($result);
 		
@@ -755,27 +767,36 @@ class NM_PersonalizedProduct {
 	 * returning NM_Inputs object
 	*/
 	function get_all_inputs() {
-
 		$nm_inputs = PPOM_Inputs();
-		// webcontact_pa($this->plugin_meta);
 
 		// registering all inputs here
-
-		$all_inputs = array(
-
-			'text'     => $nm_inputs->get_input( 'text' ),
-			'textarea' => $nm_inputs->get_input( 'textarea' ),
-			'select'   => $nm_inputs->get_input( 'select' ),
-			'radio'    => $nm_inputs->get_input( 'radio' ),
-			'checkbox' => $nm_inputs->get_input( 'checkbox' ),
-			'email'    => $nm_inputs->get_input( 'email' ),
-			'date'     => $nm_inputs->get_input( 'date' ),
-			'number'   => $nm_inputs->get_input( 'number' ),
-			'hidden'   => $nm_inputs->get_input( 'hidden' ),
-			// 'masked' 	=> $nm_inputs->get_input ( 'masked' ),
+		$free_inputs = array_map(
+			function ( $free_input ) use ( $nm_inputs ) {
+				return $nm_inputs->get_input( $free_input );
+			},
+			$this->ppom_free_inputs()
 		);
 
-		return apply_filters( 'ppom_all_inputs', $all_inputs, $nm_inputs );
+		return apply_filters( 'ppom_all_inputs', $free_inputs, $nm_inputs );
+	}
+
+	/**
+	 * All free inputs.
+	 *
+	 * @return array
+	 */
+	public function ppom_free_inputs() {
+		return array(
+			'text' => 'text',
+			'textarea' => 'textarea',
+			'select' => 'select',
+			'radio' => 'radio',
+			'checkbox' => 'checkbox',
+			'email' => 'email',
+			'date' => 'date',
+			'number' => 'number',
+			'hidden' => 'hidden',
+		);
 	}
 
 
@@ -881,7 +902,7 @@ class NM_PersonalizedProduct {
 	function ppom_export_meta() {
 
 		// if( ppom_pro_is_installed() ) return '';
-		$buy_pro = tsdk_utmify( 'https://themeisle.com/plugins/ppom-pro/upgrade', 'export-import', 'tryexport' );
+		$buy_pro = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'export-import', 'tryexport' );
 		$args    = array(
 			'link_url'  => $buy_pro,
 			'link_text' => 'Buy now',
@@ -916,5 +937,72 @@ class NM_PersonalizedProduct {
 
 	}
 
+	/**
+	 * Add tooltip.
+	 *
+	 * @param string $description Field description.
+	 * @param array  $meta Field meta.
+	 *
+	 * @return string
+	 */
+	public function show_tooltip( $description, $meta ) {
+		$input_desc = ! empty( $meta['description'] ) ? $meta['description'] : '';
+		$input_desc = apply_filters( 'ppom_description_content', stripslashes( $input_desc ), $meta );
 
+		// Check if the tooltip is enabled.
+		if ( isset( $meta['desc_tooltip'] ) && 'on' === $meta['desc_tooltip'] ) {
+			$description = ( ! empty( $meta['description'] ) ) ? ' <span data-ppom-tooltip="ppom_tooltip" class="ppom-tooltip" title="' . esc_attr( $input_desc ) . '"><svg width="13px" height="13px" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg></span>' : '';
+		}
+		return $description;
+	}
+
+	/**
+	 * Get the license category (Essential, Plus, VIP).
+	 *
+	 * @param number Plan ID.
+	 *
+	 * @return number The associated category.
+	 */
+	public static function get_license_category( $license_plan ) {
+		$license_categories = array(
+			self::LICENSE_PLAN_1 => array( 1, 4, 9 ),
+			self::LICENSE_PLAN_2 => array( 2, 5, 8 ),
+			self::LICENSE_PLAN_3 => array( 3, 6, 7, 10 ),
+		);
+
+		foreach ( $license_categories as $category => $plans ) {
+			if ( in_array( $license_plan, $plans ) ) {
+				return $category;
+			}
+		}
+
+		return self::LICENSE_PLAN_FREE;
+	}
+	/**
+	 * Method to return the type of licence.
+	 *
+	 * @param string $type Licence type.
+	 *
+	 * @access  public
+	 * @return bool
+	 */
+	public function is_license_of_type( $type ) {
+		// proceed to check the plan only if the license is active.
+		$status = apply_filters( 'product_ppom_license_status', false );
+		if ( 'valid' !== $status ) {
+			return false;
+		}
+		$plan = apply_filters( 'product_ppom_license_plan', 0 );
+		$plan = intval( $plan );
+		switch ( $type ) {
+			case 'vip':
+				return self::get_license_category( $plan ) >= self::LICENSE_PLAN_3;
+			case 'plus':
+				return self::get_license_category( $plan ) >= self::LICENSE_PLAN_2;
+			case 'pro':
+				return  self::get_license_category( $plan ) >= self::LICENSE_PLAN_1;
+		}
+
+		return false;
+	}
 }

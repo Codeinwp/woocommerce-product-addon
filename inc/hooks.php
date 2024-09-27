@@ -705,7 +705,7 @@ function ppom_hooks_input_main_wrapper_class( $wrapper_class, $classes_array, $f
 
 		foreach ( $conditions['rules'] as $index => $rule ) {
 
-			$element        = isset( $rule['elements'] ) ? $rule['elements'] : '';
+			$element        = isset( $rule['elements'] ) ? strtolower( $rule['elements']  ): '';
 			$wrapper_class .= " ppom-cond-{$element}";
 			$wrapper_class .= " ppom-locked-{$element}";
 		}

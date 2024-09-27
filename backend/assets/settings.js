@@ -74,23 +74,6 @@ jQuery(function($) {
         }
     });
 
-
-    /**
-        Migration Event
-    **/
-    $(document).on("click", ".nmsf-migrate-back-btn", function(e) {
-
-        if (!confirm(nmsf_vars.migrate_back_msg)) {
-
-            e.preventDefault();
-            return false;
-        }
-        else {
-            return true;
-        }
-    });
-
-
     /**
         Add Conditional Settings Fields
     **/
@@ -137,6 +120,17 @@ jQuery(function($) {
         Select2 Init
     **/
     $('.nmsf-multiselect-js').select2();
+
+    /**
+     * Disabled submit button.
+     */
+    $(document).on('click', '.nmsf-panels-content-inner .nmsf-label', function(){
+        var isLocked = $(this).hasClass('ppom-is-locked-section');
+        $(this)
+        .parents('.nmsf-panels-area')
+        .find('.woocommerce-save-button')
+        .attr('disabled', isLocked);
+    });
 
     const permissionField = $('#ppom_permission_mfields');
 

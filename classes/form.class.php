@@ -30,7 +30,7 @@ class PPOM_Form {
 	 *
 	 * @var number
 	 */
-	// public static $product_id;
+	public $product_id;
 
 	/**
 	 * Return wc product object
@@ -215,7 +215,8 @@ class PPOM_Form {
 			$field_html .= '</div>';
 
 			if ( count( $collapse_fields ) === $ppom_collapse_counter && $section_started ) {
-				$field_html .= '</div>';
+				$field_html     .= '</div>';
+				$section_started = false;
 			}
 
 			// Filter: nmforms_input_htmls

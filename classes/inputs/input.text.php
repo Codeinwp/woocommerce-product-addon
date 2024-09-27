@@ -30,7 +30,7 @@ class NM_Text_wooproduct extends PPOM_Inputs {
 
 	private function get_settings() {
 
-		$regex_help_url = 'https://github.com/RobinHerbots/Inputmask#any-option-can-also-be-passed-through-the-use-of-a-data-attribute-use-data-inputmask-the-name-of-the-optionvalue';
+		$regex_help_url = 'https://docs.themeisle.com/article/2060-input-masking-documentation-for-field-configuration';
 
 		$input_meta = array(
 			'title'           => array(
@@ -93,8 +93,8 @@ class NM_Text_wooproduct extends PPOM_Inputs {
 			'input_mask'      => array(
 				'type'        => 'text',
 				'title'       => __( 'Input Masking', 'woocommerce-product-addon' ),
-				'desc'        => __( 'Click options to see all Masking Options', 'woocommerce-product-addon' ),
-				'link'        => __( '<a href="https://github.com/RobinHerbots/Inputmask" target="_blank">Options</a>', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Input masking ensures that users input data in predefined formats.', 'woocommerce-product-addon' ),
+				'link'        => __( '<a href="https://docs.themeisle.com/article/2060-input-masking-documentation-for-field-configuration" target="_blank">Options</a>', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'width'           => array(
@@ -119,21 +119,22 @@ class NM_Text_wooproduct extends PPOM_Inputs {
 				'desc'   => __( 'Role separated by comma.', 'woocommerce-product-addon' ),
 				'hidden' => true,
 			),
-			'use_regex'       => array(
-				'type'        => 'checkbox',
-				'title'       => __( 'Use Regex Expresession', 'woocommerce-product-addon' ),
-				'link'        => __( '<a target="_blank" href="' . esc_url( $regex_help_url ) . '">See More</a>', 'woocommerce-product-addon' ),
-				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
-			),
 			'onetime'         => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'One Time Fee/Charge', 'woocommerce-product-addon' ),
 				'desc'        => __( 'Will not multiply with quantity', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
+			'use_regex'       => array(
+				'type'        => 'checkbox',
+				'title'       => __( 'Enable Regex Mask', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Enabling this option allows the input mask field to interpret the provided pattern as a regular expression (regex).', 'woocommerce-product-addon' ),
+				'link'        => __( '<a target="_blank" href="' . esc_url( $regex_help_url ) . '">See More</a>', 'woocommerce-product-addon' ),
+				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
+			),
 			'desc_tooltip'    => array(
 				'type'        => 'checkbox',
-				'title'       => __( 'Show tooltip (PRO)', 'woocommerce-product-addon' ),
+				'title'       => __( 'Show tooltip', 'woocommerce-product-addon' ),
 				'desc'        => __( 'Show Description in Tooltip with Help Icon', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
@@ -151,7 +152,7 @@ class NM_Text_wooproduct extends PPOM_Inputs {
 			'conditions'      => array(
 				'type'  => 'html-conditions',
 				'title' => __( 'Conditions', 'woocommerce-product-addon' ),
-				'desc'  => __( 'Tick it to turn conditional logic to work below', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Set rules to show or hide the field based on specific conditions', 'woocommerce-product-addon' ),
 			),
 
 		);

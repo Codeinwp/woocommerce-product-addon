@@ -29,6 +29,7 @@
     "dist": "bash ./bin/dist.sh",
     "release": "npx semantic-release",
     "build:makepot": "bash ./bin/makepot.sh",
-    "build:grunt": "grunt build"
+    "build:grunt": "grunt build",
+    "grunt": "grunt"
   }
 }

@@ -90,7 +90,11 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 						<td>
 							<a class="btn btn-sm btn-secondary ppom-products-modal"
 							   data-ppom_id="<?php echo esc_attr( $productmeta->productmeta_id ); ?>"
-							   data-formmodal-id="ppom-product-modal"><?php _e( 'Attach to Products', 'woocommerce-product-addon' ); ?></a>
+							   data-formmodal-id="ppom-product-modal"
+							   data-reload="true"
+							>
+								<?php _e( 'Attach to Products', 'woocommerce-product-addon' ); ?>
+							</a>
 						</td>
 						<td class="ppom-admin-meta-actions-colunm">
 							<a id="del-file-<?php echo esc_attr( $productmeta->productmeta_id ); ?>" href="#"
@@ -100,7 +104,9 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 							<a href="<?php echo esc_url( $url_edit ); ?>" title="<?php _e( 'Edit', 'woocommerce-product-addon' ); ?>"
 							   class="button"><span class="dashicons dashicons-edit"></span></a>
 							<a href="<?php echo esc_url( $url_clone ); ?>" title="<?php _e( 'Clone', 'woocommerce-product-addon' ); ?>"
-							   class="button"><span class="dashicons dashicons-image-rotate-right"></span></a>
+							   class="button">
+							   <i class="fa fa-clone"></i>
+							</a>
 						</td>
 					</tr>
 					<?php
@@ -111,25 +117,22 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 		</div>
 	</form>
 </div>
+<?php
 
-<!-- Product Modal -->
-<div id="ppom-product-modal" class="ppom-modal-box" style="display: none;">
-	<form id="ppom-product-form">
-		<input type="hidden" name="action" value="ppom_attach_ppoms"/>
-		<input type="hidden" name="ppom_id" id="ppom_id">
+ppom_load_template( 'admin/product-modal.php' );
+?>
 
-		<header>
-			<h3><?php _e( 'WooCommerce Products', 'woocommerce-product-addon' ); ?></h3>
-		</header>
-
-		<div class="ppom-modal-body">
-
+<!-- Upgrade to pro modal -->
+<div id="ppom-import-upsell" class="ppom-modal-box ppom-upsell-modal" style="display: none;">
+	<div class="ppom-modal-body">
+		<button type="button" aria-label="close" class="close-model ppom-js-modal-close"><span class="dashicons dashicons-no-alt"></span></button>
+		<div class="ppom-lock-icon">
+			<span class="dashicons dashicons-lock"></span>		
 		</div>
-
-		<footer>
-			<button type="button"
-					class="btn btn-default close-model ppom-js-modal-close"><?php _e( 'Close', 'woocommerce-product-addon' ); ?></button>
-			<button type="submit" class="btn btn-info"><?php _e( 'Save', 'woocommerce-product-addon' ); ?></button>
-		</footer>
-	</form>
+		<h3><?php esc_html_e( 'Importing fields is a PRO feature', 'woocommerce-product-addon' ); ?></h3>
+		<p>
+			<?php esc_html_e( 'We\'re sorry, importing fields is not available on your plan. Please upgrade to the Pro plan to unlock all these features and enhance your product fields management capabilities.', 'woocommerce-product-addon' ); ?>
+		</p>
+		<a class="btn btn-success" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'lockedimport' ) ); ?>" target="_blank"><?php esc_html_e( 'Upgrade to PRO', 'woocommerce-product-addon' ); ?></a>
+	</div>
 </div>

@@ -8,7 +8,7 @@ on:
 jobs:
   phpunit:
     name: Phpunit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     services:
       mysql:
         image: mysql:5.7

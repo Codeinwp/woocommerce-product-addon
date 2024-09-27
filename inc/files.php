@@ -49,15 +49,15 @@ function ppom_get_dir_url( $thumb = false ) {
 	return apply_filters( 'ppom_dir_url', set_url_scheme( $return_url ) );
 }
 
-// Check if given filenameis image
-function ppom_is_file_image( $file_name ) {
-
-	$type = strtolower( substr( strrchr( $file_name, '.' ), 1 ) );
-	if ( ( $type == 'gif' ) || ( $type == 'jpeg' ) || ( $type == 'png' ) || ( $type == 'pjpeg' ) || ( $type == 'jpg' ) ) {
-		return true;
-	} else {
-		return false;
-	}
+/**
+ * Check if given filenameis image.
+ *
+ * @param string $file_path File full path.
+ *
+ * @return bool
+ */
+function ppom_is_file_image( $file_path ) {
+	return wp_get_image_mime( $file_path );
 }
 
 // return html for file thumb
@@ -77,8 +77,8 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 		$file_dir_path  = ppom_get_confirmed_dir_thumbs( $order_id, $file_name, $product_id, $thumb = false );
 	} else {
 
-		$file_thumb_url = ppom_is_file_image( $file_name ) ? ppom_get_dir_url( true ) . $file_name : PPOM_URL . '/images/file.png';
 		$file_dir_path  = ppom_get_dir_path() . $file_name;
+		$file_thumb_url = ppom_is_file_image( $file_dir_path ) ? ppom_get_dir_url( true ) . $file_name : PPOM_URL . '/images/file.png';
 	}
 
 
@@ -107,7 +107,7 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 
 	$ppom_html  = '<table class="table table-bordered">';
 	$ppom_html .= '<tr><td><a href="' . esc_url( $file_link ) . '" class="lightbox et_pb_lightbox_image" itemprop="image" title="' . esc_attr( $file_name ) . '">' . $thumb_html . '</a></td>';
-	$ppom_html .= '<td>' . esc_attr( ppom_files_trim_name( $file_name ) ) . '</td>';
+	$ppom_html .= '<td style="max-width:300px;text-align:left;">' . esc_attr( ppom_files_trim_name( $file_name ) ) . '</td>';
 	$ppom_html .= '</tr>';
 
 	// Checking if cropped file existing
@@ -168,7 +168,7 @@ function ppom_upload_file() {
 
 	$file_name = apply_filters( 'ppom_uploaded_filename', $file_name );
 
-	$additional_mime_types = apply_filters( 'ppom_custom_allowed_mime_types', array( 'ai' => 'application/postscript' ) );
+	$additional_mime_types = apply_filters( 'ppom_custom_allowed_mime_types', array( 'ai' => 'application/postscript', 'eps' => 'application/postscript' ) );
 
 	$allowed_mime_types = array_merge( get_allowed_mime_types(), $additional_mime_types );
 
@@ -176,7 +176,6 @@ function ppom_upload_file() {
 	$file_type = wp_check_filetype_and_ext( $file_dir_path . $file_name, $file_name, $allowed_mime_types );
 
 	$extension = $file_type['ext'];
-
 
 	$default_restricted = 'php,php4,php5,php6,php7,phtml,exe,shtml';
 	$restricted_type    = ppom_get_option( 'ppom_restricted_file_type', $default_restricted );
@@ -207,7 +206,9 @@ function ppom_upload_file() {
 	$file_name       = wp_unique_filename( $file_path_thumb, $file_name );
 	$file_name       = strtolower( $file_name );
 	$file_path       = $file_dir_path . $file_name;
-
+	$file_ext        = pathinfo( $file_name, PATHINFO_EXTENSION );
+	$unique_hash     = substr( hash( 'sha256', wp_generate_password( 8, false, false ) ), 0, 8 );
+	$file_name       = str_replace( ".$file_ext", ".$unique_hash.$file_ext", $file_name );
 	// var_dump($file_path); exit;
 
 	// Make sure the fileName is unique but only if chunking is disabled
@@ -309,7 +310,7 @@ function ppom_upload_file() {
 
 
 		// making thumb if images
-		if ( ppom_is_file_image( $file_name ) ) {
+		if ( ppom_is_file_image( $file_path ) ) {
 
 			$thumb_size     = ppom_get_thumbs_size();
 			$thumb_dir_path = ppom_create_image_thumb( $file_dir_path, $file_name, $thumb_size );
@@ -345,22 +346,25 @@ function ppom_upload_file() {
 // Deleting file
 function ppom_delete_file() {
 
-	$file_name = sanitize_file_name( $_REQUEST ['file_name'] );
-
-	$ppom_nonce        = $_REQUEST['ppom_nonce'];
-	$file_nonce_action = 'ppom_deleting_file_action';
-	if ( ! wp_verify_nonce( $ppom_nonce, $file_nonce_action ) ) {
-		printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_name );
+	if ( ! isset( $_REQUEST ['file_name'] ) || ! isset( $_REQUEST['ppom_nonce'] ) ) {
+		echo __( 'Missing data.', 'woocommerce-product-addon' );
 		die( 0 );
 	}
 
-	$dir_path = ppom_get_dir_path();
+	$file_name         = sanitize_file_name( $_REQUEST ['file_name'] );
+	$ppom_nonce        = sanitize_key( $_REQUEST['ppom_nonce'] );
+	$file_nonce_action = 'ppom_deleting_file_action';
+	if ( ! wp_verify_nonce( $ppom_nonce, $file_nonce_action ) ) {
+		printf( __( 'Verification failed for file: %s', 'woocommerce-product-addon' ), $file_name );
+		die( 0 );
+	}
 
+	$dir_path  = ppom_get_dir_path();
 	$file_path = $dir_path . $file_name;
-
+	$is_image  = ppom_is_file_image( $file_path );
 	if ( file_exists( $file_path ) && unlink( $file_path ) ) {
 
-		if ( ppom_is_file_image( $file_name ) ) {
+		if ( $is_image ) {
 			$thumb_path = $dir_path . 'thumbs/' . $file_name;
 			if ( file_exists( $thumb_path ) ) {
 				unlink( $thumb_path );
@@ -379,7 +383,7 @@ function ppom_delete_file() {
 			printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
 		}
 	} else {
-		printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
+		printf( __( 'The file %s does not exists.', 'woocommerce-product-addon' ), $file_path );
 	}
 
 	die( 0 );
@@ -444,7 +448,7 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 		return '';
 	}
 
-	$is_image = ppom_is_file_image( $file_name );
+	$is_image = ppom_is_file_image( $file_path );
 
 	$thumb_url = $file_meta = $file_tools = $html = '';
 
@@ -477,7 +481,7 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 		// Tools group
 		$file_tools .= '<div class="btn-group" role="group" aria-label="Tools" style="text-align: center; display: block;">';
 		// $file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="'.__('Remove', "woocommerce-product-addon").'"><span class="fa fa-times"></span></a>';
-		$file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '">' . __( 'Delete', 'woocommerce-product-addon' ) . '</span></a>';
+		$file_tools .= '<button class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '">' . __( 'Delete', 'woocommerce-product-addon' ) . '</button>';
 
 		if ( apply_filters( 'ppom_show_image_popup', false ) ) {
 			$file_tools .= '<a href="#" data-toggle="modal" data-target="#modalFile' . esc_attr( $file_id ) . '" class="btn btn-primary"><span class="fa fa-expand"></span></a>';
@@ -491,8 +495,10 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 		$file_meta .= __( 'Size: ', 'woocommerce-product-addon' ) . ppom_get_filesize_in_kb( $file_name );
 		$thumb_url  = PPOM_URL . '/images/file.png';
 
-		$file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '"><span class="fa fa-times"></span></a>';    // delete icon
-		// $file_tools .= '<a class="btn btn-primary nm-file-tools u_i_c_tools_del" href="" title="'.__('Remove', "woocommerce-product-addon").'">Delete</a>';	//delete icon
+		// Tools group
+		$file_tools .= '<div class="btn-group" role="group" aria-label="Tools" style="text-align: center; display: block;">';
+		$file_tools .= '<button class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '">' . __( 'Delete', 'woocommerce-product-addon' ) . '</button>';
+		$file_tools .= '</div>';
 	}
 
 
@@ -519,23 +525,15 @@ function ppom_uploaded_file_preview( $file_name, $settings ) {
 	return apply_filters( 'ppom_file_preview_html', $html, $file_name, $settings );
 }
 
-// Trim long filename to short
+/**
+ * File name.
+ *
+ * @param string $file_name File name.
+ *
+ * @return string
+ */
 function ppom_files_trim_name( $file_name ) {
-
-	$text_length = strlen( $file_name );
-
-	// for different language string
-	$string_utf8 = strlen( utf8_decode( $file_name ) );
-
-	$max_chars = apply_filters( 'ppom_trim_file_maxchar', 20 );
-
-	if ( $text_length > $max_chars && $text_length == $string_utf8 ) {
-		$trimmed_filename = substr_replace( $file_name, '...', $max_chars / 2, $text_length - $max_chars );
-	} else {
-		$trimmed_filename = $file_name;
-	}
-
-	return $trimmed_filename;
+	return $file_name;
 }
 
 

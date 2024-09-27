@@ -320,10 +320,12 @@ function ppom_make_meta_data( $cart_item, $context = 'cart' ) {
 
 	// Fields sanitization.
 	$ppom = new PPOM_Meta( $product_id );
-	foreach( $ppom->fields as $field ) {
-		$data_name = sanitize_key( $field['data_name'] );
-		if ( isset( $cart_item['ppom']['fields'][$data_name] ) ) {
-			$cart_item['ppom']['fields'][$data_name] = ppom_recursive_sanitization( $cart_item['ppom']['fields'][$data_name] );
+	if ( is_array( $ppom->fields ) ) {
+		foreach( $ppom->fields as $field ) {
+			$data_name = sanitize_key( $field['data_name'] );
+			if ( isset( $cart_item['ppom']['fields'][$data_name] ) ) {
+				$cart_item['ppom']['fields'][$data_name] = ppom_recursive_sanitization( $cart_item['ppom']['fields'][$data_name] );
+			}
 		}
 	}
 
@@ -1178,13 +1180,15 @@ function ppom_convert_options_to_key_val( $options, $meta, $product ) {
 		return $options;
 	}
 
+	if ( is_string( $options ) ) {
+		$options = json_decode( $options, true );
+	}
 
 	if ( ! apply_filters( 'ppom_is_option_convertable', true, $meta ) ) {
 		return $options;
 	}
 
 	$meta_type = isset( $meta['type'] ) ? $meta['type'] : '';
-
 
 	// Do not change options for cropper
 	// if( $meta['type'] == 'cropper' ) return $options;
@@ -1541,10 +1545,16 @@ function ppom_extract_matrix_by_quantity( $quantities_field, $product, $quantity
 	return $matrix;
 }
 
-// Return thumbs size
-function ppom_get_thumbs_size() {
+/**
+ * Thumbnail image size.
+ *
+ * @param int $size Image size.
+ *
+ * @return string
+ */
+function ppom_get_thumbs_size( $size = 150 ) {
 
-	return apply_filters( 'ppom_thumbs_size', '150px' );
+	return apply_filters( 'ppom_thumbs_size', sprintf( '%dpx', absint( $size ) ) );
 }
 
 // Return file size in kb
@@ -1574,36 +1584,53 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 	foreach ( $file_name_array as $file_name ) {
 
 		$file_edit_path = ppom_get_dir_path( 'edits' ) . ppom_file_get_name( $file_name, $item->get_product_id() );
-
 		// Making file thumb download with new path
 		$ppom_file_url       = ppom_get_file_download_url( $file_name, $item->get_order_id(), $item->get_product_id() );
-		$ppom_file_thumb_url = ppom_is_file_image( $file_name ) ? ppom_get_dir_url( true ) . $file_name : PPOM_URL . '/images/file.png';
-		$order_html         .= '<tr><td><a href="' . esc_url( $ppom_file_url ) . '">';
-		$order_html         .= '<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" src="' . esc_url( $ppom_file_thumb_url ) . '">';
-		$order_html         .= '</a></td>';
 
+		$file_path           = ppom_get_dir_url( true ) . $file_name;
+		$is_image_file       = ppom_is_file_image( $file_path );
+		$ppom_file_thumb_url = $is_image_file ? $file_path : PPOM_URL . '/images/file.png';
+		$order_html         .= '<tr><td class="ppom-files-display">';
+
+		if ( $is_image_file ) {
+			$order_html .= '<a target="_blank" href="' . esc_url( $ppom_file_url ) . '">';
+		}
+
+		$order_html .= '<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" src="' . esc_url( $ppom_file_thumb_url ) . '">';
+
+		if ( $is_image_file ) {
+			$order_html .= '</a>';
+		}
+
+		$order_html .= '<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" src="' . esc_url( $ppom_file_thumb_url ) . '">';
+
+		if ( $is_image_file ) {
+			$order_html .= '</a>';
+		}
 
 		// Requested by Kevin, hiding downloading file button after order on thank you page
 		// @since version 16.6
 		if ( is_admin() ) {
-			$order_html .= '<td><a class="button" href="' . esc_url( $ppom_file_url ) . '">';
+			$order_html .= '<a class="button" href="' . esc_url( $ppom_file_url ) . '" download>';
 			$order_html .= __( 'Download File', 'woocommerce-product-addon' );
-			$order_html .= '</a></td>';
+			$order_html .= '</a>';
 		}
+
+		$order_html .= '</td>';
 		$order_html .= '</tr>';
 
 		if ( $input_type == 'cropper' ) {
 
 			$cropped_file_name = ppom_file_get_name( $file_name, $item->get_product_id() );
 			$cropped_url       = ppom_get_dir_url() . 'cropped/' . $cropped_file_name;
-			$order_html       .= '<tr><td><a href="' . esc_url( $cropped_url ) . '">';
+			$order_html       .= '<tr><td><a target="_blank" href="' . esc_url( $cropped_url ) . '">';
 			$order_html       .= '<img style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" class="img-thumbnail" src="' . esc_url( $cropped_url ) . '">';
 			$order_html       .= '</a></td>';
 
 			// Requested by Kevin, hiding downloading file button after order on thank you page
 			// @since version 16.6
 			if ( is_admin() ) {
-				$order_html .= '<td><a class="button" href="' . esc_url( $cropped_url ) . '">';
+				$order_html .= '<td><a target="_blank" class="button" href="' . esc_url( $cropped_url ) . '">';
 				$order_html .= __( 'Cropped', 'woocommerce-product-addon' );
 				$order_html .= '</a></td>';
 			}
@@ -1614,7 +1641,7 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 			$edit_file_name = ppom_file_get_name( $file_name, $item->get_product_id() );
 			$edit_url       = ppom_get_dir_url() . 'edits/' . $edit_file_name;
 			$edit_thumb_url = ppom_get_dir_url() . 'edits/thumbs/' . $file_name;
-			$order_html    .= '<tr><td><a href="' . esc_url( $edit_url ) . '">';
+			$order_html    .= '<tr><td><a target="_blank"  href="' . esc_url( $edit_url ) . '">';
 			$order_html    .= '<img style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" class="img-thumbnail" src="' . esc_url( $edit_thumb_url ) . '">';
 			$order_html    .= '</a></td>';
 			$order_html    .= '<td><a class="button" href="' . esc_url( $edit_url ) . '">';
@@ -1638,7 +1665,7 @@ function ppom_generate_html_for_images( $images ) {
 		$images_meta = json_decode( stripslashes( $images_meta ), true );
 		$image_url   = stripslashes( $images_meta['link'] );
 		$image_label = isset( $images_meta['raw'] ) ? $images_meta['raw'] : '';
-		$image_html  = '<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" src="' . esc_url( $image_url ) . '" title="' . esc_attr( $image_label ) . '">';
+		$image_html  = '<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size( 75 ) ) . '" src="' . esc_url( $image_url ) . '" title="' . esc_attr( $image_label ) . '">';
 
 		$ppom_html .= '<tr><td><a href="' . esc_url( $image_url ) . '" class="lightbox" itemprop="image" title="' . esc_attr( $image_label ) . '">' . $image_html . '</a></td>';
 		$ppom_html .= '<td>' . esc_attr( ppom_files_trim_name( $image_label ) ) . '</td>';
@@ -1869,6 +1896,15 @@ function ppom_option_has_stock( $option ) {
 // check if PPOM PRO is installed
 function ppom_pro_is_installed() {
 	return class_exists( 'PPOM_PRO' );
+}
+
+/**
+ * Check is valid license activated.
+ *
+ * @return bool
+ */
+function ppom_pro_is_valid_license() {
+	return ppom_pro_is_installed() && apply_filters( 'product_ppom_license_status', '' ) === 'valid';
 }
 
 // Check if PPOM API is enable
@@ -2244,7 +2280,8 @@ function ppom_get_confirmed_dir_thumbs( $order_id, $file_name, $product_id, $thu
 
 	$file = '';
 	if ( $thumb ) {
-		$file = ppom_is_file_image( $file_name ) ? ppom_get_dir_url() . $confirm_dir . '/' . $file_name : PPOM_URL . '/images/file.png';
+		$file_path = ppom_get_dir_url() . $confirm_dir . '/' . $file_name;
+		$file      = ppom_is_file_image( $file_path ) ? $file_path : PPOM_URL . '/images/file.png';
 	} else {
 		$file = ppom_get_dir_path( $confirm_dir ) . $file_name;
 	}
@@ -2312,10 +2349,34 @@ function ppom_get_conditional_data_attributes( $meta ) {
 
 		$bound      = isset( $conditions['bound'] ) ? ppom_wpml_translate( $conditions['bound'], 'PPOM' ) : '';
 		$visibility = isset( $conditions['visibility'] ) ? ppom_wpml_translate( $conditions['visibility'], 'PPOM' ) : '';
-
+		
 		$conditions['rules'] = array_filter(
 			$conditions['rules'],
 			function( $rule ) {
+				if ( empty( $rule['operators'] ) || ! is_string( $rule['operators'] )  ) {
+					return ! empty( $rule['element_values'] );
+				}
+
+				if ( in_array( $rule['operators'], array( 'any', 'empty', 'even-number', 'odd-number', 'regex') ) ) {
+					return true;
+				}
+
+				if ( in_array( $rule['operators'], array( 'number-multiplier', 'regex', 'contains', 'not-contains') ) ) {
+					return ! empty( $rule['element_constant'] );
+				}
+
+				if ( in_array( $rule['operators'], array( 'greater than', 'less than', 'is', 'not' ) ) ) {
+					return ! empty( $rule['element_constant'] ) || ! empty( $rule['element_values'] );
+				}
+
+				if ( 'between' === $rule['operators'] ) {
+					return (
+						! empty( $rule['cond-between-interval']) && is_array( $rule['cond-between-interval'] )
+						&& isset( $rule['cond-between-interval']['to'] )
+						&& isset( $rule['cond-between-interval']['from'] )
+					);
+				}
+
 				return ! empty( $rule['element_values'] );
 			}
 		);
@@ -2325,19 +2386,32 @@ function ppom_get_conditional_data_attributes( $meta ) {
 		$attr_html .= ' data-cond-bind="' . esc_attr( $bound ) . '"';
 		$attr_html .= ' data-cond-visibility="' . esc_attr( strtolower( $visibility ) ) . '"';
 
-		$index = 0;
+		$index       = 0;
+		$pro_enabled = ppom_pro_is_installed() && 'valid' === apply_filters( 'product_ppom_license_status', '' );
+
 		foreach ( $conditions['rules'] as $rule ) {
 
-			$counter     = ++ $index;
-			$input       = 'input' . $counter;
-			$value       = 'val' . $counter;
-			$opr         = 'operator' . $counter;
-			$element     = isset( $rule['elements'] ) ? ppom_wpml_translate( $rule['elements'], 'PPOM' ) : '';
-			$element_val = isset( $rule['element_values'] ) ? ppom_wpml_translate( $rule['element_values'], 'PPOM' ) : '';
-			$operator    = isset( $rule['operators'] ) ? ppom_wpml_translate( $rule['operators'], 'PPOM' ) : '';
-			$attr_html  .= ' data-cond-' . $input . '="' . esc_attr( $element ) . '"';
-			$attr_html  .= ' data-cond-' . $value . '="' . esc_attr( $element_val ) . '"';
-			$attr_html  .= ' data-cond-' . $opr . '="' . esc_attr( $operator ) . '"';
+			$counter      = ++ $index;
+			$input        = 'input' . $counter;
+			$value        = 'val' . $counter;
+			$opr          = 'operator' . $counter;
+			$element      = isset( $rule['elements'] ) ? ppom_wpml_translate( $rule['elements'], 'PPOM' ) : '';
+			$element_val  = isset( $rule['element_values'] ) ? ppom_wpml_translate( $rule['element_values'], 'PPOM' ) : '';
+			$constant_val = isset( $rule['element_constant'] ) ? ppom_wpml_translate( $rule['element_constant'], 'PPOM' ) : '';
+			$operator     = isset( $rule['operators'] ) ? ppom_wpml_translate( $rule['operators'], 'PPOM' ) : '';
+
+			$attr_html .= ' data-cond-' . $input . '="' . esc_attr( $element ) . '"';
+			$attr_html .= ' data-cond-' . $value . '="' . esc_attr( $element_val ) . '"';
+			$attr_html .= ' data-cond-' . $opr . '="' . esc_attr( $operator ) . '"';
+
+			if ( $pro_enabled && ! empty( $constant_val ) ) {
+				$attr_html .= ' data-cond-constant-val-' . $counter . '="' . esc_attr( $constant_val ) . '"';
+			}
+
+			if ( $pro_enabled && 'between' === $operator && isset( $rule['cond-between-interval'] ) ) {
+				$attr_html .= ' data-cond-between-from-' . $counter . '="' . esc_attr( $rule['cond-between-interval']['from'] ) . '"';
+				$attr_html .= ' data-cond-between-to-' . $counter . '="' . esc_attr( $rule['cond-between-interval']['to'] ) . '"';
+			}
 		}
 	}
 
@@ -2388,4 +2462,16 @@ function ppom_check_pro_compatibility($feature_slug) {
 	}
 
 	return isset( PPOM_PRO_COMPATIBILITY_FEATURES[ $feature_slug ] ) && PPOM_PRO_COMPATIBILITY_FEATURES[ $feature_slug ];
+}
+
+/**
+ * Check is legacy user.
+ *
+ * @return bool
+ */
+function ppom_is_legacy_user() {
+	if ( ppom_pro_is_installed() && ( function_exists( '\PPOM_Pro\get_license_status' ) && 'valid' === \PPOM_Pro\get_license_status( false ) ) ) {
+		return false;
+	}
+	return 'no' === get_option( 'ppom_legacy_user', '' );
 }

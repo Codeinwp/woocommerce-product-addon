@@ -1,4 +1,39 @@
+// @ts-check
 "use strict";
+
+const FIELD_COMPATIBLE_WITH_SELECT_OPTIONS = [ 'select', 'radio', 'switcher' ];
+const OPERATOR_COMPARISON_VALUE_FIELD_TYPE = {
+    'select': FIELD_COMPATIBLE_WITH_SELECT_OPTIONS,
+}
+const COMPARISON_VALUE_CAN_USE_SELECT = [ 'is', 'not', 'greater than', 'less than' ];
+const HIDE_COMPARISON_INPUT_FIELD = ['any', 'empty', 'odd-number', 'even-number'];
+const FIELDS_COMPATIBLE_WITH_TEXT = [ 'text', 'textarea', 'date', 'email' ]
+const FIELDS_COMPATIBLE_WITH_NUMBERS = [ ...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, 'number' ];
+const OPERATORS_FIELD_COMPATIBILITY = {
+    'is': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT, ...FIELDS_COMPATIBLE_WITH_NUMBERS, 'checkbox',],
+    'not': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT, ...FIELDS_COMPATIBLE_WITH_NUMBERS, 'checkbox'],
+    'greater than': FIELDS_COMPATIBLE_WITH_NUMBERS,
+    'less than': FIELDS_COMPATIBLE_WITH_NUMBERS,
+    'even-number': FIELDS_COMPATIBLE_WITH_NUMBERS,
+    'odd-number': FIELDS_COMPATIBLE_WITH_NUMBERS,
+    'between': FIELDS_COMPATIBLE_WITH_NUMBERS,
+    'number-multiplier': FIELDS_COMPATIBLE_WITH_NUMBERS,
+    'any': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT, ...FIELDS_COMPATIBLE_WITH_NUMBERS],
+    'empty': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT, ...FIELDS_COMPATIBLE_WITH_NUMBERS],
+    'contains': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT],
+    'not-contains': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT],
+    'regex': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT]
+}
+
+const proOperatorOptionsToLock = new Set();
+
+/**
+ * An array to store available condition targets.
+ * 
+ * @type {Array<{fieldLabel?: string, fieldId?: string, fieldType?: string, canUse: boolean}>}
+ */
+const availableConditionTargets = [];
+
 jQuery(function($) {
 
     var loader = new ImageLoader(ppom_vars.loader);
@@ -16,7 +51,7 @@ jQuery(function($) {
 
 
     /*-------------------------------------------------------
-        
+
         ------ Its Include Following Function -----
 
         1- Submit PPOM Form Fields
@@ -55,10 +90,11 @@ jQuery(function($) {
     **/
     var append_overly_model = ("<div class='ppom-modal-overlay ppom-js-modal-close'></div>");
 
-    $(document).on('click', '[data-modal-id]', function(e) {
+    $(document).on('click', '[data-modal-id]:not(.ppom-is-pro-field)', function(e) {
         e.preventDefault();
         $("body").append(append_overly_model);
         var modalBox = $(this).attr('data-modal-id');
+        lockedDataName = false;
         $('#' + modalBox).fadeIn();
     });
 
@@ -117,6 +153,10 @@ jQuery(function($) {
     **/
     $('.ppom-import-export-btn').on('click', function(event) {
         event.preventDefault();
+        if ( $(".ppom-import-export-block").length === 0 ) {
+            $('#ppom-import-upsell').fadeIn();
+            return;
+        }
         $('.ppom-more-plugins-block').hide();
         $(".ppom-import-export-block").show();
         $(".ppom-product-meta-block").hide();
@@ -207,66 +247,40 @@ jQuery(function($) {
     **/
     $('.ppom-main-field-wrapper').on('click', '.ppom_remove_field', function(e) {
         e.preventDefault();
+      
+        const inputsToRemove = document.querySelectorAll('.ppom_field_table .ppom-check-one-field input:checked');
 
-        var check_field = $('.ppom-check-one-field input[type="checkbox"]:checked');
-
-        if (check_field.length > 0) {
-            swal.fire({
-                title: "Are you sure",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55 ",
-                cancelButtonColor: "#DD6B55",
-                confirmButtonText: "Yes",
-                cancelButtonText: "No",
-            }).then( (result ) => {
-                    if (!result.isConfirmed) return;
-
-                $('.ppom_field_table').find('.ppom-check-one-field input').each(function(i, meta_field) {
-
-                    if (this.checked) {
-                        var field_id = $(meta_field).val();
-                        // console.log(field_id)
-                        $(meta_field).parent().parent().parent('.row_no_' + field_id + '').remove();
-                    }
-                    $('.ppom_save_fields_model').find('#ppom_field_model_' + field_id + '').remove();
-                });
-            });
+        if ( inputsToRemove.length > 0 ) {
+            window?.ppomPopup?.open({
+                title: window?.ppom_vars?.i18n.popup.confirmTitle,
+                onConfirmation: () => {
+                    inputsToRemove.forEach(( meta_field ) => {
+                        const field_id = meta_field.value;
+                        meta_field.closest(`.row_no_${field_id}`)?.remove();
+                        document.querySelector(`#ppom_field_model_${field_id}`)?.remove();
+                    });
+                }
+            })
         }
         else {
-            swal.fire("Please at least check one field!", "", "error");
+            window?.ppomPopup?.open({
+                title: window.ppom_vars.i18n.popup.checkFieldTitle,
+                type: "error",
+                hideCloseBtn: true
+            })
         }
     });
-
-
-    /**
-        8- On Fields Options Handle Add Option Last
-    **/
-    $('.webcontact-rules').each(function(i, meta_field) {
-
-        var selector_btn = $(this).closest('.ppom-slider');
-        selector_btn.find('.ppom-add-rule').not(':last').removeClass('ppom-add-rule').addClass('ppom-remove-rule')
-            .removeClass('btn-success').addClass('btn-danger')
-            .html('<i class="fa fa-minus" aria-hidden="true"></i>');
-
-    });
-    // $('.data-options').each(function(i, meta_field){
-
-    //     var selector_btn = $(this).closest('.ppom-slider');
-    //     selector_btn.find('.ppom-add-option').not(':last').removeClass('ppom-add-option').addClass('ppom-remove-option')
-    //    .removeClass('btn-success').addClass('btn-danger')
-    //    .html('<i class="fa fa-minus" aria-hidden="true"></i>');
-
-    // });
-
 
     /**
         9- Edit Existing Fields
     **/
-    $(document).on('click', '.ppom-edit-field', function(event) {
+    var lockedDataName = false;
+    $(document).on('click', '.ppom-edit-field:not(.ppom-is-pro-field)', function(event) {
         event.preventDefault();
 
         var the_id = $(this).attr('id');
-        $('#ppom_field_model_' + the_id + '').find('.ppom-close-checker').removeClass('ppom-close-fields');
+        $('#ppom_field_model_' + the_id).find('.ppom-close-checker').removeClass('ppom-close-fields');
+        lockedDataName = true;
     });
 
 
@@ -403,7 +417,7 @@ jQuery(function($) {
     **/
     var option_index = 0;
     $(document).on('click', '.ppom_select_field', function(event) {
-        if( $(this).hasClass('locked') ) {
+        if( $(this).hasClass('ppom-locked-field') ) {
             return;
         }
 
@@ -436,7 +450,18 @@ jQuery(function($) {
 
         var field_model_id = 'ppom_field_model_' + field_no + '';
 
-        clone_new_field.find('.ppom_save_fields_model').end().appendTo('.ppom_save_fields_model').attr('id', field_model_id);
+        clone_new_field.find('.ppom_save_fields_model')
+        .end()
+        .appendTo('.ppom_save_fields_model')
+        .attr('id', field_model_id)
+        .find( '.ppom-tabs-header label.ppom-tabs-label' )
+        .each( function( index, item ) {
+            var tabId = $(item).attr('id');
+            var hasTabOptions = $( '#' + field_model_id, document )?.find( '.ppom_handle_' + tabId )?.length > 0;
+            if ( ! hasTabOptions ) {
+                $(item).hide();
+            }
+        } );
         clone_new_field.find('.ppom-field-checker').attr('data-field-index', field_no);
         clone_new_field.find('.ppom-field-checker').addClass('ppom-add-fields-js-action');
 
@@ -484,7 +509,7 @@ jQuery(function($) {
         13- Clone Existing Fields
     **/
     var copy_no = 0;
-    $('.ppom-main-field-wrapper').on('click', '.ppom_copy_field', function(e) {
+    $('.ppom-main-field-wrapper').on('click', '.ppom_copy_field:not(.ppom-is-pro-field)', function(e) {
         e.preventDefault();
 
         var model_id_no = $(this).attr('id');
@@ -519,7 +544,7 @@ jQuery(function($) {
         clone_new_field.removeClass('ppom_sort_id_' + model_id_no + '');
         clone_new_field.addClass('ppom_sort_id_' + field_no + '');
 
-        // field attr name apply on all fields meta with ppom-meta-field class 
+        // field attr name apply on all fields meta with ppom-meta-field class
         clone_new_field.find('.ppom-meta-field').each(function(i, meta_field) {
             var field_name = 'ppom[' + field_no + '][' + $(meta_field).attr('data-metatype') + ']';
             $(meta_field).attr('name', field_name);
@@ -606,44 +631,36 @@ jQuery(function($) {
     /**
         14- Saving PPOM IDs In Existing Meta File
     **/
-    $("#ppom-product-form").on('submit', function(ev) {
 
-        //@Fayaz: Add blockui here
-        ev.preventDefault();
+    /**
+     * @type {HTMLFormElement}
+     */
+    const popupForm = document.querySelector('#ppom-product-form');
+    popupForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-        var dataTable = $(".ppom-table").DataTable();
+        const formContent = new FormData( document.querySelector('#ppom-product-form') );
 
-        var attached_cb = [];
-        var removed_cb = [];
+        formContent.append( 'action','ppom_attach_ppoms' );
+        formContent.append( 'ppom_id', $("#ppom_id").val() );
 
-        dataTable.rows().nodes().to$().find('input[type="checkbox"]').each(function() {
-            if (this.checked && this.name == 'ppom_attached[]') {
-                attached_cb.push($(this).val());
-            }
+        fetch( ajaxurl, {
+            method: 'POST',
+            body: formContent
+        })
+            .then(response => response.json())
+            .then(resp => {
+                alert(resp.message);
 
-            if (this.checked && this.name == 'ppom_removed[]') {
-                removed_cb.push($(this).val());
-            }
-        });
-        
-        
-        var data = {
-            'action': 'ppom_attach_ppoms',
-            'ppom_attached': attached_cb,
-            'ppom_removed': removed_cb,
-            'ppom_id': $("#ppom_id").val(),
-            'ppom_attached_nonce':$("#ppom_attached_nonce").val()
-        };
-
-        // return;
-        $.post(ajaxurl, data, function(resp) {
-
-            alert(resp.message);
-            window.location.reload();
-
-        }, 'json');
-    });
-
+                const openModalBtn = document.querySelector('.ppom-products-modal');
+                if ( openModalBtn && openModalBtn.dataset?.reload ) {
+                    window.location.reload();
+                } else {
+                    document.querySelector('.ppom-js-modal-close').dispatchEvent(new Event('click'));
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    })
 
     /**
         16- Handle Fields Tabs
@@ -877,27 +894,69 @@ jQuery(function($) {
 
         e.preventDefault();
 
-        var div = $(this).closest('.ppom-slider');
+        var div = $(this).parents('.form-group');
         var option_index = parseInt(div.find('.ppom-condition-last-id').val());
         div.find('.ppom-condition-last-id').val(option_index + 1);
 
-        var field_index = div.find('.ppom-fields-actions').attr('data-field-no');
-        var condition_clone = $('.webcontact-rules:last').clone();
+        var field_index = div.parents('.ppom-slider').find('.ppom-fields-actions').attr('data-field-no');
+        var cloneElement = $('.webcontact-rules:last', div);
+        var condition_clone = cloneElement.clone();
 
         var append_item = div.find('.ppom-condition-clone-js');
         condition_clone.find(append_item).end().appendTo(append_item);
+        
+        ppom_rename_rules_name();
 
         var field_type = '';
         var add_cond_selector = condition_clone.find('.ppom-conditional-keys');
         ppom_add_condition_set_index(add_cond_selector, field_index, field_type, option_index);
 
-        $('.ppom-slider').find('.webcontact-rules:not(:last) .ppom-add-rule')
-            .removeClass('ppom-add-rule').addClass('ppom-remove-rule')
+        if ( $(this).next('.ppom-remove-rule')?.length > 0 ) {
+            $(this).remove();
+            return;
+        }
+        $('.ppom-add-rule', cloneElement)
+        .removeClass('ppom-add-rule').addClass('ppom-remove-rule')
+        .removeClass('btn-success').addClass('btn-danger')
+        .html('<i class="fa fa-minus" aria-hidden="true"></i>');
+
+        // Last row.
+        var lastRow = jQuery('.webcontact-rules:visible:last');
+        if ( lastRow?.find('.ppom-remove-rule')?.length === 0 ) {
+            var cloneButton = lastRow?.find('.ppom-add-rule').clone();
+            cloneButton
+            .removeClass('ppom-add-rule').addClass('ppom-remove-rule ml-1')
             .removeClass('btn-success').addClass('btn-danger')
             .html('<i class="fa fa-minus" aria-hidden="true"></i>');
-    }).on('click', '.ppom-remove-rule', function(e) {
+            cloneButton.insertAfter(lastRow?.find('.ppom-add-rule'));
+        }
 
-        $(this).parents('.webcontact-rules:first').remove();
+    }).on('click', '.ppom-remove-rule', function(e) {
+        var removeButton = $(this );
+        if (removeButton.parents('.ppom-condition-clone-js')?.find('.webcontact-rules')?.length === 1) {
+            removeButton
+            .parents('.ppom-condition-clone-js')
+            .find('.webcontact-rules')
+            .find('select')
+            .val('')
+            .attr( 'selected', false )
+            .prop( 'selected', false );
+            $(this).remove();
+            ppom_rename_rules_name();
+            return false;
+        }
+        removeButton.parents('.webcontact-rules:first').remove();
+        // Last row.
+        var lastRow = jQuery('.webcontact-rules:visible:last');
+        if ( lastRow?.find('.ppom-add-rule')?.length === 0 ) {
+            var cloneButton = lastRow?.find('.ppom-remove-rule').clone();
+            cloneButton
+            .removeClass('ppom-remove-rule').addClass('ppom-add-rule')
+            .removeClass('btn-danger').addClass('btn-success')
+            .html('<i class="fa fa-plus" aria-hidden="true"></i>');
+            cloneButton.insertBefore(lastRow?.find('.ppom-remove-rule'));
+        }
+        ppom_rename_rules_name();
         e.preventDefault();
         return false;
     });
@@ -990,7 +1049,10 @@ jQuery(function($) {
         if (wp_field == 'shipping_fields' || wp_field == 'billing_fields') {
             return;
         }
-        selector.find('[data-meta-id="data_name"] input[type="text"]').val(field_id);
+        if ( true === lockedDataName ) {
+            return;
+        }
+        selector.find('[data-meta-id="data_name"] input[type="text"]:not([readonly])').val(field_id);
     });
 
 
@@ -1145,56 +1207,223 @@ jQuery(function($) {
         });
     }
 
+    // Rename rules name.
+    function ppom_rename_rules_name() {
+        $('.webcontact-rules:visible' ).each(function( index, item ){
+            $(this).attr('id', 'rule-box-' + parseInt(index + 1))
+            .find('label')
+            .text(function(i,txt) {
+                return txt.replace(/\d+/, parseInt(index + 1));
+            });
+        });
+    }
 
     /**
-        27- Get All Fields Title On Condition Element Value After Click On Condition Tab
-    **/
-    // populate_conditional_elements();
+     * Filter the operator options list based on the target type field.
+     * 
+     * @param {string?} fieldType The PPOM field type.
+     * @param {HTMLSelectElement} operatorSelectField The select input for condition operator.
+     * @returns 
+     */
+    function toggleOperatorFieldByTargetType( fieldType, operatorSelectField ) {
+        if ( ! operatorSelectField ) {
+            return;
+        }
 
-    $(document).on('change', 'select[data-metatype="elements"]', function(e) {
-        e.preventDefault();
+        let shouldHideSelectInput = true;
+        const currentValue = operatorSelectField?.value;
 
-        var element_name = $(this).val();
-        var div = $(this).closest('.ppom-slider');
+        operatorSelectField.querySelectorAll('optgroup').forEach( optgroup => {
+            let shouldHideGroup = true;
+            optgroup.querySelectorAll('option').forEach( option => {
+                const isAvailable = option?.value && OPERATORS_FIELD_COMPATIBILITY[option.value] ? OPERATORS_FIELD_COMPATIBILITY[option.value].includes(fieldType) : option?.value;
+                if ( shouldHideGroup && isAvailable ) {
+                    shouldHideGroup = false;
+                }
 
-        var selected_rule_box = $(this).closest('.webcontact-rules');
-        var element_value_box = selected_rule_box.find('select[data-metatype="element_values"]');
+                if ( option.value === currentValue && !isAvailable ) {
+                    operatorSelectField.value = 'any'; // NOTE: Default to 'any' if the current select value is unavailable.
+                }
 
-        $(".ppom-slider").each(function(i, item) {
+                option.classList.toggle('ppom-hide-element', !isAvailable );
+            });
 
-            var data_name = $(item).find('input[data-metatype="data_name"]').val();
-
-            if (data_name == element_name) {
-
-                // resetting
-                jQuery(element_value_box).html('');
-
-                $(item).find('.data-options').each(function(i, condition_val) {
-
-                    var condition_type = $(condition_val).attr('data-condition-type');
-                    if (condition_type == 'simple_options') {
-                        var con_val = $(condition_val).find('input[data-metatype="option"]').val();
-                    }
-                    else if (condition_type == 'image_options') {
-                        var con_val = $(condition_val).find('.ppom-image-option-title').val();
-                    }
-
-                    if ($.trim(con_val) !== '') {
-
-
-                        var val_id = $.trim(con_val);
-
-                        var $html = '';
-                        $html += '<option value="' +
-                            ppom_escape_html(val_id) + '">' +
-                            con_val +
-                            '</option>';
-
-                        $($html).appendTo(element_value_box);
-                    }
-                });
+            if ( ! shouldHideGroup ) {
+                shouldHideSelectInput = false;
             }
+
+            optgroup.classList.toggle( 'ppom-hide-element', shouldHideGroup );
         });
+
+        operatorSelectField.classList.toggle( 'ppom-invisible-element', shouldHideSelectInput );
+        tryToggleConditionInputFields( operatorSelectField );
+    }
+
+    /**
+        27- Refresh the condition comparison option list for PPOM field target that are of type select.
+    **/
+    function updateTargetComparisonValueSelect( targetSelect, conditionContainer, initialSelectedValue ) {
+        /** @type {string?} */
+        const targetElementNameToPullOptions = targetSelect.value;
+
+        /** @type {HTMLDivElement?} */
+        conditionContainer ??= targetSelect.closest('.webcontact-rules');
+        const targetSelectOptions = conditionContainer?.querySelector('select[data-metatype="element_values"]');
+
+        if ( !conditionContainer || !targetSelectOptions ) {
+            return;
+        }
+
+        document.querySelectorAll('.ppom-slider').forEach(sliderItem => {
+
+            const targetElementFieldId = sliderItem.querySelector('input[data-metatype="data_name"]')?.value;
+            if ( targetElementFieldId !== targetElementNameToPullOptions ) {
+                return;
+            }
+
+            const operatorsInput = conditionContainer.querySelector('[data-metatype="operators"]');
+            if ( ! operatorsInput ) {
+                return;
+            }
+            
+            // Reset the options lists based on the new selection.
+            const newOptions = [];
+
+            sliderItem.querySelectorAll('.data-options').forEach(/** @type {HTMLDivElement} */conditionValueContainer => {
+                const condition_type = conditionValueContainer.getAttribute('data-condition-type');
+
+                const conditionValueId = conditionValueContainer
+                    .querySelector(
+                        condition_type === 'simple_options' 
+                        ? 'input[data-metatype="option"]' 
+                        : '.ppom-image-option-title'
+                    )?.value?.trim();
+
+                if ( ! conditionValueId ) {
+                    return;
+                }
+
+                const optionElement = document.createElement('option');
+                optionElement.value = ppom_escape_html(conditionValueId);
+                optionElement.textContent = conditionValueId;
+                
+                newOptions.push( optionElement );
+            });
+            targetSelectOptions.replaceChildren(...newOptions);
+        });
+
+        if ( initialSelectedValue ) {
+            targetSelectOptions.value = initialSelectedValue;
+        }
+    }
+    /**
+     * Toggle the visibility for input fields type based on operator current value.
+     * 
+     * @param {HTMLSelectElement?} conditionOperatorInput 
+     * @returns 
+     */
+    function tryToggleConditionInputFields( conditionOperatorInput ) {
+        if ( ! conditionOperatorInput ) {
+            return;
+        }
+
+        const selectedOperator = conditionOperatorInput?.value;
+
+         /**
+         * @type {HTMLDivElement|null}
+         */
+        const container = conditionOperatorInput?.closest('.webcontact-rules');
+        if ( !container) {
+            return;
+        }
+
+        /**
+         * @type {HTMLSelectElement|null}
+         */
+        const conditionTargetSelectOptionsInput = container.querySelector( 'select[data-metatype="element_values"]' );
+
+        /**
+         * @type {HTMLInputElement|null}
+         */
+        const conditionConstantInput = container.querySelector( '[data-metatype="element_constant"]' );
+
+        /**
+         * @type {HTMLSelectElement|null}
+         */
+        const conditionTargetSelectInput = container.querySelector( '[data-metatype="elements"]' );
+
+        if ( !conditionConstantInput || !conditionTargetSelectOptionsInput || !conditionTargetSelectInput ) {
+            return;
+        }
+   
+        /**
+         * @type {HTMLDivElement|null}
+         */
+        const betweenInputs = container.querySelector('.ppom-between-input-container');
+       
+        let shouldHideSelectInput = false;
+        let shouldHideTextInput = false;
+        let shouldHideBetweenInputs = false;
+        let shouldHideUpsell = true;
+        
+        if ( proOperatorOptionsToLock.has( selectedOperator ) ) {
+            shouldHideSelectInput = true;
+            shouldHideTextInput = true;
+            shouldHideBetweenInputs = true;
+            shouldHideUpsell = false;
+        }
+        else if ( 'between' === selectedOperator ) {
+            shouldHideSelectInput = true;
+            shouldHideTextInput = true;
+            shouldHideBetweenInputs = false;
+        }
+        else if ( HIDE_COMPARISON_INPUT_FIELD.includes( selectedOperator ) ) {
+            shouldHideSelectInput = true;
+            shouldHideTextInput = true;
+            shouldHideBetweenInputs = true;
+        } else {
+            shouldHideSelectInput = true;
+            shouldHideBetweenInputs = true;
+
+            /**
+             * @type {HTMLOptionElement|null}
+             */
+            const targetFieldTypeInput = conditionTargetSelectInput.querySelector(`option[value="${conditionTargetSelectInput.value}"]`);
+            if (
+                COMPARISON_VALUE_CAN_USE_SELECT.includes( selectedOperator ) &&
+                targetFieldTypeInput?.dataset?.fieldtype &&
+                OPERATOR_COMPARISON_VALUE_FIELD_TYPE['select'].includes( targetFieldTypeInput.dataset.fieldtype )
+            ) {
+                shouldHideTextInput = true;
+                shouldHideSelectInput = false;
+            }
+        }
+
+        if ( shouldHideSelectInput && shouldHideTextInput && shouldHideBetweenInputs && shouldHideUpsell ) {
+            conditionConstantInput.parentNode?.classList.add('ppom-invisible-element'); // NOTE: Make the entire container visible to preserve the space.
+        } else {
+            conditionTargetSelectOptionsInput.classList.toggle("ppom-hide-element", shouldHideSelectInput );
+            conditionConstantInput.classList.toggle("ppom-hide-element", shouldHideTextInput );
+            betweenInputs?.classList.toggle("ppom-hide-element", shouldHideBetweenInputs );
+            container.querySelector('.ppom-upsell-condition')?.classList.toggle("ppom-hide-element", shouldHideUpsell);
+
+            conditionConstantInput.parentNode?.classList.remove('ppom-invisible-element');
+        }
+    }
+     
+     // Apply actions on initialization based on operator value.
+    document.querySelectorAll('select[data-metatype="operators"]').forEach( conditionOperatorInput => {
+        tryToggleConditionInputFields( conditionOperatorInput );
+    });
+
+    // Apply actions when operator value changes.
+    document.addEventListener('change', function (e) {
+        if ( ! e.target.matches('select[data-metatype="operators"]') ) {
+            return;
+        }
+       
+        e.preventDefault();
+        tryToggleConditionInputFields( e.target );
     });
 
     $(document).on('change', '[data-meta-id="conditions"] select[data-metatype="element_values"]', function(e) {
@@ -1206,79 +1435,164 @@ jQuery(function($) {
 
     $(document).on('click', '.ppom-condition-tab-js', function(e) {
         e.preventDefault();
-
-        var div = $(this).closest('.ppom-slider');
-        var elements = div.find('select[data-metatype="elements"]');
-
-        elements.each(function(i, item) {
-
-            var conditional_elements = item.value;
-            var exiting_meta = $(item).attr('data-existingvalue', conditional_elements);
-        });
-
-        populate_conditional_elements(elements);
-
+        populate_conditional_elements();
     });
 
-    function populate_conditional_elements(elements) {
+    /**
+     * Populate the condition target select with eligible options based on the operator.
+     * 
+     * @param {HTMLSelectElement?} selectInput 
+     * @param {string?} conditionOperator
+     * @param {string[]} excludeIds
+     * @returns 
+     */
+    function populate_condition_target( selectInput, conditionOperator, excludeIds = [] ) {
+        if ( !selectInput ) {
+            return;
+        }
 
-        // resetting
-        jQuery('select[data-metatype="elements"]').html('');
-
-        jQuery(".ppom-slider").each(function(i, item) {
-
-            var conditional_elements = jQuery(item).find(
-                'input[data-metatype="title"]').val();
-            var conditional_elements_value = jQuery(item).find(
-                'input[data-metatype="data_name"]').val();
-
-            if ($.trim(conditional_elements_value) !== '') {
-
-                var $html = '';
-                $html += '<option value="' +
-                    conditional_elements_value + '">' +
-                    conditional_elements +
-                    '</option>';
-
-                $($html).appendTo('select[data-metatype="elements"]');
-            }
-
-        });
-
-        // setting the existing conditional elements
-        $(".ppom-slider").each(function(i, item) {
-
-            $(item).find('select[data-metatype="elements"]').each(function(i, condition_element) {
-
-                var existing_value1 = $(condition_element).attr("data-existingvalue");
-
-                if ($.trim(existing_value1) !== '') {
-                    jQuery(condition_element).val(existing_value1);
-                }
-
+        const newOptions = availableConditionTargets
+            .filter( ({ fieldId, canUse }) => canUse && !excludeIds.includes( fieldId) )
+            .map( target => {
+               
+                const option = document.createElement('option');
+                option.value = target.fieldId;
+                option.textContent = target.fieldLabel;
+                option.dataset.fieldtype = target.fieldType;
+                
+                return option;
             });
-        });
 
-
-
-        // setting the existing conditional elements values
-        $(".ppom-slider").each(function(i, item) {
-
-            $(item).find('select[data-metatype="element_values"]').each(function(i, condition_element) {
-
-                var div = $(this).closest('.webcontact-rules');
-                var existing_value1 = $(condition_element).attr("data-existingvalue");
-
-                div.find('select[data-metatype="elements"]').trigger('change');
-                if ($.trim(existing_value1) !== '') {
-                    jQuery(condition_element).val(existing_value1);
-                }
-            });
-        });
-
+        selectInput.replaceChildren( ...newOptions );
     }
 
+    function findFieldTypeById( fieldId ) {
+        if ( !fieldId ) {
+            return undefined;
+        }
 
+        for ( const target of availableConditionTargets ) {
+            if ( target.fieldId === fieldId ) {
+                return target.fieldType;
+            }
+        }
+
+        return undefined;
+    }
+
+    function can_use_field_type( fieldType ) {
+        if ( ! fieldType?.length ) {
+            return false;
+        }
+
+        for ( const operatorCompatibleFields of Object.values( OPERATORS_FIELD_COMPATIBILITY ) ) {
+            if ( operatorCompatibleFields.includes( fieldType ) ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Populate the condition target select with eligible options based on the operator on initialization and value change.
+     * 
+     */
+    function populate_conditional_elements() {
+
+        // Get all available PPOM fields.
+        availableConditionTargets.splice(0, availableConditionTargets.length);
+        document.querySelectorAll(".ppom-slider").forEach(item => {
+            const fieldLabel = item.querySelector('input[data-metatype="title"]')?.value;
+            const fieldId = item.querySelector('input[data-metatype="data_name"]')?.value?.trim();
+            const fieldType = item.querySelector('input[data-metatype="type"]')?.value;
+            const canUse = can_use_field_type( fieldType );
+
+            if ( !fieldLabel || !fieldId || !fieldType ) {
+                return;
+            }
+
+            availableConditionTargets.push({ fieldLabel, fieldId, fieldType, canUse });
+        });
+      
+        // Change the target options for all the rules.
+        document.querySelectorAll(".ppom-slider").forEach(item => {
+            if ( ! item.id ) {
+                return;
+            }
+            const conditionContainers = item.querySelector('div[data-meta-id="conditions"]')?.querySelectorAll('.webcontact-rules');
+            
+            conditionContainers?.forEach(conditionContainer => {
+                const conditionTargetsSelect = conditionContainer.querySelector('[data-metatype="elements"]');
+                if ( ! conditionTargetsSelect ) {
+                    return;
+                }
+
+                const conditionOperatorSelect = conditionContainer.querySelector('[data-metatype="operators"]');
+                const fieldId = item.querySelector('input[data-metatype="data_name"]')?.value?.trim();
+
+                populate_condition_target( conditionTargetsSelect, conditionOperatorSelect?.value, [fieldId] );
+
+                if ( conditionTargetsSelect?.dataset?.existingvalue ) {
+                    conditionTargetsSelect.value = conditionTargetsSelect?.dataset?.existingvalue;
+                }
+                
+                // NOTE: Get all the locked operators. Unlock them to be eligible to show the upsell.
+                conditionOperatorSelect?.querySelectorAll( 'option' ).forEach( option => {
+                    if ( ! option.disabled ) {
+                        return;
+                    }
+
+                    proOperatorOptionsToLock.add( option.value );
+                    option.disabled = false;
+                });
+               
+                toggleOperatorFieldByTargetType( findFieldTypeById( conditionTargetsSelect?.value ), conditionOperatorSelect  ); 
+                
+                const optionsInput = conditionContainer.querySelector('[data-metatype="element_values"]');
+
+                updateTargetComparisonValueSelect( 
+                    conditionTargetsSelect,
+                    conditionContainer,
+                    optionsInput?.dataset?.existingvalue
+                );
+            });
+        });
+    }
+
+    /**
+     * Update the values of the operators selector and the comparison fields.
+     * 
+     * NOTE: We are using a global listener since some node are dinamically created/cloned.
+     */
+    document.addEventListener('change', function(e) {
+        if ( ! e.target.matches('select[data-metatype="elements"]') ) {
+            return;
+        }
+
+        e.preventDefault();
+        const conditionContainer = e.target.closest('.webcontact-rules');
+        const conditionOperatorSelect = conditionContainer?.querySelector('[data-metatype="operators"]');
+        if ( ! conditionContainer || ! conditionOperatorSelect ) {
+            return;
+        }
+        
+        toggleOperatorFieldByTargetType( findFieldTypeById(e.target?.value), conditionOperatorSelect  );
+        updateTargetComparisonValueSelect( e.target, conditionContainer );
+
+        const optionsInput = conditionContainer.querySelector('[data-metatype="element_values"]');
+        const constantInput = conditionContainer.querySelector('[data-metatype="element_constant"]');
+        
+        // Reset values.
+        if ( constantInput ) {
+            constantInput.value = '';
+        }
+
+        if ( optionsInput ) {
+            optionsInput.value = '';
+        }
+    });
+    
     /**
         28- validate API WooCommerce Product
     **/
@@ -1313,7 +1627,7 @@ jQuery(function($) {
             .replace(/'/g, "&#039;");
     }
 
-    $('div.row.ppom-tabs').on('ppom_fields_tab_changed', (e, id, tab)=>{
+    $(document).on('ppom_fields_tab_changed', 'div.row.ppom-tabs', (e, id, tab)=>{
         if( ppom_vars.i18n.freemiumCFRTab !== id ) {
             return;
         }
@@ -1322,7 +1636,7 @@ jQuery(function($) {
             return;
         }
 
-        $(`<div class="form-group">${ppom_vars.i18n.freemiumCFRContent}</div>`).insertBefore( tab.find('.form-group') );
+        $(`<div class="form-group">${ppom_vars.i18n.freemiumCFRContent}</div>`).insertAfter( tab.find('.form-group') );
     });
 
     const toggleHandler = {
@@ -1356,6 +1670,51 @@ jQuery(function($) {
         $(clone_new_field).find('input[data-metatype="jquery_dp"]').change(toggleHandler.activateHandler);
     } );
 
+    // Unsaved form exit confirmation.
+    var unsaved = false;
+    $( '.ppom-main-field-wrapper :input' ).change(function () {
+        if ( $( this ).parents( '.ppom-checkboxe-style' )?.length > 0 ) {
+            unsaved = false;
+            return;
+        }    
+        unsaved = true;
+    });
+    $( document ).on( 'click', '.ppom-submit-btn input.btn, button.ppom_copy_field, button.ppom-add-fields-js-action, button.ppom-js-modal-close', function() {
+        if ( $(this).hasClass('ppom_copy_field') || $(this).hasClass( 'ppom-add-fields-js-action' ) ) {
+            unsaved = true;
+            return;
+        }
+        unsaved = false;
+    } );
+    window.addEventListener( 'beforeunload', function( e ) {
+        if ( unsaved ) {
+          e.preventDefault();
+          e.returnValue = '';
+      }
+    });
+
+    $( document ).on( 'ppom_fields_tab_changed', function(e, id, tab) {
+        if ( 'condition_tab' !== id ) {
+            return;
+        }
+
+        if ( ! $('input[data-metatype="logic"]', tab?.first() )?.is(':checked') ) {
+            tab?.last()?.addClass( 'ppom-disabled-overlay' );
+        }
+    } );
+
+    $( document ).on( 'change', 'input[data-metatype="logic"]:visible', function() {
+        $(this)
+        .parents('.ppom_handle_condition_tab')
+        .next('.ppom_handle_condition_tab')
+        .toggleClass('ppom-disabled-overlay');
+    } );
+
+    $( document ).on( 'click', 'button.ppom-edit-field.ppom-is-pro-field, button.ppom_copy_field.ppom-is-pro-field', function() {
+        $('#ppom-lock-fields-upsell').fadeIn();
+       return false;
+    } );
+
     $(document).ready(function(){
         $('.ppom-slider').each(function(i, item){
             const itemEl = $(item);
@@ -1371,4 +1730,61 @@ jQuery(function($) {
             toggleHandler.setDisabledFields(itemEl.find('input[data-metatype="jquery_dp"]'));
         });
     })
+    $(document).on('click', '.postbox-header', function() {
+        var postbox = $(this).closest('.postbox');
+        postbox.toggleClass('closed');
+    });
+});
+document.querySelectorAll('.ppom-modal-shortcuts a')?.forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Get the href attribute and use it as the ID to display the corresponding section
+        const targetId = this.getAttribute('href');
+        if (targetId === '#all') {
+            // Show all sections
+            document.querySelectorAll('.ppom-fields-section').forEach(section => {
+                section.style.display = 'block';
+            });
+        } else {
+            // Hide all sections with the class 'ppom-fields-section'
+            document.querySelectorAll('.ppom-fields-section').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            const targetSection = document.querySelector(targetId + '-ppom-fields');
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+        }
+    });
+});
+/**
+ * Search Field for Add Field modal.
+ */
+document.querySelector('input[name="ppom-search-field"]')?.addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const sections = document.querySelectorAll('.ppom-fields-section');
+
+    sections.forEach(section => {
+        const buttons = section.querySelectorAll('.ppom-field-item');
+        let hasVisibleButton = false;
+
+        buttons.forEach(button => {
+            const text = button.textContent.toLowerCase();
+
+            if ( text.includes( query ) ) {
+                button.style.display = 'flex';
+                hasVisibleButton = true;
+            } else {
+                button.style.display = 'none';
+            }
+        });
+
+        // If no buttons in this section are visible, hide the section
+        if ( hasVisibleButton ) {
+            section.style.display = 'flex';
+        } else {
+            section.style.display = 'none';
+        }
+    });
 });

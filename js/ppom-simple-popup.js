@@ -141,8 +141,16 @@
 			modal.trigger(prefix + ':open');
 
 			// close popup listner
-			var closeButton = $('.' + options.popupcloseclass).bind('click.modalEvent', function(e) {
+			$('.' + options.popupcloseclass).bind('click.modalEvent', function(e) {
 				modal.trigger(prefix + ':close');
+				e.preventDefault();
+			});
+
+			// Close popup on overlay click, but not when clicking inside the modal
+			$('.ppom-enquiry-overlay, .ppom-popup-product-edit-overlay').bind('click.modalEvent', function(e) {
+				if (!$(e.target).closest('.ppom-enquiry-modal, .ppom-popup-product-edit-modal').length) {
+					modal.trigger(prefix + ':close');
+				}
 				e.preventDefault();
 			});
 
