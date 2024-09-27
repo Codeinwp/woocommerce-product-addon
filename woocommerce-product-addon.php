@@ -28,7 +28,7 @@ define( 'PPOM_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 define( 'PPOM_WP_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __DIR__ ) ) );
 define( 'PPOM_BASENAME', basename( PPOM_WP_PLUGIN_DIR ) );
 define( 'PPOM_VERSION', '32.0.27' );
-define( 'PPOM_DB_VERSION', '30.1.0' );
+define( 'PPOM_DB_VERSION', '32.0.0' );
 define( 'PPOM_PRODUCT_META_KEY', '_product_meta_id' );
 define( 'PPOM_TABLE_META', 'nm_personalized' );
 define( 'PPOM_UPLOAD_DIR_NAME', 'ppom_files' );
@@ -171,5 +171,3 @@ add_action(
 
 register_activation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'activate_plugin' ) );
 register_deactivation_hook( __FILE__, array( 'NM_PersonalizedProduct', 'deactivate_plugin' ) );
-
-add_action('upgrader_process_complete', array( 'NM_PersonalizedProduct', 'check_for_plugin_update' ), 10, 2);

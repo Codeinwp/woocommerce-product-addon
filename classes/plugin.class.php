@@ -327,8 +327,6 @@ class NM_PersonalizedProduct {
 		add_filter( 'woocommerce_order_again_cart_item_data', 'ppom_wc_order_again_compatibility', 10, 3 );
 		// Show description tooltip.
 		add_filter( 'ppom_field_description', array( $this, 'show_tooltip' ), 15, 2 );
-
-		$this->should_migrate_database();
 	}
 
 	/*
@@ -649,39 +647,6 @@ class NM_PersonalizedProduct {
 		dbDelta( $sql );
 
 		update_option( 'personalizedproduct_db_version', PPOM_DB_VERSION );
-	}
-
-	public static function check_for_plugin_update( $upgrader, $hook_extra ) {
-		if (
-			isset( $hook_extra['action'] ) && 'update' === $hook_extra['action'] &&
-			isset( $hook_extra['type'] ) && 'plugin' === $hook_extra['type'] &&
-			isset( $hook_extra['plugins'] ) && is_array( $hook_extra['plugins'] )
-		) {
-			$updated_plugins = $hook_extra['plugins'];
-			$plugin_name = basename(PPOM_PATH);
-
-			foreach( $updated_plugins as $updated_plugin_path ) {
-				if ( false !== str_contains( $updated_plugin_path, $plugin_name ) ) {
-					self::upgrade_database();
-					break;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Checks if the database needs to be migrated and performs the migration if necessary.
-	 *
-	 * @return void
-	 */
-	public function should_migrate_database() {
-		$last_version_upgrade = get_option( 'ppom_last_version_db_upgrade', false );
-		if ( false !== $last_version_upgrade ) {
-			return;
-		}
-
-		self::upgrade_database();
-		update_option( 'ppom_last_version_db_upgrade', PPOM_DB_VERSION );
 	}
 
 	public static function activate_plugin() {

@@ -836,10 +836,16 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * Create database tables.
 	 */
 	public function ppom_create_db_tables() {
-		if ( ! empty( get_option( 'personalizedproduct_db_version' ) ) ) {
+		$used_db_version = get_option( 'personalizedproduct_db_version', false );
+
+		if (
+			! empty( $used_db_version ) &&
+			is_string( $used_db_version ) &&
+			version_compare( PPOM_DB_VERSION, $used_db_version, '<=' )
+		) {
 			return;
 		}
-
+		
 		NM_PersonalizedProduct::activate_plugin();
 	}
 }
