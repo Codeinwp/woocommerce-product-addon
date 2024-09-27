@@ -35,10 +35,13 @@
 
 .ppom-helper-icon i {
     margin-top: 0px;
-    color: #f95700ff;
+    color: #666;
     font-size: 21px;
     margin-left: 2px;
     cursor: help !important;
+}
+.ppom-wrapper .table thead th{
+    vertical-align: middle;
 }
 
 .ppom-fields-name-model .ppom-modal-body ul li {
