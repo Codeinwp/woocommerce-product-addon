@@ -1,3 +1,8 @@
+##### [Version 33.0.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.0...v33.0.1) (2024-09-30)
+
+- Fixed a regression where the Min Image Select and Max Image Select options were not enforcing limits correctly in the latest update
+- Fixed a regression where customers could not upload images via the PPOM Image Cropper field.
+
 #### [Version 33.0.0](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.27...v33.0.0) (2024-09-27)
 
 **New Features**

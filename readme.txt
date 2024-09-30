@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, woocommerce product addon
 Requires at least: 3.5
 Tested up to: 6.6
-Stable tag: 33.0.0
+Stable tag: 33.0.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -121,6 +121,14 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 9. PPOM General Settings
 
 == Changelog ==
+
+##### [Version 33.0.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.0...v33.0.1) (2024-09-30)
+
+- Fixed a regression where the Min Image Select and Max Image Select options were not enforcing limits correctly in the latest update
+- Fixed a regression where customers could not upload images via the PPOM Image Cropper field.
+
+
+
 
 #### [Version 33.0.0](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.27...v33.0.0) (2024-09-27)
 
