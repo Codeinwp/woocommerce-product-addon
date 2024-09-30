@@ -180,9 +180,8 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                             return;
                         }
                         
-                        const multiple = input.dataset.allowMultiple;
-    
-                        if ( ! multiple ) {
+                        const multiple = input.dataset.allowMultiple || false;
+                        if ( multiple ) {
                             if (input.dataset.required) {
                                 input.checked = true;
                             }
