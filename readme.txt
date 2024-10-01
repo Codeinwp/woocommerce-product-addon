@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, woocommerce product addon
 Requires at least: 3.5
 Tested up to: 6.6
-Stable tag: 33.0.1
+Stable tag: 33.0.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -121,6 +121,16 @@ If you feels that PPOM Free or PPOM PRO versions are not enough for your needs, 
 9. PPOM General Settings
 
 == Changelog ==
+
+##### [Version 33.0.2](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.1...v33.0.2) (2024-10-01)
+
+- Fixed a few alignment and UI issues
+- Updated behavior for PPOM Image Selection to allow one selection by default.
+- Fixed an issue where the Conditions field was not working correctly in Image and Conditional Image fields 
+- Fixed issues that prevented saving group fields when a large number of fields were present.
+
+
+
 
 ##### [Version 33.0.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.0...v33.0.1) (2024-09-30)
 
