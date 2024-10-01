@@ -35,7 +35,12 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 			$ppom_settings_url = admin_url( 'admin.php?page=ppom' );
 
 			if ( $ppom->has_multiple_meta() ) {
+				$total_items = count( $ppom->meta_id ); // Get the total number of items.
+				$current_item = 0; // Counter to track the current iteration.
+
 				foreach ( $ppom->meta_id as $meta_id ) {
+					$current_item++; // Increment the counter.
+
 					$ppom_setting = $ppom->get_settings_by_id( $meta_id );
 					if ( $ppom_setting ) {
 						$meta_title = stripslashes( $ppom_setting->productmeta_name );
@@ -47,7 +52,10 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 							$ppom_settings_url
 						);
 						echo sprintf( __( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), $meta_title );
-						echo ', ';
+						// Add a comma only if it's not the last item
+						if ( $current_item < $total_items ) {
+							echo ', ';
+						}
 					} else {
 						echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), 'Add Fields' );
 					}
@@ -264,6 +272,7 @@ function ppom_admin_save_form_meta() {
 		wp_send_json( $resp );
 	}
 
+	$_REQUEST['ppom'] = is_array( $_REQUEST['ppom'] ) ? $_REQUEST['ppom'] : json_decode( wp_unslash( $_REQUEST['ppom'] ), true );
 	global $wpdb;
 
 	extract( $_REQUEST );
@@ -440,7 +449,7 @@ function ppom_admin_update_form_meta() {
 
 		wp_send_json( $resp );
 	}
-
+	$_REQUEST['ppom'] = is_array( $_REQUEST['ppom'] ) ? $_REQUEST['ppom'] : json_decode( wp_unslash( $_REQUEST['ppom'] ), true );
 	global $wpdb;
 
 	$ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];

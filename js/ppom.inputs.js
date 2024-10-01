@@ -189,7 +189,7 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                             const siblings = Array.from(input.parentNode.parentNode.querySelectorAll('input.ppom-input.image'));
                             siblings.filter(sibling => sibling !== input).forEach(sibling => sibling.checked = false);
                         } else {
-                            const maxImgSelection = parseInt( input.dataset?.maxSelection ?? '0' );
+                            const maxImgSelection = parseInt( input.dataset?.maxSelection ?? '1' );
                             if ( maxImgSelection ) {
                                 inputContainer.querySelector('img')?.addEventListener( 'click', () => {
                                     selectedImgs.push( input );

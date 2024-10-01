@@ -1,7 +1,7 @@
 // @ts-check
 "use strict";
 
-const FIELD_COMPATIBLE_WITH_SELECT_OPTIONS = [ 'select', 'radio', 'switcher' ];
+const FIELD_COMPATIBLE_WITH_SELECT_OPTIONS = [ 'select', 'radio', 'switcher', 'image','conditional_meta'];
 const OPERATOR_COMPARISON_VALUE_FIELD_TYPE = {
     'select': FIELD_COMPATIBLE_WITH_SELECT_OPTIONS,
 }
@@ -128,22 +128,31 @@ jQuery(function($) {
         jQuery(".ppom-meta-save-notice").html('<img src="' + ppom_vars.loader + '">').show();
 
         $('.ppom-unsave-data').remove();
+        var data = $(this).serializeJSON();
+        data.ppom = JSON.stringify(data.ppom);
+        // Send the JSON data via POST request
+        $.ajax({
+            url: ajaxurl,
+            data: data,  // Send as regular object (no need to stringify)
+            type: 'POST',
+            success: function(resp) {
 
-        var data = $(this).serialize();
-
-        $.post(ajaxurl, data, function(resp) {
-
-            const bg_color = resp.status == 'success' ? '#4e694859' : '#ee8b94';
-            jQuery(".ppom-meta-save-notice").html(resp.message).css({ 'background-color': bg_color, 'padding': '8px', 'border-left': '5px solid #008c00' });
-            if (resp.status == 'success') {
-                if (resp.redirect_to != '') {
-                    window.location = resp.redirect_to;
+                const bg_color = resp.status == 'success' ? '#4e694859' : '#ee8b94';
+                jQuery(".ppom-meta-save-notice").html(resp.message).css({ 'background-color': bg_color, 'padding': '8px', 'border-left': '5px solid #008c00' });
+                if (resp.status == 'success') {
+                    if (resp.redirect_to != '') {
+                        window.location = resp.redirect_to;
+                    }
+                    else {
+                        window.location.reload(true);
+                    }
                 }
-                else {
-                    window.location.reload(true);
-                }
+            },
+            error: function() {
+                // Handle error
+                jQuery(".ppom-meta-save-notice").html("An error occurred. Please try again.").css({ 'background-color': '#ee8b94', 'padding': '8px', 'border-left': '5px solid #c00' });
             }
-        }, 'json');
+        });
 
     });
 
@@ -1351,8 +1360,7 @@ jQuery(function($) {
          * @type {HTMLSelectElement|null}
          */
         const conditionTargetSelectInput = container.querySelector( '[data-metatype="elements"]' );
-
-        if ( !conditionConstantInput || !conditionTargetSelectOptionsInput || !conditionTargetSelectInput ) {
+        if ( !conditionConstantInput || !conditionTargetSelectInput ) {
             return;
         }
    
@@ -1390,6 +1398,7 @@ jQuery(function($) {
              */
             const targetFieldTypeInput = conditionTargetSelectInput.querySelector(`option[value="${conditionTargetSelectInput.value}"]`);
             if (
+                conditionTargetSelectOptionsInput &&
                 COMPARISON_VALUE_CAN_USE_SELECT.includes( selectedOperator ) &&
                 targetFieldTypeInput?.dataset?.fieldtype &&
                 OPERATOR_COMPARISON_VALUE_FIELD_TYPE['select'].includes( targetFieldTypeInput.dataset.fieldtype )
@@ -1402,7 +1411,7 @@ jQuery(function($) {
         if ( shouldHideSelectInput && shouldHideTextInput && shouldHideBetweenInputs && shouldHideUpsell ) {
             conditionConstantInput.parentNode?.classList.add('ppom-invisible-element'); // NOTE: Make the entire container visible to preserve the space.
         } else {
-            conditionTargetSelectOptionsInput.classList.toggle("ppom-hide-element", shouldHideSelectInput );
+            conditionTargetSelectOptionsInput?.classList.toggle("ppom-hide-element", shouldHideSelectInput );
             conditionConstantInput.classList.toggle("ppom-hide-element", shouldHideTextInput );
             betweenInputs?.classList.toggle("ppom-hide-element", shouldHideBetweenInputs );
             container.querySelector('.ppom-upsell-condition')?.classList.toggle("ppom-hide-element", shouldHideUpsell);
