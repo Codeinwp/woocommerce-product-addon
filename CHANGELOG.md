@@ -1,3 +1,10 @@
+##### [Version 33.0.2](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.1...v33.0.2) (2024-10-01)
+
+- Fixed a few alignment and UI issues
+- Updated behavior for PPOM Image Selection to allow one selection by default.
+- Fixed an issue where the Conditions field was not working correctly in Image and Conditional Image fields 
+- Fixed issues that prevented saving group fields when a large number of fields were present.
+
 ##### [Version 33.0.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.0...v33.0.1) (2024-09-30)
 
 - Fixed a regression where the Min Image Select and Max Image Select options were not enforcing limits correctly in the latest update
