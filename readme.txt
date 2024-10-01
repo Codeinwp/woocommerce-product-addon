@@ -40,7 +40,7 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 📌 **Checkbox Options (with price)**: Checkbox input allows the users to select multiple options set by the admin. Prices can also be set against each option. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-checkbox-input/)
 
-📌 **Date**: Date input displays regular Date using an input box that allows the user to personalize the Product with a Date, e.g. Date of birth, etc. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-date-input/)
+📌 **Date**: Date input displays a regular Date input box that allows the user to personalize the Product with a Date, e.g. Date of birth, etc. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-date-input/)
 
 📌 **Email** – Text input displays an email input box that allows users to personalize the Product with an e-mail address. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-email-input/)
 
@@ -110,7 +110,7 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 💎 **Emojis Input**: [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-emoji-input/)
 
-💎 **File Upload**: Allow customers to upload files. Admin can set filetypes and filesize. Includes progress bar, thumb display, and responsive uploader. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-file-upload-input/)
+💎 **File Upload**: Allow customers to upload files. Admin can set file types and filesize. Includes progress bar, thumb display, and responsive uploader. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-file-upload-input/)
 
 💎 **Fixed Price Input**: Set fixed prices with Add Option / First Option. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/fixed-price-input-with-add-option-first-option/)
 
@@ -130,9 +130,9 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 💎 **Price Matrix with Discount**: Set tiered or discount prices on bulk purchases. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-price-matrix-discount/)
 
-💎 **Personalized Preview**: With the Personalization Preview feature, users can type text, customize font and see exactly how it will appear on the product image, offering a clear and interactive experience that boosts confidence in their purchase. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-texter-input/)
+💎 **Personalized Preview**: With the Personalization Preview feature, users can type text, customize font, and see exactly how it will appear on the product image, offering a clear and interactive experience that boosts confidence in their purchase. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-texter-input/)
 
-💎 **Quantities Pack Input**: The Quantities Pack input helps you to create a multiple choice product page, so that the user can insert and buy different quantities of the product's types from the same page. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/quantities-pack-input/)
+💎 **Quantities Pack Input**: The Quantities Pack input helps you to create a multiple-choice product page so that the user can insert and buy different quantities of the product's types from the same page. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/quantities-pack-input/)
 
 💎 **Quantity Option Input**: The Quantity Option product might come in handy for extra services; for example, for any book bought, you receive a bookmark, but if you need more bookmarks, you can insert the quantity in the Quantity Option field. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/quantity-option-input/)
 
@@ -144,15 +144,15 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 💎 **Text Counter**: This input is a special text input that can restrict the total number of words or characters. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-text-counter/)
 
-💎 **Timezone**: Select timezone from pre defined list of timezone. Exclude/include timezones. [View Demo](https://demo-ppom-lite.vertisite.cloud/product-category/timezone-input/)
+💎 **Timezone**: Select a timezone from a pre-defined list of timezone. Exclude/include time zones. [View Demo](https://demo-ppom-lite.vertisite.cloud/product-category/timezone-input/)
 
-💎 **Variation Matrix Input**: Allow customers to order different quantities for different options like Sizes or colors.[View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-variation-matrix-input/)
+💎 **Variation Matrix Input**: Allow customers to order different quantities for different options like sizes or colors.[View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-variation-matrix-input/)
 
 💎 **Variation Quantities**: Variation Quantities allow customers to order different quantities against different options.[View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-variation-quantities/)
 
 ## PPOM PRO Features:
 
-💎 **More Conditional Logic Operators**: Expand conditional logic for text and numeric fields with operators like contains, regex, between, multiples, less than, greator than, is odd, is even and more.
+💎 **More Conditional Logic Operators**: Expand conditional logic for text and numeric fields with operators like contains, regex, between, multiples, less than, greater than, is odd, is even, and more.
 
 💎 **Custom CSS & Javascript**: Add custom CSS and JavaScript to your product fields for full control over their appearance and behavior. Use the selector to target specific elements and apply styles or functionality.
 
@@ -160,7 +160,7 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 💎 **Options Prices Taxable**: Apply tax settings to product options for accurate pricing.
 
-💎 **Weight Options**: Weight can be assgined for options.
+💎 **Weight Options**: Weight can be assigned for options.
 
 💎 **Multiple Meta Groups**: Assign multiple metas groups to a single product.
 
@@ -205,7 +205,7 @@ PPOM is designed to enhance your website’s functionality with customizable pro
 
 🌍 **Travel and Tours**: Streamline bookings by enabling customers to choose destinations, accommodation types, and extra activities with image options. Dynamically display different options based on user selections for a smoother, more personalized experience.
 
-👕 **Custom Apparel**: From custom socks to personalized shirts, allow customers to select fabrics, colors, and even upload their own designs. PPOM’s flexible nature makes it ideal for fashion e-commerce that thrives on personalization.
+👕 **Custom Apparel**: From custom socks to personalized shirts, allow customers to select fabrics, colors, and even upload their designs. PPOM’s flexible nature makes it ideal for fashion e-commerce that thrives on personalization.
 
 ### See what real users talk about us:
 
@@ -240,17 +240,28 @@ PPOM is an open-source project, and we welcome contributors to be part of our vi
 3. After activation, you can set options from `WooCommerce -> PPOM Settings` menu
 
 == Screenshots ==
-1. "Select" field sample settings
-2. "Select" field on the product
-3. "Text" field sample settings
-4. "Text" field on the product
-5. Inputs attached to the cart page
-6. Inputs attached to the checkout page
-7. Finally admin can see all attached inputs in orders panel
-8. Managing PPOM Field Groups
-9. PPOM General Settings
+
+1. PPOM Fields Walkthrough
+2. Create a Select Field
+3. Add Custom Pricing to Options
+4. Custom Fields Input Data is Available on the Cart and Order Details Pages
+5. Attach Products by Name or Category
+6. Apply Display Condition Rules
+
 
 == Changelog ==
+
+##### [Version 33.0.2](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.1...v33.0.2) (2024-10-01)
+
+- Fixed a few alignment and UI issues
+- Updated behavior for PPOM Image Selection to allow one selection by default.
+- Fixed an issue where the Conditions field was not working correctly in Image and Conditional Image fields 
+- Fixed issues that prevented saving group fields when a large number of fields were present.
+
+##### [Version 33.0.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.0...v33.0.1) (2024-09-30)
+
+- Fixed a regression where the Min Image Select and Max Image Select options were not enforcing limits correctly in the latest update
+- Fixed a regression where customers could not upload images via the PPOM Image Cropper field.
 
 #### [Version 33.0.0](https://github.com/Codeinwp/woocommerce-product-addon/compare/v32.0.27...v33.0.0) (2024-09-27)
 
