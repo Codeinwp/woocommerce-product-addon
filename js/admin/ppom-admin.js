@@ -1,7 +1,7 @@
 // @ts-check
 "use strict";
 
-const FIELD_COMPATIBLE_WITH_SELECT_OPTIONS = [ 'select', 'radio', 'switcher' ];
+const FIELD_COMPATIBLE_WITH_SELECT_OPTIONS = [ 'select', 'radio', 'switcher', 'image' ];
 const OPERATOR_COMPARISON_VALUE_FIELD_TYPE = {
     'select': FIELD_COMPATIBLE_WITH_SELECT_OPTIONS,
 }
