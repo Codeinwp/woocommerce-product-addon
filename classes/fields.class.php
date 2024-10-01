@@ -937,41 +937,48 @@ class PPOM_Fields_Meta {
 					// is
 					$pro_enabled = ppom_pro_is_installed() && 'valid' === apply_filters( 'product_ppom_license_status', '' );
 
-					$html_input .= '<div class="col-md-2 col-sm-2">';
-					$html_input .= '<select data-metatype="operators" class="ppom-conditional-keys form-control">';
+					$html_input .= '<div class="col-md-3 col-sm-3">';
+					$html_input .= '<select name="ppom[' . esc_attr( $field_index ) . '][conditions][rules][0][operators]" class="form-control ppom-conditional-keys" data-metatype="operators">';
 
 					$html_input .= '<optgroup label="' . __( 'Value Comparison', 'woocommerce-product-addon' ) . '">';
+					$html_input .= '<option  value="is">' . __( 'is', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option  value="not">' . __( 'is not', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option  value="empty">' . __( 'is empty', 'woocommerce-product-addon' ) . '</option>';
 					$html_input .= '<option value="any">' . __( 'has any value', 'woocommerce-product-addon' ) . '</option>';
-					$html_input .= '<option value="empty">' . __( 'is empty', 'woocommerce-product-addon' ) . '</option>';
-					$html_input .= '<option value="is">' . __( 'is', 'woocommerce-product-addon' ) . '</option>';
-					$html_input .= '<option value="not">' . __( 'is not', 'woocommerce-product-addon' ) . '</option>';
 					$html_input .= '</optgroup>';
 
 					$html_input .= '<optgroup label="' . __( 'Text Matching', 'woocommerce-product-addon' ) . '">';
-					$html_input .= '<option value="' . ( $pro_enabled ? 'contains' : '' ) . '"' . disabled( false, $pro_enabled, false ) . '>' . __( 'contains', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
-					$html_input .= '<option value="' . ( $pro_enabled ? 'not-contains' : '' ) . '"' . disabled( false, $pro_enabled, false ) . '>' . __( 'does not contain', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
-					$html_input .= '<option value="' . ( $pro_enabled ? 'regex' : '' ) . '"' . disabled( false, $pro_enabled, false ) . '>' . __( 'matches RegEx', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
+					$html_input .= '<option  value="contains" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'contains', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
+					$html_input .= '<option  value="not-contains" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'does not contain', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
+					$html_input .= '<option  value="regex" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'matches RegEx', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
 					$html_input .= '</optgroup>';
 
 					$html_input .= '<optgroup label="' . __( 'Numeric Comparison', 'woocommerce-product-addon' ) . '">';
-					$html_input .= '<option value="greater than">' . __( 'greater than', 'woocommerce-product-addon' ) . '</option>';
-					$html_input .= '<option value="less than">' . __( 'less than', 'woocommerce-product-addon' ) . '</option>';
-					$html_input .= '<option value="' . ( $pro_enabled ? 'even-number' : '' ) . '"' . disabled( false, $pro_enabled, false ) . '>' . __( 'is even', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
-					$html_input .= '<option value="' . ( $pro_enabled ? 'odd-number' : '' ) . '"' . disabled( false, $pro_enabled, false ) . '>' . __( 'is odd', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
-					$html_input .= '<option value="' . ( $pro_enabled ? 'between' : '' ) . '"' . disabled( false, $pro_enabled, false ) . '>' . __( 'is between', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
-					$html_input .= '<option value="' . ( $pro_enabled ? 'number-multiplier' : '' ) . '"' . disabled( false, $pro_enabled, false ) . '>' . __( 'is multiple of', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
+					$html_input .= '<option   value="greater than">' . __( 'greater than', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option   value="less than">' . __( 'less than', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option   value="between" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'is between', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
+					$html_input .= '<option  value="number-multiplier" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'is multiple of', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
+					$html_input .= '<option   value="even-number" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'is even', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
+					$html_input .= '<option  value="odd-number" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'is odd', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (PRO)' : '' ) . '</option>';
 					$html_input .= '</optgroup>';
 
 					$html_input .= '</select> ';
+
 					$html_input .= '</div>';
 
-					// conditional elements values
-					$html_input .= '<div class="col-md-4 col-sm-4">';
+					$html_input .= '<div class="col-md-3 col-sm-3">';
+					$html_input .= '<input name="ppom[' . esc_attr( $field_index ) . '][conditions][rules][0][element_constant]" class="form-control ppom-conditional-keys ppom-hide-element" data-metatype="element_constant"  >';
 
-					$html_input .= '<select data-metatype="element_values" class="ppom-conditional-keys form-control"></select>';
+					$html_input .= '<div class="ppom-between-input-container ppom-hide-element"> ';
+					$html_input .= '<input type="number" name="ppom[' . esc_attr( $field_index ) . '][conditions][rules][0][cond-between-interval][from]" class="form-control ppom-conditional-keys" data-metatype="between-input-from"  pattern="^\\d+(\\.\\d{1,4})?$">';
+					$html_input .= '<span>' . __( 'and', 'woocommerce-product-addon' ) . '</span>';
+					$html_input .= '<input type="number" name="ppom[' . esc_attr( $field_index ) . '][conditions][rules][0][cond-between-interval][to]" class="form-control ppom-conditional-keys" data-metatype="between-input-to" pattern="^\\d+(\\.\\d{1,4})?$">';
+					$html_input .= '</div>';
+
+					// Upsell
+					$html_input .= '<a class="ppom-upsell-condition ppom-hide-element" target="_blank" href="' . esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'input-field-edit', 'condition' ) ) . '"><span class="dashicons dashicons-external"></span> ' . __('Upgrade to Unlock', 'woocommerce-product-addon') . '</a>';
 
 
-					// $html_input .= '<input type="text" class="form-control ppom-conditional-keys" placeholder="Enter Option" data-metatype="element_values">';
 					$html_input .= '</div>';
 
 					// Add and remove btn

@@ -1351,8 +1351,7 @@ jQuery(function($) {
          * @type {HTMLSelectElement|null}
          */
         const conditionTargetSelectInput = container.querySelector( '[data-metatype="elements"]' );
-
-        if ( !conditionConstantInput || !conditionTargetSelectOptionsInput || !conditionTargetSelectInput ) {
+        if ( !conditionConstantInput || !conditionTargetSelectInput ) {
             return;
         }
    
@@ -1390,6 +1389,7 @@ jQuery(function($) {
              */
             const targetFieldTypeInput = conditionTargetSelectInput.querySelector(`option[value="${conditionTargetSelectInput.value}"]`);
             if (
+                conditionTargetSelectOptionsInput &&
                 COMPARISON_VALUE_CAN_USE_SELECT.includes( selectedOperator ) &&
                 targetFieldTypeInput?.dataset?.fieldtype &&
                 OPERATOR_COMPARISON_VALUE_FIELD_TYPE['select'].includes( targetFieldTypeInput.dataset.fieldtype )
@@ -1402,7 +1402,7 @@ jQuery(function($) {
         if ( shouldHideSelectInput && shouldHideTextInput && shouldHideBetweenInputs && shouldHideUpsell ) {
             conditionConstantInput.parentNode?.classList.add('ppom-invisible-element'); // NOTE: Make the entire container visible to preserve the space.
         } else {
-            conditionTargetSelectOptionsInput.classList.toggle("ppom-hide-element", shouldHideSelectInput );
+            conditionTargetSelectOptionsInput?.classList.toggle("ppom-hide-element", shouldHideSelectInput );
             conditionConstantInput.classList.toggle("ppom-hide-element", shouldHideTextInput );
             betweenInputs?.classList.toggle("ppom-hide-element", shouldHideBetweenInputs );
             container.querySelector('.ppom-upsell-condition')?.classList.toggle("ppom-hide-element", shouldHideUpsell);

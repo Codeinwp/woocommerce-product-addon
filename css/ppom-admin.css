@@ -1855,3 +1855,10 @@ header.ppom-modal-header {
 .ppom-wrapper select.form-control{
     line-height: unset;
 }
+.ppom-wrapper select.form-control{
+    line-height: unset;
+}
+
+.ppom-wrapper a.ppom-upsell-condition:hover{
+    text-decoration: none;
+}

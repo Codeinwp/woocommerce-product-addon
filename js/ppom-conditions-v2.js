@@ -362,7 +362,6 @@ function ppom_check_conditions(data_name, callback) {
 }
 
 function ppom_get_input_dom_type(data_name) {
-    console.log(data_name)
     // const field_obj = jQuery(`input[name="ppom[fields][${data_name}]"], input[name="ppom[fields][${data_name}[]]"], select[name="ppom[fields][${data_name}]"]`);
     const field_obj = jQuery(`.ppom-input[data-data_name="${data_name}"]`);
     return field_obj.closest('.ppom-field-wrapper').data('type');
