@@ -132,6 +132,7 @@ class PPOM_Fields_Meta {
 
 		// Description Tooltips JS File
 		wp_enqueue_script( 'ppom-tooltip', PPOM_URL . '/js/ppom-tooltip.js', array( 'jquery' ), PPOM_VERSION, true );
+		wp_register_script( 'serializejson', PPOM_URL . '/js/admin/serializejson.js', array( 'jquery' ), '2.8.1');
 
 		// Add the color picker css file
 		wp_enqueue_style( 'wp-color-picker' );
@@ -146,6 +147,7 @@ class PPOM_Fields_Meta {
 				'ppom-select2',
 				'ppom-tabletojson',
 				'ppom-datatables',
+				'serializejson',
 				'ppom-tooltip',
 				'jquery-ui-core',
 				'jquery-ui-sortable',
