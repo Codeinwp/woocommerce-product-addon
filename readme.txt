@@ -90,7 +90,7 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 💎 **Audio/Video**: Allow customers to select audio/video from predefined audios/videos by admin. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-video-music/)
 
-💎 **Bulk Quantity**: Bulk Quantity allows the store admin to set discount prices for each option. This Addon is the best tool for companies like Printing and designing and looking to sell products with more discount if more quantity is selected. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-bulk-quantity-input/)
+💎 **Bulk Quantity**: Bulk Quantity allows the store admin to set discount prices for each option. This add-on is the best tool for companies like printing and designing and looking to sell products with more discounts if a larger quantity is selected. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-bulk-quantity-input/)
 
 💎 **Chained Input**: Renders chained input in the dropdown. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/chained-input/)
 
@@ -235,9 +235,9 @@ PPOM is an open-source project, and we welcome contributors to be part of our vi
 - Interested in our other plugins? Take a look [here](https://themeisle.com/wordpress-plugins/?utm_source=wpadmin&utm_medium=readme&utm_campaign=PPOM).
 
 == Installation ==
-1. Upload plugin directory to the `/wp-content/plugins/` directory
+1. Upload the plugin directory to the `/wp-content/plugins/` directory
 2. Activate the plugin through the `Plugins` menu in WordPress
-3. After activation, you can set options from `WooCommerce -> PPOM Settings` menu
+3. After activation, you can set options from the `WooCommerce -> PPOM Settings` menu
 
 == Screenshots ==
 
