@@ -1,4 +1,4 @@
-=== Product Addons & Fields for WooCommerce ===
+=== PPOM - Product Addons & Custom Fields for WooCommerce ===
 Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, product addons
 Requires at least: 3.5
