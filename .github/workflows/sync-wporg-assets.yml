@@ -18,4 +18,5 @@ jobs:
         uses: selul/action-wordpress-plugin-asset-update@develop
         env:
           SVN_PASSWORD: ${{ secrets.SVN_THEMEISLE_PASSWORD }}
+          IGNORE_OTHER_FILES: true
           SVN_USERNAME: ${{ secrets.SVN_THEMEISLE_USERNAME }}
