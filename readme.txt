@@ -40,7 +40,7 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 📌 **Checkbox Options (with price)**: Checkbox input allows the users to select multiple options set by the admin. Prices can also be set against each option. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-checkbox-input/)
 
-📌 **Date**: Date input displays a regular Date input box that allows the user to personalize the Product with a Date, e.g. Date of birth, etc. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-date-input/)
+📌 **Date**: Date input displays a regular Date input box that allows the user to personalize the Product with a Date, e.g., Date of birth, etc. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-date-input/)
 
 📌 **Email** – Text input displays an email input box that allows users to personalize the Product with an e-mail address. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-email-input/)
 
