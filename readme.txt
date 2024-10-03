@@ -30,7 +30,7 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 ## Input Types in Free Version:
 
-📌 **Text**: Text input displays an input box that allows the users to personalize the Product with text like ‘Name on Mug’ etc. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-text-input/)
+📌 **Text**: Text input displays an input box allowing users to personalize the Product with text like ‘Name on Mug’ etc. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-text-input/)
 
 📌 **Textarea**: Just like the Text input, it displays a larger box that allows the client to personalize the Product with text. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-textarea-input/)
 
