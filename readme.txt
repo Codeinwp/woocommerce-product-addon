@@ -16,7 +16,7 @@ Are you a WooCommerce store owner looking to offer personalized products? PPOM (
 
 ## 🔗Quick Links:
 
-- Want to see PPOM in action before installing? [VIEW PPOM FIELDS DEMO](https://demo-ppom-lite.vertisite.cloud/)
+- Would you like to see PPOM in action before installing it? [VIEW PPOM FIELDS DEMO](https://demo-ppom-lite.vertisite.cloud/)
 - Need any help with setup? [CHECK DOCUMENTATION](https://docs.themeisle.com/collection/1695-product-option-manager)
 - Interested in PPOM PRO? [LEARN MORE ABOUT PPOM PRO](https://themeisle.com/plugins/ppom-pro/upgrade?utm_source=wpadmin&utm_medium=readme&utm_campaign=quick-links)
 
