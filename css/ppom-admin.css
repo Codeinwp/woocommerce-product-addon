@@ -446,9 +446,6 @@ ul.ppom-options-container li {
     7- Existin Meta Section CSS
 */
 
-.ppom-meta-table-checkbox-mr label {
-    margin-left: 7px;
-}
 
 #ppom-meta-table .dashicons,
 .dashicons-before:before {
@@ -1850,4 +1847,18 @@ header.ppom-modal-header {
     padding: 9px;
     display: flex;
     align-items: center;
+}
+
+.ppom-wrapper .btn .dashicons{
+    line-height: initial;
+}
+.ppom-wrapper select.form-control{
+    line-height: unset;
+}
+.ppom-wrapper select.form-control{
+    line-height: unset;
+}
+
+.ppom-wrapper a.ppom-upsell-condition:hover{
+    text-decoration: none;
 }

@@ -205,11 +205,10 @@ function ppom_upload_file() {
 	$file_path_thumb = $file_dir_path . 'thumbs';
 	$file_name       = wp_unique_filename( $file_path_thumb, $file_name );
 	$file_name       = strtolower( $file_name );
-	$file_path       = $file_dir_path . $file_name;
 	$file_ext        = pathinfo( $file_name, PATHINFO_EXTENSION );
 	$unique_hash     = substr( hash( 'sha256', wp_generate_password( 8, false, false ) ), 0, 8 );
 	$file_name       = str_replace( ".$file_ext", ".$unique_hash.$file_ext", $file_name );
-	// var_dump($file_path); exit;
+	$file_path       = $file_dir_path . $file_name;
 
 	// Make sure the fileName is unique but only if chunking is disabled
 	if ( $chunks < 2 && file_exists( $file_path ) ) {
