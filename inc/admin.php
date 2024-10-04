@@ -37,7 +37,7 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 			if ( $ppom->has_multiple_meta() ) {
 				$total_items = count( $ppom->meta_id ); // Get the total number of items.
 				$current_item = 0; // Counter to track the current iteration.
-
+                $has_fields = false;
 				foreach ( $ppom->meta_id as $meta_id ) {
 					$current_item++; // Increment the counter.
 
@@ -56,10 +56,13 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 						if ( $current_item < $total_items ) {
 							echo ', ';
 						}
-					} else {
-						echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), 'Add Fields' );
+                        $has_fields = true;
 					}
+
 				}
+                if( ! $has_fields  ) {
+                    echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), 'Add Fields' );
+                }
 			} elseif ( $ppom->ppom_settings ) {
 				$url_edit = add_query_arg(
 					array(
