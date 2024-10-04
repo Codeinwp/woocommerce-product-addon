@@ -607,7 +607,8 @@ function ppom_hooks_register_wpml( $meta_data, $ppom_id ) {
 				function ( $option ) {
 
 					// registering for translation
-					nm_wpml_register( $option['option'], 'PPOM' );
+					isset( $option['option'] ) && nm_wpml_register( $option['option'], 'PPOM' );
+					isset( $option['fontdisplay'] ) && nm_wpml_register( $option['fontdisplay'], 'PPOM' );
 
 					// if label key set e.g for palettes or price matrix
 					isset( $option['label'] ) && nm_wpml_register( $option['label'], 'PPOM' );
@@ -618,7 +619,7 @@ function ppom_hooks_register_wpml( $meta_data, $ppom_id ) {
 					return $option;
 
 				},
-				$data['options'] 
+				$data['options']
 			);
 
 		}
