@@ -1,3 +1,8 @@
+##### [Version 33.0.3](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.2...v33.0.3) (2024-10-04)
+
+- Fixed a PHP warning when saving a Font Picker meta field in the backend
+- Fixed an issue where uploaded files appeared twice on the confirmation screen
+
 ##### [Version 33.0.2](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.1...v33.0.2) (2024-10-01)
 
 - Fixed a few alignment and UI issues

@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, product addons
 Requires at least: 3.5
 Tested up to: 6.6
-Stable tag: 33.0.2
+Stable tag: 33.0.3
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -250,6 +250,14 @@ PPOM is an open-source project, and we welcome contributors to be part of our vi
 
 
 == Changelog ==
+
+##### [Version 33.0.3](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.2...v33.0.3) (2024-10-04)
+
+- Fixed a PHP warning when saving a Font Picker meta field in the backend
+- Fixed an issue where uploaded files appeared twice on the confirmation screen
+
+
+
 
 ##### [Version 33.0.2](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.1...v33.0.2) (2024-10-01)
 
