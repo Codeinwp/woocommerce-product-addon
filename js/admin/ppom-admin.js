@@ -1,16 +1,16 @@
 // @ts-check
 "use strict";
 
-const FIELD_COMPATIBLE_WITH_SELECT_OPTIONS = [ 'select', 'radio', 'switcher', 'image','conditional_meta'];
+const FIELD_COMPATIBLE_WITH_SELECT_OPTIONS = [ 'select', 'radio', 'switcher', 'image', 'conditional_meta' ];
 const OPERATOR_COMPARISON_VALUE_FIELD_TYPE = {
-    'select': FIELD_COMPATIBLE_WITH_SELECT_OPTIONS,
+    'select': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, 'checkbox'],
 }
 const COMPARISON_VALUE_CAN_USE_SELECT = [ 'is', 'not', 'greater than', 'less than' ];
 const HIDE_COMPARISON_INPUT_FIELD = ['any', 'empty', 'odd-number', 'even-number'];
 const FIELDS_COMPATIBLE_WITH_TEXT = [ 'text', 'textarea', 'date', 'email' ]
 const FIELDS_COMPATIBLE_WITH_NUMBERS = [ ...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, 'number' ];
 const OPERATORS_FIELD_COMPATIBILITY = {
-    'is': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT, ...FIELDS_COMPATIBLE_WITH_NUMBERS, 'checkbox',],
+    'is': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT, ...FIELDS_COMPATIBLE_WITH_NUMBERS, 'checkbox'],
     'not': [...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS, ...FIELDS_COMPATIBLE_WITH_TEXT, ...FIELDS_COMPATIBLE_WITH_NUMBERS, 'checkbox'],
     'greater than': FIELDS_COMPATIBLE_WITH_NUMBERS,
     'less than': FIELDS_COMPATIBLE_WITH_NUMBERS,
