@@ -1,3 +1,8 @@
+##### [Version 33.0.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.3...v33.0.4) (2024-10-07)
+
+- Fixed an issue where the max checked option was not enforcing the selection limit, allowing users to select more options than specified.
+- Fixed an issue where conditional logic based on checkbox selections was not functioning, preventing fields from being displayed correctly based on user choices.
+
 ##### [Version 33.0.3](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.2...v33.0.3) (2024-10-04)
 
 - Fixed a PHP warning when saving a Font Picker meta field in the backend
