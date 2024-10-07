@@ -228,20 +228,18 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 			continue;
 		}
 
-		if ( ! isset( $field['required'] ) || 'on' !== $field['required'] ) {
+		if (
+			empty( $field['data_name'] ) ||
+			(
+				( ! isset( $field['required'] ) || 'on' !== $field['required'] ) &&
+				empty( $field['min_checked'] ) &&
+				empty( $field['max_checked'] )
+			)
+		) {
 			continue;
 		}
 
 		$passed = apply_filters( 'ppom_before_fields_validation', $passed, $field, $post_data, $product_id );
-
-		if (
-			empty( $field['data_name'] ) &&
-			empty( $field['required'] ) &&
-			empty( $field['min_checked'] ) &&
-			empty( $field['max_checked'] )
-		) {
-			continue;
-		}
 
 		$data_name = sanitize_key( $field['data_name'] );
 
