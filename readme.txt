@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, product addons
 Requires at least: 3.5
 Tested up to: 6.6
-Stable tag: 33.0.3
+Stable tag: 33.0.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -250,6 +250,14 @@ PPOM is an open-source project, and we welcome contributors to be part of our vi
 
 
 == Changelog ==
+
+##### [Version 33.0.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.3...v33.0.4) (2024-10-07)
+
+- Fixed an issue where the max checked option was not enforcing the selection limit, allowing users to select more options than specified.
+- Fixed an issue where conditional logic based on checkbox selections was not functioning, preventing fields from being displayed correctly based on user choices.
+
+
+
 
 ##### [Version 33.0.3](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.2...v33.0.3) (2024-10-04)
 
