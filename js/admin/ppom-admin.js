@@ -128,8 +128,14 @@ jQuery(function($) {
         jQuery(".ppom-meta-save-notice").html('<img src="' + ppom_vars.loader + '">').show();
 
         $('.ppom-unsave-data').remove();
-        var data = $(this).serializeJSON();
+        const data = $(this).serializeJSON();
+        
+        const fieldsOrder = Array(...document.querySelectorAll('.ui-sortable-handle[id^="ppom_sort_id_"]'))
+            .map( node => node.id.replace('ppom_sort_id_', '') ); // ['2', '3']
+        data.ppom = fieldsOrder.map( fieldId => data.ppom[fieldId] );
+        
         data.ppom = JSON.stringify(data.ppom);
+
         // Send the JSON data via POST request
         $.ajax({
             url: ajaxurl,
@@ -329,7 +335,7 @@ jQuery(function($) {
             placeholder = '-';
         }
 
-        var html = '<tr class="row_no_' + id + '" id="ppom_sort_id_' + id + '">';
+        var html = '<tr class="row_no_' + id + ' ui-sortable-handle" id="ppom_sort_id_' + id + '">';
         html += '<td class="ppom-sortable-handle"><i class="fa fa-arrows" aria-hidden="true"></i></td>';
         html += '<td class="ppom-check-one-field ppom-checkboxe-style">';
         html += '<label>';
