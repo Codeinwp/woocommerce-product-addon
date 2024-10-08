@@ -61,13 +61,11 @@ jQuery(function($) {
 
         const data_name = modifiedElement.dataset?.data_name;
         ppom_check_conditions(data_name, (element_dataname, event_type) => {
-            const event = new CustomEvent(event_type, {
-                detail: {
-                    field: element_dataname,
-                    time: new Date()
-                }
+            $.event.trigger({
+                type: event_type,
+                field: element_dataname,
+                time: new Date()
             });
-            document.dispatchEvent(event);
         });
     }
     
