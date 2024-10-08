@@ -507,7 +507,8 @@ class PPOM_FRONTEND_SCRIPTS {
 						array(
 							'jquery',
 							'ppom-inputs',
-						) 
+						),
+						PPOM_VERSION
 					);
 
 					self::set_localize_data( $ppom_conditions_script, 'ppom_input_vars', $product, $input_js_vars, $global_js_vars );
