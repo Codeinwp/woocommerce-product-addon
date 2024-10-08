@@ -312,8 +312,6 @@ function ppom_admin_save_form_meta() {
 	$aviary_api_key         = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
 	$productmeta_style      = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
 	$productmeta_js         = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
-	$productmeta_categories = isset( $_REQUEST['productmeta_categories'] ) ? sanitize_textarea_field( $_REQUEST['productmeta_categories'] ) : '';
-
 
 	if ( strlen( $productmeta_name ) > 50 ) {
 		$resp = array(
@@ -330,7 +328,6 @@ function ppom_admin_save_form_meta() {
 		'send_file_attachment'   => $send_file_attachment,
 		'show_cart_thumb'        => $show_cart_thumb,
 		'aviary_api_key'         => trim( $aviary_api_key ),
-		'productmeta_categories' => $productmeta_categories,
 		'the_meta'               => $product_meta,
 		'productmeta_created'    => current_time( 'mysql' ),
 	);
@@ -474,7 +471,6 @@ function ppom_admin_update_form_meta() {
 	$aviary_api_key         = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
 	$productmeta_style      = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
 	$productmeta_js         = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
-	$productmeta_categories = isset( $_REQUEST['productmeta_categories'] ) ? sanitize_textarea_field( $_REQUEST['productmeta_categories'] ) : '';
 
 	if ( strlen( $productmeta_name ) > 50 ) {
 		$resp = array(
@@ -491,7 +487,6 @@ function ppom_admin_update_form_meta() {
 		'send_file_attachment'   => $send_file_attachment,
 		'show_cart_thumb'        => $show_cart_thumb,
 		'aviary_api_key'         => trim( $aviary_api_key ),
-		'productmeta_categories' => $productmeta_categories,
 		'the_meta'               => $product_meta,
 	);
 	if ( ! ppom_is_legacy_user() ) {
