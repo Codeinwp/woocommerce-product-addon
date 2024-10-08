@@ -1,3 +1,9 @@
+##### [Version 33.0.5](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.4...v33.0.5) (2024-10-08)
+
+- Fixed an issue where fields in a meta group could not be reordered, and changes to the field order were not saved.
+- Fixed an issue where the category assigned to a PPOM meta field in the 'Product Meta Basic Settings' page was not being saved in certain conditions. 
+- Fixed an issue where hidden input fields were incorrectly included in the price calculation at checkout, leading to an incorrect total when switching between price sets.
+
 ##### [Version 33.0.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.3...v33.0.4) (2024-10-07)
 
 - Fixed an issue where the max checked option was not enforcing the selection limit, allowing users to select more options than specified.
