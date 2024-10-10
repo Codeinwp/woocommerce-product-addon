@@ -131,6 +131,66 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 	return apply_filters( 'ppom_meta_file_thumb', $ppom_html, $file_name, $product_id );
 }
 
+/**
+ * Create a new file name that contains a unique string.
+ *
+ * @param string $file_name The file name.
+ * @param string $file_ext The file extension.
+ *
+ * @return string The new file name.
+ */
+function ppom_create_unique_file_name( $file_name, $file_ext ) {
+	return $file_name . "." . base64_encode( substr( wp_hash_password( $file_name ), 0, 8 ) ) . "." . $file_ext;
+}
+
+final class UploadFileErrors {
+	const OPEN_INPUT = 'open_input';
+	const OPEN_OUTPUT = 'open_output';
+	const MISSING_TEMP_FILE = 'missing_temp_file';
+	const OPEN_DIR = 'open_dir';
+
+	static function get_message_response( $error_slug ) {
+		$msg = array(
+			self::OPEN_INPUT => '{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}',
+			self::OPEN_OUTPUT => '{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}',
+			self::MISSING_TEMP_FILE => '{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}',
+			self::OPEN_DIR => '{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}',
+		);
+
+		return isset( $msg[$error_slug] ) ? $msg[$error_slug] : false;
+	}
+}
+
+/**
+ * Move the content of the file to read to the given ppom file chunk.
+ *
+ * @param string $file_path_to_read The file to read.
+ * @param string $ppom_chunk_file_path The chunk file to write.
+ * @param string $mode The writing mode for the chunk file.
+ *
+ * @return false|string The error.
+ */
+function ppom_create_chunk_file( $file_path_to_read, $ppom_chunk_file_path, $mode ) {
+	$chunk_file = fopen( $ppom_chunk_file_path, $mode );
+	if ( $chunk_file ) {
+		// Read binary input stream and append it to temp file
+		$temp_file = fopen( $file_path_to_read, 'rb' );
+
+		if ( $temp_file ) {
+			while ( $buff = fread( $temp_file, 4096 ) ) {
+				fwrite( $chunk_file, $buff );
+			}
+		} else {
+			return UploadFileErrors::OPEN_INPUT;
+		}
+		fclose( $temp_file );
+		fclose( $chunk_file );
+	} else {
+		return UploadFileErrors::OPEN_OUTPUT;
+	}
+
+	return false;
+}
 
 function ppom_upload_file() {
 
@@ -140,7 +200,7 @@ function ppom_upload_file() {
 	header( 'Cache-Control: post-check=0, pre-check=0', false );
 	header( 'Pragma: no-cache' );
 
-	$ppom_nonce               = $_REQUEST['ppom_nonce'];
+	$ppom_nonce               = sanitize_key( $_REQUEST['ppom_nonce'] );
 	$file_upload_nonce_action = 'ppom_uploading_file_action';
 	if ( ! wp_verify_nonce( $ppom_nonce, $file_upload_nonce_action ) && apply_filters( 'ppom_verify_upload_file', true ) ) {
 		$response ['status']  = 'error';
@@ -200,16 +260,19 @@ function ppom_upload_file() {
 	// Get parameters
 	$chunk  = isset( $_REQUEST ['chunk'] ) ? intval( $_REQUEST ['chunk'] ) : 0;
 	$chunks = isset( $_REQUEST ['chunks'] ) ? intval( $_REQUEST ['chunks'] ) : 0;
+
 	// $file_name = isset ( $_REQUEST ["name"] ) ? sanitize_file_name($_REQUEST ["name"]) : '';
 
 	$file_path_thumb = $file_dir_path . 'thumbs';
 	$file_name       = wp_unique_filename( $file_path_thumb, $file_name );
 	$file_name       = strtolower( $file_name );
 	$file_ext        = pathinfo( $file_name, PATHINFO_EXTENSION );
-	$unique_hash     = substr( hash( 'sha256', wp_generate_password( 8, false, false ) ), 0, 8 );
-	$file_name       = str_replace( ".$file_ext", ".$unique_hash.$file_ext", $file_name );
+	$original_name   = $file_name;
+	$original_name   = str_replace(".$file_ext", "", $original_name);
+	$file_hash       = substr( hash('haval192,5', $file_name), 0, 8 ) . '-' . $ppom_nonce;
+	$file_name       = str_replace( ".$file_ext", ".$file_hash.$file_ext", $file_name );
 	$file_path       = $file_dir_path . $file_name;
-
+	
 	// Make sure the fileName is unique but only if chunking is disabled
 	if ( $chunks < 2 && file_exists( $file_path ) ) {
 		$ext         = strrpos( $file_name, '.' );
@@ -226,87 +289,70 @@ function ppom_upload_file() {
 	}
 
 	// Remove old temp files
-	if ( $cleanupTargetDir && is_dir( $file_dir_path ) && ( $dir = opendir( $file_dir_path ) ) ) {
+	if ( is_dir( $file_dir_path ) && ( $dir = opendir( $file_dir_path ) ) ) {
 		while ( ( $file = readdir( $dir ) ) !== false ) {
-			$tmpfilePath = $file_dir_path . $file;
+			$tmp_file_path = $file_dir_path . $file;
 
 			// Remove temp file if it is older than the max age and is not the current file
-			if ( preg_match( '/\.part$/', $file ) && ( filemtime( $tmpfilePath ) < time() - $maxFileAge ) && ( $tmpfilePath != "{$file_path}.part" ) ) {
-				@unlink( $tmpfilePath );
+			if (
+				preg_match( '/\.part$/', $file ) &&
+				( filemtime( $tmp_file_path ) < time() - $maxFileAge ) &&
+				( $tmp_file_path != "$file_path.part" )
+			) {
+				@unlink( $tmp_file_path );
 			}
 		}
 
 		closedir( $dir );
 	} else {
-		die( '{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}' );
+		die( UploadFileErrors::get_message_response( UploadFileErrors::MISSING_TEMP_FILE ) );
 	}
 
-
+	$http_content_type = '';
 	// Look for the content type header
 	if ( isset( $_SERVER ['HTTP_CONTENT_TYPE'] ) ) {
-		$contentType = $_SERVER ['HTTP_CONTENT_TYPE'];
+		$http_content_type = $_SERVER ['HTTP_CONTENT_TYPE'];
 	}
 
 	if ( isset( $_SERVER ['CONTENT_TYPE'] ) ) {
-		$contentType = $_SERVER ['CONTENT_TYPE'];
+		$http_content_type = $_SERVER ['CONTENT_TYPE'];
 	}
 
-	// Handle non multipart uploads older WebKit versions didn't support multipart in HTML5
-	if ( strpos( $contentType, 'multipart' ) !== false ) {
-		if ( isset( $_FILES ['file'] ['tmp_name'] ) && is_uploaded_file( $_FILES ['file'] ['tmp_name'] ) ) {
-			// Open temp file
-			$out = fopen( "{$file_path}.part", $chunk == 0 ? 'wb' : 'ab' );
-			if ( $out ) {
-				// Read binary input stream and append it to temp file
-				$in = fopen( sanitize_text_field( $_FILES ['file'] ['tmp_name'] ), 'rb' );
+	$temp_file_name = isset( $_FILES['file']['tmp_name'] ) ? realpath( $_FILES['file']['tmp_name'] ) : '';
+	$is_multipart   = ! empty( $http_content_type ) && false !== strpos( $http_content_type, 'multipart' );
 
-				if ( $in ) {
-					while ( $buff = fread( $in, 4096 ) ) {
-						fwrite( $out, $buff );
-					}
-				} else {
-					die( '{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}' );
-				}
-				fclose( $in );
-				fclose( $out );
-				@unlink( sanitize_text_field( $_FILES ['file'] ['tmp_name'] ) );
-			} else {
-				die( '{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}' );
-			}
-		} else {
-			die( '{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}' );
-		}
-	} else {
-		// Open temp file
-		$out = fopen( "{$file_path}.part", $chunk == 0 ? 'wb' : 'ab' );
-		if ( $out ) {
-			// Read binary input stream and append it to temp file
-			$in = fopen( 'php://input', 'rb' );
-
-			if ( $in ) {
-				while ( $buff = fread( $in, 4096 ) ) {
-					fwrite( $out, $buff );
-				}
-			} else {
-				die( '{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}' );
-			}
-
-			fclose( $in );
-			fclose( $out );
-		} else {
-			die( '{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}' );
-		}
+	if (
+		$is_multipart &&
+		( empty( $temp_file_name ) || ! is_uploaded_file( $temp_file_name ) )
+	) {
+		die( UploadFileErrors::get_message_response( UploadFileErrors::MISSING_TEMP_FILE ) );
 	}
 
-	// Check if file has been uploaded
-	if ( ! $chunks || $chunk == $chunks - 1 ) {
-		// Strip the temp .part suffix off
-		rename( "{$file_path}.part", $file_path );
+	$chunk_file_path            = "$file_path.part";
+	$uploaded_file_path_to_read = $is_multipart ? $temp_file_name : 'php://input';
+
+	$error = ppom_create_chunk_file( $uploaded_file_path_to_read, $chunk_file_path, $chunk == 0 ? 'wb' : 'ab' );
+
+	if ( $is_multipart ) {
+		@unlink( $temp_file_name );
+	}
+
+	if ( $error ) {
+		die( UploadFileErrors::get_message_response( $error ) );
+	}
+
+	// Check if file has been uploaded completely.
+	if ( ! $chunks || $chunk === $chunks - 1 ) {
+
+		$file_name = ppom_create_unique_file_name( $original_name, $file_ext );
+		$unique_file_path = $file_dir_path . $file_name;
+
+		rename( $chunk_file_path, $unique_file_path );
+		$file_path = $unique_file_path;
 
 		$product_id = intval( $_REQUEST['product_id'] );
 		$data_name  = sanitize_key( $_REQUEST['data_name'] );
 		$file_meta  = ppom_get_field_meta_by_dataname( $product_id, $data_name );
-
 
 		// making thumb if images
 		if ( ppom_is_file_image( $file_path ) ) {
