@@ -205,11 +205,9 @@ function ppom_upload_file() {
 	$file_path_thumb = $file_dir_path . 'thumbs';
 	$file_name       = wp_unique_filename( $file_path_thumb, $file_name );
 	$file_name       = strtolower( $file_name );
-	$original_name   = $file_name;
 	$file_ext        = pathinfo( $file_name, PATHINFO_EXTENSION );
-	$original_name   = str_replace(".$file_ext", "", $original_name);
 	$unique_hash     = substr( hash( 'sha256', wp_generate_password( 8, false, false ) ), 0, 8 );
-	$file_name       = str_replace( ".$file_ext", "." . $chunk . ".$unique_hash.$file_ext", $file_name );
+	$file_name       = str_replace( ".$file_ext", ".$unique_hash.$file_ext", $file_name );
 	$file_path       = $file_dir_path . $file_name;
 
 	// Make sure the fileName is unique but only if chunking is disabled
@@ -301,45 +299,7 @@ function ppom_upload_file() {
 	}
 
 	// Check if file has been uploaded
-	if ( ! $chunks || $chunk === $chunks - 1 ) {
-		
-		// Gather all the chunks and combine them into a single file.
-		$final_file = fopen($file_path, 'wb');
-        if ( $final_file ) {
-			$chunks_files_path = [];
-            $dir = opendir($file_dir_path);
-            if ($dir) {
-                while (($file = readdir($dir)) !== false) {
-                    $tmpfilePath = $file_dir_path . $file;
-					
-                    if ( false !== strpos($tmpfilePath, $original_name) && false !== strpos($tmpfilePath, '.part')) {
-						$chunks_files_path[] = $tmpfilePath;
-                    }
-                }
-                closedir($dir);
-            }
-			
-			sort( $chunks_files_path );
-
-			foreach( $chunks_files_path as $tmpfilePath ) {
-				$chunk_file = fopen($tmpfilePath, 'rb');
-				if ($chunk_file) {
-					while ($buffer = fread($chunk_file, 4096)) {
-						fwrite($final_file, $buffer);
-					}
-					fclose($chunk_file);
-					// Optionally, you can delete the chunk file after appending it to the final file
-					unlink($tmpfilePath);
-				} else {
-					die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to open chunk file."}, "id" : "id"}');
-				}
-			}
-
-            fclose($final_file);
-        } else {
-            die('{"jsonrpc" : "2.0", "error" : {"code": 104, "message": "Failed to open final file."}, "id" : "id"}');
-        }
-
+	if ( ! $chunks || $chunk == $chunks - 1 ) {
 		// Strip the temp .part suffix off
 		rename( "{$file_path}.part", $file_path );
 
