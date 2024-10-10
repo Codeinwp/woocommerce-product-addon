@@ -283,6 +283,12 @@ function ppom_admin_save_form_meta() {
 	$aviary_api_key       = 'NA';
 	$show_cart_thumb      = 'NA';
 
+	if ( is_string( $_REQUEST['ppom'] ) ) {
+		$ppom_encoded = $_REQUEST['ppom'];
+		parse_str( $ppom_encoded, $ppom_decoded);
+		$_REQUEST['ppom'] = $ppom_decoded['ppom'];
+	}
+
 	$ppom_meta    = ( isset($_REQUEST['ppom_meta']) ? $_REQUEST['ppom_meta'] : isset($_REQUEST['ppom']) ) ? $_REQUEST['ppom'] : '';
 
 	if ( empty( $ppom_meta ) ) {
@@ -356,6 +362,11 @@ function ppom_admin_save_form_meta() {
 
 
 	$ppom_id = $wpdb->insert_id;
+	if ( is_string( $ppom ) ) {
+		$ppom_encoded = $ppom;
+		parse_str( $ppom_encoded, $ppom_decoded);
+		$ppom = $ppom_decoded['ppom'];
+	}
 
 	$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom, $ppom_id );
 	$product_meta = ppom_sanitize_array_data( $product_meta );
@@ -449,6 +460,12 @@ function ppom_admin_update_form_meta() {
 		wp_send_json( $resp );
 	}
 	global $wpdb;
+
+	if ( is_string( $_REQUEST['ppom'] ) ) {
+		$ppom_encoded = $_REQUEST['ppom'];
+		parse_str( $ppom_encoded, $ppom_decoded);
+		$_REQUEST['ppom'] = $ppom_decoded['ppom'];
+	}
 
 	$ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];
 	$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );

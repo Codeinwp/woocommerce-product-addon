@@ -128,10 +128,24 @@ jQuery(function($) {
         jQuery(".ppom-meta-save-notice").html('<img src="' + ppom_vars.loader + '">').show();
 
         $('.ppom-unsave-data').remove();
+
+        const formData = new FormData();
+        const ppomFields = new URLSearchParams();
+        
+        // NOTE: since the request is to big for small values of `max_input_vars`, we will send the PPOM fields as a single string.
+        (new FormData(this)).forEach(( value, key) => {
+            if ( key.startsWith('ppom[') && typeof value === 'string' ) {
+                ppomFields.append( key, value );
+            } else {
+                formData.append(key, value);
+            }
+        });
+
+        formData.append('ppom', ppomFields.toString());
        
         fetch(ajaxurl, {
             method: 'POST',
-            body: new FormData(this)
+            body: formData
         })
         .then(response => response.json())
         .then(resp => {
