@@ -151,7 +151,6 @@
 				if (!$(e.target).closest('.ppom-enquiry-modal, .ppom-popup-product-edit-modal').length) {
 					modal.trigger(prefix + ':close');
 				}
-				e.preventDefault();
 			});
 
 			// disable backgroundclickevent close
