@@ -275,8 +275,6 @@ function ppom_admin_save_form_meta() {
 		wp_send_json( $resp );
 	}
 
-	$_REQUEST['ppom'] = is_array( $_REQUEST['ppom'] ) ? $_REQUEST['ppom'] : json_decode( wp_unslash( $_REQUEST['ppom'] ), true );
-
 	global $wpdb;
 
 	extract( $_REQUEST );
@@ -450,8 +448,6 @@ function ppom_admin_update_form_meta() {
 
 		wp_send_json( $resp );
 	}
-	$_REQUEST['ppom'] = is_array( $_REQUEST['ppom'] ) ? $_REQUEST['ppom'] : json_decode( wp_unslash( $_REQUEST['ppom'] ), true );
-	
 	global $wpdb;
 
 	$ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];

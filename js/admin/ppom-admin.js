@@ -128,38 +128,26 @@ jQuery(function($) {
         jQuery(".ppom-meta-save-notice").html('<img src="' + ppom_vars.loader + '">').show();
 
         $('.ppom-unsave-data').remove();
-        const data = $(this).serializeJSON();
-        
-        const fieldsOrder = Array(...document.querySelectorAll('.ui-sortable-handle[id^="ppom_sort_id_"]'))
-            .map( node => node.id.replace('ppom_sort_id_', '') ); // ['2', '3']
-        data.ppom = fieldsOrder.map( fieldId => data.ppom[fieldId] );
-        
-        data.ppom = JSON.stringify(data.ppom);
-
-        // Send the JSON data via POST request
-        $.ajax({
-            url: ajaxurl,
-            data: data,  // Send as regular object (no need to stringify)
-            type: 'POST',
-            success: function(resp) {
-
-                const bg_color = resp.status == 'success' ? '#4e694859' : '#ee8b94';
-                jQuery(".ppom-meta-save-notice").html(resp.message).css({ 'background-color': bg_color, 'padding': '8px', 'border-left': '5px solid #008c00' });
-                if (resp.status == 'success') {
-                    if (resp.redirect_to != '') {
-                        window.location = resp.redirect_to;
-                    }
-                    else {
-                        window.location.reload(true);
-                    }
+       
+        fetch(ajaxurl, {
+            method: 'POST',
+            body: new FormData(this)
+        })
+        .then(response => response.json())
+        .then(resp => {
+            const bg_color = resp.status == 'success' ? '#4e694859' : '#ee8b94';
+            jQuery(".ppom-meta-save-notice").html(resp.message).css({ 'background-color': bg_color, 'padding': '8px', 'border-left': '5px solid #008c00' });
+            if (resp.status == 'success') {
+                if (resp.redirect_to != '') {
+                    window.location = resp.redirect_to;
+                } else {
+                    window.location.reload();
                 }
-            },
-            error: function() {
-                // Handle error
-                jQuery(".ppom-meta-save-notice").html("An error occurred. Please try again.").css({ 'background-color': '#ee8b94', 'padding': '8px', 'border-left': '5px solid #c00' });
             }
+        })
+        .catch(() => {
+            jQuery(".ppom-meta-save-notice").html("An error occurred. Please try again.").css({ 'background-color': '#ee8b94', 'padding': '8px', 'border-left': '5px solid #c00' });
         });
-
     });
 
 
