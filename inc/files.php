@@ -272,7 +272,7 @@ function ppom_upload_file() {
 	$file_hash       = substr( hash('haval192,5', $file_name), 0, 8 ) . '-' . $ppom_nonce;
 	$file_name       = str_replace( ".$file_ext", ".$file_hash.$file_ext", $file_name );
 	$file_path       = $file_dir_path . $file_name;
-	
+
 	// Make sure the fileName is unique but only if chunking is disabled
 	if ( $chunks < 2 && file_exists( $file_path ) ) {
 		$ext         = strrpos( $file_name, '.' );
@@ -341,9 +341,10 @@ function ppom_upload_file() {
 		die( UploadFileErrors::get_message_response( $error ) );
 	}
 
-	// Check if file has been uploaded completely.
+	// Check if the file has been uploaded completely.
 	if ( ! $chunks || $chunk === $chunks - 1 ) {
 
+		// Give a unique name to prevent name collisions.
 		$file_name = ppom_create_unique_file_name( $original_name, $file_ext );
 		$unique_file_path = $file_dir_path . $file_name;
 
