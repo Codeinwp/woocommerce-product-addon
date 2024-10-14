@@ -7,6 +7,7 @@ import { createSimpleGroupField } from '../utils';
 test.describe( 'Group Fields Edit', () => {
 	test( 'change fields order', async({ page, admin }) => {
         await createSimpleGroupField( admin, page );
+        await page.waitForTimeout(500);
 		await admin.visitAdminPage('admin.php?page=ppom');
 
         const firstRow = page.locator('#ppom-groups-export-form tbody tr').first();

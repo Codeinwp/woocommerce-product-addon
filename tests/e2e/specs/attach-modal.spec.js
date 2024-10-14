@@ -7,7 +7,8 @@ import { createSimpleGroupField } from '../utils';
 test.describe( 'Attach Modal', () => {
 
 	test( 'attach to products', async({ page, admin }) => {
-        const createdFieldName = await createSimpleGroupField( admin, page );
+        await createSimpleGroupField( admin, page );
+        await page.waitForTimeout(500);
 		await admin.visitAdminPage('admin.php?page=ppom');
 
         const firstRow = page.locator('#ppom-groups-export-form tbody tr').first();
