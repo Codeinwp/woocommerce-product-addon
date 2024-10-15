@@ -1,3 +1,11 @@
+##### [Version 33.0.6](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.5...v33.0.6) (2024-10-15)
+
+- Fixed an issue where PPOM meta fields were not functioning correctly inside a popup.
+- Fixed an issue where reordering options in the Select field was not working, with changes not being saved.
+- Fixed an issue where file previews were not visible when uploading large images, displaying a folder icon instead of the image.
+- Fixed an issue where all images were selected by default when the Min Image Select option was set to 1.
+- Fixed an issue where Image Dropdown (Image Select) fields did not appear in the conditional logic settings.
+
 ##### [Version 33.0.5](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.4...v33.0.5) (2024-10-08)
 
 - Fixed an issue where fields in a meta group could not be reordered, and changes to the field order were not saved.

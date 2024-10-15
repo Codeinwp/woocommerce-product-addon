@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, product addons
 Requires at least: 3.5
 Tested up to: 6.6
-Stable tag: 33.0.5
+Stable tag: 33.0.6
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -250,6 +250,17 @@ PPOM is an open-source project, and we welcome contributors to be part of our vi
 
 
 == Changelog ==
+
+##### [Version 33.0.6](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.5...v33.0.6) (2024-10-15)
+
+- Fixed an issue where PPOM meta fields were not functioning correctly inside a popup.
+- Fixed an issue where reordering options in the Select field was not working, with changes not being saved.
+- Fixed an issue where file previews were not visible when uploading large images, displaying a folder icon instead of the image.
+- Fixed an issue where all images were selected by default when the Min Image Select option was set to 1.
+- Fixed an issue where Image Dropdown (Image Select) fields did not appear in the conditional logic settings.
+
+
+
 
 ##### [Version 33.0.5](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.4...v33.0.5) (2024-10-08)
 
