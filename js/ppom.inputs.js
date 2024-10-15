@@ -174,38 +174,37 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
                      */
                     const selectedImgs = [];
 
-                    container.querySelectorAll('.pre_upload_image').forEach( (/** @type{HTMLDivElement} */ inputContainer) => {
-                        const input = inputContainer.querySelector('input');
-                        if ( ! input ) {
-                            return;
-                        }
-                        
-                        const multiple = input.dataset.allowMultiple || false;
-                        if ( multiple ) {
-                            if (input.dataset.required) {
-                                input.checked = true;
-                            }
-    
-                            const siblings = Array.from(input.parentNode.parentNode.querySelectorAll('input.ppom-input.image'));
-                            siblings.filter(sibling => sibling !== input).forEach(sibling => sibling.checked = false);
-                        } else {
-                            const maxImgSelection = parseInt( input.dataset?.maxSelection ?? '1' );
-                            if ( maxImgSelection ) {
-                                inputContainer.querySelector('img')?.addEventListener( 'click', () => {
-                                    selectedImgs.push( input );
+                    /**
+                     * @type {HTMLInputElement[]} The available images to select.
+                     */
+                    const imgsInput = Array.from(container.querySelectorAll('.ppom-input.pre_upload_image input'));
 
-                                    while( selectedImgs.length > maxImgSelection ) {
-                                        const oldestImgSelected = selectedImgs.shift();
-                                        if ( oldestImgSelected ) {
-                                            oldestImgSelected.checked = false;
-                                        }
+                    for ( const imgInput of imgsInput ) {
+                        const multiple = imgInput.dataset.allowMultiple || false;
+                        const maxImgSelection = parseInt( imgInput.dataset?.maxSelection ?? '-1' );
+
+                        imgInput.addEventListener('click', (e) => {
+                            if ( !e.target.checked ) {
+                                return;
+                            }
+
+                            if ( ! multiple ) {
+                                // Uncheck other inputs.
+                                imgsInput.filter( i => i !== imgInput).forEach( i => {
+                                    i.checked = false;
+                                });
+                            } else if ( 0 < maxImgSelection ) {
+                                // Uncheck oldest checked image.
+                                selectedImgs.push( imgInput );
+                                while( selectedImgs.length > maxImgSelection ) {
+                                    const oldestImgSelected = selectedImgs.shift();
+                                    if ( oldestImgSelected ) {
+                                        oldestImgSelected.checked = false;
                                     }
-                                })
-
+                                }
                             }
-                        }
-                        
-                    });
+                        });
+                    }
                 });
 
                 // Data Tooltip
