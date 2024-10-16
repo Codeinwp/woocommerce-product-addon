@@ -7,3 +7,4 @@ dist
 vendor
 languages/woocommerce-product-addon.pot
 *.log
+artifacts
