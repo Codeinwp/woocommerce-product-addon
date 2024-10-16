@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { test, expect } from "@wordpress/e2e-test-utils-playwright";
+
 import {
 	addNewField,
 	addNewOptionInModal,
