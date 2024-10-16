@@ -11,9 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Setup node 18
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 18.x
+          cache: "yarn"
       - name: Build & create dist/artifact
         run: |
           yarn install --frozen-lockfile
