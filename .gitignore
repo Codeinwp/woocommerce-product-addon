@@ -8,3 +8,4 @@ vendor
 languages/woocommerce-product-addon.pot
 *.log
 artifacts
+.phpunit.result.cache

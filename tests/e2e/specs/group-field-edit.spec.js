@@ -17,6 +17,10 @@ import {
 } from "../utils";
 
 test.describe("Group Fields Edit", () => {
+
+	/**
+	 * Create two input fields and change their order then save and check.
+	 */
 	test("change fields order on saving", async ({ page, admin }) => {
 		await createSimpleGroupField(admin, page);
 		await page.waitForTimeout(500);
@@ -55,6 +59,9 @@ test.describe("Group Fields Edit", () => {
 		expect(newOrderFieldIds).not.toEqual(fieldIds);
 	});
 
+	/**
+	 * Create a select input with two option. Save then change their order and check again.
+	 */
     test("change select option order on saving", async ({ page, admin }) => {
         await admin.visitAdminPage("admin.php?page=ppom");
 
