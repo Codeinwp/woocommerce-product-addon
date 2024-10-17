@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { test, expect } from "@wordpress/e2e-test-utils-playwright";
-import { createSimpleGroupField } from "../utils";
+import { addNewField, createSimpleGroupField, fillFieldNameAndId, pickFieldTypeInModal, saveFieldInModal, saveFields } from "../utils";
 
 test.describe("Attach Modal", () => {
 	/**
@@ -81,5 +81,33 @@ test.describe("Attach Modal", () => {
 			const count = await elements.count();
 			expect(count ).toBeGreaterThan(0);
 		}
+	});
+
+	/**
+	 * Attach Modal should be visible only for existing PPOM fields.
+	 */
+	test("attach modal visibility on Group Edit page", async ({ page, admin }) => {
+		await admin.visitAdminPage("admin.php?page=ppom");
+
+		await page.getByRole("link", { name: "Add New Group" }).click();
+		await page.getByRole("textbox").fill("Test Attach Modal visibility");
+
+		await expect( page.locator('[data-formmodal-id="ppom-product-modal"]') ).toBeHidden();
+
+		await addNewField(page);
+		await pickFieldTypeInModal(page, "text");
+		await fillFieldNameAndId(
+			page,
+			1,
+			`Test`,
+			`test`,
+		);
+		await saveFieldInModal(page, 1);
+		await saveFields(page);
+
+		await page.waitForLoadState("networkidle");
+		await page.reload();
+
+		await expect( page.locator('[data-formmodal-id="ppom-product-modal"]') ).toBeVisible();
 	});
 });
