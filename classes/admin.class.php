@@ -443,7 +443,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		$used_categories = array();
 		if ( ! empty( $current_values['productmeta_categories'] ) ) {
-			$used_categories = explode( "\n", $current_values['productmeta_categories'] );
+			$used_categories = preg_split('/\r\n|\n/', $current_values['productmeta_categories'] );
 		}
 
 		foreach ( $product_categories as $category ) {
@@ -620,21 +620,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$updated_cat          = count( $categories_to_attach );
 
 		// +----- Attach Field to Tags -----+
-		$categories_to_tags = isset( $_POST['ppom-attach-to-tags'] ) && is_array( $_POST['ppom-attach-to-tags'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-tags'] ) : array();
-		$updated_tags       = count( $categories_to_tags );
+		$tags_to_attach = isset( $_POST['ppom-attach-to-tags'] ) && is_array( $_POST['ppom-attach-to-tags'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-tags'] ) : false;
+		$updated_tags   = is_array( $tags_to_attach) ? count( $tags_to_attach ) : 0;
 
-		global $wpdb;
-		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-		$wpdb->update(
-			$ppom_table,
-			array(
-				'productmeta_categories' => implode( "\n", $categories_to_attach ), // NOTE: Keep the backward compatible format.
-				'productmeta_tags'       => serialize( $categories_to_tags )
-			), // Data to update
-			array( 'productmeta_id' => $ppom_id ), // Where clause
-			array( '%s' ), // Data format
-			array( '%d' )  // Where format
-		);
+		self::save_categories_and_tags( $ppom_id, $categories_to_attach, $tags_to_attach );
 
 		$response = array(
 			'message' => "PPOM updated for {$updated_products} Products, {$updated_cat} Categories and {$updated_tags} Tags.",
@@ -644,6 +633,36 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		wp_send_json( $response );
 	}
 
+	/**
+	 * Save the categories and tags to the given PPOM field.
+	 *
+	 * @param int        $ppom_id    The ID of the PPOM field.
+	 * @param array      $categories An array of categories to save.
+	 * @param array|bool $tags       An array of tags to save.
+	 *
+	 * @global wpdb $wpdb       WordPress database abstraction object.
+	 *
+	 */
+	public static function save_categories_and_tags( $ppom_id, $categories, $tags ) {
+		global $wpdb;
+		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
+
+		$data_to_update = array(
+			'productmeta_categories' => implode( "\r\n", $categories ), // NOTE: Keep the backward compatible format.
+		);
+
+		if ( is_array( $tags ) ) {
+			$data_to_update['productmeta_tags'] = serialize( $tags );
+		}
+
+		$wpdb->update(
+			$ppom_table,
+			$data_to_update,
+			array( 'productmeta_id' => $ppom_id ), // Where clause
+			array( '%s' ), // Data format
+			array( '%d' )  // Where format
+		);
+	}
 
 	/*
 	 * Plugin Validation

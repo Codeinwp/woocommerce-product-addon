@@ -1,0 +1,7 @@
+{
+    "plugins": [
+        "https://downloads.wordpress.org/plugin/woocommerce.9.3.3.zip",
+        "."
+    ],
+    "phpVersion": "8.1"
+}

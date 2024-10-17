@@ -25,9 +25,11 @@ $product_meta_id        = 0;
 $product_meta           = array();
 $ppom_field_index       = 1;
 $is_edit_screen         = false;
+$is_new_group           = false;
 
 if ( isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'new' ) {
 	$is_edit_screen = true;
+	$is_new_group   = true;
 }
 if ( isset( $_REQUEST['productmeta_id'] ) && $_REQUEST ['do_meta'] == 'edit' ) {
 
@@ -542,7 +544,7 @@ $fields_groups = [
 									</select>
 								</div>
 
-								<?php if ( $is_edit_screen ) { ?>
+								<?php if ( $is_edit_screen && ! $is_new_group ) { ?>
                                 <a class="btn btn-sm btn-secondary ppom-products-modal"
                                    data-ppom_id="<?php echo esc_attr( $product_meta_id ); ?>"
                                    data-formmodal-id="ppom-product-modal"

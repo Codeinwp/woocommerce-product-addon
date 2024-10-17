@@ -7,15 +7,16 @@ How to release a new version:
 - Clone the master branch
 - Do your changes
 - Send a PR to master and merge it using the following subject message
-    - `release: <release short description>` - for patch release
-    - `release(minor): <release short description>` - for minor release
-    - `release(major): <release short description>` - for major release
-      The release notes will inherit the body of the commit message which triggered the release. For more details check the [simple-preset](https://github.com/Codeinwp/conventional-changelog-simple-preset) that we use.
+  - `release: <release short description>` - for patch release
+  - `release(minor): <release short description>` - for minor release
+  - `release(major): <release short description>` - for major release
+    The release notes will inherit the body of the commit message which triggered the release. For more details check the [simple-preset](https://github.com/Codeinwp/conventional-changelog-simple-preset) that we use.
 
 # CONTRIBUTING GUIDELINES
-+ [Setup Guide](#setup-guide)
-+ [Development Guide](#development-guide)
-+ [Testing Guide](#testing-guide)
+
+- [Setup Guide](#setup-guide)
+- [Development Guide](#development-guide)
+- [Testing Guide](#testing-guide)
 
 # Setup Guide
 
@@ -28,7 +29,8 @@ WordPress, PHP, MySQL and Git - but you're free to use your preferred software.
 
 ### LAMP/LEMP stack
 
-Any Apache/nginx, PHP 7.x+ and MySQL 5.8+ stack running WordPress.  For example, but not limited to:
+Any Apache/nginx, PHP 7.x+ and MySQL 5.8+ stack running WordPress. For example, but not limited to:
+
 - Valet (recommended)
 - Local by Flywheel
 - Docker
@@ -65,32 +67,55 @@ In the cloned repository's directory, at the command line, run `composer install
 This will install the development dependencies. If you want to install just the production dependencies, run `composer install --no-dev`.
 
 The development dependencies include:
+
 - PHPStan
 - PHPUnit
-- PHP_CodeSniffer
 - WordPress Coding Standards
 - WordPress PHPUnit Polyfills
 
 For the JS dependencies, run `npm install`.
 To watch for changes in the JS files, run `npm run dev` if present or `npm run dist` to build a new version.
 
-### PHP_CodeSniffer
-
-To run PHP_CodeSniffer, run `composer lint`. This will run the WordPress Coding Standards checks.
-To fix automatically fixable issues, run `composer format`.
-
 ### PHPUnit
 
-To run PHPUnit, run `phpunit` or `./vendor/bin/phpunit` if it is not configured globally.
+To set-up the environment you can follow the example from `test-php.yml` or the docker version.
+
+To run with Docker:
+
+```bash
+npm run test:unit:php:setup # start the wordpress instance
+npm run test:unit:php # run the wp tests inside the tests-wordpress container
+```
 
 ### E2E Tests
-If the folder `e2e-tests` is present, you can run the E2E tests by following the instructions in the [E2E testing](./e2e-tests/README.md).
+
+E2E test use Playwright to programmatically test the plugin.
+
+```bash
+# Setup Playwright (run it only once)
+npm install -g playwright-cli
+npx playwright install --with-deps chromium
+
+npm run wp-env start # start the wordpress instance
+bash ./bin/e2e-after-setup.sh # create some woocommerce products (run it only once if you do not delete the previous instance) on the test instance
+npm run test:e2e # run the tests in the CLI
+```
+
+For creating and debugging a test use:
+
+```bash
+npm run test:e2e:debug
+```
+
+For creating a test, keep in mind those tips:
+
+- Tests should mostly be independent of others (to reduce chained conflicts).
+- Tests should include a description of the steps or the process (some setups are more complex and just reading the code is not enough).
+- If some part of the code repeats frequently or is subject to change in the future, it should be abstracted (if you need to change something, you will not have to manually revise all the tests, just the function that is supposed to handle that task).
 
 ### Next Steps
 
 With your development environment setup, you'll probably want to start development, which is covered bellow in the **Development Guide**.
-
-
 
 # Development Guide
 
@@ -103,6 +128,7 @@ You're free to use your preferred IDE and Git client. We recommend PHPStorm or V
 If you haven't yet set up your local development environment with a WordPress Plugin repository installed, refer to the [Setup Guide](#setup-guide).
 
 his is for a new feature that does not have a GitHub Issue number, enter a short descriptive name for the branch, relative to what you're working on
+
 - If this is for a feature/bug that has a GitHub Issue number, enter feat/issue_name or fix/issue_name, where issue_name is a descriptive name for the issue
 
 Once done, make sure you've switched to your new branch, and begin making the necessary code additions/changes/deletions.
@@ -118,7 +144,7 @@ When [outputting data](https://developer.wordpress.org/plugins/security/securing
 
 When reading [user input](https://developer.wordpress.org/plugins/security/securing-input/), sanitize it using WordPress' sanitization functions such as `sanitize_text_field()`, `sanitize_textarea_field()`.
 
-When writing to the database, prepare database queries using ``$wpdb->prepare()``
+When writing to the database, prepare database queries using `$wpdb->prepare()`
 
 Never trust user input. Sanitize it.
 
@@ -128,7 +154,7 @@ Coding standards will catch any sanitization, escaping or database queries that 
 
 ## Composer Packages
 
-We use Composer for package management.  A package can be added to one of two sections of the `composer.json` file: `require` or `require-dev`.
+We use Composer for package management. A package can be added to one of two sections of the `composer.json` file: `require` or `require-dev`.
 
 ### "require"
 
@@ -145,6 +171,7 @@ Packages listed in the "require-dev" directive are packages that the Plugin **do
 These packages are **not** included when the Plugin is deployed to wordpress.org
 
 Typically, packages listed in this section would be internal development tools for testing, such as:
+
 - Coding Standards
 - PHPStan
 - PHPUnit
@@ -158,14 +185,13 @@ If it's a particularly large commit, be sure to include more information in the 
 
 ## Next Steps
 
-Once you've finished your feature or issue, you must write/amend tests for it.  Refer to the [Testing Guide](#testing-guide) for a detailed walkthrough
+Once you've finished your feature or issue, you must write/amend tests for it. Refer to the [Testing Guide](#testing-guide) for a detailed walkthrough
 on how to write a test.
-
-
 
 # Testing Guide
 
 This document describes how to:
+
 - create and run tests for your development work,
 - ensure code meets PHP and WordPress Coding Standards, for best practices and security,
 - ensure code passes static analysis, to catch potential errors that tests might miss
@@ -194,6 +220,7 @@ Tests are written in TS using [Playwright](https://playwright.dev/) and PHP usin
 ## Types of Test
 
 There are different types of tests that can be written:
+
 - Acceptance Tests: Test as a non-technical user in the web browser.
 - Functional Tests: Test the framework (WordPress).
 - Integration Tests: Test code modules in the context of a WordPress website.
@@ -202,7 +229,7 @@ There are different types of tests that can be written:
 
 There is no definitive / hard guide, as a test can typically overlap into different types (such as Acceptance and Functional).
 
-The most important thing is that you have a test for *something*.  If in doubt, an Acceptance Test will suffice.
+The most important thing is that you have a test for _something_. If in doubt, an Acceptance Test will suffice.
 
 ### Writing an Acceptance Test
 
@@ -222,7 +249,7 @@ You can check End-to-End [README](./e2e-tests/README.md) for more details.
 ## Writing a WordPress Unit Test
 
 WordPress Unit tests provide testing of Plugin/Theme specific functions and/or classes, typically to assert that they perform as expected
-by a developer.  This is primarily useful for testing our API class, and confirming that any Plugin registered filters return
+by a developer. This is primarily useful for testing our API class, and confirming that any Plugin registered filters return
 the correct data.
 
 To create a new WordPress Unit Test, create a new file under `tests/php/unit` with the name of the class you are testing, and the suffix `Test`.
@@ -238,7 +265,7 @@ class APITest extends \PHPUnit\Framework\TestCase
      * @var \WpunitTester
      */
     protected $tester;
-    
+
     public function setUp(): void
     {
         // Before...
@@ -255,7 +282,7 @@ class APITest extends \PHPUnit\Framework\TestCase
     public function test_it_works()
     {
         $post = static::factory()->post->create_and_get();
-        
+
         $this->assertInstanceOf(\WP_Post::class, $post);
     }
 }
@@ -277,7 +304,7 @@ In the Plugin's or Theme's directory, run the following command to run PHP_CodeS
 as defined in the `phpcs.tests.xml` configuration:
 
 ```bash
-composer run lint 
+composer run lint
 ```
 
 `--standard=phpcs.tests.xml` tells PHP CodeSniffer to use the Coding Standards rules / configuration defined in `phpcs.tests.xml`.
@@ -287,10 +314,12 @@ in test coding style.
 `-s` specifies the precise rule that failed
 
 Any errors should be corrected by either:
+
 - making applicable code changes
 - running `composer run format` to automatically fix coding standards
 
-Need to change the PHP or WordPress coding standard rules applied?  Either:
+Need to change the PHP or WordPress coding standard rules applied? Either:
+
 - ignore a rule in the affected code, by adding `phpcs:ignore {rule}`, where {rule} is the given rule that failed in the above output.
 - edit the [phpcs.tests.xml](phpcs.tests.xml) file.
 
@@ -301,6 +330,6 @@ Once your test(s) are written and successfully run locally, submit your branch v
 It's best to create a Pull Request in draft mode, as this will trigger all tests to run as a GitHub Action, allowing you to
 double-check all tests pass.
 
-If the PR tests fail, you can make code changes as necessary, pushing to the same branch.  This will trigger the tests to run again.
+If the PR tests fail, you can make code changes as necessary, pushing to the same branch. This will trigger the tests to run again.
 
 If the PR tests pass, you can publish the PR, assigning some reviewers.

@@ -24,6 +24,9 @@ require_once $_tests_dir . '/includes/functions.php';
  */
 function _register_module() {
 	require_once dirname( dirname( __FILE__ ) ) . '/woocommerce-product-addon.php';
+	include_once PPOM_PATH . '/classes/admin.class.php';
+
+	$ppom_admin = new NM_PersonalizedProduct_Admin();
 }
 
 tests_add_filter( 'muplugins_loaded', '_register_module' );
