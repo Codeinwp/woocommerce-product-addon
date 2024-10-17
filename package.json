@@ -41,6 +41,6 @@
     "test:e2e:debug": "wp-scripts test-playwright --config tests/e2e/playwright.config.js --ui",
     "test:unit:php:setup": "wp-env start",
     "test:unit:php:setup:debug": "wp-env start --xdebug",
-    "test:unit:php": "wp-env run --env-cwd='wp-content/plugins/woocommerce-product-addon' tests-wordpress vendor/bin/phpunit -c phpunit.xml.dist --verbose"
+    "test:unit:php": "wp-env run --env-cwd='wp-content/plugins/woocommerce-product-addon' tests-wordpress vendor/bin/phpunit -c phpunit.xml --verbose"
   }
 }
