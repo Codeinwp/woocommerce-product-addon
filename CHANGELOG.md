@@ -1,3 +1,8 @@
+##### [Version 33.0.7](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.6...v33.0.7) (2024-10-18)
+
+- Fixed an issue with Meta Groups not applying to multiple categories
+- Fixed an issue where a meta group was not applied to products if it was attached before adding fields
+
 ##### [Version 33.0.6](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.5...v33.0.6) (2024-10-15)
 
 - Fixed an issue where PPOM meta fields were not functioning correctly inside a popup.

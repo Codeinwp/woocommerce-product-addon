@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, product addons
 Requires at least: 3.5
 Tested up to: 6.6
-Stable tag: 33.0.6
+Stable tag: 33.0.7
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -250,6 +250,14 @@ PPOM is an open-source project, and we welcome contributors to be part of our vi
 
 
 == Changelog ==
+
+##### [Version 33.0.7](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.6...v33.0.7) (2024-10-18)
+
+- Fixed an issue with Meta Groups not applying to multiple categories
+- Fixed an issue where a meta group was not applied to products if it was attached before adding fields
+
+
+
 
 ##### [Version 33.0.6](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.5...v33.0.6) (2024-10-15)
 
