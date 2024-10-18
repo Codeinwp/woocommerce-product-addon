@@ -1,0 +1,46 @@
+name: E2E Test
+
+on:
+  push:
+    branches-ignore: master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
+  cancel-in-progress: true
+jobs:
+  e2e:
+    name: Playwright E2E tests
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "yarn"
+      - name: Install NPM deps
+        run: |
+          yarn install --frozen-lockfile
+          npm install -g playwright-cli
+          npx playwright install --with-deps chromium
+      - name: Install composer deps
+        run: composer install --no-dev
+      - name: Install environment
+        run: |
+          npm run wp-env start
+      - name: Prepare Database
+        run: bash ./bin/e2e-after-setup.sh
+      - name: Run the tests
+        run: |
+          npm run test:e2e
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+      - name: Archive test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-playwright-results
+          path: artifacts
+          retention-days: 1
+          if-no-files-found: ignore

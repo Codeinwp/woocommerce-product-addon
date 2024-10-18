@@ -3,44 +3,30 @@ name: Test PHP
 on:
   push:
     branches-ignore:
-      - 'master'
+      - "master"
 
 jobs:
   phpunit:
     name: Phpunit
     runs-on: ubuntu-22.04
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: root
-        ports:
-          - 3306/tcp
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
-      - name: Setup PHP version
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          php-version: '7.2'
-          extensions: simplexml, mysql
-          tools: phpunit-polyfills
-      - name: Checkout source code
-        uses: actions/checkout@v2
-      - name: Install WordPress Test Suite
+          node-version: "18"
+          cache: "yarn"
+      - name: Install NPM deps
         run: |
-          bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1:${{ job.services.mysql.ports['3306'] }}
-      - name: Get Composer Cache Directory
-        id: composer-cache
+          yarn install --frozen-lockfile
+      - name: Install composer deps
+        run: composer install
+      - name: Install environment
         run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Setup Composer cache
-        uses: actions/cache@v1
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-      - name: Install composer
-        run: composer install --prefer-dist --no-progress --no-suggest
-      - name: Run phpunit
-        run: phpunit
+          npm run wp-env start
+      - name: Prepare Database
+        run: bash ./bin/e2e-after-setup.sh
+      - name: Run the tests
+        run: |
+          npm run test:unit:php
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
