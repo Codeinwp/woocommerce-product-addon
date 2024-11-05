@@ -239,15 +239,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		// existing meta group tables show only ppom main page
 		if ( $action != 'new' && $do_meta != 'edit' && $view != 'addons' && $view != 'changelog' ) {
 			ppom_load_template( 'admin/existing-meta.php' );
-
-			$should_load_banner = ! ppom_pro_is_installed();
-			if ( ppom_pro_is_installed() ) {
-				$license_data = get_option( 'ppom_pro_license_data', array() );
-				$should_load_banner = isset( $license_data->plan ) && 
-									is_numeric( $license_data->plan ) &&
-									NM_PersonalizedProduct::LICENSE_PLAN_1 <= NM_PersonalizedProduct::get_license_category( intval( $license_data->plan ) );
-			}
-
+			
+			// NOTE: Allow only for Tier 1 Plan or lower if license is present.
+			$should_load_banner = NM_PersonalizedProduct::LICENSE_PLAN_1 >= NM_PersonalizedProduct::get_license_category( intval( apply_filters( 'product_ppom_license_plan', 0 ) ) );
+			
 			if ( $should_load_banner ) {
 				do_action( 'themeisle_sdk_load_banner', 'ppom' );
 			}
