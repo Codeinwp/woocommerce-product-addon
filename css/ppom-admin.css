@@ -1862,3 +1862,7 @@ header.ppom-modal-header {
 .ppom-wrapper a.ppom-upsell-condition:hover{
     text-decoration: none;
 }
+
+.ppom-banner:has(.tsdk-banner-cta) {
+    margin: 20px 0;
+}
