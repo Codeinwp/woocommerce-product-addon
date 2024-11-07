@@ -134,12 +134,16 @@ jQuery(function($) {
         const formData = new FormData();
         const ppomFields = new URLSearchParams();
         
-        // NOTE: since the request is to big for small values of `max_input_vars`, we will send the PPOM fields as a single string.
-        (new FormData(this)).forEach(( value, key) => {
-            if ( key.startsWith('ppom[') && typeof value === 'string' ) {
-                ppomFields.append( key, value );
+        /*
+            NOTE: since the request is to big for small values of `max_input_vars`, we will send the PPOM fields as a single string.
+            
+            INFO: some parts of the code use `\r\n` as delimiter for arrays in textarea. `serializeArray` respect this convention while native JS Form value access sanitize it to just `\n`.
+        */
+        $( this ).serializeArray().forEach(({ value, name }) => {
+            if ( name.startsWith('ppom[') && typeof value === 'string' ) {
+                ppomFields.append( name, value );
             } else {
-                formData.append(key, value);
+                formData.append(name, value);
             }
         });
 
