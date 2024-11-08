@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, product addons
 Requires at least: 3.5
 Tested up to: 6.6
-Stable tag: 33.0.7
+Stable tag: 33.0.8
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -250,6 +250,14 @@ PPOM is an open-source project, and we welcome contributors to be part of our vi
 
 
 == Changelog ==
+
+##### [Version 33.0.8](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.7...v33.0.8) (2024-11-08)
+
+- Fixed issue with multiple checked options not displaying as checked by default
+- Updated dependencies
+
+
+
 
 ##### [Version 33.0.7](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.6...v33.0.7) (2024-10-18)
 
