@@ -1,6 +1,6 @@
 <?php
 /*
- * Followig class handling date input control and their
+ * Following class handling date input control and their
 * dependencies. Do not make changes in code
 * Create on: 9 November, 2013
 */
@@ -59,7 +59,7 @@ class NM_Date_wooproduct extends PPOM_Inputs {
 			'class'             => array(
 				'type'        => 'text',
 				'title'       => __( 'Class', 'woocommerce-product-addon' ),
-				'desc'        => __( 'Insert an additional class(es) (separateb by comma) for more personalization.', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Insert an additional class(es) (separate by comma) for more personalization.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'width'             => array(

@@ -642,7 +642,13 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		self::save_categories_and_tags( $ppom_id, $categories_to_attach, $tags_to_attach );
 
 		$response = array(
-			'message' => "PPOM updated for {$updated_products} Products, {$updated_cat} Categories and {$updated_tags} Tags.",
+			'message' => sprintf(
+				// translators: %1$d: number of products, %2$d: number of categories, %3$d: number of tags.
+				__('PPOM updated for %1$d Products, %2$d Categories and %3$d Tags.', 'woocommerce-product-addon'),
+				$updated_products,
+				$updated_cat, 
+				$updated_tags
+			),
 			'status'  => 'success',
 		);
 

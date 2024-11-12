@@ -61,7 +61,7 @@ class NM_File_wooproduct extends PPOM_Inputs {
 			'class'               => array(
 				'type'        => 'text',
 				'title'       => __( 'Class', 'woocommerce-product-addon' ),
-				'desc'        => __( 'Insert an additional class(es) (separateb by comma) for more personalization.', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Insert an additional class(es) (separated by comma) for more personalization.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'width'               => array(
@@ -93,7 +93,7 @@ class NM_File_wooproduct extends PPOM_Inputs {
 			'file_types'          => array(
 				'type'        => 'text',
 				'title'       => __( 'File types', 'woocommerce-product-addon' ),
-				'desc'        => __( 'File types allowed seperated by comma, e.g: jpg,pdf,zip', 'woocommerce-product-addon' ),
+				'desc'        => __( 'File types allowed separated by comma, e.g: jpg,pdf,zip', 'woocommerce-product-addon' ),
 				'default'     => 'jpg,pdf,zip',
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),

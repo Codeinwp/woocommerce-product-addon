@@ -170,7 +170,7 @@ class PPOM_Fields_Meta {
 				'bulkActionsLabel'=>esc_html__( 'Bulk Actions', 'woocommerce-product-addon' ),
 				'deleteLabel'=>esc_html__( 'Delete', 'woocommerce-product-addon' ),
 				'exportLabel'=>esc_html__( 'Export', 'woocommerce-product-addon' ),
-				'exportLockedLabel'=>esc_html__( 'Export (PRO)', 'woocommerce-product-addon' ),
+				'exportLockedLabel'=> esc_html__( 'Export', 'woocommerce-product-addon' ) . ' (' . esc_html__( 'PRO', 'woocommerce-product-addon' ) . ')',
 				'importLabel'=>esc_html__( 'Import Field Groups ', 'woocommerce-product-addon' ),
 				'freemiumCFRContent' => \PPOM_Freemium::get_instance()->get_freemium_cfr_content(),
 				'freemiumCFRTab' => \PPOM_Freemium::TAB_KEY_FREEMIUM_CFR,
@@ -410,10 +410,10 @@ class PPOM_Fields_Meta {
 				$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Tooltip', 'woocommerce-product-addon' );
 				$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : sprintf(
 					// translators: $s: the weight unit.
-					__( 'Weight-%s (PRO only)', 'woocommerce-product-addon' ),
+					__( 'Weight-%s', 'woocommerce-product-addon' ) . ' (' . __( 'PRO only', 'woocommerce-product-addon' ) . ')',
 					$weight_unit
 				);
-				$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock (PRO only)', 'woocommerce-product-addon' );
+				$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock', 'woocommerce-product-addon' ) . ' (' . __( 'PRO only', 'woocommerce-product-addon' ) . ')';
 
 				if ( ppom_pro_is_installed() ) {
 
@@ -785,10 +785,10 @@ class PPOM_Fields_Meta {
 					$condition_rules = isset( $values['rules'] ) ? $values['rules'] : array();
 					$last_array_id   = max( array_keys( $condition_rules ) );
 
-					$visibility_show = ( $values['visibility'] == 'Show' ) ? 'selected="selected"' : '';
-					$visibility_hide = ( $values['visibility'] == 'Hide' ) ? 'selected="selected"' : '';
-					$bound_all       = ( $values['bound'] == 'All' ) ? 'selected="selected"' : '';
-					$bound_any       = ( $values['bound'] == 'Any' ) ? 'selected="selected"' : '';
+					$visibility_show = ( $values['visibility'] === 'Show' ) ? 'selected="selected"' : '';
+					$visibility_hide = ( $values['visibility'] === 'Hide' ) ? 'selected="selected"' : '';
+					$bound_all       = ( $values['bound'] === 'All' ) ? 'selected="selected"' : '';
+					$bound_any       = ( $values['bound'] === 'Any' ) ? 'selected="selected"' : '';
 
 					$html_input  = '<div class="row ppom-condition-style-wrap">';
 					$html_input .= '<div class="col-md-3 col-sm-3">';
