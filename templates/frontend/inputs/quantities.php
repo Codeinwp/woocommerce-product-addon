@@ -20,7 +20,7 @@ $fm = new PPOM_InputManager( $field_meta, 'quantities' );
 if ( isset( $fm->options()[0]['option'] ) && $fm->options()[0]['option'] == '' ) {
 
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please add some options to display variations.', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . esc_html( __( 'Please add some options to display variations.', 'woocommerce-product-addon' ) ) . '</p>';
 	echo '</div>';
 
 	return '';
@@ -38,7 +38,7 @@ $matrix_found = ppom_has_field_by_type( $product_id, 'pricematrix' );
 if ( ! empty( $matrix_found ) && ppom_is_field_has_price( $field_meta ) ) {
 	$error_msg = __( 'Quantities cannot be used with Price Matrix, Remove prices from quantities input.', 'woocommerce-product-addon' );
 
-	return sprintf( __( '<div class="woocommerce-error">%s</div>', 'woocommerce-product-addon' ), $error_msg );
+	return sprintf( '<div class="woocommerce-error">%s</div>', $error_msg );
 }
 
 ?>
@@ -47,8 +47,12 @@ if ( ! empty( $matrix_found ) && ppom_is_field_has_price( $field_meta ) ) {
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+		<label
+			class="<?php echo esc_attr( $fm->label_classes() ); ?>"
+			for="<?php echo esc_attr( $fm->data_name() ); ?>"
+		>
+			<?php echo esc_html( $fm->field_label() ); ?>
+		</label>
 	<?php endif ?>
 
 	<input type="hidden" name="ppom_quantities_option_price" id="ppom_quantities_option_price">

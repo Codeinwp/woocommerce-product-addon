@@ -405,12 +405,13 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 				}
 
 				if ( $total_qty > 0 ) {
-					$qty_values[] = sprintf( __( '<strong>Total = %d</strong>', 'woocommerce-product-addon' ), $total_qty );
+					// translators: %d: the total quantity.
+					$qty_values[] = '<strong>' . sprintf( __( 'Total = %d', 'woocommerce-product-addon' ), $total_qty ) . '</strong>';
 					$meta_data    = array(
 						'name'  => $field_title,
 						'value' => implode( '<br>', $qty_values ),
 					);
-					// A placeholder key to handle qunantity display in item meta data under myaccount
+					// A placeholder key to handle quantity display in item meta data under myaccount.
 				}
 
 				$ppom_meta['ppom_has_quantities'] = $total_qty;
@@ -429,7 +430,8 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 				}
 
 				if ( $total_qty > 0 ) {
-					$qty_values[] = sprintf( __( '<strong>Total = %d</strong>', 'woocommerce-product-addon' ), $total_qty );
+					// translators: %d: the total quantity.
+					$qty_values[] = '<strong>' . sprintf( __( 'Total = %d', 'woocommerce-product-addon' ), $total_qty ) . '</strong>';
 					$meta_data    = array(
 						'name'  => $field_title,
 						'value' => implode( '<br>', $qty_values ),
@@ -454,7 +456,8 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 				}
 
 				if ( $total_qty > 0 ) {
-					$qty_values[] = sprintf( __( '<strong>Total = %d</strong>', 'woocommerce-product-addon' ), $total_qty );
+					// translators: %d: the total quantity.
+					$qty_values[] = '<strong>' . sprintf( __( 'Total = %d', 'woocommerce-product-addon' ), $total_qty ) . '</strong>';
 					$meta_data    = array(
 						'name'  => $field_title,
 						'value' => implode( ',', $qty_values ),
@@ -516,7 +519,8 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 				}
 
 				if ( $total_qty > 0 ) {
-					$meta_display[] = sprintf( __( '<strong>Total = %d</strong>', 'woocommerce-product-addon' ), $total_qty );
+					// translators: %d: the total quantity.
+					$meta_display[] = '<strong>' . sprintf( __( 'Total = %d', 'woocommerce-product-addon' ), $total_qty ) . '</strong>' ;
 					$meta_data      = array(
 						'name'    => $field_title,
 						'display' => implode( '<br>', $meta_display ),
@@ -1018,7 +1022,7 @@ function ppom_is_aviary_installed() {
 function ppom_settings_link( $links ) {
 	$ppom_setting_url = admin_url( 'admin.php?page=ppom' );
 
-	$links[] = sprintf( __( '<a href="%s">Add Fields</a>', 'woocommerce-product-addon' ), esc_url( $ppom_setting_url ) );
+	$links[] = '<a href="' . esc_url( $ppom_setting_url ) . '">' . __( 'Add Fields', 'woocommerce-product-addon' ) . '</a>';
 
 	return $links;
 }

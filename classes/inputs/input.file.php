@@ -24,7 +24,7 @@ class NM_File_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'File Input', 'woocommerce-product-addon' );
 		$this->desc     = __( 'regular file input', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-file" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-file" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}

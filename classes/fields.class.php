@@ -210,7 +210,7 @@ class PPOM_Fields_Meta {
 			// new model
 			$html .= '<div class="ppom-modal-box ppom-slider ppom-field-' . esc_attr( $fields_type ) . '">';
 			$html .= '<header>';
-			$html .= '<h3>' . sprintf( __( '%s', 'woocommerce-product-addon' ), $field_title ) . '</h3>';
+			$html .= '<h3>' . esc_html( $field_title ) . '</h3>';
 			$html .= '</header>';
 			$html .= '<div class="ppom-modal-body">';
 
@@ -298,11 +298,11 @@ class PPOM_Fields_Meta {
 				$html .= '<div data-meta-id="' . esc_attr( $fields_meta_key ) . '" class="' . esc_attr( $panel_classes ) . '">';
 				$html .= '<div class="form-group">';
 
-				$html .= '<label>' . sprintf( __( '%s', 'woocommerce-product-addon' ), $title ) . '';
+				$html .= '<label>' . esc_html( $title ) . '';
 				if ( ! empty( $learn_more['link'] ) ) {
 					$html .= '. <a href="' . esc_url( $learn_more['link'] ) . '" class="ppom-repeater-learn-more" target="_blank">' . $learn_more['text'] .  '<span class="dashicons dashicons-external"></span></a>';
 				} else if( ! empty( $desc ) ) {
-					$html .= '<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip" title="' . sprintf( __( '%s', 'woocommerce-product-addon' ), $desc ) . '">';
+					$html .= '<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip" title="' . esc_html( $desc ) . '">';
 					$html .= '<i class="dashicons dashicons-editor-help"></i>';
 				}
 				$html .= '</span>' . $link . '';
@@ -408,14 +408,22 @@ class PPOM_Fields_Meta {
 				$weight_unit  = get_option( 'woocommerce_weight_unit' );
 				$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Discount', 'woocommerce-product-addon' );
 				$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Tooltip', 'woocommerce-product-addon' );
-				$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (PRO only)", 'woocommerce-product-addon' );
+				$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : sprintf(
+					// translators: $s: the weight unit.
+					__( 'Weight-%s (PRO only)', 'woocommerce-product-addon' ),
+					$weight_unit
+				);
 				$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock (PRO only)', 'woocommerce-product-addon' );
 
 				if ( ppom_pro_is_installed() ) {
 
 					$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Discount', 'woocommerce-product-addon' );
 					$plc_tooltip  = ( isset( $placeholders[3] ) && ! empty( $placeholders ) ) ? $placeholders[3] : __( 'Tooltip', 'woocommerce-product-addon' );
-					$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : __( "Weight-{$weight_unit} (optional)", 'woocommerce-product-addon' );
+					$plc_weight   = ( isset( $placeholders[4] ) && ! empty( $placeholders ) ) ? $placeholders[4] : sprintf(
+						// translators: $s: the weight unit.
+						__( 'Weight-%s (optional)', 'woocommerce-product-addon' ),
+						$weight_unit
+					);
 					$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock (optional)', 'woocommerce-product-addon' );
 				}
 
@@ -827,7 +835,7 @@ class PPOM_Fields_Meta {
 						$operator_less    = ( $condition['operators'] == 'less than' ) ? 'selected="selected"' : '';
 
 						$html_input .= '<div class="webcontact-rules" id="rule-box-' . esc_attr( $rule_i ) . '">';
-						$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule ', 'woocommerce-product-addon' ) . $rule_i ++ . '</label></div>';
+						$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule', 'woocommerce-product-addon' ) . ' ' . $rule_i ++ . '</label></div>';
 
 						// conditional elements
 						$html_input .= '<div class="col-md-4 col-sm-4">';
@@ -923,13 +931,13 @@ class PPOM_Fields_Meta {
 					$html_input .= '</select> ';
 					$html_input .= '</div>';
 					$html_input .= '<div class="col-md-4 col-sm-4">';
-					$html_input .= '<p>' . __( ' of the following matches', 'woocommerce-product-addon' ) . '</p>';
+					$html_input .= '<p> ' . __( 'of the following matches', 'woocommerce-product-addon' ) . '</p>';
 					$html_input .= '</div>';
 					$html_input .= '</div>';
 
 					$html_input .= '<div class="row ppom-condition-clone-js">';
 					$html_input .= '<div class="webcontact-rules" id="rule-box-' . esc_attr( $rule_i ) . '">';
-					$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule ', 'woocommerce-product-addon' ) . $rule_i ++ . '</label></div>';
+					$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule', 'woocommerce-product-addon' ) . ' ' . $rule_i ++ . '</label></div>';
 
 					// conditional elements
 					$html_input .= '<div class="col-md-4 col-sm-4">';

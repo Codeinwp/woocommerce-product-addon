@@ -24,7 +24,7 @@ class NM_PriceMatrix_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'Price Matrix', 'woocommerce-product-addon' );
 		$this->desc     = __( 'Price/Quantity', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-usd" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-usd" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}

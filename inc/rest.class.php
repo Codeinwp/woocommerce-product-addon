@@ -142,7 +142,8 @@ class PPOM_Rest {
 
 		$response_info = array(
 			'status'      => 'success',
-			'message'     => __( "Meta found {$meta_id}", 'woocommerce-product-addon' ),
+			/* translators: %s: Field Meta ID */
+			'message'     => sprintf( __( 'Meta found %s', 'woocommerce-product-addon' ), $meta_id ),
 			'meta_id'     => intval( $meta_id ),
 			'product_id'  => $product_id,
 			'ppom_fields' => $ppom_fields,
@@ -179,7 +180,8 @@ class PPOM_Rest {
 
 		$response_info = array(
 			'status'      => true,
-			'message'     => __( "Meta found {$ppom_id}", 'woocommerce-product-addon' ),
+			/* translators: %s: Field Meta ID */
+			'message'     => sprintf( __( 'Meta found %s', 'woocommerce-product-addon' ), $ppom_id ),
 			'meta_id'     => intval( $ppom_id ),
 			'ppom_fields' => $ppom_fields,
 		);
@@ -544,7 +546,8 @@ class PPOM_Rest {
 
 		$response_info = array(
 			'status'           => 'success',
-			'message'          => __( "Order found {$order_id}", 'woocommerce-product-addon' ),
+			/* translators: %s: WooCommerce Order ID */
+			'message'          => sprintf( __( 'Order found %s', 'woocommerce-product-addon' ), $order_id ),
 			'order_items_meta' => $item_product_meta,
 		);
 
@@ -648,7 +651,8 @@ class PPOM_Rest {
 
 		$response_info = array(
 			'status'           => 'success',
-			'message'          => __( "Order updated {$order_id}", 'woocommerce-product-addon' ),
+			/* translators: %s: WooCommerce Order ID */
+			'message'          => sprintf( __( 'Order updated %s', 'woocommerce-product-addon' ), $order_id ),
 			'order_items_meta' => $item_product_meta,
 		);
 
@@ -732,7 +736,8 @@ class PPOM_Rest {
 
 		$response_info = array(
 			'status'           => 'success',
-			'message'          => __( "Order updated {$order_id}", 'woocommerce-product-addon' ),
+			/* translators: %s: WooCommerce Order ID */
+			'message'          => sprintf( __( 'Order updated %s', 'woocommerce-product-addon' ), $order_id ),
 			'order_items_meta' => $item_product_meta,
 		);
 

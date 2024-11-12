@@ -23,7 +23,7 @@ class NM_Date_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'Date Input', 'woocommerce-product-addon' );
 		$this->desc     = __( 'regular date input', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-calendar" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-calendar" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}
@@ -81,35 +81,40 @@ class NM_Date_wooproduct extends PPOM_Inputs {
 				'type'        => 'text',
 				'title'       => __( 'Default Date', 'woocommerce-product-addon' ),
 				'desc'        => __( '[ This feature requires jQuery datePicker ] The default highlighted date if the date field is blank.  Enter a date or use shortcode (examples: +10d, +17d, +1m +7d). Full dates should follow the same date format you have selected for this field.', 'woocommerce-product-addon' ),
-				'link'        => __( '<a target="_blank" href="https://api.jqueryui.com/datepicker/#option-defaultDate">Example</a>', 'woocommerce-product-addon' ),
+				'link'        => '<a target="_blank" href="https://api.jqueryui.com/datepicker/#option-defaultDate">' . __( 'Example', 'woocommerce-product-addon' ) . '</a>',
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'min_date'          => array(
 				'type'        => 'text',
 				'title'       => __( 'Min Date', 'woocommerce-product-addon' ),
 				'desc'        => __( '[ This feature requires jQuery datePicker ] The earliest selectable date. Enter a date or use shortcode (examples: +10d, +17d, +1m +7d). Full dates should follow the same date format you have selected for this field.', 'woocommerce-product-addon' ),
-				'link'        => __( '<a target="_blank" href="https://api.jqueryui.com/datepicker/#option-minDate">Example</a>', 'woocommerce-product-addon' ),
+				'link'        => '<a target="_blank" href="https://api.jqueryui.com/datepicker/#option-minDate">' . __( 'Example', 'woocommerce-product-addon' ) . '</a>',
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'max_date'          => array(
 				'type'        => 'text',
 				'title'       => __( 'Max Date', 'woocommerce-product-addon' ),
 				'desc'        => __( '[ This feature requires jQuery datePicker ] The maximum selectable date. Enter a date or use shortcode (examples: +10d, +17d, +1m +7d). Full dates should follow the same date format you have selected for this field.', 'woocommerce-product-addon' ),
-				'link'        => __( '<a target="_blank" href="https://api.jqueryui.com/datepicker/#option-maxDate">Example</a>', 'woocommerce-product-addon' ),
+				'link'        => '<a target="_blank" href="https://api.jqueryui.com/datepicker/#option-maxDate">' . __( 'Example', 'woocommerce-product-addon' ) . '</a>',
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'year_range'        => array(
 				'type'        => 'text',
 				'title'       => __( 'Year Range', 'woocommerce-product-addon' ),
-				'desc'        => sprintf( esc_html__( '[ This feature requires jQuery datePicker ] Years to allow date selections. Example: c-10:c+10. TIP: The letter "c" indicates the current year so "c+1" will indicate next year.  Thus c:c+1 will be %s:%s', 'woocommerce-product-addon'), date( 'Y' ), date( 'Y', strtotime( '+1 year' ) ) ),
-				'link'        => __( '<a target="_blank" href="https://api.jqueryui.com/datepicker/#option-yearRange">Example</a>', 'woocommerce-product-addon' ),
+				'desc'        => sprintf(
+					// translators: %1%s: the current year date, %2%s the next yar date.
+					esc_html__( '[ This feature requires jQuery datePicker ] Years to allow date selections. Example: c-10:c+10. TIP: The letter "c" indicates the current year so "c+1" will indicate next year.  Thus c:c+1 will be %1$s:%2$s', 'woocommerce-product-addon'),
+					date( 'Y' ),
+					date( 'Y', strtotime( '+1 year' ) )
+				),
+				'link'        => '<a target="_blank" href="https://api.jqueryui.com/datepicker/#option-yearRange">' . __( 'Example', 'woocommerce-product-addon' ) . '</a>',
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'first_day_of_week' => array(
 				'type'        => 'select',
 				'title'       => __( 'First day of week', 'woocommerce-product-addon' ),
 				'desc'        => __( '[ This feature requires jQuery datePicker ] First day of the week to show on the popup calendar.', 'woocommerce-product-addon' ),
-				'link'        => __( '<a target="_blank" href="https://api.jqueryui.com/datepicker/#option-firstDay">Example</a>', 'woocommerce-product-addon' ),
+				'link'        => '<a target="_blank" href="https://api.jqueryui.com/datepicker/#option-firstDay">' . __( 'Example', 'woocommerce-product-addon' ) . '</a>',
 				'options'     => array(
 					0 => 'Sunday',
 					1 => 'Monday',

@@ -23,7 +23,7 @@ class NM_Image_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'Images', 'woocommerce-product-addon' );
 		$this->desc     = __( 'Images selection', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-picture-o" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-picture-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}

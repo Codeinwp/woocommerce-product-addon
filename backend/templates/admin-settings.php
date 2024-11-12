@@ -99,7 +99,13 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 											<div class="nmsf-panel-settings-area <?php  echo ! $is_available ? 'ppom-is-locked-panel' : ''; ?>">
                                                 <?php if ( ! $is_available ): ?>
                                                     <div class="ppom-notice-upsell"><p>
-                                                            <?php echo sprintf( __( '%s customization is not available on your current plan. %sUpgrade to the Pro%s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ), esc_html( $title ), sprintf( '<a href="%s" target="_blank">', esc_url( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ), '</a>' ); ?>
+                                                            <?php echo sprintf( 
+																/* translators: %1$s: Title, %2$s: Opening anchor tag, %3$s: Closing anchor tag */
+																__( '%1$s customization is not available on your current plan. %2$sUpgrade to the Pro%2$s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ),
+																esc_html( $title ),
+																sprintf( '<a href="%s" target="_blank">', esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ) ),
+																'</a>'
+															); ?>
                                                         </p>
                                                     </div>
                                                 <?php endif; ?>
@@ -142,7 +148,13 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																	<td class="nmsf-section-type" colspan="2">
 																		<?php if ( $is_available && !$is_input_available ): ?>
                                                                             <div class="ppom-notice-upsell"><p>
-																					<?php echo sprintf( __( '%s customization is not available on your current plan. %sUpgrade to the Pro%s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ), esc_html( $title ), sprintf( '<a href="%s" target="_blank">', esc_url( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ), '</a>' ); ?>
+																					<?php echo sprintf(
+																						/* translators: %1$s: Title, %2$s: Opening anchor tag, %3$s: Closing anchor tag */
+																						__( '%1$s customization is not available on your current plan. %2$sUpgrade to the Pro%3$s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ),
+																						esc_html( $title ),
+																						sprintf( '<a href="%s" target="_blank">', esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ) ),
+																						'</a>' 
+																					); ?>
                                                                                 </p>
                                                                             </div>
 																		<?php endif; ?>

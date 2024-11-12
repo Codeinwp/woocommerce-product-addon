@@ -56,7 +56,7 @@ $url_cancel = add_query_arg(
 	)
 );
 
-echo '<p><a href="' . esc_url( $url_cancel ) . '">' . __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ) . '</a></p>';
+echo '<p><a href="' . esc_url( $url_cancel ) . '">&laquo; ' . __( 'Existing Product Meta', 'woocommerce-product-addon' ) . '</a></p>';
 
 $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 
@@ -567,7 +567,16 @@ $fields_groups = [
 							<div class="row">
 								<div class="col-md-12 col-sm-12">
 									<div class="notice notice-info">
-										<p><?php echo sprintf( __( 'Custom CSS and JS customization is not available on your current plan. <a href="%s" target="_blank">Upgrade to the Pro</a> plan to unlock the ability to fully customize your fields\' appearance and functionality.', 'woocommerce-product-addon' ), esc_url( tsdk_utmify( PPOM_UPGRADE_URL, 'customstyle' ) ) ); ?></p>
+										<p>
+											<?php
+											echo sprintf(
+												// translators: %1$s the opening HTML link tag, %2$s the closing HTML link tag.
+												__( 'Custom CSS and JS customization is not available on your current plan. %1$sUpgrade to the Pro%2$s plan to unlock the ability to fully customize your fields\' appearance and functionality.', 'woocommerce-product-addon' ),
+												'<a href="' . esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, 'customstyle' ) ) ) . '" target="_blank">',
+												'</a>'
+											);
+											?>
+										</p>
 									</div>
 								</div>
 							</div>

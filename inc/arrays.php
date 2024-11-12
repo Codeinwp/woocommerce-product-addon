@@ -173,14 +173,24 @@ function ppom_array_settings() {
 		array(
 			'title' => 'Settings Panel Migration',
 			'type'  => 'title',
-			'desc'  => __( 'Please migrate settings to new settings panel framework. <a href="' . esc_url( $ppom_migrate_url ) . '" class="page-title-action">Start Migration</a>', 'woocommerce-product-addon' ),
+			'desc'  => wp_sprintf(
+				// translators: %1$s: the opening HTML link tags, %2$s: the closing HTML link tags.
+				__( 'Please migrate settings to new settings panel framework. %1$sStart Migration%2$s', 'woocommerce-product-addon' ),
+				'<a class="page-title-action" href="' . esc_url( $ppom_migrate_url ) . '">',
+				'</a>'
+			),
 			'id'    => 'ppom_settings_migration',
 		),
 
 		array(
 			'title' => 'PPOM Labels',
 			'type'  => 'title',
-			'desc'  => __( 'Following settings help you the control and customize plugin as per your need. <a href="' . esc_url( $ppom_fields ) . '">PPOM Fields Manager</a>', 'woocommerce-product-addon' ),
+			'desc'  => wp_sprintf(
+				// translators: %1$s: the opening HTML link tags, %2$s: the closing HTML link tags.
+				__( 'Following settings help you the control and customize plugin as per your need. %1$sPPOM Fields Manager%2$s', 'woocommerce-product-addon' ),
+				'<a href="' . esc_url( $ppom_fields ) . '">',
+				'</a>'
+			),
 			'id'    => 'ppom_labels_settings',
 		),
 
@@ -198,7 +208,7 @@ function ppom_array_settings() {
 			'title'    => __( 'Option Total Suffix', 'woocommerce-product-addon' ),
 			'type'     => 'text',
 			'desc'     => __( 'E.g for Tax/Va info like. Vat included', 'woocommerce-product-addon' ),
-			'default'  => __( '', 'woocommerce-product-addon' ),
+			'default'  => '',
 			'id'       => 'ppom_label_option_total_suffex',
 			'css'      => 'min-width:300px;',
 			'desc_tip' => true,
@@ -592,14 +602,14 @@ function ppom_array_get_js_input_vars( $product, $args = null ) {
 	$ppom_label_fixed_fee                 = ppom_get_option( 'ppom_label_fixed_fee', __( 'Fixed Fee', 'woocommerce-product-addon' ) );
 	$ppom_label_total_discount            = ppom_get_option( 'ppom_label_total_discount', __( 'Total Discount', 'woocommerce-product-addon' ) );
 	$ppom_label_total                     = ppom_get_option( 'ppom_label_total', __( 'Total', 'woocommerce-product-addon' ) );
-	$js_vars['total_discount_label']      = sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_total_discount );
-	$js_vars['price_matrix_heading']      = sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_discount_price );
-	$js_vars['product_base_label']        = sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_product_price );
-	$js_vars['option_total_label']        = sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_option_total );
-	$js_vars['fixed_fee_heading']         = sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_fixed_fee );
-	$js_vars['total_without_fixed_label'] = sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_total );
+	$js_vars['total_discount_label']      = $ppom_label_total_discount;
+	$js_vars['price_matrix_heading']      = $ppom_label_discount_price;
+	$js_vars['product_base_label']        = $ppom_label_product_price;
+	$js_vars['option_total_label']        = $ppom_label_option_total;
+	$js_vars['fixed_fee_heading']         = $ppom_label_fixed_fee;
+	$js_vars['total_without_fixed_label'] = $ppom_label_total;
 	$js_vars['product_quantity_label']    = __( 'Product Quantity', 'woocommerce-product-addon' );
-	$js_vars['product_title']             = sprintf( __( '%s', 'woocommerce-product-addon' ), $product->get_title() );
+	$js_vars['product_title']             = $product->get_title();
 	$js_vars['per_unit_label']            = __( 'unit', 'woocommerce-product-addon' );
 	$js_vars['show_price_per_unit']       = $show_price_per_unit;
 	$js_vars['text_quantity']             = __( 'Quantity', 'woocommerce-product-addon' );
@@ -621,12 +631,12 @@ function ppom_array_get_js_input_vars( $product, $args = null ) {
 function ppom_tax_label_display() {
 	/*
 	if ( wc_tax_enabled() && 'excl' === get_option( 'woocommerce_tax_display_shop' ) &&  get_option( 'woocommerce_price_display_suffix' ) !== '' ) {
-		return sprintf(__("%s", 'woocommerce-product-addon'), get_option( 'woocommerce_price_display_suffix' ));
+		return sprintf("%s", get_option( 'woocommerce_price_display_suffix' ));
 	}*/
 
-	$suffex = ppom_get_option( 'ppom_label_option_total_suffex' );
-	if ( wc_tax_enabled() && $suffex !== '' ) {
-		return sprintf( __( '%s', 'woocommerce-product-addon' ), $suffex );
+	$suffix = ppom_get_option( 'ppom_label_option_total_suffex' );
+	if ( wc_tax_enabled() && $suffix !== '' ) {
+		return $suffix;
 	}
 }
 

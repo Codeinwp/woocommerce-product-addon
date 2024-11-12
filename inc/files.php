@@ -103,7 +103,7 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 
 	$ppom_cart_meta_thumb_size = ppom_get_thumbs_size();
 
-	$thumb_html = '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $file_thumb_url ) . '" alt="' . sprintf( __( '%s', 'woocommerce-product-addon' ), $file_name ) . '">';
+	$thumb_html = '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $file_thumb_url ) . '" alt="' . esc_attr( $file_name ) . '">';
 
 	$ppom_html  = '<table class="table table-bordered">';
 	$ppom_html .= '<tr><td><a href="' . esc_url( $file_link ) . '" class="lightbox et_pb_lightbox_image" itemprop="image" title="' . esc_attr( $file_name ) . '">' . $thumb_html . '</a></td>';
@@ -114,11 +114,13 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 	$cropped_file_name = ppom_file_get_name( $file_name, $product_id );
 	if ( $cropped && file_exists( ppom_get_dir_path( 'cropped' ) . $cropped_file_name ) ) {
 
-		$cropped_url   = ppom_get_dir_url() . 'cropped/' . $cropped_file_name;
-		$ppom_html    .= '<tr>';
-		$ppom_html    .= '<td><a href="' . esc_url( $cropped_url ) . '" class="lightbox et_pb_lightbox_image" itemprop="image" title="' . esc_attr( $file_name ) . '">';
-		$ppom_html    .= '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $cropped_url ) . '">';
-		$ppom_html    .= '</a></td>';
+		$cropped_url  = ppom_get_dir_url() . 'cropped/' . $cropped_file_name;
+		$ppom_html   .= '<tr>';
+		$ppom_html   .= '<td><a href="' . esc_url( $cropped_url ) . '" class="lightbox et_pb_lightbox_image" itemprop="image" title="' . esc_attr( $file_name ) . '">';
+		$ppom_html   .= '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $cropped_url ) . '">';
+		$ppom_html   .= '</a></td>';
+
+		// translators: $s: the size of the cropped image.
 		$cropped_title = sprintf( __( 'Your image-%s', 'woocommerce-product-addon' ), $size );
 		$ppom_html    .= '<td>' . $cropped_title . '</td>';
 		$ppom_html    .= '</tr>';
@@ -243,7 +245,11 @@ function ppom_upload_file() {
 
 	if ( empty( $extension ) || in_array( strtolower( $extension ), $restricted_type ) ) {
 		$response ['status']  = 'error';
-		$response ['message'] = __( 'File type not valid - ' . $extension, 'woocommerce-product-addon' );
+		$response ['message'] = sprintf(
+			// translators: %s: the name of the extension.
+			__( 'File type not valid - %s', 'woocommerce-product-addon' ),
+			$extension
+		);
 		wp_send_json( $response );
 	}
 	/* ========== Invalid File type checking ========== */
@@ -401,6 +407,7 @@ function ppom_delete_file() {
 	$ppom_nonce        = sanitize_key( $_REQUEST['ppom_nonce'] );
 	$file_nonce_action = 'ppom_deleting_file_action';
 	if ( ! wp_verify_nonce( $ppom_nonce, $file_nonce_action ) ) {
+		// translators: $s: the name of file
 		printf( __( 'Verification failed for file: %s', 'woocommerce-product-addon' ), $file_name );
 		die( 0 );
 	}
@@ -426,9 +433,11 @@ function ppom_delete_file() {
 		if ( ! file_exists( $file_path ) ) {
 			_e( 'File removed', 'woocommerce-product-addon' );
 		} else {
+			// translators: $s: the name of file
 			printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
 		}
 	} else {
+		// translators: $s: the name of file
 		printf( __( 'The file %s does not exists.', 'woocommerce-product-addon' ), $file_path );
 	}
 

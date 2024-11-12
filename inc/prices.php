@@ -793,6 +793,7 @@ function ppom_generate_field_price( $field_price, $field_meta, $apply, $option =
 	$option_id  = isset( $option['option_id'] ) ? $option['option_id'] : '';
 
 	if ( $field_type == 'file' ) {
+		// translators: $d: the number of files options.
 		$option_label = sprintf( __( '%d Files', 'woocommerce-product-addon' ), count( $option ) );
 	}
 
@@ -802,7 +803,7 @@ function ppom_generate_field_price( $field_price, $field_meta, $apply, $option =
 			'type'         => $field_type,
 			'option_id'    => $option_id,
 			'label'        => $field_title,
-			'label_price'  => sprintf( __( '%s', 'woocommerce-product-addon' ), $label_price ),
+			'label_price'  => $label_price,
 			'price'        => $field_price,
 			'apply'        => $apply,
 			'data_name'    => $data_name,
@@ -1236,7 +1237,7 @@ function ppom_price_cart_fee( $cart ) {
 			$discount_label   = $cart_counter . '-' . $matrix_found['label'];
 			$matrix_discount  = floatval( $matrix_discount );
 			$discount_taxable = apply_filters( 'ppom_matrix_discount_taxable', false, $item, $cart );
-			$cart->add_fee( sprintf( __( '%s', 'woocommerce-product-addon' ), esc_html( $discount_label ) ), - $matrix_discount, $discount_taxable );
+			$cart->add_fee( esc_html( $discount_label ), - $matrix_discount, $discount_taxable );
 			// ppom_pa($discount_label);
 		}
 
@@ -1277,7 +1278,7 @@ function ppom_price_cart_fee( $cart ) {
 					$fee_price = $fee_price - $total_tax;
 				}
 
-				$cart->add_fee( sprintf( __( '%s', 'woocommerce-product-addon' ), esc_html( $label ) ), $fee_price, $taxable, $tax_class );
+				$cart->add_fee( esc_html( $label ), $fee_price, $taxable, $tax_class );
 				$fee_no ++;
 			}
 		}

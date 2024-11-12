@@ -25,7 +25,7 @@ $first_option = $fm->get_meta_value( 'first_option' );
 $options      = ppom_array_get_timezone_list( $regions, $show_time );
 
 if ( ! empty( $first_option ) ) {
-	$options[''] = sprintf( __( '%s', 'woocommerce-product-addon' ), $first_option );
+	$options[''] = $first_option;
 }
 
 if ( ! $options ) {

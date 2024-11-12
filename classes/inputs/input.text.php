@@ -23,7 +23,7 @@ class NM_Text_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'Text Input', 'woocommerce-product-addon' );
 		$this->desc     = __( 'regular text input', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-pencil-square-o" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-pencil-square-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}
@@ -129,7 +129,7 @@ class NM_Text_wooproduct extends PPOM_Inputs {
 				'type'        => 'checkbox',
 				'title'       => __( 'Enable Regex Mask', 'woocommerce-product-addon' ),
 				'desc'        => __( 'Enabling this option allows the input mask field to interpret the provided pattern as a regular expression (regex).', 'woocommerce-product-addon' ),
-				'link'        => __( '<a target="_blank" href="' . esc_url( $regex_help_url ) . '">See More</a>', 'woocommerce-product-addon' ),
+				'link'        => '<a target="_blank" href="' . esc_url( $regex_help_url ) . '">' . __( 'See More', 'woocommerce-product-addon' ) . '</a>',
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'desc_tooltip'    => array(

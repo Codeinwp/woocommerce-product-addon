@@ -29,7 +29,7 @@ echo '<input type="hidden" name="ppom_cart_key" value="' . esc_attr( $cart_key )
 // Price placeholder, it will be cloned via js in ppom-price.js
 echo '<div id="ppom-price-cloner-wrapper">';
 echo '<span id="ppom-price-cloner">';
-printf( __( get_woocommerce_price_format(), 'woocommerce-product-addon' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' );
+printf( get_woocommerce_price_format(), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' );
 echo '</span>';
 echo '</div>';
 
@@ -79,6 +79,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 	}
 
 	if ( empty( $data_name ) ) {
+		// translators: $s: the name of the field.
 		printf( __( 'Please provide data name property for %s', 'woocommerce-product-addon' ), $title );
 		continue;
 	}
@@ -415,7 +416,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 			$options = ppom_array_get_timezone_list( $regions, $show_time );
 			if ( ! empty( $first_option ) ) {
-				$options[''] = sprintf( __( '%s', 'woocommerce-product-addon' ), $first_option );
+				$options[''] = $first_option;
 			}
 
 			// ppom_pa($options);

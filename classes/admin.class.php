@@ -150,7 +150,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 				$menu = add_submenu_page(
 					$page ['parent_slug'],
-					__( $page ['page_title'], 'woocommerce-product-addon' ),
+					$page ['page_title'],
 					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
 					$page ['slug'],
@@ -165,7 +165,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				$cap = 'ppom_options_page';
 				// Menu page for roles set by PPOM Permission Settings
 				$menu = add_menu_page(
-					__( $page ['page_title'], 'woocommerce-product-addon' ),
+					$page ['page_title'],
 					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
 					$page ['slug'],
@@ -270,7 +270,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$ppom_id                      = intval( $_GET['ppom_id'] );
 		$license_status               = apply_filters( 'product_ppom_license_status', '' );
 		$current_saved_value          = $this->get_db_field( $ppom_id );
-		$pro_multiple_fields          = ! ppom_pro_is_installed() || 'valid' !== $license_status ? '</br><i style="font-size: 90%">' . sprintf( __( 'Your current plan supports adding one group of fields per product. To add multiple groups to the same product, please %supgrade%s your plan!', 'woocommerce-product-addon' ), '<a target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'multiple-fields' ) . '">', '</a>' ) . '</i>' : '';
+		$pro_multiple_fields          = ! ppom_pro_is_installed() || 'valid' !== $license_status 
+			? '</br><i style="font-size: 90%">' . sprintf(
+				// translators: %1$s: the opening tag for upsell link, %2$s: the closing tag for upsell link.
+				__( 'Your current plan supports adding one group of fields per product. To add multiple groups to the same product, please %1$supgrade%2$s your plan!', 'woocommerce-product-addon' ),
+				'<a target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'multiple-fields' ) . '">',
+				'</a>'
+			) . '</i>'
+			: '';
 		$select_products_id_component = ( new \PPOM\Attach\SelectComponent() )
 			->set_id( 'attach-to-products' )
 			->set_title( __( 'Display on Specific Products', 'woocommerce-product-addon' ) )
@@ -680,10 +687,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		echo '<div class="wrap">';
 		echo '<h2>' . __( 'Provide API key below:', 'woocommerce-product-addon' ) . '</h2>';
-		echo '<p>' . __( 'If you don\'t know your API key, please login into your: <a target="_blank" href="http://wordpresspoets.com/member-area">Member area</a>', 'woocommerce-product-addon' ) . '</p>';
-
 		echo '<form onsubmit="return validate_api_wooproduct(this)">';
-		echo '<p><label id="plugin_api_key">' . __( 'Entery API key', 'woocommerce-product-addon' ) . ':</label><br /><input type="text" name="plugin_api_key" id="plugin_api_key" /></p>';
+		echo '<p><label id="plugin_api_key">' . __( 'Enter API key', 'woocommerce-product-addon' ) . ':</label><br /><input type="text" name="plugin_api_key" id="plugin_api_key" /></p>';
 		wp_nonce_field();
 		echo '<p><input type="submit" class="button-primary button" name="plugin_api_key" /></p>';
 		echo '<p id="nm-sending-api"></p>';

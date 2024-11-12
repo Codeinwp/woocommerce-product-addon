@@ -23,7 +23,7 @@ class NM_Number_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'Number Input', 'woocommerce-product-addon' );
 		$this->desc     = __( 'regular number input', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-hashtag" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-hashtag" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}

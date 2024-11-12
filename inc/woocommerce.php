@@ -38,7 +38,7 @@ function ppom_woocommerce_show_fields_on_product( $product_id, $args = null ) {
 
 	if ( ! $ppom->has_unique_datanames() ) {
 
-		printf( __( "<div class='error'>Some of your fields has duplicated datanames, please fix it</div>", 'woocommerce-product-addon' ), 'ppom' );
+		printf( '<div class="error">' . __( "Some of your fields has duplicated datanames, please fix it", 'woocommerce-product-addon' ) . '</div>', 'ppom' );
 
 		return;
 	}
@@ -160,7 +160,7 @@ function ppom_woocommerce_ajax_validate() {
 	$validate_nonce_action = 'ppom_validating_action';
 	if ( ! wp_verify_nonce( $ppom_nonce, $validate_nonce_action ) ) {
 
-		$message  = sprintf( __( '<div class="woocommerce-error" role="alert">%s</div>', 'woocommerce-product-addon' ), 'Error while validating, try again' );
+		$message  = sprintf( '<div class="woocommerce-error" role="alert">%s</div>', __(  'Error while validating, try again', 'woocommerce-product-addon' ) );
 		$response = array(
 			'status'  => 'error',
 			'message' => $message,
@@ -256,8 +256,15 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 			// Note: Checkbox is being validate by hook: ppom_has_posted_field_value
 			// $error_message = isset($field['error_message']) ? $field['error_message'] : '';
 			// $error_message = (isset($field['error_message']) && $field['error_message'] != '') ? $title.": ".$field['error_message'] : "{$title} is a required field";
-			$error_message = ( isset( $field['error_message'] ) && $field['error_message'] != '' ) ? sprintf( __( '%1$s: %2$s', 'woocommerce-product-addon' ), $title, $field['error_message'] ) : "{$title} " . __( 'is a required field', 'woocommerce-product-addon' );
-			$error_message = sprintf( __( '%s', 'woocommerce-product-addon' ), $error_message );
+			
+			$error_message = ( isset( $field['error_message'] ) && $field['error_message'] != '' )
+				? sprintf( '%1$s: %2$s', $title, $field['error_message'] )
+				: sprintf(
+					/* translators: %s: the name of the field. */
+					__( '%s is a required field', 'woocommerce-product-addon' ),
+					$title
+				);
+			$error_message = $error_message;
 			$error_message = stripslashes( $error_message );
 			ppom_wc_add_notice( $error_message );
 			$passed = false;
@@ -579,7 +586,7 @@ function ppom_woocommerce_add_fixed_fee( $cart ) {
 				$fee_price = apply_filters( 'ppom_cart_fixed_fee', $fee_price, $fee, $cart );
 
 				if ( $fee_price != 0 ) {
-					$cart->add_fee( sprintf( __( '%s', 'woocommerce-product-addon' ), esc_html( $label ) ), $fee_price, $taxable );
+					$cart->add_fee( esc_html( $label ), $fee_price, $taxable );
 					$fee_no ++;
 				}
 			}
@@ -1105,7 +1112,7 @@ function ppom_woocommerce_control_email_item_quantity( $quantity, $item ) {
 	$ppom_has_quantities = ppom_price_get_total_quantities( $ppom_fields_post, $product_id );
 
 	if ( $ppom_has_quantities > 0 ) {
-		$quantity = '<strong class="product-quantity">' . sprintf( '%s', $ppom_has_quantities ) . '</strong>';
+		$quantity = '<strong class="product-quantity">' . esc_html( $ppom_has_quantities ) . '</strong>';
 	}
 
 	return $quantity;
@@ -1144,7 +1151,14 @@ function ppom_woocommerce_cart_update_validate( $cart_validated, $cart_item_key,
 	if ( ! is_null( $max_quantity ) && $quantity > intval( $max_quantity ) ) {
 
 		$cart_validated = false;
-		wc_add_notice( sprintf( __( 'Sorry, maximum quantity is %d.', 'woocommerce-product-addon' ), $max_quantity ), 'error' );
+		wc_add_notice(
+			sprintf(
+				// translators: %d: the number of maximum quantity.
+				__( 'Sorry, maximum quantity is %d.', 'woocommerce-product-addon' ),
+				$max_quantity
+			),
+			'error'
+		);
 	}
 
 	return $cart_validated;

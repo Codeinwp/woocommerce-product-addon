@@ -23,7 +23,7 @@ class NM_Select_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'Select Input', 'woocommerce-product-addon' );
 		$this->desc     = __( 'regular select input', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-check" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-check" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}

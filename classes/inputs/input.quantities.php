@@ -23,7 +23,7 @@ class NM_Quantities_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'Variation Quantity', 'woocommerce-product-addon' );
 		$this->desc     = __( 'regular select-box input', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-list-ol" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-list-ol" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}

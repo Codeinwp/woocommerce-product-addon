@@ -23,7 +23,7 @@ class NM_Measure_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'Measure Input', 'woocommerce-product-addon' );
 		$this->desc     = __( 'Measuremnts', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-building-o" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-building-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 		add_filter( 'ppom_option_label', array( $this, 'change_option_label' ), 15, 4 );

@@ -23,7 +23,7 @@ class NM_Divider_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'Divider', 'woocommerce-product-addon' );
 		$this->desc     = __( 'regular didider input', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-pencil-square-o" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-pencil-square-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}
