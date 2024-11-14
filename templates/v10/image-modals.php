@@ -17,7 +17,7 @@ $modal_id = 'modalImage' . $image_id;
 			<img src="<?php echo esc_url( $image_full ); ?>">
 		</div>
 		<footer class="ppom-popup-footer">
-			<a href="#" class="ppom-popup-button ppom-popup-close-js">Close</a>
+			<a href="#" class="ppom-popup-button ppom-popup-close-js"><?php esc_html_e( 'Close', 'woocommerce-product-addon'); ?></a>
 		</footer>
 	</div>
 </div>

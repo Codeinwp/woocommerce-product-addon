@@ -181,7 +181,20 @@ class PPOM_Fields_Meta {
 					'finishTitle' => __( 'Done', 'woocommerce-product-addon' ),
 					'errorTitle' => __( 'Error', 'woocommerce-product-addon' ),
 					'checkFieldTitle' => __( 'Please at least check one field!', 'woocommerce-product-addon' ),
-				]
+
+				],
+				'errorOccurred' => __( 'An error occurred. Please try again.', 'woocommerce-product-addon' ),
+				'yes' => __( 'Yes', 'woocommerce-product-addon' ),
+				'no' => __( 'No', 'woocommerce-product-addon' ),
+				'updatedField' => __( 'Update Field', 'woocommerce-product-addon' ),
+				'pricePlaceholder' => __( 'Price (fix or %)', 'woocommerce-product-addon' ),
+				'choseFile' => __( 'Choose File', 'woocommerce-product-addon' ),
+				'upload' => __( 'Upload', 'woocommerce-product-addon' ),
+				'stock' => __( 'Stock', 'woocommerce-product-addon' ),
+				'metaIds' => __( 'Meta IDs', 'woocommerce-product-addon' ),
+				'cannotRemoveMoreOption' => __( 'Cannot Remove More Option', 'woocommerce-product-addon' ),
+				'dataNameRequired' => __( 'Data Name must be required', 'woocommerce-product-addon' ),
+				'dataNameExists' => __( 'Data Name already exists', 'woocommerce-product-addon' )
 			]
 		);
 

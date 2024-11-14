@@ -133,6 +133,8 @@ ppom_load_template( 'admin/product-modal.php' );
 		<p>
 			<?php esc_html_e( 'We\'re sorry, importing fields is not available on your plan. Please upgrade to the Pro plan to unlock all these features and enhance your product fields management capabilities.', 'woocommerce-product-addon' ); ?>
 		</p>
-		<a class="btn btn-success" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'lockedimport' ) ); ?>" target="_blank"><?php esc_html_e( 'Upgrade to PRO', 'woocommerce-product-addon' ); ?></a>
+		<a class="btn btn-success" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'lockedimport' ) ); ?>" target="_blank">
+			<?php esc_html_e( 'Upgrade to PRO', 'woocommerce-product-addon' ); ?>
+		</a>
 	</div>
 </div>
