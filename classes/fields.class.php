@@ -1185,8 +1185,8 @@ class PPOM_Fields_Meta {
 						$html_input .= '<th>' . $title . ' ' . $deleteIcon . '</th>';
 					}
 				} else {
-					$html_input .= '<th>Quantity Range</th>';
-					$html_input .= '<th>Base Price</th>';
+					$html_input .= '<th>' . esc_html__( 'Quantity Range', 'woocommerce-product-addon' ) . '</th>';
+					$html_input .= '<th>' . esc_html__( 'Base Price', 'woocommerce-product-addon' ) . '</th>';
 				}
 
 				$html_input .= '</tr>';
