@@ -105,7 +105,7 @@ class NM_Textarea_wooproduct extends PPOM_Inputs {
 				'type'        => 'checkbox',
 				'title'       => __( 'Rich Editor', 'woocommerce-product-addon' ),
 				'desc'        => __( 'Enable WordPress rich editor.', 'woocommerce-product-addon' ),
-				'link'        => __( '<a target="_blank" href="https://codex.wordpress.org/Function_Reference/wp_editor">Editor</a>', 'woocommerce-product-addon' ),
+				'link'        => '<a target="_blank" href="https://codex.wordpress.org/Function_Reference/wp_editor">' . __( 'Editor', 'woocommerce-product-addon' ) . '</a>',
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'desc_tooltip'    => array(

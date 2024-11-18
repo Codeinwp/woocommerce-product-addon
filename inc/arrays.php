@@ -311,7 +311,7 @@ function ppom_array_settings() {
 		),
 
 		array(
-			'name' => __( 'Advance Features (PRO)', 'woocommerce-product-addon' ),
+			'name' => __( 'Advance Features', 'woocommerce-product-addon' ) . ' (' . __( 'PRO', 'woocommerce-product-addon' ) .')',
 			'type' => 'title',
 			'desc' => __( 'These options will work when PRO version is installed', 'woocommerce-product-addon' ),
 			'id'   => 'ppom_pro_features',

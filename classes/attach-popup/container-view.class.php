@@ -12,7 +12,7 @@ class ContainerView {
 	 * @return string
 	 */
 	public function render() {
-		return __( 'Empty', 'woocommerce-product-addon' );
+		return '';
 	}
 
 	/**
