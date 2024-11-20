@@ -570,10 +570,13 @@ $fields_groups = [
 										<p>
 											<?php
 											echo sprintf(
-												// translators: %1$s the opening HTML link tag, %2$s the closing HTML link tag.
-												__( 'Custom CSS and JS customization is not available on your current plan. %1$sUpgrade to the Pro%2$s plan to unlock the ability to fully customize your fields\' appearance and functionality.', 'woocommerce-product-addon' ),
-												'<a href="' . esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, 'customstyle' ) ) ) . '" target="_blank">',
-												'</a>'
+												// translators: %1$s the upgrade link with label: 'Upgrade To Pro'.
+												__( 'Custom CSS and JS customization is not available on your current plan. %1$s plan to unlock the ability to fully customize your fields\' appearance and functionality.', 'woocommerce-product-addon' ),
+												sprintf(
+													'<a href="%s" target="_blank">%s</a>',
+													esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, 'customstyle' ) ) ),
+													__( 'Upgrade to the Pro', 'woocommerce-product-addon' )
+												)
 											);
 											?>
 										</p>

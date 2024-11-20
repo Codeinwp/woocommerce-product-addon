@@ -181,10 +181,14 @@ function ppom_meta_list( $post ) {
 	$html .= '<hr>';
 	$html .= '<div class="ppom-settings-container">';
 	$html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input disabled type="checkbox">' . __( 'Enable Enquiry Form', 'woocommerce-product-addon' ) . '<span class="woocommerce-help-tip" data-tip="' . __( 'Enhances your product pages by adding a customizable enquiry button. It allows customers to send inquiries directly to the admin about products with PPOM Fields via email.', 'woocommerce-product-addon' ) . '"></span><i>' . sprintf(
-		// translators: %1$s the opening link HTML tag, %2$s the close link HTML tag.
-		__( 'Available in the %1$sPremium%2$s version.', 'woocommerce-product-addon' ),
-		'<a  target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'enable-enquiry', 'metabox' ) . '">',
-		'</a>'
+		// translators: %1$s the link to Store with label: 'Premium'.
+		__( 'Available in the %1$s version.', 'woocommerce-product-addon' ),
+		sprintf(
+			'<a href="%s" target="_blank">%s</a>',
+			esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'enable-enquiry', 'metabox' ) ),
+			__( 'Premium', 'woocommerce-product-addon' )
+		)
+		
 	) . '</i></label>';
 	$html .= '</div>';
 

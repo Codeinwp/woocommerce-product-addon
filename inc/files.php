@@ -407,7 +407,7 @@ function ppom_delete_file() {
 	$ppom_nonce        = sanitize_key( $_REQUEST['ppom_nonce'] );
 	$file_nonce_action = 'ppom_deleting_file_action';
 	if ( ! wp_verify_nonce( $ppom_nonce, $file_nonce_action ) ) {
-		// translators: $s: the name of file
+		// translators: %s: the name of file
 		printf( __( 'Verification failed for file: %s', 'woocommerce-product-addon' ), $file_name );
 		die( 0 );
 	}
@@ -433,11 +433,11 @@ function ppom_delete_file() {
 		if ( ! file_exists( $file_path ) ) {
 			_e( 'File removed', 'woocommerce-product-addon' );
 		} else {
-			// translators: $s: the name of file
+			// translators: %s: the name of file
 			printf( __( 'Error while deleting file %s', 'woocommerce-product-addon' ), $file_path );
 		}
 	} else {
-		// translators: $s: the name of file
+		// translators: %s: the name of file
 		printf( __( 'The file %s does not exists.', 'woocommerce-product-addon' ), $file_path );
 	}
 

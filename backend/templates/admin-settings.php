@@ -100,11 +100,14 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
                                                 <?php if ( ! $is_available ): ?>
                                                     <div class="ppom-notice-upsell"><p>
                                                             <?php echo sprintf( 
-																// translators: %1$s: the name of plugin feature, %2$s: opening anchor tag, %3$s: closing anchor tag.
-																__( '%1$s customization is not available on your current plan. %2$sUpgrade to the Pro%2$s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ),
+																// translators: %1$s: the name of plugin feature, %2$s: the upgrade link.
+																__( '%1$s customization is not available on your current plan. %2$s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ),
 																esc_html( $title ),
-																sprintf( '<a href="%s" target="_blank">', esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ) ),
-																'</a>'
+																sprintf(
+																	'<a href="%s" target="_blank">%s</a>',
+																	esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ),
+																	__( 'Upgrade to the Pro', 'woocommerce-product-addon' )
+																)
 															); ?>
                                                         </p>
                                                     </div>
@@ -149,11 +152,14 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																		<?php if ( $is_available && !$is_input_available ): ?>
                                                                             <div class="ppom-notice-upsell"><p>
 																					<?php echo sprintf(
-																						// translators: %1$s: the name of plugin feature, %2$s: opening anchor tag, %3$s: closing anchor tag.
-																						__( '%1$s customization is not available on your current plan. %2$sUpgrade to the Pro%3$s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ),
+																						// translators: %1$s: the name of plugin feature, %2$s: opening anchor tag.
+																						__( '%1$s customization is not available on your current plan. %2$s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ),
 																						esc_html( $title ),
-																						sprintf( '<a href="%s" target="_blank">', esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ) ),
-																						'</a>' 
+																						sprintf(
+																							'<a href="%s" target="_blank">%s</a>',
+																							esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ),
+																							__( 'Upgrade to the Pro', 'woocommerce-product-addon' )
+																						)
 																					); ?>
                                                                                 </p>
                                                                             </div>

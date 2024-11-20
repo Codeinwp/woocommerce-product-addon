@@ -793,7 +793,7 @@ function ppom_generate_field_price( $field_price, $field_meta, $apply, $option =
 	$option_id  = isset( $option['option_id'] ) ? $option['option_id'] : '';
 
 	if ( $field_type == 'file' ) {
-		// translators: $d: the number of files options.
+		// translators: %d: the number of files options.
 		$option_label = sprintf( __( '%d Files', 'woocommerce-product-addon' ), count( $option ) );
 	}
 

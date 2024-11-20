@@ -89,11 +89,11 @@ foreach ( $ppom_fields_meta as $meta ) {
 		<span class="ppom-option-notice">
 			<?php
 				printf(
-					// translators: %1$s the name of the field, %2$s the opening tag for HTML strong, %3$s the closing tag for HTML strong.
-					__( 'The %1$s field cannot be used because the Conditional Field Repeater mode is activated, although Legacy Input Rendering is enabled. %2$sConditional Field Repeater%3$s cannot work if the %2$sLegacy Input Rendering%3$s is enabled.' ),
-					sprintf('<strong>%s</strong>', esc_html( $title ) ),
-					'<strong>',
-					'</strong>'
+					// translators: %1$s: the name of the field, %2$s: label 'Conditional Field Repeater' with bold, %3$s: label 'Legacy Input Rendering' with bold.
+					__( 'The %1$s field cannot be used because the Conditional Field Repeater mode is activated, although Legacy Input Rendering is enabled. %2$s cannot work if the %3$s is enabled.', 'woocommerce-product-addon' ),
+					'<strong>' . esc_html( $title ) . '</strong>',
+					'<strong>' . __( 'Conditional Field Repeater', 'woocommerce-product-addon' ) . '</strong>',
+					'<strong>' . __( 'Legacy Input Rendering', 'woocommerce-product-addon' ) . '</strong>',
 				);
 			?>
 		</span>

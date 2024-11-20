@@ -173,11 +173,9 @@ function ppom_array_settings() {
 		array(
 			'title' => 'Settings Panel Migration',
 			'type'  => 'title',
-			'desc'  => wp_sprintf(
-				// translators: %1$s: the opening HTML link tags, %2$s: the closing HTML link tags.
-				__( 'Please migrate settings to new settings panel framework. %1$sStart Migration%2$s', 'woocommerce-product-addon' ),
-				'<a class="page-title-action" href="' . esc_url( $ppom_migrate_url ) . '">',
-				'</a>'
+			'desc'  => esc_html(
+				__( 'Please migrate settings to new settings panel framework.', 'woocommerce-product-addon' ) . ' ' .
+				'<a class="page-title-action" href="' . esc_url( $ppom_migrate_url ) . '">' . __( 'Start Migration', 'woocommerce-product-addon' ) . '</a>'
 			),
 			'id'    => 'ppom_settings_migration',
 		),
@@ -185,11 +183,9 @@ function ppom_array_settings() {
 		array(
 			'title' => 'PPOM Labels',
 			'type'  => 'title',
-			'desc'  => wp_sprintf(
-				// translators: %1$s: the opening HTML link tags, %2$s: the closing HTML link tags.
-				__( 'Following settings help you the control and customize plugin as per your need. %1$sPPOM Fields Manager%2$s', 'woocommerce-product-addon' ),
-				'<a href="' . esc_url( $ppom_fields ) . '">',
-				'</a>'
+			'desc'  => esc_html(
+				__( 'Following settings help you the control and customize plugin as per your need.', 'woocommerce-product-addon' ) . ' ' .
+				'<a href="' . esc_url( $ppom_fields ) . '">' . __( 'PPOM Fields Manager', 'woocommerce-product-addon' ) . '</a>'
 			),
 			'id'    => 'ppom_labels_settings',
 		),

@@ -272,10 +272,13 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$current_saved_value          = $this->get_db_field( $ppom_id );
 		$pro_multiple_fields          = ! ppom_pro_is_installed() || 'valid' !== $license_status 
 			? '</br><i style="font-size: 90%">' . sprintf(
-				// translators: %1$s: the opening tag for upsell link, %2$s: the closing tag for upsell link.
-				__( 'Your current plan supports adding one group of fields per product. To add multiple groups to the same product, please %1$supgrade%2$s your plan!', 'woocommerce-product-addon' ),
-				'<a target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'multiple-fields' ) . '">',
-				'</a>'
+				// translators: %1$s: the link to the store with label 'upgrade'.
+				__( 'Your current plan supports adding one group of fields per product. To add multiple groups to the same product, please %1$ your plan!', 'woocommerce-product-addon' ),
+				sprintf(
+					'<a href="%s" target="_blank">%s</a>',
+					esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'multiple-fields' ) ),
+					__( 'Upgrade to the Pro', 'woocommerce-product-addon' )
+				)
 			) . '</i>'
 			: '';
 		$select_products_id_component = ( new \PPOM\Attach\SelectComponent() )
