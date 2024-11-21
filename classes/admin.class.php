@@ -239,14 +239,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		// existing meta group tables show only ppom main page
 		if ( $action != 'new' && $do_meta != 'edit' && $view != 'addons' && $view != 'changelog' ) {
 			ppom_load_template( 'admin/existing-meta.php' );
-			
+
 			// NOTE: Allow only for Tier 1 Plan or lower if license is present.
 			$should_load_banner = NM_PersonalizedProduct::LICENSE_PLAN_1 >= NM_PersonalizedProduct::get_license_category( intval( apply_filters( 'product_ppom_license_plan', 0 ) ) );
-			
+
 			if ( $should_load_banner ) {
 				do_action( 'themeisle_sdk_load_banner', 'ppom' );
 			}
-			
+
 		}
 
 		echo '</div>';
@@ -270,12 +270,12 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$ppom_id                      = intval( $_GET['ppom_id'] );
 		$license_status               = apply_filters( 'product_ppom_license_status', '' );
 		$current_saved_value          = $this->get_db_field( $ppom_id );
-		$pro_multiple_fields          = ! ppom_pro_is_installed() || 'valid' !== $license_status 
+		$pro_multiple_fields          = ! ppom_pro_is_installed() || 'valid' !== $license_status
 			? '</br><i style="font-size: 90%">' . sprintf(
 				// translators: %1$s: the link to the store with label 'upgrade'.
-				__( 'Your current plan supports adding one group of fields per product. To add multiple groups to the same product, please %1$ your plan!', 'woocommerce-product-addon' ),
+				__( 'Your current plan supports adding one group of fields per product. To add multiple groups to the same product, please %1$s your plan!', 'woocommerce-product-addon' ),
 				sprintf(
-					'<a href="%s" target="_blank">%s</a>',
+					'<a href="%1$s" target="_blank">%2$s</a>',
 					esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'multiple-fields' ) ),
 					__( 'Upgrade to the Pro', 'woocommerce-product-addon' )
 				)
@@ -487,7 +487,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * Retrieves WooCommerce product tags and checks if they are used in the current values.
 	 *
 	 * @param array $current_values The current values to check against.
-	 * 
+	 *
 	 * @return array An array containing the options of product tags and a flag indicating if any category is used.
 	 */
 	function get_wc_tags( $current_values ) {
@@ -649,7 +649,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				// translators: %1$d: number of products, %2$d: number of categories, %3$d: number of tags.
 				__('PPOM updated for %1$d Products, %2$d Categories and %3$d Tags.', 'woocommerce-product-addon'),
 				$updated_products,
-				$updated_cat, 
+				$updated_cat,
 				$updated_tags
 			),
 			'status'  => 'success',
@@ -887,7 +887,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		) {
 			return;
 		}
-		
+
 		NM_PersonalizedProduct::activate_plugin();
 	}
 }
