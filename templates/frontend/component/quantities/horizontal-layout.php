@@ -70,7 +70,11 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 				$required     = ( $fm->required() == 'on' ? 'required' : '' );
 				$label        = $opt['raw'];
 				$name         = $fm->form_name() . '[' . htmlentities( $label ) . ']';
-				$in_stock     = $manage_stock ? sprintf( __( '%s in stock', 'woocommerce-product-addon' ), $stock ) : '';
+				$in_stock     = $manage_stock ? sprintf(
+					/* translators: %s: stock quantity */
+					__( '%s in stock', 'woocommerce-product-addon' ),
+					$stock
+				) : '';
 				$out_of_stock = $manage_stock && $stock < 1 ? true : false;
 				$disabled     = $out_of_stock ? 'disabled="disabled"' : '';
 				$min          = $out_of_stock ? 0 : $min;
@@ -113,7 +117,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 					>
 
 					<?php
-					printf( __( '<span class="ppom-instock">%s</span>', 'woocommerce-product-addon' ), $in_stock );
+					printf( '<span class="ppom-instock">%s</span>', $in_stock );
 					?>
 				</td>
 			<?php } ?>

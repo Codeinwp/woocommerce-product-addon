@@ -1,4 +1,4 @@
-// @ts-check
+/* global ppom_vars */
 "use strict";
 
 const FIELD_COMPATIBLE_WITH_SELECT_OPTIONS = [ 'select', 'radio', 'switcher', 'image', 'conditional_meta' ];
@@ -166,7 +166,9 @@ jQuery(function($) {
             }
         })
         .catch(() => {
-            jQuery(".ppom-meta-save-notice").html("An error occurred. Please try again.").css({ 'background-color': '#ee8b94', 'padding': '8px', 'border-left': '5px solid #c00' });
+            jQuery(".ppom-meta-save-notice")
+                .html( ppom_vars.i18n.errorOccurred )
+                .css({ 'background-color': '#ee8b94', 'padding': '8px', 'border-left': '5px solid #c00' });
         });
     });
 
@@ -334,10 +336,10 @@ jQuery(function($) {
         // console.log(field_title);
 
         if (required == true) {
-            var _ok = 'Yes';
+            var _ok = ppom_vars.i18n.yes;
         }
         else {
-            _ok = 'No';
+            _ok = ppom_vars.i18n.no;
         }
         if (placeholder == null) {
             placeholder = '-';
@@ -387,7 +389,7 @@ jQuery(function($) {
         });
 
         $(this).removeClass('ppom-add-field').addClass('ppom-update-field');
-        $(this).html('Update Field');
+        $(this).html( ppom_vars.i18n.updatedField );
 
     });
 
@@ -415,10 +417,10 @@ jQuery(function($) {
         var type = $(this).attr('data-field-type');
 
         if (required == true) {
-            var _ok = 'Yes';
+            var _ok = ppom_vars.i18n.yes;
         }
         else {
-            _ok = 'No';
+            _ok = ppom_vars.i18n.no;
         }
 
         var row = $('.ppom_field_table tbody').find('.row_no_' + id);
@@ -723,7 +725,7 @@ jQuery(function($) {
         var option_index = parseInt($uploaded_image_container.find('#ppom-meta-opt-index').val());
         var main_wrapper = $(this).closest('.ppom-slider');
         var field_index = main_wrapper.find('.ppom-fields-actions').attr('data-field-no');
-        var price_placeholder = 'Price (fix or %)';
+        var price_placeholder = ppom_vars.i18n.pricePlaceholder;
 
         var wp_media_type = 'image';
         if (meta_type == 'audio') {
@@ -732,12 +734,12 @@ jQuery(function($) {
 
         var button = $(this),
             custom_uploader = wp.media({
-                title: 'Choose File',
+                title: ppom_vars.i18n.choseFile,
                 library: {
                     type: wp_media_type
                 },
                 button: {
-                    text: 'Upload'
+                    text: ppom_vars.i18n.upload
                 },
                 multiple: true
             }).on('select', function() {
@@ -762,7 +764,7 @@ jQuery(function($) {
 
                     var price_metatype = 'price';
                     var stock_metatype = 'stock';
-                    var stock_placeholder = 'Stock';
+                    var stock_placeholder = ppom_vars.i18n.stock;
 
                     // Set name key for imageselect addon
                     if (meta_type == 'imageselect') {
@@ -780,7 +782,7 @@ jQuery(function($) {
                         meta_type = 'images';
                         var class_name = 'data-options ui-sortable-handle';
                         var condidtion_attr = 'image_options';
-                        price_placeholder = 'Meta IDs';
+                        price_placeholder = ppom_vars.i18n.metaIds;
                         price_metatype = 'meta_id';
                     }
                     else {
@@ -834,7 +836,7 @@ jQuery(function($) {
         $uploaded_image_container.find('#ppom-meta-opt-index').val(option_index + 1);
         var main_wrapper = $(this).closest('.ppom-slider');
         var field_index = main_wrapper.find('.ppom-fields-actions').attr('data-field-no');
-        var price_placeholder = 'Price (fix or %)';
+        var price_placeholder = ppom_vars.i18n.pricePlaceholder;
         wp.media.editor.send.attachment = function(props, attachment) {
             // console.log(attachment);
             var existing_images;
@@ -850,7 +852,7 @@ jQuery(function($) {
 
             var price_metatype = 'price';
             var stock_metatype = 'stock';
-            var stock_placeholder = 'Stock';
+            var stock_placeholder = ppom_vars.i18n.stock;
 
             // Set name key for imageselect addon
             if (meta_type == 'imageselect') {
@@ -868,7 +870,7 @@ jQuery(function($) {
                 meta_type = 'images';
                 var class_name = 'data-options ui-sortable-handle';
                 var condidtion_attr = 'image_options';
-                price_placeholder = 'Meta IDs';
+                price_placeholder = ppom_vars.i18n.metaIds;
                 price_metatype = 'meta_id';
             }
             else {
@@ -1025,7 +1027,7 @@ jQuery(function($) {
             $(this).parents('.data-options:first').remove();
         }
         else {
-            alert('Cannot Remove More Option');
+            alert( ppom_vars.i18n.cannotRemoveMoreOption );
         }
 
         e.preventDefault();
@@ -1126,10 +1128,10 @@ jQuery(function($) {
             return metaFieldId;
         }).get();
         if (data_name == '') {
-            var msg = 'Data Name must be required';
+            var msg = ppom_vars.i18n.dataNameRequired;
             var is_ok = false;
         } else if (('new'===context || ( 'update'===context && savedDataName !== data_name ) ) && $.inArray(data_name, allDataName) != -1) {
-            var msg = 'Data Name already exists';
+            var msg = ppom_vars.i18n.dataNameExists;
             var is_ok = false;
         }
         else {

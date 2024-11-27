@@ -23,7 +23,7 @@ class NM_Color_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'Color picker', 'woocommerce-product-addon' );
 		$this->desc     = __( 'Color pallete input', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-modx" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-modx" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}

@@ -29,7 +29,7 @@ echo '<input type="hidden" name="ppom_cart_key" value="' . esc_attr( $cart_key )
 // Price placeholder, it will be cloned via js in ppom-price.js
 echo '<div id="ppom-price-cloner-wrapper">';
 echo '<span id="ppom-price-cloner">';
-printf( __( get_woocommerce_price_format(), 'woocommerce-product-addon' ), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' );
+printf( get_woocommerce_price_format(), get_woocommerce_currency_symbol(), '<span class="ppom-price"></span>' );
 echo '</span>';
 echo '</div>';
 
@@ -79,6 +79,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 	}
 
 	if ( empty( $data_name ) ) {
+		// translators: $s: the name of the field.
 		printf( __( 'Please provide data name property for %s', 'woocommerce-product-addon' ), $title );
 		continue;
 	}
@@ -87,7 +88,13 @@ foreach ( $ppom_fields_meta as $meta ) {
 	if( ppom_check_pro_compatibility('cond_field_repeat') && isset( $meta['cond_field_repeater_enable'] ) && $meta['cond_field_repeater_enable'] === 'on' ) {?>
 		<span class="ppom-option-notice">
 			<?php
-				printf( 'The %s field cannot be used because the Conditional Field Repeater mode is activated, although Legacy Input Rendering is enabled. <strong>Conditional Field Repeater</strong> cannot work if the <strong>Legacy Input Rendering</strong> is enabled.', sprintf('<strong>%s</strong>', esc_html( $title ) ) );
+				printf(
+					// translators: %1$s: the name of the field, %2$s: label 'Conditional Field Repeater' with bold, %3$s: label 'Legacy Input Rendering' with bold.
+					__( 'The %1$s field cannot be used because the Conditional Field Repeater mode is activated, although Legacy Input Rendering is enabled. %2$s cannot work if the %3$s is enabled.', 'woocommerce-product-addon' ),
+					'<strong>' . esc_html( $title ) . '</strong>',
+					'<strong>' . __( 'Conditional Field Repeater', 'woocommerce-product-addon' ) . '</strong>',
+					'<strong>' . __( 'Legacy Input Rendering', 'woocommerce-product-addon' ) . '</strong>',
+				);
 			?>
 		</span>
 		<?php
@@ -415,7 +422,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 
 			$options = ppom_array_get_timezone_list( $regions, $show_time );
 			if ( ! empty( $first_option ) ) {
-				$options[''] = sprintf( __( '%s', 'woocommerce-product-addon' ), $first_option );
+				$options[''] = $first_option;
 			}
 
 			// ppom_pa($options);

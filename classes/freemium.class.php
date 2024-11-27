@@ -49,7 +49,7 @@ class PPOM_Freemium {
 			return $tabs;
 		}
 		$tabs[self::TAB_KEY_FREEMIUM_CFR] = array(
-			'label' => __( 'Conditional Repeater (PRO)', 'woocommerce-product-addon' ),
+			'label' => __( 'Conditional Repeater', 'woocommerce-product-addon' ). ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')',
 			'class' => array( 'ppom-tabs-label' ),
 			'field_depend' => array( 'all' )
 		);
