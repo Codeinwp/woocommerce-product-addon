@@ -23,7 +23,7 @@ class NM_Textarea_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'Textarea Input', 'woocommerce-product-addon' );
 		$this->desc     = __( 'regular textarea input', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-file-text-o" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-file-text-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}
@@ -77,7 +77,7 @@ class NM_Textarea_wooproduct extends PPOM_Inputs {
 			'class'           => array(
 				'type'        => 'text',
 				'title'       => __( 'Class', 'woocommerce-product-addon' ),
-				'desc'        => __( 'Insert an additional class(es) (separateb by comma) for more personalization.', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Insert an additional class(es) (separated by comma) for more personalization.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'width'           => array(
@@ -105,7 +105,7 @@ class NM_Textarea_wooproduct extends PPOM_Inputs {
 				'type'        => 'checkbox',
 				'title'       => __( 'Rich Editor', 'woocommerce-product-addon' ),
 				'desc'        => __( 'Enable WordPress rich editor.', 'woocommerce-product-addon' ),
-				'link'        => __( '<a target="_blank" href="https://codex.wordpress.org/Function_Reference/wp_editor">Editor</a>', 'woocommerce-product-addon' ),
+				'link'        => '<a target="_blank" href="https://codex.wordpress.org/Function_Reference/wp_editor">' . __( 'Editor', 'woocommerce-product-addon' ) . '</a>',
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'desc_tooltip'    => array(

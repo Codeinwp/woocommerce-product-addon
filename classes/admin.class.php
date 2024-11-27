@@ -150,7 +150,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 				$menu = add_submenu_page(
 					$page ['parent_slug'],
-					__( $page ['page_title'], 'woocommerce-product-addon' ),
+					$page ['page_title'],
 					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
 					$page ['slug'],
@@ -165,7 +165,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				$cap = 'ppom_options_page';
 				// Menu page for roles set by PPOM Permission Settings
 				$menu = add_menu_page(
-					__( $page ['page_title'], 'woocommerce-product-addon' ),
+					$page ['page_title'],
 					__( 'PPOM Fields', 'woocommerce-product-addon' ),
 					$cap,
 					$page ['slug'],
@@ -239,14 +239,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		// existing meta group tables show only ppom main page
 		if ( $action != 'new' && $do_meta != 'edit' && $view != 'addons' && $view != 'changelog' ) {
 			ppom_load_template( 'admin/existing-meta.php' );
-			
+
 			// NOTE: Allow only for Tier 1 Plan or lower if license is present.
 			$should_load_banner = NM_PersonalizedProduct::LICENSE_PLAN_1 >= NM_PersonalizedProduct::get_license_category( intval( apply_filters( 'product_ppom_license_plan', 0 ) ) );
-			
+
 			if ( $should_load_banner ) {
 				do_action( 'themeisle_sdk_load_banner', 'ppom' );
 			}
-			
+
 		}
 
 		echo '</div>';
@@ -270,7 +270,17 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$ppom_id                      = intval( $_GET['ppom_id'] );
 		$license_status               = apply_filters( 'product_ppom_license_status', '' );
 		$current_saved_value          = $this->get_db_field( $ppom_id );
-		$pro_multiple_fields          = ! ppom_pro_is_installed() || 'valid' !== $license_status ? '</br><i style="font-size: 90%">' . sprintf( __( 'Your current plan supports adding one group of fields per product. To add multiple groups to the same product, please %supgrade%s your plan!', 'woocommerce-product-addon' ), '<a target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'multiple-fields' ) . '">', '</a>' ) . '</i>' : '';
+		$pro_multiple_fields          = ! ppom_pro_is_installed() || 'valid' !== $license_status
+			? '</br><i style="font-size: 90%">' . sprintf(
+				// translators: %1$s: the link to the store with label 'upgrade'.
+				__( 'Your current plan supports adding one group of fields per product. To add multiple groups to the same product, please %1$s your plan!', 'woocommerce-product-addon' ),
+				sprintf(
+					'<a href="%1$s" target="_blank">%2$s</a>',
+					esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'multiple-fields' ) ),
+					__( 'Upgrade to the Pro', 'woocommerce-product-addon' )
+				)
+			) . '</i>'
+			: '';
 		$select_products_id_component = ( new \PPOM\Attach\SelectComponent() )
 			->set_id( 'attach-to-products' )
 			->set_title( __( 'Display on Specific Products', 'woocommerce-product-addon' ) )
@@ -477,7 +487,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * Retrieves WooCommerce product tags and checks if they are used in the current values.
 	 *
 	 * @param array $current_values The current values to check against.
-	 * 
+	 *
 	 * @return array An array containing the options of product tags and a flag indicating if any category is used.
 	 */
 	function get_wc_tags( $current_values ) {
@@ -635,7 +645,13 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		self::save_categories_and_tags( $ppom_id, $categories_to_attach, $tags_to_attach );
 
 		$response = array(
-			'message' => "PPOM updated for {$updated_products} Products, {$updated_cat} Categories and {$updated_tags} Tags.",
+			'message' => sprintf(
+				// translators: %1$d: number of products, %2$d: number of categories, %3$d: number of tags.
+				__('PPOM updated for %1$d Products, %2$d Categories and %3$d Tags.', 'woocommerce-product-addon'),
+				$updated_products,
+				$updated_cat,
+				$updated_tags
+			),
 			'status'  => 'success',
 		);
 
@@ -680,10 +696,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		echo '<div class="wrap">';
 		echo '<h2>' . __( 'Provide API key below:', 'woocommerce-product-addon' ) . '</h2>';
-		echo '<p>' . __( 'If you don\'t know your API key, please login into your: <a target="_blank" href="http://wordpresspoets.com/member-area">Member area</a>', 'woocommerce-product-addon' ) . '</p>';
-
 		echo '<form onsubmit="return validate_api_wooproduct(this)">';
-		echo '<p><label id="plugin_api_key">' . __( 'Entery API key', 'woocommerce-product-addon' ) . ':</label><br /><input type="text" name="plugin_api_key" id="plugin_api_key" /></p>';
+		echo '<p><label id="plugin_api_key">' . __( 'Enter API key', 'woocommerce-product-addon' ) . ':</label><br /><input type="text" name="plugin_api_key" id="plugin_api_key" /></p>';
 		wp_nonce_field();
 		echo '<p><input type="submit" class="button-primary button" name="plugin_api_key" /></p>';
 		echo '<p id="nm-sending-api"></p>';
@@ -873,7 +887,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		) {
 			return;
 		}
-		
+
 		NM_PersonalizedProduct::activate_plugin();
 	}
 }

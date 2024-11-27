@@ -486,7 +486,7 @@ class PPOM_FRONTEND_SCRIPTS {
 				$input_js_vars['wc_no_decimal']            = $decimal_palces;
 				$input_js_vars['wc_product_price']         = ppom_get_product_price( $product, '', 'product' );
 				$input_js_vars['wc_product_regular_price'] = ppom_get_product_regular_price( $product );
-				$input_js_vars['product_title']            = sprintf( __( '%s', 'woocommerce-product-addon' ), $product->get_title() );
+				$input_js_vars['product_title']            = $product->get_title();
 				$input_js_vars['show_price_per_unit']      = $show_price_per_unit;
 				$input_js_vars['show_option_price']        = $ppom->price_display;
 				$input_js_vars['product_id']               = $product_id;
@@ -566,12 +566,12 @@ class PPOM_FRONTEND_SCRIPTS {
 					'wc_thousand_sep'           => wc_get_price_thousand_separator(),
 					'wc_currency_pos'           => get_option( 'woocommerce_currency_pos' ),
 					'wc_decimal_sep'            => get_option( 'woocommerce_price_decimal_sep' ),
-					'total_discount_label'      => sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_total_discount ),
+					'total_discount_label'      => $ppom_label_total_discount,
 					'price_matrix_heading'      => '',
-					'product_base_label'        => sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_product_price ),
-					'option_total_label'        => sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_option_total ),
-					'fixed_fee_heading'         => sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_fixed_fee ),
-					'total_without_fixed_label' => sprintf( __( '%s', 'woocommerce-product-addon' ), $ppom_label_total ),
+					'product_base_label'        => $ppom_label_product_price,
+					'option_total_label'        => $ppom_label_option_total,
+					'fixed_fee_heading'         => $ppom_label_fixed_fee,
+					'total_without_fixed_label' => $ppom_label_total,
 					'product_quantity_label'    => __( 'Product Quantity', 'woocommerce-product-addon' ),
 					'per_unit_label'            => __( 'unit', 'woocommerce-product-addon' ),
 					'text_quantity'             => __( 'Quantity', 'woocommerce-product-addon' ),

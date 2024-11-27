@@ -23,7 +23,7 @@ class NM_Email_wooproduct extends PPOM_Inputs {
 
 		$this->title    = __( 'Email Input', 'woocommerce-product-addon' );
 		$this->desc     = __( 'regular email input', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-user-plus" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->icon     = '<i class="fa fa-user-plus" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}
@@ -59,7 +59,7 @@ class NM_Email_wooproduct extends PPOM_Inputs {
 			'class'           => array(
 				'type'        => 'text',
 				'title'       => __( 'Class', 'woocommerce-product-addon' ),
-				'desc'        => __( 'Insert an additional class(es) (separateb by comma) for more personalization.', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Insert an additional class(es) (separated by comma) for more personalization.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'width'           => array(

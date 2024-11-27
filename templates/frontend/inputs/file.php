@@ -34,8 +34,12 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 
 	<!-- if title of field exist -->
 	<?php if ( $field_label ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo sprintf( __( '%s', 'woocommerce-product-addon' ), $field_label ); ?></label>
+		<label
+			class="<?php echo esc_attr( $fm->label_classes() ); ?>"
+			for="<?php echo esc_attr( $fm->data_name() ); ?>"
+		>
+			<?php echo esc_html( $field_label ); ?>
+		</label>
 	<?php endif ?>
 
 

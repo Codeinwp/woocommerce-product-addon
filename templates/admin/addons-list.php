@@ -50,7 +50,12 @@ $addons_list = ppom_array_get_addons_details();
 							<div class="ppom_addons_model_heading_button_display">
 								<h4 class="ppom_addons_model_card_title"><?php echo $addon_title; ?></h4>
 								<?php if ( ! ppom_pro_is_installed() ) : ?>
-									<span class="badge badge-secondary"><?php esc_html_e('PRO', 'woocommerce-product-addon'); ?></span>
+									<span class="badge badge-secondary">
+										<?php
+										// translators: it marks if a feature is locked under a paid plan. 
+										esc_html_e('PRO', 'woocommerce-product-addon');
+										?>
+									</span>
 								<?php endif; ?>
 							</div>
 							<hr>
