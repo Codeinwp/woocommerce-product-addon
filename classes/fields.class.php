@@ -990,6 +990,8 @@ class PPOM_Fields_Meta {
 					$html_input .= '</div>';
 
 					$html_input .= '<div class="col-md-3 col-sm-3">';
+					$html_input .= '<select name="ppom[' . esc_attr( $field_index ) . '][conditions][rules][0][element_values]" class="form-control ppom-conditional-keys ppom-hide-element" data-metatype="element_values">';
+					$html_input .= '</select>';
 					$html_input .= '<input name="ppom[' . esc_attr( $field_index ) . '][conditions][rules][0][element_constant]" class="form-control ppom-conditional-keys ppom-hide-element" data-metatype="element_constant"  >';
 
 					$html_input .= '<div class="ppom-between-input-container ppom-hide-element"> ';
