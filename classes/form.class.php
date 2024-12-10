@@ -134,7 +134,11 @@ class PPOM_Form {
 			}
 
 			if ( empty( $data_name ) ) {
-				printf( __( 'Please provide data name property for %s', 'woocommerce-product-addon' ), $title );
+				printf(
+					// translators: $s: the name of the field.
+					__( 'Please provide data name property for %s', 'woocommerce-product-addon' ),
+					$title
+				);
 				continue;
 			}
 

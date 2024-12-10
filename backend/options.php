@@ -487,7 +487,7 @@ function ppom_load_pro_options() {
 		'ppom-enf-btn-class'      => array(
 			'type'  => 'text',
 			'title' => __( 'Button Class', 'woocommerce-product-addon' ),
-			'desc'  => __( ' Add custom CSS classes to the enquiry form button, separated by commas.', 'woocommerce-product-addon' ),
+			'desc'  => __( 'Add custom CSS classes to the enquiry form button, separated by commas.', 'woocommerce-product-addon' ),
 		),
 		'ppom-enf-btn-text-color' => array(
 			'type'  => 'color',

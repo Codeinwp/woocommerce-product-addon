@@ -51,7 +51,7 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 							),
 							$ppom_settings_url
 						);
-						echo sprintf( __( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), $meta_title );
+						echo sprintf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $meta_title );
 						// Add a comma only if it's not the last item
 						if ( $current_item < $total_items ) {
 							echo ', ';
@@ -61,7 +61,7 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 
 				}
                 if( ! $has_fields  ) {
-                    echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), 'Add Fields' );
+                    echo sprintf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
                 }
 			} elseif ( $ppom->ppom_settings ) {
 				$url_edit = add_query_arg(
@@ -71,9 +71,9 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 					),
 					$ppom_settings_url
 				);
-				echo sprintf( __( '<a href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $url_edit ), $ppom->meta_title );
+				echo sprintf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $ppom->meta_title );
 			} else {
-				echo sprintf( __( '<a class="btn button" href="%1$s">%2$s</a>', 'woocommerce-product-addon' ), esc_url( $ppom_settings_url ), 'Add Fields' );
+				echo sprintf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
 			}
 
 			break;
@@ -170,12 +170,26 @@ function ppom_meta_list( $post ) {
 
 	$html .= '<hr>';
 	$html .= '<div class="ppom-settings-container">';
-	$html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input type="checkbox" disabled>' . __( 'Enable Pop-up.', 'woocommerce-product-addon' ) . '<span class="woocommerce-help-tip" data-tip="' . __( 'Enable this option to display product fields in a popup instead of directly on the product page.' ) . '"></span><i>' . sprintf( __( 'Available in the %sPremium%s version.', 'woocommerce-product-addon' ), '<a  target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'enable-popup', 'metabox' ) . '">', '</a>' ) . '</i></label>';
+	$html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input type="checkbox" disabled>' . __( 'Enable Pop-up.', 'woocommerce-product-addon' ) . '<span class="woocommerce-help-tip" data-tip="' . __( 'Enable this option to display product fields in a popup instead of directly on the product page.', 'woocommerce-product-addon' ) . '"></span><i>' . sprintf(
+		// translators: %1$s the opening link HTML tag, %2$s the close link HTML tag.
+		__( 'Available in the %1$sPremium%2$s version.', 'woocommerce-product-addon' ),
+		'<a target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'enable-popup', 'metabox' ) . '">',
+		'</a>'
+	) . '</i></label>';
 	$html .= '</div>';
 
 	$html .= '<hr>';
 	$html .= '<div class="ppom-settings-container">';
-	$html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input disabled type="checkbox">' . __( 'Enable Enquiry Form', 'woocommerce-product-addon' ) . '<span class="woocommerce-help-tip" data-tip="' . __( 'Enhances your product pages by adding a customizable enquiry button. It allows customers to send inquiries directly to the admin about products with PPOM Fields via email.' ) . '"></span><i>' . sprintf( __( 'Available in the %sPremium%s version.', 'woocommerce-product-addon' ), '<a  target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'enable-enquiry', 'metabox' ) . '">', '</a>' ) . '</i></label>';
+	$html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input disabled type="checkbox">' . __( 'Enable Enquiry Form', 'woocommerce-product-addon' ) . '<span class="woocommerce-help-tip" data-tip="' . __( 'Enhances your product pages by adding a customizable enquiry button. It allows customers to send inquiries directly to the admin about products with PPOM Fields via email.', 'woocommerce-product-addon' ) . '"></span><i>' . sprintf(
+		// translators: %1$s the link to Store with label: 'Premium'.
+		__( 'Available in the %1$s version.', 'woocommerce-product-addon' ),
+		sprintf(
+			'<a href="%s" target="_blank">%s</a>',
+			esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'enable-enquiry', 'metabox' ) ),
+			__( 'Premium', 'woocommerce-product-addon' )
+		)
+		
+	) . '</i></label>';
 	$html .= '</div>';
 
 	?>
@@ -780,7 +794,7 @@ function ppom_admin_bar_menu() {
 	$wp_admin_bar->add_node(
 		array(
 			'id'    => 'ppom-setting-bar',
-			'title' => sprintf( __( '%s', 'woocommerce-product-addon' ), $bar_title ),
+			'title' => $bar_title,
 			'href'  => esc_url( $ppom_setting_url ),
 		)
 	);
@@ -800,7 +814,7 @@ function ppom_admin_bar_menu() {
 		$wp_admin_bar->add_node(
 			array(
 				'id'     => "ppom-setting-bar-{$meta->productmeta_id}",
-				'title'  => sprintf( __( '%s', 'woocommerce-product-addon' ), $bar_title ),
+				'title'  => $bar_title,
 				'href'   => esc_url( $apply_link ),
 				'parent' => 'ppom-setting-bar',
 			)

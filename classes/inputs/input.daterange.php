@@ -22,8 +22,8 @@ class NM_Daterange_wooproduct extends PPOM_Inputs {
 		$this->plugin_meta = ppom_get_plugin_meta();
 
 		$this->title    = __( 'DateRange Input', 'woocommerce-product-addon' );
-		$this->desc     = __( '<a href="http://www.daterangepicker.com/" target="_blank">More detail</a>', 'woocommerce-product-addon' );
-		$this->icon     = __( '<i class="fa fa-table" aria-hidden="true"></i>', 'woocommerce-product-addon' );
+		$this->desc     = '<a href="https://www.daterangepicker.com/" target="_blank">' . __( 'More detail', 'woocommerce-product-addon' ) . '</a>';
+		$this->icon     = '<i class="fa fa-table" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 	}
@@ -35,7 +35,7 @@ class NM_Daterange_wooproduct extends PPOM_Inputs {
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
 				'desc'  => __( 'All about Daterangepicker, see daterangepicker', 'woocommerce-product-addon' ),
-				'link'  => __( '<a href="http://www.daterangepicker.com/" target="_blank">Daterangepicker</a>', 'woocommerce-product-addon' ),
+				'link'  => '<a href="https://www.daterangepicker.com/" target="_blank">' . __( 'Daterangepicker', 'woocommerce-product-addon' ) . '</a>',
 			),
 			'data_name'       => array(
 				'type'  => 'text',
@@ -55,7 +55,7 @@ class NM_Daterange_wooproduct extends PPOM_Inputs {
 			'class'           => array(
 				'type'        => 'text',
 				'title'       => __( 'Class', 'woocommerce-product-addon' ),
-				'desc'        => __( 'Insert an additional class(es) (separateb by comma) for more personalization.', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Insert an additional class(es) (separated by comma) for more personalization.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'width'           => array(
