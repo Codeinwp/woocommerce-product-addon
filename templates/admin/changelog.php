@@ -57,7 +57,15 @@ $ppom_fields_url = admin_url( "admin.php?page=ppom" );
 		</div>
 		<div class="ppom-admin-addons-header">
 			<div class="ppom-admin-addons-header-logo">
-				<h3><?php printf( esc_html__( '%s Changelog', 'woocommerce-product-addon' ), sprintf( '<span id="ppom-type-label">%s</span>', array_values($changelogs)[0]['label']) ); ?></h3>
+				<h3>
+					<?php
+					printf(
+						/* translators: %s: PPOM version type (Free/Pro) */
+						esc_html__( '%s Changelog', 'woocommerce-product-addon' ),
+						sprintf( '<span id="ppom-type-label">%s</span>', array_values($changelogs)[0]['label'])
+					);
+					?>
+				</h3>
 			</div>
 			<?php if(count($changelogs)>1){ ?>
 			<div class="ppom-admin-addons-header-search-input">

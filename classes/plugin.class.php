@@ -448,8 +448,14 @@ class NM_PersonalizedProduct {
 				?>
 				<script type="text/javascript">
 					jQuery(document).ready(function () {
-						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'woocommerce-product-addon' ), $meta->productmeta_id ); ?>', "ppom").text('<?php _e( $meta->productmeta_name, 'woocommerce-product-addon' ); ?>').appendTo("select[name='action']");
-						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'woocommerce-product-addon' ), $meta->productmeta_id ); ?>').text('<?php _e( $meta->productmeta_name, 'woocommerce-product-addon' ); ?>').appendTo("select[name='action2']");
+						jQuery('<option>')
+							.val('<?php printf( 'nm_action_%d', $meta->productmeta_id ); ?>', "ppom")
+							.text('<?php echo esc_html( $meta->productmeta_name ); ?>')
+							.appendTo("select[name='action']");
+						jQuery('<option>')
+							.val('<?php printf( 'nm_action_%d', $meta->productmeta_id ); ?>')
+							.text('<?php echo esc_html( $meta->productmeta_name ); ?>')
+							.appendTo("select[name='action2']");
 					});
 				</script>
 				<?php
@@ -560,11 +566,30 @@ class NM_PersonalizedProduct {
 	function nm_add_meta_notices() {
 		global $post_type, $pagenow;
 
-		if ( $pagenow == 'edit.php' && $post_type == 'product' && isset( $_REQUEST['nm_updated'] ) && (int) $_REQUEST['nm_updated'] ) {
-			$message = sprintf( _n( 'Product meta updated.', '%s Products meta updated.', $_REQUEST['nm_updated'], 'woocommerce-product-addon' ), number_format_i18n( $_REQUEST['nm_updated'] ) );
+		if ($pagenow == 'edit.php' && $post_type == 'product' && isset($_REQUEST['nm_updated']) && (int) $_REQUEST['nm_updated']) {
+			$count = (int) $_REQUEST['nm_updated'];
+			if ($count === 1) {
+				$message = __('Product meta updated.', 'woocommerce-product-addon');
+			} else {
+				$message = sprintf(
+					/* translators: %s: number of products */
+					__('%s Products meta updated.', 'woocommerce-product-addon'),
+					number_format_i18n($count)
+				);
+			}
 			echo "<div class=\"updated\"><p>{$message}</p></div>";
-		} elseif ( $pagenow == 'edit.php' && $post_type == 'product' && isset( $_REQUEST['nm_removed'] ) && (int) $_REQUEST['nm_removed'] ) {
-			$message = sprintf( _n( 'Product meta removed.', '%s Products meta removed.', $_REQUEST['nm_removed'], 'woocommerce-product-addon' ), number_format_i18n( $_REQUEST['nm_removed'] ) );
+		} 
+		elseif ($pagenow == 'edit.php' && $post_type == 'product' && isset($_REQUEST['nm_removed']) && (int) $_REQUEST['nm_removed']) {
+			$count = (int) $_REQUEST['nm_removed'];
+			if ($count === 1) {
+				$message = __('Product meta removed.', 'woocommerce-product-addon');
+			} else {
+				$message = sprintf(
+					/* translators: %s: number of products */
+					__('%s Products meta removed.', 'woocommerce-product-addon'),
+					number_format_i18n($count)
+				);
+			}
 			echo "<div class=\"updated\"><p>{$message}</p></div>";
 		}
 	}
@@ -894,6 +919,7 @@ class NM_PersonalizedProduct {
 		if ( is_product() && isset( $_GET['ppom_title'] ) ) {
 
 			$meta_title = sanitize_text_field( $_GET['ppom_title'] );
+			/* translators: %s: meta title */
 			wc_add_notice( sprintf( __( 'PPOM Meta Successfully Changed to - %s', 'woocommerce-product-addon' ), $meta_title ) );
 		}
 	}
