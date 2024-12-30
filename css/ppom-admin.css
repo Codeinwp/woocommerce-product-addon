@@ -1563,8 +1563,6 @@ header.ppom-modal-header {
     flex-direction: column;
     gap: 30px;
     max-height: 600px;
-    overflow-y: auto;
-    overflow-x: hidden;
     scrollbar-color: #D8D8D8 white;
     padding-right: 20px;
 }
@@ -1631,6 +1629,8 @@ header.ppom-modal-header {
 
 .ppom-fields:has(.ppom-fields-sections) {
     padding: 10px 10px 20px 40px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .ppom-search-container input::placeholder {
@@ -1865,8 +1865,4 @@ header.ppom-modal-header {
 
 .ppom-banner:has(.tsdk-banner-cta) {
     margin: 20px 0;
-}
-
-.ppom-admin-fields-wrapper .ppom-fields-sections {
-    overflow: inherit;
 }
