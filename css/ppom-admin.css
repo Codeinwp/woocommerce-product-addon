@@ -1866,3 +1866,7 @@ header.ppom-modal-header {
 .ppom-banner:has(.tsdk-banner-cta) {
     margin: 20px 0;
 }
+
+.ppom-admin-fields-wrapper .ppom-fields-sections {
+    overflow: inherit;
+}
