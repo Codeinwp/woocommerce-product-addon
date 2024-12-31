@@ -219,7 +219,6 @@ class PPOM_Form {
 			$field_html .= '</div>';
 
 			if ( count( $collapse_fields ) === $ppom_collapse_counter && $section_started ) {
-				$field_html     .= '</div>';
 				$section_started = false;
 			}
 
