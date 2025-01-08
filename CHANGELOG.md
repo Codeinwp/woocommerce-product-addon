@@ -1,3 +1,10 @@
+##### [Version 33.0.9](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.8...v33.0.9) (2025-01-08)
+
+- Improved tooltip style in the dashboard
+- Enhanced security
+- Improved translatable strings
+- Fixed conditional field display issue with a select option
+
 ##### [Version 33.0.8](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.7...v33.0.8) (2024-11-08)
 
 - Fixed issue with multiple checked options not displaying as checked by default
