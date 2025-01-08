@@ -56,7 +56,7 @@ $url_cancel = add_query_arg(
 	)
 );
 
-echo '<p><a href="' . esc_url( $url_cancel ) . '">' . __( '&laquo; Existing Product Meta', 'woocommerce-product-addon' ) . '</a></p>';
+echo '<p><a href="' . esc_url( $url_cancel ) . '">&laquo; ' . __( 'Existing Product Meta', 'woocommerce-product-addon' ) . '</a></p>';
 
 $product_id = isset( $_GET['product_id'] ) ? intval( $_GET['product_id'] ) : '';
 
@@ -567,7 +567,19 @@ $fields_groups = [
 							<div class="row">
 								<div class="col-md-12 col-sm-12">
 									<div class="notice notice-info">
-										<p><?php echo sprintf( __( 'Custom CSS and JS customization is not available on your current plan. <a href="%s" target="_blank">Upgrade to the Pro</a> plan to unlock the ability to fully customize your fields\' appearance and functionality.', 'woocommerce-product-addon' ), esc_url( tsdk_utmify( PPOM_UPGRADE_URL, 'customstyle' ) ) ); ?></p>
+										<p>
+											<?php
+											echo sprintf(
+												// translators: %1$s the upgrade link with label: 'Upgrade To Pro'.
+												__( 'Custom CSS and JS customization is not available on your current plan. %1$s plan to unlock the ability to fully customize your fields\' appearance and functionality.', 'woocommerce-product-addon' ),
+												sprintf(
+													'<a href="%s" target="_blank">%s</a>',
+													esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, 'customstyle' ) ) ),
+													__( 'Upgrade to the Pro', 'woocommerce-product-addon' )
+												)
+											);
+											?>
+										</p>
 									</div>
 								</div>
 							</div>
@@ -813,7 +825,7 @@ $fields_groups = [
 		$download_id = $license->download_id;
 	}
 	$admin_license_url = admin_url( 'options-general.php#ppom_pro_license' );
-	$renew_license_url = tsdk_utmify( PPOM_STORE_URL . '?edd_license_key=' . $license_key . '&download_id=' . $download_id, 'ppom_license_block' );
+	$renew_license_url = tsdk_translate_link( tsdk_utmify( PPOM_STORE_URL . '?edd_license_key=' . $license_key . '&download_id=' . $download_id, 'ppom_license_block' ) );
 	?>
 	<div class="ppom-modal-body">
 		<button type="button" aria-label="close" class="close-model ppom-js-modal-close"><span class="dashicons dashicons-no-alt"></span></button>

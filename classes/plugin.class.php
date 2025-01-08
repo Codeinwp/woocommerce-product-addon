@@ -448,8 +448,14 @@ class NM_PersonalizedProduct {
 				?>
 				<script type="text/javascript">
 					jQuery(document).ready(function () {
-						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'woocommerce-product-addon' ), $meta->productmeta_id ); ?>', "ppom").text('<?php _e( $meta->productmeta_name, 'woocommerce-product-addon' ); ?>').appendTo("select[name='action']");
-						jQuery('<option>').val('<?php printf( __( 'nm_action_%d', 'woocommerce-product-addon' ), $meta->productmeta_id ); ?>').text('<?php _e( $meta->productmeta_name, 'woocommerce-product-addon' ); ?>').appendTo("select[name='action2']");
+						jQuery('<option>')
+							.val('<?php printf( 'nm_action_%d', $meta->productmeta_id ); ?>', "ppom")
+							.text('<?php echo esc_html( $meta->productmeta_name ); ?>')
+							.appendTo("select[name='action']");
+						jQuery('<option>')
+							.val('<?php printf( 'nm_action_%d', $meta->productmeta_id ); ?>')
+							.text('<?php echo esc_html( $meta->productmeta_name ); ?>')
+							.appendTo("select[name='action2']");
 					});
 				</script>
 				<?php
@@ -560,11 +566,30 @@ class NM_PersonalizedProduct {
 	function nm_add_meta_notices() {
 		global $post_type, $pagenow;
 
-		if ( $pagenow == 'edit.php' && $post_type == 'product' && isset( $_REQUEST['nm_updated'] ) && (int) $_REQUEST['nm_updated'] ) {
-			$message = sprintf( _n( 'Product meta updated.', '%s Products meta updated.', $_REQUEST['nm_updated'], 'woocommerce-product-addon' ), number_format_i18n( $_REQUEST['nm_updated'] ) );
+		if ($pagenow == 'edit.php' && $post_type == 'product' && isset($_REQUEST['nm_updated']) && (int) $_REQUEST['nm_updated']) {
+			$count = (int) $_REQUEST['nm_updated'];
+			if ($count === 1) {
+				$message = __('Product meta updated.', 'woocommerce-product-addon');
+			} else {
+				$message = sprintf(
+					/* translators: %s: number of products */
+					__('%s Products meta updated.', 'woocommerce-product-addon'),
+					number_format_i18n($count)
+				);
+			}
 			echo "<div class=\"updated\"><p>{$message}</p></div>";
-		} elseif ( $pagenow == 'edit.php' && $post_type == 'product' && isset( $_REQUEST['nm_removed'] ) && (int) $_REQUEST['nm_removed'] ) {
-			$message = sprintf( _n( 'Product meta removed.', '%s Products meta removed.', $_REQUEST['nm_removed'], 'woocommerce-product-addon' ), number_format_i18n( $_REQUEST['nm_removed'] ) );
+		} 
+		elseif ($pagenow == 'edit.php' && $post_type == 'product' && isset($_REQUEST['nm_removed']) && (int) $_REQUEST['nm_removed']) {
+			$count = (int) $_REQUEST['nm_removed'];
+			if ($count === 1) {
+				$message = __('Product meta removed.', 'woocommerce-product-addon');
+			} else {
+				$message = sprintf(
+					/* translators: %s: number of products */
+					__('%s Products meta removed.', 'woocommerce-product-addon'),
+					number_format_i18n($count)
+				);
+			}
 			echo "<div class=\"updated\"><p>{$message}</p></div>";
 		}
 	}
@@ -894,6 +919,7 @@ class NM_PersonalizedProduct {
 		if ( is_product() && isset( $_GET['ppom_title'] ) ) {
 
 			$meta_title = sanitize_text_field( $_GET['ppom_title'] );
+			/* translators: %s: meta title */
 			wc_add_notice( sprintf( __( 'PPOM Meta Successfully Changed to - %s', 'woocommerce-product-addon' ), $meta_title ) );
 		}
 	}
@@ -948,9 +974,10 @@ class NM_PersonalizedProduct {
 	public function show_tooltip( $description, $meta ) {
 		$input_desc = ! empty( $meta['description'] ) ? $meta['description'] : '';
 		$input_desc = apply_filters( 'ppom_description_content', stripslashes( $input_desc ), $meta );
+		$input_desc = wp_strip_all_tags( html_entity_decode( $input_desc ) );
 
 		// Check if the tooltip is enabled.
-		if ( isset( $meta['desc_tooltip'] ) && 'on' === $meta['desc_tooltip'] ) {
+		if ( ! empty( $input_desc ) && isset( $meta['desc_tooltip'] ) && 'on' === $meta['desc_tooltip'] ) {
 			$description = ( ! empty( $meta['description'] ) ) ? ' <span data-ppom-tooltip="ppom_tooltip" class="ppom-tooltip" title="' . esc_attr( $input_desc ) . '"><svg width="13px" height="13px" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg></span>' : '';
 		}
 		return $description;

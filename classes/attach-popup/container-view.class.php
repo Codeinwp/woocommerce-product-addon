@@ -12,7 +12,7 @@ class ContainerView {
 	 * @return string
 	 */
 	public function render() {
-		return 'Empty!';
+		return '';
 	}
 
 	/**

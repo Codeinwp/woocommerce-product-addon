@@ -21,13 +21,13 @@ $modal_id = 'modalImage' . $image_id;
 	<div class="ppom-popup-inner-section">
 		<header class="ppom-popup-header">
 			<!-- <a href="#" class="js-modal-close close">×</a> -->
-			<h3><?php echo $image_title; ?></h3>
+			<h3><?php echo esc_html( $image_title ); ?></h3>
 		</header>
 		<div class="ppom-popup-body images">
 			<img src="<?php echo esc_url( $image_full ); ?>">
 		</div>
 		<footer class="ppom-popup-footer">
-			<a href="#" class="ppom-popup-button ppom-popup-close-js">Close</a>
+			<a href="#" class="ppom-popup-button ppom-popup-close-js"><?php esc_html_e( 'Close', 'woocommerce-product-addon'); ?></a>
 		</footer>
 	</div>
 </div>
