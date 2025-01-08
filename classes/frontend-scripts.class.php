@@ -444,6 +444,9 @@ class PPOM_FRONTEND_SCRIPTS {
 								break;
 						}
 
+						if ( ! empty( $fields_meta['description'] ) ) {
+							$fields_meta['description'] = wp_strip_all_tags( html_entity_decode( $fields_meta['description'] ) );
+						}
 						$inputs_meta_updated[] = $fields_meta;
 
 						// Conditional fields
