@@ -974,6 +974,7 @@ class NM_PersonalizedProduct {
 	public function show_tooltip( $description, $meta ) {
 		$input_desc = ! empty( $meta['description'] ) ? $meta['description'] : '';
 		$input_desc = apply_filters( 'ppom_description_content', stripslashes( $input_desc ), $meta );
+		$input_desc = wp_strip_all_tags( html_entity_decode( $input_desc ) );
 
 		// Check if the tooltip is enabled.
 		if ( isset( $meta['desc_tooltip'] ) && 'on' === $meta['desc_tooltip'] ) {
