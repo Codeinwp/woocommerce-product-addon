@@ -51,7 +51,7 @@ if ( ! empty( $matrix_found ) && ppom_is_field_has_price( $field_meta ) ) {
 			class="<?php echo esc_attr( $fm->label_classes() ); ?>"
 			for="<?php echo esc_attr( $fm->data_name() ); ?>"
 		>
-			<?php echo esc_html( $fm->field_label() ); ?>
+			<?php echo wp_kses( $fm->field_label(), array( 'span' => array( 'class' => true, 'data-*' => true, 'title' => true ) ) ); ?>
 		</label>
 	<?php endif ?>
 

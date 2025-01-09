@@ -595,3 +595,21 @@ div.filelist .u_i_c_box {
   max-width: 700px !important;
   min-height: 0 !important;
 }
+
+span.ppom-tooltip .ppom-tooltip-icon {
+    width: 13px;
+    height: 13px;
+    font-size: 11px;
+    line-height: 13px;
+    background-color: #000;
+    border-radius: 100%;
+    display: inline-block;
+    text-align: center
+}
+span.ppom-tooltip .ppom-tooltip-icon::after {
+    content: '?';
+    font-size: 10px;
+    color: #fff;
+    line-height: 13px;
+    font-weight: 700;
+}

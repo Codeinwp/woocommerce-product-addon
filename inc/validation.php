@@ -72,6 +72,17 @@ function ppom_esc_html( $content ) {
 	$allowedposttags['a']        = $allowed_atts;
 	$allowedposttags['b']        = $allowed_atts;
 	$allowedposttags['i']        = $allowed_atts;
+	$allowedposttags['svg']      = array(
+		'width' => true,
+		'height' => true,
+		'role' => true,
+		'xmlns' => true,
+		'viewBox' => true,
+	);
+	$allowedposttags['path']     = array(
+		'fill' => true,
+		'd'    => true,
+	);
 
 	$allowed_tags = wp_kses_allowed_html( 'post' );
 
