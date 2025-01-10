@@ -1,3 +1,8 @@
+##### [Version 33.0.10](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.9...v33.0.10) (2025-01-10)
+
+- Fixed issue with HTML Output being displayed on fields in the front-end
+- Fixed collapse menu issue with conditional fields
+
 ##### [Version 33.0.9](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.8...v33.0.9) (2025-01-08)
 
 - Improved tooltip style in the dashboard
