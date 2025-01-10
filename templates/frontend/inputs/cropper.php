@@ -41,7 +41,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 	<!-- if title of field exist -->
 	<?php if ( $field_label ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo esc_html( $field_label ); ?></label>
+			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo wp_kses( $field_label, array( 'span' => array( 'class' => true, 'data-*' => true, 'title' => true ) ) ); ?></label>
 	<?php endif ?>
 
 
