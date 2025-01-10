@@ -72,7 +72,6 @@ function ppom_esc_html( $content ) {
 	$allowedposttags['a']        = $allowed_atts;
 	$allowedposttags['b']        = $allowed_atts;
 	$allowedposttags['i']        = $allowed_atts;
-
 	$allowed_tags = wp_kses_allowed_html( 'post' );
 
 	return wp_kses( stripslashes_deep( $content ), $allowed_tags );
