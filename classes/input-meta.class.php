@@ -155,7 +155,7 @@ class PPOM_InputManager {
 
 		$asterisk_symbol = ( ! empty( $this->required() ) && $this->title() != '' ) ? '<span class="show_required"> *</span>' : '';
 
-		$show_desc = ( ! empty( $this->desc() ) ) ? '<span class="show_description ppom-input-desc">' . wp_strip_all_tags( html_entity_decode( $this->desc() ) ) . '</span>' : '';
+		$show_desc = ( ! empty( $this->desc() ) ) ? '<span class="show_description ppom-input-desc">' . $this->desc() . '</span>' : '';
 
 		if ( $desc ) {
 			$show_desc = apply_filters( 'ppom_field_description', $show_desc, self::$input_meta );
