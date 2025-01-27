@@ -54,7 +54,7 @@ $default_value = strip_tags( $default_value );
 			class="<?php echo esc_attr( $fm->label_classes() ); ?>"
 			for="<?php echo esc_attr( $fm->data_name() ); ?>"
 		>
-		<?php echo wp_kses( $fm->field_label(), array( 'span' => array( 'class' => true, 'data-*' => true, 'title' => true ) ) ); ?>
+		<?php echo ppom_esc_html( $fm->field_label() ); ?>
 		</label>
 	<?php endif ?>
 
