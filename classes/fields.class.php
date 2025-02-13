@@ -201,6 +201,17 @@ class PPOM_Fields_Meta {
 		// localize ppom_vars
 		wp_localize_script( 'ppom-field', 'ppom_vars', $ppom_admin_meta );
 		wp_localize_script( 'ppom-meta-table', 'ppom_vars', $ppom_admin_meta );
+
+		$action    = isset( $_GET['action'] ) ? sanitize_text_field( $_GET['action'] ) : '';
+		$page_slug = 'fields';
+
+		if ( 'new' === $action ) {
+			$page_slug = 'new-field';
+		} elseif( 'edit' === $action ) {
+			$page_slug = 'edit-field';
+		}
+
+		do_action( 'themeisle_internal_page', PPOM_PRODUCT_SLUG, $page_slug );
 	}
 
 
