@@ -52,22 +52,10 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 			$license_data = get_option( 'ppom_pro_license_data', array() );
 
 			$install_days_number = round( ( time() - get_option( 'woocommerce_product_addon_install', time() ) ) / DAY_IN_SECONDS );
-			$install_category    = 0; 
-
-			if ( 1 < $install_days_number && 8 > $install_days_number ) {
-				$install_category = 7;
-			} elseif ( 8 <= $install_days_number && 31 > $install_days_number ) {
-				$install_category = 30;
-			} elseif ( 30 < $install_days_number && 90 > $install_days_number ) {
-				$install_category = 90;
-			} elseif ( 90 <= $install_days_number ) {
-				$install_category = 91;
-			}
 
 			$data = array(
 				'environmentId'     => 'clza3s4zm000h10km1699nlli',
 				'attributes'        => array(
-					'days_since_install'  => strval( $install_category ),
 					'install_days_number' => $install_days_number,
 					'free_version'        => PPOM_VERSION,
 					'license_status'      => ! empty( $license_data->license ) ? $license_data->license : 'invalid',
