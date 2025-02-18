@@ -49,6 +49,10 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 				return $data;
 			}
 
+			$license_status = apply_filters( 'product_ppom_license_status', 'invalid' );
+			$license_plan   = intval( apply_filters( 'product_ppom_license_plan', -1 ) );
+			$license_key    = apply_filters( 'product_ppom_license_key', '' );
+
 			$license_data = get_option( 'ppom_pro_license_data', array() );
 
 			$install_days_number = round( ( time() - get_option( 'woocommerce_product_addon_install', time() ) ) / DAY_IN_SECONDS );
@@ -58,15 +62,15 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 				'attributes'        => array(
 					'install_days_number' => $install_days_number,
 					'free_version'        => PPOM_VERSION,
-					'license_status'      => ! empty( $license_data->license ) ? $license_data->license : 'invalid',
+					'license_status'      => $license_status,
 				)
 			);
 
-			if ( ! empty( $license_data->plan ) ) {
-				$data['attributes']['plan'] = $this->plan_category( $license_data );
+			if ( 1 <= $license_plan ) {
+				$data['attributes']['plan'] = NM_PersonalizedProduct::get_license_category( $license_plan );
 			}
 
-			if ( isset( $license_data->key ) ) {
+			if ( ! empty( $license_key ) ) {
 				$data['attributes']['license_key'] = apply_filters( 'themeisle_sdk_secret_masking', $license_data->key );
 			}
 
@@ -75,37 +79,6 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 			}
 
 			return $data;
-		}
-
-		/**
-		 * Get the plan category for the product plan ID.
-		 *
-		 * @param object $license_data The license data.
-		 * @return int
-		 */
-		private static function plan_category( $license_data ) {
-
-			if ( ! isset( $license_data->plan ) || ! is_numeric( $license_data->plan ) ) {
-				return 0; // Free.
-			}
-
-			$plan             = (int) $license_data->plan;
-			$current_category = -1;
-
-			$categories = array(
-				'1' => array( 1, 4, 9 ), // Personal.
-				'2' => array( 2, 5, 8 ), // Business/Developer.
-				'3' => array( 3, 6, 7, 10 ), // Agency.
-			);
-
-			foreach ( $categories as $category => $plans ) {
-				if ( in_array( $plan, $plans, true ) ) {
-					$current_category = (int) $category;
-					break;
-				}
-			}
-
-			return $current_category;
 		}
 	}
 }
