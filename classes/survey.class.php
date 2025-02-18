@@ -49,13 +49,17 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 				return $data;
 			}
 
-			$license_status = apply_filters( 'product_ppom_license_status', 'invalid' );
-			$license_plan   = intval( apply_filters( 'product_ppom_license_plan', -1 ) );
-			$license_key    = apply_filters( 'product_ppom_license_key', '' );
+			$license_status     = apply_filters( 'product_ppom_license_status', 'invalid' );
+			$license_plan       = intval( apply_filters( 'product_ppom_license_plan', -1 ) );
+			$license_key        = apply_filters( 'product_ppom_license_key', '' );
+			$group_fields_count = get_transient( PPOM_GROUPS_COUNT_CACHE_KEY );
 
-			$license_data = get_option( 'ppom_pro_license_data', array() );
+			if ( false === $group_fields_count ) {
+				$group_fields_count = min( 100, NM_PersonalizedProduct::get_product_meta_count() );
+				set_transient( PPOM_GROUPS_COUNT_CACHE_KEY, $group_fields_count, 100 <= $group_fields_count ? WEEK_IN_SECONDS : 12 * HOUR_IN_SECONDS );
+			}
 
-			$install_days_number = round( ( time() - get_option( 'woocommerce_product_addon_install', time() ) ) / DAY_IN_SECONDS );
+			$install_days_number = intval( ( time() - get_option( 'woocommerce_product_addon_install', time() ) ) / DAY_IN_SECONDS );
 
 			$data = array(
 				'environmentId'     => 'clza3s4zm000h10km1699nlli',
@@ -63,6 +67,7 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 					'install_days_number' => $install_days_number,
 					'free_version'        => PPOM_VERSION,
 					'license_status'      => $license_status,
+					'field_groups_count'  => intval( $group_fields_count )
 				)
 			);
 
@@ -71,7 +76,7 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 			}
 
 			if ( ! empty( $license_key ) ) {
-				$data['attributes']['license_key'] = apply_filters( 'themeisle_sdk_secret_masking', $license_data->key );
+				$data['attributes']['license_key'] = apply_filters( 'themeisle_sdk_secret_masking', $license_key );
 			}
 
 			if ( defined( 'PPOM_PRO_VERSION' ) ) {

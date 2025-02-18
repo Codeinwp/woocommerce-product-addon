@@ -33,6 +33,7 @@ define( 'PPOM_DB_VERSION', '32.0.0' );
 define( 'PPOM_PRODUCT_META_KEY', '_product_meta_id' );
 define( 'PPOM_TABLE_META', 'nm_personalized' );
 define( 'PPOM_UPLOAD_DIR_NAME', 'ppom_files' );
+define( 'PPOM_GROUPS_COUNT_CACHE_KEY', 'ppom_groups_count_cache' );
 define( 'PPOM_COMPATIBILITY_FEATURES', [
 	'pro_cond_field_repeat' => true, // Compatibility for Conditional Field Repeater feature
 	'pgfbdfm_wp_filter_param_fix' => true // Fix for the wrong params of the ppom_get_field_by_dataname__field_meta WP filter .

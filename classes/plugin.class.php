@@ -623,6 +623,20 @@ class NM_PersonalizedProduct {
 		return $res;
 	}
 
+	/**
+	 * Get the count of all the created PPOM Group fields.
+	 * 
+	 * @return int - The number of group fields in the database.
+	 */
+	public static function get_product_meta_count() {
+		global $wpdb;
+
+		$qry = 'SELECT COUNT(*) FROM ' . $wpdb->prefix . PPOM_TABLE_META;
+		$count = $wpdb->get_var($qry);
+
+		return intval($count);
+	}
+
 	function get_product_meta( $meta_id ) {
 
 		if ( ! $meta_id ) {
