@@ -812,6 +812,8 @@ class PPOM_SettingsFramework {
 		PPOM_SCRIPTS::enqueue_script( 'nmsf-settings-panel' );
 
 		$this->set_localize_data( 'nmsf-settings-panel', 'nmsf_vars' );
+
+		do_action( 'themeisle_internal_page', PPOM_PRODUCT_SLUG, 'settings' );
 	}
 
 
