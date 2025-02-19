@@ -15,6 +15,13 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 	class PPOM_Survey {
 
 		/**
+		 * The maximum limit of created groups to count. Used in the duration of the cached value.
+		 *
+		 * @var int
+		 */
+		public const GROUPS_COUNT_LIMIT = 100;
+
+		/**
 		 * Reference to singleton insance.
 		 *
 		 * @var [PPOM_Survey]
@@ -55,8 +62,8 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 			$group_fields_count = get_transient( PPOM_GROUPS_COUNT_CACHE_KEY );
 
 			if ( false === $group_fields_count ) {
-				$group_fields_count = min( 100, NM_PersonalizedProduct::get_product_meta_count() );
-				set_transient( PPOM_GROUPS_COUNT_CACHE_KEY, $group_fields_count, 100 <= $group_fields_count ? WEEK_IN_SECONDS : 12 * HOUR_IN_SECONDS );
+				$group_fields_count = NM_PersonalizedProduct::get_product_meta_count( self::GROUPS_COUNT_LIMIT );
+				set_transient( PPOM_GROUPS_COUNT_CACHE_KEY, $group_fields_count, self::GROUPS_COUNT_LIMIT === $group_fields_count ? WEEK_IN_SECONDS : 12 * HOUR_IN_SECONDS );
 			}
 
 			$install_days_number = intval( ( time() - get_option( 'woocommerce_product_addon_install', time() ) ) / DAY_IN_SECONDS );
