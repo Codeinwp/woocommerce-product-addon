@@ -155,7 +155,7 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= esc_html( $label ) . '</label>';
+			$html .= wp_kses( $label, array( 'span' => array( 'class' => true, 'data-*' => true, 'title' => true ) ) ) . '</label>';
 		}
 
 		if ( $price !== '' ) {
@@ -235,7 +235,7 @@ class NM_Form {
 		$html                = '<div class="' . esc_attr( $input_wrapper_class ) . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= esc_html( $label ) . '</label>';
+			$html .= wp_kses( $label, array( 'span' => array( 'class' => true, 'data-*' => true, 'title' => true ) ) ) . '</label>';
 		}
 
 		$classes .= ' ppom-measure-input';
@@ -1596,7 +1596,7 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= esc_html( $label ) . '</label>';
+			$html .= wp_kses( $label, array( 'span' => array( 'class' => true, 'data-*' => true, 'title' => true ) ) ) . '</label>';
 		}
 
 		$html .= apply_filters( 'nmform_custom_input', $html, $args, $default_value );

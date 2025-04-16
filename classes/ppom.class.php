@@ -204,7 +204,7 @@ class PPOM_Meta {
 			}
 		}
 
-		return apply_filters( 'ppom_product_meta_id', $ppom_product_id, $product_id );
+		return apply_filters( 'ppom_product_meta_id', is_array( $ppom_product_id ) ? array_unique( $ppom_product_id ) : $ppom_product_id, $product_id );
 	}
 
 	// Properties functions

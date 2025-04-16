@@ -15,6 +15,13 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 	class PPOM_Survey {
 
 		/**
+		 * The maximum limit of created groups to count. Used in the duration of the cached value.
+		 *
+		 * @var int
+		 */
+		public const GROUPS_COUNT_LIMIT = 100;
+
+		/**
 		 * Reference to singleton insance.
 		 *
 		 * @var [PPOM_Survey]
@@ -25,7 +32,7 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 		 * Init hooks.
 		 */
 		public function init() {
-			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+			add_filter( 'themeisle-sdk/survey/' . PPOM_PRODUCT_SLUG, array( $this, 'get_survey_metadata' ), 10, 2 );
 		}
 
 		/**
@@ -44,91 +51,46 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 		 * @return array
 		 * @see survey.js
 		 */
-		public function get_survey_metadata() {
-			$license_data = get_option( 'ppom_pro_license_data', array() );
-			$attributes   = array();
-			$user_id      = 'ppom_' . ( ! empty( $license_data->key ) ? $license_data->key : preg_replace( '/[^\w\d]*/', '', get_site_url() ) ); // Use a normalized version of the site URL as a user ID for free users.
-
-			$days_since_install = round( ( time() - get_option( 'woocommerce_product_addon_install', 0 ) ) / DAY_IN_SECONDS );
-			$install_category   = 0; // Normalized value.
-			if ( 0 === $days_since_install || 1 === $days_since_install ) {
-				$install_category = 0;
-			} elseif ( 1 < $days_since_install && 8 > $days_since_install ) {
-				$install_category = 7;
-			} elseif ( 8 <= $days_since_install && 31 > $days_since_install ) {
-				$install_category = 30;
-			} elseif ( 30 < $days_since_install && 90 > $days_since_install ) {
-				$install_category = 90;
-			} elseif ( 90 <= $days_since_install ) {
-				$install_category = 91;
+		public function get_survey_metadata( $data, $page_slug ) {
+			if ( defined( 'CYPRESS_TESTING' ) ) {
+				return $data;
 			}
 
-			$attributes['days_since_install'] = strval( $install_category );
-			$attributes['license_status']     = ! empty( $license_data->license ) ? $license_data->license : 'invalid';
-			$attributes['free_version']       = PPOM_VERSION;
+			$license_status     = apply_filters( 'product_ppom_license_status', 'invalid' );
+			$license_plan       = intval( apply_filters( 'product_ppom_license_plan', -1 ) );
+			$license_key        = apply_filters( 'product_ppom_license_key', '' );
+			$group_fields_count = get_transient( PPOM_GROUPS_COUNT_CACHE_KEY );
 
-			if ( ! empty( $license_data->plan ) ) {
-				$attributes['plan'] = $this->plan_category( $license_data );
+			if ( false === $group_fields_count ) {
+				$group_fields_count = NM_PersonalizedProduct::get_product_meta_count( self::GROUPS_COUNT_LIMIT );
+				set_transient( PPOM_GROUPS_COUNT_CACHE_KEY, $group_fields_count, self::GROUPS_COUNT_LIMIT === $group_fields_count ? WEEK_IN_SECONDS : 12 * HOUR_IN_SECONDS );
+			}
+
+			$install_days_number = intval( ( time() - get_option( 'woocommerce_product_addon_install', time() ) ) / DAY_IN_SECONDS );
+
+			$data = array(
+				'environmentId'     => 'clza3s4zm000h10km1699nlli',
+				'attributes'        => array(
+					'install_days_number' => $install_days_number,
+					'free_version'        => PPOM_VERSION,
+					'license_status'      => $license_status,
+					'field_groups_count'  => intval( $group_fields_count )
+				)
+			);
+
+			if ( 1 <= $license_plan ) {
+				$data['attributes']['plan'] = NM_PersonalizedProduct::get_license_category( $license_plan );
+			}
+
+			if ( ! empty( $license_key ) ) {
+				$data['attributes']['license_key'] = apply_filters( 'themeisle_sdk_secret_masking', $license_key );
 			}
 
 			if ( defined( 'PPOM_PRO_VERSION' ) ) {
-				$attributes['pro_version'] = PPOM_PRO_VERSION;
+				$data['attributes']['pro_version'] = PPOM_PRO_VERSION;
 			}
 
-			return array(
-				'userId'     => $user_id,
-				'attributes' => $attributes,
-			);
-		}
-
-		/**
-		 * Enqueue scripts.
-		 */
-		public function enqueue_scripts() {
-
-			if ( defined( 'CYPRESS_TESTING' ) ) {
-				return;
-			}
-
-			$survey_handler = apply_filters( 'themeisle_sdk_dependency_script_handler', 'survey' );
-			if ( empty( $survey_handler ) ) {
-				return;
-			}
-
-			do_action( 'themeisle_sdk_dependency_enqueue_script', 'survey' );
-			wp_enqueue_script( 'ppom_survey', PPOM_URL . '/js/survey.js', array( $survey_handler ), PPOM_VERSION, true );
-			wp_localize_script( 'ppom_survey', 'PPOMSurveyData', $this->get_survey_metadata() );
-		}
-
-		/**
-		 * Get the plan category for the product plan ID.
-		 *
-		 * @param object $license_data The license data.
-		 * @return int
-		 */
-		private static function plan_category( $license_data ) {
-
-			if ( ! isset( $license_data->plan ) || ! is_numeric( $license_data->plan ) ) {
-				return 0; // Free.
-			}
-
-			$plan             = (int) $license_data->plan;
-			$current_category = -1;
-
-			$categories = array(
-				'1' => array( 1, 4, 9 ), // Personal.
-				'2' => array( 2, 5, 8 ), // Business/Developer.
-				'3' => array( 3, 6, 7, 10 ), // Agency.
-			);
-
-			foreach ( $categories as $category => $plans ) {
-				if ( in_array( $plan, $plans, true ) ) {
-					$current_category = (int) $category;
-					break;
-				}
-			}
-
-			return $current_category;
+			return $data;
 		}
 	}
 }
