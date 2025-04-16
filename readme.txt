@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, product addons
 Requires at least: 3.5
 Tested up to: 6.8
-Stable tag: 33.0.10
+Stable tag: 33.0.11
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -251,10 +251,12 @@ PPOM is an open-source project, and we welcome contributors to be part of our vi
 
 == Changelog ==
 
-##### [Version 33.0.10](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.9...v33.0.10) (2025-01-10)
+##### [Version 33.0.11](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.10...v33.0.11) (2025-04-16)
 
-- Fixed issue with HTML Output being displayed on fields in the front-end
-- Fixed collapse menu issue with conditional fields
+- Fixed issue with HTML tags not working in the description field
+- Fixed duplicate data names error
+- Fixed input label escaping issue
+- Updated dependencies
 
 
 

@@ -1,3 +1,10 @@
+##### [Version 33.0.11](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.10...v33.0.11) (2025-04-16)
+
+- Fixed issue with HTML tags not working in the description field
+- Fixed duplicate data names error
+- Fixed input label escaping issue
+- Updated dependencies
+
 ##### [Version 33.0.10](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.9...v33.0.10) (2025-01-10)
 
 - Fixed issue with HTML Output being displayed on fields in the front-end
