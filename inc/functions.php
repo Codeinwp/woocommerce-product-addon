@@ -1595,17 +1595,9 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 		$is_image_file       = ppom_is_file_image( $file_path );
 		$ppom_file_thumb_url = $is_image_file ? $file_path : PPOM_URL . '/images/file.png';
 		$order_html         .= '<tr><td class="ppom-files-display">';
-
-		if ( $is_image_file ) {
-			$order_html .= '<a target="_blank" href="' . esc_url( $ppom_file_url ) . '">';
-		}
-
-		$order_html .= '<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" src="' . esc_url( $ppom_file_thumb_url ) . '">';
-
-		if ( $is_image_file ) {
-			$order_html .= '</a>';
-		}
-
+		$order_html         .= '<a target="_blank" href="' . esc_url( $ppom_file_url ) . '">';
+		$order_html         .= '<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" src="' . esc_url( $ppom_file_thumb_url ) . '">';
+		$order_html         .= '</a>';
 
 		// Requested by Kevin, hiding downloading file button after order on thank you page
 		// @since version 16.6
