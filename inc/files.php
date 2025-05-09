@@ -142,7 +142,8 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
  * @return string The new file name.
  */
 function ppom_create_unique_file_name( $file_name, $file_ext ) {
-	return $file_name . "." . base64_encode( substr( wp_hash_password( $file_name ), 0, 8 ) ) . "." . $file_ext;
+    $seed = $file_name . microtime( true ) . mt_rand();
+    return $file_name . "." . wp_hash( $seed ) . "." . $file_ext;
 }
 
 final class UploadFileErrors {
