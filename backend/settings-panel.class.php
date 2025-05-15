@@ -98,7 +98,7 @@ class PPOM_SettingsFramework {
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_scripts' ), 999 );
 
-		add_action( 'in_admin_header', array( $this, 'remove_admin_notices' ), 99 );
+		// add_action( 'in_admin_header', array( $this, 'remove_admin_notices' ), 99 );
 		// delete_option('ppom_settings_migration_done');
 	}
 
