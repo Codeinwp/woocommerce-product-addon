@@ -1863,6 +1863,14 @@ header.ppom-modal-header {
     text-decoration: none;
 }
 
-.ppom-banner:has(.tsdk-banner-cta) {
-    margin: 20px 0;
+div.ppom-banner .themeisle-sale {
+    margin: 0 0 10px 0;
+}
+
+.ppom-banner .themeisle-sale-title {
+    font-size: 14px;
+}
+
+.ppom-banner .themeisle-sale .themeisle-sale-action a {
+    text-decoration: none;
 }
