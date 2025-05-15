@@ -182,6 +182,10 @@ class PPOM_Form {
 
 				$section_started = true;
 				$ppom_collapse_counter ++;
+
+				if ( count( $fields ) === $ppom_field_counter ) {
+					echo '</div>';
+				}
 			}
 
 			// skip collapse div
@@ -218,14 +222,14 @@ class PPOM_Form {
 
 			$field_html .= '</div>';
 
-			if ( count( $collapse_fields ) === $ppom_collapse_counter && $section_started ) {
-				$section_started = false;
-			}
-
 			// Filter: nmforms_input_htmls
 			// @TODO need to change with relevant name
 			echo apply_filters( 'nmforms_input_html', $field_html, $meta, $default_value );
 
+			if ( count( $fields ) === $ppom_field_counter && $section_started ) {
+				echo '</div>';
+				$section_started = false;
+			}
 		}
 	}
 
