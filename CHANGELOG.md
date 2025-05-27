@@ -1,3 +1,9 @@
+##### [Version 33.0.12](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.11...v33.0.12) (2025-05-27)
+
+- Fixed broken product page layout with Collapse field in use
+- Fixed issue with files can't be downloaded from the Order Received email
+- Updated dependencies
+
 ##### [Version 33.0.11](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.10...v33.0.11) (2025-04-16)
 
 - Fixed issue with HTML tags not working in the description field
