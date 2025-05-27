@@ -322,7 +322,7 @@ class NM_PersonalizedProduct {
 		// NOTE: Debug only
 		// delete_option('ppom_demo_meta_installed');
 
-		add_action( 'in_admin_header', 'ppom_hooks_remove_admin_notices', 99 );
+		// add_action( 'in_admin_header', 'ppom_hooks_remove_admin_notices', 99 );
 
 		add_filter( 'woocommerce_order_again_cart_item_data', 'ppom_wc_order_again_compatibility', 10, 3 );
 		// Show description tooltip.
