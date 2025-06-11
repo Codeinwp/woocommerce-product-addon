@@ -36,17 +36,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		/*
 		 * [1] TODO: change this for plugin admin pages
 		*/
-		$this->menu_pages = array(
-			array(
-				'page_title'  => __( 'PPOM', 'woocommerce-product-addon' ),
-				'menu_title'  => __( 'PPOM', 'woocommerce-product-addon' ),
-				'cap'         => 'manage_options',
-				'slug'        => 'ppom',
-				'callback'    => 'product_meta',
-				'parent_slug' => 'woocommerce',
-			),
-		);
-
+		add_action( 'init', array( $this, 'menu_page_options' ) );
 
 		add_action(
 			'admin_menu',
@@ -88,6 +78,22 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		add_action( 'admin_init', array( $this, 'set_legacy_user' ) );
 		add_action( 'admin_init', array( $this, 'ppom_create_db_tables' ) );
+	}
+
+	/**
+	 * Menu page options.
+	 */
+	public function menu_page_options() {
+		$this->menu_pages = array(
+			array(
+				'page_title'  => __( 'PPOM', 'woocommerce-product-addon' ),
+				'menu_title'  => __( 'PPOM', 'woocommerce-product-addon' ),
+				'cap'         => 'manage_options',
+				'slug'        => 'ppom',
+				'callback'    => 'product_meta',
+				'parent_slug' => 'woocommerce',
+			),
+		);
 	}
 
 	/**
