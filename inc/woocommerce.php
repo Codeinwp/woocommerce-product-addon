@@ -1421,17 +1421,17 @@ function ppom_wc_order_again_compatibility( $cart_item_data, $item, $order ) {
  * @param int $item_id The item ID.
  * @param \WC_Order_Item_Product $item The order item object.
  */
-function ppom_woocommerce_order_itam_meta_html( $item_id, $item ) {
+function ppom_woocommerce_order_item_meta_html( $item_id, $item ) {
 	$formatted_meta = $item->get_formatted_meta_data();
 
 	$strings = array();
 	$meta_item_html = '';
 	$output_args = apply_filters( 'ppom_woocommerce_item_meta_args',
 		array(
-			'before'       => '<div style="display: flex; flex-wrap: wrap; gap: 5px;">',
+			'before'       => '<div>',
 			'after'        => '</div>',
 			'separator'    => '<br>',
-			'label_before' => '<span>',
+			'label_before' => '<span style="float: left;">',
 			'label_after'  => ':</span> ',
 		)
 	);
@@ -1442,7 +1442,7 @@ function ppom_woocommerce_order_itam_meta_html( $item_id, $item ) {
 	if ( $strings ) {
 		$meta_item_html = implode( $output_args['separator'], $strings );
 	}
-	echo $meta_item_html;
+	echo wp_kses_post( $meta_item_html );
 }
 
 /**

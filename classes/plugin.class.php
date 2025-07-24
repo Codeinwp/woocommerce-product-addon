@@ -172,7 +172,7 @@ class NM_PersonalizedProduct {
 
 		// when email improvements feature enabled in woocommerce.
 		if ( ppom_wc_email_improvements_enabled() ) {
-			add_action( 'woocommerce_order_item_meta_end', 'ppom_woocommerce_order_itam_meta_html', 10, 4 );
+			add_action( 'woocommerce_order_item_meta_end', 'ppom_woocommerce_order_item_meta_html', 10, 4 );
 			add_filter( 'woocommerce_display_item_meta', '__return_empty_string' );
 		} else {
 			// Few inputs like file/crop/image need to show meta value in tags
