@@ -73,9 +73,12 @@ class PPOM_SettingsFramework {
 	var $scripts_class;
 
 	function __construct() {
+		$this->config = array(
+			'id'         => 'ppom',
+			'plugin_url' => PPOM_URL,
+		);
 
-
-		$this->register_config();
+		add_action( 'init', array( $this, 'register_config' ) );
 
 		self::$assets_url = $this->get_config( 'plugin_url' ) . '/backend/assets';
 
@@ -120,9 +123,8 @@ class PPOM_SettingsFramework {
 	 */
 	public function register_config() {
 
-		$this->config = array(
+		$config = array(
 			'name'            => __( 'PPOM Admin Settings', 'woocommerce-product-addon' ),
-			'id'              => 'ppom',
 			'version'         => '1.0',
 			'form_tag'        => false,
 			'menu_type'       => 'wc',
@@ -136,8 +138,9 @@ class PPOM_SettingsFramework {
 			'plugin_name'     => __( 'PPOM', 'woocommerce-product-addon' ),
 			'plugin_version'  => PPOM_VERSION,
 			'plugin_domain'   => 'woocommerce-product-addon',
-			'plugin_url'      => PPOM_URL,
 		);
+
+		$this->config = array_merge( $this->config, $config );
 	}
 
 
