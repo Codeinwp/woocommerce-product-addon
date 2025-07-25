@@ -1414,3 +1414,42 @@ function ppom_wc_order_again_compatibility( $cart_item_data, $item, $order ) {
 
 	return $cart_item_data;
 }
+
+/**
+ * Outputs the formatted meta data for WooCommerce order items.
+ *
+ * @param int $item_id The item ID.
+ * @param \WC_Order_Item_Product $item The order item object.
+ */
+function ppom_woocommerce_order_item_meta_html( $item_id, $item ) {
+	$formatted_meta = $item->get_formatted_meta_data();
+
+	$strings = array();
+	$meta_item_html = '';
+	$output_args = apply_filters( 'ppom_woocommerce_item_meta_args',
+		array(
+			'before'       => '<div>',
+			'after'        => '</div>',
+			'separator'    => '<br>',
+			'label_before' => '<span style="float: left;">',
+			'label_after'  => ':</span> ',
+		)
+	);
+	foreach ( $formatted_meta as $meta ) {
+		$strings[] = $output_args['before'] . $output_args['label_before'] . wp_kses_post( $meta->display_key ) . $output_args['label_after'] . ppom_woocommerce_order_value( $meta->display_value, $meta, $item ) . $output_args['after'];
+	}
+
+	if ( $strings ) {
+		$meta_item_html = implode( $output_args['separator'], $strings );
+	}
+	echo wp_kses_post( $meta_item_html );
+}
+
+/**
+ * Check if the email improvements feature is enabled.
+ *
+ * @return bool
+ */
+function ppom_wc_email_improvements_enabled() {
+	return 'yes' === get_option( 'woocommerce_feature_email_improvements_enabled', 'no' );
+}
