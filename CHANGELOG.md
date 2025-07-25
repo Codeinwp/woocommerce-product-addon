@@ -1,3 +1,8 @@
+##### [Version 33.0.13](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.12...v33.0.13) (2025-07-25)
+
+- Fixed early textdomain loading issue
+- Fixed uploaded files not showing up in emails with WooCommerce
+
 ##### [Version 33.0.12](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.11...v33.0.12) (2025-05-27)
 
 - Fixed broken product page layout with Collapse field in use
