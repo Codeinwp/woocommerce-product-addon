@@ -37,7 +37,7 @@ function ppom_esc_html( $content ) {
 		'onclick'    => array(),
 		'onchange'   => array(),
 		'onkeyup'    => array(),
-		'data-*'     => array(),
+		'data-*'     => true, // allows all data-* attributes
 		'style'      => array(),
 	);
 	$allowedposttags['form']     = $allowed_atts;
