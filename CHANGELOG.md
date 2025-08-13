@@ -1,3 +1,9 @@
+##### [Version 33.0.14](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.13...v33.0.14) (2025-08-13)
+
+- Fixed showing PPOM fields in WC PDF invoices
+- Fixed missing tooltips on some fields
+- Fixed issue with uploaded files not showing in the order details
+
 ##### [Version 33.0.13](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.12...v33.0.13) (2025-07-25)
 
 - Fixed early textdomain loading issue
