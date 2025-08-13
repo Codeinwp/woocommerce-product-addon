@@ -171,13 +171,11 @@ class NM_PersonalizedProduct {
 		add_filter( 'woocommerce_order_item_display_meta_key', 'ppom_woocommerce_order_key', 10, 3 );
 
 		// when email improvements feature enabled in woocommerce.
+		add_filter( 'woocommerce_order_item_display_meta_value', 'ppom_woocommerce_order_value', 10, 3 );
 		if ( ppom_wc_email_improvements_enabled() ) {
 			add_action( 'woocommerce_order_item_meta_end', 'ppom_woocommerce_order_item_meta_html', 10, 2 );
 			add_filter( 'woocommerce_display_item_meta', '__return_empty_string' );
 			add_filter( 'wpo_ips_display_item_meta_html', 'ppom_invoice_packing_slips_html', 10, 3 );
-		} else {
-			// Few inputs like file/crop/image need to show meta value in tags
-			add_filter( 'woocommerce_order_item_display_meta_value', 'ppom_woocommerce_order_value', 10, 3 );
 		}
 		// Hiding some additional field like ppom_has_quantities
 		add_filter( 'woocommerce_order_item_get_formatted_meta_data', 'ppom_woocommerce_hide_order_meta', 10, 2 );
