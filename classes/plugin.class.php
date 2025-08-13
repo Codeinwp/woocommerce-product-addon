@@ -172,8 +172,9 @@ class NM_PersonalizedProduct {
 
 		// when email improvements feature enabled in woocommerce.
 		if ( ppom_wc_email_improvements_enabled() ) {
-			add_action( 'woocommerce_order_item_meta_end', 'ppom_woocommerce_order_item_meta_html', 10, 4 );
+			add_action( 'woocommerce_order_item_meta_end', 'ppom_woocommerce_order_item_meta_html', 10, 2 );
 			add_filter( 'woocommerce_display_item_meta', '__return_empty_string' );
+			add_filter( 'wpo_ips_display_item_meta_html', 'ppom_invoice_packing_slips_html', 10, 3 );
 		} else {
 			// Few inputs like file/crop/image need to show meta value in tags
 			add_filter( 'woocommerce_order_item_display_meta_value', 'ppom_woocommerce_order_value', 10, 3 );
