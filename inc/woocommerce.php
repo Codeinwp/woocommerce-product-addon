@@ -1428,19 +1428,19 @@ function ppom_woocommerce_order_item_meta_html( $item_id, $item ) {
 	$meta_item_html = '';
 	$output_args = apply_filters( 'ppom_woocommerce_item_meta_args',
 		array(
-			'before'       => '<div>',
-			'after'        => '</div>',
-			'separator'    => '<br>',
-			'label_before' => '<span style="float: left;">',
-			'label_after'  => ':</span> ',
+			'before'       => '<ul class="wc-item-meta"><li>',
+			'after'        => '</li></ul>',
+			'separator'    => '</li><li>',
+			'label_before' => '<strong class="wc-item-meta-label">',
+			'label_after'  => ':</strong> ',
 		)
 	);
 	foreach ( $formatted_meta as $meta ) {
-		$strings[] = $output_args['before'] . $output_args['label_before'] . wp_kses_post( $meta->display_key ) . $output_args['label_after'] . ppom_woocommerce_order_value( $meta->display_value, $meta, $item ) . $output_args['after'];
+		$strings[] = $output_args['label_before'] . wp_kses_post( $meta->display_key ) . $output_args['label_after'] . ppom_woocommerce_order_value( $meta->display_value, $meta, $item );
 	}
 
 	if ( $strings ) {
-		$meta_item_html = implode( $output_args['separator'], $strings );
+		$meta_item_html = $output_args['before'] . implode( $output_args['separator'], $strings ) . $output_args['after'];
 	}
 	echo wp_kses_post( $meta_item_html );
 }
@@ -1452,4 +1452,39 @@ function ppom_woocommerce_order_item_meta_html( $item_id, $item ) {
  */
 function ppom_wc_email_improvements_enabled() {
 	return 'yes' === get_option( 'woocommerce_feature_email_improvements_enabled', 'no' );
+}
+
+/**
+ * Outputs the formatted meta data for invoice or packing slips.
+ *
+ * @param string $html HTML of the item meta data 
+ * @param \WC_Order_Item_Product $item The order item object.
+ * @param array $args arguments for display the html.
+ */
+function ppom_invoice_packing_slips_html( $html, $item, $args = array() ) {
+	$strings = array();
+	$args    = wp_parse_args(
+		$args,
+		array(
+			'before'       => '<ul class="wc-item-meta"><li>',
+			'after'        => '</li></ul>',
+			'separator'    => '</li><li>',
+			'echo'         => true,
+			'autop'        => false,
+			'label_before' => '<strong class="wc-item-meta-label">',
+			'label_after'  => ':</strong> ',
+		)
+	);
+
+	foreach ( $item->get_all_formatted_meta_data() as $meta_id => $meta ) {
+		$meta_value = ppom_woocommerce_order_value( $meta->display_value, $meta, $item );
+		$value      = $args['autop'] ? wp_kses_post( $meta_value ) : wp_kses_post( make_clickable( trim( $meta_value ) ) );
+		$strings[]  = $args['label_before'] . wp_kses_post( $meta->display_key ) . $args['label_after'] . $value;
+	}
+
+	if ( $strings ) {
+		$html = $args['before'] . implode( $args['separator'], $strings ) . $args['after'];
+	}
+
+	return $html;
 }
