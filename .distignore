@@ -21,6 +21,8 @@ artifact
 composer.json
 composer.lock
 .idea
+phpstan.neon
+phpstan-baseline.neon
 **/*.css.map
 .DS_Store
 .gitkeep

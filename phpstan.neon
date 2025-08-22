@@ -1,0 +1,15 @@
+parameters:
+	level: 6
+	paths:
+		- %currentWorkingDirectory%/inc
+		- %currentWorkingDirectory%/classes
+		- %currentWorkingDirectory%/backend
+		- %currentWorkingDirectory%/templates
+	scanFiles:
+		- %currentWorkingDirectory%/woocommerce-product-addon.php
+		- %currentWorkingDirectory%/vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php
+		- %currentWorkingDirectory%/vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+		- %currentWorkingDirectory%/vendor/damian-elenbaas/elementor-stubs/elementor-stubs.php
+includes:
+	- %currentWorkingDirectory%/vendor/szepeviktor/phpstan-wordpress/extension.neon
+	- %currentWorkingDirectory%/phpstan-baseline.neon
