@@ -208,7 +208,9 @@ height: 100px;*/
 /** ========= PPOM Conditional Fields =========== */
 
 .ppom-c-hide{
-  display:none;
+  visibility: hidden;
+  position: absolute;
+  height: 0;
 }
 
 .ppom-c-show{
