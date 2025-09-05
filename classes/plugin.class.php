@@ -1002,7 +1002,8 @@ class NM_PersonalizedProduct {
 
 		// Check if the tooltip is enabled.
 		if ( isset( $meta['desc_tooltip'] ) && 'on' === $meta['desc_tooltip'] ) {
-			$description = ( ! empty( $meta['description'] ) ) ? ' <span data-ppom-tooltip="ppom_tooltip" class="ppom-tooltip" title="' . esc_attr( $input_desc ) . '"><span class="ppom-tooltip-icon"></span></span>' : '';
+			$icon_color  = ppom_get_option( 'ppom_input_tooltip_iconclr', '#000000' );
+			$description = ( ! empty( $meta['description'] ) ) ? ' <span data-ppom-tooltip="ppom_tooltip" class="ppom-tooltip" title="' . esc_attr( $input_desc ) . '"><span class="ppom-tooltip-icon" style="background-color:' . esc_attr( $icon_color ) .'"></span></span>' : '';
 		}
 		return $description;
 	}
