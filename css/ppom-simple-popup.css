@@ -93,3 +93,17 @@
 .ppom-popup-product-edit-modal {
   top: 5%;
 }
+
+.ppom-popup-wrapper .ppom-popup-body .row{
+  margin: 0;
+  padding: 10px 0;
+}
+
+.ppom-popup-wrapper .ppom-popup-body .ppom-addtocart-right {
+  text-align: right;
+  padding-right: 15px;
+}
+
+.woocommerce .cart .ppom-popup-body button {
+  display: inline;
+}
