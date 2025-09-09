@@ -348,3 +348,29 @@ function ppom_get_product_limits( $product_id, $variation_id ) {
 	// ppom_pa($limits);
 	return $limits;
 }
+
+/**
+ * By default, WordPress strips CSS values that contain \ ( & } = or comments, such as rgb()
+ * and rgba(), because the core regex in safecss_filter_attr() flags them as unsafe.
+ *
+ * This filter overrides that behavior by checking if the CSS string contains
+ * "rgb(" or "rgba(" and explicitly allows it. All other CSS values still pass
+ * through the normal WordPress sanitization process.
+ *
+ * @since 1.0.0
+ *
+ * @param bool   $allow_css  Whether the CSS in the string is considered safe.
+ * @param string $css_string The full CSS declaration.
+ *
+ * @return bool  True if the CSS is safe and should be allowed, false otherwise.
+ */
+function ppom_safecss_filter_attr( $allow_css, $css_string ) {
+
+    // If the CSS string contains rgb() or rgba(), mark it as safe.
+    if ( stripos( $css_string, 'rgb(' ) !== false || stripos( $css_string, 'rgba(' ) !== false ) {
+        return true;
+    }
+
+    return $allow_css;
+}
+add_filter( 'safecss_filter_attr_allow_css', 'ppom_safecss_filter_attr', 10, 2 );
