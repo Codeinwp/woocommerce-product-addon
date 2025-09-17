@@ -1,3 +1,10 @@
+##### [Version 33.0.15](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.14...v33.0.15) (2025-09-17)
+
+- Fixed file upload field on iOS devices
+- Fixed the inconsistent Pop-up layout with different themes
+- Fixed tooltip icon color
+- Updated dependencies
+
 ##### [Version 33.0.14](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.13...v33.0.14) (2025-08-13)
 
 - Fixed showing PPOM fields in WC PDF invoices
