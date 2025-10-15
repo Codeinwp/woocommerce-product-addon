@@ -45,10 +45,8 @@ function ppom_hooks_save_cropped_image( $ppom_fields, $posted_data ) {
 				$file_name  = isset( $values['org'] ) ? $values['org'] : '';
 
 				// Verify uploaded file type.
-				if ( ! isset( $cropper['file_types'] ) || empty( $cropper['file_types'] ) ) {
-					continue;
-				}
-				$allowed_types = explode( ',', sanitize_text_field( $cropper['file_types'] ) );
+				$allowed_types = isset( $cropper['file_types'] ) ? sanitize_text_field( $cropper['file_types'] ) : 'jpg,png';
+				$allowed_types = explode( ',', $allowed_types );
 				$dir_path      = ppom_get_dir_path();
 				$file_type     = wp_check_filetype_and_ext( $dir_path . $file_name, $file_name );
 
