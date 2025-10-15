@@ -334,8 +334,8 @@ class PPOM_Meta {
 		$ppom_ids = explode( ',', $ppom_id );
 		foreach ( $ppom_ids as $meta_id ) {
 
-			$qry    = 'SELECT the_meta FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
-			$fields = $wpdb->get_var( $qry );
+			$table  = $wpdb->prefix . PPOM_TABLE_META;
+			$fields = $wpdb->get_var( $wpdb->prepare( "SELECT the_meta FROM $table WHERE productmeta_id = %d", $meta_id ) );
 			$fields = json_decode( $fields, true );
 			if ( is_array( $fields ) ) {
 				$meta_fields = array_merge( $meta_fields, $fields );
@@ -566,7 +566,8 @@ class PPOM_Meta {
 		global $wpdb;
 
 		$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
-		$meta_settings = $wpdb->get_row( $qry );
+		$table         = $wpdb->prefix . PPOM_TABLE_META;
+		$meta_settings = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE productmeta_id = %d", $meta_id ) );
 
 		$meta_settings = empty( $meta_settings ) ? null : $meta_settings;
 

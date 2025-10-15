@@ -465,7 +465,7 @@ class PPOM_Rest {
 
 			// Deleting all fields
 			$ppom_table         = $wpdb->prefix . PPOM_TABLE_META;
-			$res                = $wpdb->query( "DELETE FROM {$ppom_table} WHERE productmeta_id = " . $ppom_meta->productmeta_id );
+			$res                = $wpdb->query( $wpdb->prepare( "DELETE FROM $ppom_table WHERE productmeta_id = %d", $ppom_meta->productmeta_id ) );
 			$delete_fields_resp = array( 'ppom_id' => $ppom_meta->productmeta_id );
 
 			$resp = array(

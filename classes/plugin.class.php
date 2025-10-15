@@ -659,8 +659,8 @@ class NM_PersonalizedProduct {
 
 		global $wpdb;
 
-		$qry = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = $meta_id";
-		$res = $wpdb->get_row( $qry );
+		$table = $wpdb->prefix . PPOM_TABLE_META;
+		$res   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE productmeta_id = %d", $meta_id ) );
 
 		return $res;
 	}
