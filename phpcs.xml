@@ -49,6 +49,7 @@
             </property>
         </properties>
     </rule>
+    <rule ref="WordPress.DB.PreparedSQL"></rule>
     <arg name="extensions" value="php"/>
     <arg value="sp"/>
     <arg name="basepath" value="./" />
