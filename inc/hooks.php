@@ -43,7 +43,18 @@ function ppom_hooks_save_cropped_image( $ppom_fields, $posted_data ) {
 
 				$image_data = $values['cropped'];
 				$file_name  = isset( $values['org'] ) ? $values['org'] : '';
-				$file_name  = ppom_file_get_name( $file_name, $product_id );
+
+				// Verify uploaded file type.
+				$allowed_types = isset( $cropper['file_types'] ) && ! empty( $cropper['file_types'] ) ? sanitize_text_field( $cropper['file_types'] ) : 'jpg,png';
+				$allowed_types = explode( ',', $allowed_types );
+				$dir_path      = ppom_get_dir_path();
+				$file_type     = wp_check_filetype_and_ext( $dir_path . $file_name, $file_name );
+
+				if ( ! in_array( $file_type['ext'], $allowed_types, true ) ) {
+					continue;
+				}
+
+				$file_name = ppom_file_get_name( $file_name, $product_id );
 				ppom_save_data_url_to_image( $image_data, $file_name );
 			}
 			// Saving cropped data to image
