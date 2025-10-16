@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, product addons
 Requires at least: 3.5
 Tested up to: 6.8
-Stable tag: 33.0.15
+Stable tag: 33.0.16
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -251,12 +251,10 @@ PPOM is an open-source project, and we welcome contributors to be part of our vi
 
 == Changelog ==
 
-##### [Version 33.0.15](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.14...v33.0.15) (2025-09-17)
+##### [Version 33.0.16](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.15...v33.0.16) (2025-10-16)
 
-- Fixed file upload field on iOS devices
-- Fixed the inconsistent Pop-up layout with different themes
-- Fixed tooltip icon color
 - Updated dependencies
+- Enhanced security
 
 
 
