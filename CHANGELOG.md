@@ -1,3 +1,8 @@
+##### [Version 33.0.16](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.15...v33.0.16) (2025-10-16)
+
+- Updated dependencies
+- Enhanced security
+
 ##### [Version 33.0.15](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.14...v33.0.15) (2025-09-17)
 
 - Fixed file upload field on iOS devices
