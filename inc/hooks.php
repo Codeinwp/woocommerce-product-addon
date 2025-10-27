@@ -218,14 +218,11 @@ function ppom_hooks_load_input_scripts( $product, $ppom_id = null ) {
 
 	// Price display controller
 	$ppom_price_js = ppom_get_price_table_calculation();
+	$dependencies  = ppom_get_price_table_js_dependencies();
 	wp_enqueue_script(
 		'ppom-price',
 		PPOM_URL . "/js/price/{$ppom_price_js}",
-		array(
-			'jquery',
-			'ppom-inputs',
-			'accounting',
-		),
+		$dependencies,
 		PPOM_VERSION,
 		true 
 	);
