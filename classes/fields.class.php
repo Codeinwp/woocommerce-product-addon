@@ -355,6 +355,7 @@ class PPOM_Fields_Meta {
 
 		$options      = ( isset( $data ['options'] ) ? $data ['options'] : '' );
 		$placeholders = isset( $data['placeholders'] ) ? $data['placeholders'] : '';
+		$types        = isset( $data['types'] ) ? $data['types'] : '';
 
 		$existing_name = 'name="ppom[' . esc_attr( $field_index ) . '][' . esc_attr( $name ) . ']"';
 
@@ -439,6 +440,13 @@ class PPOM_Fields_Meta {
 				);
 				$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock', 'woocommerce-product-addon' ) . ' (' . __( 'PRO only', 'woocommerce-product-addon' ) . ')';
 
+				$option_type   = ( isset( $types[0] ) && ! empty( $types[0] ) ) ? $types[0] : 'text';
+				$price_type    = ( isset( $types[1] ) && ! empty( $types[1] ) ) ? $types[1] : 'text';
+				$discount_type = ( isset( $types[2] ) && ! empty( $types[2] ) ) ? $types[2] : 'text';
+				$tooltip_type  = ( isset( $types[3] ) && ! empty( $types[3] ) ) ? $types[3] : 'text';
+				$weight_type   = ( isset( $types[4] ) && ! empty( $types[4] ) ) ? $types[4] : 'text';
+				$stock_type    = ( isset( $types[5] ) && ! empty( $types[5] ) ) ? $types[5] : 'text';
+
 				if ( ppom_pro_is_installed() ) {
 
 					$plc_discount = ( isset( $placeholders[2] ) && ! empty( $placeholders ) ) ? $placeholders[2] : __( 'Discount', 'woocommerce-product-addon' );
@@ -470,16 +478,16 @@ class PPOM_Fields_Meta {
 						$option_id   = ppom_get_option_id( $option );
 						$html_input .= '<li class="data-options ppom-sortable-handle" style="display: flex;" data-condition-type="simple_options">';
 						$html_input .= '<span class="dashicons dashicons-move"></span>';
-						$html_input .= '<input type="text" class="option-title form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . $plc_option . '" data-metatype="option" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="option-price form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][price]" value="' . esc_attr( $option['price'] ) . '" placeholder="' . $plc_price . '" data-metatype="price" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="' . $option_type . '" class="option-title form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][option]" value="' . esc_attr( stripslashes( $option['option'] ) ) . '" placeholder="' . $plc_option . '" data-metatype="option" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="' . $price_type . '" class="option-price form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][price]" value="' . esc_attr( $option['price'] ) . '" placeholder="' . $plc_price . '" data-metatype="price" data-opt-index="' . esc_attr( $opt_index ) . '">';
 
 						if ( $fields_type === 'checkbox' ) {
-							$html_input .= '<input type="text" class="option-discount form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][discount]" value="' . esc_attr( $discount ) . '" placeholder="' . $plc_discount . '" data-metatype="discount" data-opt-index="' . esc_attr( $opt_index ) . '">';
-							$html_input .= '<input type="text" class="option-tooltip form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][tooltip]" value="' . esc_attr( $tooltip ) . '" placeholder="' . $plc_tooltip . '" data-metatype="tooltip" data-opt-index="' . esc_attr( $opt_index ) . '">';
+							$html_input .= '<input type="' . $discount_type . '" class="option-discount form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][discount]" value="' . esc_attr( $discount ) . '" placeholder="' . $plc_discount . '" data-metatype="discount" data-opt-index="' . esc_attr( $opt_index ) . '">';
+							$html_input .= '<input type="' . $tooltip_type . '" class="option-tooltip form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][tooltip]" value="' . esc_attr( $tooltip ) . '" placeholder="' . $plc_tooltip . '" data-metatype="tooltip" data-opt-index="' . esc_attr( $opt_index ) . '">';
 						}
 
-						$html_input .= '<input type="text" class="option-weight form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][weight]" value="' . esc_attr( $weight ) . '" placeholder="' . $plc_weight . '" data-metatype="weight" data-opt-index="' . esc_attr( $opt_index ) . '">';
-						$html_input .= '<input type="text" class="option-stock form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][stock]" value="' . esc_attr( $stock ) . '" placeholder="' . $plc_stock . '" data-metatype="stock" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="' . $weight_type . '" class="option-weight form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][weight]" value="' . esc_attr( $weight ) . '" placeholder="' . $plc_weight . '" data-metatype="weight" data-opt-index="' . esc_attr( $opt_index ) . '">';
+						$html_input .= '<input type="' . $stock_type . '" class="option-stock form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][stock]" value="' . esc_attr( $stock ) . '" placeholder="' . $plc_stock . '" data-metatype="stock" data-opt-index="' . esc_attr( $opt_index ) . '">';
 						$html_input .= '<input type="text" class="option-id form-control ppom-option-keys" name="ppom[' . esc_attr( $field_index ) . '][options][' . esc_attr( $opt_index ) . '][id]" value="' . esc_attr( $option_id ) . '" placeholder="' . $plc_id . '" data-metatype="id" data-opt-index="' . esc_attr( $opt_index ) . '">';
 
 						$html_input .= '<button class="btn btn-success ppom-add-option" data-option-type="paired"><i class="fa fa-plus" aria-hidden="true"></i></button>';
@@ -494,16 +502,16 @@ class PPOM_Fields_Meta {
 				} else {
 					$html_input .= '<li class="data-options" style="display: flex;" data-condition-type="simple_options">';
 					$html_input .= '<span class="dashicons dashicons-move"></span>';
-					$html_input .= '<input type="text" class="option-title form-control ppom-option-keys" placeholder="' . $plc_option . '" data-metatype="option">';
-					$html_input .= '<input type="text" class="option-price form-control ppom-option-keys" placeholder="' . $plc_price . '" data-metatype="price">';
+					$html_input .= '<input type="' . $option_type . '" class="option-title form-control ppom-option-keys" placeholder="' . $plc_option . '" data-metatype="option">';
+					$html_input .= '<input type="' . $price_type . '" class="option-price form-control ppom-option-keys" placeholder="' . $plc_price . '" data-metatype="price">';
 
 					if ( $fields_type === 'checkbox' ) {
-						$html_input .= '<input type="text" class="option-discount form-control ppom-option-keys" placeholder="' . $plc_discount . '" data-metatype="discount">';
-						$html_input .= '<input type="text" class="option-tooltip form-control ppom-option-keys" placeholder="' . $plc_tooltip . '" data-metatype="tooltip">';
+						$html_input .= '<input type="' . $discount_type . '" class="option-discount form-control ppom-option-keys" placeholder="' . $plc_discount . '" data-metatype="discount">';
+						$html_input .= '<input type="' . $tooltip_type . '" class="option-tooltip form-control ppom-option-keys" placeholder="' . $plc_tooltip . '" data-metatype="tooltip">';
 					}
 
-					$html_input .= '<input type="text" class="option-weight form-control ppom-option-keys" placeholder="' . $plc_weight . '" data-metatype="weight">';
-					$html_input .= '<input type="text" class="option-stock form-control ppom-option-keys" placeholder="' . $plc_stock . '" data-metatype="stock">';
+					$html_input .= '<input type="' . $weight_type . '" class="option-weight form-control ppom-option-keys" placeholder="' . $plc_weight . '" data-metatype="weight">';
+					$html_input .= '<input type="' . $stock_type . '" class="option-stock form-control ppom-option-keys" placeholder="' . $plc_stock . '" data-metatype="stock">';
 
 					$html_input .= '<input type="text" class="option-id form-control ppom-option-keys" placeholder="' . $plc_id . '" data-metatype="id">';
 
