@@ -755,12 +755,6 @@ jQuery(function($) {
 
 
                     var img_icon = '<img width="60" src="' + fileurl + '" style="width: 34px;">';
-                    var url_field = '<input placeholder="url" type="text" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][url]" class="form-control" data-opt-index="' + option_index + '" data-metatype="url">';
-
-                    if (meta.type !== 'image') {
-                        var img_icon = '<img width="60" src="' + meta.icon + '" style="width: 34px;">';
-                        url_field = '';
-                    }
 
                     var price_metatype = 'price';
                     var stock_metatype = 'stock';
@@ -777,6 +771,7 @@ jQuery(function($) {
                     else if (meta_type == 'images') {
                         var class_name = 'data-options ui-sortable-handle';
                         var condidtion_attr = 'image_options';
+                        price_metatype = 'meta_id';
                     }
                     else if (meta_type == 'conditional_meta') {
                         meta_type = 'images';
@@ -788,6 +783,13 @@ jQuery(function($) {
                     else {
                         var class_name = '';
                         var condidtion_attr = '';
+                    }
+
+                    let url_field = '<input placeholder="url" type="text" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][url]" class="form-control" data-opt-index="' + option_index + '" data-metatype="url" value="">';
+
+                    if (meta.type !== 'image') {
+                        img_icon = '<img width="60" src="' + meta.icon + '" style="width: 34px;">';
+                        url_field = '';
                     }
 
                     if (fileurl) {
@@ -802,7 +804,7 @@ jQuery(function($) {
                         image_box += '<input type="hidden" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][link]" value="' + fileurl + '" data-opt-index="' + option_index + '" data-metatype="link">';
                         image_box += '<input type="hidden" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][id]" value="' + fileid + '" data-opt-index="' + option_index + '" data-metatype="id">';
                         image_box += '<input type="text" placeholder="Title" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][title]" class="form-control ppom-image-option-title" data-opt-index="' + option_index + '" data-metatype="title" value="' + file_title + '">';
-                        image_box += '<input class="form-control" type="text" placeholder="' + price_placeholder + '" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][' + price_metatype + ']" class="form-control" data-opt-index="' + option_index + '" data-metatype="' + price_metatype + '">';
+                        image_box += '<input class="form-control" type="text" placeholder="' + price_placeholder + '" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][' + price_metatype + ']" class="form-control" data-opt-index="' + option_index + '" data-metatype="' + price_metatype + '" value="">';
 
                         if (meta_type != 'audio') {
                             image_box += '<input class="form-control" type="text" placeholder="' + stock_placeholder + '" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][' + stock_metatype + ']" class="form-control" data-opt-index="' + option_index + '" data-metatype="' + stock_metatype + '">';
@@ -843,12 +845,6 @@ jQuery(function($) {
             var fileurl = attachment.url;
             var fileid = attachment.id;
             var img_icon = '<img width="60" src="' + fileurl + '" style="width: 34px;">';
-            var url_field = '<input placeholder="url" type="text" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][url]" class="form-control" data-opt-index="' + option_index + '" data-metatype="url">';
-
-            if (attachment.type !== 'image') {
-                var img_icon = '<img width="60" src="' + attachment.icon + '" style="width: 34px;">';
-                url_field = '';
-            }
 
             var price_metatype = 'price';
             var stock_metatype = 'stock';
@@ -865,6 +861,7 @@ jQuery(function($) {
             else if (meta_type == 'images') {
                 var class_name = 'data-options ui-sortable-handle';
                 var condidtion_attr = 'image_options';
+                price_metatype = 'meta_id';
             }
             else if (meta_type == 'conditional_meta') {
                 meta_type = 'images';
@@ -876,6 +873,13 @@ jQuery(function($) {
             else {
                 var class_name = '';
                 var condidtion_attr = '';
+            }
+
+            let url_field = '<input placeholder="url" type="text" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][url]" class="form-control" data-opt-index="' + option_index + '" data-metatype="url" value="">';
+
+            if (attachment.type !== 'image') {
+                img_icon = '<img width="60" src="' + attachment.icon + '" style="width: 34px;">';
+                url_field = '';
             }
 
             if (fileurl) {
@@ -890,7 +894,7 @@ jQuery(function($) {
                 image_box += '<input type="hidden" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][link]" value="' + fileurl + '" data-opt-index="' + option_index + '" data-metatype="link">';
                 image_box += '<input type="hidden" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][id]" value="' + fileid + '" data-opt-index="' + option_index + '" data-metatype="id">';
                 image_box += '<input type="text" placeholder="Title" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][title]" class="form-control ppom-image-option-title" data-opt-index="' + option_index + '" data-metatype="title">';
-                image_box += '<input class="form-control" type="text" placeholder="' + price_placeholder + '" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][' + price_metatype + ']" class="form-control" data-opt-index="' + option_index + '" data-metatype="' + price_metatype + '">';
+                image_box += '<input class="form-control" type="text" placeholder="' + price_placeholder + '" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][' + price_metatype + ']" class="form-control" data-opt-index="' + option_index + '" data-metatype="' + price_metatype + '" value="">';
                 image_box += '<input class="form-control" type="text" placeholder="' + stock_placeholder + '" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][' + stock_metatype + ']" class="form-control" data-opt-index="' + option_index + '" data-metatype="' + stock_metatype + '">';
                 image_box += url_field;
                 image_box += '<button class="btn btn-danger ppom-pre-upload-delete" style="height: 35px;"><i class="fa fa-times" aria-hidden="true"></i></button>';
