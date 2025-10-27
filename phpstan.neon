@@ -1,5 +1,7 @@
 parameters:
 	level: 6
+	dynamicConstantNames:
+		- WC_VERSION
 	paths:
 		- %currentWorkingDirectory%/inc
 		- %currentWorkingDirectory%/classes

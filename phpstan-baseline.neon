@@ -4111,11 +4111,6 @@ parameters:
 			path: inc/functions.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: inc/functions.php
-
-		-
 			message: "#^Parameter \\#1 \\$text of function esc_attr expects string, int\\<0, max\\> given\\.$#"
 			count: 1
 			path: inc/functions.php
@@ -4592,7 +4587,7 @@ parameters:
 
 		-
 			message: "#^If condition is always true\\.$#"
-			count: 2
+			count: 1
 			path: inc/hooks.php
 
 		-

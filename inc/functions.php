@@ -2186,7 +2186,6 @@ function ppom_get_price_table_calculation() {
 function ppom_get_price_table_js_dependencies() {
 	$dependencies = array( 'jquery', 'ppom-inputs' );
 
-	// @phpstan-ignore-next-line
 	if ( version_compare( WC_VERSION, '10.3.0', '<' ) ) {
 		$dependencies[] = 'accounting';
 	} else{
