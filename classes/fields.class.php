@@ -440,12 +440,12 @@ class PPOM_Fields_Meta {
 				);
 				$plc_stock    = ( isset( $placeholders[5] ) && ! empty( $placeholders ) ) ? $placeholders[5] : __( 'Stock', 'woocommerce-product-addon' ) . ' (' . __( 'PRO only', 'woocommerce-product-addon' ) . ')';
 
-				$option_type   = ( isset( $types[0] ) && ! empty( $types[0] ) ) ? $types[0] : 'text';
-				$price_type    = ( isset( $types[1] ) && ! empty( $types[1] ) ) ? $types[1] : 'text';
-				$discount_type = ( isset( $types[2] ) && ! empty( $types[2] ) ) ? $types[2] : 'text';
-				$tooltip_type  = ( isset( $types[3] ) && ! empty( $types[3] ) ) ? $types[3] : 'text';
-				$weight_type   = ( isset( $types[4] ) && ! empty( $types[4] ) ) ? $types[4] : 'text';
-				$stock_type    = ( isset( $types[5] ) && ! empty( $types[5] ) ) ? $types[5] : 'text';
+				$option_type   = ( isset( $types[0] ) && ! empty( $types[0] ) ) ? sanitize_text_field( $types[0] ) : 'text';
+				$price_type    = ( isset( $types[1] ) && ! empty( $types[1] ) ) ? sanitize_text_field( $types[1] ) : 'text';
+				$discount_type = ( isset( $types[2] ) && ! empty( $types[2] ) ) ? sanitize_text_field( $types[2] ) : 'text';
+				$tooltip_type  = ( isset( $types[3] ) && ! empty( $types[3] ) ) ? sanitize_text_field( $types[3] ) : 'text';
+				$weight_type   = ( isset( $types[4] ) && ! empty( $types[4] ) ) ? sanitize_text_field( $types[4] ) : 'text';
+				$stock_type    = ( isset( $types[5] ) && ! empty( $types[5] ) ) ? sanitize_text_field( $types[5] ) : 'text';
 
 				if ( ppom_pro_is_installed() ) {
 
