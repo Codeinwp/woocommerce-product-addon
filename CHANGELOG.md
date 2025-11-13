@@ -1,3 +1,10 @@
+##### [Version 33.0.17](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.16...v33.0.17) (2025-11-13)
+
+- Enhanced security
+- Fixed load of JS script dependencies for latest WooCommerce version
+- Fixed issue with FixedPrice field giving a fatal error when string is used in quantity field 
+- Fixed color option overlapping
+
 ##### [Version 33.0.16](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.15...v33.0.16) (2025-10-16)
 
 - Updated dependencies
