@@ -904,6 +904,19 @@ select {
     margin: 0 !important
 }
 
+.ppom-color-picker-cloner .wp-picker-container .wp-picker-holder {
+    z-index: 2;
+    position: absolute;
+}
+
+.ppom-color-picker-cloner .wp-picker-container .wp-picker-input-wrap {
+    margin-top: 8px;
+}
+
+.wp-picker-container input[type=text].wp-color-picker {
+    width: 4.5rem;
+}
+
 ul.ppom-options-container li input[type="text"] {
     height: 34px;
 }
