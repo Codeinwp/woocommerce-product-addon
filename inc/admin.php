@@ -808,6 +808,7 @@ function ppom_admin_bar_menu() {
 			'metaid'    => $meta->productmeta_id,
 			'metatitle' => $meta->productmeta_name,
 			'action'    => 'ppom_attach',
+			'nonce'     => wp_create_nonce( 'ppom_attach' ),
 		);
 		$apply_link = add_query_arg( $apply_arg, $apply_link );
 		$bar_title  = "Apply {$meta->productmeta_name}";
