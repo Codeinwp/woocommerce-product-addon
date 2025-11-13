@@ -52,6 +52,7 @@ class PPOM_FRONTEND_SCRIPTS {
 	private static function get_scripts() {
 
 		$ppom_price_js = ppom_get_price_table_calculation();
+		$dependencies  = ppom_get_price_table_js_dependencies();
 
 		$register_scripts = array(
 			'PPOM-sm-popup'      => array(
@@ -71,7 +72,7 @@ class PPOM_FRONTEND_SCRIPTS {
 			),
 			'ppom-price'         => array(
 				'src'     => self::$scripts_url . "/js/price/{$ppom_price_js}",
-				'deps'    => array( 'jquery', 'ppom-inputs', 'accounting' ),
+				'deps'    => $dependencies,
 				'version' => self::$version,
 			),
 			'ppom-inputmask'     => array(
