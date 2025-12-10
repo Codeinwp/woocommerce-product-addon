@@ -2,7 +2,7 @@
 Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, product addons
 Requires at least: 3.5
-Tested up to: 6.8
+Tested up to: 6.9
 Stable tag: 33.0.17
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
