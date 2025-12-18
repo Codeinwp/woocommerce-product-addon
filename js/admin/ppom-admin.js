@@ -759,6 +759,7 @@ jQuery(function($) {
                     var price_metatype = 'price';
                     var stock_metatype = 'stock';
                     var stock_placeholder = ppom_vars.i18n.stock;
+                    let url_field = '<input placeholder="url" type="text" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][url]" class="form-control" data-opt-index="' + option_index + '" data-metatype="url" value="">';
 
                     // Set name key for imageselect addon
                     if (meta_type == 'imageselect') {
@@ -779,13 +780,12 @@ jQuery(function($) {
                         var condidtion_attr = 'image_options';
                         price_placeholder = ppom_vars.i18n.metaIds;
                         price_metatype = 'meta_id';
+                        url_field = '<input placeholder="url" type="text" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][url]" class="form-control" data-opt-index="' + option_index + '" data-metatype="url" value="">';
                     }
                     else {
                         var class_name = '';
                         var condidtion_attr = '';
                     }
-
-                    let url_field = '<input placeholder="url" type="text" name="ppom[' + field_index + '][' + meta_type + '][' + option_index + '][url]" class="form-control" data-opt-index="' + option_index + '" data-metatype="url" value="">';
 
                     if (meta.type !== 'image') {
                         img_icon = '<img width="60" src="' + meta.icon + '" style="width: 34px;">';
