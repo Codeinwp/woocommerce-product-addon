@@ -2916,21 +2916,6 @@ parameters:
 			path: inc/admin.php
 
 		-
-			message: "#^Variable \\$ppom might not be defined\\.$#"
-			count: 1
-			path: inc/admin.php
-
-		-
-			message: "#^Variable \\$product_id might not be defined\\.$#"
-			count: 1
-			path: inc/admin.php
-
-		-
-			message: "#^Variable \\$productmeta_id might not be defined\\.$#"
-			count: 11
-			path: inc/admin.php
-
-		-
 			message: "#^Constant PPOM_PATH not found\\.$#"
 			count: 1
 			path: inc/arrays.php
