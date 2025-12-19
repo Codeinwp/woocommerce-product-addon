@@ -291,19 +291,20 @@ function ppom_admin_save_form_meta() {
 
 	global $wpdb;
 
-	extract( $_REQUEST );
-
 	$send_file_attachment = 'NA';
 	$aviary_api_key       = 'NA';
 	$show_cart_thumb      = 'NA';
 
+	$ppom           = array();
+	$productmeta_id = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
+
 	if ( is_string( $_REQUEST['ppom'] ) ) {
 		$ppom_encoded = $_REQUEST['ppom'];
 		parse_str( $ppom_encoded, $ppom_decoded);
-		$_REQUEST['ppom'] = $ppom_decoded['ppom'];
+		$ppom = $ppom_decoded['ppom'];
 	}
 
-	$ppom_meta    = ( isset($_REQUEST['ppom_meta']) ? $_REQUEST['ppom_meta'] : isset($_REQUEST['ppom']) ) ? $_REQUEST['ppom'] : '';
+	$ppom_meta    = isset($_REQUEST['ppom_meta']) ? $_REQUEST['ppom_meta'] : $ppom;
 
 	if ( empty( $ppom_meta ) ) {
 		$resp = array(
@@ -331,6 +332,7 @@ function ppom_admin_save_form_meta() {
 	$aviary_api_key         = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
 	$productmeta_style      = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
 	$productmeta_js         = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
+	$product_id             = isset( $_REQUEST['product_id'] ) ? intval( $_REQUEST['product_id'] ) : 0;
 
 	if ( strlen( $productmeta_name ) > 50 ) {
 		$resp = array(
@@ -406,8 +408,8 @@ function ppom_admin_save_form_meta() {
 	}
 
 
-	if ( isset( $_REQUEST['product_id'] ) && $_REQUEST['product_id'] != '' ) {
-		ppom_attach_fields_to_product( $ppom_id, intval( $_REQUEST['product_id'] ) );
+	if ( ! empty( $product_id ) ) {
+		ppom_attach_fields_to_product( $ppom_id, $product_id );
 		$redirect_to = get_permalink( $product_id );
 	}
 
@@ -438,8 +440,8 @@ function ppom_admin_save_form_meta() {
 function ppom_admin_update_form_meta() {
 
 
-	$return_page = isset( $_REQUEST['ppom_meta'] ) ? 'ppom-energy' : 'ppom';
-	extract( $_REQUEST );
+	$return_page    = isset( $_REQUEST['ppom_meta'] ) ? 'ppom-energy' : 'ppom';
+	$productmeta_id = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
 
 	$ppom_args   = array(
 		'page'           => $return_page,
@@ -640,7 +642,7 @@ function ppom_admin_delete_meta() {
 
 	global $wpdb;
 
-	extract( $_REQUEST );
+	$productmeta_id = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
 
 	$tbl_name = $wpdb->prefix . PPOM_TABLE_META;
 	$ppom_id  = intval( $productmeta_id );
