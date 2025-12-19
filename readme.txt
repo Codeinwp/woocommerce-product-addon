@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, product addons
 Requires at least: 3.5
 Tested up to: 6.9
-Stable tag: 33.0.17
+Stable tag: 33.0.18
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -251,12 +251,10 @@ PPOM is an open-source project, and we welcome contributors to be part of our vi
 
 == Changelog ==
 
-##### [Version 33.0.17](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.16...v33.0.17) (2025-11-13)
+##### [Version 33.0.18](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.17...v33.0.18) (2025-12-19)
 
+- Fixed image upload in image dropdown field
 - Enhanced security
-- Fixed load of JS script dependencies for latest WooCommerce version
-- Fixed issue with FixedPrice field giving a fatal error when string is used in quantity field 
-- Fixed color option overlapping
 
 
 

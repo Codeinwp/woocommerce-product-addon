@@ -1,3 +1,8 @@
+##### [Version 33.0.18](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.17...v33.0.18) (2025-12-19)
+
+- Fixed image upload in image dropdown field
+- Enhanced security
+
 ##### [Version 33.0.17](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.16...v33.0.17) (2025-11-13)
 
 - Enhanced security
