@@ -18,7 +18,7 @@ Are you a WooCommerce store owner looking to offer personalized products? PPOM (
 
 - Would you like to see PPOM in action before installing it? [VIEW PPOM FIELDS DEMO](https://demo-ppom-lite.vertisite.cloud/)
 - Need any help with setup? [CHECK DOCUMENTATION](https://docs.themeisle.com/collection/1695-product-option-manager)
-- Interested in PPOM PRO? [LEARN MORE ABOUT PPOM PRO](https://themeisle.com/plugins/ppom-pro/upgrade?utm_source=wpadmin&utm_medium=readme&utm_campaign=quick-links)
+- Interested in PPOM PRO? [LEARN MORE ABOUT PPOM PRO](https://themeisle.com/plugins/ppom-pro/upgrade?utm_source=wordpressorg&utm_medium=readme&utm_campaign=quick-links)
 
 ## Why Choose PPOM?
 
@@ -193,7 +193,7 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 ✅ **Enquiry Form**: The "Enquiry Form" add-on simplifies collecting custom customer inquiries directly from your website, helping you address their needs efficiently. Customize where messages go and how you respond to enhance user satisfaction and potentially increase sales.
 
-Interested in PPOM PRO? [Learn more](https://themeisle.com/plugins/ppom-pro/upgrade?utm_source=wpadmin&utm_medium=readme&utm_campaign=interested-pro)
+Interested in PPOM PRO? [Learn more](https://themeisle.com/plugins/ppom-pro/upgrade?utm_source=wordpressorg&utm_medium=readme&utm_campaign=interested-pro)
 
 ## Tailored Flexibility for Every Business Need:
 
@@ -232,7 +232,7 @@ PPOM is an open-source project, and we welcome contributors to be part of our vi
 ###Useful Resources 📌
 
 - Read more about WordPress on our [blog](https://themeisle.com/blog/).
-- Interested in our other plugins? Take a look [here](https://themeisle.com/wordpress-plugins/?utm_source=wpadmin&utm_medium=readme&utm_campaign=PPOM).
+- Interested in our other plugins? Take a look [here](https://themeisle.com/wordpress-plugins/?utm_source=wordpressorg&utm_medium=readme&utm_campaign=PPOM).
 
 == Installation ==
 1. Upload the plugin directory to the `/wp-content/plugins/` directory
