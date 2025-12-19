@@ -84,7 +84,7 @@ function ppom_init_js_for_ppom_fields(ppom_fields) {
             // masking
             case 'text':
                 if (input.input_mask == undefined || input.input_mask == '') break;
-                InputSelector.inputmask();
+                InputSelector.inputmask({regex: input.input_mask});
                 if (input.type === 'text' &&
                     input.input_mask !== '' &&
                     input.use_regex !== 'on') {
