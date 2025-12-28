@@ -604,7 +604,7 @@ jQuery(function($) {
         clone_new_field.find('[data-table-id="audio"] .pre-upload-box li').remove();
         // clone_new_field.find('[data-table-id="imageselect"] .pre-upload-box li').remove();
         // clone_new_field.find('.data-options').not(':last').remove();
-        clone_new_field.find('.webcontact-rules').not(':last').remove();
+        // clone_new_field.find('.webcontact-rules').not(':last').remove();
 
         // set existing conditions meta
         $(clone_new_field).find('select[data-metatype="elements"]').each(function(i, condition_element) {
@@ -631,7 +631,22 @@ jQuery(function($) {
         var option_controller = clone_new_field.find('.ppom-fields-option');
 
         ppom_option_controller(option_controller, field_index, option_index, ppom_option_type);
-        ppom_add_condition_set_index(add_cond_selector, field_index, field_type, option_index);
+        // ppom_add_condition_set_index(add_cond_selector, field_index, field_type, option_index);
+        clone_new_field.find('.webcontact-rules').each(function(index, rule_row) {
+             // Update ID and Label
+             $(rule_row).attr('id', 'rule-box-' + parseInt(index + 1))
+                .find('label')
+                .text(function(i,txt) {
+                    return txt.replace(/\d+/, parseInt(index + 1));
+                });
+
+             var rule_inputs = $(rule_row).find('.ppom-conditional-keys');
+             ppom_add_condition_set_index(rule_inputs, field_index, field_type, index);
+        });
+        
+        // Update last-id
+        var rules_count = clone_new_field.find('.webcontact-rules').length;
+        clone_new_field.find('.ppom-condition-last-id').val(rules_count);
 
         // for eventcalendar changing index
         ppom_eventcalendar_set_index(eventcalendar_selector, field_index);
