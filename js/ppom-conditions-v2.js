@@ -16,11 +16,12 @@ jQuery(function($) {
             if ($(field).closest('div.ppom-field-wrapper').hasClass('ppom-c-hide')) return;
 
             const data_name = $(field).data('data_name');
-            ppom_check_conditions(data_name, function(element_dataname, event_type) {
+            ppom_check_conditions(data_name, function(element_dataname, event_type, was_hidden) {
             // console.log(data_name, event_type);
                 $.event.trigger({
                     type: event_type,
                     field: element_dataname,
+                    was_hidden: was_hidden,
                     time: new Date()
                 });
             });
@@ -29,10 +30,11 @@ jQuery(function($) {
         $('form.cart').find('div.ppom-c-show').each(function(i, field) {
 
             const data_name = $(field).data('data_name');
-            ppom_check_conditions(data_name, function(element_dataname, event_type) {
+            ppom_check_conditions(data_name, function(element_dataname, event_type, was_hidden) {
                 $.event.trigger({
                     type: event_type,
                     field: element_dataname,
+                    was_hidden: was_hidden,
                     time: new Date()
                 });
             });
@@ -60,10 +62,11 @@ jQuery(function($) {
         }
 
         const data_name = modifiedElement.dataset?.data_name;
-        ppom_check_conditions(data_name, (element_dataname, event_type) => {
+        ppom_check_conditions(data_name, (element_dataname, event_type, was_hidden) => {
             $.event.trigger({
                 type: event_type,
                 field: element_dataname,
+                was_hidden: was_hidden,
                 time: new Date()
             });
         });
@@ -170,11 +173,12 @@ jQuery(function($) {
             time: new Date()
         });
 
-        ppom_check_conditions(e.field, function(element_dataname, event_type) {
+        ppom_check_conditions(e.field, function(element_dataname, event_type, was_hidden) {
             // console.log(`${element_dataname} ===> ${event_type}`);
             $.event.trigger({
                 type: event_type,
                 field: element_dataname,
+                was_hidden: was_hidden,
                 time: new Date()
             });
         });
@@ -191,13 +195,16 @@ jQuery(function($) {
         ppom_fields_hidden_conditionally();
 
         // Set checked/selected again
-        ppom_set_default_option(e.field);
+        if (e.was_hidden) {
+            ppom_set_default_option(e.field);
+        }
 
-        ppom_check_conditions(e.field, function(element_dataname, event_type) {
+        ppom_check_conditions(e.field, function(element_dataname, event_type, was_hidden) {
             // console.log(`${element_dataname} ===> ${event_type}`);
             $.event.trigger({
                 type: event_type,
                 field: element_dataname,
+                was_hidden: was_hidden,
                 time: new Date()
             });
         });
@@ -318,6 +325,8 @@ function ppom_check_conditions(data_name, callback) {
             event_type = visibility === 'hide' ? 'ppom_field_hidden' : 'ppom_field_shown';
             // console.log(`${t} ***** ${element_data_name} total_cond ${total_cond} == matched ${matched} ==> ${matched_conditions[element_data_name]} ==> visibility ${event_type}`);
 
+            const was_hidden = jQuery(this).hasClass('ppom-c-hide');
+
             if ( (matched_conditions[element_data_name] > 0 && binding === 'Any') ||
                  (matched_conditions[element_data_name] == total_cond && binding === 'All')
                 ) {
@@ -332,7 +341,7 @@ function ppom_check_conditions(data_name, callback) {
                 });
 
                 if ( typeof callback == "function" ) {
-                    callback(element_data_name, event_type);
+                    callback(element_data_name, event_type, was_hidden);
                 }
             }
             else if ( ! is_matched || matched_conditions[element_data_name] !== total_cond) {
@@ -346,7 +355,7 @@ function ppom_check_conditions(data_name, callback) {
                 }
 
                 if ( typeof callback == "function" )
-                    callback(element_data_name, event_type);
+                    callback(element_data_name, event_type, was_hidden);
             } else {
 
                 jQuery(this).removeClass(`ppom-locked-${data_name} ppom-c-hide`);
@@ -535,9 +544,7 @@ function ppom_set_default_option(field_id) {
         break;
 
         case 'select':
-            if ( '' === jQuery("#" + field.data_name).val() ) {
-                jQuery("#" + field.data_name).val(field.selected);
-            }
+            jQuery("#" + field.data_name).val(field.selected);
             break;
 
         case 'image':
