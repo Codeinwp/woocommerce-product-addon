@@ -595,7 +595,6 @@ jQuery(function($) {
         // handle multiple options
         var ppom_option_type = 'ppom_copy_option';
         var option_selector = clone_new_field.find('.ppom-option-keys');
-        var add_cond_selector = clone_new_field.find('.ppom-conditional-keys');
         var eventcalendar_selector = clone_new_field.find('.ppom-eventcalendar-field');
         var image_option_selector = clone_new_field.find('[data-table-id="image"] .data-options, [data-table-id="imageselect"] .data-options');
 
@@ -604,7 +603,6 @@ jQuery(function($) {
         clone_new_field.find('[data-table-id="audio"] .pre-upload-box li').remove();
         // clone_new_field.find('[data-table-id="imageselect"] .pre-upload-box li').remove();
         // clone_new_field.find('.data-options').not(':last').remove();
-        clone_new_field.find('.webcontact-rules').not(':last').remove();
 
         // set existing conditions meta
         $(clone_new_field).find('select[data-metatype="elements"]').each(function(i, condition_element) {
@@ -631,7 +629,10 @@ jQuery(function($) {
         var option_controller = clone_new_field.find('.ppom-fields-option');
 
         ppom_option_controller(option_controller, field_index, option_index, ppom_option_type);
-        ppom_add_condition_set_index(add_cond_selector, field_index, field_type, option_index);
+        clone_new_field.find('.webcontact-rules').each(function(index, rule_row) {
+            const rule_inputs = $(rule_row).find('.ppom-conditional-keys');
+            ppom_add_condition_set_index(rule_inputs, field_index, field_type, index);
+        });
 
         // for eventcalendar changing index
         ppom_eventcalendar_set_index(eventcalendar_selector, field_index);
@@ -961,6 +962,10 @@ jQuery(function($) {
         }
 
     }).on('click', '.ppom-remove-rule', function(e) {
+        const div = $(this).parents('.form-group');
+        const option_index = parseInt(div.find('.ppom-condition-last-id').val());
+        div.find('.ppom-condition-last-id').val(option_index - 1);
+
         var removeButton = $(this );
         if (removeButton.parents('.ppom-condition-clone-js')?.find('.webcontact-rules')?.length === 1) {
             removeButton
