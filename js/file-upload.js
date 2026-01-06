@@ -38,13 +38,14 @@ jQuery(function($) {
         var image_id = e.image.id;
         var data_name = e.data_name;
         var input_type = e.input_type;
+        const file_input = e.file_input;
 
         if (input_type === 'cropper') {
 
             field_meta = ppom_get_field_meta_by_id(data_name);
             // console.log('ppom',field_meta)
             if (field_meta.legacy_cropper === undefined) {
-                ppom_show_cropped_preview(data_name, image_url, image_id);
+                ppom_show_cropped_preview(data_name, image_url, image_id, file_input);
                 // hiding the filelist-{data_name} when preview enabled
                 $(`#filelist-${data_name}`).hide();
                 // hide the file upload area too
@@ -82,8 +83,15 @@ jQuery(function($) {
         cropp_preview_container.find('.croppie-container').each(function(i, croppie_dom) {
 
             var image_id = jQuery(croppie_dom).attr('data-image_id');
+            const croppie_container = jQuery('.ppom-croppie-preview-' + image_id);
+            const image_url = jQuery(croppie_dom).find('img').attr('src');
             $(croppie_dom).croppie('destroy');
             const viewport = {'width': v_width, 'height': v_height};
+
+            file_list_preview_containers[data_name]['croppie'][image_id] = croppie_container;
+            file_list_preview_containers[data_name]['image_id'] = image_id;
+            file_list_preview_containers[data_name]['image_url'] = image_url;
+
             ppom_set_croppie_options(data_name, viewport, image_id);
         });
 
@@ -257,7 +265,7 @@ function save_edited_photo(img_id, photo_url) {
 }
 
 // Cropping image with Croppie
-function ppom_show_cropped_preview(file_name, image_url, image_id) {
+function ppom_show_cropped_preview(file_name, image_url, image_id, file_input) {
 
     var cropp_preview_container = jQuery(".ppom-croppie-wrapper-" + file_name);
     // Enable size option
@@ -272,13 +280,23 @@ function ppom_show_cropped_preview(file_name, image_url, image_id) {
     // Change preview image
     jQuery('<a/>')
         .addClass('btn ' + image_id)
-        .attr('href', '#')
+        .attr('href', 'javascript:;')
+        .attr('id', 'selectfiles-' + file_name + '-' + image_id)
+        .attr('data-field-name', file_name)
+        .attr('data-image-id', image_id)
         .html('Change image')
         .appendTo(cropp_preview_container)
         .click(function(e){
             e.preventDefault();
-            location.reload();
         });
+
+        const file_inputs = {
+            ...file_input,
+            data_name: file_name + '-' + image_id,
+            is_change_image: true,
+            original_data_name: file_name,
+        }
+        ppom_setup_file_upload_input(file_inputs);
 
 
     // file_list_preview_containers[file_name]['croppie'] = cropp_preview_container.find('.ppom-croppie-preview');
@@ -338,12 +356,22 @@ function ppom_reset_cropping_preview(file_name) {
 // Attach FILE API with DOM
 function ppom_setup_file_upload_input(file_input) {
 
-    const file_data_name = file_input.data_name;
-    if ( plupload_instances[file_data_name] !== undefined ) {
+    const file_inputs = file_input;
+    const parts = file_input.data_name.split('-');
+    const [file_data_name, file_id ] = parts;
+    let data_name = file_data_name;
+
+    if ( file_id !== undefined ) {
+        data_name = file_data_name + '-' + file_id;
+    }
+
+    if ( plupload_instances[data_name] !== undefined ) {
         return;
     }
 
-    field_file_count[file_data_name] = 0;
+    if ( ! field_file_count.hasOwnProperty( file_data_name ) ) {
+        field_file_count[file_data_name] = 0;
+    }
     file_list_preview_containers[file_data_name] = jQuery('#filelist-' + file_data_name);
 
     // Energy pack
@@ -363,7 +391,7 @@ function ppom_setup_file_upload_input(file_input) {
 
     plupload_instances[file_data_name] = new plupload.Uploader({
         runtimes: ppom_file_vars.plupload_runtime,
-        browse_button: 'selectfiles-' + file_data_name, // you can pass in id...
+        browse_button: 'selectfiles-' + data_name, // you can pass in id...
         container: 'ppom-file-container-' + file_data_name, // ... or DOM Element itself
         drop_element: 'ppom-file-container-' + file_data_name,
         url: ppom_file_vars.ajaxurl,
@@ -447,12 +475,24 @@ function ppom_setup_file_upload_input(file_input) {
                 //     img.load(file.getSource());
                 // });
 
+                if ( file_id !== undefined ) {
+                    --field_file_count[file_data_name];
+                }
+
                 if ((field_file_count[file_data_name] + files_added) > plupload_instances[file_data_name].settings.max_file_count) {
                     alert(plupload_instances[file_data_name].settings.max_file_count + ppom_file_vars.mesage_max_files_limit);
                 }
                 else {
 
-                    plupload.each(files, function(file) {
+                    if ( file_id !== undefined ) {
+
+                        jQuery('.ppom-croppie-preview-' + file_id).hide(500).remove();
+                        jQuery(`.btn.${file_id}`).hide(500).remove();
+                        jQuery("#u_i_c_" + file_id).hide(500).remove();
+                        jQuery(`input[name="ppom[fields][${file_data_name}][${file_data_name}][cropped]"`).hide(500).remove();
+                    }
+
+                    plupload.each(files, function (file) {
 
                         if (file.type.indexOf("image") !== -1 && file.type !== 'image/photoshop') {
                             const img = new moxie.image.Image();
@@ -463,32 +503,28 @@ function ppom_setup_file_upload_input(file_input) {
 
                                 let aspect_ratio = Math.max(img_width, img_height) / Math.min(img_width, img_height);
 
-                                if (img_width >= parseFloat(file_input.max_img_w) || img_width <= parseFloat(file_input.min_img_w)) {
-                                    plupload_instances[file_data_name].stop();
-                                    plupload_instances[file_data_name].removeFile(file);
+                                if (
+                                    img_width >= parseFloat(file_input.max_img_w) ||
+                                    img_width <= parseFloat(file_input.min_img_w) ||
+                                    img_height >= parseFloat(file_input.max_img_h) ||
+                                    img_height <= parseFloat(file_input.min_img_h)
+                                ) {
+                                    up.removeFile(file);
                                     alert(img_dim_errormsg);
-                                }
-                                else if (img_height >= parseFloat(file_input.max_img_h) || img_height <= parseFloat(file_input.min_img_h)) {
-                                    plupload_instances[file_data_name].stop();
-                                    plupload_instances[file_data_name].removeFile(file);
-                                    alert(img_dim_errormsg);
-                                }
-                                else {
+                                } else {
                                     field_file_count[file_data_name]++;
                                     // Code to add pending file details, if you want
                                     add_thumb_box(file, file_list_preview_containers[file_data_name], up);
-                                    setTimeout('plupload_instances[\'' + file_data_name + '\'].start()', 100);
+                                    up.start();
                                 }
                             };
                             img.load(file.getSource());
-                        }
-                        else {
+                        } else {
                             field_file_count[file_data_name]++;
                             // Code to add pending file details, if you want
                             add_thumb_box(file, file_list_preview_containers[file_data_name], up);
-                            setTimeout('plupload_instances[\'' + file_data_name + '\'].start()', 100);
+                            up.start();
                         }
-
 
                         // Energy pack
                         if ( bar ) {
@@ -553,7 +589,8 @@ function ppom_setup_file_upload_input(file_input) {
                         input_type: file_input.type,
                         image_url: obj_resp.file_url,
                         image_resp: obj_resp,
-                        time: new Date()
+                        time: new Date(),
+                        file_input: file_inputs,
                     });
 
 
