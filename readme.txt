@@ -12,9 +12,9 @@ Easily add a range of custom fields to WooCommerce products, from text boxes to 
 
 == Description ==
 
-Are you a WooCommerce store owner looking to offer personalized products? PPOM (Personalized Product Option Manager) is your ultimate solution for crafting custom product options and addons tailored to customer needs. This powerful plugin simplifies adding a variety of custom fields directly to your product pages, including text inputs, dropdown menus, checkboxes, radio buttons, date pickers, file uploads, and more. Enhancing the shopping experience and meeting diverse customer preferences.
+Are you a WooCommerce store owner looking to offer personalized products? PPOM (Personalized Product Option Manager) is your solution for crafting custom product options and addons tailored to customer needs. This plugin simplifies adding custom fields directly to your product pages, including text inputs, dropdown menus, checkboxes, radio buttons, date pickers, file uploads, and more to enhance the shopping experience.
 
-## 🔗Quick Links:
+## Quick Links
 
 - Would you like to see PPOM in action before installing it? [VIEW PPOM FIELDS DEMO](https://demo-ppom-lite.vertisite.cloud/)
 - Need any help with setup? [CHECK DOCUMENTATION](https://docs.themeisle.com/collection/1695-product-option-manager)
@@ -30,32 +30,32 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 ## Input Types in Free Version:
 
-📌 **Text**: Text input displays an input box allowing users to personalize the Product with text like ‘Name on Mug’ etc. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-text-input/)
+📌 **Text**: Displays an input box for text personalization like 'Name on Mug'. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-text-input/)
 
-📌 **Textarea**: Just like the Text input, it displays a larger box that allows the client to personalize the Product with text. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-textarea-input/)
+📌 **Textarea**: Displays a larger text box for longer text personalization. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-textarea-input/)
 
-📌 **Select Options (with price)**: Select input allows the users to select a single option set by admin in the Dropdown, recommended when you have many options. Prices can also be set against each option. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-select-input/)
+📌 **Select Options (with price)**: Dropdown for selecting a single option. Best for many options. Supports per-option pricing. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-select-input/)
 
-📌 **Radio Options (with price)**: Radio input allows the users to select a single option set by the admin, recommended when you have fewer options. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-radio-input/)
+📌 **Radio Options (with price)**: Radio buttons for selecting a single option. Best for fewer options. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-radio-input/)
 
-📌 **Checkbox Options (with price)**: Checkbox input allows the users to select multiple options set by the admin. Prices can also be set against each option. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-checkbox-input/)
+📌 **Checkbox Options (with price)**: Checkboxes for selecting multiple options. Supports per-option pricing. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-checkbox-input/)
 
-📌 **Date**: Date input displays a regular Date input box that allows the user to personalize the Product with a Date, e.g., Date of birth, etc. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-date-input/)
+📌 **Date**: Date picker for selecting dates (e.g., date of birth). [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-date-input/)
 
-📌 **Email** – Text input displays an email input box that allows users to personalize the Product with an e-mail address. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-email-input/)
+📌 **Email**: Email input displays an input box that allows users to add an email address. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-email-input/)
 
-📌 **Number**: Number input displays a regular Number input box that allows the client to personalize Products with digits only, like for Phones, IDs, etc. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-number-input/)
+📌 **Number**: Number input for digits only (e.g., phone numbers, IDs). [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-number-input/)
 
-📌 **Hidden** (Hidden input with a default value): The Hidden Input helps you to display certain messages that can be seen only after a customer adds specific products to the cart. – [View Demo](https://demo-ppom-lite.vertisite.cloud/product/hidden-input/)
+📌 **Hidden**: Hidden input with a default value, visible only after adding to cart. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/hidden-input/)
 
 
 ## Features in Free Version:
 
 📌 **Prices with Options**: Enable dynamic pricing for custom features, ensuring each choice reflects its value.
 
-📌 **Conditional Logic**: PPOM allows you to set flexible display conditions, showing or hiding fields based on user inputs or specific criteria. 
+📌 **Conditional Logic**: Show or hide fields based on user inputs or specific criteria.
 
-📌 **Tooltip**: Enhance user experience with our Tooltip feature, which provides a brief description when hovered over, helping users understand the functionalities without cluttering the interface.
+📌 **Tooltip**: Displays helpful descriptions on hover without cluttering the interface.
 
 📌 CSS Classes: Assign CSS classes to each input for enhanced styling.
 
@@ -63,7 +63,7 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 📌 **Min/Max Length**: Set minimum and maximum values for text or number inputs.
 
-📌 **Input Masking**: Input masking ensures that users input data in predefined formats. This helps maintain data accuracy and consistency across forms.
+📌 **Input Masking**: Ensures users input data in predefined formats for accuracy and consistency.
 
 📌 **Placeholder**: Establish placeholders for `text, textarea, and number inputs`.
 
@@ -90,7 +90,7 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 💎 **Audio/Video**: Allow customers to select audio/video from predefined audios/videos by admin. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-video-music/)
 
-💎 **Bulk Quantity**: Bulk Quantity allows the store admin to set discount prices for each option. This add-on is the best tool for companies like printing and designing and looking to sell products with more discounts if a larger quantity is selected. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-bulk-quantity-input/)
+💎 **Bulk Quantity**: Set discount prices for larger quantities. Ideal for printing and design businesses. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-bulk-quantity-input/)
 
 💎 **Chained Input**: Renders chained input in the dropdown. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/chained-input/)
 
@@ -104,13 +104,13 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 💎 **Date Range**: Select two dates between from and to. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-date-range-input/)
 
-💎 **Divider Input**: This input allows you to define each meta field better and to create a more attractive design for your products. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-divider-input/)
+💎 **Divider Input**: Visually separates meta fields for better product page design. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-divider-input/)
 
 💎 **Domain Input**: Check web domain availability. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-domain-input/)
 
 💎 **Emojis Input**: [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-emoji-input/)
 
-💎 **File Upload**: Allow customers to upload files. Admin can set file types and filesize. Includes progress bar, thumb display, and responsive uploader. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-file-upload-input/)
+💎 **File Upload**: Allow customers to upload files with configurable file types and size limits. Includes progress bar and thumbnail display. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-file-upload-input/)
 
 💎 **Fixed Price Input**: Set fixed prices with Add Option / First Option. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/fixed-price-input-with-add-option-first-option/)
 
@@ -120,41 +120,41 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 💎 **Image Cropper**: Allows users to upload and crop images. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-basic-image-cropping-input/)
 
-💎 **Image Dropdown Input**: Some pricing options are too complex to be presented in a standard way, such as printing price packages, and the fixed price input is helpful in this regard. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/image-dropdown-input/)
+💎 **Image Dropdown Input**: Dropdown with images for complex pricing options like print packages. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/image-dropdown-input/)
 
 💎 **Images Options**: Image input is just like Radio/Checkbox, but images can be uploaded against each option. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-images-options/)
 
 💎 **Measure Input**: Set prices for measure units like milk, clothes & frames, etc. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-measure-input/)
 
-💎 **Phone Input**: The Phone Input can be very useful for marketing products, such as business cards, and advertisement places. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-images-options/)
+💎 **Phone Input**: Phone number input field, useful for business cards and marketing products. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-images-options/)
 
 💎 **Price Matrix with Discount**: Set tiered or discount prices on bulk purchases. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-price-matrix-discount/)
 
-💎 **Personalized Preview**: With the Personalization Preview feature, users can type text, customize font, and see exactly how it will appear on the product image, offering a clear and interactive experience that boosts confidence in their purchase. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-texter-input/)
+💎 **Personalized Preview**: Users can type text, customize font, and preview how it appears on the product image. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-texter-input/)
 
-💎 **Quantities Pack Input**: The Quantities Pack input helps you to create a multiple-choice product page so that the user can insert and buy different quantities of the product's types from the same page. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/quantities-pack-input/)
+💎 **Quantities Pack Input**: Create multiple-choice product pages where users can buy different quantities of product variants. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/quantities-pack-input/)
 
-💎 **Quantity Option Input**: The Quantity Option product might come in handy for extra services; for example, for any book bought, you receive a bookmark, but if you need more bookmarks, you can insert the quantity in the Quantity Option field. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/quantity-option-input/)
+💎 **Quantity Option Input**: Add quantity fields for extras (e.g., additional bookmarks with a book purchase). [View Demo](https://demo-ppom-lite.vertisite.cloud/product/quantity-option-input/)
 
-💎 **Radio Switcher Input**: The Radio Switcher input creates a more appealing view for the product page and allows different images for each option. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/radio-switcher-input/)
+💎 **Radio Switcher Input**: Visual radio buttons with different images for each option. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/radio-switcher-input/)
 
 💎 **Select Option Quantity Input**: This input allows you to display a dropdown with options along with their quantities. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/select-quantity-option-input/)
 
-💎 **Superlist Input**: The Super List input offers predefined dropdowns with the most common topics, such as languages, countries, currency symbols, etc. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/superlist-input/)
+💎 **Superlist Input**: Predefined dropdowns for common data like languages, countries, and currencies. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/superlist-input/)
 
 💎 **Text Counter**: This input is a special text input that can restrict the total number of words or characters. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-text-counter/)
 
 💎 **Timezone**: Select a timezone from a pre-defined list of timezone. Exclude/include time zones. [View Demo](https://demo-ppom-lite.vertisite.cloud/product-category/timezone-input/)
 
-💎 **Variation Matrix Input**: Allow customers to order different quantities for different options like sizes or colors.[View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-variation-matrix-input/)
+💎 **Variation Matrix Input**: Allow customers to order different quantities for different options like sizes or colors. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-variation-matrix-input/)
 
-💎 **Variation Quantities**: Variation Quantities allow customers to order different quantities against different options.[View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-variation-quantities/)
+💎 **Variation Quantities**: Allow customers to order different quantities for different options. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/demo-for-variation-quantities/)
 
 ## PPOM PRO Features:
 
 💎 **More Conditional Logic Operators**: Expand conditional logic for text and numeric fields with operators like contains, regex, between, multiples, less than, greater than, is odd, is even, and more.
 
-💎 **Custom CSS & Javascript**: Add custom CSS and JavaScript to your product fields for full control over their appearance and behavior. Use the selector to target specific elements and apply styles or functionality.
+💎 **Custom CSS & Javascript**: Add custom CSS and JavaScript for full control over field appearance and behavior.
 
 💎 **Apply via Product Tags**: Attach fields to products using product tags.
 
@@ -168,7 +168,7 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 💎 **[Client-Side Validation](https://www.youtube.com/watch?v=1IoABjkQ--I)**: Validate data on the client side to prevent page refreshes and speed up error detection.
 
-💎 **PPOM Repeater**: The PPOM Repeater allows you to repeat a meta-field group after enabling it, from the meta-group editing mode.
+💎 **PPOM Repeater**: Repeat meta-field groups as needed.
 
 💎 **Compatibility with WooCommerce Currency Switcher**: Seamlessly switch currencies to accommodate global customers.
 
@@ -181,31 +181,27 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 ## More Add-ons in PPOM PRO:
 
-✅ **Conditional Repeater**: The Conditional Repeater allows fields to be automatically repeated based on the value entered in another field, such as a Number, Variation Quantity, or Quantity Pack field. For example, if a user enters "2," two corresponding fields will appear. This feature is part of the PPOM Pro plugin.
+✅ **Conditional Repeater**: Automatically repeat fields based on quantity entered. Example: customer orders 5 caps and gets 5 name fields for personalization. [VIEW DEMO](https://demo-ppom-lite.vertisite.cloud/product/personalized-caps-using-conditional-repeater/)
 
-**USE CASE**: Selling personalized caps? With the Conditional Repeater, customers can select the number of caps (e.g., 5), and the feature will automatically generate 5 fields to enter unique names for each cap. This makes it simple to personalize multiple caps in one go! [VIEW DEMO](https://demo-ppom-lite.vertisite.cloud/product/personalized-caps-using-conditional-repeater/)
+✅ **Cart Edit**: Allow customers to modify their orders from the cart page.
 
-✅ **Cart Edit**: The Cart Edit addon can help the visitors of your website easily change their orders to suit their needs while they're checking the cart. 
+✅ **Fields Popup**: Display PPOM fields inside a popup on the product page.
 
-✅ **Fields Popup addon**: The Fields Popup addon allows the PPOM meta fields to be displayed inside a popup on the product page
+✅ **Collapse Settings**: Customize how sections open and display with colors, icons, and navigation options.
 
-✅ **Collapse Settings**: The "Collapse" settings enhance your interface by allowing adjustments for how sections open and display, with options for colors, icons, and navigation for a smoother user experience.
-
-✅ **Enquiry Form**: The "Enquiry Form" add-on simplifies collecting custom customer inquiries directly from your website, helping you address their needs efficiently. Customize where messages go and how you respond to enhance user satisfaction and potentially increase sales.
+✅ **Enquiry Form**: Collect custom customer inquiries directly from your product pages.
 
 Interested in PPOM PRO? [Learn more](https://themeisle.com/plugins/ppom-pro/upgrade?utm_source=wordpressorg&utm_medium=readme&utm_campaign=interested-pro)
 
-## Tailored Flexibility for Every Business Need:
+## Use Cases
 
-PPOM is designed to enhance your website’s functionality with customizable product options, ideal for any business looking to offer personalized services or products. Here are a few inspirational use cases:
+🍰 **Bakery**: Customers choose cake sizes, flavors, and decorations.
 
-🍰 **Bakery or Cake Shop**: Enable customers to choose from various cake sizes, flavors, and image decorations. PPOM handles complex variations with ease, making it simple for customers to order their dream customized cake online.
+💍 **Jewelry Store**: Offer material choices (gold, silver, platinum), gemstones, and custom engravings.
 
-💍 **Jewelry Store**: Offer material choices such as gold, silver, and platinum, along with different gemstones and custom engravings using a text input field to ensure each piece can be uniquely customized.
+🌍 **Travel and Tours**: Let customers select destinations, accommodations, and activities with conditional options.
 
-🌍 **Travel and Tours**: Streamline bookings by enabling customers to choose destinations, accommodation types, and extra activities with image options. Dynamically display different options based on user selections for a smoother, more personalized experience.
-
-👕 **Custom Apparel**: From custom socks to personalized shirts, allow customers to select fabrics, colors, and even upload their designs. PPOM’s flexible nature makes it ideal for fashion e-commerce that thrives on personalization.
+👕 **Custom Apparel**: Allow fabric, color, and design uploads for personalized clothing.
 
 ### See what real users talk about us:
 
@@ -217,19 +213,19 @@ PPOM is designed to enhance your website’s functionality with customizable pro
 
 - “[Amazing plugin](https://wordpress.org/support/topic/amazing-plugin-2602/)” - I love this plugin! I use the free version and I’m extremely happy with it. I would highly recommend it to anyone needing to add on extras to their products in WooCommerce.
 
-### Support 🤝
+### Support
 
-We’re here to help. Feel free to open a new thread on the [Support Forum](https://wordpress.org/support/plugin/woocommerce-product-addon/).
+Need help? Open a thread on the [Support Forum](https://wordpress.org/support/plugin/woocommerce-product-addon/).
 
-### Documentation 📚
+### Documentation
 
-Discover how to make the most of PPOM with our detailed and user-friendly [documentation](https://docs.themeisle.com/collection/1695-product-option-manager).
+View the [documentation](https://docs.themeisle.com/collection/1695-product-option-manager).
 
-### Become a Contributor 💁‍♂️
+### Contribute
 
-PPOM is an open-source project, and we welcome contributors to be part of our vibrant community! Help us improve the plugin and make it even better – [GitHub Link](https://github.com/Codeinwp/woocommerce-product-addon)
+PPOM is open-source. Contribute on [GitHub](https://github.com/Codeinwp/woocommerce-product-addon).
 
-###Useful Resources 📌
+### Useful Resources
 
 - Read more about WordPress on our [blog](https://themeisle.com/blog/).
 - Interested in our other plugins? Take a look [here](https://themeisle.com/wordpress-plugins/?utm_source=wordpressorg&utm_medium=readme&utm_campaign=PPOM).
@@ -266,15 +262,15 @@ PPOM is an open-source project, and we welcome contributors to be part of our vi
 = Where can I find documentation for WooCommerce Product Addon? =
 [Installation & Overview](https://docs.themeisle.com/article/1700-personalized-product-meta-manager)
 [Docs for Free Inputs](https://docs.themeisle.com/article/1701-ppom-free-input-types)
-= I can add fields in Variable Products also? =
-Yes
-= Is there any fields limits? =
-No - But sometime due to server limitation you cannot add more fields.
-= Can we price with option? =
-Yes, price can be added with Select,Radio,Checbox
-= Can I see Demo, how fields are displayed and added to cart? =
-Yes, [See here](https://demo-ppom-lite.vertisite.cloud/)
+= Can I add fields to Variable Products? =
+Yes.
+= Are there any field limits? =
+No, but server limitations may restrict the number of fields you can add.
+= Can I add prices to options? =
+Yes, prices can be added to Select, Radio, and Checkbox fields.
+= Can I see a demo? =
+Yes, [view demo here](https://demo-ppom-lite.vertisite.cloud/).
 
 == Upgrade Notice ==
-* Since version 10 we have major changes
-* Free Version must be installed with PRO version
+* Version 10 introduced major changes.
+* The Free Version must be installed alongside the PRO version.
