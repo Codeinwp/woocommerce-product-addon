@@ -114,11 +114,16 @@ Product page → `woocommerce_before_add_to_cart_button` (render fields) → `wo
 
 Declares WooCommerce Custom Order Tables compatibility via `FeaturesUtil::declare_compatibility('custom_order_tables', ...)`.
 
-## Security Rules
+## WooCommerce Security + Workflow
 
-- **Escape all output**: `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()` — never echo raw user data
-- **Sanitize all input**: `sanitize_text_field()`, `absint()`, `wp_unslash()` before use
-- **Prepare all SQL**: Always `$wpdb->prepare()` — never interpolate variables into queries
-- **Nonces**: `wp_nonce_field()` / `check_ajax_referer()` on all POST and AJAX handlers
-- **Capability checks**: `current_user_can()` before any privileged operation
-- **File uploads** (`inc/files.php`): Validate MIME types, guard against path traversal, enforce size limits
+- Treat all input as untrusted (POST/AJAX/cart session/order meta).
+- For state-changing actions, require both capability checks and nonce verification.
+- Never trust frontend option pricing; recompute server-side in cart/checkout.
+- Validate product/variation context with Woo objects before processing.
+- Sanitize on input (type-aware) and escape on output (context-aware).
+- Use `$wpdb->prepare()` (plus `$wpdb->esc_like()` for LIKE queries); never concatenate user input.
+- For uploads, enforce extension/mime/size rules and block executable files.
+- Prefer WooCommerce CRUD/order APIs (HPOS-safe) over direct post/meta SQL.
+- Keep pricing hooks idempotent, especially in `woocommerce_before_calculate_totals`.
+- Preferred option lifecycle hooks: `woocommerce_add_to_cart_validation` -> `woocommerce_add_cart_item_data` -> `woocommerce_get_cart_item_from_session` -> `woocommerce_get_item_data` -> `woocommerce_checkout_create_order_line_item`.
+- Minimum regression checks per addon: simple/variable products, guest/logged-in checkout, tax modes, coupons/sales, session restore, and (if enabled) multi-currency/multi-language.
