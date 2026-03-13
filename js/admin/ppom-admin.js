@@ -1583,7 +1583,7 @@ jQuery(function($) {
                 updateTargetComparisonValueSelect( 
                     conditionTargetsSelect,
                     conditionContainer,
-                    optionsInput?.dataset?.existingvalue
+                    ppom_escape_html(optionsInput?.dataset?.existingvalue)
                 );
             });
         });
