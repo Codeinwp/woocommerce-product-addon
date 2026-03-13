@@ -204,7 +204,7 @@ jQuery(function($) {
     /**
         4- Show And Hide Visibility Role Field
     **/
-    $('.ppom-slider').find('[data-meta-id="visibility_role"]').removeClass('ppom_handle_fields_tab').hide();
+    $('.ppom-slider').find('[data-meta-id="visibility_role"]').hide();
     $('.ppom_save_fields_model .ppom-slider').each(function(i, div) {
         var visibility_value = $(div).find('[data-meta-id="visibility"] select').val();
         if (visibility_value == 'roles') {
