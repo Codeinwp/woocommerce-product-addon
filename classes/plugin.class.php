@@ -333,6 +333,8 @@ class NM_PersonalizedProduct {
 		add_filter( 'woocommerce_order_again_cart_item_data', 'ppom_wc_order_again_compatibility', 10, 3 );
 		// Show description tooltip.
 		add_filter( 'ppom_field_description', array( $this, 'show_tooltip' ), 15, 2 );
+
+		add_filter( 'ppom_option_price', array( $this, 'ppom_convert_price' ), 99, 1 );
 	}
 
 	/*
@@ -1068,5 +1070,30 @@ class NM_PersonalizedProduct {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Convert price using active multi-currency plugin's filter or function.
+	 *
+	 * @param float $price The price to convert.
+	 * @return float The converted price.
+	 */
+	public function ppom_convert_price( $price ) {
+		// WCML.
+		if ( has_filter( 'wcml_raw_price_amount' ) ) {
+			return apply_filters( 'wcml_raw_price_amount', (float) $price );
+		}
+
+		// FOX - Currency Switcher.
+		if ( has_filter( 'woocs_exchange_value' ) ) {
+			return apply_filters( 'woocs_exchange_value', (float) $price );
+		}
+
+		// CURCY - WooCommerce Multi Currency.
+		if ( function_exists( 'wmc_get_price' ) ) {
+			return wmc_get_price( (float) $price );
+		}
+
+		return $price;
 	}
 }

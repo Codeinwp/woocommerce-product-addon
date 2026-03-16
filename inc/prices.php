@@ -786,6 +786,7 @@ function ppom_generate_field_price( $field_price, $field_meta, $apply, $option =
 	$taxable      = ( isset( $field_meta['onetime_taxable'] ) && $field_meta['onetime_taxable'] == 'on' ) ? true : false;
 	$option_label = isset( $option['raw'] ) ? $option['raw'] : '';
 	$without_tax  = isset( $option['without_tax'] ) ? $option['without_tax'] : '';
+	$field_price = apply_filters( 'ppom_option_price', $field_price );
 
 	$label_price = "{$field_title} - " . wc_price( $field_price );
 	// For bulkquantity

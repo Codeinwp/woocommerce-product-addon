@@ -6226,11 +6226,6 @@ parameters:
 			path: inc/woocommerce.php
 
 		-
-			message: "#^Parameter \\#1 \\$price of function wc_price expects float, string given\\.$#"
-			count: 1
-			path: inc/woocommerce.php
-
-		-
 			message: "#^Variable \\$price_after_precent might not be defined\\.$#"
 			count: 1
 			path: inc/woocommerce.php

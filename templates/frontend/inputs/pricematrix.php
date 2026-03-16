@@ -51,6 +51,7 @@ if ( ! $ranges ) {
 			$price    = isset( $opt['price'] ) ? trim( $opt['price'] ) : 0;
 			$label    = isset( $opt['label'] ) ? $opt['label'] : $opt['raw'];
 			$range_id = isset( $value['option_id'] ) ? $value['option_id'] : '';
+			$price    = apply_filters( 'ppom_option_price', $price );
 
 			if ( ! empty( $opt['percent'] ) ) {
 

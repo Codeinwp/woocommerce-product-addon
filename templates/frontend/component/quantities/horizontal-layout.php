@@ -43,10 +43,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 		<thead>
 		<tr>
 			<th><?php _e( 'Options', 'woocommerce-product-addon' ); ?></th>
-			<?php 
-			foreach ( $options as $opt ) {
-				$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
-				?>
+			<?php foreach ( $options as $opt ) { ?>
 				<th>
 					<label class="quantities-lable"> <?php echo stripslashes( trim( $opt['label'] ) ); ?></label>
 				</th>
@@ -61,6 +58,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 
 				// Price need to filter for currency switcher here not in wc_price
 				$the_price    = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
+				$the_price    = apply_filters( 'ppom_option_price', $the_price );
 				$usebaseprice = isset( $opt['price'] ) ? 'no' : 'yes';
 
 				$min          = ( ! empty( $opt['min'] ) ? $opt['min'] : 0 );

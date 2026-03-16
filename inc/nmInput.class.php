@@ -140,6 +140,7 @@ class NM_Form {
 		$onetime           = $this->get_attribute_value( 'onetime', $args );
 		$taxable           = $this->get_attribute_value( 'taxable', $args );
 		$price             = $this->get_attribute_value( 'price', $args );
+		$price             = apply_filters( 'ppom_option_price', $price );
 		$price_without_tax = '';
 
 		// Only title without description for price calculation etc.
@@ -260,8 +261,9 @@ class NM_Form {
 				// $measure_label = $option['label'].'/'.$
 				$option_id = $option['option_id'];
 				$unit      = $option['raw'];
+				$price     = apply_filters( 'ppom_option_price', $option['price'] );
 				$html     .= '<input checked name="ppom[unit][' . $id . ']" value="' . esc_attr( $unit ) . '" class="form-check-input ppom-measure-unit" type="radio" id="' . esc_attr( $option_id ) . '" data-apply="measure" ';
-				$html     .= sprintf( 'data-use_units="' . esc_attr( $use_units ) . '" data-price="%s" data-label="%s" data-data_name="%s" data-unit="%s" data-optionid="%s">', $option['price'], esc_attr( $data_label ), $id, $unit, $option_id );
+				$html     .= sprintf( 'data-use_units="' . esc_attr( $use_units ) . '" data-price="%s" data-label="%s" data-data_name="%s" data-unit="%s" data-optionid="%s">', $price, esc_attr( $data_label ), $id, $unit, $option_id );
 				$html     .= '<label class="form-check-label" id="' . esc_attr( $option_id ) . '">';
 				$html     .= $option['label'];
 				$html     .= '</label>';
@@ -465,7 +467,7 @@ class NM_Form {
 			// ppom_pa($value);
 
 			$option_label = $value['label'];
-			$option_price = $value['price'];
+			$option_price = apply_filters( 'ppom_option_price', $value['price'] );
 			$option_id    = isset( $value['id'] ) ? $value['id'] : '';
 			$raw_label    = $value['raw'];
 			$without_tax  = $value['without_tax'];
@@ -644,7 +646,7 @@ class NM_Form {
 		foreach ( $options as $key => $value ) {
 
 			$option_label = $value['label'];
-			$option_price = $value['price'];
+			$option_price = apply_filters( 'ppom_option_price', $value['price'] );
 			$raw_label    = $value['raw'];
 			$without_tax  = $value['without_tax'];
 			$option_id    = $value['option_id'];
@@ -727,7 +729,7 @@ class NM_Form {
 		foreach ( $options as $key => $value ) {
 
 			$option_label = $value['label'];
-			$option_price = $value['price'];
+			$option_price = apply_filters( 'ppom_option_price', $value['price'] );
 			$raw_label    = $value['raw'];
 			$without_tax  = $value['without_tax'];
 			$option_id    = $value['option_id'];
@@ -834,7 +836,7 @@ class NM_Form {
 
 			$color_label  = $value['label'];
 			$option_label = $value['label'];
-			$option_price = $value['price'];
+			$option_price = apply_filters( 'ppom_option_price', $value['price'] );
 			$raw_label    = $value['raw'];
 			$without_tax  = $value['without_tax'];
 
@@ -958,6 +960,7 @@ class NM_Form {
 				$image_title = isset( $image['raw'] ) ? stripslashes( $image['raw'] ) : '';
 				$image_label = isset( $image['label'] ) ? stripslashes( $image['label'] ) : '';
 				$image_price = isset( $image['price'] ) ? $image['price'] : 0;
+				$image_price = apply_filters( 'ppom_option_price', $image_price );
 				$option_id   = $id . '-' . $image_id;
 
 				// If price set in %
@@ -1053,6 +1056,7 @@ class NM_Form {
 					$image_title = isset( $image['raw'] ) ? stripslashes( $image['raw'] ) : '';
 					$image_label = isset( $image['label'] ) ? stripslashes( $image['label'] ) : '';
 					$image_price = isset( $image['price'] ) ? $image['price'] : 0;
+					$image_price = apply_filters( 'ppom_option_price', $image_price );
 					$option_id   = $id . '-' . $image_id;
 
 					// If price set in %
@@ -1169,6 +1173,7 @@ class NM_Form {
 		if ( ! $is_hidden ) {
 			foreach ( $ranges as $opt ) {
 				$price = isset( $opt['raw_price'] ) ? trim( $opt['raw_price'] ) : 0;
+				$price = apply_filters( 'ppom_option_price', $price );
 				$label = isset( $opt['label'] ) ? $opt['label'] : $opt['raw'];
 
 				if ( ! empty( $opt['percent'] ) ) {
@@ -1343,6 +1348,7 @@ class NM_Form {
 			$audio_id    = isset( $audio['id'] ) ? $audio['id'] : 0;
 			$audio_title = isset( $audio['title'] ) ? stripslashes( $audio['title'] ) : 0;
 			$audio_price = isset( $audio['price'] ) ? $audio['price'] : 0;
+			$audio_price = apply_filters( 'ppom_option_price', $audio_price );
 
 			// Actually image URL is link
 			$audio_url         = wp_get_attachment_url( $audio_id );
@@ -1551,6 +1557,7 @@ class NM_Form {
 
 				$option_label = $size['label'];
 				$option_price = $size['price'];
+				$option_price = apply_filters( 'ppom_option_price', $option_price );
 				$raw_label    = $size['raw'];
 				$without_tax  = $size['without_tax'];
 				$option_id    = $size['option_id'];

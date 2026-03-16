@@ -64,6 +64,7 @@ $custom_attr = array();
 				$image_price = isset( $image['price'] ) ? $image['price'] : 0;
 				$option_id   = $fm->data_name() . '-' . $image_id;
 				$opt_percent = isset( $value['percent'] ) ? $value['percent'] : '';
+				$image_price = apply_filters( 'ppom_option_price', $image_price );
 
 				// If price set in %
 				if ( strpos( $image['price'], '%' ) !== false ) {
@@ -167,6 +168,7 @@ $custom_attr = array();
 					$image_price = isset( $image['price'] ) ? $image['price'] : 0;
 					$option_id   = $fm->data_name() . '-' . $image_id;
 					$opt_percent = isset( $image['percent'] ) ? $image['percent'] : '';
+					$image_price = apply_filters( 'ppom_option_price', $image_price );
 
 
 					// Actually image URL is link
