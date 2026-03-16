@@ -1075,23 +1075,34 @@ class NM_PersonalizedProduct {
 	/**
 	 * Convert price using active multi-currency plugin's filter or function.
 	 *
-	 * @param float $price The price to convert.
-	 * @return float The converted price.
+	 * @param float|int|string|null $price The price to convert.
+ 	 * @return float|int|string|null The converted price.
 	 */
 	public function ppom_convert_price( $price ) {
+		if ( '' === $price || null === $price ) {
+ 			return $price;
+ 		}
+ 		if ( is_string( $price ) && false !== strpos( $price, '%' ) ) {
+ 			return $price;
+ 		}
+ 		if ( ! is_numeric( $price ) ) {
+ 			return $price;
+ 		}
+ 		$numeric_price = (float) $price;
+
 		// WCML.
 		if ( has_filter( 'wcml_raw_price_amount' ) ) {
-			return apply_filters( 'wcml_raw_price_amount', (float) $price );
+			return apply_filters( 'wcml_raw_price_amount', $numeric_price );
 		}
 
 		// FOX - Currency Switcher.
 		if ( has_filter( 'woocs_exchange_value' ) ) {
-			return apply_filters( 'woocs_exchange_value', (float) $price );
+			return apply_filters( 'woocs_exchange_value', $numeric_price );
 		}
 
 		// CURCY - WooCommerce Multi Currency.
 		if ( function_exists( 'wmc_get_price' ) ) {
-			return wmc_get_price( (float) $price );
+			return wmc_get_price( $numeric_price );
 		}
 
 		return $price;
