@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'PPOM_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'PPOM_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
-define( 'PPOM_WP_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __DIR__ ) ) );
+define( 'PPOM_WP_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'PPOM_BASENAME', basename( PPOM_WP_PLUGIN_DIR ) );
 define( 'PPOM_PRODUCT_SLUG', PPOM_BASENAME );
 define( 'PPOM_VERSION', '33.0.18' );
