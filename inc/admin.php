@@ -919,6 +919,7 @@ function ppom_add_black_friday_data( $configs ) {
 	$plan    = apply_filters( 'product_ppom_license_plan', 0 );
 	$license = apply_filters( 'product_ppom_license_key', false );
 	$status  = apply_filters( 'product_ppom_license_status', false );
+	$pro_product_slug = defined( 'PPOM_PRO_BASENAME' ) ? PPOM_PRO_BASENAME : '';
 
 	$is_pro  = 'valid' === $status;
 	$is_expired = 'expired' === $status || 'active-expired' === $status;
@@ -940,9 +941,19 @@ function ppom_add_black_friday_data( $configs ) {
 		'lkey'     => ! empty( $license ) ? $license : false,
 		'expired'  => $is_expired ? '1' : false,
 	);
-	
-	$config['message']  = $message;
+
+	if ( ( $is_pro || $is_expired ) && ! empty( $pro_product_slug ) ) {
+		// translators: %s is the discount percentage.
+		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - up to %s off', 'woocommerce-product-addon' ), '30%' );
+		$config['plugin_meta_targets'] = array( $pro_product_slug );
+	} else {
+		// translators: %s is the discount percentage.
+		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - %s off', 'woocommerce-product-addon' ), '60%' );
+	}
+
+	$config['message']   = $message;
 	$config['cta_label'] = $cta_label;
+
 	$config['sale_url'] = add_query_arg(
 		$url_params,
 		tsdk_translate_link( tsdk_utmify( 'https://themeisle.link/ppom-bf', 'bfcm', 'ppom' ) )
