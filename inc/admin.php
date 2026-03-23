@@ -934,6 +934,8 @@ function ppom_add_black_friday_data( $configs ) {
 	} else {
 		// translators: %s - discount.
 		$config['title'] = sprintf( __( 'PPOM Pro: %s off this week', 'woocommerce-product-addon' ), '60%' );
+		// translators: %s is the discount percentage.
+		$config['upgrade_menu_text'] = sprintf( __( 'BF Sale - %s off', 'woocommerce-product-addon' ), '60%' );
 	}
 	
 	$url_params    = array(
