@@ -962,6 +962,7 @@ function ppom_has_posted_field_value( $posted_fields, $field ) {
 	$data_name = sanitize_key( $field['data_name'] );
 	$type      = $field['type'];
 
+	// var_dump($posted_fields, $field );
 	if ( ! empty( $posted_fields ) ) {
 		foreach ( $posted_fields as $field_key => $value ) {
 			$field_key = explode( '__clone__', $field_key );
@@ -1005,6 +1006,7 @@ function ppom_has_posted_field_value( $posted_fields, $field ) {
 			}
 		}
 	}
+	// exit;
 
 	return apply_filters( 'ppom_has_posted_field_value', $has_value, $posted_fields, $field );
 }
@@ -2482,4 +2484,68 @@ function ppom_is_legacy_user() {
 		return false;
 	}
 	return 'no' === get_option( 'ppom_legacy_user', '' );
+}
+
+/**
+ * Validate max and min value.
+ *
+ * @param array<string, mixed> $posted_fields Posted fields data.
+ * @param array<string, mixed> $field        Field meta data.
+ * @return string Validation message if validation fails, empty string otherwise.
+ */
+function ppom_posted_field_max_min_value_validation( $posted_fields, $field ) {
+	if ( empty( $field['max_checked'] ) && empty( $field['min_checked'] ) ) {
+		return '';
+	}
+
+	$data_name     = isset( $field['data_name'] ) ? $field['data_name'] : '';
+	$title         = isset( $field['title'] ) ? $field['title'] : '';
+	$min_check     = isset( $field['min_checked'] ) ? intval( $field['min_checked'] ) : 0;
+	$max_check     = isset( $field['max_checked'] ) ? intval( $field['max_checked'] ) : 0;
+	$error_message = isset( $field['error_message'] ) ? sprintf( '%1$s: %2$s', $title, $field['error_message'] ) : '';
+
+	if ( $min_check && ! isset( $posted_fields[ $data_name ] ) ) {
+		$message = '' !== $error_message 
+				? $error_message
+				: sprintf(
+					// translators: 1. Field label, 2. Min checked value.
+					__( 'You must select at least %1$s options for %2$s field.', 'woocommerce-product-addon' ),
+					$min_check,
+					$title
+				);
+		return apply_filters( 'ppom_posted_field_min_value_validation_message', $message, $posted_fields, $field );
+	}
+
+	foreach ( $posted_fields as $field_key => $field_value ) {
+		$field_key = explode( '__clone__', $field_key );
+
+		if ( in_array( $data_name, $field_key, true ) ) {
+			if ( is_array( $field_value ) ) {
+				$count = count( $field_value );
+				if ( $max_check && $count > $max_check ) {
+					$message = '' !== $error_message
+							? $error_message
+							: sprintf(
+								// translators: 1. Field label, 2. Max checked value.
+								__( 'You can select maximum %1$s options for %2$s field.', 'woocommerce-product-addon' ),
+								$max_check,
+								$title
+							);
+					return apply_filters( 'ppom_posted_field_max_value_validation_message', $message, $posted_fields, $field );
+				} elseif ( $min_check && $count < $min_check ) {
+					$message = '' !== $error_message
+							? $error_message
+							: sprintf(
+								// translators: 1. Field label, 2. Min checked value.
+								__( 'You must select at least %1$s options for %2$s field.', 'woocommerce-product-addon' ),
+								$min_check,
+								$title
+							);
+					return apply_filters( 'ppom_posted_field_min_value_validation_message', $message, $posted_fields, $field );
+				}
+			}
+		}
+	}
+
+	return '';
 }

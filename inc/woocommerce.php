@@ -251,7 +251,11 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 			continue;
 		}
 
-		if ( ! ppom_has_posted_field_value( $ppom_posted_fields, $field ) ) {
+		$max_min_validation = ppom_posted_field_max_min_value_validation( $ppom_posted_fields, $field );
+		if ( ! empty( $max_min_validation ) ) {
+			ppom_wc_add_notice( $max_min_validation );
+			$passed = false;
+		} elseif ( isset( $field['required'] ) && 'on' === $field['required'] && ! ppom_has_posted_field_value( $ppom_posted_fields, $field ) ) {
 
 			// Note: Checkbox is being validate by hook: ppom_has_posted_field_value
 			// $error_message = isset($field['error_message']) ? $field['error_message'] : '';
