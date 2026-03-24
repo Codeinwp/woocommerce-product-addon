@@ -2529,30 +2529,28 @@ function ppom_posted_field_max_min_value_validation( $posted_fields, $field ) {
 	foreach ( $posted_fields as $field_key => $field_value ) {
 		$field_key = explode( '__clone__', $field_key );
 
-		if ( in_array( $data_name, $field_key, true ) ) {
-			if ( is_array( $field_value ) ) {
-				$count = count( $field_value );
-				if ( $max_check && $count > $max_check ) {
-					$message = '' !== $error_message
-							? $error_message
-							: sprintf(
-								// translators: %1$s is maximum checked value, %2$s is Field label
-								__( 'You can select maximum %1$s options for %2$s field.', 'woocommerce-product-addon' ),
-								$max_check,
-								$title
-							);
-					return apply_filters( 'ppom_posted_field_max_value_validation_message', $message, $posted_fields, $field );
-				} elseif ( $min_check && $count < $min_check ) {
-					$message = '' !== $error_message
-							? $error_message
-							: sprintf(
-								// translators: %1$s is minimum checked value, %2$s is Field label
-								__( 'You must select at least %1$s options for %2$s field.', 'woocommerce-product-addon' ),
-								$min_check,
-								$title
-							);
-					return apply_filters( 'ppom_posted_field_min_value_validation_message', $message, $posted_fields, $field );
-				}
+		if ( in_array( $data_name, $field_key, true ) && is_array( $field_value ) ) {
+			$count = count( $field_value );
+			if ( $max_check && $count > $max_check ) {
+				$message = '' !== $error_message
+						? $error_message
+						: sprintf(
+							// translators: %1$s is maximum checked value, %2$s is Field label
+							__( 'You can select maximum %1$s options for %2$s field.', 'woocommerce-product-addon' ),
+							$max_check,
+							$title
+						);
+				return apply_filters( 'ppom_posted_field_max_value_validation_message', $message, $posted_fields, $field );
+			} elseif ( $min_check && $count < $min_check ) {
+				$message = '' !== $error_message
+						? $error_message
+						: sprintf(
+							// translators: %1$s is minimum checked value, %2$s is Field label
+							__( 'You must select at least %1$s options for %2$s field.', 'woocommerce-product-addon' ),
+							$min_check,
+							$title
+						);
+				return apply_filters( 'ppom_posted_field_min_value_validation_message', $message, $posted_fields, $field );
 			}
 		}
 	}
