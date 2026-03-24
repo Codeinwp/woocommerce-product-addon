@@ -684,6 +684,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		if ( is_array( $tags ) ) {
 			$data_to_update['productmeta_tags'] = serialize( $tags );
+		} else if ( ! $tags ) {
+			$data_to_update['productmeta_tags'] = '';
 		}
 
 		$wpdb->update(
