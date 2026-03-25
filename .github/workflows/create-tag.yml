@@ -16,17 +16,17 @@ jobs:
         with:
           persist-credentials: false
       - name: Build files using ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "yarn"
+          cache: "npm"
       - name: Release new version
         id: release
         run: |
-          yarn install --frozen-lockfile
+          npm ci
           composer install --prefer-dist --no-progress --no-suggest
-          yarn run build
-          yarn run release
+          npm run build
+          npm run release
         env:
           CI: true
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}

@@ -10,14 +10,14 @@ jobs:
     name: Phpunit
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v6
         with:
           node-version: "18"
-          cache: "yarn"
+          cache: "npm"
       - name: Install NPM deps
         run: |
-          yarn install --frozen-lockfile
+          npm ci
       - name: Install composer deps
         run: composer install
       - name: Install environment
@@ -40,7 +40,7 @@ jobs:
           php-version: "7.4"
           extensions: simplexml
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@master
       - name: Install composer
         run: |
           composer install --no-progress

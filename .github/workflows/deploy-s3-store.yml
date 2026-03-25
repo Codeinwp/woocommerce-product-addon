@@ -11,16 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Setup node 18
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 18.x
-          cache: "yarn"
+          cache: "npm"
       - name: Build & create dist/artifact
         run: |
-          yarn install --frozen-lockfile
+          npm ci
           composer install --no-dev --prefer-dist --no-progress --no-suggest
-          yarn run build
-          yarn run dist
+          npm run build
+          npm run dist
       - name: Upload Latest Version to S3
         uses: jakejarvis/s3-sync-action@master
         with:
