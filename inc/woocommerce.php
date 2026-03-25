@@ -676,7 +676,7 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 
 			$item_meta[] = array(
 				'name'    => wp_strip_all_tags( $meta_key ),
-				'value'   => $meta_value,
+				'value'   => ppom_get_image_name( $meta_value ),
 				'hidden'  => $hidden,
 				'display' => $display,
 			);

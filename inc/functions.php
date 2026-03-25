@@ -665,7 +665,7 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 
 					$meta_data = array(
 						'name'    => $field_title,
-						'value'   => ppom_get_image_name( $value ),
+						'value'   => $value,
 						'display' => $display,
 					);
 				}
@@ -1652,7 +1652,12 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 function ppom_generate_html_for_images( $images ) {
 	global $post;
 
-	if ( has_block( 'woocommerce/cart', $post ) ) {
+	static $ppom_has_cart_block = null;
+	if ( is_null( $ppom_has_cart_block ) ) {
+		$ppom_has_cart_block = has_block( 'woocommerce/cart', $post );
+	}
+
+	if ( $ppom_has_cart_block ) {
 		return ppom_get_image_name( $images );
 	}
 
