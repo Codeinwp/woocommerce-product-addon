@@ -1,0 +1,4 @@
+{
+  "extends": ["plugin:@wordpress/eslint-plugin/recommended"],
+  "ignorePatterns": ["**/*.min.js", "**/*.bundle.js", "js/inputmask/**", "js/sweetalert/**"]
+}
