@@ -731,7 +731,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 		case 'fixedprice_DEPRECATED':
 			break;
 
-		case 'hidden';
+		case 'hidden':
 
 			$field_name = "ppom[fields][{$data_name}]";
 			$hidden_val = isset( $meta['field_value'] ) ? $meta['field_value'] : '';
