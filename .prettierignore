@@ -1,0 +1,4 @@
+**/*.min.js
+**/*.bundle.js
+js/inputmask/**
+js/sweetalert/**

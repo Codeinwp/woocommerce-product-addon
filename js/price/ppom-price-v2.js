@@ -1,674 +1,682 @@
 /**
-    import $ from "jquery";
-**/
+  import $ from "jquery";
+ */
 const $ = jQuery;
 
-
 /**
-    NMedia Helper Object
-**/
+  NMedia Helper Object
+ */
 const nmh = {
+	show_console: true,
+	working_dom: 'loading-data',
+	decimal_separator: ppom_input_vars.wc_decimal_sep,
+	no_of_decimal: ppom_input_vars.wc_no_decimal,
+	thousand_sep: ppom_input_vars.wc_thousand_sep,
+	fields_meta: ppom_input_vars.field_meta,
+	input_selector: $( '.ppom-input' ),
+	dom_product_qty: $( 'form.cart' ).find( 'input[name="quantity"]' ),
 
-    show_console: true,
-    working_dom: 'loading-data',
-    decimal_separator: ppom_input_vars.wc_decimal_sep,
-    no_of_decimal: ppom_input_vars.wc_no_decimal,
-    thousand_sep: ppom_input_vars.wc_thousand_sep,
-    fields_meta: ppom_input_vars.field_meta,
-    input_selector: $('.ppom-input'),
-    dom_product_qty: $('form.cart').find('input[name="quantity"]'),
+	l( a, b ) {
+		this.show_console && console.log( a, b );
+	},
 
-    l: function(a, b) {
-        this.show_console && console.log(a, b);
-    },
+	strip_slashes( s ) {
+		if ( s !== undefined ) {
+			return s.replace( /\\/g, '' );
+		}
+	},
 
-    strip_slashes: function(s) {
-        if (s !== undefined) { return s.replace(/\\/g, ''); }
-    },
+	working( m ) {
+		$( '#' + this.working_dom ).html( m );
+	},
 
-    working: function(m) {
-        $("#" + this.working_dom).html(m);
-    },
+	percentage( num, per ) {
+		// console.log(per);
+		per = per.replace( '%', '' );
+		return ( Number( num ) / 100 ) * per;
+	},
 
-    percentage: function(num, per) {
-        // console.log(per);
-        per = per.replace('%', '');
-        return (Number(num) / 100) * per;
-    },
+	get_product_qty() {
+		const quantity = this.dom_product_qty.val() || 0;
+		return parseInt( quantity );
+	},
 
-    get_product_qty: function() {
+	get_formatted_price( price ) {
+		const is_positive = price > 0;
+		const price_cloner = $( '#ppom-price-cloner' ).clone();
 
-        const quantity = this.dom_product_qty.val() || 0;
-        return parseInt(quantity);
-    },
+		// adding separator and decimal place
+		let formatted_price = Math.abs( parseFloat( price ) );
+		formatted_price = formatted_price.toFixed( this.no_of_decimal );
+		formatted_price = formatted_price
+			.toString()
+			.replace( '.', this.decimal_separator );
+		formatted_price = this.add_thousand_separator( formatted_price );
 
-    get_formatted_price: function(price) {
+		price_cloner.find( '.ppom-price' ).html( formatted_price );
 
-        const is_positive = price > 0;
-        let price_cloner = $("#ppom-price-cloner").clone();
+		// Adding (-) symbol
+		if ( ! is_positive ) {
+			price_cloner.prepend( '-' );
+		}
 
-        // adding separator and decimal place
-        let formatted_price = Math.abs(parseFloat(price));
-        formatted_price = formatted_price.toFixed(this.no_of_decimal);
-        formatted_price = formatted_price.toString().replace('.', this.decimal_separator);
-        formatted_price = this.add_thousand_separator(formatted_price);
+		return $( price_cloner ).html();
+	},
 
-        price_cloner.find('.ppom-price').html(formatted_price);
+	add_thousand_separator( p ) {
+		const rx = /(\d+)(\d{3})/;
 
-        // Adding (-) symbol
-        if (!is_positive) price_cloner.prepend('-');
+		return String( p ).replace( /^\d+/, function ( w ) {
+			if ( this.thousand_sep ) {
+				while ( rx.test( w ) ) {
+					w = w.replace( rx, '$1' + this.thousand_sep + '$2' );
+				}
+			}
+			return w;
+		} );
+	},
 
-        return $(price_cloner).html();
-    },
+	error( field_id ) {
+		let t = true;
 
-    add_thousand_separator: function(p) {
+		if ( field_id === undefined ) {
+			this.l( 'Input dataname not found' );
+			t = false;
+		}
+		return t;
+	},
 
-        var rx = /(\d+)(\d{3})/;
+	ppom_get_quantity( option ) {
+		let qty = this.get_product_qty();
 
-        return String(p).replace(/^\d+/, function(w) {
-            if (this.thousand_sep) {
-                while (rx.test(w)) {
-                    w = w.replace(rx, '$1' + this.thousand_sep + '$2');
-                }
-            }
-            return w;
-        });
-    },
-
-    error: function(field_id) {
-        let t = true;
-
-        if (field_id === undefined) {
-            this.l('Input dataname not found');
-            t = false;
-        }
-        return t;
-    },
-
-    ppom_get_quantity: function(option) {
-
-        let qty = this.get_product_qty();
-
-        switch (option.apply) {
-            case 'fixed':
-                qty = 1;
-                break;
-        }
-        return qty;
-    },
+		switch ( option.apply ) {
+			case 'fixed':
+				qty = 1;
+				break;
+		}
+		return qty;
+	},
 };
 
-
 /**
-    DOM Manipulation
-**/
+  DOM Manipulation
+ */
 const ppom_input = {
-    dom: {},
+	dom: {},
 
-    init: function(dom) {
-        this.dom = dom;
-        return this;
-    },
+	init( dom ) {
+		this.dom = dom;
+		return this;
+	},
 
-    dataname: function() {
+	dataname() {
+		let Field_id = $( this.dom ).attr( 'data-data_name' );
 
-        let Field_id = $(this.dom).attr('data-data_name');
+		if ( Field_id == undefined ) {
+			Field_id = $( this.dom ).attr( 'data-dataname' );
+		}
 
-        if (Field_id == undefined) {
-            Field_id = $(this.dom).attr('data-dataname');
-        }
+		return Field_id;
+	},
 
-        return Field_id;
-    },
+	type() {
+		return this.dom.type;
+	},
 
-    type: function() {
-        return this.dom.type;
-    },
-
-    value: function() {
-        let v = $(this.dom).val();
-        if (this.type() === 'checkbox' || this.type() === 'radio') {
-            v = $(this.dom).is(':checked') ? v : '';
-        }
-        return v;
-    },
+	value() {
+		let v = $( this.dom ).val();
+		if ( this.type() === 'checkbox' || this.type() === 'radio' ) {
+			v = $( this.dom ).is( ':checked' ) ? v : '';
+		}
+		return v;
+	},
 };
 
-
 /**
-    Build OptionPrice Class
-**/
+  Build OptionPrice Class
+ */
 class PPOM_Price_Class {
+	constructor( field, value ) {
+		this.field = field;
 
-    constructor(field, value) {
+		//parse for image/audio input
+		this.value = this.get_value( value );
 
-        this.field = field;
+		// Object Destructruing
+		const { type: ppom_type, title: price_label, data_name } = this.field;
 
-        //parse for image/audio input
-        this.value = this.get_value(value);
+		this.dataname = data_name;
+		this.type = ppom_type;
+		this.label = price_label;
+		this.label_val = this.get_label_value();
+		this.options = this.get_options();
+		this.id = this.get_id();
+		this.has_percent = this.get_has_percent();
+		this.price = Number( this.get_price() );
+		this.formatted_price = nmh.get_formatted_price( this.price );
+		this.apply = this.get_apply();
+		this.is_positive = this.price > 0 ? true : false;
 
-        // Object Destructruing
-        const {
-            type: ppom_type,
-            title: price_label,
-            data_name,
-        } = this.field;
+		//console.log('PPOM Fields', this.field);
+	}
 
-        this.dataname = data_name;
-        this.type = ppom_type;
-        this.label = price_label;
-        this.label_val = this.get_label_value();
-        this.options = this.get_options();
-        this.id = this.get_id();
-        this.has_percent = this.get_has_percent();
-        this.price = Number(this.get_price());
-        this.formatted_price = nmh.get_formatted_price(this.price);
-        this.apply = this.get_apply();
-        this.is_positive = this.price > 0 ? true : false;
+	get_id() {
+		let id = this.dataname;
 
-        //console.log('PPOM Fields', this.field);
-    }
+		if ( this.options && this.options.length > 0 ) {
+			const option_found = this.options.find(
+				( o ) =>
+					o.price !== 0 && nmh.strip_slashes( o.title ) === this.value
+			);
 
+			if ( option_found ) {
+				id = this.dataname + '_' + option_found.id;
+			}
+		}
+		return id;
+	}
 
-    get_id() {
+	get_label_value() {
+		let value_label = '';
 
-        let id = this.dataname;
+		switch ( this.type ) {
+			case 'file':
+			case 'cropper':
+				value_label = this.label;
+				break;
 
-        if (this.options && this.options.length > 0) {
+			// case 'pricematrix':
 
-            const option_found = this.options.find(o => o.price !== 0 && nmh.strip_slashes(o.title) === this.value);
+			// //console.log('pricematrix label', this.value);
+			//     $.each(this.value, (range, meta) => {
+			//       value_label = `${this.label} [${meta.label}]`;
+			//     });
+			// break;
 
+			default:
+				value_label = `${ this.label } [${ this.value }]`;
+		}
 
-            if (option_found) {
-                id = this.dataname + '_' + option_found.id;
-            }
-        }
-        return id;
-    }
+		return value_label;
+	}
 
-    get_label_value() {
+	get_price() {
+		const price_key =
+			this.type == 'cropper' || this.type == 'file'
+				? 'file_cost'
+				: 'price';
 
-        let value_label = '';
+		let p = this.field[ price_key ] || '';
+		// If Field Have Options
+		if ( this.options && this.options.length > 0 ) {
+			const priced = this.options.find(
+				( o ) =>
+					o.price !== '' &&
+					( nmh.strip_slashes( o.title ) === this.value ||
+						nmh.strip_slashes( o.id ) === this.value )
+			);
+			if ( priced ) {
+				if ( this.has_percent ) {
+					p = nmh.percentage( ppomPrice.base_price, priced.price );
+				} else {
+					p = priced.price;
+				}
+			}
+		}
+		return p;
+	}
 
-        switch (this.type) {
-            case 'file':
-            case 'cropper':
-                value_label = this.label;
-                break;
+	get_apply() {
+		const { onetime } = this.field;
+		return onetime == 'on' ? 'fixed' : 'variable';
+	}
 
-                // case 'pricematrix':
+	get_value( value ) {
+		const { type } = this.field;
 
-                // //console.log('pricematrix label', this.value);
-                //     $.each(this.value, (range, meta) => {
-                //       value_label = `${this.label} [${meta.label}]`;
-                //     });
-                // break;
+		switch ( type ) {
+			case 'audio':
+				value = JSON.parse( value );
+				value = value.title;
+				break;
+			case 'image':
+				value = JSON.parse( value );
+				value = value.image_id;
+				break;
+			case 'pricematrix':
+				value = JSON.parse( value );
+				break;
+		}
+		return value;
+	}
 
-            default:
-                value_label = `${this.label} [${this.value}]`;
-        }
+	get_options() {
+		const { options, images, audio } = this.field;
 
-        return value_label;
-    }
+		const field_options = options || images || audio || [];
+		if ( field_options ) {
+			// set option.title field for title
+			field_options.map( ( fo ) => ( fo.title = fo.option || fo.title ) );
+		}
 
-    get_price() {
+		return field_options;
+	}
 
-        const price_key = this.type == 'cropper' || this.type == 'file' ? 'file_cost' : 'price';
-
-        let p = this.field[price_key] || '';
-        // If Field Have Options
-        if (this.options && this.options.length > 0) {
-
-            const priced = this.options.find(o => o.price !== '' && (nmh.strip_slashes(o.title) === this.value || nmh.strip_slashes(o.id) === this.value));
-            if (priced) {
-
-                if (this.has_percent) {
-                    p = nmh.percentage(ppomPrice.base_price, priced.price);
-                }
-                else {
-                    p = priced.price;
-                }
-            }
-        }
-        return p;
-    }
-
-    get_apply() {
-        const { onetime } = this.field;
-        return onetime == 'on' ? 'fixed' : 'variable';
-    }
-
-    get_value(value) {
-
-        const { type } = this.field;
-
-        switch (type) {
-            case 'audio':
-                value = JSON.parse(value);
-                value = value.title;
-                break;
-            case 'image':
-                value = JSON.parse(value);
-                value = value.image_id;
-                break;
-            case 'pricematrix':
-                value = JSON.parse(value);
-                break;
-        }
-        return value;
-    }
-
-    get_options() {
-
-        const { options, images, audio } = this.field;
-
-        let field_options = options || images || audio || [];
-        if (field_options) {
-            // set option.title field for title
-            field_options.map(fo => fo.title = fo.option || fo.title);
-
-        }
-
-        return field_options;
-    }
-
-    get_has_percent() {
-        const p = this.get_price();
-        return typeof p == "string" && p.includes("%");
-    }
+	get_has_percent() {
+		const p = this.get_price();
+		return typeof p === 'string' && p.includes( '%' );
+	}
 }
 
-
 /**
-    Render price table
-**/
+  Render price table
+ */
 const PPOM_Price_Table = {
+	price_container: $( '#ppom-price-container' ),
+	show_value_in_label: true,
+	base_price_label: ppom_input_vars.product_base_label,
+	total_price_label: ppom_input_vars.total_without_fixed_label,
+	total_price: 0,
+	row_index: 0,
 
-    price_container: $('#ppom-price-container'),
-    show_value_in_label: true,
-    base_price_label: ppom_input_vars.product_base_label,
-    total_price_label: ppom_input_vars.total_without_fixed_label,
-    total_price: 0,
-    row_index: 0,
+	init( ppom_prices ) {
+		//reset price table
+		this.price_container.html( '' );
+		this.total_price = 0;
+		this.row_index = 0;
+		this.show_base_price = this.enable_base_price();
 
-    init: function(ppom_prices) {
+		// init table
+		this.table_container = $( '<table/>' )
+			.addClass( 'table table-striped' )
+			.appendTo( this.price_container )
+			.css( 'width', '100%' );
 
-        //reset price table
-        this.price_container.html('');
-        this.total_price = 0;
-        this.row_index = 0;
-        this.show_base_price = this.enable_base_price();
+		// console.log('Price Table', ppom_prices);
 
-        // init table
-        this.table_container = $('<table/>').addClass('table table-striped').appendTo(this.price_container).css('width', '100%');
+		ppom_prices.map( ( option, i ) => {
+			const row_class = `ppom-${ option.type }-${ option.apply }`;
 
-        // console.log('Price Table', ppom_prices);
+			const p_row = $( '<tr/>' )
+				.addClass( 'ppom-option-option-list' )
+				.addClass( option.dataname )
+				.addClass( row_class )
+				.attr( 'data-option_id', option.id )
+				.attr( 'data-data_name', option.dataname )
+				.hide()
+				.appendTo( this.table_container );
 
-        ppom_prices.map((option, i) => {
+			let quantitify = true;
+			switch ( option.apply ) {
+				case 'fixed':
+					quantitify = false;
+					break;
+			}
 
-            const row_class = `ppom-${option.type}-${option.apply}`;
+			const context = option.has_discount
+				? 'option_discount'
+				: 'option_price';
 
-            const p_row = $('<tr/>')
-                .addClass('ppom-option-option-list')
-                .addClass(option.dataname)
-                .addClass(row_class)
-                .attr('data-option_id', option.id)
-                .attr('data-data_name', option.dataname)
-                .hide()
-                .appendTo(this.table_container);
+			const price_calculate = this.price_with_product_qty(
+				option,
+				context
+			);
 
-            let quantitify = true;
-            switch (option.apply) {
-                case 'fixed':
-                    quantitify = false;
-                    break;
-            }
+			const label = this.show_value_in_label
+				? this.label_val( option, quantitify )
+				: this.simple_label( option, quantitify );
 
-            const context = option.has_discount ? 'option_discount' : 'option_price';
+			this.add_row(
+				label,
+				nmh.get_formatted_price( price_calculate ),
+				p_row
+			);
 
-            const price_calculate = this.price_with_product_qty(option, context);
+			this.total_price += price_calculate;
 
-            const label = this.show_value_in_label ? this.label_val(option, quantitify) : this.simple_label(option, quantitify);
+			$.event.trigger( {
+				type: 'ppom_option_price_added',
+				option,
+				price: price_calculate,
+				time: new Date(),
+			} );
+		} );
 
-            this.add_row(label, nmh.get_formatted_price(price_calculate), p_row);
+		// Base/Product Price
+		if ( this.show_base_price ) {
+			const row = $( '<tr/>' )
+				.addClass( 'ppom-product-price' )
+				.addClass( 'ppom-product-base-price' ) // legacy
+				.hide()
+				.appendTo( this.table_container );
 
-            this.total_price += price_calculate;
+			const price = nmh.get_formatted_price( ppomPrice.base_price );
+			const price_calculate = this.price_with_product_qty(
+				ppomPrice,
+				'product_price'
+			);
+			const label = `${
+				this.base_price_label
+			} ${ price } x ${ nmh.get_product_qty() }`;
 
-            $.event.trigger({
-                type: "ppom_option_price_added",
-                option: option,
-                price: price_calculate,
-                time: new Date()
-            });
-        });
+			// const label = this.base_price_label;
+			this.add_row(
+				label,
+				nmh.get_formatted_price( price_calculate ),
+				row
+			);
 
-        // Base/Product Price
-        if (this.show_base_price) {
+			this.total_price += Number( price_calculate );
+		}
 
-            const row = $('<tr/>')
-                .addClass('ppom-product-price')
-                .addClass('ppom-product-base-price') // legacy
-                .hide()
-                .appendTo(this.table_container);
+		// TOTAL
+		const row_total = $( '<tr/>' )
+			.addClass( 'ppom-total-price' )
+			.addClass( 'ppom-total-without-fixed' ) // legacy
+			.hide()
+			.appendTo( this.table_container );
 
-            const price = nmh.get_formatted_price(ppomPrice.base_price);
-            const price_calculate = this.price_with_product_qty(ppomPrice, 'product_price');
-            const label = `${this.base_price_label} ${price} x ${nmh.get_product_qty()}`;
+		const label = `<strong>${ this.total_price_label }</strong>`;
+		const price = `<strong>${ nmh.get_formatted_price(
+			this.total_price
+		) }</strong>`;
+		this.add_row( label, price, row_total );
+	},
 
-            // const label = this.base_price_label;
-            this.add_row(label, nmh.get_formatted_price(price_calculate), row);
+	add_row( label, price, row ) {
+		const p_label = $( '<th/>' )
+			.html( label )
+			.addClass( 'ppom-label-item' )
+			.appendTo( row );
 
-            this.total_price += Number(price_calculate);
-        }
+		const p_price = $( '<th/>' )
+			.html( price )
+			.addClass( 'ppom-price-item' )
+			.appendTo( row );
 
-        // TOTAL
-        const row_total = $('<tr/>')
-            .addClass('ppom-total-price')
-            .addClass('ppom-total-without-fixed') // legacy
-            .hide()
-            .appendTo(this.table_container);
+		// Animate
+		row.delay( this.row_index * 100 ).show();
+		this.row_index++;
+	},
 
-        const label = `<strong>${this.total_price_label}</strong>`;
-        const price = `<strong>${nmh.get_formatted_price(this.total_price)}</strong>`;
-        this.add_row(label, price, row_total);
-    },
+	price_with_product_qty( option, context ) {
+		let price = 0;
+		switch ( context ) {
+			case 'option_price':
+				price = option.price * nmh.ppom_get_quantity( option );
+				break;
 
-    add_row: function(label, price, row) {
+			case 'option_discount':
+				price = option.price * nmh.ppom_get_quantity( option );
+				break;
 
-        const p_label = $('<th/>')
-            .html(label)
-            .addClass('ppom-label-item')
-            .appendTo(row);
+			case 'product_price':
+				price = option.base_price * nmh.ppom_get_quantity( option );
+				break;
+		}
 
-        const p_price = $('<th/>')
-            .html(price)
-            .addClass('ppom-price-item')
-            .appendTo(row);
+		return price;
+	},
 
-        // Animate
-        row.delay(this.row_index * 100).show();
-        this.row_index++;
-    },
+	label_val( option, quantitify ) {
+		//console.log('price formated', option.formatted_price);
+		let label = `${ option.label_val } ${
+			option.formatted_price
+		} x ${ nmh.get_product_qty() }`;
 
-    price_with_product_qty: function(option, context) {
+		if ( ! quantitify ) {
+			label = option.label_val;
+		}
 
-        let price = 0;
-        switch (context) {
-            case 'option_price':
-                price = option.price * nmh.ppom_get_quantity(option);
-                break;
+		return label;
+	},
 
-            case 'option_discount':
-                price = option.price * nmh.ppom_get_quantity(option);
-                break;
+	simple_label( option, quantitify ) {
+		let label = `${ option.label } ${
+			option.formatted_price
+		} x ${ nmh.get_product_qty() }`;
 
-            case 'product_price':
-                price = option.base_price * nmh.ppom_get_quantity(option);
-                break;
-        }
+		if ( ! quantitify ) {
+			label = option.label;
+		}
 
-        return price;
-    },
+		return label;
+	},
 
-    label_val: function(option, quantitify) {
-        //console.log('price formated', option.formatted_price);
-        let label = `${option.label_val} ${option.formatted_price} x ${nmh.get_product_qty()}`;
+	enable_base_price() {
+		let is_base_price = true;
 
-        if (!quantitify) { label = option.label_val; }
-
-        return label;
-    },
-
-    simple_label: function(option, quantitify) {
-
-        let label = `${option.label} ${option.formatted_price} x ${nmh.get_product_qty()}`;
-
-        if (!quantitify) { label = option.label; }
-
-        return label;
-    },
-
-    enable_base_price: function() {
-
-        let is_base_price = true;
-
-        nmh.fields_meta.map((meta, index) => {
-            // console.log(meta);
-            if (meta.type == "pricematrix" && meta.discount !== 'on') {
-                is_base_price = false;
-            }
-        });
-        return is_base_price;
-    },
+		nmh.fields_meta.map( ( meta, index ) => {
+			// console.log(meta);
+			if ( meta.type == 'pricematrix' && meta.discount !== 'on' ) {
+				is_base_price = false;
+			}
+		} );
+		return is_base_price;
+	},
 };
-
 
 /**
-    Fields Price Handler Object
-**/
+  Fields Price Handler Object
+ */
 const ppomPrice = {
+	meta: [],
+	field_prices: [],
+	ppom_type: '', //ppom input type
 
-    meta: [],
-    field_prices: [],
-    ppom_type: '', //ppom input type
+	init() {
+		this.base_price = this.get_base_price();
 
-    init: function() {
+		// reset field_prices
+		this.field_prices = [];
 
-        this.base_price = this.get_base_price();
+		let list = document.querySelectorAll( '.ppom-input, .ppom-quantity' );
 
-        // reset field_prices
-        this.field_prices = [];
+		//convert to array
+		list = Array.from( list );
 
-        let list = document.querySelectorAll(".ppom-input, .ppom-quantity");
+		list.map( ( elem, index ) => {
+			// binding events
+			const input = ppom_input.init( elem );
 
-        //convert to array
-        list = Array.from(list);
+			this.set_ppom_type( input.dataname() );
 
-        list.map((elem, index) => {
+			const has_value = input.value() || false;
+			const field_meta = this.meta.find(
+				( m ) => m.data_name === input.dataname()
+			);
 
-            // binding events
-            const input = ppom_input.init(elem);
+			if ( has_value && field_meta ) {
+				let ppom_price = new PPOM_Price_Class(
+					field_meta,
+					input.value()
+				);
 
-            this.set_ppom_type(input.dataname());
+				/**
+				 ** Filter/third party addons/plugin to update price object
+				 ** Example: https://gist.github.com/nmedia82/e2bcc4e9db4f8acc4cfb8bf29962bc19
+				 */
+				if (
+					window[ 'ppom_get_price_' + this.ppom_type ] != undefined
+				) {
+					ppom_price = window[ 'ppom_get_price_' + this.ppom_type ](
+						ppom_price,
+						field_meta,
+						input.value()
+					);
+				}
 
-            const has_value = input.value() || false;
-            const field_meta = this.meta.find(m => m.data_name === input.dataname());
+				this.update_price( ppom_price );
+				PPOM_Price_Table.init( this.field_prices );
+			}
+		} );
+		return this;
+	},
 
-            if (has_value && field_meta) {
+	load_data() {
+		this.meta = nmh.fields_meta;
 
-                let ppom_price = new PPOM_Price_Class(field_meta, input.value());
+		// Load Init
+		this.init();
+	},
 
-                /**
-                 ** Filter/third party addons/plugin to update price object
-                 ** Example: https://gist.github.com/nmedia82/e2bcc4e9db4f8acc4cfb8bf29962bc19
-                 **/
-                if (window['ppom_get_price_' + this.ppom_type] != undefined) {
-                    ppom_price = window['ppom_get_price_' + this.ppom_type](ppom_price, field_meta, input.value());
-                }
+	// Get ppom input type from meta by datame
+	set_ppom_type( dataname ) {
+		if ( nmh.error( dataname ) ) {
+			const meta_found = this.meta.find(
+				( m ) => m.data_name === dataname
+			);
+			this.ppom_type = meta_found.type != '' ? meta_found.type : '';
+		}
+	},
 
-                this.update_price(ppom_price);
-                PPOM_Price_Table.init(this.field_prices);
-            }
-        });
-        return this;
-    },
+	update_price( ppom_price ) {
+		// filter only those option which have prices
+		let field_prices = this.field_prices.filter(
+			( f ) => f.id !== ppom_price.id
+		);
 
-    load_data: function() {
+		// If price found
+		if ( ppom_price && ppom_price.price != 0 ) {
+			field_prices = [ ...field_prices, ppom_price ];
+		}
 
-        this.meta = nmh.fields_meta;
+		this.field_prices = field_prices;
 
-        // Load Init
-        this.init();
-    },
+		$.event.trigger( {
+			type: 'ppom_option_price_updated',
+			ppom_price,
+			time: new Date(),
+		} );
+	},
 
-    // Get ppom input type from meta by datame
-    set_ppom_type: function(dataname) {
-
-        if (nmh.error(dataname)) {
-            const meta_found = this.meta.find(m => m.data_name === dataname);
-            this.ppom_type = meta_found.type != '' ? meta_found.type : '';
-        }
-    },
-
-    update_price: function(ppom_price) {
-
-        // filter only those option which have prices
-        let field_prices = this.field_prices.filter(f => f.id !== ppom_price.id);
-
-        // If price found
-        if (ppom_price && ppom_price.price != 0)
-            field_prices = [...field_prices, ppom_price];
-
-        this.field_prices = field_prices;
-
-        $.event.trigger({
-            type: "ppom_option_price_updated",
-            ppom_price: ppom_price,
-            time: new Date()
-        });
-    },
-
-    get_base_price: function() {
-        return ppom_input_vars.wc_product_price;
-    },
+	get_base_price() {
+		return ppom_input_vars.wc_product_price;
+	},
 };
 
-
-/* 
- **========== PriceMatrix Input Prices Handle  =========== 
+/*
+ **========== PriceMatrix Input Prices Handle  ===========
  */
 class PPOM_PriceMatrix_Class extends PPOM_Price_Class {
+	constructor( field, value ) {
+		super( field, value );
+		this.label = this.get_label_value();
+		this.has_percent = this.get_has_percent();
+		this.has_discount = field.discount === 'on' ? true : false;
+		// console.log("Value", value);
+	}
 
-    constructor(field, value) {
-        super(field, value);
-        this.label = this.get_label_value();
-        this.has_percent = this.get_has_percent();
-        this.has_discount = field.discount === 'on' ? true : false;
-        // console.log("Value", value);
-    }
+	get_price() {
+		let p = 0;
 
-    get_price() {
+		if ( this.get_pricematrix_meta().price ) {
+			if ( this.has_percent ) {
+				p = nmh.percentage(
+					ppomPrice.base_price,
+					this.get_pricematrix_meta().percent
+				);
+			} else {
+				p = this.get_pricematrix_meta().price;
+			}
+		}
 
-        let p = 0;
+		const has_discount = this.field.discount === 'on' ? true : false;
+		return has_discount ? p * -1 : p;
+	}
 
-        if (this.get_pricematrix_meta().price) {
+	get_label_value() {
+		return `${ this.field.title } [${ this.get_pricematrix_meta().label }]`;
+	}
 
-            if (this.has_percent) {
-                p = nmh.percentage(ppomPrice.base_price, this.get_pricematrix_meta().percent);
-            }
-            else {
-                p = this.get_pricematrix_meta().price;
-            }
-        }
+	get_pricematrix_meta() {
+		let matrix_obj = {};
+		$.each( this.value, ( range, meta ) => {
+			const range_break = range.split( '-' );
 
-        const has_discount = this.field.discount === 'on' ? true : false;
-        return has_discount ? p * -1 : p;
-    }
+			const range_from = parseInt( range_break[ 0 ] );
+			const range_to = parseInt( range_break[ 1 ] );
+			const product_qty = nmh.get_product_qty();
 
-    get_label_value() {
+			if ( product_qty >= range_from && product_qty <= range_to ) {
+				matrix_obj = meta;
+			}
+		} );
+		return matrix_obj;
+	}
 
-        return `${this.field.title} [${this.get_pricematrix_meta().label}]`;
-    }
-
-    get_pricematrix_meta() {
-
-        let matrix_obj = {};
-        $.each(this.value, (range, meta) => {
-
-            const range_break = range.split("-");
-
-            let range_from = parseInt(range_break[0]);
-            let range_to = parseInt(range_break[1]);
-            const product_qty = nmh.get_product_qty();
-
-            if (product_qty >= range_from && product_qty <= range_to) {
-                matrix_obj = meta;
-            }
-        });
-        return matrix_obj;
-    }
-
-    get_has_percent() {
-        // console.log(this.get_pricematrix_meta().percent);
-        // const p = this.get_price();
-        return this.get_pricematrix_meta().percent && true;
-    }
+	get_has_percent() {
+		// console.log(this.get_pricematrix_meta().percent);
+		// const p = this.get_price();
+		return this.get_pricematrix_meta().percent && true;
+	}
 }
 
+function ppom_get_price_pricematrix( price_obj, field_meta, value ) {
+	const field_price = new PPOM_PriceMatrix_Class( field_meta, value );
 
-function ppom_get_price_pricematrix(price_obj, field_meta, value) {
-
-    const field_price = new PPOM_PriceMatrix_Class(field_meta, value);
-
-    return field_price;
+	return field_price;
 }
 
 // For Variation Quantity
 class PPOM_variationQuantity_Class extends PPOM_Price_Class {
+	constructor( field, value ) {
+		super( field, value );
+	}
 
-    constructor(field, value) {
-        super(field, value);
-    }
+	get_price() {
+		let p = this.field.default_price || '';
 
-    get_price() {
+		if ( p ) {
+			p = Number( this.value ) * p;
+		}
 
-        let p = this.field.default_price || '';
+		// if options found
+		if ( this.field.options && this.field.options.length > 0 ) {
+			// const option_title = o.option || o.title;
 
+			const priced = this.field.options.find(
+				( o ) =>
+					o.price !== '' &&
+					( nmh.strip_slashes( o.title ) === this.value ||
+						nmh.strip_slashes( o.id ) === this.value )
+			);
 
-        if (p) {
-            p = Number(this.value) * p;
-        }
+			if ( priced ) {
+				p = priced.price * Number( this.value );
+			}
+		}
 
-        // if options found    
-        if (this.field.options && this.field.options.length > 0) {
-            // const option_title = o.option || o.title;
-
-            const priced = this.field.options.find(o => o.price !== '' &&
-                (nmh.strip_slashes(o.title) === this.value || nmh.strip_slashes(o.id) === this.value)
-            );
-
-            if (priced) {
-
-                p = priced.price * Number(this.value);
-
-            }
-        }
-
-        return p;
-    }
+		return p;
+	}
 }
-
 
 //Filter function
-function ppom_get_price_quantities(price_obj, field_meta, value) {
+function ppom_get_price_quantities( price_obj, field_meta, value ) {
+	const field_price = new PPOM_variationQuantity_Class( field_meta, value );
+	//console.log("Value",field_price);
 
-    const field_price = new PPOM_variationQuantity_Class(field_meta, value);
-    //console.log("Value",field_price);
-
-    return field_price;
+	return field_price;
 }
 
-
-
-/* 
- **========== PPOM Price INITs  =========== 
+/*
+ **========== PPOM Price INITs  ===========
  * 1- Run PPOM Price Init
  * 2- Event Listeners
  */
 ppomPrice.load_data();
 
-const ppom_event_handler = selector => {
-
-    selector.on('change keyup', (currentTarget) => {
-        ppomPrice.init();
-    });
+const ppom_event_handler = ( selector ) => {
+	selector.on( 'change keyup', ( currentTarget ) => {
+		ppomPrice.init();
+	} );
 };
 
 // Event Listeners
-ppom_event_handler(nmh.input_selector);
-ppom_event_handler(nmh.dom_product_qty);
+ppom_event_handler( nmh.input_selector );
+ppom_event_handler( nmh.dom_product_qty );
 
 // Legacy price init function
 function ppom_update_option_prices() {
-    ppomPrice.init();
+	ppomPrice.init();
 }

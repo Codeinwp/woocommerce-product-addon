@@ -4,18 +4,19 @@
 
 'use strict';
 
-(function($) {
-
+( function ( $ ) {
 	// Tooltip Init.
-	var tooltipConfig = 'undefined' !== typeof ppom_tooltip_vars ? ppom_tooltip_vars : {};
-	var tooltip_position = tooltipConfig.ppom_tooltip_position;
-	var tooltip_trigger = tooltipConfig.ppom_tooltip_trigger;
-	var tooltip_animation = tooltipConfig.ppom_tooltip_animation;
-	var tooltip_maxwidth = tooltipConfig.ppom_tooltip_maxwidth;
-	var tooltip_borderclr = tooltipConfig.ppom_tooltip_borderclr;
-	var tooltip_bgclr = tooltipConfig.ppom_tooltip_bgclr;
-	var tooltip_txtclr = tooltipConfig.ppom_tooltip_txtclr;
-	var tooltip_interactive = (tooltipConfig.ppom_tooltip_interactive == 'yes') ? true : false;
+	const tooltipConfig =
+		'undefined' !== typeof ppom_tooltip_vars ? ppom_tooltip_vars : {};
+	const tooltip_position = tooltipConfig.ppom_tooltip_position;
+	const tooltip_trigger = tooltipConfig.ppom_tooltip_trigger;
+	const tooltip_animation = tooltipConfig.ppom_tooltip_animation;
+	const tooltip_maxwidth = tooltipConfig.ppom_tooltip_maxwidth;
+	const tooltip_borderclr = tooltipConfig.ppom_tooltip_borderclr;
+	const tooltip_bgclr = tooltipConfig.ppom_tooltip_bgclr;
+	const tooltip_txtclr = tooltipConfig.ppom_tooltip_txtclr;
+	const tooltip_interactive =
+		tooltipConfig.ppom_tooltip_interactive == 'yes' ? true : false;
 
 	const tooltip_options = {
 		contentAsHTML: true,
@@ -27,11 +28,10 @@
 		maxWidth: tooltip_maxwidth,
 		tooltipBorderColor: tooltip_borderclr,
 		tooltipBGColor: tooltip_bgclr,
-		tooltipContentColor: tooltip_txtclr
+		tooltipContentColor: tooltip_txtclr,
 	};
 
-	if (tooltip_trigger != 'yes') {
-
+	if ( tooltip_trigger != 'yes' ) {
 		tooltip_options.triggerClose = {
 			mouseleave: true,
 			originClick: true,
@@ -42,9 +42,7 @@
 			mouseenter: true,
 			tap: true,
 		};
-	}
-	else {
-
+	} else {
 		tooltip_options.triggerClose = {
 			click: true,
 			tap: true,
@@ -55,113 +53,126 @@
 			tap: true,
 		};
 	}
-	if ( $('[data-ppom-tooltip~=ppom_tooltip]').length > 0 ) {
-		$('[data-ppom-tooltip~=ppom_tooltip]').ppom_tooltipster?.(tooltip_options);
+	if ( $( '[data-ppom-tooltip~=ppom_tooltip]' ).length > 0 ) {
+		$( '[data-ppom-tooltip~=ppom_tooltip]' ).ppom_tooltipster?.(
+			tooltip_options
+		);
 	}
 
-	// Plugin name and prefix 
-	var pluginName = 'megapopup';
-	var prefix = 'ppom-popup';
+	// Plugin name and prefix
+	const pluginName = 'megapopup';
+	const prefix = 'ppom-popup';
 
 	function pluploadRefresh() {
-		if( typeof uploaderInstances !== 'object' ) {
+		if ( typeof uploaderInstances !== 'object' ) {
 			return;
 		}
-		const instances = Object.values(uploaderInstances);
+		const instances = Object.values( uploaderInstances );
 
-		for( let i=0; i<instances.length; i++ ) {
-			if( typeof instances[i].refresh !== 'function' ) {
+		for ( let i = 0; i < instances.length; i++ ) {
+			if ( typeof instances[ i ].refresh !== 'function' ) {
 				continue;
 			}
 
-			instances[i].refresh();
+			instances[ i ].refresh();
 		}
 	}
 
-	$(document).on('click', '[data-model-id]', function(e) {
+	$( document ).on( 'click', '[data-model-id]', function ( e ) {
 		e.preventDefault();
-		var popup_id = $(this).attr('data-model-id');
+		const popup_id = $( this ).attr( 'data-model-id' );
 
-		$('#' + popup_id).megapopup($(this).data());
+		$( '#' + popup_id ).megapopup( $( this ).data() );
 
 		pluploadRefresh();
-	});
+	} );
 
 	// Init Plugin
-	$.fn[pluginName] = function(options) {
-
-
-		var defaults = {
+	$.fn[ pluginName ] = function ( options ) {
+		const defaults = {
 			backgroundclickevent: true,
 			popupcloseclass: prefix + '-close-js',
-			bodycontroller: prefix + '-open'
+			bodycontroller: prefix + '-open',
 		};
 
 		//Extend popup options
-		var options = $.extend({}, defaults, options);
+		var options = $.extend( {}, defaults, options );
 
-		return this.each(function() {
-
+		return this.each( function () {
 			// Global Variables
-			var modal = $(this),
-				modalBG = $('.' + prefix + '-bg-controler');
+			let modal = $( this ),
+				modalBG = $( '.' + prefix + '-bg-controler' );
 
 			// Popup background show
-			if (modalBG.length == 0) {
-				modalBG = $('<div class="' + prefix + '-bg-controler" />').appendTo('body');
+			if ( modalBG.length == 0 ) {
+				modalBG = $(
+					'<div class="' + prefix + '-bg-controler" />'
+				).appendTo( 'body' );
 			}
 
 			// open popup
-			modal.bind(prefix + ':open', function() {
-
-				$('body').addClass(options.bodycontroller);
-				modal.css({ 'display': 'block', });
+			modal.bind( prefix + ':open', function () {
+				$( 'body' ).addClass( options.bodycontroller );
+				modal.css( { display: 'block' } );
 				modalBG.fadeIn();
-				modal.animate({
-					"top": '0px',
-					"opacity": 1
-				}, 0);
-
-			});
+				modal.animate(
+					{
+						top: '0px',
+						opacity: 1,
+					},
+					0
+				);
+			} );
 
 			// close popup
-			modal.bind(prefix + ':close', function() {
-
-				$('body').removeClass(options.bodycontroller);
+			modal.bind( prefix + ':close', function () {
+				$( 'body' ).removeClass( options.bodycontroller );
 				modalBG.fadeOut();
-				modal.animate({
-					"top": '0px',
-					"opacity": 0
-				}, 0, function() {
-					modal.css({ 'display': 'none' });
-				});
-			});
+				modal.animate(
+					{
+						top: '0px',
+						opacity: 0,
+					},
+					0,
+					function () {
+						modal.css( { display: 'none' } );
+					}
+				);
+			} );
 
 			//Open Modal Immediately
-			modal.trigger(prefix + ':open');
+			modal.trigger( prefix + ':open' );
 
 			// close popup listner
-			$('.' + options.popupcloseclass).bind('click.modalEvent', function(e) {
-				modal.trigger(prefix + ':close');
-				e.preventDefault();
-			});
+			$( '.' + options.popupcloseclass ).bind(
+				'click.modalEvent',
+				function ( e ) {
+					modal.trigger( prefix + ':close' );
+					e.preventDefault();
+				}
+			);
 
 			// Close popup on overlay click, but not when clicking inside the modal
-			$('.ppom-enquiry-overlay, .ppom-popup-product-edit-overlay').bind('click.modalEvent', function(e) {
-				if (!$(e.target).closest('.ppom-enquiry-modal, .ppom-popup-product-edit-modal').length) {
-					modal.trigger(prefix + ':close');
+			$( '.ppom-enquiry-overlay, .ppom-popup-product-edit-overlay' ).bind(
+				'click.modalEvent',
+				function ( e ) {
+					if (
+						! $( e.target ).closest(
+							'.ppom-enquiry-modal, .ppom-popup-product-edit-modal'
+						).length
+					) {
+						modal.trigger( prefix + ':close' );
+					}
 				}
-			});
+			);
 
 			// disable backgroundclickevent close
-			if (options.backgroundclickevent) {
-				modalBG.css({ "cursor": "pointer" })
-				modalBG.bind('click.modalEvent', function() {
-					modal.trigger(prefix + ':close')
-				});
+			if ( options.backgroundclickevent ) {
+				modalBG.css( { cursor: 'pointer' } );
+				modalBG.bind( 'click.modalEvent', function () {
+					modal.trigger( prefix + ':close' );
+				} );
 			}
-
-		});
-	}
-
-})(jQuery);
+		} );
+	};
+} )( jQuery );

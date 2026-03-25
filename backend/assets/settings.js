@@ -1,155 +1,157 @@
-"use strict";
-jQuery(function($) {
+'use strict';
+jQuery( function ( $ ) {
+	/**
+	  CSS Loader
+	 */
+	$( '#nmsf-page-loader' ).hide();
+	$( '#nmsf-page' ).show();
 
-    /**
-        CSS Loader
-    **/
-    $("#nmsf-page-loader").hide();
-    $("#nmsf-page").show();
+	/**
+	  Submit Form Data
+	 */
+	$( 'form#mainform, .nmsf-form-js' ).submit( function ( e ) {
+		e.preventDefault();
 
+		jQuery( '.nmsf-wrapper' ).block( {
+			message: null,
+			overlayCSS: {
+				background: '#fff',
+				opacity: 0.6,
+			},
+		} );
 
-    /**
-        Submit Form Data
-    **/
-    $("form#mainform, .nmsf-form-js").submit(function(e) {
-        e.preventDefault();
+		const data = $( this ).serialize();
 
-        jQuery('.nmsf-wrapper').block({
-            message: null,
-            overlayCSS: {
-                background: "#fff",
-                opacity: .6,
-            }
-        });
+		$.post(
+			ajaxurl,
+			data,
+			function ( resp ) {
+				jQuery( '.nmsf-wrapper' ).unblock();
 
-        var data = $(this).serialize();
+				window.createNotification( {
+					closeOnClick: true,
+					displayCloseButton: false,
+					positionClass: 'nfc-bottom-right',
+					showDuration: 2000,
+					theme: resp.status,
+				} )( {
+					title: '',
+					message: resp.message,
+				} );
+			},
+			'json'
+		);
+	} );
 
-        $.post(ajaxurl, data, function(resp) {
+	/**
+	  WP Colorpicker
+	 */
+	$( '.nmsf-wp-colorpicker' ).wpColorPicker();
 
-            jQuery('.nmsf-wrapper').unblock();
+	/**
+	  Active First Settings Panel 
+	 */
+	$( '.nmsf-panels-content' ).each( function ( index, item ) {
+		$( item ).find( '.nmsf-panel-handler:first' ).prop( 'checked', true );
+	} );
 
-            window.createNotification({
-                closeOnClick: true,
-                displayCloseButton: false,
-                positionClass: 'nfc-bottom-right',
-                showDuration: 2000,
-                theme: resp.status
-            })({
-                title: '',
-                message: resp.message
-            });
+	/**
+	  Settings Panel Tab
+	 */
+	$( document ).on( 'click', '.nmsf-tabs-content div', function () {
+		const tab_id = $( this ).attr( 'data-tab-id' );
 
-        }, 'json');
+		if ( ! $( this ).is( 'active' ) ) {
+			$( '.nmsf-tabs-content div' ).removeClass( 'active' );
+			$( '.nmsf-panels-content' ).removeClass( 'active' );
 
-    });
+			$( this ).addClass( 'active' );
+			$( '.nmsf-panels-area' )
+				.find( 'div[data-panel-id=' + tab_id + ']' )
+				.addClass( 'active' );
+		}
+	} );
 
+	/**
+	  Add Conditional Settings Fields
+	 */
+	const ruleset = $.deps.createRuleset();
 
-    /**
-        WP Colorpicker
-    **/
-    $('.nmsf-wp-colorpicker').wpColorPicker();
+	$( '.nmsf-panel-conditional-field' ).each( function ( index, elem ) {
+		let conditions = $( elem ).attr( 'data-conditions' );
+		conditions = JSON.parse( conditions );
+		let conditional_rule = ruleset;
+		const $this = $( this );
 
+		$.each( conditions, function ( index, elements ) {
+			const element = elements[ 0 ];
+			const operator = elements[ 1 ];
+			const input_val = elements[ 2 ].join( ',' );
 
-    /**
-        Active First Settings Panel 
-    **/
-    $('.nmsf-panels-content').each(function(index, item) {
-        $(item).find('.nmsf-panel-handler:first').prop('checked', true);
-    });
+			conditional_rule = conditional_rule.createRule(
+				'[data-rule-id="' + element + '"]',
+				operator,
+				input_val
+			);
+			conditional_rule.include( $this );
+		} );
+	} );
 
+	ruleset.install( { log: false } );
 
-    /**
-        Settings Panel Tab
-    **/
-    $(document).on("click", ".nmsf-tabs-content div", function() {
-        var tab_id = $(this).attr('data-tab-id');
+	/**
+	  ToolTip Init
+	 */
+	$( '.nmsf-tooltip' ).ppom_tooltipster( {
+		interactive: true,
+		theme: 'nmsf_tooltipster-punk',
+		tooltipBorderColor: '#32334a',
+		tooltipBGColor: '#32334a',
+	} );
 
-        if (!$(this).is("active")) {
+	/**
+	  Video Popup Init
+	 */
+	$( '.nmsf-ref-video-popup' ).videoPopup();
 
-            $(".nmsf-tabs-content div").removeClass("active");
-            $(".nmsf-panels-content").removeClass("active");
+	/**
+	  Select2 Init
+	 */
+	$( '.nmsf-multiselect-js' ).select2();
 
-            $(this).addClass("active");
-            $(".nmsf-panels-area").find("div[data-panel-id=" + tab_id + "]").addClass("active");
-        }
-    });
+	/**
+	 * Disabled submit button.
+	 */
+	$( document ).on(
+		'click',
+		'.nmsf-panels-content-inner .nmsf-label',
+		function () {
+			const isLocked = $( this ).hasClass( 'ppom-is-locked-section' );
+			$( this )
+				.parents( '.nmsf-panels-area' )
+				.find( '.woocommerce-save-button' )
+				.attr( 'disabled', isLocked );
+		}
+	);
 
-    /**
-        Add Conditional Settings Fields
-    **/
-    var ruleset = $.deps.createRuleset();
+	const permissionField = $( '#ppom_permission_mfields' );
 
-    $('.nmsf-panel-conditional-field').each(function(index, elem) {
-        var conditions = $(elem).attr('data-conditions');
-        conditions = JSON.parse(conditions);
-        var conditional_rule = ruleset;
-        var $this = $(this);
+	$( document ).ready( function () {
+		if ( permissionField.val().length === 0 ) {
+			permissionField.val( [ 'administrator' ] );
+			permissionField.trigger( 'change' );
+		}
 
-        $.each(conditions, function(index, elements) {
+		permissionField.on( 'select2:unselecting', function ( e ) {
+			if ( typeof e.params.args === 'undefined' ) {
+				return;
+			}
 
-            var element = elements[0];
-            var operator = elements[1];
-            var input_val = elements[2].join(',');
-
-            conditional_rule = conditional_rule.createRule('[data-rule-id="' + element + '"]', operator, input_val);
-            conditional_rule.include($this);
-        });
-    });
-
-    ruleset.install({ log: false });
-
-
-    /**
-        ToolTip Init
-    **/
-    $('.nmsf-tooltip').ppom_tooltipster({
-        interactive: true,
-        theme: 'nmsf_tooltipster-punk',
-        tooltipBorderColor: '#32334a',
-        tooltipBGColor: '#32334a'
-    });
-
-
-    /**
-        Video Popup Init
-    **/
-    $(".nmsf-ref-video-popup").videoPopup();
-
-
-    /**
-        Select2 Init
-    **/
-    $('.nmsf-multiselect-js').select2();
-
-    /**
-     * Disabled submit button.
-     */
-    $(document).on('click', '.nmsf-panels-content-inner .nmsf-label', function(){
-        var isLocked = $(this).hasClass('ppom-is-locked-section');
-        $(this)
-        .parents('.nmsf-panels-area')
-        .find('.woocommerce-save-button')
-        .attr('disabled', isLocked);
-    });
-
-    const permissionField = $('#ppom_permission_mfields');
-
-    $(document).ready(function(){
-        if( permissionField.val().length === 0 ) {
-            permissionField.val(['administrator']);
-            permissionField.trigger('change');
-        }
-
-        permissionField.on('select2:unselecting', function(e){
-            if( typeof e.params.args === 'undefined' ) {
-                return;
-            }
-
-            const element = $(e.params.args.data.element);
-            if( element.prop('value') === 'administrator' ) {
-                alert(nmsf_vars.administrator_role_cannot_be_removed);
-                e.preventDefault();
-            }
-        });
-    });
-});
+			const element = $( e.params.args.data.element );
+			if ( element.prop( 'value' ) === 'administrator' ) {
+				alert( nmsf_vars.administrator_role_cannot_be_removed );
+				e.preventDefault();
+			}
+		} );
+	} );
+} );
