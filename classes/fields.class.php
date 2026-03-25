@@ -525,7 +525,7 @@ class PPOM_Fields_Meta {
 
 				break;
 
-			case 'paired-palettes';
+			case 'paired-palettes':
 			case 'paired-pricematrix':
 				$plc_option = ( ! empty( $placeholders ) ) ? $placeholders[0] : __( 'Option', 'woocommerce-product-addon' );
 				$plc_price  = ( ! empty( $placeholders ) ) ? $placeholders[1] : __( 'Price (optional)', 'woocommerce-product-addon' );
