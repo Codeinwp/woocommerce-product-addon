@@ -114,11 +114,11 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 	$cropped_file_name = ppom_file_get_name( $file_name, $product_id );
 	if ( $cropped && file_exists( ppom_get_dir_path( 'cropped' ) . $cropped_file_name ) ) {
 
-		$cropped_url  = ppom_get_dir_url() . 'cropped/' . $cropped_file_name;
-		$ppom_html   .= '<tr>';
-		$ppom_html   .= '<td><a href="' . esc_url( $cropped_url ) . '" class="lightbox et_pb_lightbox_image" itemprop="image" title="' . esc_attr( $file_name ) . '">';
-		$ppom_html   .= '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $cropped_url ) . '">';
-		$ppom_html   .= '</a></td>';
+		$cropped_url = ppom_get_dir_url() . 'cropped/' . $cropped_file_name;
+		$ppom_html  .= '<tr>';
+		$ppom_html  .= '<td><a href="' . esc_url( $cropped_url ) . '" class="lightbox et_pb_lightbox_image" itemprop="image" title="' . esc_attr( $file_name ) . '">';
+		$ppom_html  .= '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $cropped_url ) . '">';
+		$ppom_html  .= '</a></td>';
 
 		// translators: $s: the size of the cropped image.
 		$cropped_title = sprintf( __( 'Your image-%s', 'woocommerce-product-addon' ), $size );
@@ -142,25 +142,25 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
  * @return string The new file name.
  */
 function ppom_create_unique_file_name( $file_name, $file_ext ) {
-    $seed = $file_name . microtime( true ) . mt_rand();
-    return $file_name . "." . wp_hash( $seed ) . "." . $file_ext;
+	$seed = $file_name . microtime( true ) . mt_rand();
+	return $file_name . '.' . wp_hash( $seed ) . '.' . $file_ext;
 }
 
 final class UploadFileErrors {
-	const OPEN_INPUT = 'open_input';
-	const OPEN_OUTPUT = 'open_output';
+	const OPEN_INPUT        = 'open_input';
+	const OPEN_OUTPUT       = 'open_output';
 	const MISSING_TEMP_FILE = 'missing_temp_file';
-	const OPEN_DIR = 'open_dir';
+	const OPEN_DIR          = 'open_dir';
 
 	static function get_message_response( $error_slug ) {
 		$msg = array(
-			self::OPEN_INPUT => '{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}',
-			self::OPEN_OUTPUT => '{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}',
+			self::OPEN_INPUT        => '{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}',
+			self::OPEN_OUTPUT       => '{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}',
 			self::MISSING_TEMP_FILE => '{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}',
-			self::OPEN_DIR => '{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}',
+			self::OPEN_DIR          => '{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}',
 		);
 
-		return isset( $msg[$error_slug] ) ? $msg[$error_slug] : false;
+		return isset( $msg[ $error_slug ] ) ? $msg[ $error_slug ] : false;
 	}
 }
 
@@ -231,7 +231,13 @@ function ppom_upload_file() {
 
 	$file_name = apply_filters( 'ppom_uploaded_filename', $file_name );
 
-	$additional_mime_types = apply_filters( 'ppom_custom_allowed_mime_types', array( 'ai' => 'application/postscript', 'eps' => 'application/postscript' ) );
+	$additional_mime_types = apply_filters(
+		'ppom_custom_allowed_mime_types',
+		array(
+			'ai'  => 'application/postscript',
+			'eps' => 'application/postscript',
+		) 
+	);
 
 	$allowed_mime_types = array_merge( get_allowed_mime_types(), $additional_mime_types );
 
@@ -275,8 +281,8 @@ function ppom_upload_file() {
 	$file_name       = strtolower( $file_name );
 	$file_ext        = pathinfo( $file_name, PATHINFO_EXTENSION );
 	$original_name   = $file_name;
-	$original_name   = str_replace(".$file_ext", "", $original_name);
-	$file_hash       = substr( hash('haval192,5', $file_name), 0, 8 ) . '-' . $ppom_nonce;
+	$original_name   = str_replace( ".$file_ext", '', $original_name );
+	$file_hash       = substr( hash( 'haval192,5', $file_name ), 0, 8 ) . '-' . $ppom_nonce;
 	$file_name       = str_replace( ".$file_ext", ".$file_hash.$file_ext", $file_name );
 	$file_path       = $file_dir_path . $file_name;
 
@@ -288,7 +294,7 @@ function ppom_upload_file() {
 
 		$count = 1;
 		while ( file_exists( $file_dir_path . $file_name_a . '_' . $count . $file_name_b ) ) {
-			$count ++;
+			++$count;
 		}
 
 		$file_name = $file_name_a . '_' . $count . $file_name_b;
@@ -352,7 +358,7 @@ function ppom_upload_file() {
 	if ( ! $chunks || $chunk === $chunks - 1 ) {
 
 		// Give a unique name to prevent name collisions.
-		$file_name = ppom_create_unique_file_name( $original_name, $file_ext );
+		$file_name        = ppom_create_unique_file_name( $original_name, $file_ext );
 		$unique_file_path = $file_dir_path . $file_name;
 
 		rename( $chunk_file_path, $unique_file_path );
@@ -488,7 +494,6 @@ function ppom_get_file_download_url( $file_name, $order_id, $product_id ) {
 	}
 
 	return apply_filters( 'ppom_file_download_url', $file_download_url_found, $file_name );
-
 }
 
 // Generate uploaded file preview
@@ -657,7 +662,6 @@ function ppom_get_croppie_options( $settings ) {
 
 
 	return apply_filters( 'ppom_croppie_options', $cropping_settigs, $settings );
-
 }
 
 function ppom_get_viewport_settings( $settings ) {
@@ -695,7 +699,6 @@ function ppom_get_viewport_settings( $settings ) {
 	$the_viewport['type'] = $viewport_type;
 
 	return $the_viewport;
-
 }
 
 /*

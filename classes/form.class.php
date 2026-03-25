@@ -72,7 +72,7 @@ class PPOM_Form {
 	 */
 	function wrapper_inner_classes() {
 
-		$classes = [ 'form-row', 'ppom-rendering-fields', 'align-items-center', 'ppom-section-collapse' ];
+		$classes = array( 'form-row', 'ppom-rendering-fields', 'align-items-center', 'ppom-section-collapse' );
 
 		$classes = apply_filters( 'ppom_wrapper2_classes', $classes, $this->product );
 
@@ -95,16 +95,16 @@ class PPOM_Form {
 
 		// posted value being
 		// used ppom-pro
-		$posted_values = apply_filters( 'ppom_default_values', $posted_values, $_POST, $this->product_id, self::$args );
-		$fields        = array_filter(
+		$posted_values   = apply_filters( 'ppom_default_values', $posted_values, $_POST, $this->product_id, self::$args );
+		$fields          = array_filter(
 			self::$ppom->fields,
-			function( $field ) use ( $meta_id ) {
+			function ( $field ) use ( $meta_id ) {
 				return (int) $meta_id === (int) $field['ppom_id'];
 			}
 		);
 		$collapse_fields = array_filter(
 			$fields,
-			function( $collapse_field ) {
+			function ( $collapse_field ) {
 				return isset( $collapse_field['type'] ) && 'collapse' === $collapse_field['type'];
 			}
 		);
@@ -114,7 +114,7 @@ class PPOM_Form {
 			$type      = isset( $meta['type'] ) ? $meta['type'] : '';
 			$title     = isset( $meta['title'] ) ? ppom_wpml_translate( $meta['title'], 'PPOM' ) : '';
 			$data_name = isset( $meta['data_name'] ) ? $meta['data_name'] : $title;
-			$ppom_field_counter ++;
+			++$ppom_field_counter;
 
 			// Set ID on meta against dataname
 			$meta['id'] = $data_name;
@@ -181,7 +181,7 @@ class PPOM_Form {
 				}
 
 				$section_started = true;
-				$ppom_collapse_counter ++;
+				++$ppom_collapse_counter;
 
 				if ( count( $fields ) === $ppom_field_counter ) {
 					echo '</div>';
@@ -378,10 +378,10 @@ class PPOM_Form {
 			}
 		} elseif ( isset( $_GET[ $data_name ] ) ) {
 			// When Cart Edit addon used.
-			$edit_data = isset( $_GET[ $data_name ] ) ? $_GET[ $data_name ] : '';
+			$edit_data     = isset( $_GET[ $data_name ] ) ? $_GET[ $data_name ] : '';
 			$default_value = is_array( $edit_data ) ? map_deep( $edit_data, 'sanitize_text_field' ) : sanitize_text_field( $_GET[ $data_name ] );
 		} elseif ( isset( $_POST['ppom']['fields'][ $data_name ] ) && apply_filters( 'ppom_retain_after_add_to_cart', true ) ) {
-			$edit_data = isset( $_POST['ppom']['fields'][ $data_name ] ) ? $_POST['ppom']['fields'][ $data_name ] : '';
+			$edit_data     = isset( $_POST['ppom']['fields'][ $data_name ] ) ? $_POST['ppom']['fields'][ $data_name ] : '';
 			$default_value = is_array( $edit_data ) ? map_deep( $edit_data, 'sanitize_text_field' ) : sanitize_text_field( $_POST['ppom']['fields'][ $data_name ] );
 		} else {
 			// Default values in settings

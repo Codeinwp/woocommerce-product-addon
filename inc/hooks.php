@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Saving Cropped image when posted from product page.
 function ppom_hooks_save_cropped_image( $ppom_fields, $posted_data ) {
 
-	if( ! isset( $posted_data['ppom_product_id'] ) ) {
+	if ( ! isset( $posted_data['ppom_product_id'] ) ) {
 		return $ppom_fields;
 	}
 
@@ -413,7 +413,7 @@ function ppom_hooks_load_input_scripts( $product, $ppom_id = null ) {
 						continue;
 					}
 					$field_conditions['rules'][ $rule_index ]['element_values'] = ppom_wpml_translate( $rule['element_values'], 'PPOM' );
-					$rule_index ++;
+					++$rule_index;
 				}
 
 				$ppom_conditional_fields[ $data_name ] = $field_conditions;
@@ -435,8 +435,8 @@ function ppom_hooks_load_input_scripts( $product, $ppom_id = null ) {
 	wp_enqueue_script( 'ppom-inputs', PPOM_URL . '/js/ppom.inputs.js', $ppom_core_scripts, PPOM_DB_VERSION, true );
 	/*
 	$ppom_input_vars = array('ajaxurl' => admin_url( 'admin-ajax.php', (is_ssl() ? 'https' : 'http') ),
-							'ppom_inputs'		=> $ppom_meta_fields,
-							'field_meta'		=> $ppom_meta_fields);*/
+							'ppom_inputs'       => $ppom_meta_fields,
+							'field_meta'        => $ppom_meta_fields);*/
 
 
 	$vars_args       = array(
@@ -466,7 +466,6 @@ function ppom_hooks_load_input_scripts( $product, $ppom_id = null ) {
 		);
 		wp_localize_script( "ppom-{$ppom_conditions_script}", 'ppom_input_vars', $ppom_input_vars );
 	}
-
 }
 
 function ppom_hooks_input_args( $field_setting, $field_meta, $product ) {
@@ -598,7 +597,6 @@ function ppom_hooks_register_wpml( $meta_data, $ppom_id ) {
 					nm_wpml_register( $option['title'], 'PPOM' );
 
 					return $option;
-
 				},
 				$data['images'] 
 			);
@@ -625,7 +623,6 @@ function ppom_hooks_register_wpml( $meta_data, $ppom_id ) {
 					$option['id'] = ppom_get_option_id( $option );
 
 					return $option;
-
 				},
 				$data['options']
 			);
@@ -687,7 +684,6 @@ function ppom_hooks_input_wrapper_class_new( $input_wrapper_class, $field_meta )
 	$input_wrapper_class .= ' ppom-input-' . $field_meta['id'];
 
 	return $input_wrapper_class;
-
 }
 
 /** The input MAIN wrapper class */
@@ -714,7 +710,7 @@ function ppom_hooks_input_main_wrapper_class( $wrapper_class, $classes_array, $f
 
 		foreach ( $conditions['rules'] as $index => $rule ) {
 
-			$element        = isset( $rule['elements'] ) ? strtolower( $rule['elements']  ): '';
+			$element        = isset( $rule['elements'] ) ? strtolower( $rule['elements'] ) : '';
 			$wrapper_class .= " ppom-cond-{$element}";
 			$wrapper_class .= " ppom-locked-{$element}";
 		}
@@ -840,8 +836,8 @@ function ppom_hooks_render_shortcode( $attr ) {
 		PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id( $params['product_id'], '', 'shortcode' );
 		?>
 		<form class="cart"
-			  action="<?php echo esc_url( apply_filters( 'woocommerce_add_to_cart_form_action', $product->get_permalink() ) ); ?>"
-			  method="post" enctype='multipart/form-data'>
+				action="<?php echo esc_url( apply_filters( 'woocommerce_add_to_cart_form_action', $product->get_permalink() ) ); ?>"
+				method="post" enctype='multipart/form-data'>
 			<?php
 			if ( ppom_is_legacy_mode() ) {
 				ppom_woocommerce_show_fields_on_product( $params['product_id'] );
@@ -865,7 +861,7 @@ function ppom_hooks_render_shortcode( $attr ) {
 
 			<input type="hidden" name="ppom[ppom_shorcode_page_id]" value="<?php echo esc_attr( $page_id ); ?>">
 			<input type="hidden" name="ppom[ppom_shorcode_product_id]"
-				   value="<?php echo esc_attr( $params['product_id'] ); ?>">
+					value="<?php echo esc_attr( $params['product_id'] ); ?>">
 
 			<button type="submit" name="add-to-cart" value="<?php echo esc_attr( $product->get_id() ); ?>"
 					class="single_add_to_cart_button button alt"><?php echo esc_html( $product->single_add_to_cart_text() ); ?></button>
@@ -953,7 +949,6 @@ function update_converted_option_keys( $new_option, $option_key, $option, $meta,
 	}
 
 	return $new_option;
-
 }
 
 // search PPOM meta in order search
@@ -974,7 +969,7 @@ function ppom_hooks_search_in_order( $search_fields ) {
 		$order    = new WC_Order( $order_id );
 		$items    = $order->get_items();
 
-		$ppom_fields = [];
+		$ppom_fields = array();
 		foreach ( $order->get_items() as $item_id => $item_values ) {
 			if ( version_compare( WC_VERSION, '3.0', '<' ) ) {
 				$product_id = $item_values['product_id'];
@@ -988,7 +983,7 @@ function ppom_hooks_search_in_order( $search_fields ) {
 			}
 			$ppom_fields[] = $ppom_fields_post['fields'];
 			// array_merge($ppom_fields, $ppom_fields_post['fields']);
-			// ppom_pa($ppom_fields	);
+			// ppom_pa($ppom_fields );
 		}
 		add_post_meta( $order_id, '_ppom_fields', $ppom_fields, true );
 	}

@@ -25,7 +25,7 @@
         <exclude-pattern>includes/modules/custom_layouts/elementor/custom_layout.php</exclude-pattern>
     </rule>
     <rule ref="WordPress-Core">
-        <exclude name="Generic.Arrays.DisallowShortArraySyntax.Found" />
+        <exclude name="Generic.Arrays.DisallowShortArraySyntax" />
         <exclude name="WordPress.PHP.YodaConditions.NotYoda" />
         <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
         <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />

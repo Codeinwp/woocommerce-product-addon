@@ -38,7 +38,7 @@ function ppom_woocommerce_show_fields_on_product( $product_id, $args = null ) {
 
 	if ( ! $ppom->has_unique_datanames() ) {
 
-		printf( '<div class="error">' . __( "Some of your fields has duplicated datanames, please fix it", 'woocommerce-product-addon' ) . '</div>', 'ppom' );
+		printf( '<div class="error">' . __( 'Some of your fields has duplicated datanames, please fix it', 'woocommerce-product-addon' ) . '</div>', 'ppom' );
 
 		return;
 	}
@@ -80,7 +80,7 @@ function ppom_woocommerce_inputs_template_base() {
 
 	$product_id = ppom_get_product_id( $product );
 
-	$args = apply_filters( 'ppom_rendering_template_args', [ 'enable_add_to_cart_id' => false ], $product );
+	$args = apply_filters( 'ppom_rendering_template_args', array( 'enable_add_to_cart_id' => false ), $product );
 
 	ppom_woocommerce_template_base_inputs_rendering( $product_id, $args );
 }
@@ -98,7 +98,7 @@ function ppom_woocommerce_template_base_inputs_rendering( $product_id, $args = n
 	}
 
 	$ppom_html     = '';
-	$template_vars = [ 'form_obj' => $form_obj ];
+	$template_vars = array( 'form_obj' => $form_obj );
 
 	ob_start();
 	ppom_load_input_templates( 'frontend/ppom-fields.php', $template_vars );
@@ -140,7 +140,7 @@ function ppom_woocommerce_validate_product( $passed, $product_id, $qty ) {
 	if ( ppom_get_price_mode() == 'legacy' && isset( $_POST['ppom']['fields'] ) ) {
 
 		if ( ppom_is_price_attached_with_fields( $_POST['ppom']['fields'] ) &&
-			 empty( $_POST['ppom']['ppom_option_price'] )
+			empty( $_POST['ppom']['ppom_option_price'] )
 		) {
 			$error_message = __( 'Sorry, an error has occurred. Please enable JavaScript or contact site owner.', 'woocommerce-product-addon' );
 			ppom_wc_add_notice( $error_message );
@@ -160,7 +160,7 @@ function ppom_woocommerce_ajax_validate() {
 	$validate_nonce_action = 'ppom_validating_action';
 	if ( ! wp_verify_nonce( $ppom_nonce, $validate_nonce_action ) ) {
 
-		$message  = sprintf( '<div class="woocommerce-error" role="alert">%s</div>', __(  'Error while validating, try again', 'woocommerce-product-addon' ) );
+		$message  = sprintf( '<div class="woocommerce-error" role="alert">%s</div>', __( 'Error while validating, try again', 'woocommerce-product-addon' ) );
 		$response = array(
 			'status'  => 'error',
 			'message' => $message,
@@ -324,7 +324,7 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 
 	// converting back to org price if Currency Switcher is used
 	$ppom_item_org_price = ppom_hooks_convert_price_back( $wc_product->get_price() );
-	// $ppom_item_org_price	= $wc_product->get_price();
+	// $ppom_item_org_price = $wc_product->get_price();
 
 	$ppom_item_order_qty = floatval( $cart_items['quantity'] );
 
@@ -437,7 +437,7 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 				case 'measure':
 					$measer_qty       = isset( $option['qty'] ) ? intval( $option['qty'] ) : 0;
 					$price_multiplier = isset( $option['price_multiplier'] ) ? floatval( $option['price_multiplier'] ) : 1;
-					$option_price = $option['price'];
+					$option_price     = $option['price'];
 
 					$ppomm_measures *= $measer_qty * $price_multiplier;
 
@@ -587,7 +587,7 @@ function ppom_woocommerce_add_fixed_fee( $cart ) {
 
 				if ( $fee_price != 0 ) {
 					$cart->add_fee( esc_html( $label ), $fee_price, $taxable );
-					$fee_no ++;
+					++$fee_no;
 				}
 			}
 		}
@@ -764,7 +764,7 @@ function ppom_woocommerce_alter_price( $price, $product ) {
 function ppom_hide_variation_price_html($show, $parent, $variation) {
 
 	$product_id = $parent->get_id();
-	$ppom		= new PPOM_Meta( $product_id );
+	$ppom       = new PPOM_Meta( $product_id );
 
 	if( $ppom->is_exists && $ppom->price_display != 'hide' ) {
 		$show = false;
@@ -942,7 +942,7 @@ function ppom_woocommerce_control_cart_quantity_legacy( $quantity, $cart_item_ke
 
 	// ppom_pa($cart_item)
 	if ( ! isset( $cart_item['ppom']['ppom_option_price'] ) &&
-		 ! isset( $cart_item['ppom']['ppom_pricematrix'] ) ) {
+		! isset( $cart_item['ppom']['ppom_pricematrix'] ) ) {
 		return $quantity;
 	}
 
@@ -1178,7 +1178,7 @@ function ppom_woocommerce_order_item_meta( $item, $cart_item_key, $values, $orde
 	$ppom_meta = ppom_make_meta_data( $values, 'order' );
 	// ppom_pa($item->get_product_id()); exit;
 
-	$cropper_fields = [];
+	$cropper_fields = array();
 	foreach ( $ppom_meta as $key => $meta ) {
 
 		if ( ! isset( $meta['value'] ) ) {
@@ -1400,15 +1400,15 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
  * Responsible from the adding a support for Order Again functionality in the WooCommerce My Account -> Order View page.
  * The method adds PPOM Fields to the given order item from the provided order. (Clones the PPOM data of data order item to the new cart)
  *
- * @param  array $cart_item_data Current custom item data.
+ * @param  array                  $cart_item_data Current custom item data.
  * @param  \WC_Order_Item_Product $item Order Item Product
- * @param  \WC_Order $order
+ * @param  \WC_Order              $order
  * @return void
  */
 function ppom_wc_order_again_compatibility( $cart_item_data, $item, $order ) {
-	$ppom_data = $item->get_meta('_ppom_fields');
+	$ppom_data = $item->get_meta( '_ppom_fields' );
 
-	if( is_array($ppom_data) && array_key_exists( 'fields', $ppom_data ) ) {
+	if ( is_array( $ppom_data ) && array_key_exists( 'fields', $ppom_data ) ) {
 		$cart_item_data['ppom'] = $ppom_data;
 	}
 
@@ -1418,15 +1418,16 @@ function ppom_wc_order_again_compatibility( $cart_item_data, $item, $order ) {
 /**
  * Outputs the formatted meta data for WooCommerce order items.
  *
- * @param int $item_id The item ID.
+ * @param int                    $item_id The item ID.
  * @param \WC_Order_Item_Product $item The order item object.
  */
 function ppom_woocommerce_order_item_meta_html( $item_id, $item ) {
 	$formatted_meta = $item->get_formatted_meta_data();
 
-	$strings = array();
+	$strings        = array();
 	$meta_item_html = '';
-	$output_args = apply_filters( 'ppom_woocommerce_item_meta_args',
+	$output_args    = apply_filters(
+		'ppom_woocommerce_item_meta_args',
 		array(
 			'before'       => '<ul class="wc-item-meta"><li>',
 			'after'        => '</li></ul>',
@@ -1457,9 +1458,9 @@ function ppom_wc_email_improvements_enabled() {
 /**
  * Outputs the formatted meta data for invoice or packing slips.
  *
- * @param string $html HTML of the item meta data 
+ * @param string                 $html HTML of the item meta data 
  * @param \WC_Order_Item_Product $item The order item object.
- * @param array $args arguments for display the html.
+ * @param array                  $args arguments for display the html.
  */
 function ppom_invoice_packing_slips_html( $html, $item, $args = array() ) {
 	$strings = array();

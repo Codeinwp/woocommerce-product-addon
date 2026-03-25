@@ -25,7 +25,6 @@ class NM_Hidden_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'regular hidden input', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-hashtag" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 

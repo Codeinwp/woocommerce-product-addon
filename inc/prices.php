@@ -6,8 +6,6 @@
 /**
  * Important function: getting prices against posted fields
  **/
-
-
 function ppom_price_controller( $cart_item, $values ) {
 
 	// ppom_pa($cart_item);
@@ -94,8 +92,8 @@ function ppom_before_calculate_totals( $cart_items ) {
 
 		$product_price = apply_filters( 'ppom_product_price_on_cart', $wc_product->get_price(), $cart_item );
 
-		// $context		= 'cart';
-		// $product_price	= ppom_get_product_price( $product, $variation_id, $context);
+		// $context     = 'cart';
+		// $product_price   = ppom_get_product_price( $product, $variation_id, $context);
 
 		// return array with: price, source
 		$price_info = ppom_price_get_product_base(
@@ -575,7 +573,7 @@ function ppom_get_field_prices( $ppom_fields_post, $product_id, &$product_quanti
 						$val      = $value['option'];
 						$quantity = $value['qty'];
 
-						// var_dump($val, $option);	
+						// var_dump($val, $option); 
 						$quantity          = intval( $quantity );
 						$quantities_total += $quantity;
 
@@ -679,7 +677,7 @@ function ppom_get_field_prices( $ppom_fields_post, $product_id, &$product_quanti
 
 				$product_quantity = $value['qty'];
 				$bq_value         = $value['option'];
-				// $option				= null;
+				// $option              = null;
 
 				$bq_found     = ppom_price_bulkquantity_chunk( $product, $options, $product_quantity );
 				$option_price = isset( $bq_found[ $bq_value ] ) ? floatval( $bq_found[ $bq_value ] ) : null;
@@ -708,7 +706,7 @@ function ppom_get_field_prices( $ppom_fields_post, $product_id, &$product_quanti
 					$measure_price_field['price-multiplier'] = floatval( $field_meta['price-multiplier'] );
 				} 
 
-				$field_prices[]   = $measure_price_field;
+				$field_prices[] = $measure_price_field;
 				break;
 
 			case 'eventcalendar':
@@ -1021,16 +1019,21 @@ function ppom_price_get_total_measure( $price_array ) {
 
 // Get product base price
 function ppom_price_get_product_base(
-	$product_price, $product, $ppom_fields_post,
-	$product_quantity, $ppom_field_prices, &$ppom_discount, $ppom_pricematrix = null
+	$product_price,
+	$product,
+	$ppom_fields_post,
+	$product_quantity,
+	$ppom_field_prices,
+	&$ppom_discount,
+	$ppom_pricematrix = null
 ) {
 
 	// converting back to org price if Currency Switcher is used
 	$base_price = ppom_hooks_convert_price_back( $product_price );
-	// $base_price	= $product->get_price();
+	// $base_price  = $product->get_price();
 	// $base_price = floatval($base_price);
-	// $base_price	= $product->get_price();
-	// ppom_pa($product);	
+	// $base_price  = $product->get_price();
+	// ppom_pa($product);   
 	// var_dump($product_quantity);
 	$product_id = ppom_get_product_id( $product );
 	// var_dump('varia',$product_id);
@@ -1065,7 +1068,7 @@ function ppom_price_get_product_base(
 				$base_price = ($base_price + $total_addon_price);
 			}
 			$base_price = floatval($base_price) - $matrix_discount;
-			$source		= 'matrix_discount';
+			$source     = 'matrix_discount';
 		}*/
 
 	}
@@ -1187,13 +1190,11 @@ function ppom_price_fixedprice_chunk( $product, $fixedprice_options, $product_qu
 	}
 
 	return apply_filters( 'ppom_price_fixedprice_chunk_cart', $fixedprice_found, $product );
-
 }
 
 /**
  * Calculating Fixed Fees
  * **/
-
 function ppom_price_cart_fee( $cart ) {
 	$fee_no       = 1;
 	$cart_counter = 1;
@@ -1217,7 +1218,7 @@ function ppom_price_cart_fee( $cart ) {
 
 		if ( $matrix_found = ppom_price_has_discount_matrix( $product, $quantity ) ) {
 
-			// $price_tobe_discount	= $cart_item_price * $quantity; NOTE: This has to be check
+			// $price_tobe_discount = $cart_item_price * $quantity; NOTE: This has to be check
 			$native_product      = wc_get_product( $product_id );
 			$price_tobe_discount = ppom_get_product_price( $native_product ) * $quantity;
 			if ( $matrix_found['discount'] == 'both' ) {
@@ -1271,19 +1272,19 @@ function ppom_price_cart_fee( $cart ) {
 				$tax_class = $product->get_tax_class( 'unfiltered' );
 
 				// if wc prices include tax: substract the tax from additional fixed fee since already WC will add tax.
-				if( wc_prices_include_tax() ) {
-					$tax = WC_Tax::calc_tax( $fee_price, \WC_Tax::get_rates($tax_class), true );
+				if ( wc_prices_include_tax() ) {
+					$tax = WC_Tax::calc_tax( $fee_price, \WC_Tax::get_rates( $tax_class ), true );
 
-					$total_tax = array_sum($tax);
+					$total_tax = array_sum( $tax );
 					$fee_price = $fee_price - $total_tax;
 				}
 
 				$cart->add_fee( esc_html( $label ), $fee_price, $taxable, $tax_class );
-				$fee_no ++;
+				++$fee_no;
 			}
 		}
 
-		$cart_counter ++;
+		++$cart_counter;
 	}
 }
 
@@ -1350,12 +1351,10 @@ function ppom_parse_price_matrix( $ppom_pricematrix, $product, $product_quantity
 		} else {
 			$matrix_discount = isset( $matrix_found['raw_price'] ) ? floatval( $matrix_found['raw_price'] ) : 0;
 		}
-	} else {
-		if ( isset( $matrix_found['matrix_fixed'] ) ) {
+	} elseif ( isset( $matrix_found['matrix_fixed'] ) ) {
 			$matrix_price = isset( $matrix_found['raw_price'] ) ? $matrix_found['raw_price'] / $product_quantity : $base_price;
-		} else {
-			$matrix_price = isset( $matrix_found['raw_price'] ) ? $matrix_found['raw_price'] : $base_price;
-		}
+	} else {
+		$matrix_price = isset( $matrix_found['raw_price'] ) ? $matrix_found['raw_price'] : $base_price;
 	}
 
 	$matrix = array(
@@ -1470,7 +1469,7 @@ function ppom_price_check_price_matrix( $cart_items, $values ) {
 		return $cart_items;
 	}
 
-	$matrix_found = [];
+	$matrix_found = array();
 	foreach ( $pricematrix_field as $pm ) {
 
 		$pm_dataname = isset( $pm['data_name'] ) ? $pm['data_name'] : '';
@@ -1504,10 +1503,10 @@ function ppom_option_price_handle_vat( $option_price, $product ) {
 
 	if ( $option_price >= 0 && ( ! is_product() && apply_filters( 'ppom_handle_option_price_vat_in_cart', true ) === true ) ) {
 		$vat_type = get_option( 'woocommerce_tax_display_cart' );
-		$args     = [
+		$args     = array(
 			'price'    => $option_price,
 			'quantity' => 1,
-		];
+		);
 		if ( $vat_type == 'excl' ) {
 			$option_price = wc_get_price_excluding_tax( $product, $args );
 		} else {
@@ -1517,10 +1516,10 @@ function ppom_option_price_handle_vat( $option_price, $product ) {
 
 	if ( $option_price >= 0 && ( is_product() && apply_filters( 'ppom_handle_option_price_vat_in_product', true ) === true ) ) {
 		$vat_type = get_option( 'woocommerce_tax_display_shop' );
-		$args     = [
+		$args     = array(
 			'price'    => $option_price,
 			'quantity' => 1,
-		];
+		);
 		if ( $vat_type == 'excl' ) {
 			$option_price = wc_get_price_excluding_tax( $product, $args );
 		} else {

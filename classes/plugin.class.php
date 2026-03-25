@@ -10,7 +10,7 @@ class NM_PersonalizedProduct {
 	public const LICENSE_PLAN_1    = 1; // Essential.
 	public const LICENSE_PLAN_2    = 2; // Plus.
 	public const LICENSE_PLAN_3    = 3; // VIP.
-	static $tbl_productmeta = 'nm_personalized';
+	static $tbl_productmeta        = 'nm_personalized';
 
 
 	/**
@@ -144,7 +144,7 @@ class NM_PersonalizedProduct {
 		}
 
 
-		add_filter( 'woocommerce_cart_item_subtotal', 'ppom_woocommerce_item_subtotal', 10, 3);
+		add_filter( 'woocommerce_cart_item_subtotal', 'ppom_woocommerce_item_subtotal', 10, 3 );
 		add_filter( 'woocommerce_checkout_cart_item_quantity', 'ppom_woocommerce_control_checkout_quantity', 10, 3 );
 		add_filter( 'woocommerce_order_item_quantity_html', 'ppom_woocommerce_control_oder_item_quantity', 10, 2 );
 		add_filter( 'woocommerce_email_order_item_quantity', 'ppom_woocommerce_control_email_item_quantity', 10, 2 );
@@ -350,7 +350,7 @@ class NM_PersonalizedProduct {
 		}
 
 		$product_id = ppom_get_product_id( $product );
-		// $ppom		= new PPOM_Meta( $product_id );
+		// $ppom        = new PPOM_Meta( $product_id );
 		$ppom = new PPOM_Meta( $product_id );
 		if ( ! $ppom->is_exists ) {
 			return $url;
@@ -477,7 +477,6 @@ class NM_PersonalizedProduct {
 		}
 
 		$wp_list_table = _get_list_table( 'WP_Posts_List_Table' );
-
 	}
 
 	function nm_meta_bulk_action() {
@@ -528,7 +527,7 @@ class NM_PersonalizedProduct {
 						$meta_id = array( intval( substr( $action, 10 ) ) );
 						update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $meta_id );
 
-						$nm_updated ++;
+						++$nm_updated;
 					}
 					$sendback = add_query_arg(
 						array(
@@ -545,7 +544,7 @@ class NM_PersonalizedProduct {
 
 						delete_post_meta( $post_id, PPOM_PRODUCT_META_KEY );
 
-						$nm_removed ++;
+						++$nm_removed;
 					}
 					$sendback = add_query_arg(
 						array(
@@ -572,28 +571,27 @@ class NM_PersonalizedProduct {
 	function nm_add_meta_notices() {
 		global $post_type, $pagenow;
 
-		if ($pagenow == 'edit.php' && $post_type == 'product' && isset($_REQUEST['nm_updated']) && (int) $_REQUEST['nm_updated']) {
+		if ( $pagenow == 'edit.php' && $post_type == 'product' && isset( $_REQUEST['nm_updated'] ) && (int) $_REQUEST['nm_updated'] ) {
 			$count = (int) $_REQUEST['nm_updated'];
-			if ($count === 1) {
-				$message = __('Product meta updated.', 'woocommerce-product-addon');
+			if ( $count === 1 ) {
+				$message = __( 'Product meta updated.', 'woocommerce-product-addon' );
 			} else {
 				$message = sprintf(
 					/* translators: %s: number of products */
-					__('%s Products meta updated.', 'woocommerce-product-addon'),
-					number_format_i18n($count)
+					__( '%s Products meta updated.', 'woocommerce-product-addon' ),
+					number_format_i18n( $count )
 				);
 			}
 			echo "<div class=\"updated\"><p>{$message}</p></div>";
-		} 
-		elseif ($pagenow == 'edit.php' && $post_type == 'product' && isset($_REQUEST['nm_removed']) && (int) $_REQUEST['nm_removed']) {
+		} elseif ( $pagenow == 'edit.php' && $post_type == 'product' && isset( $_REQUEST['nm_removed'] ) && (int) $_REQUEST['nm_removed'] ) {
 			$count = (int) $_REQUEST['nm_removed'];
-			if ($count === 1) {
-				$message = __('Product meta removed.', 'woocommerce-product-addon');
+			if ( $count === 1 ) {
+				$message = __( 'Product meta removed.', 'woocommerce-product-addon' );
 			} else {
 				$message = sprintf(
 					/* translators: %s: number of products */
-					__('%s Products meta removed.', 'woocommerce-product-addon'),
-					number_format_i18n($count)
+					__( '%s Products meta removed.', 'woocommerce-product-addon' ),
+					number_format_i18n( $count )
 				);
 			}
 			echo "<div class=\"updated\"><p>{$message}</p></div>";
@@ -639,12 +637,12 @@ class NM_PersonalizedProduct {
 		global $wpdb;
 
 		$qry = 'SELECT COUNT(*) FROM ' . $wpdb->prefix . PPOM_TABLE_META;
-		if ($limit !== null) {
-			$qry .= ' LIMIT ' . intval($limit);
+		if ( $limit !== null ) {
+			$qry .= ' LIMIT ' . intval( $limit );
 		}
-		$count = $wpdb->get_var($qry);
+		$count = $wpdb->get_var( $qry );
 
-		return intval($count);
+		return intval( $count );
 	}
 
 	function get_product_meta( $meta_id ) {
@@ -720,7 +718,6 @@ class NM_PersonalizedProduct {
 
 		// migration done
 		update_option( 'ppom_settings_migration_done', 1 );
-
 	}
 
 	public static function deactivate_plugin() {
@@ -749,10 +746,8 @@ class NM_PersonalizedProduct {
 						$wp_role->add_cap( 'ppom_options_page' );
 					}
 				}
-			} else {
-				if ( $wp_role->has_cap( 'ppom_options_page' ) ) {
+			} elseif ( $wp_role->has_cap( 'ppom_options_page' ) ) {
 					$wp_role->remove_cap( 'ppom_options_page' );
-				}
 			}
 		}
 	}
@@ -783,7 +778,7 @@ class NM_PersonalizedProduct {
 	function clone_product_meta( $meta_id ) {
 
 		if ( ! isset( $_GET['ppom_clone_nonce'] )
-			 || ! wp_verify_nonce( $_GET['ppom_clone_nonce'], 'ppom_clone_nonce_action' )
+			|| ! wp_verify_nonce( $_GET['ppom_clone_nonce'], 'ppom_clone_nonce_action' )
 		) {
 			_e( 'Sorry, you are not allowed to clone', 'woocommerce-product-addon' );
 
@@ -803,13 +798,12 @@ class NM_PersonalizedProduct {
 		$result = $wpdb->query( $wpdb->prepare( $sql, array( $meta_id ) ) );
 
 		wp_safe_redirect( admin_url( 'admin.php?page=ppom&productmeta_id=' . intval( $wpdb->insert_id ) . '&do_meta=edit' ) );
-        die();
+		die();
 		/*
-		 var_dump($result);
+		var_dump($result);
 		
 		$wpdb->show_errors();
 		$wpdb->print_error(); */
-
 	}
 
 	/*
@@ -836,15 +830,15 @@ class NM_PersonalizedProduct {
 	 */
 	public function ppom_free_inputs() {
 		return array(
-			'text' => 'text',
+			'text'     => 'text',
 			'textarea' => 'textarea',
-			'select' => 'select',
-			'radio' => 'radio',
+			'select'   => 'select',
+			'radio'    => 'radio',
 			'checkbox' => 'checkbox',
-			'email' => 'email',
-			'date' => 'date',
-			'number' => 'number',
-			'hidden' => 'hidden',
+			'email'    => 'email',
+			'date'     => 'date',
+			'number'   => 'number',
+			'hidden'   => 'hidden',
 		);
 	}
 
@@ -896,7 +890,7 @@ class NM_PersonalizedProduct {
 
 			$table = $wpdb->prefix . PPOM_TABLE_META;
 			$qry   = "INSERT INTO {$table} SET ";
-			$meta_count ++;
+			++$meta_count;
 
 			foreach ( $meta as $key => $val ) {
 
@@ -996,7 +990,6 @@ class NM_PersonalizedProduct {
 		echo '<div id="ppom_meta_data_tab" class="panel woocommerce_options_panel"	>';
 		ppom_meta_list( $post );
 		echo '</div>';
-
 	}
 
 	/**
@@ -1015,7 +1008,7 @@ class NM_PersonalizedProduct {
 		// Check if the tooltip is enabled.
 		if ( isset( $meta['desc_tooltip'] ) && 'on' === $meta['desc_tooltip'] ) {
 			$icon_color  = ppom_get_option( 'ppom_input_tooltip_iconclr', '#000000' );
-			$description = ( ! empty( $meta['description'] ) ) ? ' <span data-ppom-tooltip="ppom_tooltip" class="ppom-tooltip" title="' . esc_attr( $input_desc ) . '"><span class="ppom-tooltip-icon" style="background-color:' . esc_attr( $icon_color ) .'"></span></span>' : '';
+			$description = ( ! empty( $meta['description'] ) ) ? ' <span data-ppom-tooltip="ppom_tooltip" class="ppom-tooltip" title="' . esc_attr( $input_desc ) . '"><span class="ppom-tooltip-icon" style="background-color:' . esc_attr( $icon_color ) . '"></span></span>' : '';
 		}
 		return $description;
 	}
@@ -1064,7 +1057,7 @@ class NM_PersonalizedProduct {
 			case 'plus':
 				return self::get_license_category( $plan ) >= self::LICENSE_PLAN_2;
 			case 'pro':
-				return  self::get_license_category( $plan ) >= self::LICENSE_PLAN_1;
+				return self::get_license_category( $plan ) >= self::LICENSE_PLAN_1;
 		}
 
 		return false;

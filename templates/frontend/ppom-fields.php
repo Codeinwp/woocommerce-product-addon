@@ -28,9 +28,9 @@ if ( ! $form_obj::$ppom->has_unique_datanames() ) {
 $ppom_wrapper_id = is_array( $form_obj::$ppom->meta_id ) ? implode( '-', $form_obj::$ppom->meta_id ) : $form_obj::$ppom->meta_id;
 
 if ( isset( $form_obj::$ppom->meta_id ) ) {
-    $ppom_groups = is_array($form_obj::$ppom->meta_id) ? $form_obj::$ppom->meta_id : array($form_obj::$ppom->meta_id);
+	$ppom_groups = is_array( $form_obj::$ppom->meta_id ) ? $form_obj::$ppom->meta_id : array( $form_obj::$ppom->meta_id );
 } else {
-    $ppom_groups = array();
+	$ppom_groups = array();
 }
 
 ?>
@@ -49,8 +49,8 @@ if ( isset( $form_obj::$ppom->meta_id ) ) {
 	<?php $form_obj->form_contents(); ?>
 	<?php
 	foreach ( $ppom_groups as $meta_id ) :
-		$ppom            = new PPOM_Meta();
-		$ppom_settings   = $ppom->get_settings_by_id( $meta_id );
+		$ppom                           = new PPOM_Meta();
+		$ppom_settings                  = $ppom->get_settings_by_id( $meta_id );
 		$form_obj::$ppom->ppom_settings = $ppom_settings;
 		?>
 		<div class="<?php echo esc_attr( $form_obj->wrapper_inner_classes() ); ?>">

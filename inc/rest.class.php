@@ -17,7 +17,6 @@ class PPOM_Rest {
 		if ( ppom_is_api_enable() ) {
 			add_action( 'rest_api_init', array( $this, 'init_api' ) );
 		}
-
 	}
 
 
@@ -251,7 +250,6 @@ class PPOM_Rest {
 		// ppom_pa($ppom_fields);
 
 		return new WP_REST_Response( $meta_response );
-
 	}
 
 
@@ -312,7 +310,6 @@ class PPOM_Rest {
 		// ppom_pa($ppom_fields);
 
 		return new WP_REST_Response( $meta_response );
-
 	}
 
 
@@ -742,7 +739,6 @@ class PPOM_Rest {
 		);
 
 		return new WP_REST_Response( $response_info );
-
 	}
 
 
@@ -857,7 +853,6 @@ class PPOM_Rest {
 
 			exit( 0 );
 		}
-
 	}
 }
 

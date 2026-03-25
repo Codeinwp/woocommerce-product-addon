@@ -173,7 +173,6 @@ if ( ! function_exists( 'nm_get_order_id' ) ) {
  *
  * @since 7.9
  */
-
 function ppom_get_product_id( $product ) {
 
 	$product_id = '';
@@ -181,16 +180,14 @@ function ppom_get_product_id( $product ) {
 
 		// vesion less then 2.7
 		$product_id = isset( $product->id ) ? $product->id : $product->ID;
-	} else {
+	} elseif ( is_a( $product, 'WC_Product' ) ) {
 
-		if ( is_a( $product, 'WC_Product' ) ) {
 
-			if ( $product->is_type( 'variation' ) ) {
-				$product_id = $product->get_parent_id();
-			} else {
+		if ( $product->is_type( 'variation' ) ) {
+			$product_id = $product->get_parent_id();
+		} else {
 
-				$product_id = $product->get_id();
-			}
+			$product_id = $product->get_id();
 		}
 	}
 
@@ -284,7 +281,7 @@ function ppom_recursive_sanitization( $field_value ) {
 	}
 
 	if ( is_array( $field_value ) ) {
-		foreach ($field_value as $key => $val ) {
+		foreach ( $field_value as $key => $val ) {
 			$field_value[ $key ] = ppom_recursive_sanitization( $val );
 		}
 	}
@@ -316,15 +313,15 @@ function ppom_make_meta_data( $cart_item, $context = 'cart' ) {
 		$variation_id = $cart_item['variation_id'];
 	}
 
-	$product_id       = ppom_get_product_id( $cart_item['data'] );
+	$product_id = ppom_get_product_id( $cart_item['data'] );
 
 	// Fields sanitization.
 	$ppom = new PPOM_Meta( $product_id );
 	if ( is_array( $ppom->fields ) ) {
-		foreach( $ppom->fields as $field ) {
+		foreach ( $ppom->fields as $field ) {
 			$data_name = sanitize_key( $field['data_name'] );
-			if ( isset( $cart_item['ppom']['fields'][$data_name] ) ) {
-				$cart_item['ppom']['fields'][$data_name] = ppom_recursive_sanitization( $cart_item['ppom']['fields'][$data_name] );
+			if ( isset( $cart_item['ppom']['fields'][ $data_name ] ) ) {
+				$cart_item['ppom']['fields'][ $data_name ] = ppom_recursive_sanitization( $cart_item['ppom']['fields'][ $data_name ] );
 			}
 		}
 	}
@@ -520,7 +517,7 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 
 				if ( $total_qty > 0 ) {
 					// translators: %d: the total quantity.
-					$meta_display[] = '<strong>' . sprintf( __( 'Total = %d', 'woocommerce-product-addon' ), $total_qty ) . '</strong>' ;
+					$meta_display[] = '<strong>' . sprintf( __( 'Total = %d', 'woocommerce-product-addon' ), $total_qty ) . '</strong>';
 					$meta_data      = array(
 						'name'    => $field_title,
 						'display' => implode( '<br>', $meta_display ),
@@ -700,7 +697,7 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 						$audio_meta = json_decode( stripslashes( $audio_meta ), true );
 						$audio_url  = stripslashes( $audio_meta['link'] );
 						$audio_html = '<a href="' . esc_url( $audio_url ) . '" title="' . esc_attr( $audio_meta['title'] ) . '">' . $audio_meta['title'] . '</a>';
-						$meta_lable = $field_title . ': ' . $ppom_file_count ++;
+						$meta_lable = $field_title . ': ' . $ppom_file_count++;
 						// $ppom_meta[$meta_lable] = $audio_html;
 						$meta_data = array(
 							'name'  => $meta_lable,
@@ -1016,7 +1013,6 @@ function ppom_is_aviary_installed() {
 	} else {
 		return false;
 	}
-
 }
 
 function ppom_settings_link( $links ) {
@@ -1058,7 +1054,7 @@ function ppom_get_field_meta_by_dataname( $product_id, $original_data_name, $ppo
 	}
 
 	// Keep the apply_filters call has wrong param (released with v32.0.0)
-	if( ppom_pro_is_installed() && ppom_check_pro_compatibility( 'cond_field_repeat' ) && ! ppom_check_pro_compatibility( 'pgfbdfm_wp_filter_param_fix' ) ) {
+	if ( ppom_pro_is_installed() && ppom_check_pro_compatibility( 'cond_field_repeat' ) && ! ppom_check_pro_compatibility( 'pgfbdfm_wp_filter_param_fix' ) ) {
 		return apply_filters( 'ppom_get_field_by_dataname__field_meta', $ppom_fields, $field_meta, $original_data_name, $data_name );
 	}
 
@@ -1265,7 +1261,7 @@ function ppom_convert_options_to_key_val( $options, $meta, $product ) {
 			$option_label = ppom_generate_option_label( $option, $option_price, $meta );
 
 			// This filter change prices for Currency switcher
-			// $option_price	= apply_filters('ppom_option_price', $option_price);
+			// $option_price    = apply_filters('ppom_option_price', $option_price);
 
 			// Price matrix discount
 			$discount      = isset( $meta['discount'] ) && $meta['discount'] == 'on' ? true : false;
@@ -1285,7 +1281,7 @@ function ppom_convert_options_to_key_val( $options, $meta, $product ) {
 						$option_price_without_tax = $option_price;
 						$option_price = ppom_get_price_including_tax($option_price, $product);
 					}
-					$option_label	= ppom_generate_option_label($option, $option_price, $meta);
+					$option_label   = ppom_generate_option_label($option, $option_price, $meta);
 					$option_percent = $option['price'];
 				} else {
 
@@ -1576,7 +1572,6 @@ function ppom_get_filesize_in_kb( $file_name ) {
 
 		return round( $size / 1024, 2 ) . ' KB';
 	}
-
 }
 
 
@@ -1589,7 +1584,7 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 
 		$file_edit_path = ppom_get_dir_path( 'edits' ) . ppom_file_get_name( $file_name, $item->get_product_id() );
 		// Making file thumb download with new path
-		$ppom_file_url       = ppom_get_file_download_url( $file_name, $item->get_order_id(), $item->get_product_id() );
+		$ppom_file_url = ppom_get_file_download_url( $file_name, $item->get_order_id(), $item->get_product_id() );
 
 		$file_path           = ppom_get_dir_url( true ) . $file_name;
 		$is_image_file       = ppom_is_file_image( $file_path );
@@ -1957,7 +1952,6 @@ function ppom_is_field_visible( $field ) {
 	}
 
 	return apply_filters( 'ppom_is_field_visible', $is_visible, $field );
-
 }
 
 // Get logged in user role
@@ -2188,7 +2182,7 @@ function ppom_get_price_table_js_dependencies() {
 
 	if ( version_compare( WC_VERSION, '10.3.0', '<' ) ) {
 		$dependencies[] = 'accounting';
-	} else{
+	} else {
 		$dependencies[] = 'wc-accounting';
 	}
 
@@ -2225,10 +2219,10 @@ function ppom_is_cart_quantity_updatable( $product_id ) {
 		$unlinked = isset( $field['unlink_order_qty'] ) ? true : false;
 
 		if ( ( $field['type'] == 'quantities' && ! $unlinked ) ||
-			 $field['type'] == 'eventcalendar' ||
-			 $field['type'] == 'vm' ||
-			 ( $field['type'] == 'vqmatrix' && ppom_is_field_has_price( $field ) ) ||
-			 $field['type'] == 'bulkquantity_zzz'    // bulkquantity should not be in there ... TESTING.
+			$field['type'] == 'eventcalendar' ||
+			$field['type'] == 'vm' ||
+			( $field['type'] == 'vqmatrix' && ppom_is_field_has_price( $field ) ) ||
+			$field['type'] == 'bulkquantity_zzz'    // bulkquantity should not be in there ... TESTING.
 		) {
 
 			$qty_updatable = false;
@@ -2263,8 +2257,8 @@ function ppom_reset_cart_quantity_to_one( $product_id ) {
 		$unlinked = isset( $field['unlink_order_qty'] ) ? true : false;
 
 		if ( $field['type'] == 'vm' ||
-			 ( $field['type'] == 'quantities' && ppom_is_field_has_price( $field ) && ! $unlinked ) ||
-			 ( $field['type'] == 'vqmatrix' && ppom_is_field_has_price( $field ) )
+			( $field['type'] == 'quantities' && ppom_is_field_has_price( $field ) && ! $unlinked ) ||
+			( $field['type'] == 'vqmatrix' && ppom_is_field_has_price( $field ) )
 		) {
 
 			$reset_qty = true;
@@ -2360,16 +2354,16 @@ function ppom_get_conditional_data_attributes( $meta ) {
 		
 		$conditions['rules'] = array_filter(
 			$conditions['rules'],
-			function( $rule ) {
-				if ( empty( $rule['operators'] ) || ! is_string( $rule['operators'] )  ) {
+			function ( $rule ) {
+				if ( empty( $rule['operators'] ) || ! is_string( $rule['operators'] ) ) {
 					return ! empty( $rule['element_values'] );
 				}
 
-				if ( in_array( $rule['operators'], array( 'any', 'empty', 'even-number', 'odd-number', 'regex') ) ) {
+				if ( in_array( $rule['operators'], array( 'any', 'empty', 'even-number', 'odd-number', 'regex' ) ) ) {
 					return true;
 				}
 
-				if ( in_array( $rule['operators'], array( 'number-multiplier', 'regex', 'contains', 'not-contains') ) ) {
+				if ( in_array( $rule['operators'], array( 'number-multiplier', 'regex', 'contains', 'not-contains' ) ) ) {
 					return ! empty( $rule['element_constant'] );
 				}
 
@@ -2379,7 +2373,7 @@ function ppom_get_conditional_data_attributes( $meta ) {
 
 				if ( 'between' === $rule['operators'] ) {
 					return (
-						! empty( $rule['cond-between-interval']) && is_array( $rule['cond-between-interval'] )
+						! empty( $rule['cond-between-interval'] ) && is_array( $rule['cond-between-interval'] )
 						&& isset( $rule['cond-between-interval']['to'] )
 						&& isset( $rule['cond-between-interval']['from'] )
 					);
@@ -2399,7 +2393,7 @@ function ppom_get_conditional_data_attributes( $meta ) {
 
 		foreach ( $conditions['rules'] as $rule ) {
 
-			$counter      = ++ $index;
+			$counter      = ++$index;
 			$input        = 'input' . $counter;
 			$value        = 'val' . $counter;
 			$opr          = 'operator' . $counter;
@@ -2464,8 +2458,8 @@ function ppom_settings_migrated() {
  * @param  string $feature_slug That represents feature key to look the if there is a compatibility.
  * @return bool
  */
-function ppom_check_pro_compatibility($feature_slug) {
-	if( ! defined( 'PPOM_PRO_COMPATIBILITY_FEATURES' ) || ! is_array( PPOM_PRO_COMPATIBILITY_FEATURES ) ) {
+function ppom_check_pro_compatibility( $feature_slug ) {
+	if ( ! defined( 'PPOM_PRO_COMPATIBILITY_FEATURES' ) || ! is_array( PPOM_PRO_COMPATIBILITY_FEATURES ) ) {
 		return false;
 	}
 

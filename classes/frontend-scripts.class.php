@@ -296,10 +296,10 @@ class PPOM_FRONTEND_SCRIPTS {
 
 				/* Global JS Inputs Vars */
 				$global_js_vars = array(
-					'ajaxurl'    => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
-					'plugin_url' => PPOM_URL,
-					'product_id' => $product_id,
-					'sp_force_display_block'  => apply_filters( 'ppom_sp_ac_force_css_display_block', true ) ? 'on' : 'off' // force display:block instead of display:flex for add to cart form of the single product page
+					'ajaxurl'                => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
+					'plugin_url'             => PPOM_URL,
+					'product_id'             => $product_id,
+					'sp_force_display_block' => apply_filters( 'ppom_sp_ac_force_css_display_block', true ) ? 'on' : 'off', // force display:block instead of display:flex for add to cart form of the single product page
 				);
 
 				$decimal_palces = wc_get_price_decimals();
@@ -464,7 +464,7 @@ class PPOM_FRONTEND_SCRIPTS {
 								}
 
 								$field_conditions['rules'][ $rule_index ]['element_values'] = ppom_wpml_translate( $rule['element_values'], 'PPOM' );
-								$rule_index ++;
+								++$rule_index;
 							}
 
 							$ppom_conditional_fields[ $data_name ] = $field_conditions;

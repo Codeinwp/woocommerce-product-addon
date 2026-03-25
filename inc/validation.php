@@ -75,7 +75,7 @@ function ppom_esc_html( $content ) {
 	$allowedposttags['b']        = $allowed_atts;
 	$allowedposttags['i']        = $allowed_atts;
 	$allowedposttags['br']       = $allowed_atts;
-	$allowed_tags = wp_kses_allowed_html( 'post' );
+	$allowed_tags                = wp_kses_allowed_html( 'post' );
 
 	return wp_kses( stripslashes_deep( $content ), $allowed_tags );
 }
@@ -85,12 +85,10 @@ function ppom_sanitize_array_data( $array ) {
 	foreach ( $array as $key => &$value ) {
 		if ( is_array( $value ) ) {
 			$value = ppom_sanitize_array_data( $value );
-		} else {
-			if ( in_array( $key, ppom_fields_with_html(), true ) ) {
+		} elseif ( in_array( $key, ppom_fields_with_html(), true ) ) {
 				$value = ppom_esc_html( $value );
-			} else {
-				$value = sanitize_text_field( $value );
-			}
+		} else {
+			$value = sanitize_text_field( $value );
 		}
 	}
 
@@ -101,7 +99,7 @@ function ppom_sanitize_array_data( $array ) {
 // ppom_fields keys requires html
 function ppom_fields_with_html() {
 
-	$have_html = [ 'description', 'tooltip', 'heading', 'html', 'error_message', 'checked', 'disable_custom_dates' ];
+	$have_html = array( 'description', 'tooltip', 'heading', 'html', 'error_message', 'checked', 'disable_custom_dates' );
 
 	return apply_filters( 'ppom_fields_with_html', $have_html );
 }
@@ -114,7 +112,6 @@ function ppom_fields_with_html() {
  *
  * @return array
  */
-
 function ppom_validation_product_limits( $data, $product ) {
 
 	if ( ppom_is_client_validation_enabled() ) {
@@ -366,11 +363,11 @@ function ppom_get_product_limits( $product_id, $variation_id ) {
  */
 function ppom_safecss_filter_attr( $allow_css, $css_string ) {
 
-    // If the CSS string contains rgb() or rgba(), mark it as safe.
-    if ( stripos( $css_string, 'rgb(' ) !== false || stripos( $css_string, 'rgba(' ) !== false ) {
-        return true;
-    }
+	// If the CSS string contains rgb() or rgba(), mark it as safe.
+	if ( stripos( $css_string, 'rgb(' ) !== false || stripos( $css_string, 'rgba(' ) !== false ) {
+		return true;
+	}
 
-    return $allow_css;
+	return $allow_css;
 }
 add_filter( 'safecss_filter_attr_allow_css', 'ppom_safecss_filter_attr', 10, 2 );

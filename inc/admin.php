@@ -35,11 +35,11 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 			$ppom_settings_url = admin_url( 'admin.php?page=ppom' );
 
 			if ( $ppom->has_multiple_meta() ) {
-				$total_items = count( $ppom->meta_id ); // Get the total number of items.
+				$total_items  = count( $ppom->meta_id ); // Get the total number of items.
 				$current_item = 0; // Counter to track the current iteration.
-                $has_fields = false;
+				$has_fields   = false;
 				foreach ( $ppom->meta_id as $meta_id ) {
-					$current_item++; // Increment the counter.
+					++$current_item; // Increment the counter.
 
 					$ppom_setting = $ppom->get_settings_by_id( $meta_id );
 					if ( $ppom_setting ) {
@@ -51,18 +51,17 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 							),
 							$ppom_settings_url
 						);
-						echo sprintf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $meta_title );
+						printf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $meta_title );
 						// Add a comma only if it's not the last item
 						if ( $current_item < $total_items ) {
 							echo ', ';
 						}
-                        $has_fields = true;
-					}
-
+						$has_fields = true;
+					}               
 				}
-                if( ! $has_fields  ) {
-                    echo sprintf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
-                }
+				if ( ! $has_fields ) {
+					printf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
+				}
 			} elseif ( $ppom->ppom_settings ) {
 				$url_edit = add_query_arg(
 					array(
@@ -71,9 +70,9 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 					),
 					$ppom_settings_url
 				);
-				echo sprintf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $ppom->meta_title );
+				printf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $ppom->meta_title );
 			} else {
-				echo sprintf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
+				printf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
 			}
 
 			break;
@@ -92,7 +91,7 @@ function ppom_meta_list( $post ) {
 	$all_meta     = PPOM()->get_product_meta_all();
 	$ppom_setting = admin_url( 'admin.php?page=ppom' );
 	
-	$html  = '<div class="options_group ppom-settings-container" style="max-height:375px; overflow:auto;">';
+	$html = '<div class="options_group ppom-settings-container" style="max-height:375px; overflow:auto;">';
 
 	if ( count( $all_meta ) > 1 ) {
 		// UP-SELL
@@ -103,7 +102,7 @@ function ppom_meta_list( $post ) {
 	}
 	// PPOM Fields select table.
 	$html .= '<table id="ppom_meta_sortable" class="wp-list-table widefat fixed striped">';
-	//Hide search if we don't have many metas
+	// Hide search if we don't have many metas
 
 	$html .= '<div class="ppom-search-meta" style="text-align: right;">';
 	if ( count( $all_meta ) > 3 ) {
@@ -188,7 +187,6 @@ function ppom_meta_list( $post ) {
 			esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'enable-enquiry', 'metabox' ) ),
 			__( 'Premium', 'woocommerce-product-addon' )
 		)
-		
 	) . '</i></label>';
 	$html .= '</div>';
 
@@ -230,7 +228,7 @@ function ppom_admin_process_product_meta( $post_id ) {
 	
 	if ( is_numeric( $ppom_meta_selected ) ) {
 		$ppom_meta_selected = array( $ppom_meta_selected );
-	} else if ( ! is_array( $ppom_meta_selected ) ) {
+	} elseif ( ! is_array( $ppom_meta_selected ) ) {
 		$ppom_meta_selected = array();
 	}
 	
@@ -278,8 +276,8 @@ function ppom_admin_save_form_meta() {
 	// print_r($_REQUEST); exit;
 
 	if ( ! isset( $_POST['ppom_form_nonce'] )
-		 || ! wp_verify_nonce( $_POST['ppom_form_nonce'], 'ppom_form_nonce_action' )
-		 || ! ppom_security_role()
+		|| ! wp_verify_nonce( $_POST['ppom_form_nonce'], 'ppom_form_nonce_action' )
+		|| ! ppom_security_role()
 	) {
 		$resp = array(
 			'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
@@ -300,16 +298,16 @@ function ppom_admin_save_form_meta() {
 
 	if ( is_string( $_REQUEST['ppom'] ) ) {
 		$ppom_encoded = $_REQUEST['ppom'];
-		parse_str( $ppom_encoded, $ppom_decoded);
+		parse_str( $ppom_encoded, $ppom_decoded );
 		$ppom = $ppom_decoded['ppom'];
 	}
 
-	$ppom_meta    = isset($_REQUEST['ppom_meta']) ? $_REQUEST['ppom_meta'] : $ppom;
+	$ppom_meta = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $ppom;
 
 	if ( empty( $ppom_meta ) ) {
 		$resp = array(
-			'message'        => __( 'No fields found.', 'woocommerce-product-addon' ),
-			'status'         => 'error',
+			'message' => __( 'No fields found.', 'woocommerce-product-addon' ),
+			'status'  => 'error',
 		);
 		wp_send_json( $resp );
 	}
@@ -318,21 +316,21 @@ function ppom_admin_save_form_meta() {
 	$product_meta = ppom_sanitize_array_data( $product_meta );
 	$product_meta = array_filter(
 		$product_meta,
-		function( $pm ) {
+		function ( $pm ) {
 			return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] );
 		}
 	);
 	$product_meta = json_encode( $product_meta );
 
 	// sanitize
-	$productmeta_name       = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
-	$dynamic_price_hide     = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
-	$send_file_attachment   = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
-	$show_cart_thumb        = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
-	$aviary_api_key         = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
-	$productmeta_style      = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
-	$productmeta_js         = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
-	$product_id             = isset( $_REQUEST['product_id'] ) ? intval( $_REQUEST['product_id'] ) : 0;
+	$productmeta_name     = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
+	$dynamic_price_hide   = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
+	$send_file_attachment = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
+	$show_cart_thumb      = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
+	$aviary_api_key       = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
+	$productmeta_style    = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
+	$productmeta_js       = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
+	$product_id           = isset( $_REQUEST['product_id'] ) ? intval( $_REQUEST['product_id'] ) : 0;
 
 	if ( strlen( $productmeta_name ) > 50 ) {
 		$resp = array(
@@ -344,13 +342,13 @@ function ppom_admin_save_form_meta() {
 	}
 
 	$ppom_settings_meta_data = array(
-		'productmeta_name'       => $productmeta_name,
-		'dynamic_price_display'  => $dynamic_price_hide,
-		'send_file_attachment'   => $send_file_attachment,
-		'show_cart_thumb'        => $show_cart_thumb,
-		'aviary_api_key'         => trim( $aviary_api_key ),
-		'the_meta'               => $product_meta,
-		'productmeta_created'    => current_time( 'mysql' ),
+		'productmeta_name'      => $productmeta_name,
+		'dynamic_price_display' => $dynamic_price_hide,
+		'send_file_attachment'  => $send_file_attachment,
+		'show_cart_thumb'       => $show_cart_thumb,
+		'aviary_api_key'        => trim( $aviary_api_key ),
+		'the_meta'              => $product_meta,
+		'productmeta_created'   => current_time( 'mysql' ),
 	);
 
 	if ( ! ppom_is_legacy_user() ) {
@@ -380,7 +378,7 @@ function ppom_admin_save_form_meta() {
 	$ppom_id = $wpdb->insert_id;
 	if ( is_string( $ppom ) ) {
 		$ppom_encoded = $ppom;
-		parse_str( $ppom_encoded, $ppom_decoded);
+		parse_str( $ppom_encoded, $ppom_decoded );
 		$ppom = $ppom_decoded['ppom'];
 	}
 
@@ -388,7 +386,7 @@ function ppom_admin_save_form_meta() {
 	$product_meta = ppom_sanitize_array_data( $product_meta );
 	$product_meta = array_filter(
 		$product_meta,
-		function( $pm ) {
+		function ( $pm ) {
 			return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] );
 		}
 	);
@@ -465,8 +463,8 @@ function ppom_admin_update_form_meta() {
 
 
 	if ( ! isset( $_POST['ppom_form_nonce'] )
-		 || ! wp_verify_nonce( $_POST['ppom_form_nonce'], 'ppom_form_nonce_action' )
-		 || ! ppom_security_role()
+		|| ! wp_verify_nonce( $_POST['ppom_form_nonce'], 'ppom_form_nonce_action' )
+		|| ! ppom_security_role()
 	) {
 		$resp = array(
 			'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
@@ -479,7 +477,7 @@ function ppom_admin_update_form_meta() {
 
 	if ( is_string( $_REQUEST['ppom'] ) ) {
 		$ppom_encoded = $_REQUEST['ppom'];
-		parse_str( $ppom_encoded, $ppom_decoded);
+		parse_str( $ppom_encoded, $ppom_decoded );
 		$_REQUEST['ppom'] = $ppom_decoded['ppom'];
 	}
 
@@ -489,19 +487,19 @@ function ppom_admin_update_form_meta() {
 	// Remove the meta row if the type or data_name is empty.
 	$product_meta = array_filter(
 		$product_meta,
-		function( $pm ) {
+		function ( $pm ) {
 			return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] );
 		}
 	);
 	$product_meta = json_encode( $product_meta );
 	
-	$productmeta_name       = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
-	$dynamic_price_hide     = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
-	$send_file_attachment   = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
-	$show_cart_thumb        = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
-	$aviary_api_key         = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
-	$productmeta_style      = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
-	$productmeta_js         = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
+	$productmeta_name     = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
+	$dynamic_price_hide   = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
+	$send_file_attachment = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
+	$show_cart_thumb      = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
+	$aviary_api_key       = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
+	$productmeta_style    = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
+	$productmeta_js       = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
 
 	if ( strlen( $productmeta_name ) > 50 ) {
 		$resp = array(
@@ -513,12 +511,12 @@ function ppom_admin_update_form_meta() {
 	}
 
 	$ppom_settings_meta_data = array(
-		'productmeta_name'       => $productmeta_name,
-		'dynamic_price_display'  => $dynamic_price_hide,
-		'send_file_attachment'   => $send_file_attachment,
-		'show_cart_thumb'        => $show_cart_thumb,
-		'aviary_api_key'         => trim( $aviary_api_key ),
-		'the_meta'               => $product_meta,
+		'productmeta_name'      => $productmeta_name,
+		'dynamic_price_display' => $dynamic_price_hide,
+		'send_file_attachment'  => $send_file_attachment,
+		'show_cart_thumb'       => $show_cart_thumb,
+		'aviary_api_key'        => trim( $aviary_api_key ),
+		'the_meta'              => $product_meta,
 	);
 	if ( ! ppom_is_legacy_user() ) {
 		$ppom_settings_meta_data['productmeta_style'] = $productmeta_style;
@@ -620,7 +618,6 @@ function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 	} else {
 		return false;
 	}
-
 }
 
 /*
@@ -629,8 +626,8 @@ function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 function ppom_admin_delete_meta() {
 
 	if ( ! isset( $_POST['ppom_meta_nonce'] )
-		 || ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
-		 || ! ppom_security_role()
+		|| ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
+		|| ! ppom_security_role()
 	) {
 		$response = array(
 			'status'  => 'error',
@@ -649,7 +646,7 @@ function ppom_admin_delete_meta() {
 	$res      = $wpdb->query( $wpdb->prepare( "DELETE FROM {$tbl_name} WHERE productmeta_id = %d", $productmeta_id ) );
 
 
-	$response = [];
+	$response = array();
 	if ( $res ) {
 		$response = array(
 			'status'  => 'success',
@@ -671,10 +668,10 @@ function ppom_admin_delete_meta() {
 function ppom_admin_delete_selected_meta() {
 
 	if ( ! isset( $_POST['ppom_meta_nonce'] )
-		 || ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
-		 || ! ppom_security_role()
-		 || ! array_key_exists( 'productmeta_ids', $_POST )
-		 || ! is_array( $_POST['productmeta_ids'] )
+		|| ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
+		|| ! ppom_security_role()
+		|| ! array_key_exists( 'productmeta_ids', $_POST )
+		|| ! is_array( $_POST['productmeta_ids'] )
 	) {
 		_e( 'Sorry, you are not allowed to perform this action', 'woocommerce-product-addon' );
 		die( 0 );
@@ -682,24 +679,24 @@ function ppom_admin_delete_selected_meta() {
 
 	global $wpdb;
 
-	$del_ids = [];
-	$del_ids_ph = [];
+	$del_ids    = array();
+	$del_ids_ph = array();
 
 	// for the performance wise, prefer to use foreach instead of array_map-array_filter-array_fill stack.
-	foreach( $_POST['productmeta_ids'] as $id ) {
+	foreach ( $_POST['productmeta_ids'] as $id ) {
 		$id = absint( $id );
 
-		if( 0 === $id ) {
+		if ( 0 === $id ) {
 			continue;
 		}
 
-		$del_ids[] = $id;
+		$del_ids[]    = $id;
 		$del_ids_ph[] = '%d';
 	}
 
 	$del_ids_ph = implode( ', ', $del_ids_ph );
 
-	$tbl_name        = $wpdb->prefix . PPOM_TABLE_META;
+	$tbl_name = $wpdb->prefix . PPOM_TABLE_META;
 
 	$res = $wpdb->query( $wpdb->prepare( "DELETE FROM {$tbl_name} WHERE productmeta_id IN ({$del_ids_ph})", $del_ids ) );
 

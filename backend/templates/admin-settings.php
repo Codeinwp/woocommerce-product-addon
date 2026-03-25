@@ -42,19 +42,19 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 			?>
 
 			<input type="hidden" name="action"
-				   value="<?php echo esc_attr( $class_ins->get_config( 'id' ) ); ?>_settings_panel_action"/>
+					value="<?php echo esc_attr( $class_ins->get_config( 'id' ) ); ?>_settings_panel_action"/>
 			<input type="hidden" name="nmsf_version"
-				   value="<?php echo esc_attr( $class_ins->get_config( 'version' ) ); ?>"/>
+					value="<?php echo esc_attr( $class_ins->get_config( 'version' ) ); ?>"/>
 
 
 			<!--Tabs & Panel Sections-->
 			<div class="row">
 				<div class="nmsf-cols col-md-12">
 					<div class="nmsf-panels-area">
-                        <p class="submit">
-                            <input type="submit" class="woocommerce-save-button components-button is-primary"
-                                   value="<?php _e( 'Save changes', 'woocommerce-product-addon' ); ?>"/>
-                        </p>
+						<p class="submit">
+							<input type="submit" class="woocommerce-save-button components-button is-primary"
+									value="<?php _e( 'Save changes', 'woocommerce-product-addon' ); ?>"/>
+						</p>
 						<?php
 						foreach ( $tabs as $tab_id => $tab_meta ) {
 							$panel_meta = isset( $tab_meta['panels'] ) ? $tab_meta['panels'] : array();
@@ -62,20 +62,20 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 							?>
 
 							<div class="<?php echo implode( ' ', $classes ); ?> nmsf-panels-content"
-								 data-panel-id="<?php echo esc_attr( $tab_id ); ?>">
+								data-panel-id="<?php echo esc_attr( $tab_id ); ?>">
 
 								<div class="nmsf-panels-content-inner">
 
 									<?php
 									foreach ( $panel_meta as $panel_id => $subtab_meta ) {
 
-										$id          = isset( $subtab_meta['id'] ) ? $subtab_meta['id'] : '';
-										$title       = isset( $subtab_meta['title'] ) ? $subtab_meta['title'] : '';
-										$desc        = isset( $subtab_meta['desc'] ) ? $subtab_meta['desc'] : '';
+										$id           = isset( $subtab_meta['id'] ) ? $subtab_meta['id'] : '';
+										$title        = isset( $subtab_meta['title'] ) ? $subtab_meta['title'] : '';
+										$desc         = isset( $subtab_meta['desc'] ) ? $subtab_meta['desc'] : '';
 										$is_available = isset( $subtab_meta['is_available'] ) ? $subtab_meta['is_available'] : true;
-										$active      = isset( $subtab_meta['active'] ) ? $subtab_meta['active'] : '';
-										$is_sabpanel = isset( $subtab_meta['is_sabpanel'] ) ? $subtab_meta['is_sabpanel'] : '';
-										$params      = isset( $subtab_meta['settings'] ) ? $subtab_meta['settings'] : array();
+										$active       = isset( $subtab_meta['active'] ) ? $subtab_meta['active'] : '';
+										$is_sabpanel  = isset( $subtab_meta['is_sabpanel'] ) ? $subtab_meta['is_sabpanel'] : '';
+										$params       = isset( $subtab_meta['settings'] ) ? $subtab_meta['settings'] : array();
 
 										// Change the settings position
 										$params = $class_ins::settings_position_controller( $params );
@@ -88,18 +88,19 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 										if ( $is_sabpanel ) {
 											?>
 											<input type="radio" name="tab_<?php echo esc_attr( $tab_id ); ?>"
-												   class="nmsf-panel-handler"
-												   id="nmsf-<?php echo esc_attr( $panel_id ); ?>" <?php echo esc_attr( $is_checked ); ?>>
+													class="nmsf-panel-handler"
+													id="nmsf-<?php echo esc_attr( $panel_id ); ?>" <?php echo esc_attr( $is_checked ); ?>>
 											<label for="nmsf-<?php echo esc_attr( $panel_id ); ?>"
-												   class="nmsf-label <?php  echo ! $is_available ? 'ppom-is-locked-section' : ''; ?>">
-												<?php if ( ! $is_available ): ?>
-                                                    <span class="dashicons dashicons-lock"></span>
+													class="nmsf-label <?php echo ! $is_available ? 'ppom-is-locked-section' : ''; ?>">
+												<?php if ( ! $is_available ) : ?>
+													<span class="dashicons dashicons-lock"></span>
 												<?php endif; ?>
-                                                <?php  echo esc_html( $title ); ?></label>
-											<div class="nmsf-panel-settings-area <?php  echo ! $is_available ? 'ppom-is-locked-panel' : ''; ?>">
-                                                <?php if ( ! $is_available ): ?>
-                                                    <div class="ppom-notice-upsell"><p>
-                                                            <?php echo sprintf( 
+												<?php echo esc_html( $title ); ?></label>
+											<div class="nmsf-panel-settings-area <?php echo ! $is_available ? 'ppom-is-locked-panel' : ''; ?>">
+												<?php if ( ! $is_available ) : ?>
+													<div class="ppom-notice-upsell"><p>
+															<?php
+															printf( 
 																// translators: %1$s: the name of plugin feature, %2$s: the upgrade link.
 																__( '%1$s customization is not available on your current plan. %2$s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ),
 																esc_html( $title ),
@@ -108,10 +109,11 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																	esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ),
 																	__( 'Upgrade to the Pro', 'woocommerce-product-addon' )
 																)
-															); ?>
-                                                        </p>
-                                                    </div>
-                                                <?php endif; ?>
+															);
+															?>
+														</p>
+													</div>
+												<?php endif; ?>
 												<span class="nmsf-panel-desc"><?php echo esc_html( $desc ); ?></span>
 												<table class="nmsf-panel-table form-table">
 													<?php
@@ -131,10 +133,10 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 															$video_title            = isset( $reference['ref_video_title'] ) ? $reference['ref_video_title'] : '';
 															$video_link             = isset( $reference['ref_video_link'] ) ? $reference['ref_video_link'] : '';
 															$input_meta['input_id'] = $id;
-															$condition_class = '';
-															$is_input_available = isset( $input_meta['is_available'] ) ? $input_meta['is_available'] : $is_available;
+															$condition_class        = '';
+															$is_input_available     = isset( $input_meta['is_available'] ) ? $input_meta['is_available'] : $is_available;
 															if ( ! $is_input_available ) {
-																$condition_class .= 'ppom-is-locked-field';
+																$condition_class       .= 'ppom-is-locked-field';
 																$input_meta['input_id'] = '_locked' . $input_meta['input_id'];
 															}
 															if ( ! empty( $conditions ) ) {
@@ -149,9 +151,10 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																		class="<?php echo $condition_class; ?>"
 																>
 																	<td class="nmsf-section-type" colspan="2">
-																		<?php if ( $is_available && !$is_input_available ): ?>
-                                                                            <div class="ppom-notice-upsell"><p>
-																					<?php echo sprintf(
+																		<?php if ( $is_available && ! $is_input_available ) : ?>
+																			<div class="ppom-notice-upsell"><p>
+																					<?php
+																					printf(
 																						// translators: %1$s: the name of plugin feature, %2$s: opening anchor tag.
 																						__( '%1$s customization is not available on your current plan. %2$s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ),
 																						esc_html( $title ),
@@ -160,9 +163,10 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																							esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ),
 																							__( 'Upgrade to the Pro', 'woocommerce-product-addon' )
 																						)
-																					); ?>
-                                                                                </p>
-                                                                            </div>
+																					);
+																					?>
+																				</p>
+																			</div>
 																		<?php endif; ?>
 																		<h3>
 																			<?php echo esc_html( $title ); ?>
@@ -182,7 +186,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 
 																		<?php if ( $tooltip ) { ?>
 																			<span class="nmsf-tooltip"
-																				  title="<?php echo $desc; ?>">
+																					title="<?php echo $desc; ?>">
 																			<i class="dashicons dashicons-editor-help"></i>
 																		</span>
 
@@ -191,7 +195,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																				<span class="nmsf-ref-area">
 																				<?php if ( $ref_link != '' ) { ?>
 																				<a href="<?php echo esc_url( $ref_link ); ?>"
-																				   target="_blank">
+																					target="_blank">
 																					<span class="dashicons dashicons-admin-links"></span>
 																					<?php echo $ref_title; ?>
 																				</a>
@@ -199,7 +203,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 
 																					<?php if ( $video_link != '' ) { ?>
 																						<a class="nmsf-ref-video-popup"
-																						   video-url="<?php echo esc_url( $video_link ); ?>">
+																							video-url="<?php echo esc_url( $video_link ); ?>">
 																					<span class="dashicons dashicons-video-alt2"></span>
 																						<?php echo $video_title; ?>
 																				</a>
@@ -214,7 +218,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																				<span class="nmsf-ref-area">
 																				<?php if ( $ref_link != '' ) { ?>
 																				<a href="<?php echo esc_url( $ref_link ); ?>"
-																				   target="_blank">
+																					target="_blank">
 																					<span class="dashicons dashicons-admin-links"></span>
 																					<?php echo $ref_title; ?>
 																				</a>
@@ -222,7 +226,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 
 																					<?php if ( $video_link != '' ) { ?>
 																						<a class="nmsf-ref-video-popup"
-																						   video-url="<?php echo esc_url( $video_link ); ?>">
+																							video-url="<?php echo esc_url( $video_link ); ?>">
 																					<span class="dashicons dashicons-video-alt2"></span>
 																						<?php echo $video_title; ?>
 																				</a>
@@ -290,10 +294,10 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 							<?php
 						}
 						?>
-                        <p class="submit">
-                            <input type="submit" class="woocommerce-save-button components-button is-primary"
-                                   value="<?php _e( 'Save changes', 'woocommerce-product-addon' ); ?>"/>
-                        </p>
+						<p class="submit">
+							<input type="submit" class="woocommerce-save-button components-button is-primary"
+									value="<?php _e( 'Save changes', 'woocommerce-product-addon' ); ?>"/>
+						</p>
 					</div>
 				</div>
 			</div>

@@ -287,7 +287,7 @@ function ppom_array_settings() {
 			'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 			'default' => 'no',
 			'id'      => 'ppom_legacy_price',
-			'desc'	  => __( 'Enable this option to use the legacy method for price calculations.', 'woocommerce-product-addon' ),
+			'desc'    => __( 'Enable this option to use the legacy method for price calculations.', 'woocommerce-product-addon' ),
 		),
 		array(
 			'title'       => __( 'PPOM Permissions', 'woocommerce-product-addon' ),
@@ -307,7 +307,7 @@ function ppom_array_settings() {
 		),
 
 		array(
-			'name' => __( 'Advance Features', 'woocommerce-product-addon' ) . ' (' . __( 'PRO', 'woocommerce-product-addon' ) .')',
+			'name' => __( 'Advance Features', 'woocommerce-product-addon' ) . ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')',
 			'type' => 'title',
 			'desc' => __( 'These options will work when PRO version is installed', 'woocommerce-product-addon' ),
 			'id'   => 'ppom_pro_features',
@@ -689,8 +689,8 @@ function ppom_array_get_addons_details() {
 					'title' => __( 'Demo', 'woocommerce-product-addon' ),
 					'link'  => 'https://demo-ppom-lite.vertisite.cloud/',
 				),
-			),	
-			'type' => 'field'
+			),  
+			'type'    => 'field',
 		),
 		array(
 			'title'   => __( 'Cart Edit', 'woocommerce-product-addon' ),
@@ -701,7 +701,7 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1793-how-to-enable-the-cart-edit-in-ppom',
 				),
 			),
-			'type' => 'feature'
+			'type'    => 'feature',
 		),
 		array(
 			'title'   => __( 'Conditional Field Repeater', 'woocommerce-product-addon' ),
@@ -712,13 +712,13 @@ function ppom_array_get_addons_details() {
 					'link'  => 'https://docs.themeisle.com/article/1700-personalized-product-meta-manager#conditional-repeater',
 				),
 			),
-			'type' => 'feature'
+			'type'    => 'feature',
 		),
 		array(
 			'title'   => __( 'Enquiry Form', 'woocommerce-product-addon' ),
 			'desc'    => __( 'Enquiry Form Add-on enhances your product pages by adding a customizable enquiry button. It allows customers to send inquiries directly to the admin about products with PPOM Fields via email. All associated PPOM Meta Fields are included in the customer\'s message.', 'woocommerce-product-addon' ),
 			'actions' => array(),
-			'type' => 'feature'
+			'type'    => 'feature',
 		),
 		array(
 			'title'   => __( 'Fields Popup', 'woocommerce-product-addon' ),
@@ -728,8 +728,8 @@ function ppom_array_get_addons_details() {
 					'title' => __( 'Documentation', 'woocommerce-product-addon' ),
 					'link'  => 'https://docs.themeisle.com/article/1982-how-to-configure-the-field-popup-in-ppom',
 				),
-			),	
-			'type' => 'feature'
+			),  
+			'type'    => 'feature',
 		),
 	);
 

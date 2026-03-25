@@ -103,7 +103,7 @@ class PPOM_Meta {
 	function __construct( $product_id = null ) {
 
 		self::$wc_product                   = wc_get_product( $product_id );
-		$this->category_meta                = [];
+		$this->category_meta                = array();
 		$this->ppom_categories_and_tags_row = $this->all_ppom_with_categories();
 		$this->meta_id                      = $this->get_meta_id( $product_id );
 		self::$product_id                   = $product_id;
@@ -226,8 +226,8 @@ class PPOM_Meta {
 
 		$single_meta = ( $this->meta_id == 0 || $this->meta_id == 'None' || empty( $this->meta_id ) ) ? null : $this->meta_id;
 
-		if ( is_array( $single_meta) && 0 < count( $single_meta ) ) {
-			$single_meta =  $single_meta[0];
+		if ( is_array( $single_meta ) && 0 < count( $single_meta ) ) {
+			$single_meta = $single_meta[0];
 		}
 
 		return $single_meta;
@@ -264,7 +264,7 @@ class PPOM_Meta {
 		$meta_settings = $wpdb->get_results( $qry );
 		$filter_meta   = array_filter(
 			$meta_settings,
-			function( $meta ) {
+			function ( $meta ) {
 				return 'on' === $meta->productmeta_validation ? $meta : false;
 			}
 		);
@@ -362,7 +362,7 @@ class PPOM_Meta {
 		return apply_filters( 'ppom_meta_fields_by_id', $meta_fields, $ppom_ids, $this );
 	}
 
-	function ppom_has_category_meta($product_id ) {
+	function ppom_has_category_meta( $product_id ) {
 
 		$product_categories = get_the_terms( $product_id, 'product_cat' );
 
@@ -375,7 +375,7 @@ class PPOM_Meta {
 				} else {
 					// making array of meta cats
 
-					$meta_cat_array = preg_split('/\r\n|\n/', $row->productmeta_categories);
+					$meta_cat_array = preg_split( '/\r\n|\n/', $row->productmeta_categories );
 					// Now iterating the product_categories to check it's slug in meta cats
 					foreach ( $product_categories as $cat ) {
 						if ( in_array( $cat->slug, $meta_cat_array ) ) {
@@ -443,13 +443,13 @@ class PPOM_Meta {
 			$template = stripslashes( strip_tags( $this->ppom_settings->productmeta_style ) );
 
 			if ( is_array( $this->meta_id ) ) {
-				$field_selector = [];
-				foreach( $this->meta_id as $field_id ) {
-					$field_selector[] = ".ppom-id-" . $field_id;
+				$field_selector = array();
+				foreach ( $this->meta_id as $field_id ) {
+					$field_selector[] = '.ppom-id-' . $field_id;
 				}
 				$selector = ':where(' . implode( ', ', $field_selector ) . ')';
-			} else if ( is_numeric( $this->meta_id ) ) {
-				$selector = ".ppom-id-" . $this->meta_id;
+			} elseif ( is_numeric( $this->meta_id ) ) {
+				$selector = '.ppom-id-' . $this->meta_id;
 			}
 			$inline_css = str_replace( 'selector', $selector, $template );
 		}
@@ -573,5 +573,4 @@ class PPOM_Meta {
 
 		return apply_filters( 'ppom_get_settings_by_id', $meta_settings, $meta_id, $this );
 	}
-
 }

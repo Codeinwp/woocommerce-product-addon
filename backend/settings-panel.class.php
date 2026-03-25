@@ -37,28 +37,28 @@ class PPOM_SettingsFramework {
 	 *
 	 * @var array
 	 */
-	public $tabs = [];
+	public $tabs = array();
 
 	/**
 	 * Return setting panels.
 	 *
 	 * @var array
 	 */
-	public $panels = [];
+	public $panels = array();
 
 	/**
 	 * Return panels setting.
 	 *
 	 * @var array
 	 */
-	public $settings_array = [];
+	public $settings_array = array();
 
 	/**
 	 * Return settings config array.
 	 *
 	 * @var array
 	 */
-	public $config = [];
+	public $config = array();
 
 	/**
 	 * Return current settings panel assets URL.
@@ -211,7 +211,7 @@ class PPOM_SettingsFramework {
 		// only used for store all Panels on single array
 		$this->panels = array_merge( $this->panels, $panels );
 
-		$existing_panels                 = ! isset( $this->tabs[ $tab_id ]['panels'] ) ? [] : $this->tabs[ $tab_id ]['panels'];
+		$existing_panels                 = ! isset( $this->tabs[ $tab_id ]['panels'] ) ? array() : $this->tabs[ $tab_id ]['panels'];
 		$this->tabs[ $tab_id ]['panels'] = array_merge( $existing_panels, $panels );
 
 		return $this;
@@ -230,8 +230,8 @@ class PPOM_SettingsFramework {
 		$this->tabs = array_map(
 			function ( $tab ) use ( $panel_id, $settings ) {
 				if ( isset( $tab['panels'] ) && isset( $tab['panels'][ $panel_id ] ) ) {
-					  $existing_settings                      = ! isset( $tab['panels'][ $panel_id ]['settings'] ) ? [] : $tab['panels'][ $panel_id ]['settings'];
-					  $tab['panels'][ $panel_id ]['settings'] = array_merge( $existing_settings, $settings );
+						$existing_settings                      = ! isset( $tab['panels'][ $panel_id ]['settings'] ) ? array() : $tab['panels'][ $panel_id ]['settings'];
+						$tab['panels'][ $panel_id ]['settings'] = array_merge( $existing_settings, $settings );
 				}
 
 				return $tab;
@@ -289,7 +289,7 @@ class PPOM_SettingsFramework {
 			return $arr;
 		}
 
-		$elem  = [ $move => $arr[ $move ] ];
+		$elem  = array( $move => $arr[ $move ] );
 		$start = array_splice( $arr, 0, array_search( $find, array_keys( $arr ) ) );
 		unset( $start[ $move ] );
 
@@ -303,8 +303,8 @@ class PPOM_SettingsFramework {
 	function save_settings() {
 
 		if ( ! isset( $_POST['ppom_settings_nonce'] )
-			 || ! wp_verify_nonce( $_POST['ppom_settings_nonce'], 'ppom_settings_nonce_action' )
-			 || ! ppom_security_role()
+			|| ! wp_verify_nonce( $_POST['ppom_settings_nonce'], 'ppom_settings_nonce_action' )
+			|| ! ppom_security_role()
 		) {
 			$response = array(
 				'status'  => 'error',
@@ -317,9 +317,13 @@ class PPOM_SettingsFramework {
 
 		$response = array();
 		if ( isset( $_REQUEST[ self::$save_key ] ) ) {
-			$_REQUEST[ self::$save_key ]  = array_filter( $_REQUEST[ self::$save_key ] , function ( $key ) {
-				return strpos( $key, '_locked' ) === false;
-			}, ARRAY_FILTER_USE_KEY );
+			$_REQUEST[ self::$save_key ] = array_filter(
+				$_REQUEST[ self::$save_key ],
+				function ( $key ) {
+					return strpos( $key, '_locked' ) === false;
+				},
+				ARRAY_FILTER_USE_KEY 
+			);
 			// $settings_meta = $_REQUEST[self::$save_key];
 			$settings_meta = array_map(
 				function ( $setting ) {
@@ -453,7 +457,7 @@ class PPOM_SettingsFramework {
 	function ppom_migrate_settings_panel() {
 
 		if ( ! isset( $_GET['ppom_migrate_nonce'] )
-			 || ! wp_verify_nonce( $_GET['ppom_migrate_nonce'], 'ppom_migrate_nonce_action' )
+			|| ! wp_verify_nonce( $_GET['ppom_migrate_nonce'], 'ppom_migrate_nonce_action' )
 		) {
 			wp_die( 'Sorry, you are not allowed to clone', 'ppom' );
 		}
@@ -478,7 +482,7 @@ class PPOM_SettingsFramework {
 			exit;
 		} else {
 
-			$legacy_values = [];
+			$legacy_values = array();
 			$panel_fields  = $this->settings_array;
 
 			// Getting the keys
@@ -593,10 +597,8 @@ class PPOM_SettingsFramework {
 				if ( isset( $css_val[ $key ], $css_val['style'], $css_val['color'] ) && $css_val[ $key ] != '' && $css_val['color'] != '' && $css_val['style'] != 'none' ) {
 					$css_prop .= $mode . '-' . $key . '-style:' . $css_val['style'] . '!important;';
 				}
-			} else {
-				if ( isset( $css_val[ $key ] ) && $css_val[ $key ] != '' ) {
+			} elseif ( isset( $css_val[ $key ] ) && $css_val[ $key ] != '' ) {
 					$css_prop .= $mode . '-' . $key . ':' . $css_val[ $key ] . '!important;';
-				}
 			}
 		}
 
@@ -800,14 +802,14 @@ class PPOM_SettingsFramework {
 		PPOM_SCRIPTS::enqueue_style( 'nmsf-tooltip-lib' );
 		PPOM_SCRIPTS::enqueue_script( 'nmsf-tooltip-lib' );
 
-		// Videopopup library	
+		// Videopopup library   
 		PPOM_SCRIPTS::enqueue_style( 'nmsf-videopopup-lib' );
 		PPOM_SCRIPTS::enqueue_script( 'nmsf-videopopup-lib' );
 
-		// nmsf grid library	
+		// nmsf grid library    
 		PPOM_SCRIPTS::enqueue_style( 'nmsf-grid-lib' );
 
-		// Condition base settings library	
+		// Condition base settings library  
 		PPOM_SCRIPTS::enqueue_script( 'nmsf-deps-lib' );
 
 		// Settings panel scripts
@@ -828,10 +830,10 @@ class PPOM_SettingsFramework {
 		switch ( $handle ) {
 
 			case 'nmsf-settings-panel':
-				$localize_data = [
+				$localize_data = array(
 					'migrate_back_msg'                     => __( 'Are you sure?', 'woocommerce-product-addon' ),
 					'administrator_role_cannot_be_removed' => esc_html__( 'The administrator role cannot be removed.', 'woocommerce-product-addon' ),
-				];
+				);
 
 				break;
 		}
@@ -886,7 +888,7 @@ class PPOM_SettingsFramework {
 	}
 
 
-	function insert_at( $array = [], $item = [], $position = 0 ) {
+	function insert_at( $array = array(), $item = array(), $position = 0 ) {
 		$previous_items = array_slice( $array, 0, $position, true );
 		$next_items     = array_slice( $array, $position, null, true );
 

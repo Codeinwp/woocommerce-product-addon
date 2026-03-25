@@ -19,7 +19,6 @@ if ( ! class_exists( 'PPOM_SettingsFramework' ) ) {
  * Register Settings Panel
  * --------------------------
  */
-
 function ppom_load_free_options() {
 
 	/**
@@ -50,7 +49,7 @@ function ppom_load_free_options() {
 		'ppom_legacy_price'                   => array(
 			'type'  => 'checkbox',
 			'title' => __( 'Enable Legacy Price Calculations', 'woocommerce-product-addon' ),
-			'desc'	=> __( 'Enable this option to use the legacy method for price calculations.', 'woocommerce-product-addon' ),
+			'desc'  => __( 'Enable this option to use the legacy method for price calculations.', 'woocommerce-product-addon' ),
 		),
 		'ppom_permission_mfields'             => array(
 			'type'        => 'select',
@@ -648,30 +647,30 @@ function ppom_load_pro_options() {
 		'ppom_repeater_clone_mode'     => array(
 			'type'         => 'select',
 			'is_available' => false,
-			'options'      => [
+			'options'      => array(
 				'first_box' => 'Clone from first box only',
 				'each_box'  => 'Clone from each box',
-			],
+			),
 			'title'        => __( 'Clone Mode', 'woocommerce-product-addon' ),
 			'desc'         => __( 'How to clone the fields', 'woocommerce-product-addon' ),
 		),
 		'ppom_repeater_clone_position' => array(
 			'type'         => 'select',
 			'is_available' => false,
-			'options'      => [
+			'options'      => array(
 				'top'    => 'Top',
 				'bottom' => 'Bottom',
-			],
+			),
 			'title'        => __( 'Clone Icons Position', 'woocommerce-product-addon' ),
 			'desc'         => __( 'Set the placement of the clone icons within the repeater fields.', 'woocommerce-product-addon' ),
 		),
 		'ppom_repeater_icon_lib'       => array(
 			'type'         => 'select',
 			'is_available' => false,
-			'options'      => [
+			'options'      => array(
 				'dashicons'   => 'Dashicons',
 				'fontawesome' => 'FontAwesome',
-			],
+			),
 			'title'        => __( 'Icons Library', 'woocommerce-product-addon' ),
 			'desc'         => __( 'Select the icon library to be used for displaying icons.', 'woocommerce-product-addon' ),
 		),
@@ -693,10 +692,10 @@ function ppom_load_pro_options() {
 			'default'      => 'Bulk Quantity Standard',
 			'options'      => array(
 				'bq_standard' => __( 'Bulk Quantity Standard', 'woocommerce-product-addon' ),
-				'bq_packaged' => __( 'Bulk Quantity Packaged', 'woocommerce-product-addon' )
+				'bq_packaged' => __( 'Bulk Quantity Packaged', 'woocommerce-product-addon' ),
 			),
 			'desc'         => __( 'Choose how bulk quantities are displayed. Select \'Bulk Quantity Standard\' for standard bulk orders or \'Bulk Quantity Packaged\' for pre-packaged bulk quantities.', 'woocommerce-product-addon' ),
-		)
+		),
 	);
 
 	PPOMSETTINGS()->register_setting( 'ppom_admin_fields_settings', $settings );
@@ -746,9 +745,8 @@ function ppom_load_pro_options() {
 			'is_available' => false,
 			'title'        => __( 'Integrations', 'woocommerce-product-addon' ),
 			'is_sabpanel'  => true,
-		)
+		),
 	);
 	PPOMSETTINGS()->register_panel( 'ppom_general_tab', $panels )->register_setting( 'ppom_integrations', $integration_settings );
-
 }
-add_action('init', 'ppom_load_pro_options', 99);
+add_action( 'init', 'ppom_load_pro_options', 99 );
