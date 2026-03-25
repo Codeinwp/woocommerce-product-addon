@@ -2500,7 +2500,7 @@ function ppom_posted_field_max_min_value_validation( $posted_fields, $field ) {
 	$title         = isset( $field['title'] ) ? sanitize_text_field( $field['title'] ) : '';
 	$min_check     = isset( $field['min_checked'] ) ? intval( $field['min_checked'] ) : 0;
 	$max_check     = isset( $field['max_checked'] ) ? intval( $field['max_checked'] ) : 0;
-	$error_message = isset( $field['error_message'] ) ? sprintf( '%1$s: %2$s', $title, sanitize_text_field( $field['error_message'] ) ) : '';
+	$error_message = isset( $field['error_message'] ) ? sanitize_text_field( $field['error_message'] ) : '';
 
 	if ( $min_check ) {
 		$has_field_value = isset( $posted_fields[ $data_name ] );
@@ -2515,7 +2515,7 @@ function ppom_posted_field_max_min_value_validation( $posted_fields, $field ) {
 		}
 		if ( ! $has_field_value ) {
 			$message = '' !== $error_message
-				? $error_message
+				? sprintf( '%1$s: %2$s', $title, $error_message )
 				: sprintf(
 					// translators: %1$s is minimum checked value, %2$s is Field label.
 					__('You must select at least %1$s options for %2$s field.', 'woocommerce-product-addon'),
@@ -2533,7 +2533,7 @@ function ppom_posted_field_max_min_value_validation( $posted_fields, $field ) {
 			$count = count( $field_value );
 			if ( $max_check && $count > $max_check ) {
 				$message = '' !== $error_message
-						? $error_message
+						? sprintf( '%1$s: %2$s', $title, $error_message )
 						: sprintf(
 							// translators: %1$s is maximum checked value, %2$s is Field label
 							__( 'You can select maximum %1$s options for %2$s field.', 'woocommerce-product-addon' ),
@@ -2543,7 +2543,7 @@ function ppom_posted_field_max_min_value_validation( $posted_fields, $field ) {
 				return apply_filters( 'ppom_posted_field_max_value_validation_message', $message, $posted_fields, $field );
 			} elseif ( $min_check && $count < $min_check ) {
 				$message = '' !== $error_message
-						? $error_message
+						? sprintf( '%1$s: %2$s', $title, $error_message )
 						: sprintf(
 							// translators: %1$s is minimum checked value, %2$s is Field label
 							__( 'You must select at least %1$s options for %2$s field.', 'woocommerce-product-addon' ),
