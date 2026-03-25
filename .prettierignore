@@ -2,3 +2,4 @@
 **/*.bundle.js
 js/inputmask/**
 js/sweetalert/**
+backend/assets/**
