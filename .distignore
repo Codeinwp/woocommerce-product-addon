@@ -28,3 +28,4 @@ phpstan-baseline.neon
 .gitkeep
 .wordpress-org
 AGENTS.md
+phpcs.baseline.xml

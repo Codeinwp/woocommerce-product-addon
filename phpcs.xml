@@ -14,44 +14,57 @@
     <exclude-pattern>*.js</exclude-pattern>
     <exclude-pattern>*.css</exclude-pattern>
     <exclude-pattern>*.asset.php</exclude-pattern>
-	<exclude-pattern>globals/google-fonts.php</exclude-pattern>
+    <exclude-pattern>globals/google-fonts.php</exclude-pattern>
     <exclude-pattern>bin/*.php</exclude-pattern>
 
-    <rule ref="Themeisle">
-        <exclude name="Squiz.Scope.MethodScope.Missing"></exclude>
-        <exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedCatch"></exclude>
+    <rule ref="WordPress-VIP-Go">
     </rule>
+
     <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
         <exclude-pattern>includes/modules/elementor_booster/widgets/*.php</exclude-pattern>
         <exclude-pattern>includes/modules/custom_layouts/elementor/custom_layout.php</exclude-pattern>
     </rule>
+    <rule ref="WordPress-Core">
+        <exclude name="Generic.Arrays.DisallowShortArraySyntax.Found" />
+        <exclude name="WordPress.PHP.YodaConditions.NotYoda" />
+        <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+        <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
+    </rule>
+
+    <rule ref="WordPress-Docs" />
+    <rule ref="WordPress-Extra">
+        <exclude name="PSR2.Classes.PropertyDeclaration.Underscore" />
+    </rule>
+    <rule ref="PHPCompatibilityWP" />
     <rule ref="WordPressVIPMinimum.Hooks.AlwaysReturnInFilter">
         <exclude-pattern>includes/core/generic_style.php</exclude-pattern>
     </rule>
     <rule ref="WordPressVIPMinimum.Security.Vuejs.RawHTMLDirectiveFound">
-        <exclude-pattern>includes/modules/header_footer_grid/templates/components/page-header-html.php</exclude-pattern>
+        <exclude-pattern>
+            includes/modules/header_footer_grid/templates/components/page-header-html.php</exclude-pattern>
     </rule>
-    <rule ref="PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.MethodDoubleUnderscore">
+    <rule
+        ref="PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.MethodDoubleUnderscore">
         <exclude-pattern>includes/modules/elementor_booster/widgets/*.php</exclude-pattern>
     </rule>
     <rule ref="WordPress.WP.I18n">
         <properties>
             <property name="text_domain" type="array">
-                <element value="woocommerce-product-addon"/>
-                <element value="default"/>
+                <element value="woocommerce-product-addon" />
+                <element value="default" />
             </property>
         </properties>
     </rule>
     <rule ref="WordPress.Security.EscapeOutput">
         <properties>
             <property name="customAutoEscapedFunctions" type="array">
-                <element value="neve_kses_svg"/>
+                <element value="neve_kses_svg" />
             </property>
         </properties>
     </rule>
     <rule ref="WordPress.DB.PreparedSQL"></rule>
-    <arg name="extensions" value="php"/>
-    <arg value="sp"/>
+    <arg name="extensions" value="php" />
+    <arg value="sp" />
     <arg name="basepath" value="./" />
-    <arg name="parallel" value="20"/>
+    <arg name="parallel" value="20" />
 </ruleset>
