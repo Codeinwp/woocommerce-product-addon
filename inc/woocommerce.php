@@ -302,8 +302,6 @@ function ppom_woocommerce_add_cart_item_data( $cart, $product_id ) {
 	// PPOM also saving cropped images under this filter.
 	$ppom_posted_fields = apply_filters( 'ppom_add_cart_item_data', $_POST['ppom'], $_POST );
 	$cart['ppom']       = $ppom_posted_fields;
-	// var_dump($cart);
-	// exit;
 
 	return $cart;
 }
@@ -695,7 +693,6 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 			);
 		}
 	}
-	// var_dump($item_meta);
 
 	return $item_meta;
 }
