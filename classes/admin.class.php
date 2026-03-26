@@ -693,6 +693,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			array( '%s' ), // Data format
 			array( '%d' )  // Where format
 		);
+
+		PPOM_Meta::flush_cache();
 	}
 
 	/*

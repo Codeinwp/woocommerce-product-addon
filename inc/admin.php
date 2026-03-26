@@ -416,6 +416,7 @@ function ppom_admin_save_form_meta() {
 	$resp = array();
 	if ( $ppom_id ) {
 
+		PPOM_Meta::flush_cache();
 		$resp = array(
 			'message'        => __( 'Form added successfully', 'woocommerce-product-addon' ),
 			'status'         => 'success',
@@ -566,6 +567,7 @@ function ppom_admin_update_form_meta() {
 	$resp = array();
 	if ( $rows_effected ) {
 
+		PPOM_Meta::flush_cache();
 		$resp = array(
 			'message'        => __( 'Form updated successfully', 'woocommerce-product-addon' ),
 			'status'         => 'success',
@@ -614,6 +616,8 @@ function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 
 	// $wpdb->show_errors(); $wpdb->print_error();
 
+	PPOM_Meta::flush_cache();
+
 	if ( $rows_effected ) {
 
 		return true;
@@ -651,6 +655,7 @@ function ppom_admin_delete_meta() {
 
 	$response = [];
 	if ( $res ) {
+		PPOM_Meta::flush_cache();
 		$response = array(
 			'status'  => 'success',
 			'message' => __( 'Meta deleted successfully', 'woocommerce-product-addon' ),
@@ -704,6 +709,7 @@ function ppom_admin_delete_selected_meta() {
 	$res = $wpdb->query( $wpdb->prepare( "DELETE FROM {$tbl_name} WHERE productmeta_id IN ({$del_ids_ph})", $del_ids ) );
 
 	if ( $res ) {
+		PPOM_Meta::flush_cache();
 		_e( 'Meta deleted successfully', 'woocommerce-product-addon' );
 	} else {
 		$wpdb->show_errors();
