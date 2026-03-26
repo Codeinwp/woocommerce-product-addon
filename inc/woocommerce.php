@@ -302,6 +302,8 @@ function ppom_woocommerce_add_cart_item_data( $cart, $product_id ) {
 	// PPOM also saving cropped images under this filter.
 	$ppom_posted_fields = apply_filters( 'ppom_add_cart_item_data', $_POST['ppom'], $_POST );
 	$cart['ppom']       = $ppom_posted_fields;
+	// var_dump($cart);
+	// exit;
 
 	return $cart;
 }
@@ -665,6 +667,10 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 
 		if ( ! empty( $meta_name ) ) {
 
+			if ( ! is_scalar( $meta_value ) ) {
+				$meta_value = wp_json_encode( $meta_value );
+			}
+
 			if ( apply_filters( 'ppom_show_option_price_cart', false ) && isset( $meta['price'] ) ) {
 				$meta_value .= ' (' . wc_price( $meta['price'] ) . ')';
 			}
@@ -676,7 +682,7 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 
 			$item_meta[] = array(
 				'name'    => wp_strip_all_tags( $meta_key ),
-				'value'   => ppom_get_image_name( $meta_value ),
+				'value'   => $meta_value,
 				'hidden'  => $hidden,
 				'display' => $display,
 			);
@@ -689,6 +695,7 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 			);
 		}
 	}
+	// var_dump($item_meta);
 
 	return $item_meta;
 }
