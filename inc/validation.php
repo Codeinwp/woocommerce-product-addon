@@ -140,6 +140,7 @@ function ppom_validation_product_limits( $data, $product ) {
 		} else {
 			$data['min_value'] = $limits['min_qty'];
 		}
+		$data['input_value'] = $data['min_value'];
 	}
 
 	// Max qty
