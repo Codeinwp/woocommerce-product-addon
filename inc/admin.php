@@ -616,10 +616,8 @@ function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 
 	// $wpdb->show_errors(); $wpdb->print_error();
 
-	PPOM_Meta::flush_cache();
-
 	if ( $rows_effected ) {
-
+		PPOM_Meta::flush_cache();
 		return true;
 	} else {
 		return false;

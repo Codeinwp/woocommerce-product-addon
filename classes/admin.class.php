@@ -686,7 +686,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			$data_to_update['productmeta_tags'] = serialize( $tags );
 		}
 
-		$wpdb->update(
+		$row_affected = $wpdb->update(
 			$ppom_table,
 			$data_to_update,
 			array( 'productmeta_id' => $ppom_id ), // Where clause
@@ -694,7 +694,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			array( '%d' )  // Where format
 		);
 
-		PPOM_Meta::flush_cache();
+		if ( $row_affected ) {
+			PPOM_Meta::flush_cache();
+		}
 	}
 
 	/*

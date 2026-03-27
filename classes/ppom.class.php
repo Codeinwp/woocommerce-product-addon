@@ -288,9 +288,9 @@ class PPOM_Meta {
 		$meta_settings = wp_cache_get( $cache_key, 'ppom_meta' );
 
 		if ( false === $meta_settings ) {
-			$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id IN($meta_id)";
-			$meta_settings = $wpdb->get_results( $qry );
-			wp_cache_set( $cache_key, $meta_settings, 'ppom_meta' );
+			$table         = $wpdb->prefix . PPOM_TABLE_META;
+			$meta_settings = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table WHERE productmeta_id IN($meta_id)" ) );
+			wp_cache_set( $cache_key, $meta_settings, 'ppom_meta', DAY_IN_SECONDS );
 		}
 
 		$filter_meta   = array_filter(
@@ -323,13 +323,14 @@ class PPOM_Meta {
 		if ( $this->has_multiple_meta() ) {
 
 			foreach ( $this->meta_id as $meta_id ) {
+				$meta_id   = absint( trim( $meta_id ) );
 				$cache_key = 'ppom_fields_' . $meta_id . '_' . self::get_cache_version();
 				$fields    = wp_cache_get( $cache_key, 'ppom_meta' );
 
 				if ( false === $fields ) {
-					$qry    = 'SELECT the_meta FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
-					$fields = $wpdb->get_var( $qry );
-					wp_cache_set( $cache_key, $fields, 'ppom_meta' );
+					$table  = $wpdb->prefix . PPOM_TABLE_META;
+					$fields = $wpdb->get_var( $wpdb->prepare( "SELECT the_meta FROM $table WHERE productmeta_id = %d", $meta_id ) );
+					wp_cache_set( $cache_key, $fields, 'ppom_meta', DAY_IN_SECONDS );
 				}
 
 				if ( ! is_string( $fields ) || empty( $fields ) ) {
@@ -348,11 +349,11 @@ class PPOM_Meta {
 			$fields      = wp_cache_get( $cache_key, 'ppom_meta' );
 
 			if ( false === $fields ) {
-				$qry    = 'SELECT the_meta FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
-				$fields = $wpdb->get_var( $qry );
-				wp_cache_set( $cache_key, $fields, 'ppom_meta' );
+				$table  = $wpdb->prefix . PPOM_TABLE_META;
+				$fields = $wpdb->get_var( $wpdb->prepare( "SELECT the_meta FROM $table WHERE productmeta_id = %d", $meta_id ) );
+				wp_cache_set( $cache_key, $fields, 'ppom_meta', DAY_IN_SECONDS );
 			}
-			
+
 			$meta_fields = json_decode( $fields, true );
 		}
 
@@ -378,13 +379,14 @@ class PPOM_Meta {
 		$ppom_ids = explode( ',', $ppom_id );
 		foreach ( $ppom_ids as $meta_id ) {
 
+			$meta_id   = absint( trim( $meta_id ) );
 			$cache_key = 'ppom_fields_' . $meta_id . '_' . self::get_cache_version();
 			$fields    = wp_cache_get( $cache_key, 'ppom_meta' );
 
 			if ( false === $fields ) {
 				$table  = $wpdb->prefix . PPOM_TABLE_META;
 				$fields = $wpdb->get_var( $wpdb->prepare( "SELECT the_meta FROM $table WHERE productmeta_id = %d", $meta_id ) );
-				wp_cache_set( $cache_key, $fields, 'ppom_meta' );
+				wp_cache_set( $cache_key, $fields, 'ppom_meta', DAY_IN_SECONDS );
 			}
 			$fields = json_decode( $fields, true );
 			if ( is_array( $fields ) ) {
@@ -456,7 +458,7 @@ class PPOM_Meta {
 			$qry = "SELECT productmeta_id, productmeta_categories, productmeta_tags FROM {$ppom_table} WHERE productmeta_categories != '' OR productmeta_tags != ''";
 
 			$results = $wpdb->get_results( $qry );
-			wp_cache_set( $cache_key, $results, 'ppom_meta' );
+			wp_cache_set( $cache_key, $results, 'ppom_meta', DAY_IN_SECONDS );
 		}
 
 		return $results;
@@ -624,13 +626,14 @@ class PPOM_Meta {
 
 		global $wpdb;
 
+		$meta_id       = absint( trim( $meta_id ) );
 		$cache_key     = 'ppom_settings_row_' . $meta_id . '_' . self::get_cache_version();
 		$meta_settings = wp_cache_get( $cache_key, 'ppom_meta' );
 
 		if ( false === $meta_settings ) {
 			$table         = $wpdb->prefix . PPOM_TABLE_META;
 			$meta_settings = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE productmeta_id = %d", $meta_id ) );
-			wp_cache_set( $cache_key, $meta_settings, 'ppom_meta' );
+			wp_cache_set( $cache_key, $meta_settings, 'ppom_meta', DAY_IN_SECONDS );
 		}
 
 		$meta_settings = empty( $meta_settings ) ? null : $meta_settings;
