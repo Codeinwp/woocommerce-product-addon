@@ -29,7 +29,7 @@ npm run test:unit:php                # Run PHPUnit tests
 # Run a single PHPUnit test file
 wp-env run --env-cwd='wp-content/plugins/woocommerce-product-addon' tests-wordpress vendor/bin/phpunit -c phpunit.xml --filter TestClassName
 
-# E2E tests (Playwright, Chromium only)
+# E2E tests (Playwright, Chromium only) that runs on docker.
 npm run test:e2e
 npm run test:e2e:debug               # Opens Playwright UI
 
@@ -38,13 +38,22 @@ composer run phpstan                  # PHPStan level 6
 composer run phpstan:generate:baseline
 ```
 
+You can also use `agent-browser` CLI if available with WP Docker environments for a more interactive testing experience, with credentials:
+
+```
+Username: admin
+Password: password
+```
+
 ## Code Quality
 
 - **PHP standard**: Themeisle ruleset (WordPress-based) via `phpcs.xml`. Text domain: `woocommerce-product-addon`.
-- **PHPStan**: Level 6 with a large baseline file (`phpstan-baseline.neon`). Scans `inc/`, `classes/`, `backend/`, `templates/`, and the main plugin file.
-- **Min PHP**: 7.2 (composer platform config). CI runs PHPStan on PHP 7.4.
+- **PHPStan**: Level 8 with a large baseline file (`phpstan-baseline.neon`). Scans `inc/`, `classes/`, `backend/`, `templates/`, and the main plugin file.
+- **Min PHP**: 7.4
 
 ## Architecture
+
+You can read more about it on `./ARCHITECTURE.md`, but here’s a high-level overview of the main components and their relationships.
 
 ### Entry Point & Bootstrap
 
@@ -116,14 +125,49 @@ Declares WooCommerce Custom Order Tables compatibility via `FeaturesUtil::declar
 
 ## WooCommerce Security + Workflow
 
-- Treat all input as untrusted (POST/AJAX/cart session/order meta).
-- For state-changing actions, require both capability checks and nonce verification.
-- Never trust frontend option pricing; recompute server-side in cart/checkout.
-- Validate product/variation context with Woo objects before processing.
-- Sanitize on input (type-aware) and escape on output (context-aware).
-- Use `$wpdb->prepare()` (plus `$wpdb->esc_like()` for LIKE queries); never concatenate user input.
-- For uploads, enforce extension/mime/size rules and block executable files.
-- Prefer WooCommerce CRUD/order APIs (HPOS-safe) over direct post/meta SQL.
-- Keep pricing hooks idempotent, especially in `woocommerce_before_calculate_totals`.
+### Trust Boundaries
+
+- Treat product page fields, AJAX/REST payloads, cart item data, restored sessions, order item meta, and admin imports/settings as untrusted input.
+- Never trust browser-sent prices, fee amounts, labels, field IDs, variation IDs, conditional flags, upload metadata, or Pro gating flags. Recompute from saved PPOM/WooCommerce configuration on the server.
+- Validate submitted field names/options against the field schema attached to the current product/meta group before storing or pricing anything.
+- Resolve product and variation IDs to real WooCommerce objects and confirm the variation belongs to the parent product before processing.
+
+### Authorization + Request Integrity
+
+- For every state-changing admin, AJAX, or REST action, require both a capability check and nonce verification. For REST routes, always implement a strict `permission_callback`.
+- Never use `is_admin()` as an authorization check.
+- Scope privileged actions to the narrowest capability that fits the action: field-group CRUD, settings changes, file deletion, import/export, license actions, and diagnostic tools should not share a blanket permission model.
+
+### Data Handling Rules
+
+- Sanitize on input with type-appropriate functions, validate against business rules, and escape on output with the correct context-aware `esc_*()` function.
+- Use `$wpdb->prepare()` for every query containing dynamic input, and pair `LIKE` clauses with `$wpdb->esc_like()`. Never concatenate request data into SQL.
+- Prefer WooCommerce CRUD APIs and order/item meta APIs over direct post/meta SQL so behavior stays HPOS-safe.
+- Do not persist raw `$_POST` or `$_REQUEST` payloads into cart item data, session data, or order meta. Store only the normalized values the plugin actually needs.
+- Do not expose addon values, upload URLs, or order item metadata in logs, notices, REST responses, emails, or templates unless the current user/context is explicitly allowed to see them.
+
+### Pricing + Cart Integrity
+
+- Keep all pricing logic server-authoritative and idempotent. Hooks like `woocommerce_before_calculate_totals` may run multiple times per request.
+- Recalculate addon totals from canonical field definitions during validation, cart restore, and checkout instead of trusting values carried forward from the browser or session.
+- Guard against double-charging when cart items are restored from session, when quantities change, or when multiple pricing hooks run in sequence.
+- When pricing depends on product type, variation, quantity, tax mode, currency, or coupon state, use current WooCommerce objects/state at calculation time instead of stale cart snapshots.
+
+### Upload Safety
+
+- Enforce an allowlist for extensions, MIME types, and size limits; reject executable/scriptable files, double extensions, and unexpected archive types.
+- Generate filenames and paths server-side, keep uploads inside the dedicated PPOM upload directory, and never trust client-provided path, MIME, or filename values.
+- Re-check authorization and attachment ownership before serving, deleting, or attaching uploaded files to cart/order data.
+
+### WooCommerce Lifecycle
+
 - Preferred option lifecycle hooks: `woocommerce_add_to_cart_validation` -> `woocommerce_add_cart_item_data` -> `woocommerce_get_cart_item_from_session` -> `woocommerce_get_item_data` -> `woocommerce_checkout_create_order_line_item`.
-- Minimum regression checks per addon: simple/variable products, guest/logged-in checkout, tax modes, coupons/sales, session restore, and (if enabled) multi-currency/multi-language.
+- Validate as early as possible, normalize before storing in cart data, and only persist to order items after the cart payload has been revalidated.
+- Treat session restore, reorder, and edit-cart flows as fresh untrusted input, not trusted historical state.
+
+### Minimum Regression Checks
+
+- Per addon/security-sensitive change, cover simple and variable products, guest and logged-in checkout, tax modes, coupons/sales, quantity changes, and session restore.
+- If uploads are involved, test invalid MIME/extension cases, oversized files, duplicate filenames, and cleanup paths.
+- If REST, AJAX, or admin writes are involved, explicitly test success, nonce failure, and capability failure paths.
+- If enabled in the target store, also verify multi-currency, multi-language, and HPOS behavior.

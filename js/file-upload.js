@@ -1,8 +1,36 @@
 /**
- * file upload js
- * @since 8.4
+ * File and cropper workflow for PPOM frontend fields.
+ *
+ * Each file/cropper field gets a dedicated Plupload instance. This script owns
+ * the upload UI, preview/croppie state, and the hidden inputs that eventually
+ * travel through add-to-cart, cart restore, and order meta persistence.
+ *
+ * @see ppom_get_field_meta_by_id in js/ppom.inputs.js
+ * @see ppom_update_option_prices in js/price/ppom-price.js
+ * @see ppom_generate_cropper_data_for_cart
+ */
+
+/**
+ * Minimal localized metadata used by the upload/cropper bootstrap.
+ *
+ * @typedef {{
+ *   data_name: string,
+ *   type: 'file'|'cropper',
+ *   file_size: string,
+ *   files_allowed: string,
+ *   file_types: string,
+ *   title?: string,
+ *   required?: string,
+ *   file_cost?: string,
+ *   onetime?: string,
+ *   max_img_w?: string,
+ *   min_img_w?: string,
+ *   max_img_h?: string,
+ *   min_img_h?: string
+ * }} PPOMUploadFieldMeta
  */
 let isCartBlock = false;
+// Runtime registries keyed by PPOM field data_name.
 const plupload_instances = Array();
 const field_file_count = Array();
 const file_list_preview_containers = Array();
@@ -12,6 +40,8 @@ const uploaderInstances = {};
 const Cropped_Data_Captured = false;
 
 jQuery( function ( $ ) {
+	// Keep cropper previews, price recalculation, and modal placement aligned
+	// with the rest of the PPOM product form lifecycle.
 	// If cropper input found in fields
 	// if (ppom_get_field_meta_by_type('cropper').length > 0) {
 
@@ -216,7 +246,7 @@ jQuery( function ( $ ) {
 	} ); // $.each(ppom_file_vars
 } ); //	jQuery(function($){});
 
-// generate thumbbox
+// Build the temporary thumbnail shell shown while a file is uploading.
 function add_thumb_box( file, $filelist_DIV ) {
 	let inner_html =
 		'<div class="u_i_c_thumb"><div class="progress_bar"><span class="progress_bar_runner"></span><span class="progress_bar_number">(' +
@@ -268,7 +298,8 @@ function save_edited_photo( img_id, photo_url ) {
 	} );
 }
 
-// Cropping image with Croppie
+// Once an upload finishes, create the Croppie preview that feeds the hidden
+// cropped-image payload later submitted with the add-to-cart request.
 function ppom_show_cropped_preview( file_name, image_url, image_id ) {
 	const cropp_preview_container = jQuery(
 		'.ppom-croppie-wrapper-' + file_name
@@ -352,7 +383,13 @@ function ppom_reset_cropping_preview( file_name ) {
 	cropp_preview_container.find( '.ppom-croppie-preview' ).html( '' );
 }
 
-// Attach FILE API with DOM
+/**
+ * Attach one Plupload instance per PPOM file/cropper field and keep the
+ * resulting hidden checkbox inputs compatible with the price/validation stack.
+ *
+ * @param {PPOMUploadFieldMeta} file_input
+ * @return {void}
+ */
 function ppom_setup_file_upload_input( file_input ) {
 	const file_data_name = file_input.data_name;
 	if ( plupload_instances[ file_data_name ] !== undefined ) {
@@ -778,7 +815,8 @@ function ppom_setup_file_upload_input( file_input ) {
 	uploaderInstances[ file_data_name ] = plupload_instances[ file_data_name ];
 }
 
-// Generate Cropped image data for cart
+// Persist the Croppie canvas output into hidden inputs so PHP can rebuild the
+// edited image from the same request payload used for normal uploaded files.
 function ppom_generate_cropper_data_for_cart( field_name ) {
 	const cropp_preview_container = jQuery(
 		'.ppom-croppie-wrapper-' + field_name

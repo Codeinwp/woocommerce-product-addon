@@ -1,15 +1,46 @@
 /**
- * PPOM input scripts
+ * Frontend field bootstrapper for PPOM inputs.
+ *
+ * PHP localizes each field definition into `ppom_input_vars.ppom_inputs`; this
+ * file hydrates those definitions into live widgets on the product page. It is
+ * the bridge between rendered markup and the other frontend subsystems such as
+ * pricing, conditional logic, and file uploads.
+ *
+ * @see ppom_update_option_prices in js/price/ppom-price.js
+ * @see ppom_update_option_prices in js/price/ppom-price-v2.js
+ * @see ppom_check_conditions in js/ppom-conditions-v2.js
+ * @see ppom_setup_file_upload_input in js/file-upload.js
+ */
+
+/**
+ * Minimal shape of a localized PPOM field as consumed by the frontend scripts.
+ *
+ * PHP sends richer metadata, but these are the keys repeatedly used across the
+ * field bootstrapper, price engines, and condition/upload helpers.
+ *
+ * @typedef {{
+ *   data_name: string,
+ *   type: string,
+ *   title?: string,
+ *   field_type?: string,
+ *   input_mask?: string,
+ *   discount_type?: string,
+ *   options?: Array<Object> | string,
+ *   images?: Array<Object>,
+ *   audio?: Array<Object>
+ * }} PPOMLocalizedFieldMeta
  */
 
 'use strict';
 
 /* global ppom_input_vars */
 
+// Runtime caches shared by bulk quantity and price-matrix widgets.
 const ppom_bulkquantity_meta = [];
 let ppom_pricematrix_discount_type = '';
 
 jQuery( function ( $ ) {
+	// Boot the product-form behaviors once WooCommerce and PPOM markup exist.
 	// Tooltip Init
 	// $('.ppom-tooltip').powerTip({
 	//     placement: 'n',
@@ -61,7 +92,12 @@ jQuery( function ( $ ) {
 	ppom_init_js_for_ppom_fields( ppom_input_vars.ppom_inputs );
 } );
 
-// JS Init PPOM Inputs
+/**
+ * Hydrate each localized field definition with the JS behavior its type needs.
+ *
+ * @param {PPOMLocalizedFieldMeta[]} ppom_fields
+ * @return {void}
+ */
 function ppom_init_js_for_ppom_fields( ppom_fields ) {
 	if ( ppom_input_vars.sp_force_display_block === 'on' ) {
 		// Fixed the form button issue
@@ -445,6 +481,12 @@ function ppom_get_palette_setting( input ) {
 	return palettes_setting;
 }
 
+/**
+ * Shared field lookup used by pricing, conditions, and file upload helpers.
+ *
+ * @param {string} field_id
+ * @return {string}
+ */
 function ppom_get_field_type_by_id( field_id ) {
 	let field_type = '';
 	jQuery.each( ppom_input_vars.ppom_inputs, function ( i, field ) {
@@ -456,7 +498,12 @@ function ppom_get_field_type_by_id( field_id ) {
 	return field_type;
 }
 
-// Get all field meta by id
+/**
+ * Return the full localized field definition for a given data_name.
+ *
+ * @param {string} field_id
+ * @return {PPOMLocalizedFieldMeta|string}
+ */
 function ppom_get_field_meta_by_id( field_id ) {
 	let field_meta = '';
 	jQuery.each( ppom_input_vars.ppom_inputs, function ( i, field ) {
@@ -468,6 +515,12 @@ function ppom_get_field_meta_by_id( field_id ) {
 	return field_meta;
 }
 
+/**
+ * Some flows need all fields of a given type, for example cropper/file setup.
+ *
+ * @param {string} type
+ * @return {PPOMLocalizedFieldMeta[]}
+ */
 function ppom_get_field_meta_by_type( type ) {
 	const field_meta = Array();
 	jQuery.each( ppom_input_vars.ppom_inputs, function ( i, field ) {
@@ -479,6 +532,7 @@ function ppom_get_field_meta_by_type( type ) {
 	return field_meta;
 }
 
+// Keep the range and number UIs for bulkquantity in sync before recalculating.
 function ppom_bq_qty_changed( qty, data_name, context ) {
 	if ( context === 'range' ) {
 		// update the quantity too.
@@ -491,6 +545,8 @@ function ppom_bq_qty_changed( qty, data_name, context ) {
 	ppom_bulkquantity_price_manager( qty, data_name );
 }
 
+// Resolve the active bulkquantity row into price/base-price attributes expected
+// by the legacy and modern price preview engines.
 function ppom_bulkquantity_price_manager( quantity, data_name ) {
 	let ppom_base_price = 0;
 	jQuery.each(

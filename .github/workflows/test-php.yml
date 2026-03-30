@@ -46,3 +46,19 @@ jobs:
           composer install --no-progress
       - name: Run phpstan
         run: composer run phpstan
+  phpcs:
+    name: PHPCS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup PHP version
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          extensions: simplexml
+      - name: Checkout source code
+        uses: actions/checkout@master
+      - name: Install composer
+        run: |
+          composer install --no-progress
+      - name: Run linter for PHP
+        run: composer run lint

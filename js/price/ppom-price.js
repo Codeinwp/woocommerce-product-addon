@@ -1,3 +1,11 @@
+/**
+ * Legacy PPOM price preview engine.
+ *
+ * Older templates render pricing hints directly as data attributes on DOM
+ * inputs. This file scans those inputs, builds the hidden `ppom_option_price`
+ * payload consumed later in WooCommerce/cart hooks, and renders the visible
+ * price summary for legacy mode.
+ */
 'use strict';
 
 const PPOMWrapper = jQuery( 'body.woocommerce, body.woocommerce-js' );
@@ -8,6 +16,7 @@ const wc_product_qty = jQuery( 'form.cart' ).find( 'input[name="quantity"]' );
 let ppom_product_base_price = ppom_input_vars.wc_product_price;
 
 jQuery( function ( $ ) {
+	// Rebuild the preview immediately so defaults and preselected values show up.
 	ppom_update_option_prices();
 
 	// If quantity is changing with some -/+ elements
@@ -143,6 +152,8 @@ jQuery( function ( $ ) {
 	} );
 } );
 
+// Main legacy rebuild pass: normalize selections, refresh hidden payloads, and
+// redraw the price table exactly as the PHP cart hooks expect to receive them.
 function ppom_update_option_prices() {
 	if ( ppom_input_vars.show_option_price == 'hide' ) {
 		jQuery( '#ppom-price-container' ).hide();
@@ -710,7 +721,7 @@ function ppom_calculate_totals(
 	return totals;
 }
 
-// Adding TDs item in price container
+// Render a single row in the legacy price table and emit the historic hook.
 function ppom_add_price_item_in_table(
 	label,
 	price,
@@ -825,6 +836,8 @@ function ppom_get_wc_price( price, is_discount ) {
 	return wcPriceWithCurrency;
 }
 
+// Scan every rendered PPOM input and normalize the chosen values into the
+// `ppom_option_price` shape that frontend previews and PHP cart logic share.
 function ppom_update_get_prices() {
 	const options_price_added = [];
 
@@ -1260,7 +1273,8 @@ function ppom_set_order_quantity( qty ) {
 	jQuery( 'form.cart' ).find( 'input[name="quantity"]' ).val( qty );
 }
 
-// Deleting option from price table
+// The summary table can also remove selections, so mirror that back into the
+// original form control and let the regular change listeners recompute prices.
 function ppom_delete_option_from_price_table( field_name, option_id ) {
 	const field_type = ppom_get_field_type_by_id( field_name );
 
@@ -1292,7 +1306,8 @@ function ppom_delete_option_from_price_table( field_name, option_id ) {
 	);
 }
 
-// Update variation quantity price if baseprice is set = yes
+// Variation-quantity rows can derive their unit price from the selected base
+// WooCommerce variation, so this refresh runs whenever variation prices change.
 function ppom_update_variation_quatity( price ) {
 	jQuery( 'input.ppom-quantity' ).each( function ( i, q ) {
 		if ( jQuery( q ).attr( 'data-usebase_price' ) == 'yes' ) {
@@ -1349,6 +1364,7 @@ function ppom_build_input_price_meta( field_dataname ) {
     option_price.apply          = checked_option_apply;*/
 }
 
+// Quantity-type fields can disable add to cart until their aggregate rules pass.
 function ppom_quantities_min_max( dataname ) {
 	const ppomInputWrapper = jQuery( '.ppom-input-' + dataname );
 	let list = jQuery( '.ppom-quantity', ppomInputWrapper );

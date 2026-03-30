@@ -1,10 +1,39 @@
 /**
-  import $ from "jquery";
+ * Modern PPOM price preview engine.
+ *
+ * This script converts localized field metadata plus the current DOM state into
+ * normalized price objects and rebuilds the live price table shown on the
+ * product form. Cart and checkout totals are still recalculated server-side;
+ * this layer exists to keep the storefront preview in sync.
+ *
+ * @see js/price/ppom-price.js
+ * @see ppom_init_js_for_ppom_fields in js/ppom.inputs.js
  */
 const $ = jQuery;
 
 /**
-  NMedia Helper Object
+ * Minimal field metadata used by the modern price engine.
+ *
+ * @typedef {{
+ *   data_name: string,
+ *   type: string,
+ *   title?: string,
+ *   price?: string,
+ *   file_cost?: string,
+ *   onetime?: string,
+ *   default_price?: string,
+ *   discount?: string,
+ *   options?: Array<Object>,
+ *   images?: Array<Object>,
+ *   audio?: Array<Object>
+ * }} PPOMPriceFieldMeta
+ */
+
+/**
+ * Shared helpers for formatting, quantity lookups, and field metadata access.
+ *
+ * This object keeps the newer class-based price engine compatible with the
+ * rest of the older PPOM frontend code that still calls global helpers.
  */
 const nmh = {
 	show_console: true,
@@ -99,7 +128,7 @@ const nmh = {
 };
 
 /**
-  DOM Manipulation
+ * Small DOM adapter used to normalize how the price engine reads field values.
  */
 const ppom_input = {
 	dom: {},
@@ -133,9 +162,17 @@ const ppom_input = {
 };
 
 /**
-  Build OptionPrice Class
+ * Canonical client-side representation of a priced PPOM field selection.
+ *
+ * Specialized field types inherit from this class so the price table can treat
+ * them uniformly regardless of whether the source was a checkbox, upload,
+ * quantity row, or price matrix.
  */
 class PPOM_Price_Class {
+	/**
+	 * @param {PPOMPriceFieldMeta} field
+	 * @param {string} value
+	 */
 	constructor( field, value ) {
 		this.field = field;
 
@@ -269,7 +306,10 @@ class PPOM_Price_Class {
 }
 
 /**
-  Render price table
+ * Renders the live option-price table that sits under the product form.
+ *
+ * The renderer is intentionally presentation-focused; price discovery happens
+ * in `ppomPrice`, then this object decides how to display the resulting rows.
  */
 const PPOM_Price_Table = {
 	price_container: $( '#ppom-price-container' ),
@@ -457,10 +497,15 @@ const PPOM_Price_Table = {
 };
 
 /**
-  Fields Price Handler Object
+ * Collects the active field selections and turns them into priced objects.
+ *
+ * Every relevant change event funnels back here so the price preview, hidden
+ * WooCommerce payload, and extension hooks stay consistent.
  */
 const ppomPrice = {
+	/** @type {PPOMPriceFieldMeta[]} */
 	meta: [],
+	/** @type {PPOM_Price_Class[]} */
 	field_prices: [],
 	ppom_type: '', //ppom input type
 
@@ -555,9 +600,7 @@ const ppomPrice = {
 	},
 };
 
-/*
- **========== PriceMatrix Input Prices Handle  ===========
- */
+// Specializes the generic price object for range-based price matrix rules.
 class PPOM_PriceMatrix_Class extends PPOM_Price_Class {
 	constructor( field, value ) {
 		super( field, value );
@@ -618,7 +661,7 @@ function ppom_get_price_pricematrix( price_obj, field_meta, value ) {
 	return field_price;
 }
 
-// For Variation Quantity
+// Specializes the generic price object for quantity rows that carry unit prices.
 class PPOM_variationQuantity_Class extends PPOM_Price_Class {
 	constructor( field, value ) {
 		super( field, value );
@@ -659,11 +702,7 @@ function ppom_get_price_quantities( price_obj, field_meta, value ) {
 	return field_price;
 }
 
-/*
- **========== PPOM Price INITs  ===========
- * 1- Run PPOM Price Init
- * 2- Event Listeners
- */
+// Keep the modern engine wired into the legacy event-driven PPOM frontend.
 ppomPrice.load_data();
 
 const ppom_event_handler = ( selector ) => {
@@ -676,7 +715,7 @@ const ppom_event_handler = ( selector ) => {
 ppom_event_handler( nmh.input_selector );
 ppom_event_handler( nmh.dom_product_qty );
 
-// Legacy price init function
+// Preserve the legacy global API because several other scripts still call it.
 function ppom_update_option_prices() {
 	ppomPrice.init();
 }

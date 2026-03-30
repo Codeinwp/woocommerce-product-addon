@@ -1,11 +1,19 @@
 /*
- * jQuery Simple Popup Window Plugin 1.0
+ * PPOM frontend popup bridge.
+ *
+ * This wraps a lightweight popup pattern used by some frontend field flows and
+ * also bootstraps Tooltipster-based help tooltips when tooltip settings were
+ * localized for the current product form.
+ *
+ * @see ppom_setup_file_upload_input in js/file-upload.js
+ * @see imageTooltip in js/image-tooltip.js
  */
 
 'use strict';
 
 ( function ( $ ) {
-	// Tooltip Init.
+	// Tooltipster settings are localized from PHP per product/form instance so
+	// the same script can respect store-specific trigger, width, and color rules.
 	const tooltipConfig =
 		'undefined' !== typeof ppom_tooltip_vars ? ppom_tooltip_vars : {};
 	const tooltip_position = tooltipConfig.ppom_tooltip_position;
@@ -53,6 +61,8 @@
 			tap: true,
 		};
 	}
+	// Tooltips are optional because some forms load this popup bridge only for
+	// modal behavior, while others use it to initialize tooltip-enabled inputs.
 	if ( $( '[data-ppom-tooltip~=ppom_tooltip]' ).length > 0 ) {
 		$( '[data-ppom-tooltip~=ppom_tooltip]' ).ppom_tooltipster?.(
 			tooltip_options
@@ -63,6 +73,8 @@
 	const pluginName = 'megapopup';
 	const prefix = 'ppom-popup';
 
+	// File-upload browse buttons need a refresh after hidden containers become
+	// visible inside a popup, otherwise Plupload can calculate stale positions.
 	function pluploadRefresh() {
 		if ( typeof uploaderInstances !== 'object' ) {
 			return;
@@ -82,12 +94,16 @@
 		e.preventDefault();
 		const popup_id = $( this ).attr( 'data-model-id' );
 
+		// Frontend templates point at modal containers with `data-model-id`.
+		// Opening through the plugin keeps overlay handling and file-upload
+		// refresh logic in one place.
 		$( '#' + popup_id ).megapopup( $( this ).data() );
 
 		pluploadRefresh();
 	} );
 
-	// Init Plugin
+	// jQuery plugin wrapper used by PPOM frontend templates that render inline
+	// modal markup and want a consistent open/close contract.
 	$.fn[ pluginName ] = function ( options ) {
 		const defaults = {
 			backgroundclickevent: true,
@@ -110,7 +126,8 @@
 				).appendTo( 'body' );
 			}
 
-			// open popup
+			// Opening only toggles classes/visibility; the popup contents are
+			// already rendered by PHP and may include live PPOM inputs/widgets.
 			modal.bind( prefix + ':open', function () {
 				$( 'body' ).addClass( options.bodycontroller );
 				modal.css( { display: 'block' } );
@@ -124,7 +141,8 @@
 				);
 			} );
 
-			// close popup
+			// Closing keeps the modal in the DOM so reopening does not discard
+			// field state entered inside the popup-backed PPOM form controls.
 			modal.bind( prefix + ':close', function () {
 				$( 'body' ).removeClass( options.bodycontroller );
 				modalBG.fadeOut();

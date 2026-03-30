@@ -1,28 +1,35 @@
 'use strict';
+
+/**
+ * Admin editor for the bulkquantity field type.
+ *
+ * The table built here is serialized into JSON and stored in the field meta.
+ * Frontend scripts later read that JSON to map entered quantities to the
+ * matching price/base-price row on the product page.
+ *
+ * @see ppom_bulkquantity_price_manager in js/ppom.inputs.js
+ */
+
+/**
+ * Row shape produced by `tableToJSON()` for a bulkquantity matrix.
+ *
+ * The first two headers are expected to remain "Quantity Range" and
+ * "Base Price"; any additional headers represent variation labels whose cell
+ * values become the unit prices for that range.
+ *
+ * @typedef {{
+ *   'Quantity Range': string,
+ *   'Base Price'?: string
+ * }} PPOMBulkQuantityRow
+ */
 jQuery( function ( $ ) {
-	/*********************************
-	 *   PPOM Bulk Quantity Addon JS  *
-	 **********************************/
-
-	/*-------------------------------------------------------
-        
-        ------ Its Include Following Function -----
-
-        1- Body Selector
-        2- Add New Quantity Row
-        3- Remove Quantity Row
-        4- Remove Variation Colunm
-        5- Add Bulk Variation Colunm
-        6- Save Bulk Quantity Meta
-        7- Edit Bulk Quantity Meta
-    --------------------------------------------------------*/
-
-	/**
-	  1- Body Selector
-	 */
 	const body = $( 'body' );
 
+	// Encapsulates the table editor so add/edit flows reuse the same validation
+	// and input-mask setup before the hidden JSON payload is updated.
 	const ppomBQ = {
+		// Range inputs are kept as strings like `1-10` because `tableToJSON()`
+		// later serializes visible table cells, not hidden numeric inputs.
 		setMaskRangeInput() {
 			$( '.ppom-bulk-qty-val-picker,.ppom-bulk-qty-val' ).each(
 				( i, el ) => {
@@ -36,6 +43,16 @@ jQuery( function ( $ ) {
 				}
 			);
 		},
+		/**
+		 * Validate the matrix before it is persisted into the hidden JSON field.
+		 *
+		 * The frontend price resolver assumes ranges are non-overlapping and
+		 * ordered as `start-end`; allowing bad data here would make product-page
+		 * price lookups ambiguous.
+		 *
+		 * @param {PPOMBulkQuantityRow[]} formData
+		 * @return {boolean}
+		 */
 		formValidation( formData ) {
 			const pattern = new RegExp( '^([0-9]+)-([0-9]+)$' );
 			const notification = ( msgSlug, magicValues ) => {
@@ -97,6 +114,16 @@ jQuery( function ( $ ) {
 
 			return true;
 		},
+		/**
+		 * Turn the read-only preview table back into an editable grid.
+		 *
+		 * The saved state is rendered as plain table text for compactness inside
+		 * the builder. Editing reverses that presentation step by replacing each
+		 * cell with an input and restoring the row-removal affordance.
+		 *
+		 * @param {JQuery<HTMLElement>} el
+		 * @return {void}
+		 */
 		showEditForm( el ) {
 			const bulk_wrap = el.closest( '.ppom-bulk-quantity-wrapper' );
 			bulk_wrap
@@ -148,9 +175,6 @@ jQuery( function ( $ ) {
 		}
 	);
 
-	/**
-	  2- Add New Quantity Row 
-	 */
 	body.on( 'click', 'button.ppom-add-bulk-qty-row', function ( e ) {
 		e.preventDefault();
 
@@ -164,6 +188,8 @@ jQuery( function ( $ ) {
 			tbody = table.find( 'tbody' ),
 			thead = table.find( 'thead' );
 
+		// Clone the last visible row so merchants keep the same number of
+		// variation columns while defining the next quantity interval.
 		const clon_qty_section = tbody.find( 'tr:last-child' ).clone();
 		clon_qty_section
 			.find( '.ppom-bulk-qty-val-picker' )
@@ -173,9 +199,6 @@ jQuery( function ( $ ) {
 		ppomBQ.setMaskRangeInput();
 	} );
 
-	/**
-	  3- Remove Quantity Row
-	 */
 	body.on( 'click', 'span.ppom-rm-bulk-qty', function ( e ) {
 		e.preventDefault();
 
@@ -187,9 +210,6 @@ jQuery( function ( $ ) {
 		$( this ).closest( 'tr' ).remove();
 	} );
 
-	/**
-	  4- Remove Variation Colunm
-	 */
 	body.on( 'click', 'span.ppom-rm-bulk-variation', function ( e ) {
 		e.preventDefault();
 
@@ -201,9 +221,6 @@ jQuery( function ( $ ) {
 			.remove();
 	} );
 
-	/**
-	  5- Add Bulk Variation Colunm 
-	 */
 	body.on( 'click', 'button.ppom-add-bulk-variation-col', function ( e ) {
 		e.preventDefault();
 
@@ -218,6 +235,8 @@ jQuery( function ( $ ) {
 			tbody = table.find( 'tbody' );
 		const closest_td = tbody.find( 'td:last-child' );
 
+		// Every added column becomes a new object key when `tableToJSON()`
+		// serializes the matrix, so the header text is the persisted identifier.
 		$( '<th>', {
 			html:
 				' <span class="ppom-bulk-variation-meta"> ' +
@@ -229,9 +248,8 @@ jQuery( function ( $ ) {
 		} ).insertAfter( closest_td );
 	} );
 
-	/**
-	  6- Save Bulk Quantity Meta
-	 */
+	// Convert the editable grid back into the JSON blob later consumed by
+	// `ppom_bulkquantity_price_manager()` on the product page.
 	$( 'body' ).on( 'click', '.ppom-save-bulk-json', function ( event ) {
 		event.preventDefault();
 
@@ -260,9 +278,7 @@ jQuery( function ( $ ) {
 		bulk_wrap.find( '.ppom-edit-bulk-json' ).show();
 	} );
 
-	/**
-	  7- Edit Bulk Quantity Meta 
-	 */
+	// Rehydrate the read-only table into inputs so an existing matrix can be edited.
 	$( 'body' ).on( 'click', '.ppom-edit-bulk-json', function ( event ) {
 		event.preventDefault();
 		ppomBQ.showEditForm( $( this ) );

@@ -1,3 +1,10 @@
+/**
+ * Lightweight hover preview used by PPOM image inputs.
+ *
+ * Product-page image choices can carry a larger image URL in
+ * `data-image-tooltip`; this plugin renders that preview near the cursor
+ * without opening the full media modal flow.
+ */
 ( function ( $ ) {
 	$.fn.imageTooltip = function ( options ) {
 		const defaults = {

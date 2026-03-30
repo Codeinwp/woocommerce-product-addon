@@ -1,11 +1,16 @@
 /**
- * PPOM Fields Conditions
+ * Legacy PPOM conditional-logic engine.
+ *
+ * This version works with the older `ppom_input_vars.conditions` structure.
+ * It still emits the same hidden/shown events so the rest of the frontend and
+ * the hidden `conditionally_hidden` payload remain compatible with PHP.
  */
 'use strict';
 
 const ppom_field_matched_rules = {};
 const ppom_hidden_fields = [];
 jQuery( function ( $ ) {
+	// Legacy mode recalculates all conditions after each relevant field change.
 	$( '.ppom-wrapper' ).on(
 		'change',
 		'select,input:radio,input:checkbox',
@@ -247,6 +252,7 @@ function ppom_set_default_option( field_id ) {
 	}
 }
 
+// Evaluate every configured field condition and toggle the target wrappers.
 function ppom_check_conditions() {
 	jQuery.each( ppom_input_vars.conditions, function ( field, condition ) {
 		// It will return rules array with True or False
@@ -273,6 +279,8 @@ function ppom_check_conditions() {
 	} );
 }
 
+// Showing/hiding a field also needs to broadcast the same lifecycle events
+// used by uploads, pricing, and validation to keep their state consistent.
 function ppom_unlock_field_from_condition( field, unlock ) {
 	const classname = '.ppom-input-' + field;
 	if ( unlock === 'Show' ) {
@@ -330,7 +338,7 @@ function ppom_lock_field_from_condition( field, lock ) {
 	} );
 }
 
-// It will return rules array with True or False
+// Count how many rules match for a target field in the legacy condition format.
 function ppom_get_field_rule_status( condition ) {
 	let ppom_rules_matched = 0;
 	jQuery.each( condition.rules, function ( i, rule ) {
@@ -420,7 +428,7 @@ function ppom_get_field_rule_status( condition ) {
 	return ppom_rules_matched;
 }
 
-// Getting rule element value
+// Normalize legacy field values before comparing them against rule operators.
 function ppom_get_element_value( field_name ) {
 	const element_type = ppom_get_field_type_by_id( field_name );
 	let value_found = '';

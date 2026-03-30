@@ -1,5 +1,8 @@
 /**
- * Getting user response when deactivate plugin
+ * Deactivation survey modal for the plugin list screen.
+ *
+ * The collected reason is optional telemetry; the saved redirect target still
+ * drives the final plugin deactivation link after the modal flow completes.
  */
 'use strict';
 jQuery( function ( $ ) {
@@ -58,6 +61,8 @@ jQuery( function ( $ ) {
 
 	modal.on( 'click', 'button.pipe-model-submit', function ( e ) {
 		e.preventDefault();
+		// Submit the reason asynchronously, then continue to the original
+		// deactivation URL regardless of whether the response body is useful.
 		const button = $( this );
 		if ( button.hasClass( 'disabled' ) ) {
 			return;

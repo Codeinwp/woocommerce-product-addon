@@ -1,9 +1,13 @@
 'use strict';
-jQuery( function ( $ ) {
-	/*******************************************
-	 *  PPOM Fields Desciption Tooltip JS Code  *
-	 ********************************************/
 
+/**
+ * Fallback tooltip renderer for PPOM helper icons.
+ *
+ * Some screens still use this lightweight tooltip instead of Tooltipster. It
+ * reads the native `title` attribute, temporarily moves that content into a
+ * positioned tooltip node, and restores the attribute on teardown.
+ */
+jQuery( function ( $ ) {
 	var target, tooltip, title, tip;
 	var targets = $( '[data-ppom-tooltip~=ppom_tooltip]' ),
 		target = false,

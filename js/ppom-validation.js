@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * AJAX product-form validation before WooCommerce submits add-to-cart.
+ *
+ * The server still owns validation. This script performs a preflight request so
+ * PPOM can show validation notices inline without losing the current form state.
+ */
 jQuery( function ( $ ) {
 	//   console.log('loaded cart');
 
@@ -14,6 +20,8 @@ jQuery( function ( $ ) {
 			return true;
 		}
 
+		// Stop the first native submit, ask PHP to validate the serialized PPOM
+		// payload, then re-trigger add-to-cart only after the response is clean.
 		e.preventDefault();
 
 		// Removing validation div

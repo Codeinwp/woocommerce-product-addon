@@ -2,13 +2,32 @@
 
 /**
  * PPOM Conditional Version 2
- * More Fast and Optimized
- * April, 2020 in LockedDown (CORVID-19)
+ *
+ * This is the current conditional-logic engine used on the product page. PHP
+ * renders rule metadata into `data-cond-*` attributes; this file evaluates
+ * those rules and emits the shared `ppom_field_hidden` / `ppom_field_shown`
+ * events that pricing, uploads, validation, and default restoration rely on.
+ *
+ * @see populate_conditional_elements in js/admin/ppom-admin.js
+ * @see ppom_fields_hidden_conditionally
+ * @see ppom_update_option_prices in js/price/ppom-price.js
  */
 
+/** @type {string[]} */
 let ppom_hidden_fields = [];
 
+/**
+ * @typedef {Object} PPOMConditionCompareArgs
+ * @property {string|string[]|undefined|null} valueToCompare
+ * @property {string|undefined} selectOptionToCompare
+ * @property {string|undefined} constantValueToCompare
+ * @property {{to: string, from: string}} betweenValueInterval
+ * @property {string} operator
+ */
+
 jQuery( function ( $ ) {
+	// Replay the initial field state after the product form has rendered so
+	// defaults, preselected options, and conditionally hidden fields line up.
 	setTimeout( function () {
 		$( 'form.cart' )
 			.find(
@@ -67,6 +86,12 @@ jQuery( function ( $ ) {
 
 	// $('form.cart').on('change', 'select, input[type="radio"], input[type="checkbox"]', function(ev) {
 
+	/**
+	 * Re-evaluate any condition tree that depends on the changed form control.
+	 *
+	 * @param {HTMLInputElement|HTMLSelectElement} modifiedElement
+	 * @return {void}
+	 */
 	function trigger_check_conditions( modifiedElement ) {
 		let value = null;
 		if (
@@ -335,6 +360,9 @@ jQuery( function ( $ ) {
 } );
 
 function ppom_check_conditions( data_name, callback ) {
+	// Each `.ppom-cond-*` node describes one target field and its dependencies.
+	// We evaluate all rules for that target, then notify the rest of the stack
+	// through shared PPOM events instead of mutating unrelated features directly.
 	let is_matched = false;
 	let event_type, element_data_name;
 
@@ -458,6 +486,8 @@ function ppom_get_input_dom_type( data_name ) {
 	return field_obj.closest( '.ppom-field-wrapper' ).data( 'type' );
 }
 
+// Normalize values across PPOM field types so condition operators can stay
+// unaware of the exact DOM structure used by each input renderer.
 function ppom_get_element_value( data_name ) {
 	const ppom_type = ppom_get_input_dom_type( data_name );
 	let element_value = '';
@@ -521,12 +551,8 @@ function ppom_get_element_value( data_name ) {
 /**
  * Compares values based on the provided operator.
  *
- * @param {Object}                     args                        - The arguments object containing comparison parameters.
- * @param {string}                     args.valueToCompare         - The target value to compare.
- * @param {string}                     args.selectOptionToCompare  - The select option value to compare.
- * @param {string}                     args.constantValueToCompare - The constant value to compare.
- * @param {{to: string, from: string}} args.betweenValueInterval   - The between interval.
- * @param {string}                     args.operator               - The operator used for comparison.
+ * @param {PPOMConditionCompareArgs} args - Comparison parameters taken from a
+ * rendered condition rule and the current state of its target field.
  * @return {boolean} - The result of the comparison.
  */
 function ppom_compare_values( args ) {
@@ -649,6 +675,8 @@ function ppom_compare_values( args ) {
 }
 
 function ppom_set_default_option( field_id ) {
+	// When a field becomes visible again, restore its default state the same way
+	// the original PHP renderer would have populated it on first page load.
 	// get product id
 	const product_id = ppom_input_vars.product_id;
 
@@ -724,7 +752,7 @@ function ppom_set_default_option( field_id ) {
 	}
 }
 
-// Updating conditionally hidden fields
+// Mirror the current hidden field list into the hidden input consumed by PHP.
 function ppom_fields_hidden_conditionally() {
 	// Reset
 	ppom_hidden_fields = [];

@@ -1,4 +1,9 @@
-/* Image loader */
+/**
+ * Small image preloader used by the admin field builder shell.
+ *
+ * The main admin UI stays hidden until the loader asset is available so the
+ * screen does not flash half-rendered styles while the builder initializes.
+ */
 function addListener( element, type, expression, bubbling ) {
 	bubbling = bubbling || false;
 	if ( window.addEventListener ) {

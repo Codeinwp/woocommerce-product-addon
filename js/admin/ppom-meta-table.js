@@ -1,23 +1,16 @@
 'use strict';
+
+/**
+ * Admin list screen actions for saved PPOM field groups.
+ *
+ * This file wires DataTables, bulk actions, and the "attach to products" modal
+ * around the server-side group list rendered by PHP.
+ *
+ * @see window.ppomPopup in js/popup.js
+ */
 jQuery( function ( $ ) {
-	/*********************************
-	 *   PPOM Existing Table Meta JS  *
-	 **********************************/
-
-	/*-------------------------------------------------------
-
-        ------ Its Include Following Function -----
-
-        1- Apply DataTable JS Library To PPOM Meta List
-        2- Delete Selected Products
-        3- Check And Uncheck All Existing Product Meta List
-        4- Loading Products In Modal DataTable
-        5- Delete Single Product Meta
-    --------------------------------------------------------*/
-
-	/**
-	  1- Apply DataTable JS Library To PPOM Meta List
-	 */
+	// DataTables provides the searchable/sortable shell, while PPOM injects its
+	// own action toolbar into the custom `ppom-toolbar` slot defined in `dom`.
 	$( '#ppom-meta-table' ).DataTable( {
 		pageLength: 50,
 		dom: 'f<"ppom-toolbar"><"top">rt<"bottom">lpi',
@@ -25,9 +18,13 @@ jQuery( function ( $ ) {
 	const append_overly_model =
 		"<div class='ppom-modal-overlay ppom-js-modal-close'></div>";
 
+	// Bulk delete is confirmation-driven because it removes saved field groups,
+	// not just the rows in the current DataTable view.
 	/**
-	  2- Delete Selected Products
-	 * @param checkedProducts_ids
+	 * Delete multiple saved PPOM groups after an explicit confirmation step.
+	 *
+	 * @param {number[]} checkedProducts_ids
+	 * @return {void}
 	 */
 	function deleteSelectedProducts( checkedProducts_ids ) {
 		window?.ppomPopup?.open( {
@@ -62,9 +59,6 @@ jQuery( function ( $ ) {
 		} );
 	}
 
-	/**
-	  3- Check And Uncheck All Existing Product Meta List
-	 */
 	$( '.ppom_product_checkbox' ).on( 'click', function ( event ) {
 		const checkboxProducts = $( '.ppom_product_checkbox' )
 			.map( function () {
@@ -106,9 +100,8 @@ jQuery( function ( $ ) {
 		$( '#selected_products_count' ).html( checkedProducts.length );
 	} );
 
-	/**
-	  4- Loading Products In Modal DataTable
-	 */
+	// Load the product-assignment UI lazily so the heavy modal table is fetched
+	// only when the merchant asks to attach a group to products.
 	$( '#ppom-meta-table_wrapper, .ppom-basic-setting-section' ).on(
 		'click',
 		'a.ppom-products-modal',
@@ -132,9 +125,6 @@ jQuery( function ( $ ) {
 		}
 	);
 
-	/**
-	  5- Delete Single Product Meta
-	 */
 	$( 'body' ).on( 'click', 'a.ppom-delete-single-product', function ( e ) {
 		e.preventDefault();
 		const productmeta_id = $( this ).attr( 'data-product-id' );
@@ -193,6 +183,8 @@ jQuery( function ( $ ) {
 			return;
 		}
 
+		// Only one action runs per selection. Resetting the select afterwards
+		// prevents DataTables redraws from accidentally replaying the last action.
 		if ( 'delete' === type ) {
 			deleteSelectedProducts( checkedProducts_ids );
 		} else if ( 'export' === type ) {
@@ -202,6 +194,9 @@ jQuery( function ( $ ) {
 		$( this ).val( -1 );
 	} );
 
+	// Import/export are always surfaced in the toolbar so the locked Pro state
+	// is visible even on Free installs; the markup changes between enabled and
+	// disabled variants based on the localized license flag.
 	const exportOption =
 		ppom_vars.ppomProActivated === 'yes'
 			? `<option value="export">${ ppom_vars.i18n.exportLabel }</option>`
@@ -219,6 +214,8 @@ jQuery( function ( $ ) {
 
 	const btn = `<a class="btn btn-success btn-sm float-right mr-4" href="${ ppom_vars.i18n.addGroupUrl }"><span class="dashicons dashicons-plus"></span>${ ppom_vars.i18n.addGroupLabel }</a>`;
 
+	// DataTables creates the placeholder container, then PPOM injects the
+	// toolbar HTML after initialization so the controls stay inside the table UI.
 	$( 'div.ppom-toolbar' ).html(
 		`<div class="">${ bulkActions } ${ importBtn } <span id="ppom-toolbar-extra"></span> ${ btn }</div>`
 	);

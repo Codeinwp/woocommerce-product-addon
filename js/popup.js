@@ -1,5 +1,26 @@
 // @ts-check
 
+/**
+ * Shared confirmation/error popup used by PPOM admin screens.
+ *
+ * Unlike the field-builder inline modals, this is a single programmatic popup
+ * instance exposed on `window.ppomPopup` so list-table and settings actions can
+ * reuse the same confirmation UX.
+ *
+ * @see js/admin/ppom-meta-table.js
+ * @see js/admin/ppom-admin.js
+ */
+
+/**
+ * @typedef {{
+ *   title?: string,
+ *   text?: string,
+ *   hideCloseBtn?: boolean,
+ *   type?: string,
+ *   onConfirmation?: () => void,
+ *   onClose?: () => void
+ * }} PpomPopupOptions
+ */
 class PpomPopup {
 	constructor() {
 		this.overlay = document.createElement( 'div' );
@@ -50,10 +71,18 @@ class PpomPopup {
 		this.popup.appendChild( this.container );
 		this.overlay.appendChild( this.popup );
 
+		/** @type {() => void} */
 		this.onConfirmation = () => {};
+		/** @type {() => void} */
 		this.onClose = () => {};
 	}
 
+	/**
+	 * Open the shared admin popup with optional callbacks and copy.
+	 *
+	 * @param {PpomPopupOptions} [options]
+	 * @return {void}
+	 */
 	open( options = {} ) {
 		if ( options?.title ) {
 			this.title.innerHTML = options.title;

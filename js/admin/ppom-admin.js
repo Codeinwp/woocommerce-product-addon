@@ -1,3 +1,15 @@
+/**
+ * Main admin field-builder controller for PPOM field groups.
+ *
+ * PHP renders hidden modal/template markup for each field type. This script
+ * turns those templates into the interactive builder by cloning field models,
+ * rewriting nested `ppom[...]` input names, refreshing the summary table, and
+ * keeping option/condition editors aligned with the current field list.
+ *
+ * @see populate_conditional_elements
+ * @see ppom_check_conditions in js/ppom-conditions-v2.js
+ * @see window.ppomPopup in js/popup.js
+ */
 /* global ppom_vars */
 'use strict';
 
@@ -82,14 +94,21 @@ const OPERATORS_FIELD_COMPATIBILITY = {
 const proOperatorOptionsToLock = new Set();
 
 /**
- * An array to store available condition targets.
+ * Minimal condition-target description derived from the current field models.
  *
- * @type {Array<{fieldLabel?: string, fieldId?: string, fieldType?: string, canUse: boolean}>}
+ * @typedef {Object} PPOMConditionTarget
+ * @property {string} fieldLabel
+ * @property {string} fieldId
+ * @property {string} fieldType
+ * @property {boolean} canUse
  */
+
+/** @type {PPOMConditionTarget[]} */
 const availableConditionTargets = [];
 
 jQuery( function ( $ ) {
 	const loader = new ImageLoader( ppom_vars.loader );
+	// Keep the admin shell hidden until shared assets are ready.
 	// define your 'onreadystatechange'
 	loader.loadEvent = function ( url, imageAsDom ) {
 		$( '#ppom-pre-loading' ).hide();
@@ -97,47 +116,13 @@ jQuery( function ( $ ) {
 	};
 	loader.load();
 
-	/*********************************
-	 *       PPOM Form Design JS       *
-	 **********************************/
-
-	/*-------------------------------------------------------
-
-        ------ Its Include Following Function -----
-
-        1- Submit PPOM Form Fields
-        2- Hide And Show Import & Export & Product Meta blocks
-        3- Get Last Field Index
-        4- Show And Hide Visibility Role Field
-        5- Remove Unsaved Fields
-        6- Check And Uncheck All Fields
-        7- Remove Check Fields
-        8- On Fields Options Handle Add Option Last
-        9- Edit Existing Fields
-        10- Add New Fields
-        11- Update Existing Fields
-        12- Clone New Fields
-        13- Clone Existing Fields
-        14- Saving PPOM IDs In Existing Meta File
-        15- Open Product Modal In Existing Meta File (removed)
-        16- Handle Fields Tabs
-        17- Handle Media Images Of Following Inputs Types
-        18- Add Fields Conditions
-        19- Add Fields Options
-        20- Auto Generate Option IDs
-        21- Create Field data_name By Thier Title
-        22- Fields Sortable
-        23- Fields Option Sortable
-        24- Fields Dataname Must Be Required
-        25- Fields Add Option Index Controle Funtion
-        26- Fields Add Condition Index Controle Function
-        27- Get All Fields Title On Condition Element Value After Click On Condition Tab
-        28- validate API WooCommerce Product
-    ------------------------------------------------------------*/
-
-	/**
-	  PPOM Model
+	/*
+	 * The builder is template-driven: hidden modal markup is cloned per field,
+	 * then all nested names/ids are rewritten to the current field index before
+	 * the field is added to the summary table and save payload.
 	 */
+
+	// Shared overlay injected behind the builder's inline modal dialogs.
 	const append_overly_model =
 		"<div class='ppom-modal-overlay ppom-js-modal-close'></div>";
 
@@ -156,6 +141,8 @@ jQuery( function ( $ ) {
 	ppom_close_popup();
 
 	function ppom_close_popup() {
+		// The admin builder uses lightweight inline modals, not WordPress media
+		// modals, so closing must also clean up the injected overlay element.
 		$( '.ppom-js-modal-close, .ppom-modal-overlay' ).click( function ( e ) {
 			const target = $( e.target );
 			if ( target.hasClass( 'ppom-modal-overlay' ) ) {
@@ -188,10 +175,12 @@ jQuery( function ( $ ) {
 		const ppomFields = new URLSearchParams();
 
 		/*
-            NOTE: since the request is to big for small values of `max_input_vars`, we will send the PPOM fields as a single string.
-            
-            INFO: some parts of the code use `\r\n` as delimiter for arrays in textarea. `serializeArray` respect this convention while native JS Form value access sanitize it to just `\n`.
-        */
+		 * PPOM field builders can exceed `max_input_vars`, so all `ppom[...]`
+		 * values are collapsed into a single encoded string before POSTing.
+		 *
+		 * `serializeArray()` is used on purpose because some textarea-backed
+		 * settings depend on preserving `\r\n` separators.
+		 */
 		$( this )
 			.serializeArray()
 			.forEach( ( { value, name } ) => {
@@ -586,9 +575,6 @@ jQuery( function ( $ ) {
 		);
 	} );
 
-	/**
-	  12- Clone New Fields
-	 */
 	const option_index = 0;
 	$( document ).on( 'click', '.ppom_select_field', function ( event ) {
 		if ( $( this ).hasClass( 'ppom-locked-field' ) ) {
@@ -606,7 +592,9 @@ jQuery( function ( $ ) {
 			'.ppom-field-' + field_type + ':last'
 		).clone();
 
-		// field attr name apply on all fields meta with ppom-meta-field class
+		// Every cloned template starts life with placeholder names. Before the
+		// field can be saved, each nested input must be rebound to its new
+		// `ppom[field_no][...]` namespace.
 		clone_new_field
 			.find( '.ppom-meta-field' )
 			.each( function ( i, meta_field ) {
@@ -627,7 +615,7 @@ jQuery( function ( $ ) {
 			.find( '.ppom-fields-actions' )
 			.attr( 'data-field-no', field_no );
 
-		// fields conditions handle name attr
+		// Conditions have their own nested payload shape under the field entry.
 		clone_new_field
 			.find( '.ppom-condition-visible-bound' )
 			.each( function ( i, meta_field ) {
@@ -734,9 +722,6 @@ jQuery( function ( $ ) {
 		field_no++;
 	} );
 
-	/**
-	  13- Clone Existing Fields
-	 */
 	const copy_no = 0;
 	$( '.ppom-main-field-wrapper' ).on(
 		'click',
@@ -807,7 +792,8 @@ jQuery( function ( $ ) {
 			clone_new_field.removeClass( 'ppom_sort_id_' + model_id_no + '' );
 			clone_new_field.addClass( 'ppom_sort_id_' + field_no + '' );
 
-			// field attr name apply on all fields meta with ppom-meta-field class
+			// Cloned existing fields need the same namespace rewrite as new ones,
+			// otherwise two field modals would submit into the same PHP array slot.
 			clone_new_field
 				.find( '.ppom-meta-field' )
 				.each( function ( i, meta_field ) {
@@ -1815,6 +1801,9 @@ jQuery( function ( $ ) {
 		field_type,
 		opt_no
 	) {
+		// Condition rows are saved under `ppom[field][conditions][rules][n]`.
+		// PHP later serializes that data back into the `data-cond-*` attributes
+		// consumed by the storefront condition engine.
 		add_c_selector.each( function ( i, meta_field ) {
 			// var field_name = 'ppom['+field_no+']['+$(meta_field).attr('data-metatype')+']';
 			const field_name =
@@ -1940,16 +1929,21 @@ jQuery( function ( $ ) {
 	}
 
 	/**
-	  27- Refresh the condition comparison option list for PPOM field target that are of type select.
-	 * @param targetSelect
-	 * @param conditionContainer
-	 * @param initialSelectedValue
+	 * Refresh the comparison-value list for the selected condition target.
+	 *
+	 * @param {HTMLSelectElement} targetSelect
+	 * @param {HTMLDivElement} [conditionContainer]
+	 * @param {string} [initialSelectedValue]
+	 * @see populate_conditional_elements
 	 */
 	function updateTargetComparisonValueSelect(
 		targetSelect,
 		conditionContainer,
 		initialSelectedValue
 	) {
+		// Comparison values are not hard-coded. They are pulled from the current
+		// options/images configured on the target field so the condition builder
+		// stays synchronized with whatever the merchant has edited in this session.
 		/** @type {string?} */
 		const targetElementNameToPullOptions = targetSelect.value;
 
@@ -2177,7 +2171,6 @@ jQuery( function ( $ ) {
 	 * Populate the condition target select with eligible options based on the operator.
 	 *
 	 * @param {HTMLSelectElement?} selectInput
-	 * @param {string?}            conditionOperator
 	 * @param {string[]}           excludeIds
 	 * @return
 	 */
@@ -2238,10 +2231,18 @@ jQuery( function ( $ ) {
 	}
 
 	/**
-	 * Populate the condition target select with eligible options based on the operator on initialization and value change.
+	 * Rebuild condition targets from the current builder state.
 	 *
+	 * This keeps the condition tab in sync with renamed or newly cloned fields
+	 * before the field group has been saved and re-rendered by PHP.
+	 *
+	 * @see ppom_add_condition_set_index
+	 * @see ppom_check_conditions in js/ppom-conditions-v2.js
 	 */
 	function populate_conditional_elements() {
+		// Rebuild the list of condition targets from the current slider state so
+		// newly added, renamed, or cloned fields are immediately available as rule
+		// dependencies without reloading the admin page.
 		// Get all available PPOM fields.
 		availableConditionTargets.splice( 0, availableConditionTargets.length );
 		document.querySelectorAll( '.ppom-slider' ).forEach( ( item ) => {
@@ -2432,6 +2433,8 @@ jQuery( function ( $ ) {
 	);
 
 	const toggleHandler = {
+		// jQuery datepicker-specific settings should only be editable when the
+		// field actually opts into the jQuery UI datepicker renderer.
 		setDisabledFields( jQueryDP ) {
 			const on = jQueryDP.is( ':checked' );
 			const slider = jQueryDP.parents( '.ppom-slider' );
@@ -2471,7 +2474,8 @@ jQuery( function ( $ ) {
 		}
 	);
 
-	// Unsaved form exit confirmation.
+	// Track whether the builder has diverged from the last persisted state so
+	// accidental navigation does not discard a large field-group edit session.
 	let unsaved = false;
 	$( '.ppom-main-field-wrapper :input' ).change( function () {
 		if ( $( this ).parents( '.ppom-checkboxe-style' )?.length > 0 ) {
