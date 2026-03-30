@@ -132,7 +132,7 @@ function ppom_meta_list( $post ) {
 	$html .= '<th>' . __( 'Group Name', 'woocommerce-product-addon' ) . '</th>';
 	$html .= '<th>' . __( 'Edit', 'woocommerce-product-addon' ) . '</th>';
 	$html .= '</tr></thead>';
-	
+
 	foreach ( $all_meta as $meta ) {
 		$html .= '<tr data-ppom-search="' . esc_attr( sanitize_key( $meta->productmeta_name ) ) . '" style="cursor: move;">';
 
@@ -250,15 +250,15 @@ function ppom_admin_process_product_meta( $post_id ) {
 
 
 	$ppom_meta_selected = isset( $_POST ['ppom_product_meta'] ) ? $_POST ['ppom_product_meta'] : array();
-	
+
 	if ( is_numeric( $ppom_meta_selected ) ) {
 		$ppom_meta_selected = array( $ppom_meta_selected );
 	} elseif ( ! is_array( $ppom_meta_selected ) ) {
 		$ppom_meta_selected = array();
 	}
-	
+
 	$ppom_meta_selected = array_map( 'intval', $ppom_meta_selected );
-	
+
 	// ppom_pa($ppom_meta_selected); exit;
 	update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $ppom_meta_selected );
 
@@ -428,7 +428,7 @@ function ppom_admin_save_form_meta() {
 			return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] );
 		}
 	);
-	
+
 	// Updating PPOM Meta with ppom_id in each meta array
 	ppom_admin_update_ppom_meta_only( $ppom_id, $product_meta );
 
@@ -925,19 +925,23 @@ function ppom_add_black_friday_data( $configs ) {
 	$is_expired = 'expired' === $status || 'active-expired' === $status;
 
 	if ( $is_pro ) {
+		// translators: %s is the discount percentage.
+		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - up to %s off', 'woocommerce-product-addon' ), '30%' );
 		// translators: %1$s - discount, %2$s - discount.
 		$message = sprintf( __( 'Upgrade your PPOM Pro plan: %1$s off this week. Already on the plan you need? Renew early and save up to %2$s.', 'woocommerce-product-addon' ), '30%', '20%' );
 		$cta_label = __( 'See your options', 'woocommerce-product-addon' );
 	} elseif ( $is_expired ) {
+		// translators: %s is the discount percentage.
+		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - %s off', 'woocommerce-product-addon' ), '50%' );
 		$message = __( 'Your PPOM Pro features are still here, just locked. Renew at a reduced rate this week.', 'woocommerce-product-addon' );
 		$cta_label = __( 'Reactivate now', 'woocommerce-product-addon' );
 	} else {
+		// translators: %s is the discount percentage.
+		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - %s off', 'woocommerce-product-addon' ), '60%' );
 		// translators: %s - discount.
 		$config['title'] = sprintf( __( 'PPOM Pro: %s off this week', 'woocommerce-product-addon' ), '60%' );
-		// translators: %s is the discount percentage.
-		$config['upgrade_menu_text'] = sprintf( __( 'BF Sale - %s off', 'woocommerce-product-addon' ), '60%' );
 	}
-	
+
 	$url_params    = array(
 		'utm_term' => $is_pro ? 'plan-' . $plan : 'free',
 		'lkey'     => ! empty( $license ) ? $license : false,
@@ -945,12 +949,7 @@ function ppom_add_black_friday_data( $configs ) {
 	);
 
 	if ( ( $is_pro || $is_expired ) && ! empty( $pro_product_slug ) ) {
-		// translators: %s is the discount percentage.
-		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - up to %s off', 'woocommerce-product-addon' ), '30%' );
 		$config['plugin_meta_targets'] = array( $pro_product_slug );
-	} else {
-		// translators: %s is the discount percentage.
-		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - %s off', 'woocommerce-product-addon' ), '60%' );
 	}
 
 	$config['message']   = $message;
