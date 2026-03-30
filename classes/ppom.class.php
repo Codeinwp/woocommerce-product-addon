@@ -4,11 +4,6 @@
  *
  * @package PPOM
  * @subpackage Metadata
- *
- * @see PPOM_Meta::__construct()
- * @see PPOM_Meta::get_meta_id()
- * @see PPOM_Meta::settings()
- * @see PPOM_Meta::get_fields()
  */
 
 /**
@@ -115,10 +110,6 @@ class PPOM_Meta {
 	 * @param int|null $product_id Product ID used to resolve attached field groups.
 	 *
 	 * @return void
-	 *
-	 * @see PPOM_Meta::get_meta_id()
-	 * @see PPOM_Meta::settings()
-	 * @see PPOM_Meta::get_fields()
 	 */
 	// $product_id can be null if get instance to get data by meta_id
 	function __construct( $product_id = null ) {
@@ -182,8 +173,6 @@ class PPOM_Meta {
 	 * @return array|int|null
 	 *
 	 * @see PPOM_PRODUCT_META_KEY
-	 * @see PPOM_Meta::settings()
-	 * @see PPOM_Meta::get_fields()
 	 */
 	public function get_meta_id( $product_id ) {
 
@@ -282,9 +271,6 @@ class PPOM_Meta {
 	 * Loads the primary settings row for the resolved PPOM group.
 	 *
 	 * @return object|null
-	 *
-	 * @see PPOM_Meta::get_meta_id()
-	 * @see PPOM_Meta::get_fields()
 	 */
 	public function settings() {
 
@@ -320,7 +306,6 @@ class PPOM_Meta {
 	 *
 	 * @return array|null
 	 *
-	 * @see PPOM_Meta::settings()
 	 * @see ppom_get_field_meta_by_dataname()
 	 */
 	public function get_fields() {

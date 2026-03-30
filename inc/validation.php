@@ -4,11 +4,6 @@
  *
  * @package PPOM
  * @subpackage Validation
- *
- * @see ppom_sanitize_array_data()
- * @see ppom_validation_product_limits()
- * @see ppom_validation_variation_limits()
- * @see ppom_get_product_limits()
  */
 
 // Sanitization and allowed HTML.
@@ -22,9 +17,6 @@
  * @param string $content Raw field-builder content.
  *
  * @return string
- *
- * @see ppom_fields_with_html()
- * @see ppom_sanitize_array_data()
  */
 function ppom_esc_html( $content ) {
 
@@ -102,19 +94,19 @@ function ppom_esc_html( $content ) {
 	return wp_kses( stripslashes_deep( $content ), $allowed_tags );
 }
 
-/**
- * Recursively sanitizes PPOM field definitions before they are stored.
- *
- * Keys listed by {@see ppom_fields_with_html()} keep HTML via
- * {@see ppom_esc_html()}. All other scalar values are reduced to plain text.
- *
- * @param array $array Untrusted field-definition array.
- *
- * @return array
- *
- * @see ppom_admin_save_form_meta()
- * @see ppom_admin_update_form_meta()
- */
+	/**
+	 * Recursively sanitizes PPOM field definitions before they are stored.
+	 *
+	 * Keys that allow stored HTML are sanitized with `ppom_esc_html()`. All other
+	 * scalar values are reduced to plain text.
+	 *
+	 * @param array $array Untrusted field-definition array.
+	 *
+	 * @return array
+	 *
+	 * @see ppom_admin_save_form_meta()
+	 * @see ppom_admin_update_form_meta()
+	 */
 function ppom_sanitize_array_data( $array ) {
 	foreach ( $array as $key => &$value ) {
 		if ( is_array( $value ) ) {
@@ -130,13 +122,11 @@ function ppom_sanitize_array_data( $array ) {
 }
 
 
-/**
- * Returns field-definition keys that store sanitized HTML instead of plain text.
- *
- * @return array
- *
- * @see ppom_esc_html()
- */
+	/**
+	 * Returns field-definition keys that store sanitized HTML instead of plain text.
+	 *
+	 * @return array
+	 */
 function ppom_fields_with_html() {
 
 	$have_html = array( 'description', 'tooltip', 'heading', 'html', 'error_message', 'checked', 'disable_custom_dates' );
@@ -157,9 +147,6 @@ function ppom_fields_with_html() {
  * @param \WC_Product $product Product object.
  *
  * @return array
- *
- * @see ppom_get_product_limits()
- * @see ppom_validation_variation_limits()
  */
 function ppom_validation_product_limits( $data, $product ) {
 
@@ -228,9 +215,6 @@ function ppom_validation_product_limits( $data, $product ) {
  * @param \WC_Product_Variable $variation Variation object.
  *
  * @return array $data
- *
- * @see ppom_get_product_limits()
- * @see ppom_validation_product_limits()
  */
 function ppom_validation_variation_limits( $data, $product, $variation ) {
 
@@ -303,7 +287,6 @@ function ppom_validation_variation_limits( $data, $product, $variation ) {
  *
  * @see PPOM_Meta::__construct()
  * @see ppom_has_field_by_type()
- * @see ppom_validation_product_limits()
  */
 function ppom_get_product_limits( $product_id, $variation_id ) {
 

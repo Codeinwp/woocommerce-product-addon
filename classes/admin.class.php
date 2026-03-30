@@ -1,6 +1,11 @@
 <?php
-/*
- * working behind the seen
+/**
+ * Coordinates PPOM admin pages, attach flows, and settings bridges.
+ *
+ * @package PPOM
+ * @subpackage Admin
+ *
+ * @see ppom_admin_save_form_meta()
  */
 
 /*
@@ -10,6 +15,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed' );
 }
 
+/**
+ * Coordinates the PPOM admin UI and field-group attachment workflows.
+ *
+ * Registers the PPOM menu pages, AJAX attach handlers, legacy WooCommerce
+ * settings tab, and admin initialization hooks that prepare the PPOM schema.
+ */
 class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 
@@ -22,7 +33,12 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 */
 	public $plugin_meta = array();
 
-	function __construct() {
+	/**
+	 * Registers PPOM admin menus, AJAX handlers, and settings hooks.
+	 *
+	 * @return void
+	 */
+	public function __construct() {
 
 		// setting plugin meta saved in config.php
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -80,6 +96,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		add_action( 'admin_init', array( $this, 'ppom_create_db_tables' ) );
 	}
 
+	// Admin page registration.
+
 	/**
 	 * Menu page options.
 	 */
@@ -124,10 +142,12 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		);
 	}
 
-	/*
-	 * creating menu page for this plugin
-	*/
-	function add_menu_pages() {
+	/**
+	 * Registers the PPOM admin menu entries and page-load callbacks.
+	 *
+	 * @return string|void
+	 */
+	public function add_menu_pages() {
 
 		if ( ! $this->menu_pages ) {
 			return '';
@@ -185,11 +205,21 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		}
 	}
 
+	// Field-group pages and attach UI.
 
-	/*
-	 * CALLBACKS
-	*/
-	function product_meta() {
+	/**
+	 * Renders the main PPOM field-group management screen.
+	 *
+	 * Routes between the field-group list, field editor, clone flow, addons
+	 * listing, and changelog views based on the current admin request.
+	 *
+	 * @return void
+	 *
+	 * @see PPOM_Fields_Meta::render_field_settings()
+	 * @see ppom_admin_save_form_meta()
+	 * @see ppom_admin_update_form_meta()
+	 */
+	public function product_meta() {
 		// hide this on PPOM page since is conflicting with floating widget.
 		add_filter( 'update_footer', '__return_empty_string' );
 		echo '<div id="ppom-pre-loading"></div>';
@@ -256,10 +286,15 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		echo '</div>';
 	}
 
-	/*
-	 * Get Products
-	*/
-	function get_products() {
+	/**
+	 * Renders the attach-to-products popup content for a field group.
+	 *
+	 * Loads the product, category, and tag selectors used to attach or detach a
+	 * PPOM field group from WooCommerce catalog objects.
+	 *
+	 * @return void
+	 */
+	public function get_products() {
 
 		if ( ! ppom_security_role() ) {
 			_e( 'Sorry, you are not allowed to perform this action', 'woocommerce-product-addon' );
@@ -381,12 +416,16 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 	/**
-	 * Retrieves WooCommerce products and checks if they are associated with a given PPOM ID.
+	 * Returns product selector options for the attach popup.
 	 *
-	 * @param int $ppom_id The PPOM ID to check against the products.
-	 * @return array An array containing the product options and a flag indicating if any product is used.
+	 * Marks which products already reference the current PPOM ID through
+	 * {@see PPOM_PRODUCT_META_KEY}.
+	 *
+	 * @param int $ppom_id PPOM field-group ID being attached.
+	 *
+	 * @return array
 	 */
-	function get_wc_products( $ppom_id ) {
+	public function get_wc_products( $ppom_id ) {
 		$result = array(
 			'options' => array(),
 			'is_used' => true,
@@ -497,7 +536,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 *
 	 * @return array An array containing the options of product tags and a flag indicating if any category is used.
 	 */
-	function get_wc_tags( $current_values ) {
+	public function get_wc_tags( $current_values ) {
 		$result = array(
 			'options' => array(),
 			'is_used' => false,
@@ -553,7 +592,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @param int $ppom_field_id The ID of the PPOM field to retrieve data for.
 	 * @return array
 	 */
-	function get_db_field( $ppom_field_id ) {
+	public function get_db_field( $ppom_field_id ) {
 		global $wpdb;
 		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
 		$rows       = $wpdb->get_results(
@@ -574,7 +613,18 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 *
 	 * @return void
 	 */
-	function ppom_attach_ppoms() {
+	/**
+	 * Persists product, category, and tag attachments for a field group.
+	 *
+	 * Reconciles the submitted attach selections against the stored
+	 * {@see PPOM_PRODUCT_META_KEY} product assignments and then stores the
+	 * category and tag rules on the PPOM custom-table row.
+	 *
+	 * @return void
+	 *
+	 * @see ppom_admin_process_product_meta()
+	 */
+	public function ppom_attach_ppoms() {
 		if ( ! isset( $_POST['ppom_attached_nonce'] )
 			|| ! wp_verify_nonce( $_POST['ppom_attached_nonce'], 'ppom_attached_nonce_action' )
 			|| ! ppom_security_role()
@@ -666,13 +716,13 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 	/**
-	 * Save the categories and tags to the given PPOM field.
+	 * Stores category and tag attachment rules on a PPOM field-group row.
 	 *
-	 * @param int        $ppom_id    The ID of the PPOM field.
-	 * @param array      $categories An array of categories to save.
-	 * @param array|bool $tags       An array of tags to save.
+	 * @param int        $ppom_id    PPOM field-group ID.
+	 * @param array      $categories Category slugs attached to the field group.
+	 * @param array|bool $tags       Tag slugs attached to the field group.
 	 *
-	 * @global wpdb $wpdb       WordPress database abstraction object.
+	 * @return void
 	 */
 	public static function save_categories_and_tags( $ppom_id, $categories, $tags ) {
 		global $wpdb;
@@ -695,10 +745,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		);
 	}
 
-	/*
-	 * Plugin Validation
-	*/
-	function validate_plugin() {
+	// Legacy settings bridge and setup.
+
+	/**
+	 * Renders the legacy PPOM plugin-validation screen.
+	 *
+	 * @return void
+	 */
+	public function validate_plugin() {
 
 		echo '<div class="wrap">';
 		echo '<h2>' . __( 'Provide API key below:', 'woocommerce-product-addon' ) . '</h2>';
@@ -721,21 +775,44 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		return $settings_tabs;
 	}
 
-	function settings_tab() {
+	/**
+	 * Renders the legacy WooCommerce settings tab for PPOM.
+	 *
+	 * @return void
+	 *
+	 * @see ppom_array_settings()
+	 */
+	public function settings_tab() {
 
 		if ( current_user_can( 'manage_options' ) ) {
 			woocommerce_admin_fields( ppom_array_settings() );
 		}
 	}
 
-	function save_settings() {
+	/**
+	 * Saves the legacy WooCommerce settings tab for PPOM.
+	 *
+	 * @return void
+	 *
+	 * @see ppom_array_settings()
+	 */
+	public function save_settings() {
 
 		if ( current_user_can( 'manage_options' ) ) {
 			woocommerce_update_options( ppom_array_settings() );
 		}
 	}
 
-	function ppom_setting_wpml( $value, $option, $raw_value ) {
+	/**
+	 * Translates text settings through WPML during WooCommerce option saves.
+	 *
+	 * @param mixed $value Sanitized setting value.
+	 * @param array $option WooCommerce setting definition.
+	 * @param mixed $raw_value Raw submitted setting value.
+	 *
+	 * @return mixed
+	 */
+	public function ppom_setting_wpml( $value, $option, $raw_value ) {
 
 		if ( isset( $option['type'] ) && isset( $option['type'] ) == 'text' ) {
 			$value = ppom_wpml_translate( $value, 'PPOM' );
@@ -744,7 +821,12 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		return $value;
 	}
 
-	function ppom_tabs_custom_style() {
+	/**
+	 * Prints admin CSS overrides used by the PPOM metabox and list screens.
+	 *
+	 * @return void
+	 */
+	public function ppom_tabs_custom_style() {
 		?>
 		<style>
 			#woocommerce-product-data .ppom_extra_options_panel label {
@@ -812,7 +894,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		<?php
 	}
 
-	function ppom_multi_select_role_setting( $value ) {
+	/**
+	 * Renders the multi-select field used for PPOM role permissions.
+	 *
+	 * @param array $value WooCommerce setting definition.
+	 *
+	 * @return void
+	 */
+	public function ppom_multi_select_role_setting( $value ) {
 		$selections = get_option( $value['id'] ) ? get_option( $value['id'] ) : 'administrator';
 
 

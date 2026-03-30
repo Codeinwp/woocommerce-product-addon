@@ -22,8 +22,6 @@
  * @package PPOM
  * @subpackage Bootstrap
  *
- * @see ppom_i18n_setup()
- * @see PPOM()
  * @see NM_PersonalizedProduct::__construct()
  */
 
@@ -65,13 +63,11 @@ add_filter(
 );
 
 add_action( 'init', 'ppom_i18n_setup' );
-/**
- * Loads the PPOM textdomain.
- *
- * @return void
- *
- * @see PPOM()
- */
+	/**
+	 * Loads the PPOM textdomain.
+	 *
+	 * @return void
+	 */
 function ppom_i18n_setup() {
 	load_plugin_textdomain( 'woocommerce-product-addon', false, basename( __DIR__ ) . '/languages' );
 }

@@ -4,11 +4,6 @@
  *
  * @package PPOM
  * @subpackage Admin
- *
- * @see ppom_meta_list()
- * @see ppom_admin_process_product_meta()
- * @see ppom_admin_save_form_meta()
- * @see ppom_admin_update_form_meta()
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -104,7 +99,6 @@ function ppom_admin_product_meta_metabox() {
  * @return void
  *
  * @see PPOM_Meta::__construct()
- * @see ppom_admin_process_product_meta()
  */
 function ppom_meta_list( $post ) {
 
@@ -191,7 +185,7 @@ function ppom_meta_list( $post ) {
 	$html .= '<hr>';
 	$html .= '<div class="ppom-settings-container">';
 	$html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input type="checkbox" disabled>' . __( 'Enable Pop-up.', 'woocommerce-product-addon' ) . '<span class="woocommerce-help-tip" data-tip="' . __( 'Enable this option to display product fields in a popup instead of directly on the product page.', 'woocommerce-product-addon' ) . '"></span><i>' . sprintf(
-		// translators: %1$s the opening link HTML tag, %2$s the close link HTML tag.
+	// translators: %1$s the opening link HTML tag, %2$s the close link HTML tag.
 		__( 'Available in the %1$sPremium%2$s version.', 'woocommerce-product-addon' ),
 		'<a target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'enable-popup', 'metabox' ) . '">',
 		'</a>'
@@ -201,7 +195,7 @@ function ppom_meta_list( $post ) {
 	$html .= '<hr>';
 	$html .= '<div class="ppom-settings-container">';
 	$html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input disabled type="checkbox">' . __( 'Enable Enquiry Form', 'woocommerce-product-addon' ) . '<span class="woocommerce-help-tip" data-tip="' . __( 'Enhances your product pages by adding a customizable enquiry button. It allows customers to send inquiries directly to the admin about products with PPOM Fields via email.', 'woocommerce-product-addon' ) . '"></span><i>' . sprintf(
-		// translators: %1$s the link to Store with label: 'Premium'.
+	// translators: %1$s the link to Store with label: 'Premium'.
 		__( 'Available in the %1$s version.', 'woocommerce-product-addon' ),
 		sprintf(
 			'<a href="%s" target="_blank">%s</a>',
@@ -232,11 +226,12 @@ function ppom_meta_list( $post ) {
 	</script>
 	<?php
 
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Filtered metabox markup is expected here.
 	echo apply_filters( 'ppom_select_meta_in_product', $html, $ppom, $all_meta );
 
-	echo '<div class="ppom_extra_options_panel">';
-	do_action( 'ppom_meta_box_after_list', $post );
-	echo '</div>';
+		echo '<div class="ppom_extra_options_panel">';
+		do_action( 'ppom_meta_box_after_list', $post );
+		echo '</div>';
 }
 
 // Product-field assignment persistence.
@@ -250,9 +245,6 @@ function ppom_meta_list( $post ) {
  * @param int $post_id Product ID receiving the PPOM assignment.
  *
  * @return void
- *
- * @see PPOM_Meta::get_meta_id()
- * @see ppom_meta_list()
  */
 function ppom_admin_process_product_meta( $post_id ) {
 
@@ -303,7 +295,6 @@ function ppom_admin_show_notices() {
  * @return void
  *
  * @see ppom_sanitize_array_data()
- * @see ppom_admin_update_ppom_meta_only()
  * @see ppom_attach_fields_to_product()
  */
 function ppom_admin_save_form_meta() {
@@ -322,8 +313,8 @@ function ppom_admin_save_form_meta() {
 	// print_r($_REQUEST); exit;
 
 	if ( ! isset( $_POST['ppom_form_nonce'] )
-		|| ! wp_verify_nonce( $_POST['ppom_form_nonce'], 'ppom_form_nonce_action' )
-		|| ! ppom_security_role()
+	|| ! wp_verify_nonce( $_POST['ppom_form_nonce'], 'ppom_form_nonce_action' )
+	|| ! ppom_security_role()
 	) {
 		$resp = array(
 			'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
@@ -487,7 +478,6 @@ function ppom_admin_save_form_meta() {
  * @return void
  *
  * @see ppom_sanitize_array_data()
- * @see ppom_admin_update_ppom_meta_only()
  */
 function ppom_admin_update_form_meta() {
 
@@ -517,8 +507,8 @@ function ppom_admin_update_form_meta() {
 
 
 	if ( ! isset( $_POST['ppom_form_nonce'] )
-		|| ! wp_verify_nonce( $_POST['ppom_form_nonce'], 'ppom_form_nonce_action' )
-		|| ! ppom_security_role()
+	|| ! wp_verify_nonce( $_POST['ppom_form_nonce'], 'ppom_form_nonce_action' )
+	|| ! ppom_security_role()
 	) {
 		$resp = array(
 			'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
@@ -644,9 +634,6 @@ function ppom_admin_update_form_meta() {
  * @param array $ppom_meta Normalized field definitions for `the_meta`.
  *
  * @return bool
- *
- * @see ppom_admin_save_form_meta()
- * @see ppom_admin_update_form_meta()
  */
 function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 
@@ -693,14 +680,12 @@ function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
  * PPOM custom table.
  *
  * @return void
- *
- * @see ppom_admin_delete_selected_meta()
  */
 function ppom_admin_delete_meta() {
 
 	if ( ! isset( $_POST['ppom_meta_nonce'] )
-		|| ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
-		|| ! ppom_security_role()
+	|| ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
+	|| ! ppom_security_role()
 	) {
 		$response = array(
 			'status'  => 'error',
@@ -742,16 +727,14 @@ function ppom_admin_delete_meta() {
  * the PPOM custom table in a single prepared query.
  *
  * @return void
- *
- * @see ppom_admin_delete_meta()
  */
 function ppom_admin_delete_selected_meta() {
 
 	if ( ! isset( $_POST['ppom_meta_nonce'] )
-		|| ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
-		|| ! ppom_security_role()
-		|| ! array_key_exists( 'productmeta_ids', $_POST )
-		|| ! is_array( $_POST['productmeta_ids'] )
+	|| ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
+	|| ! ppom_security_role()
+	|| ! array_key_exists( 'productmeta_ids', $_POST )
+	|| ! is_array( $_POST['productmeta_ids'] )
 	) {
 		_e( 'Sorry, you are not allowed to perform this action', 'woocommerce-product-addon' );
 		die( 0 );

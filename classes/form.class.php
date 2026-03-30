@@ -6,8 +6,6 @@
  * @subpackage Frontend
  *
  * @see ppom_woocommerce_template_base_inputs_rendering()
- * @see PPOM_Form::ppom_fields_render()
- * @see PPOM_Form::render_input_template()
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -90,7 +88,6 @@ class PPOM_Form {
 	 * @return void
 	 *
 	 * @see PPOM_Meta::get_fields()
-	 * @see PPOM_Form::render_input_template()
 	 */
 	function ppom_fields_render( $meta_id = 0 ) {
 
@@ -250,7 +247,6 @@ class PPOM_Form {
 	 * @return void
 	 *
 	 * @see ppom_load_input_templates()
-	 * @see PPOM_Form::ppom_fields_render()
 	 */
 	public function render_input_template( $meta, $default_value ) {
 

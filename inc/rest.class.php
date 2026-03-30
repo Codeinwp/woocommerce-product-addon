@@ -4,10 +4,6 @@
  *
  * @package PPOM
  * @subpackage REST
- *
- * @see PPOM_Rest::init_api()
- * @see PPOM_Rest::ppom_save_meta_product()
- * @see PPOM_Rest::ppom_update_meta_order()
  */
 
 /**
@@ -24,8 +20,6 @@ class PPOM_Rest {
 	 * Hooks PPOM REST route registration when the API setting is enabled.
 	 *
 	 * @return void
-	 *
-	 * @see self::init_api()
 	 */
 	public function __construct() {
 
@@ -42,11 +36,6 @@ class PPOM_Rest {
 	 * callbacks before mutating PPOM field groups or order item metadata.
 	 *
 	 * @return void
-	 *
-	 * @see self::ppom_save_meta_product()
-	 * @see self::delete_ppom_fields_product()
-	 * @see self::ppom_update_meta_order()
-	 * @see self::delete_ppom_fields_order()
 	 */
 	public function init_api() {
 
@@ -141,7 +130,6 @@ class PPOM_Rest {
 	 * @return WP_REST_Response
 	 *
 	 * @see PPOM_Meta::__construct()
-	 * @see self::filter_required_keys_only()
 	 */
 	public function get_ppom_meta_info_product( WP_REST_Request $request ) {
 
@@ -202,7 +190,6 @@ class PPOM_Rest {
 	 * @return WP_REST_Response
 	 *
 	 * @see PPOM_Meta::get_fields_by_id()
-	 * @see self::filter_required_keys_only()
 	 */
 	public function get_ppom_meta_by_id( WP_REST_Request $request ) {
 
@@ -251,10 +238,6 @@ class PPOM_Rest {
 	 *                                 `secret_key`, and `fields`.
 	 *
 	 * @return WP_REST_Response
-	 *
-	 * @see self::is_secret_key_valid()
-	 * @see self::save_new_meta_data()
-	 * @see self::update_meta_data()
 	 */
 	public function ppom_save_meta_product( WP_REST_Request $request ) {
 
@@ -322,9 +305,6 @@ class PPOM_Rest {
 	 *                                 `secret_key`, and `fields`.
 	 *
 	 * @return WP_REST_Response
-	 *
-	 * @see self::is_secret_key_valid()
-	 * @see self::delete_meta_data()
 	 */
 	public function delete_ppom_fields_product( WP_REST_Request $request ) {
 
@@ -491,8 +471,6 @@ class PPOM_Rest {
 	 * @param int    $product_id  Product ID attached to the field group.
 	 *
 	 * @return array
-	 *
-	 * @see self::ppom_save_meta_product()
 	 */
 	public function update_meta_data( $ppom_meta, $ppom_fields, $product_id ) {
 
@@ -623,8 +601,6 @@ class PPOM_Rest {
 	 * @param WP_REST_Request $request REST request containing `order_id`.
 	 *
 	 * @return WP_REST_Response
-	 *
-	 * @see self::get_order_item_meta()
 	 */
 	public function get_ppom_meta_info_order( WP_REST_Request $request ) {
 
@@ -670,9 +646,6 @@ class PPOM_Rest {
 	 *                                 `secret_key`, and `fields`.
 	 *
 	 * @return WP_REST_Response
-	 *
-	 * @see self::is_secret_key_valid()
-	 * @see self::get_order_item_meta()
 	 */
 	public function ppom_update_meta_order( WP_REST_Request $request ) {
 
@@ -781,9 +754,6 @@ class PPOM_Rest {
 	 *                                 `secret_key`, and `fields`.
 	 *
 	 * @return WP_REST_Response
-	 *
-	 * @see self::is_secret_key_valid()
-	 * @see self::get_order_item_meta()
 	 */
 	public function delete_ppom_fields_order( WP_REST_Request $request ) {
 
@@ -930,9 +900,6 @@ class PPOM_Rest {
 	 * @param array $ppom_fields Full PPOM field definitions.
 	 *
 	 * @return array
-	 *
-	 * @see self::get_ppom_meta_info_product()
-	 * @see self::get_ppom_meta_by_id()
 	 */
 	public function filter_required_keys_only( $ppom_fields ) {
 

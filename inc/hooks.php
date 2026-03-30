@@ -5,8 +5,6 @@
  * @package PPOM
  * @subpackage Hooks
  *
- * @see ppom_hooks_load_input_scripts()
- * @see ppom_hooks_render_shortcode()
  * @see PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id()
  */
 
@@ -94,8 +92,6 @@ function ppom_hooks_save_cropped_image( $ppom_fields, $posted_data ) {
  * @param float|string $option_price Raw option price.
  *
  * @return mixed
- *
- * @see ppom_hooks_convert_price_back()
  */
 function ppom_hooks_convert_price( $option_price ) {
 	return apply_filters( 'woocs_exchange_value', $option_price );
@@ -112,7 +108,6 @@ function ppom_hooks_convert_price( $option_price ) {
  *
  * @return mixed
  *
- * @see ppom_hooks_convert_price()
  * @see ppom_price_controller()
  */
 function ppom_hooks_convert_price_back( $price ) {
@@ -762,8 +757,6 @@ function ppom_hooks_register_wpml( $meta_data, $ppom_id ) {
  * @param array  $field_meta          Stored field definition.
  *
  * @return string
- *
- * @see ppom_hooks_input_main_wrapper_class()
  */
 function ppom_hooks_input_wrapper_class( $input_wrapper_class, $field_meta ) {
 
@@ -822,9 +815,6 @@ function ppom_hooks_input_wrapper_class_new( $input_wrapper_class, $field_meta )
  * @param array  $field_meta    Stored field definition.
  *
  * @return string
- *
- * @see ppom_hooks_input_wrapper_class()
- * @see ppom_hooks_input_wrapper_class_new()
  */
 function ppom_hooks_input_main_wrapper_class( $wrapper_class, $classes_array, $field_meta ) {
 
@@ -1046,8 +1036,6 @@ function ppom_hooks_render_shortcode( $attr ) {
  * @param string $url Default WooCommerce add-to-cart redirect URL.
  *
  * @return string
- *
- * @see ppom_hooks_render_shortcode()
  */
 function ppom_hooks_redirect_to_cart_if_shortcode( $url ) {
 	$url = isset( $_POST['ppom']['ppom_shorcode_product_id'] ) ? wc_get_cart_url() : $url;

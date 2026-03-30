@@ -1,7 +1,12 @@
 <?php
 /**
- * PPOM Fields Manager Class
- **/
+ * Renders the PPOM field-builder UI and field-setting controls.
+ *
+ * @package PPOM
+ * @subpackage Fields
+ *
+ * @see ppom_admin_save_form_meta()
+ */
 
 /*
 **========== Direct access not allowed ===========
@@ -11,17 +16,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
+/**
+ * Renders admin-side field settings for every registered PPOM input type.
+ *
+ * Loads the builder assets, renders the modal UI for each input type, and
+ * expands the stored field schema into the editable form controls used by the
+ * PPOM field-group editor.
+ */
 class PPOM_Fields_Meta {
 
 	private static $ins;
 
 
-	function __construct() {
+	/**
+	 * Hooks field-builder asset loading on PPOM admin pages.
+	 *
+	 * @return void
+	 */
+	public function __construct() {
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_script' ) );
 	}
 
+	// Builder asset loading.
 
+	/**
+	 * Returns the shared field-builder registry instance.
+	 *
+	 * @return self
+	 */
 	public static function get_instance() {
 		// create a new object if it doesn't exist.
 		is_null( self::$ins ) && self::$ins = new self();
@@ -30,10 +53,20 @@ class PPOM_Fields_Meta {
 	}
 
 
-	/*
-	**============ Load all scripts ===========
-	*/
-	function load_script( $hook ) {
+	/**
+	 * Enqueues the PPOM field-builder scripts, styles, and localized data.
+	 *
+	 * Loads the editor dependencies used by the field-group admin screen,
+	 * including code editors, media selectors, table tooling, and the builder's
+	 * localized `ppom_vars` payload.
+	 *
+	 * @param string $hook Current admin page hook.
+	 *
+	 * @return void
+	 *
+	 * @see NM_PersonalizedProduct_Admin::product_meta()
+	 */
+	public function load_script( $hook ) {
 
 		if ( ! isset( $_GET['page'] ) || $_GET['page'] != 'ppom' ) {
 			return;
@@ -219,12 +252,14 @@ class PPOM_Fields_Meta {
 	}
 
 
-	/*
-	**============ Render all fields ===========
-	*/
-	function render_field_settings() {
-		// ppom_pa(PPOM() -> inputs);
+	// Field-builder rendering.
 
+	/**
+	 * Renders the modal shells for every registered PPOM input type.
+	 *
+	 * @return void
+	 */
+	public function render_field_settings() {
 		$html  = '';
 		$html .= '<div id="ppom-fields-wrapper">';
 		foreach ( PPOM()->inputs as $fields_type => $meta ) {
@@ -257,11 +292,17 @@ class PPOM_Fields_Meta {
 		echo $html;
 	}
 
-	/*
-	**============ Render all fields meta ===========
-	*/
-	function render_field_meta( $field_meta, $fields_type, $field_index = '', $save_meta = '' ) {
-		// ppom_pa($save_meta);
+	/**
+	 * Renders the editable settings panels for a single PPOM input type.
+	 *
+	 * @param array        $field_meta  Input settings schema.
+	 * @param string       $fields_type PPOM input type slug.
+	 * @param string|int   $field_index Field index in the builder payload.
+	 * @param array|string $save_meta   Stored field values being edited.
+	 *
+	 * @return string
+	 */
+	public function render_field_meta( $field_meta, $fields_type, $field_index = '', $save_meta = '' ) {
 		$html  = '';
 		$html .= '<div data-table-id="' . esc_attr( $fields_type ) . '" class="row ppom-tabs ppom-fields-actions" data-field-no="' . esc_attr( $field_index ) . '">';
 		$html .= '<input type="hidden" name="ppom[' . $field_index . '][type]" value="' . $fields_type . '" class="ppom-meta-field" data-metatype="type">';
@@ -349,12 +390,24 @@ class PPOM_Fields_Meta {
 	}
 
 
-	/*
-	* this function is rendring input field for settings
-	*/
-	function render_all_input_types( $name, $data, $fields_type, $field_index, $values ) {
-		// ppom_pa($data);
-
+	/**
+	 * Renders the concrete control markup for one builder setting field.
+	 *
+	 * Expands complex PPOM field definitions, including options, images,
+	 * conditions, and bulk-quantity data, into the HTML controls stored in the
+	 * admin builder form payload.
+	 *
+	 * @param string     $name        Setting key inside the field definition.
+	 * @param array      $data        Setting metadata for the current control.
+	 * @param string     $fields_type PPOM input type slug.
+	 * @param string|int $field_index Field index in the builder payload.
+	 * @param mixed      $values      Stored value for the current control.
+	 *
+	 * @return string
+	 *
+	 * @see ppom_admin_save_form_meta()
+	 */
+	public function render_all_input_types( $name, $data, $fields_type, $field_index, $values ) {
 		$type = ( isset( $data ['type'] ) ? $data ['type'] : '' );
 
 		$options      = ( isset( $data ['options'] ) ? $data ['options'] : '' );
@@ -1273,7 +1326,14 @@ class PPOM_Fields_Meta {
 	}
 
 
-	function ppom_fields_tabs( $fields_type ) {
+	/**
+	 * Returns the field-builder tab configuration for an input type.
+	 *
+	 * @param string $fields_type PPOM input type slug.
+	 *
+	 * @return array
+	 */
+	public function ppom_fields_tabs( $fields_type ) {
 
 		$tabs = array();
 
@@ -1346,7 +1406,7 @@ class PPOM_Fields_Meta {
 	 * @param  array $settings
 	 * @return array Returns setting fields as updated their HTML classes.
 	 */
-	function update_html_classes( $settings ) {
+	public function update_html_classes( $settings ) {
 
 		foreach ( $settings as $fields_meta_key => $meta ) {
 
@@ -1396,6 +1456,11 @@ class PPOM_Fields_Meta {
 	}
 }
 
+/**
+ * Returns the shared PPOM field-builder registry instance.
+ *
+ * @return PPOM_Fields_Meta
+ */
 PPOM_FIELDS_META();
 function PPOM_FIELDS_META() {
 	return PPOM_Fields_Meta::get_instance();

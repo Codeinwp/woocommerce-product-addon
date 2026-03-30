@@ -1,6 +1,11 @@
 <?php
 /**
- * Plugin Admin Settings
+ * Registers PPOM settings-panel tabs, panels, and field definitions.
+ *
+ * @package PPOM
+ * @subpackage Settings
+ *
+ * @see PPOM_SettingsFramework::register_setting()
  */
 
 /* 
@@ -15,9 +20,20 @@ if ( ! class_exists( 'PPOM_SettingsFramework' ) ) {
 	return;
 }
 
+// Core settings registration.
+
 /**
- * Register Settings Panel
- * --------------------------
+ * Registers the free PPOM settings-panel tabs, panels, and fields.
+ *
+ * Defines the base admin, pricing-label, and permission settings that are
+ * always available once the settings framework has been initialized.
+ *
+ * @return void
+ *
+ * @see PPOMSETTINGS()
+ * @see PPOM_SettingsFramework::register_tabs()
+ * @see PPOM_SettingsFramework::register_panel()
+ * @see PPOM_SettingsFramework::register_setting()
  */
 function ppom_load_free_options() {
 
@@ -130,6 +146,21 @@ function ppom_load_free_options() {
 }
 add_action( 'init', 'ppom_load_free_options' );
 
+// Pro and integration settings registration.
+
+/**
+ * Registers the pro, styling, addon, and integration settings definitions.
+ *
+ * Extends the base settings panel with advanced pricing, style output, REST
+ * API, and addon-specific settings that are consumed by the PPOM runtime.
+ *
+ * @return void
+ *
+ * @see PPOMSETTINGS()
+ * @see PPOM_SettingsFramework::register_panel()
+ * @see PPOM_SettingsFramework::register_setting()
+ * @see PPOM_Rest::init_api()
+ */
 function ppom_load_pro_options() {
 	$pro_settings = array(
 		'ppom_pro_basics'                    => array(

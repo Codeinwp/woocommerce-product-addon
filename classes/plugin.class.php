@@ -5,7 +5,6 @@
  * @package PPOM
  * @subpackage Core
  *
- * @see NM_PersonalizedProduct::__construct()
  * @see ppom_woocommerce_show_fields_on_product()
  * @see ppom_price_controller()
  * @see ppom_woocommerce_order_item_meta()

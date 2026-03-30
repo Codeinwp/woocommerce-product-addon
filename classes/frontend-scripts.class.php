@@ -5,7 +5,6 @@
  * @package PPOM
  * @subpackage Frontend
  *
- * @see PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id()
  * @see ppom_hooks_load_input_scripts()
  * @see ppom_woocommerce_template_base_inputs_rendering()
  */
@@ -49,8 +48,6 @@ class PPOM_FRONTEND_SCRIPTS {
 	 * Boots frontend asset loading for product requests.
 	 *
 	 * @return void
-	 *
-	 * @see self::load_scripts()
 	 */
 	public static function init() {
 
@@ -65,8 +62,6 @@ class PPOM_FRONTEND_SCRIPTS {
 	 * Returns the script registry used by the modern frontend loader.
 	 *
 	 * @return array
-	 *
-	 * @see self::load_scripts()
 	 */
 	private static function get_scripts() {
 
@@ -164,8 +159,6 @@ class PPOM_FRONTEND_SCRIPTS {
 	 * Returns the style registry used by the modern frontend loader.
 	 *
 	 * @return array
-	 *
-	 * @see self::load_scripts()
 	 */
 	private static function get_styles() {
 
@@ -231,10 +224,6 @@ class PPOM_FRONTEND_SCRIPTS {
 	 * Registers PPOM assets on frontend requests and loads product-specific ones.
 	 *
 	 * @return void
-	 *
-	 * @see self::get_scripts()
-	 * @see self::get_styles()
-	 * @see self::load_scripts_by_product_id()
 	 */
 	public static function load_scripts() {
 
