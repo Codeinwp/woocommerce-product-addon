@@ -1,13 +1,21 @@
 <?php
 /**
- * admin related functions/hooks
+ * Registers PPOM admin product and field-group management callbacks.
  *
- * @since 10.0
- **/
+ * @package PPOM
+ * @subpackage Admin
+ *
+ * @see ppom_meta_list()
+ * @see ppom_admin_process_product_meta()
+ * @see ppom_admin_save_form_meta()
+ * @see ppom_admin_update_form_meta()
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed.' );
 }
+
+// Product edit integration.
 
 /**
  * Adding column in product list.
@@ -85,6 +93,19 @@ function ppom_admin_product_meta_metabox() {
 	add_meta_box( 'ppom-select-meta', __( 'Select PPOM Meta', 'woocommerce-product-addon' ), 'ppom_meta_list', 'product', 'side', 'default' );
 }
 
+/**
+ * Renders the product edit metabox for selecting a PPOM field group.
+ *
+ * Reads the current product assignment from {@see PPOM_Meta} and lists every
+ * available group returned by {@see PPOM()} for attachment.
+ *
+ * @param WP_Post $post Product post being edited.
+ *
+ * @return void
+ *
+ * @see PPOM_Meta::__construct()
+ * @see ppom_admin_process_product_meta()
+ */
 function ppom_meta_list( $post ) {
 
 	$ppom         = new PPOM_Meta( $post->ID );
@@ -218,8 +239,20 @@ function ppom_meta_list( $post ) {
 	echo '</div>';
 }
 
-/*
- * saving meta data against product
+// Product-field assignment persistence.
+
+/**
+ * Persists the selected PPOM field group IDs on a WooCommerce product.
+ *
+ * Normalizes the submitted `ppom_product_meta` payload to an integer array and
+ * stores it under {@see PPOM_PRODUCT_META_KEY}.
+ *
+ * @param int $post_id Product ID receiving the PPOM assignment.
+ *
+ * @return void
+ *
+ * @see PPOM_Meta::get_meta_id()
+ * @see ppom_meta_list()
  */
 function ppom_admin_process_product_meta( $post_id ) {
 
@@ -257,8 +290,21 @@ function ppom_admin_show_notices() {
 	}
 }
 
-/*
- * saving form meta in admin call
+// Field group create and update.
+
+/**
+ * Creates a PPOM field group from the admin builder request.
+ *
+ * Verifies the admin nonce and capability, sanitizes the submitted field
+ * schema, inserts the field-group row into the PPOM custom table, then updates
+ * each field entry with the generated PPOM ID. When a product ID is submitted,
+ * the new field group is attached to that product.
+ *
+ * @return void
+ *
+ * @see ppom_sanitize_array_data()
+ * @see ppom_admin_update_ppom_meta_only()
+ * @see ppom_attach_fields_to_product()
  */
 function ppom_admin_save_form_meta() {
 
@@ -432,8 +478,16 @@ function ppom_admin_save_form_meta() {
 	wp_send_json( $resp );
 }
 
-/*
- * updating form meta in admin call
+/**
+ * Updates an existing PPOM field group from the admin builder request.
+ *
+ * Rebuilds the stored `the_meta` JSON payload from the submitted field schema
+ * and updates the field-group settings row in the PPOM custom table.
+ *
+ * @return void
+ *
+ * @see ppom_sanitize_array_data()
+ * @see ppom_admin_update_ppom_meta_only()
  */
 function ppom_admin_update_form_meta() {
 
@@ -583,7 +637,17 @@ function ppom_admin_update_form_meta() {
 	wp_send_json( $resp );
 }
 
-// Update PPOM Fields Only
+/**
+ * Rewrites only the stored PPOM field schema for a field group.
+ *
+ * @param int   $ppom_id   PPOM field-group ID.
+ * @param array $ppom_meta Normalized field definitions for `the_meta`.
+ *
+ * @return bool
+ *
+ * @see ppom_admin_save_form_meta()
+ * @see ppom_admin_update_form_meta()
+ */
 function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 
 	// print_r($_REQUEST); exit;
@@ -620,8 +684,17 @@ function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 	}
 }
 
-/*
- * delete meta
+// Field group deletion.
+
+/**
+ * Deletes a single PPOM field group from the admin UI.
+ *
+ * Verifies the admin nonce and capability before removing the row from the
+ * PPOM custom table.
+ *
+ * @return void
+ *
+ * @see ppom_admin_delete_selected_meta()
  */
 function ppom_admin_delete_meta() {
 
@@ -662,8 +735,15 @@ function ppom_admin_delete_meta() {
 	wp_send_json( $response );
 }
 
-/*
- * delete meta
+/**
+ * Deletes multiple PPOM field groups from the admin list table.
+ *
+ * Sanitizes the submitted field-group IDs and removes the matching rows from
+ * the PPOM custom table in a single prepared query.
+ *
+ * @return void
+ *
+ * @see ppom_admin_delete_meta()
  */
 function ppom_admin_delete_selected_meta() {
 
@@ -763,7 +843,19 @@ function ppom_admin_simplify_meta( $meta ) {
 	return $html;
 }
 
-// Showing PPOM Edit on Product Page
+// Admin product-page shortcuts.
+
+/**
+ * Adds PPOM edit and attach shortcuts to the product admin bar.
+ *
+ * Builds links from the current product's resolved PPOM assignment so store
+ * managers can jump straight to the field-group editor or attach another group.
+ *
+ * @return void
+ *
+ * @see PPOM_Meta::__construct()
+ * @see ppom_attach_fields_to_product()
+ */
 function ppom_admin_bar_menu() {
 
 	if ( ! is_product() ) {

@@ -1,11 +1,21 @@
 <?php
 /**
- * PPOM Meta Class
- * Manages a PPOM Fields Group
+ * Resolves PPOM field groups and settings for products.
+ *
+ * @package PPOM
+ * @subpackage Metadata
+ *
+ * @see PPOM_Meta::__construct()
+ * @see PPOM_Meta::get_meta_id()
+ * @see PPOM_Meta::settings()
+ * @see PPOM_Meta::get_fields()
+ */
+
+/**
+ * Resolves product-level PPOM metadata.
  *
  * @since version 15.0
  */
-
 class PPOM_Meta {
 
 	protected static $wc_product;
@@ -99,6 +109,17 @@ class PPOM_Meta {
 	// QM-5
 	var $meta_id;
 
+	/**
+	 * Resolves field groups, settings, and derived flags for a product.
+	 *
+	 * @param int|null $product_id Product ID used to resolve attached field groups.
+	 *
+	 * @return void
+	 *
+	 * @see PPOM_Meta::get_meta_id()
+	 * @see PPOM_Meta::settings()
+	 * @see PPOM_Meta::get_fields()
+	 */
 	// $product_id can be null if get instance to get data by meta_id
 	function __construct( $product_id = null ) {
 
@@ -150,8 +171,21 @@ class PPOM_Meta {
 		return self::$ins;
 	}
 
-	// QM-5
-	function get_meta_id( $product_id ) {
+	/**
+	 * Resolves PPOM meta IDs for a product.
+	 *
+	 * Reads direct product assignments and category assignments before applying
+	 * merge and override filters.
+	 *
+	 * @param int|null $product_id Product ID being resolved.
+	 *
+	 * @return array|int|null
+	 *
+	 * @see PPOM_PRODUCT_META_KEY
+	 * @see PPOM_Meta::settings()
+	 * @see PPOM_Meta::get_fields()
+	 */
+	public function get_meta_id( $product_id ) {
 
 		$ppom_product_id = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
 
@@ -244,9 +278,15 @@ class PPOM_Meta {
 		return $multiple_meta;
 	}
 
-	// getting settings
-	// QM-5
-	function settings() {
+	/**
+	 * Loads the primary settings row for the resolved PPOM group.
+	 *
+	 * @return object|null
+	 *
+	 * @see PPOM_Meta::get_meta_id()
+	 * @see PPOM_Meta::get_fields()
+	 */
+	public function settings() {
 
 		$meta_id = $this->single_meta_id();
 
@@ -275,8 +315,15 @@ class PPOM_Meta {
 		return apply_filters( 'ppom_meta_settings', $meta_settings, $this );
 	}
 
-	// getting fields
-	function get_fields() {
+	/**
+	 * Loads active field definitions for the resolved PPOM group or groups.
+	 *
+	 * @return array|null
+	 *
+	 * @see PPOM_Meta::settings()
+	 * @see ppom_get_field_meta_by_dataname()
+	 */
+	public function get_fields() {
 
 		if ( ! $this->is_exists() ) {
 			return null;

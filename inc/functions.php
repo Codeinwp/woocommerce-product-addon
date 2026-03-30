@@ -1,8 +1,13 @@
 <?php
-/*
- * this file contains pluing meta information and then shared
- * between pluging and admin classes
- * * [1]
+/**
+ * Provides shared PPOM helpers for metadata lookup and cart formatting.
+ *
+ * @package PPOM
+ * @subpackage Helpers
+ *
+ * @see ppom_make_meta_data()
+ * @see ppom_generate_cart_meta()
+ * @see ppom_get_field_meta_by_dataname()
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -289,11 +294,25 @@ function ppom_recursive_sanitization( $field_value ) {
 	return $field_value;
 }
 
+// Cart and order metadata.
+
 /**
- * adding cart items to order
+ * Formats PPOM cart data into metadata rows.
+ *
+ * Sanitizes saved field values against the resolved field schema before
+ * delegating display formatting to `ppom_generate_cart_meta()`.
+ *
+ * @param array  $cart_item Cart item data.
+ * @param string $context   Metadata context.
+ *
+ * @return array
  *
  * @since 8.2
- **/
+ *
+ * @see ppom_generate_cart_meta()
+ * @see ppom_get_field_meta_by_dataname()
+ * @see ppom_woocommerce_order_item_meta()
+ */
 function ppom_make_meta_data( $cart_item, $context = 'cart' ) {
 
 	if ( ! isset( $cart_item['ppom']['fields'] ) ) {
@@ -336,12 +355,19 @@ function ppom_make_meta_data( $cart_item, $context = 'cart' ) {
 }
 
 /**
- * This function will process all fields in cart and return into
- * readable form for cart meta
+ * Builds readable PPOM metadata from cart field values.
  *
- * @params: $product_id
- * @params: $ppom_meta_ids (if product_is not known)
- **/
+ * @param array                 $ppom_cart_items Cart PPOM payload.
+ * @param int                   $product_id      Product ID.
+ * @param array|int|string|null $ppom_meta_ids Optional PPOM group IDs.
+ * @param string                $context         Metadata context.
+ * @param int|null              $variation_id    Variation ID.
+ *
+ * @return array
+ *
+ * @see ppom_make_meta_data()
+ * @see ppom_get_field_meta_by_dataname()
+ */
 function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids = null, $context = 'cart', $variation_id = null ) {
 	$ppom_meta = array();
 	// Return the empty array if the cart is empty.
@@ -1023,7 +1049,23 @@ function ppom_settings_link( $links ) {
 	return $links;
 }
 
-// Get field type by data_name
+// Field lookup.
+
+/**
+ * Resolves a visible PPOM field definition by data name.
+ *
+ * @param int                   $product_id          Product ID.
+ * @param string                $original_data_name Field data name from the request or stored payload.
+ * @param array|int|string|null $ppom_id            Optional PPOM group ID or IDs.
+ *
+ * @return array|string
+ *
+ * @internal Maintains the legacy `ppom_get_field_by_dataname__field_meta` filter signature when required by Pro compatibility flags.
+ *
+ * @see PPOM_Meta::get_fields()
+ * @see ppom_make_meta_data()
+ * @see ppom_generate_cart_meta()
+ */
 function ppom_get_field_meta_by_dataname( $product_id, $original_data_name, $ppom_id = null ) {
 
 	$ppom        = new PPOM_Meta( $product_id );

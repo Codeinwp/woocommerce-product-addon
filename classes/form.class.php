@@ -1,19 +1,22 @@
 <?php
 /**
- * PPOM Frontend Form Rendering Class
+ * Renders template-based PPOM fields for products.
  *
- * It control inputs base templates
+ * @package PPOM
+ * @subpackage Frontend
  *
- * @version  1.0
+ * @see ppom_woocommerce_template_base_inputs_rendering()
+ * @see PPOM_Form::ppom_fields_render()
+ * @see PPOM_Form::render_input_template()
  */
 
-/*
-**========== Block direct access ===========
-*/
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Renders template-based PPOM field markup for a product.
+ */
 class PPOM_Form {
 
 	private static $ins = null;
@@ -80,9 +83,14 @@ class PPOM_Form {
 	}
 
 	/**
-	 * PPOM fields rendering callback.
+	 * Renders the fields for a PPOM group.
 	 *
-	 * @param int $meta_id Meta ID.
+	 * @param int $meta_id PPOM group ID.
+	 *
+	 * @return void
+	 *
+	 * @see PPOM_Meta::get_fields()
+	 * @see PPOM_Form::render_input_template()
 	 */
 	function ppom_fields_render( $meta_id = 0 ) {
 
@@ -233,7 +241,18 @@ class PPOM_Form {
 		}
 	}
 
-	function render_input_template( $meta, $default_value ) {
+	/**
+	 * Loads the frontend template for a field.
+	 *
+	 * @param array $meta Field definition.
+	 * @param mixed $default_value Default value for the field.
+	 *
+	 * @return void
+	 *
+	 * @see ppom_load_input_templates()
+	 * @see PPOM_Form::ppom_fields_render()
+	 */
+	public function render_input_template( $meta, $default_value ) {
 
 		$type = isset( $meta['type'] ) ? $meta['type'] : '';
 

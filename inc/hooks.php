@@ -1,16 +1,36 @@
 <?php
 /**
- * handling all hooks callbacks in future
+ * Registers shared hook callbacks for PPOM integrations.
  *
- * @since 8.0
- **/
+ * @package PPOM
+ * @subpackage Hooks
+ *
+ * @see ppom_hooks_load_input_scripts()
+ * @see ppom_hooks_render_shortcode()
+ * @see PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id()
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed' );
 }
 
+// Upload and cropper hooks.
 
-// Saving Cropped image when posted from product page.
+/**
+ * Persists cropped image payloads submitted from the product page.
+ *
+ * Reads the posted cropper field payload, validates the resolved file
+ * extension against the field definition, and writes cropped image data into
+ * the PPOM upload directory.
+ *
+ * @param array $ppom_fields Posted PPOM cart payload.
+ * @param array $posted_data Raw add-to-cart request payload.
+ *
+ * @return array
+ *
+ * @see ppom_get_dir_path()
+ * @see ppom_save_data_url_to_image()
+ */
 function ppom_hooks_save_cropped_image( $ppom_fields, $posted_data ) {
 
 	if ( ! isset( $posted_data['ppom_product_id'] ) ) {
@@ -66,14 +86,35 @@ function ppom_hooks_save_cropped_image( $ppom_fields, $posted_data ) {
 	return $ppom_fields;
 }
 
-// Convert option price if WOOCS currency swithcer found
+// Pricing and order formatting hooks.
+
+/**
+ * Converts a PPOM option price through WOOCS when the currency filter is active.
+ *
+ * @param float|string $option_price Raw option price.
+ *
+ * @return mixed
+ *
+ * @see ppom_hooks_convert_price_back()
+ */
 function ppom_hooks_convert_price( $option_price ) {
 	return apply_filters( 'woocs_exchange_value', $option_price );
 }
 
 
-// Converting currency back to default currency rates due to WC itself converting these
-// Like for cart line total, fixed fee etc.
+/**
+ * Converts PPOM prices back to the store currency before WooCommerce totals run.
+ *
+ * WOOCS converts cart totals later in the request, so PPOM reverses any earlier
+ * option-price conversion to avoid double conversion in cart and checkout math.
+ *
+ * @param float|string $price Price already converted for display.
+ *
+ * @return mixed
+ *
+ * @see ppom_hooks_convert_price()
+ * @see ppom_price_controller()
+ */
 function ppom_hooks_convert_price_back( $price ) {
 
 	if ( has_filter( 'woocs_exchange_value' ) ) {
@@ -96,7 +137,18 @@ function ppom_hooks_convert_price_back( $price ) {
 	return $price;
 }
 
-// Format order value for json encoded string for options
+/**
+ * Formats JSON-encoded PPOM option data for order item display.
+ *
+ * @param string $display_value Order item meta display value.
+ * @param object $meta          Order item meta object.
+ * @param object $item          Order item.
+ *
+ * @return string
+ *
+ * @see ppom_generate_cart_meta()
+ * @see ppom_woocommerce_order_value()
+ */
 function ppom_hooks_format_order_value( $display_value, $meta, $item ) {
 
 	$is_jsone = json_decode( $display_value, true );
@@ -129,7 +181,18 @@ function ppom_hooks_format_order_value( $display_value, $meta, $item ) {
 	return $display_value;
 }
 
-// While rendering fields return attributes for fields
+// Input attribute and asset hooks.
+
+/**
+ * Builds HTML attributes used by frontend PPOM input templates.
+ *
+ * @param array  $field_meta Stored field definition.
+ * @param string $type       Input type being rendered.
+ *
+ * @return array
+ *
+ * @see PPOM_Form::render_input_template()
+ */
 function ppom_hooks_set_attributes( $field_meta, $type ) {
 
 	$ppom_attribtues = array();
@@ -159,7 +222,22 @@ function ppom_hooks_set_attributes( $field_meta, $type ) {
 	return $ppom_attribtues;
 }
 
-// enqueu required scripts/css for inputs
+/**
+ * Enqueues the legacy frontend assets required by a product's PPOM fields.
+ *
+ * Resolves the effective field set for the product, loads the matching script
+ * and style handles, and localizes `ppom_input_vars` and `ppom_file_vars` for
+ * pricing, conditions, validation, and uploads.
+ *
+ * @param WC_Product|int $product Product object or product ID.
+ * @param int|null       $ppom_id Optional field-group ID override.
+ *
+ * @return string|void
+ *
+ * @see PPOM_Meta::__construct()
+ * @see PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id()
+ * @see ppom_woocommerce_template_base_inputs_rendering()
+ */
 function ppom_hooks_load_input_scripts( $product, $ppom_id = null ) {
 
 	$product_id = ppom_get_product_id( $product );
@@ -468,6 +546,17 @@ function ppom_hooks_load_input_scripts( $product, $ppom_id = null ) {
 	}
 }
 
+/**
+ * Normalizes per-field input args before the field template renders.
+ *
+ * @param array      $field_setting Prepared input settings.
+ * @param array      $field_meta    Stored field definition.
+ * @param WC_Product $product       Product being rendered.
+ *
+ * @return array
+ *
+ * @see PPOM_Form::ppom_fields_render()
+ */
 function ppom_hooks_input_args( $field_setting, $field_meta, $product ) {
 
 	if ( $field_setting['type'] == 'date' && isset( $field_meta['jquery_dp'] ) && $field_meta['jquery_dp'] == 'on' ) {
@@ -492,6 +581,17 @@ function ppom_hooks_input_args( $field_setting, $field_meta, $product ) {
 	return $field_setting;
 }
 
+/**
+ * Validates checkbox minimum and maximum selections.
+ *
+ * @param bool  $has_value     Current validation result.
+ * @param array $posted_fields Normalized posted field values.
+ * @param array $field         Stored field definition.
+ *
+ * @return bool
+ *
+ * @see ppom_check_validation()
+ */
 function ppom_hooks_checkbox_valided( $has_value, $posted_fields, $field ) {
 
 	if ( $field['type'] != 'checkbox' ) {
@@ -540,11 +640,19 @@ function ppom_hooks_show_option_price_pricematrix( $show_price, $meta ) {
 	return $show_price;
 }
 
+// Input metadata normalization hooks.
+
 /**
- * registration meta in wmp for translation
+ * Registers translatable strings and normalized option IDs for a field group.
  *
- * @since 7.0
- **/
+ * @param array $meta_data Field definitions being stored.
+ * @param int   $ppom_id   Field-group ID being written.
+ *
+ * @return array
+ *
+ * @see ppom_admin_save_form_meta()
+ * @see ppom_admin_update_form_meta()
+ */
 function ppom_hooks_register_wpml( $meta_data, $ppom_id ) {
 
 
@@ -644,8 +752,19 @@ function ppom_hooks_register_wpml( $meta_data, $ppom_id ) {
 	return $meta_data;
 }
 
+// Conditional wrapper hooks.
 
-/** The input wrapper class, it is NOT the main wrapper */
+
+/**
+ * Adds conditional-visibility classes to the legacy field wrapper element.
+ *
+ * @param string $input_wrapper_class Existing wrapper classes.
+ * @param array  $field_meta          Stored field definition.
+ *
+ * @return string
+ *
+ * @see ppom_hooks_input_main_wrapper_class()
+ */
 function ppom_hooks_input_wrapper_class( $input_wrapper_class, $field_meta ) {
 
 	$input_wrapper_class .= ' ppom-input-' . $field_meta['id'];
@@ -678,7 +797,16 @@ function ppom_hooks_input_wrapper_class( $input_wrapper_class, $field_meta ) {
 	return $input_wrapper_class;
 }
 
-/** The input wrapper class, it is NOT the main wrapper: WHEN NEW CONDITTIONS */
+/**
+ * Adds stable wrapper classes for the newer conditional-logic renderer.
+ *
+ * @param string $input_wrapper_class Existing wrapper classes.
+ * @param array  $field_meta          Stored field definition.
+ *
+ * @return string
+ *
+ * @see ppom_get_conditions_mode()
+ */
 function ppom_hooks_input_wrapper_class_new( $input_wrapper_class, $field_meta ) {
 	// var_dump($input_wrapper_class);
 	$input_wrapper_class .= ' ppom-input-' . $field_meta['id'];
@@ -686,7 +814,18 @@ function ppom_hooks_input_wrapper_class_new( $input_wrapper_class, $field_meta )
 	return $input_wrapper_class;
 }
 
-/** The input MAIN wrapper class */
+/**
+ * Adds conditional-logic classes to the main field wrapper element.
+ *
+ * @param string $wrapper_class Existing wrapper classes.
+ * @param array  $classes_array Wrapper class array passed by the caller.
+ * @param array  $field_meta    Stored field definition.
+ *
+ * @return string
+ *
+ * @see ppom_hooks_input_wrapper_class()
+ * @see ppom_hooks_input_wrapper_class_new()
+ */
 function ppom_hooks_input_main_wrapper_class( $wrapper_class, $classes_array, $field_meta ) {
 
 	$logic      = ( isset( $field_meta['logic'] ) ? $field_meta['logic'] : '' );
@@ -735,6 +874,19 @@ function ppom_hooks_convert_option_json_to_string( $row, $order ) {
 	return $row;
 }
 
+// Cart and order integration hooks.
+
+/**
+ * Adds PPOM option weights to the cart item's product object.
+ *
+ * @param array $ppom_field_prices Calculated PPOM pricing rows.
+ * @param array $ppom_fields_post  Normalized posted PPOM field payload.
+ * @param array $cart_items        WooCommerce cart item data.
+ *
+ * @return void
+ *
+ * @see ppom_get_field_prices()
+ */
 function ppom_hooks_update_cart_weight( $ppom_field_prices, $ppom_fields_post, $cart_items ) {
 
 	if ( ppom_pro_is_installed() ) {
@@ -807,7 +959,22 @@ function ppom_hooks_set_option_operator( $operator, $price, $meta ) {
 	return $operator;
 }
 
-// PPOM shortcode
+// Shortcode and template override hooks.
+
+/**
+ * Renders PPOM fields inside the `[ppom]` shortcode form.
+ *
+ * Loads the same product-scoped assets used on the single-product template and
+ * then renders either the legacy or template-based PPOM field output.
+ *
+ * @param array $attr Shortcode attributes.
+ *
+ * @return string|null
+ *
+ * @see PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id()
+ * @see ppom_woocommerce_show_fields_on_product()
+ * @see ppom_woocommerce_template_base_inputs_rendering()
+ */
 function ppom_hooks_render_shortcode( $attr ) {
 
 	$params = shortcode_atts(
@@ -873,14 +1040,32 @@ function ppom_hooks_render_shortcode( $attr ) {
 	}
 }
 
-// redirecting to cart directly if being called from shortcode
+/**
+ * Redirects shortcode submissions to the cart after add-to-cart completes.
+ *
+ * @param string $url Default WooCommerce add-to-cart redirect URL.
+ *
+ * @return string
+ *
+ * @see ppom_hooks_render_shortcode()
+ */
 function ppom_hooks_redirect_to_cart_if_shortcode( $url ) {
 	$url = isset( $_POST['ppom']['ppom_shorcode_product_id'] ) ? wc_get_cart_url() : $url;
 
 	return $url;
 }
 
-// Check if the PPOM field template inside the theme
+/**
+ * Resolves theme-level template overrides for PPOM field templates.
+ *
+ * @param string     $full_path     Resolved plugin template path.
+ * @param string     $template_path Relative template path within PPOM.
+ * @param array|null $vars          Template vars available during resolution.
+ *
+ * @return string
+ *
+ * @see PPOM_Form::render_input_template()
+ */
 function ppom_hooks_check_theme_path( $full_path, $template_path, $vars ) {
 
 	// Extract variable from array

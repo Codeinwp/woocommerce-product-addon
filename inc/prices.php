@@ -1,11 +1,30 @@
 <?php
 /**
- * PPOM Price Controls
- * */
+ * Calculates server-side addon pricing for PPOM cart items.
+ *
+ * @package PPOM
+ * @subpackage Pricing
+ *
+ * @see ppom_price_controller()
+ * @see ppom_get_field_prices()
+ * @see ppom_price_get_product_base()
+ * @see ppom_price_cart_fee()
+ */
+
+// Cart line pricing.
 
 /**
- * Important function: getting prices against posted fields
- **/
+ * Recalculates the cart line price for a PPOM cart item.
+ *
+ * @param array $cart_item Cart item restored from the session.
+ * @param array $values    Raw cart item values.
+ *
+ * @return array
+ *
+ * @see ppom_get_field_prices()
+ * @see ppom_price_get_product_base()
+ * @see ppom_price_cart_fee()
+ */
 function ppom_price_controller( $cart_item, $values ) {
 
 	// ppom_pa($cart_item);
@@ -123,6 +142,24 @@ function ppom_before_calculate_totals( $cart_items ) {
 }
 
 
+/**
+ * Resolves price entries for posted PPOM fields.
+ *
+ * Uses submitted field selections to look up field definitions and build the
+ * normalized pricing rows used by cart line pricing and cart fees.
+ *
+ * @param array      $ppom_fields_post Posted PPOM field values.
+ * @param int        $product_id       Product ID.
+ * @param float|int  $product_quantity Product quantity.
+ * @param int|string $variation_id     Variation ID.
+ * @param array|null $item             Cart item context.
+ *
+ * @return array
+ *
+ * @see ppom_get_field_meta_by_dataname()
+ * @see ppom_price_get_product_base()
+ * @see ppom_price_cart_fee()
+ */
 function ppom_get_field_prices( $ppom_fields_post, $product_id, &$product_quantity, $variation_id, $item = null ) {
 
 	$field_prices  = array();
@@ -1017,7 +1054,26 @@ function ppom_price_get_total_measure( $price_array ) {
 	return $total_measure;
 }
 
-// Get product base price
+/**
+ * Resolves the base product price for a PPOM cart item.
+ *
+ * Applies matrix, quantity, fixed-price, and measure pricing before returning
+ * the base amount used in the final cart line total.
+ *
+ * @param float      $product_price      Product price before PPOM adjustments.
+ * @param WC_Product $product            Product object.
+ * @param array      $ppom_fields_post   Posted PPOM field values.
+ * @param float|int  $product_quantity   Product quantity.
+ * @param array      $ppom_field_prices  Normalized PPOM price rows.
+ * @param float|int  $ppom_discount      Discount accumulator passed by reference.
+ * @param array|null $ppom_pricematrix   Matched price matrix data.
+ *
+ * @return array
+ *
+ * @see ppom_get_field_prices()
+ * @see ppom_parse_price_matrix()
+ * @see ppom_price_controller()
+ */
 function ppom_price_get_product_base(
 	$product_price,
 	$product,
@@ -1192,9 +1248,19 @@ function ppom_price_fixedprice_chunk( $product, $fixedprice_options, $product_qu
 	return apply_filters( 'ppom_price_fixedprice_chunk_cart', $fixedprice_found, $product );
 }
 
+// Cart fees.
+
 /**
- * Calculating Fixed Fees
- * **/
+ * Adds PPOM cart fees and discounts to the WooCommerce cart.
+ *
+ * @param WC_Cart $cart WooCommerce cart.
+ *
+ * @return void
+ *
+ * @see ppom_get_field_prices()
+ * @see ppom_price_has_discount_matrix()
+ * @see ppom_price_controller()
+ */
 function ppom_price_cart_fee( $cart ) {
 	$fee_no       = 1;
 	$cart_counter = 1;

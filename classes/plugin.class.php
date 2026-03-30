@@ -1,9 +1,19 @@
 <?php
-/*
- * The base plugin class.
+/**
+ * Registers PPOM runtime hooks for WooCommerce requests.
+ *
+ * @package PPOM
+ * @subpackage Core
+ *
+ * @see NM_PersonalizedProduct::__construct()
+ * @see ppom_woocommerce_show_fields_on_product()
+ * @see ppom_price_controller()
+ * @see ppom_woocommerce_order_item_meta()
  */
 
-
+/**
+ * Coordinates PPOM hooks across product, cart, checkout, and order flows.
+ */
 class NM_PersonalizedProduct {
 
 	public const LICENSE_PLAN_FREE = -1;
@@ -32,7 +42,19 @@ class NM_PersonalizedProduct {
 	}
 
 
-	function __construct() {
+	/**
+	 * Registers the PPOM runtime hook map.
+	 *
+	 * @return void
+	 *
+	 * @see ppom_woocommerce_show_fields_on_product()
+	 * @see ppom_woocommerce_validate_product()
+	 * @see ppom_woocommerce_add_cart_item_data()
+	 * @see ppom_price_controller()
+	 * @see ppom_woocommerce_order_item_meta()
+	 * @see ppom_woocommerce_rename_files()
+	 */
+	public function __construct() {
 
 
 		// populating $inputs with NM_Inputs object

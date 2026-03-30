@@ -1,12 +1,32 @@
 <?php
 /**
- * Manage file uploads, thumbs and generate links for uploaded files
- **/
+ * Manages PPOM upload storage, upload handlers, and file download resolution.
+ *
+ * @package PPOM
+ * @subpackage Files
+ *
+ * @see ppom_files_setup_get_directory()
+ * @see ppom_upload_file()
+ * @see ppom_delete_file()
+ * @see ppom_get_file_download_url()
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed.' );
 }
 
-// Set/create directory and return path
+// Upload storage.
+
+/**
+ * Creates and returns a PPOM upload directory path.
+ *
+ * @param string|false $sub_dir Optional upload subdirectory.
+ *
+ * @return string|null
+ *
+ * @see ppom_get_dir_path()
+ * @see ppom_woocommerce_rename_files()
+ */
 function ppom_files_setup_get_directory( $sub_dir = false ) {
 
 	$upload_dir = wp_upload_dir();
@@ -195,6 +215,20 @@ function ppom_create_chunk_file( $file_path_to_read, $ppom_chunk_file_path, $mod
 	return false;
 }
 
+// Upload handlers.
+
+/**
+ * Handles AJAX uploads for PPOM file fields.
+ *
+ * Validates the request nonce, checks the file type, and stores the upload in
+ * the PPOM upload directory.
+ *
+ * @return void
+ *
+ * @see ppom_files_setup_get_directory()
+ * @see ppom_delete_file()
+ * @see ppom_woocommerce_rename_files()
+ */
 function ppom_upload_file() {
 
 	header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
@@ -402,7 +436,14 @@ function ppom_upload_file() {
 	die( json_encode( apply_filters( 'ppom_file_upload', $response, $file_type, $file_dir_path, $file_name ) ) );
 }
 
-// Deleting file
+/**
+ * Deletes a temporary PPOM upload.
+ *
+ * @return void
+ *
+ * @see ppom_upload_file()
+ * @see ppom_files_setup_get_directory()
+ */
 function ppom_delete_file() {
 
 	if ( ! isset( $_REQUEST ['file_name'] ) || ! isset( $_REQUEST['ppom_nonce'] ) ) {
@@ -468,7 +509,20 @@ function ppom_create_image_thumb( $file_path, $image_name, $thumb_size ) {
 	return $image_destination;
 }
 
-// Get file download url after payment
+// Download resolution.
+
+/**
+ * Resolves the download URL for a confirmed PPOM file.
+ *
+ * @param string $file_name  Original file name.
+ * @param int    $order_id   Order ID.
+ * @param int    $product_id Product ID.
+ *
+ * @return string
+ *
+ * @see ppom_woocommerce_rename_files()
+ * @see ppom_get_dir_path()
+ */
 function ppom_get_file_download_url( $file_name, $order_id, $product_id ) {
 
 	$base_dir_path      = ppom_get_dir_path() . $file_name;

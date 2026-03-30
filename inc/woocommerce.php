@@ -1,14 +1,21 @@
 <?php
-/*
- * all WooCommerce Hooks will be called here
+/**
+ * Coordinates PPOM rendering, validation, cart data, order metadata, and upload finalization in WooCommerce.
  *
+ * @package PPOM
+ * @subpackage WooCommerce
  *
+ * @see ppom_woocommerce_show_fields_on_product()
+ * @see ppom_check_validation()
+ * @see ppom_woocommerce_order_item_meta()
+ * @see ppom_woocommerce_rename_files()
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed.' );
 }
 
+// Rendering.
 /**
  * Renders field if legacy input rendering mode is on
  *
@@ -24,7 +31,18 @@ function ppom_woocommerce_show_fields() {
 }
 
 
-// for shortcode/direct access purpose
+/**
+ * Renders legacy PPOM fields for a product.
+ *
+ * @param int        $product_id Product ID.
+ * @param array|null $args       Rendering arguments.
+ *
+ * @return string|void
+ *
+ * @see PPOM_Meta::__construct()
+ * @see ppom_load_template()
+ * @see ppom_woocommerce_template_base_inputs_rendering()
+ */
 function ppom_woocommerce_show_fields_on_product( $product_id, $args = null ) {
 
 	$product = wc_get_product( $product_id );
@@ -85,6 +103,18 @@ function ppom_woocommerce_inputs_template_base() {
 	ppom_woocommerce_template_base_inputs_rendering( $product_id, $args );
 }
 
+/**
+ * Renders template-based PPOM fields for a product.
+ *
+ * @param int        $product_id Product ID.
+ * @param array|null $args       Rendering arguments.
+ *
+ * @return string|void
+ *
+ * @see PPOM_Form::ppom_fields_render()
+ * @see ppom_load_input_templates()
+ * @see ppom_woocommerce_show_fields_on_product()
+ */
 function ppom_woocommerce_template_base_inputs_rendering( $product_id, $args = null ) {
 
 	$product = wc_get_product( $product_id );
@@ -130,6 +160,23 @@ function ppom_woocommerce_load_scripts() {
 }
 
 
+// Validation.
+
+/**
+ * Validates PPOM fields during add to cart.
+ *
+ * Treats posted PPOM values as untrusted input and validates them against the
+ * resolved field schema for the product.
+ *
+ * @param bool      $passed     Validation state from earlier callbacks.
+ * @param int       $product_id Product ID.
+ * @param int|float $qty        Requested quantity.
+ *
+ * @return bool
+ *
+ * @see ppom_check_validation()
+ * @see PPOM_Meta::__construct()
+ */
 function ppom_woocommerce_validate_product( $passed, $product_id, $qty ) {
 
 	$ppom = new PPOM_Meta( $product_id );
@@ -153,6 +200,14 @@ function ppom_woocommerce_validate_product( $passed, $product_id, $qty ) {
 	return $passed;
 }
 
+/**
+ * Validates PPOM fields through the AJAX validation endpoint.
+ *
+ * @return void
+ *
+ * @see ppom_check_validation()
+ * @see ppom_woocommerce_validate_product()
+ */
 function ppom_woocommerce_ajax_validate() {
 
 	// ppom_pa($_POST); exit;
@@ -206,6 +261,22 @@ function ppom_woocommerce_ajax_validate() {
 	wp_send_json( $response );
 }
 
+/**
+ * Validates posted PPOM fields against the product field schema.
+ *
+ * Reads posted values from `ppom[fields]`, skips hidden fields, and adds
+ * WooCommerce notices for failed requirements.
+ *
+ * @param int   $product_id Product ID.
+ * @param array $post_data  Posted request payload.
+ * @param bool  $passed     Validation state from earlier checks.
+ *
+ * @return bool
+ *
+ * @see PPOM_Meta::get_fields()
+ * @see ppom_has_posted_field_value()
+ * @see ppom_woocommerce_add_cart_item_data()
+ */
 function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 
 	$ppom = new PPOM_Meta( $product_id );
@@ -277,6 +348,23 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 }
 
 
+// Cart data and session pricing.
+
+/**
+ * Stores posted PPOM data on the WooCommerce cart item.
+ *
+ * The posted payload remains untrusted and is revalidated and repriced later in
+ * the cart and checkout lifecycle.
+ *
+ * @param array $cart       Cart item data.
+ * @param int   $product_id Product ID.
+ *
+ * @return array
+ *
+ * @see ppom_check_validation()
+ * @see ppom_price_controller()
+ * @see ppom_make_meta_data()
+ */
 function ppom_woocommerce_add_cart_item_data( $cart, $product_id ) {
 
 	if ( ! isset( $_POST['ppom'] ) ) {
@@ -1165,6 +1253,25 @@ function ppom_woocommerce_cart_update_validate( $cart_validated, $cart_item_key,
 }
 
 
+// Order persistence.
+
+/**
+ * Stores PPOM metadata on an order line item.
+ *
+ * Saves formatted display values as line-item meta and preserves the raw PPOM
+ * payload in `_ppom_fields` for later formatting and replay.
+ *
+ * @param WC_Order_Item_Product $item          Order line item.
+ * @param string                $cart_item_key Cart item key.
+ * @param array                 $values        Cart item values.
+ * @param WC_Order              $order         Order being created.
+ *
+ * @return void
+ *
+ * @see ppom_make_meta_data()
+ * @see ppom_get_field_meta_by_dataname()
+ * @see ppom_woocommerce_order_value()
+ */
 function ppom_woocommerce_order_item_meta( $item, $cart_item_key, $values, $order ) {
 
 	if ( ! isset( $values ['ppom']['fields'] ) ) {
@@ -1221,6 +1328,19 @@ function ppom_woocommerce_order_key( $display_key, $meta, $item ) {
 	return $display_key;
 }
 
+/**
+ * Formats PPOM order item meta for display.
+ *
+ * @param mixed              $display_value Formatted value from WooCommerce.
+ * @param object|null        $meta          Order item meta object.
+ * @param WC_Order_Item|null $item   Order item.
+ *
+ * @return mixed
+ *
+ * @see ppom_generate_html_for_files()
+ * @see ppom_get_field_meta_by_dataname()
+ * @see ppom_woocommerce_order_item_meta()
+ */
 function ppom_woocommerce_order_value( $display_value, $meta = null, $item = null ) {
 
 	if ( is_null( $item ) ) {
@@ -1285,7 +1405,24 @@ function ppom_woocommerce_hide_order_meta( $formatted_meta, $order_item ) {
 	return $formatted_meta;
 }
 
-// When order paid update filename with order number
+// Upload finalization.
+
+/**
+ * Moves uploaded PPOM files into the confirmed order directory.
+ *
+ * File names and destination paths are resolved on the server from the cart
+ * payload and the saved field schema.
+ *
+ * @param int      $order_id    Order ID.
+ * @param mixed    $posted_data Posted checkout data.
+ * @param WC_Order $order       Processed order.
+ *
+ * @return void
+ *
+ * @see ppom_get_dir_path()
+ * @see ppom_get_field_meta_by_dataname()
+ * @see ppom_get_file_download_url()
+ */
 function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 
 	global $woocommerce;

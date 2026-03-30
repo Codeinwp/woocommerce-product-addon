@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Plugin Name: PPOM for WooCommerce
  * Plugin URI: https://themeisle.com/plugins/ppom-pro/
  * Description: PPOM (Personalized Product Meta Manager) plugin allow WooCommerce Store Admin to create unlimited input fields and files to attach with Product Pages.
@@ -16,6 +16,15 @@
  * WordPress Available:  yes
  * Requires License:     no
  * Requires Plugins: woocommerce
+ *
+ * Bootstraps PPOM and registers top-level plugin hooks.
+ *
+ * @package PPOM
+ * @subpackage Bootstrap
+ *
+ * @see ppom_i18n_setup()
+ * @see PPOM()
+ * @see NM_PersonalizedProduct::__construct()
  */
 
 // @since 6.1
@@ -55,10 +64,14 @@ add_filter(
 	}
 );
 
-/*
- * plugin localization being initiated here
- */
 add_action( 'init', 'ppom_i18n_setup' );
+/**
+ * Loads the PPOM textdomain.
+ *
+ * @return void
+ *
+ * @see PPOM()
+ */
 function ppom_i18n_setup() {
 	load_plugin_textdomain( 'woocommerce-product-addon', false, basename( __DIR__ ) . '/languages' );
 }
@@ -114,9 +127,18 @@ if ( is_admin() ) {
 	add_filter( "plugin_action_links_{$ppom_basename}", array( $ppom_admin, 'upgrade_to_pro_plugin_action' ), 10, 2 );
 }
 
+// phpcs:disable WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid -- Established bootstrap accessor.
+/**
+ * Returns the PPOM runtime singleton.
+ *
+ * @return NM_PersonalizedProduct
+ *
+ * @see NM_PersonalizedProduct::get_instance()
+ */
 function PPOM() {
 	return NM_PersonalizedProduct::get_instance();
 }
+// phpcs:enable WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid
 
 add_filter(
 	'themeisle_sdk_compatibilities/' . PPOM_BASENAME,
