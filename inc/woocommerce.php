@@ -648,8 +648,8 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 			$hidden = true;
 		}
 
-		$allowed_input_fields = array( 'text_field', 'textarea', 'number' );
-		$is_allowed_field     = in_array( $key, $allowed_input_fields, true );
+		$allowed_input_fields = array( 'text', 'textarea', 'number' );
+		$is_allowed_field     = in_array( $meta['type'], $allowed_input_fields, true );
 
 		if ( $is_allowed_field && '' === $display ) {
 			// Allow 0 and '0', skip only truly empty values
