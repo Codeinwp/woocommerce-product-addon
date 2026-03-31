@@ -289,8 +289,6 @@ function ppom_admin_save_form_meta() {
 		wp_send_json( $resp );
 	}
 
-	global $wpdb;
-
 	$send_file_attachment = 'NA';
 	$aviary_api_key       = 'NA';
 	$show_cart_thumb      = 'NA';
@@ -372,12 +370,7 @@ function ppom_admin_save_form_meta() {
 		'%s',
 	);
 
-	global $wpdb;
-	$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-	$wpdb->insert( $ppom_table, $dt, $format );
-
-
-	$ppom_id = $wpdb->insert_id;
+	$ppom_id = PPOM_Meta_DB::insert( $dt, $format );
 	if ( is_string( $ppom ) ) {
 		$ppom_encoded = $ppom;
 		parse_str( $ppom_encoded, $ppom_decoded);
@@ -416,7 +409,6 @@ function ppom_admin_save_form_meta() {
 	$resp = array();
 	if ( $ppom_id ) {
 
-		PPOM_Meta::flush_cache();
 		$resp = array(
 			'message'        => __( 'Form added successfully', 'woocommerce-product-addon' ),
 			'status'         => 'success',
@@ -476,7 +468,6 @@ function ppom_admin_update_form_meta() {
 
 		wp_send_json( $resp );
 	}
-	global $wpdb;
 
 	if ( is_string( $_REQUEST['ppom'] ) ) {
 		$ppom_encoded = $_REQUEST['ppom'];
@@ -530,10 +521,6 @@ function ppom_admin_update_form_meta() {
 
 	// wp_send_json($dt);
 
-	$where = array(
-		'productmeta_id' => $productmeta_id,
-	);
-
 	$format       = array(
 		'%s',
 		'%s',
@@ -549,9 +536,7 @@ function ppom_admin_update_form_meta() {
 		'%d',
 	);
 
-	global $wpdb;
-	$ppom_table    = $wpdb->prefix . PPOM_TABLE_META;
-	$rows_effected = $wpdb->update( $ppom_table, $dt, $where, $format, $where_format );
+	$rows_effected = PPOM_Meta_DB::update( $productmeta_id, $dt, $format, $where_format );
 
 	// $wpdb->show_errors(); $wpdb->print_error();
 
@@ -567,7 +552,6 @@ function ppom_admin_update_form_meta() {
 	$resp = array();
 	if ( $rows_effected ) {
 
-		PPOM_Meta::flush_cache();
 		$resp = array(
 			'message'        => __( 'Form updated successfully', 'woocommerce-product-addon' ),
 			'status'         => 'success',
@@ -591,16 +575,9 @@ function ppom_admin_update_form_meta() {
 function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 
 	// print_r($_REQUEST); exit;
-	global $wpdb;
 
 	$dt = array(
 		'the_meta' => wp_json_encode( ppom_sanitize_array_data( $ppom_meta ) ),
-	);
-
-	// ppom_pa($dt); exit;
-
-	$where = array(
-		'productmeta_id' => $ppom_id,
 	);
 
 	$format       = array(
@@ -610,14 +587,10 @@ function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 		'%d',
 	);
 
-	global $wpdb;
-	$ppom_table    = $wpdb->prefix . PPOM_TABLE_META;
-	$rows_effected = $wpdb->update( $ppom_table, $dt, $where, $format, $where_format );
-
+	$rows_effected = PPOM_Meta_DB::update( $ppom_id, $dt, $format, $where_format );
 	// $wpdb->show_errors(); $wpdb->print_error();
 
 	if ( $rows_effected ) {
-		PPOM_Meta::flush_cache();
 		return true;
 	} else {
 		return false;
@@ -642,18 +615,15 @@ function ppom_admin_delete_meta() {
 		wp_send_json( $response );
 	}
 
-	global $wpdb;
-
 	$productmeta_id = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
+	$ppom_id        = intval( $productmeta_id );
+	$where_format   = array( '%d' );
 
-	$tbl_name = $wpdb->prefix . PPOM_TABLE_META;
-	$ppom_id  = intval( $productmeta_id );
-	$res      = $wpdb->query( $wpdb->prepare( "DELETE FROM {$tbl_name} WHERE productmeta_id = %d", $productmeta_id ) );
+	$res = PPOM_Meta_DB::delete( $ppom_id, $where_format );
 
 
 	$response = [];
 	if ( $res ) {
-		PPOM_Meta::flush_cache();
 		$response = array(
 			'status'  => 'success',
 			'message' => __( 'Meta deleted successfully', 'woocommerce-product-addon' ),
@@ -683,8 +653,6 @@ function ppom_admin_delete_selected_meta() {
 		die( 0 );
 	}
 
-	global $wpdb;
-
 	$del_ids = [];
 	$del_ids_ph = [];
 
@@ -702,14 +670,12 @@ function ppom_admin_delete_selected_meta() {
 
 	$del_ids_ph = implode( ', ', $del_ids_ph );
 
-	$tbl_name        = $wpdb->prefix . PPOM_TABLE_META;
-
-	$res = $wpdb->query( $wpdb->prepare( "DELETE FROM {$tbl_name} WHERE productmeta_id IN ({$del_ids_ph})", $del_ids ) );
+	$res = PPOM_Meta_DB::delete( $del_ids, $del_ids_ph );
 
 	if ( $res ) {
-		PPOM_Meta::flush_cache();
 		_e( 'Meta deleted successfully', 'woocommerce-product-addon' );
 	} else {
+		global $wpdb;
 		$wpdb->show_errors();
 		$wpdb->print_error();
 	}

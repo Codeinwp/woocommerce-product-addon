@@ -367,11 +367,7 @@ class PPOM_Rest {
 			'%s',
 			'%s',
 		);
-
-		global $wpdb;
-		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-		$wpdb->insert( $ppom_table, $dt, $format );
-		$res_id = $wpdb->insert_id;
+		$res_id = PPOM_Meta_DB::insert( $dt, $format );
 
 		$ppom_fields = apply_filters( 'ppom_meta_data_saving', $ppom_fields, $res_id );
 		// Updating PPOM Meta with ppom_id in each meta array
@@ -428,17 +424,11 @@ class PPOM_Rest {
 
 		$merger_array = apply_filters( 'ppom_meta_data_saving', $merger_array, $ppom_meta->productmeta_id );
 
-		$data  = array( 'the_meta' => json_encode( $merger_array ) );
-		$where = array(
-			'productmeta_id' => $ppom_meta->productmeta_id,
-		);
+		$data          = array( 'the_meta' => json_encode( $merger_array ) );
+		$format        = array( '%s' );
+		$where_format  = array( '%d' );
 
-		$format       = array( '%s' );
-		$where_format = array( '%d' );
-
-		global $wpdb;
-		$ppom_table    = $wpdb->prefix . PPOM_TABLE_META;
-		$rows_effected = $wpdb->update( $ppom_table, $data, $where, $format, $where_format );
+		$rows_effected = PPOM_Meta_DB::update( $ppom_meta->productmeta_id, $data, $format, $where_format );
 
 		$resp = array(
 			'status'     => 'success',
@@ -464,8 +454,8 @@ class PPOM_Rest {
 			delete_post_meta( $product_id, PPOM_PRODUCT_META_KEY );
 
 			// Deleting all fields
-			$ppom_table         = $wpdb->prefix . PPOM_TABLE_META;
-			$res                = $wpdb->query( $wpdb->prepare( "DELETE FROM $ppom_table WHERE productmeta_id = %d", $ppom_meta->productmeta_id ) );
+			$where_format       = array( '%d' );
+			$res                = PPOM_Meta_DB::delete( $ppom_meta->productmeta_id, $where_format );
 			$delete_fields_resp = array( 'ppom_id' => $ppom_meta->productmeta_id );
 
 			$resp = array(
@@ -493,16 +483,11 @@ class PPOM_Rest {
 		}
 
 
-		$data  = array( 'the_meta' => json_encode( $merger_array ) );
-		$where = array(
-			'productmeta_id' => $ppom_meta->productmeta_id,
-		);
+		$data          = array( 'the_meta' => json_encode( $merger_array ) );
+		$format        = array( '%s' );
+		$where_format  = array( '%d' );
 
-		$format       = array( '%s' );
-		$where_format = array( '%d' );
-
-		$ppom_table    = $wpdb->prefix . PPOM_TABLE_META;
-		$rows_effected = $wpdb->update( $ppom_table, $data, $where, $format, $where_format );
+		$rows_effected = PPOM_Meta_DB::update( $ppom_meta->productmeta_id, $data, $format, $where_format );
 
 		$resp = array(
 			'status'     => 'success',
