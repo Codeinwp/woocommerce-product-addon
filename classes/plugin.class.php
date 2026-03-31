@@ -802,6 +802,10 @@ class NM_PersonalizedProduct {
 
 		$result = $wpdb->query( $wpdb->prepare( $sql, array( $meta_id ) ) );
 
+		if ( $wpdb->insert_id ) {
+			PPOM_Meta_DB::invalidate_cache( $wpdb->insert_id );
+		}
+
 		wp_safe_redirect( admin_url( 'admin.php?page=ppom&productmeta_id=' . intval( $wpdb->insert_id ) . '&do_meta=edit' ) );
         die();
 		/*
@@ -914,6 +918,10 @@ class NM_PersonalizedProduct {
 			$qry = substr( $qry, 0, - 1 );
 			// print $qry; exit;
 			$res = $wpdb->query( $qry );
+
+			if ( $wpdb->insert_id ) {
+				PPOM_Meta_DB::invalidate_cache( $wpdb->insert_id );
+			}
 
 			/*
 			$wpdb->show_errors();

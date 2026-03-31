@@ -668,6 +668,11 @@ function ppom_admin_delete_selected_meta() {
 		$del_ids_ph[] = '%d';
 	}
 
+	if ( empty( $del_ids ) ) {
+		_e( 'No valid meta IDs found to delete.', 'woocommerce-product-addon' );
+		die( 0 );
+	}
+
 	$del_ids_ph = implode( ', ', $del_ids_ph );
 
 	$res = PPOM_Meta_DB::delete( $del_ids, $del_ids_ph );

@@ -115,8 +115,10 @@ class PPOM_Meta_DB {
 
 		foreach ( $ids as $id ) {
 			$key = "ppom_meta_{$id}";
-			if ( isset( $cached[ $key ] ) && false !== $cached[ $key ] ) {
-				$results[ $id ] = $cached[ $key ];
+			if ( array_key_exists( $key, $cached ) ) {
+				if ( null !== $cached[ $key ] && false !== $cached[ $key ] ) {
+					$results[ $id ] = $cached[ $key ];
+				}
 			} else {
 				$uncached_ids[] = $id;
 			}
@@ -125,9 +127,13 @@ class PPOM_Meta_DB {
 		// Fetch missing IDs
 		if ( ! empty( $uncached_ids ) ) {
 			global $wpdb;
-			$table       = self::get_table_name();
-			$id_list     = implode( ',', $uncached_ids ); // Already absint
-			$db_results  = $wpdb->get_results( "SELECT * FROM {$table} WHERE productmeta_id IN ({$id_list})" );
+			$table        = self::get_table_name();
+			$placeholders = implode( ',', array_fill( 0, count( $uncached_ids ), '%d' ) );
+			$query        = $wpdb->prepare(
+				"SELECT * FROM {$table} WHERE productmeta_id IN ({$placeholders})",
+				$uncached_ids
+			);
+			$db_results   = $wpdb->get_results( $query );
 
 			$fetched_map = array();
 			foreach ( $db_results as $row ) {
@@ -258,7 +264,8 @@ class PPOM_Meta_DB {
 				return 0;
 			}
 
-			$result = $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE productmeta_id IN ({$where_format})", $ids ) );
+			$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+			$result       = $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE productmeta_id IN ($placeholders)", $ids ) );
 			
 			if ( false !== $result ) {
 				foreach ( $ids as $deleted_id ) {

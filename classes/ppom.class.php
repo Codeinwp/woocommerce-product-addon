@@ -313,7 +313,6 @@ class PPOM_Meta {
 	function get_fields_by_id( $ppom_id ) {
 
 		$meta_fields = array();
-		global $wpdb;
 
 		$ppom_ids = explode( ',', $ppom_id );
 		$metas    = PPOM_Meta_DB::get_multiple( $ppom_ids );
