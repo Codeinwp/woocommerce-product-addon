@@ -32,7 +32,7 @@ function _activate_woocommerce() {
  * Registers theme
  */
 function _register_module() {
-	require_once dirname( dirname( __FILE__ ) ) . '/woocommerce-product-addon.php';
+	require_once dirname( dirname( dirname( __FILE__ ) ) ) . '/woocommerce-product-addon.php';
 	include_once PPOM_PATH . '/classes/admin.class.php';
 
 	$ppom_admin = new NM_PersonalizedProduct_Admin();

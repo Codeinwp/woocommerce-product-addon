@@ -192,4 +192,78 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 
 		$this->assertSame( 12.5, (float) $price );
 	}
+
+	/**
+	 * Ensure hidden-field resolution respects explicit lists and posted fallbacks.
+	 *
+	 * @return void
+	 */
+	public function testIsFieldHiddenByConditionUsesProvidedListAndPostFallback() {
+		$this->assertFalse( ppom_is_field_hidden_by_condition( 'alpha' ) );
+		$this->assertTrue( ppom_is_field_hidden_by_condition( 'beta', 'alpha,beta,beta' ) );
+		$this->assertFalse( ppom_is_field_hidden_by_condition( 'gamma', 'alpha,beta' ) );
+
+		$_POST['ppom']['conditionally_hidden'] = 'posted_one,posted_two';
+
+		$this->assertTrue( ppom_is_field_hidden_by_condition( 'posted_two', 'alpha,beta' ) );
+		$this->assertFalse( ppom_is_field_hidden_by_condition( 'beta', 'alpha,beta' ) );
+	}
+
+	/**
+	 * Ensure cart matrix max quantity reads the upper bound from the last range.
+	 *
+	 * @return void
+	 */
+	public function testGetCartItemMaxQuantityReturnsUpperBoundOfLastRange() {
+		$max_quantity = ppom_get_cart_item_max_quantity(
+			array(
+				'ppom' => array(
+					'ppom_pricematrix' => wp_json_encode(
+						array(
+							array(
+								'raw' => '1-2',
+							),
+							array(
+								'raw' => '3-5',
+							),
+						)
+					),
+				),
+			)
+		);
+
+		$this->assertSame( 5, (int) $max_quantity );
+	}
+
+	/**
+	 * Ensure quantity stock handling subtracts the requested amount from matched options.
+	 *
+	 * @return void
+	 */
+	public function testFieldHasStockForQuantitiesSubtractsRequestedAmount() {
+		$has_stock = ppom_field_has_stock(
+			array(
+				'type'         => 'quantities',
+				'manage_stock' => 'on',
+				'options'      => array(
+					array(
+						'option' => 'Large',
+						'stock'  => 5,
+					),
+					array(
+						'option' => 'Medium',
+						'stock'  => 4,
+					),
+				),
+			),
+			array(
+				'Large'  => 2,
+				'Medium' => 0,
+			)
+		);
+
+		$this->assertCount( 1, $has_stock );
+		$this->assertSame( 'Large', $has_stock[0]['option'] );
+		$this->assertSame( 3, (int) $has_stock[0]['stock'] );
+	}
 }

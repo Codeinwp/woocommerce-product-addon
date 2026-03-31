@@ -288,6 +288,84 @@ class Test_Validation_And_Pricing extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Ensure discount-matrix lookup returns the matching configured range.
+	 *
+	 * @return void
+	 */
+	public function testPriceHasDiscountMatrixReturnsMatchedDiscountRange() {
+		$product = $this->create_simple_product(
+			array(
+				'regular_price' => '100',
+			)
+		);
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_price_matrix_field(
+					'price_matrix',
+					array(
+						array(
+							'option' => '2-4',
+							'price'  => '10%',
+							'label'  => 'Discount range',
+							'id'     => 'discount_range',
+						),
+					),
+					array(
+						'discount'      => 'on',
+						'discount_type' => 'both',
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$matrix = ppom_price_has_discount_matrix( $product, 3 );
+
+		$this->assertSame( 'both', $matrix['discount'] );
+		$this->assertSame( '10%', $matrix['percent'] );
+		$this->assertSame( '10%', $matrix['raw_price'] );
+	}
+
+	/**
+	 * Ensure hidden price matrices are not attached to cart state.
+	 *
+	 * @return void
+	 */
+	public function testPriceCheckPriceMatrixSkipsConditionallyHiddenMatrix() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_price_matrix_field(
+					'price_matrix',
+					array(
+						array(
+							'option' => '2-4',
+							'price'  => '10',
+							'label'  => 'Visible range',
+							'id'     => 'visible_range',
+						),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$cart_item = ppom_price_check_price_matrix(
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'conditionally_hidden' => 'price_matrix',
+				),
+			),
+			array()
+		);
+
+		$this->assertSame( array(), $cart_item['ppom']['price_matrix_found'] );
+	}
+
+	/**
 	 * Build a price matrix field definition.
 	 *
 	 * @param string $data_name Field data name.
