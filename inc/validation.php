@@ -100,25 +100,25 @@ function ppom_esc_html( $content ) {
 	 * Keys that allow stored HTML are sanitized with `ppom_esc_html()`. All other
 	 * scalar values are reduced to plain text.
 	 *
-	 * @param array $array Untrusted field-definition array.
+	 * @param array $data Untrusted field-definition array.
 	 *
 	 * @return array
 	 *
 	 * @see ppom_admin_save_form_meta()
 	 * @see ppom_admin_update_form_meta()
 	 */
-function ppom_sanitize_array_data( $array ) {
-	foreach ( $array as $key => &$value ) {
+function ppom_sanitize_array_data( $data ) {
+	foreach ( $data as $key => &$value ) {
 		if ( is_array( $value ) ) {
 			$value = ppom_sanitize_array_data( $value );
 		} elseif ( in_array( $key, ppom_fields_with_html(), true ) ) {
-				$value = ppom_esc_html( $value );
+			$value = ppom_esc_html( $value );
 		} else {
 			$value = sanitize_text_field( $value );
 		}
 	}
 
-	return $array;
+	return $data;
 }
 
 

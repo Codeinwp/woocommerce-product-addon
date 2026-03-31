@@ -25,16 +25,10 @@ parameters:
 			path: backend/changelog_handler.php
 
 		-
-			message: '#^Function ppom_load_free_options\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Action callback returns string\|void but should not return anything\.$#'
+			identifier: return.void
 			count: 1
-			path: backend/options.php
-
-		-
-			message: '#^Function ppom_load_pro_options\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/options.php
+			path: backend/settings-panel.class.php
 
 		-
 			message: '#^Cannot access property \$id on WP_Screen\|null\.$#'
@@ -109,14 +103,8 @@ parameters:
 			path: backend/settings-panel.class.php
 
 		-
-			message: '#^Method PPOM_SettingsFramework\:\:generate_css\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:generate_css\(\) has parameter \$settings_meta with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_SettingsFramework\:\:generate_css\(\) has parameter \$settings_meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: backend/settings-panel.class.php
 
@@ -217,32 +205,20 @@ parameters:
 			path: backend/settings-panel.class.php
 
 		-
-			message: '#^Method PPOM_SettingsFramework\:\:insert_at\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_SettingsFramework\:\:insert_at\(\) has parameter \$item with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: backend/settings-panel.class.php
 
 		-
-			message: '#^Method PPOM_SettingsFramework\:\:insert_at\(\) has parameter \$array with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_SettingsFramework\:\:insert_at\(\) has parameter \$items with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: backend/settings-panel.class.php
 
 		-
-			message: '#^Method PPOM_SettingsFramework\:\:insert_at\(\) has parameter \$item with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:insert_at\(\) has parameter \$position with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:is_settings_page\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_SettingsFramework\:\:insert_at\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: backend/settings-panel.class.php
 
@@ -255,12 +231,6 @@ parameters:
 		-
 			message: '#^Method PPOM_SettingsFramework\:\:load_inputs\(\) has parameter \$input_meta with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:load_scripts\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: backend/settings-panel.class.php
 
@@ -279,12 +249,6 @@ parameters:
 		-
 			message: '#^Method PPOM_SettingsFramework\:\:load_template\(\) has parameter \$variables with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:ppom_migrate_settings_panel\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: backend/settings-panel.class.php
 
@@ -313,20 +277,8 @@ parameters:
 			path: backend/settings-panel.class.php
 
 		-
-			message: '#^Method PPOM_SettingsFramework\:\:register_setting\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:register_setting\(\) has parameter \$panel_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:register_setting\(\) has parameter \$settings with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_SettingsFramework\:\:register_setting\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: backend/settings-panel.class.php
 
@@ -344,12 +296,6 @@ parameters:
 
 		-
 			message: '#^Method PPOM_SettingsFramework\:\:remove_admin_notices\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:render_settings_panel\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: backend/settings-panel.class.php
@@ -379,38 +325,14 @@ parameters:
 			path: backend/settings-panel.class.php
 
 		-
-			message: '#^Method PPOM_SettingsFramework\:\:save_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_SettingsFramework\:\:set_localize_data\(\) has parameter \$global_js_vars with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: backend/settings-panel.class.php
 
 		-
-			message: '#^Method PPOM_SettingsFramework\:\:set_localize_data\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:set_localize_data\(\) has parameter \$global_js_vars with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:set_localize_data\(\) has parameter \$handle with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:set_localize_data\(\) has parameter \$js_vars with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:set_localize_data\(\) has parameter \$var_name with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_SettingsFramework\:\:set_localize_data\(\) has parameter \$js_vars with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: backend/settings-panel.class.php
 
@@ -565,6 +487,12 @@ parameters:
 			path: backend/templates/inputs/typography.php
 
 		-
+			message: '#^Action callback returns string\|void but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: classes/admin.class.php
+
+		-
 			message: '#^Callback expects 1 parameter, \$accepted_args is set to 10\.$#'
 			identifier: arguments.count
 			count: 1
@@ -583,8 +511,8 @@ parameters:
 			path: classes/admin.class.php
 
 		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:add_menu_pages\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Loose comparison using \=\= between true and ''text'' will always evaluate to true\.$#'
+			identifier: equal.alwaysTrue
 			count: 1
 			path: classes/admin.class.php
 
@@ -603,12 +531,6 @@ parameters:
 		-
 			message: '#^Method NM_PersonalizedProduct_Admin\:\:get_db_field\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:get_products\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: classes/admin.class.php
 
@@ -661,56 +583,14 @@ parameters:
 			path: classes/admin.class.php
 
 		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:ppom_multi_select_role_setting\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method NM_PersonalizedProduct_Admin\:\:ppom_multi_select_role_setting\(\) has parameter \$value with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/admin.class.php
 
 		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:ppom_multi_select_role_setting\(\) has parameter \$value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:ppom_setting_wpml\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:ppom_setting_wpml\(\) has parameter \$option with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:ppom_setting_wpml\(\) has parameter \$raw_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:ppom_setting_wpml\(\) has parameter \$value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:ppom_tabs_custom_style\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:product_meta\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:save_categories_and_tags\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method NM_PersonalizedProduct_Admin\:\:ppom_setting_wpml\(\) has parameter \$option with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/admin.class.php
 
@@ -727,19 +607,7 @@ parameters:
 			path: classes/admin.class.php
 
 		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:save_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/admin.class.php
-
-		-
 			message: '#^Method NM_PersonalizedProduct_Admin\:\:set_legacy_user\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:settings_tab\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: classes/admin.class.php
@@ -757,12 +625,6 @@ parameters:
 			path: classes/admin.class.php
 
 		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:validate_plugin\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/admin.class.php
-
-		-
 			message: '#^Offset ''logo'' does not exist on string\.$#'
 			identifier: offsetAccess.notFound
 			count: 1
@@ -771,6 +633,12 @@ parameters:
 		-
 			message: '#^Offset ''menu_position'' does not exist on string\.$#'
 			identifier: offsetAccess.notFound
+			count: 1
+			path: classes/admin.class.php
+
+		-
+			message: '#^Offset ''type'' on non\-empty\-array in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
 			count: 1
 			path: classes/admin.class.php
 
@@ -937,104 +805,26 @@ parameters:
 			path: classes/fields.class.php
 
 		-
-			message: '#^Method PPOM_Fields_Meta\:\:get_instance\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_Fields_Meta\:\:ppom_fields_tabs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/fields.class.php
 
 		-
-			message: '#^Method PPOM_Fields_Meta\:\:load_script\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_Fields_Meta\:\:render_all_input_types\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/fields.class.php
 
 		-
-			message: '#^Method PPOM_Fields_Meta\:\:load_script\(\) has parameter \$hook with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_Fields_Meta\:\:render_field_meta\(\) has parameter \$field_meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/fields.class.php
 
 		-
-			message: '#^Method PPOM_Fields_Meta\:\:ppom_fields_tabs\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:ppom_fields_tabs\(\) has parameter \$fields_type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:render_all_input_types\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:render_all_input_types\(\) has parameter \$data with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:render_all_input_types\(\) has parameter \$field_index with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:render_all_input_types\(\) has parameter \$fields_type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:render_all_input_types\(\) has parameter \$name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:render_all_input_types\(\) has parameter \$values with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:render_field_meta\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:render_field_meta\(\) has parameter \$field_index with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:render_field_meta\(\) has parameter \$field_meta with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:render_field_meta\(\) has parameter \$fields_type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:render_field_meta\(\) has parameter \$save_meta with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Method PPOM_Fields_Meta\:\:render_field_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_Fields_Meta\:\:render_field_meta\(\) has parameter \$save_meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/fields.class.php
 
@@ -1090,6 +880,12 @@ parameters:
 			message: '#^Parameter \#1 \$text of function esc_attr expects string, int\<1, max\> given\.$#'
 			identifier: argument.type
 			count: 1
+			path: classes/fields.class.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int\|string given\.$#'
+			identifier: argument.type
+			count: 57
 			path: classes/fields.class.php
 
 		-
@@ -1237,26 +1033,8 @@ parameters:
 			path: classes/form.class.php
 
 		-
-			message: '#^Method PPOM_Form\:\:ppom_fields_render\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/form.class.php
-
-		-
-			message: '#^Method PPOM_Form\:\:render_input_template\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/form.class.php
-
-		-
-			message: '#^Method PPOM_Form\:\:render_input_template\(\) has parameter \$default_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/form.class.php
-
-		-
-			message: '#^Method PPOM_Form\:\:render_input_template\(\) has parameter \$meta with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_Form\:\:render_input_template\(\) has parameter \$meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/form.class.php
 
@@ -1393,105 +1171,45 @@ parameters:
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:add_inline_css\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:add_inline_css\(\) has parameter \$field_meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:add_inline_css\(\) has parameter \$field_meta with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:get_scripts\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:add_inline_css\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:get_styles\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:get_scripts\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) has parameter \$global_js_vars with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:get_styles\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) has parameter \$js_vars with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:init\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Parameter \#1 \$hook_name of function apply_filters expects non\-empty\-string, string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:load_scripts\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:load_scripts_by_product_id\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:load_scripts_by_product_id\(\) has parameter \$display_location with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:load_scripts_by_product_id\(\) has parameter \$ppom_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:load_scripts_by_product_id\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) has parameter \$global_js_vars with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) has parameter \$handle with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) has parameter \$js_vars with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) has parameter \$product with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) has parameter \$var_name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
+			message: '#^Parameter \#3 \$product of static method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) expects WC_Product, WC_Product\|false\|null given\.$#'
+			identifier: argument.type
+			count: 5
 			path: classes/frontend-scripts.class.php
 
 		-
@@ -1729,14 +1447,8 @@ parameters:
 			path: classes/input.class.php
 
 		-
-			message: '#^Method PPOM_Inputs\:\:get_input\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input.class.php
-
-		-
-			message: '#^Method PPOM_Inputs\:\:get_input\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_Inputs\:\:get_input\(\) should return object\|null but return statement is missing\.$#'
+			identifier: return.missing
 			count: 1
 			path: classes/input.class.php
 
@@ -2941,6 +2653,12 @@ parameters:
 			path: classes/plugin.class.php
 
 		-
+			message: '#^Parameter \#2 \$callback of function add_shortcode expects callable\(array\<string\>, string\|null, string\)\: string, ''ppom_hooks_render…'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/plugin.class.php
+
+		-
 			message: '#^Parameter \#2 \$version2 of function version_compare expects string, float given\.$#'
 			identifier: argument.type
 			count: 2
@@ -3001,12 +2719,6 @@ parameters:
 			path: classes/ppom.class.php
 
 		-
-			message: '#^Method PPOM_Meta\:\:__construct\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/ppom.class.php
-
-		-
 			message: '#^Method PPOM_Meta\:\:ajax_validation_enabled\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -3019,8 +2731,8 @@ parameters:
 			path: classes/ppom.class.php
 
 		-
-			message: '#^Method PPOM_Meta\:\:get_fields\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_Meta\:\:get_fields\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/ppom.class.php
 
@@ -3049,14 +2761,8 @@ parameters:
 			path: classes/ppom.class.php
 
 		-
-			message: '#^Method PPOM_Meta\:\:get_meta_id\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/ppom.class.php
-
-		-
-			message: '#^Method PPOM_Meta\:\:get_meta_id\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_Meta\:\:get_meta_id\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: classes/ppom.class.php
 
@@ -3127,14 +2833,14 @@ parameters:
 			path: classes/ppom.class.php
 
 		-
-			message: '#^Method PPOM_Meta\:\:settings\(\) has no return type specified\.$#'
+			message: '#^Method PPOM_Meta\:\:single_meta_id\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: classes/ppom.class.php
 
 		-
-			message: '#^Method PPOM_Meta\:\:single_meta_id\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Parameter \#1 \$post_id of function get_post_meta expects int, int\|null given\.$#'
+			identifier: argument.type
 			count: 1
 			path: classes/ppom.class.php
 
@@ -3147,6 +2853,12 @@ parameters:
 		-
 			message: '#^Property PPOM_Meta\:\:\$category_meta type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: classes/ppom.class.php
+
+		-
+			message: '#^Property PPOM_Meta\:\:\$fields \(array\) does not accept array\|null\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: classes/ppom.class.php
 
@@ -3171,6 +2883,12 @@ parameters:
 		-
 			message: '#^Property PPOM_Meta\:\:\$ppom_categories_and_tags_row type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: classes/ppom.class.php
+
+		-
+			message: '#^Property PPOM_Meta\:\:\$ppom_settings \(array\) does not accept object\|null\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: classes/ppom.class.php
 
@@ -3547,36 +3265,6 @@ parameters:
 			path: inc/admin.php
 
 		-
-			message: '#^Function ppom_admin_bar_menu\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/admin.php
-
-		-
-			message: '#^Function ppom_admin_delete_meta\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/admin.php
-
-		-
-			message: '#^Function ppom_admin_delete_selected_meta\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/admin.php
-
-		-
-			message: '#^Function ppom_admin_process_product_meta\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/admin.php
-
-		-
-			message: '#^Function ppom_admin_process_product_meta\(\) has parameter \$post_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/admin.php
-
-		-
 			message: '#^Function ppom_admin_product_meta_column\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -3596,12 +3284,6 @@ parameters:
 
 		-
 			message: '#^Function ppom_admin_product_meta_metabox\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/admin.php
-
-		-
-			message: '#^Function ppom_admin_save_form_meta\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: inc/admin.php
@@ -3637,38 +3319,8 @@ parameters:
 			path: inc/admin.php
 
 		-
-			message: '#^Function ppom_admin_update_form_meta\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/admin.php
-
-		-
-			message: '#^Function ppom_admin_update_ppom_meta_only\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/admin.php
-
-		-
-			message: '#^Function ppom_admin_update_ppom_meta_only\(\) has parameter \$ppom_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/admin.php
-
-		-
-			message: '#^Function ppom_admin_update_ppom_meta_only\(\) has parameter \$ppom_meta with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/admin.php
-
-		-
-			message: '#^Function ppom_meta_list\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/admin.php
-
-		-
-			message: '#^Function ppom_meta_list\(\) has parameter \$post with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_admin_update_ppom_meta_only\(\) has parameter \$ppom_meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/admin.php
 
@@ -3871,12 +3523,6 @@ parameters:
 			path: inc/files.php
 
 		-
-			message: '#^Function ppom_delete_file\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/files.php
-
-		-
 			message: '#^Function ppom_file_get_name\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -3907,15 +3553,9 @@ parameters:
 			path: inc/files.php
 
 		-
-			message: '#^Function ppom_files_setup_get_directory\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/files.php
-
-		-
-			message: '#^Function ppom_files_setup_get_directory\(\) has parameter \$sub_dir with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
+			message: '#^Function ppom_files_setup_get_directory\(\) should return string\|null but return statement is missing\.$#'
+			identifier: return.missing
+			count: 3
 			path: inc/files.php
 
 		-
@@ -3973,30 +3613,6 @@ parameters:
 			path: inc/files.php
 
 		-
-			message: '#^Function ppom_get_file_download_url\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/files.php
-
-		-
-			message: '#^Function ppom_get_file_download_url\(\) has parameter \$file_name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/files.php
-
-		-
-			message: '#^Function ppom_get_file_download_url\(\) has parameter \$order_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/files.php
-
-		-
-			message: '#^Function ppom_get_file_download_url\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/files.php
-
-		-
 			message: '#^Function ppom_get_viewport_settings\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -4029,12 +3645,6 @@ parameters:
 		-
 			message: '#^Function ppom_save_data_url_to_image\(\) has parameter \$file_name with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: inc/files.php
-
-		-
-			message: '#^Function ppom_upload_file\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: inc/files.php
 
@@ -4167,6 +3777,12 @@ parameters:
 		-
 			message: '#^Call to static method wwp_get_product_id\(\) on an unknown class WWP_Helper_Functions\.$#'
 			identifier: class.notFound
+			count: 1
+			path: inc/functions.php
+
+		-
+			message: '#^Cannot assign offset ''images''\|''options'' to array\|string\.$#'
+			identifier: offsetAssign.dimType
 			count: 1
 			path: inc/functions.php
 
@@ -4339,38 +3955,20 @@ parameters:
 			path: inc/functions.php
 
 		-
-			message: '#^Function ppom_generate_cart_meta\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_generate_cart_meta\(\) has parameter \$ppom_cart_items with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/functions.php
 
 		-
-			message: '#^Function ppom_generate_cart_meta\(\) has parameter \$context with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_generate_cart_meta\(\) has parameter \$ppom_meta_ids with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/functions.php
 
 		-
-			message: '#^Function ppom_generate_cart_meta\(\) has parameter \$ppom_cart_items with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/functions.php
-
-		-
-			message: '#^Function ppom_generate_cart_meta\(\) has parameter \$ppom_meta_ids with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/functions.php
-
-		-
-			message: '#^Function ppom_generate_cart_meta\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/functions.php
-
-		-
-			message: '#^Function ppom_generate_cart_meta\(\) has parameter \$variation_id with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_generate_cart_meta\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/functions.php
 
@@ -4537,26 +4135,14 @@ parameters:
 			path: inc/functions.php
 
 		-
-			message: '#^Function ppom_get_field_meta_by_dataname\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_get_field_meta_by_dataname\(\) has parameter \$ppom_id with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/functions.php
 
 		-
-			message: '#^Function ppom_get_field_meta_by_dataname\(\) has parameter \$original_data_name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/functions.php
-
-		-
-			message: '#^Function ppom_get_field_meta_by_dataname\(\) has parameter \$ppom_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/functions.php
-
-		-
-			message: '#^Function ppom_get_field_meta_by_dataname\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_get_field_meta_by_dataname\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/functions.php
 
@@ -4993,20 +4579,14 @@ parameters:
 			path: inc/functions.php
 
 		-
-			message: '#^Function ppom_make_meta_data\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_make_meta_data\(\) has parameter \$cart_item with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/functions.php
 
 		-
-			message: '#^Function ppom_make_meta_data\(\) has parameter \$cart_item with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/functions.php
-
-		-
-			message: '#^Function ppom_make_meta_data\(\) has parameter \$context with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_make_meta_data\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/functions.php
 
@@ -5149,6 +4729,30 @@ parameters:
 			path: inc/functions.php
 
 		-
+			message: '#^Offset ''images''\|''options'' might not exist on non\-empty\-array\|non\-falsy\-string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: inc/functions.php
+
+		-
+			message: '#^Offset ''options'' might not exist on non\-empty\-array\|non\-falsy\-string\.$#'
+			identifier: offsetAccess.notFound
+			count: 6
+			path: inc/functions.php
+
+		-
+			message: '#^Offset ''type'' might not exist on non\-empty\-array\|non\-falsy\-string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: inc/functions.php
+
+		-
+			message: '#^Parameter \#1 \$product_id of function ppom_get_field_meta_by_dataname expects int, null given\.$#'
+			identifier: argument.type
+			count: 3
+			path: inc/functions.php
+
+		-
 			message: '#^Parameter \#1 \$str of function strtolower expects string, bool\|float\|int\|string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -5239,6 +4843,12 @@ parameters:
 			path: inc/hooks.php
 
 		-
+			message: '#^Call to function is_array\(\) with non\-empty\-array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: inc/hooks.php
+
+		-
 			message: '#^Constant PPOM_URL not found\.$#'
 			identifier: constant.notFound
 			count: 23
@@ -5251,50 +4861,20 @@ parameters:
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_check_theme_path\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_hooks_check_theme_path\(\) has parameter \$vars with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_check_theme_path\(\) has parameter \$full_path with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_checkbox_valided\(\) has parameter \$field with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_check_theme_path\(\) has parameter \$template_path with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_check_theme_path\(\) has parameter \$vars with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_checkbox_valided\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_checkbox_valided\(\) has parameter \$field with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_checkbox_valided\(\) has parameter \$has_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_checkbox_valided\(\) has parameter \$posted_fields with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_checkbox_valided\(\) has parameter \$posted_fields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
@@ -5341,30 +4921,6 @@ parameters:
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_convert_price\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_convert_price\(\) has parameter \$option_price with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_convert_price_back\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_convert_price_back\(\) has parameter \$price with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
 			message: '#^Function ppom_hooks_dom_option_id\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -5378,30 +4934,6 @@ parameters:
 
 		-
 			message: '#^Function ppom_hooks_dom_option_id\(\) has parameter \$option_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_format_order_value\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_format_order_value\(\) has parameter \$display_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_format_order_value\(\) has parameter \$item with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_format_order_value\(\) has parameter \$meta with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: inc/hooks.php
@@ -5425,134 +4957,56 @@ parameters:
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_input_args\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_hooks_input_args\(\) has parameter \$field_meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_input_args\(\) has parameter \$field_meta with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_input_args\(\) has parameter \$field_setting with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_input_args\(\) has parameter \$field_setting with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_input_args\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_input_args\(\) has parameter \$product with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_input_main_wrapper_class\(\) has parameter \$classes_array with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_input_main_wrapper_class\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_hooks_input_main_wrapper_class\(\) has parameter \$field_meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_input_main_wrapper_class\(\) has parameter \$classes_array with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_input_wrapper_class\(\) has parameter \$field_meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_input_main_wrapper_class\(\) has parameter \$field_meta with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_input_wrapper_class_new\(\) has parameter \$field_meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_input_main_wrapper_class\(\) has parameter \$wrapper_class with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_register_wpml\(\) has parameter \$meta_data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_input_wrapper_class\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_input_wrapper_class\(\) has parameter \$field_meta with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_input_wrapper_class\(\) has parameter \$input_wrapper_class with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_input_wrapper_class_new\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_input_wrapper_class_new\(\) has parameter \$field_meta with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_input_wrapper_class_new\(\) has parameter \$input_wrapper_class with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_load_input_scripts\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_load_input_scripts\(\) has parameter \$ppom_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_load_input_scripts\(\) has parameter \$product with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_redirect_to_cart_if_shortcode\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_redirect_to_cart_if_shortcode\(\) has parameter \$url with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_register_wpml\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_register_wpml\(\) has parameter \$meta_data with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_register_wpml\(\) has parameter \$ppom_id with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_register_wpml\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
@@ -5563,32 +5017,38 @@ parameters:
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_render_shortcode\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_hooks_render_shortcode\(\) has parameter \$attr with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_render_shortcode\(\) has parameter \$attr with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_render_shortcode\(\) should return string\|null but return statement is missing\.$#'
+			identifier: return.missing
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_save_cropped_image\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_hooks_render_shortcode\(\) should return string\|null but returns string\|false\.$#'
+			identifier: return.type
+			count: 2
+			path: inc/hooks.php
+
+		-
+			message: '#^Function ppom_hooks_save_cropped_image\(\) has parameter \$posted_data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_save_cropped_image\(\) has parameter \$posted_data with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_save_cropped_image\(\) has parameter \$ppom_fields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_save_cropped_image\(\) has parameter \$ppom_fields with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_save_cropped_image\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
@@ -5605,20 +5065,14 @@ parameters:
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_set_attributes\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_hooks_set_attributes\(\) has parameter \$field_meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_set_attributes\(\) has parameter \$field_meta with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_set_attributes\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_set_attributes\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
@@ -5665,26 +5119,20 @@ parameters:
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_update_cart_weight\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_hooks_update_cart_weight\(\) has parameter \$cart_items with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_update_cart_weight\(\) has parameter \$cart_items with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_update_cart_weight\(\) has parameter \$ppom_field_prices with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
 		-
-			message: '#^Function ppom_hooks_update_cart_weight\(\) has parameter \$ppom_field_prices with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/hooks.php
-
-		-
-			message: '#^Function ppom_hooks_update_cart_weight\(\) has parameter \$ppom_fields_post with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_hooks_update_cart_weight\(\) has parameter \$ppom_fields_post with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/hooks.php
 
@@ -5749,7 +5197,31 @@ parameters:
 			path: inc/hooks.php
 
 		-
+			message: '#^Parameter \#1 \$product_id of function ppom_woocommerce_show_fields_on_product expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: inc/hooks.php
+
+		-
+			message: '#^Parameter \#1 \$product_id of function ppom_woocommerce_template_base_inputs_rendering expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: inc/hooks.php
+
+		-
+			message: '#^Parameter \#1 \$product_id of static method PPOM_FRONTEND_SCRIPTS\:\:load_scripts_by_product_id\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: inc/hooks.php
+
+		-
 			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: inc/hooks.php
+
+		-
+			message: '#^Parameter \#2 \$ppom_id of static method PPOM_FRONTEND_SCRIPTS\:\:load_scripts_by_product_id\(\) expects int\|null, string given\.$#'
 			identifier: argument.type
 			count: 1
 			path: inc/hooks.php
@@ -6379,38 +5851,20 @@ parameters:
 			path: inc/prices.php
 
 		-
-			message: '#^Function ppom_get_field_prices\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_get_field_prices\(\) has parameter \$item with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/prices.php
 
 		-
-			message: '#^Function ppom_get_field_prices\(\) has parameter \$item with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_get_field_prices\(\) has parameter \$ppom_fields_post with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/prices.php
 
 		-
-			message: '#^Function ppom_get_field_prices\(\) has parameter \$ppom_fields_post with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/prices.php
-
-		-
-			message: '#^Function ppom_get_field_prices\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/prices.php
-
-		-
-			message: '#^Function ppom_get_field_prices\(\) has parameter \$product_quantity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/prices.php
-
-		-
-			message: '#^Function ppom_get_field_prices\(\) has parameter \$variation_id with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_get_field_prices\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/prices.php
 
@@ -6511,18 +5965,6 @@ parameters:
 			path: inc/prices.php
 
 		-
-			message: '#^Function ppom_price_cart_fee\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/prices.php
-
-		-
-			message: '#^Function ppom_price_cart_fee\(\) has parameter \$cart with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/prices.php
-
-		-
 			message: '#^Function ppom_price_check_price_matrix\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -6541,20 +5983,20 @@ parameters:
 			path: inc/prices.php
 
 		-
-			message: '#^Function ppom_price_controller\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_price_controller\(\) has parameter \$cart_item with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/prices.php
 
 		-
-			message: '#^Function ppom_price_controller\(\) has parameter \$cart_item with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_price_controller\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/prices.php
 
 		-
-			message: '#^Function ppom_price_controller\(\) has parameter \$values with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_price_controller\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/prices.php
 
@@ -6607,50 +6049,26 @@ parameters:
 			path: inc/prices.php
 
 		-
-			message: '#^Function ppom_price_get_product_base\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_price_get_product_base\(\) has parameter \$ppom_field_prices with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/prices.php
 
 		-
-			message: '#^Function ppom_price_get_product_base\(\) has parameter \$ppom_discount with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_price_get_product_base\(\) has parameter \$ppom_fields_post with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/prices.php
 
 		-
-			message: '#^Function ppom_price_get_product_base\(\) has parameter \$ppom_field_prices with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_price_get_product_base\(\) has parameter \$ppom_pricematrix with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/prices.php
 
 		-
-			message: '#^Function ppom_price_get_product_base\(\) has parameter \$ppom_fields_post with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/prices.php
-
-		-
-			message: '#^Function ppom_price_get_product_base\(\) has parameter \$ppom_pricematrix with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/prices.php
-
-		-
-			message: '#^Function ppom_price_get_product_base\(\) has parameter \$product with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/prices.php
-
-		-
-			message: '#^Function ppom_price_get_product_base\(\) has parameter \$product_price with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/prices.php
-
-		-
-			message: '#^Function ppom_price_get_product_base\(\) has parameter \$product_quantity with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_price_get_product_base\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/prices.php
 
@@ -6823,9 +6241,27 @@ parameters:
 			path: inc/prices.php
 
 		-
+			message: '#^Offset ''count_price'' might not exist on array\|string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: inc/prices.php
+
+		-
+			message: '#^Offset ''count_type'' might not exist on array\|string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: inc/prices.php
+
+		-
 			message: '#^Offset ''option'' might not exist on non\-empty\-array\<mixed, mixed\>\|string\.$#'
 			identifier: offsetAccess.notFound
 			count: 2
+			path: inc/prices.php
+
+		-
+			message: '#^Offset ''ppom'' might not exist on array\|null\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
 			path: inc/prices.php
 
 		-
@@ -6859,6 +6295,12 @@ parameters:
 			path: inc/prices.php
 
 		-
+			message: '#^Parameter &\$product_quantity by\-ref type of function ppom_get_field_prices\(\) expects float\|int, array\<mixed, mixed\>\|string given\.$#'
+			identifier: parameterByRef.type
+			count: 1
+			path: inc/prices.php
+
+		-
 			message: '#^Variable \$quantities_total might not be defined\.$#'
 			identifier: variable.undefined
 			count: 4
@@ -6877,6 +6319,18 @@ parameters:
 			path: inc/prices.php
 
 		-
+			message: '#^Access to an undefined property object\:\:\$productmeta_id\.$#'
+			identifier: property.notFound
+			count: 8
+			path: inc/rest.class.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$the_meta\.$#'
+			identifier: property.notFound
+			count: 2
+			path: inc/rest.class.php
+
+		-
 			message: '#^Call to an undefined method WC_Order_Item\:\:get_product_id\(\)\.$#'
 			identifier: method.notFound
 			count: 3
@@ -6889,158 +6343,68 @@ parameters:
 			path: inc/rest.class.php
 
 		-
-			message: '#^Method PPOM_Rest\:\:delete_meta_data\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_Rest\:\:delete_meta_data\(\) has parameter \$delete_fields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/rest.class.php
 
 		-
-			message: '#^Method PPOM_Rest\:\:delete_meta_data\(\) has parameter \$delete_fields with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_Rest\:\:delete_meta_data\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/rest.class.php
 
 		-
-			message: '#^Method PPOM_Rest\:\:delete_meta_data\(\) has parameter \$ppom_meta with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_Rest\:\:filter_required_keys_only\(\) has parameter \$ppom_fields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/rest.class.php
 
 		-
-			message: '#^Method PPOM_Rest\:\:delete_meta_data\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_Rest\:\:filter_required_keys_only\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/rest.class.php
 
 		-
-			message: '#^Method PPOM_Rest\:\:delete_ppom_fields_order\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_Rest\:\:get_order_item_meta\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/rest.class.php
 
 		-
-			message: '#^Method PPOM_Rest\:\:delete_ppom_fields_product\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_Rest\:\:save_new_meta_data\(\) has parameter \$ppom_fields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/rest.class.php
 
 		-
-			message: '#^Method PPOM_Rest\:\:filter_required_keys_only\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_Rest\:\:save_new_meta_data\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/rest.class.php
 
 		-
-			message: '#^Method PPOM_Rest\:\:filter_required_keys_only\(\) has parameter \$ppom_fields with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_Rest\:\:update_meta_data\(\) has parameter \$ppom_fields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/rest.class.php
 
 		-
-			message: '#^Method PPOM_Rest\:\:get_order_item_meta\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Method PPOM_Rest\:\:update_meta_data\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/rest.class.php
 
 		-
-			message: '#^Method PPOM_Rest\:\:get_order_item_meta\(\) has parameter \$order_id with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Parameter \#1 \$ppom_meta of method PPOM_Rest\:\:delete_meta_data\(\) expects object, array given\.$#'
+			identifier: argument.type
 			count: 1
 			path: inc/rest.class.php
 
 		-
-			message: '#^Method PPOM_Rest\:\:get_ppom_meta_by_id\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:get_ppom_meta_info_order\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:get_ppom_meta_info_product\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:init_api\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:is_secret_key_valid\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:is_secret_key_valid\(\) has parameter \$secretkey with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:ppom_save_meta_product\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:ppom_update_meta_order\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:save_new_meta_data\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:save_new_meta_data\(\) has parameter \$ppom_fields with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:save_new_meta_data\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:set_headers\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:update_meta_data\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:update_meta_data\(\) has parameter \$ppom_fields with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:update_meta_data\(\) has parameter \$ppom_meta with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/rest.class.php
-
-		-
-			message: '#^Method PPOM_Rest\:\:update_meta_data\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Parameter \#1 \$ppom_meta of method PPOM_Rest\:\:update_meta_data\(\) expects object, array given\.$#'
+			identifier: argument.type
 			count: 1
 			path: inc/rest.class.php
 
@@ -7063,50 +6427,26 @@ parameters:
 			path: inc/validation.php
 
 		-
-			message: '#^Function ppom_esc_html\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_fields_with_html\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/validation.php
 
 		-
-			message: '#^Function ppom_esc_html\(\) has parameter \$content with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_get_product_limits\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/validation.php
 
 		-
-			message: '#^Function ppom_fields_with_html\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_sanitize_array_data\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/validation.php
 
 		-
-			message: '#^Function ppom_get_product_limits\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/validation.php
-
-		-
-			message: '#^Function ppom_get_product_limits\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/validation.php
-
-		-
-			message: '#^Function ppom_get_product_limits\(\) has parameter \$variation_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/validation.php
-
-		-
-			message: '#^Function ppom_sanitize_array_data\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/validation.php
-
-		-
-			message: '#^Function ppom_sanitize_array_data\(\) has parameter \$array with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_sanitize_array_data\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/validation.php
 
@@ -7141,6 +6481,24 @@ parameters:
 			path: inc/woocommerce.php
 
 		-
+			message: '#^Call to an undefined method WC_Order_Item\:\:get_product_id\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: inc/woocommerce.php
+
+		-
+			message: '#^Cannot access property \$key on object\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: inc/woocommerce.php
+
+		-
+			message: '#^Cannot access property \$value on object\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: inc/woocommerce.php
+
+		-
 			message: '#^Cannot call method get_id\(\) on WC_Product\|false\|null\.$#'
 			identifier: method.nonObject
 			count: 1
@@ -7165,26 +6523,8 @@ parameters:
 			path: inc/woocommerce.php
 
 		-
-			message: '#^Function ppom_check_validation\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_check_validation\(\) has parameter \$passed with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_check_validation\(\) has parameter \$post_data with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_check_validation\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_check_validation\(\) has parameter \$post_data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/woocommerce.php
 
@@ -7213,20 +6553,14 @@ parameters:
 			path: inc/woocommerce.php
 
 		-
-			message: '#^Function ppom_woocommerce_add_cart_item_data\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_woocommerce_add_cart_item_data\(\) has parameter \$cart with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/woocommerce.php
 
 		-
-			message: '#^Function ppom_woocommerce_add_cart_item_data\(\) has parameter \$cart with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_add_cart_item_data\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_woocommerce_add_cart_item_data\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/woocommerce.php
 
@@ -7275,12 +6609,6 @@ parameters:
 		-
 			message: '#^Function ppom_woocommerce_add_to_cart_quantity\(\) has parameter \$quantity with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_ajax_validate\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: inc/woocommerce.php
 
@@ -7507,32 +6835,8 @@ parameters:
 			path: inc/woocommerce.php
 
 		-
-			message: '#^Function ppom_woocommerce_order_item_meta\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_order_item_meta\(\) has parameter \$cart_item_key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_order_item_meta\(\) has parameter \$item with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_order_item_meta\(\) has parameter \$order with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_order_item_meta\(\) has parameter \$values with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_woocommerce_order_item_meta\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/woocommerce.php
 
@@ -7567,30 +6871,6 @@ parameters:
 			path: inc/woocommerce.php
 
 		-
-			message: '#^Function ppom_woocommerce_order_value\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_order_value\(\) has parameter \$display_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_order_value\(\) has parameter \$item with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_order_value\(\) has parameter \$meta with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
 			message: '#^Function ppom_woocommerce_product_default_quantity\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -7604,30 +6884,6 @@ parameters:
 
 		-
 			message: '#^Function ppom_woocommerce_product_default_quantity\(\) has parameter \$product with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_rename_files\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_rename_files\(\) has parameter \$order with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_rename_files\(\) has parameter \$order_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_rename_files\(\) has parameter \$posted_data with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: inc/woocommerce.php
@@ -7687,38 +6943,14 @@ parameters:
 			path: inc/woocommerce.php
 
 		-
-			message: '#^Function ppom_woocommerce_show_fields_on_product\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Function ppom_woocommerce_show_fields_on_product\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/woocommerce.php
 
 		-
-			message: '#^Function ppom_woocommerce_show_fields_on_product\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_show_fields_on_product\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_template_base_inputs_rendering\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_template_base_inputs_rendering\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_template_base_inputs_rendering\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Function ppom_woocommerce_template_base_inputs_rendering\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: inc/woocommerce.php
 
@@ -7741,26 +6973,14 @@ parameters:
 			path: inc/woocommerce.php
 
 		-
-			message: '#^Function ppom_woocommerce_validate_product\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#^Offset ''data_name'' might not exist on non\-empty\-array\|non\-falsy\-string\.$#'
+			identifier: offsetAccess.notFound
 			count: 1
 			path: inc/woocommerce.php
 
 		-
-			message: '#^Function ppom_woocommerce_validate_product\(\) has parameter \$passed with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_validate_product\(\) has parameter \$product_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/woocommerce.php
-
-		-
-			message: '#^Function ppom_woocommerce_validate_product\(\) has parameter \$qty with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Offset ''type'' might not exist on non\-empty\-array\|non\-falsy\-string\.$#'
+			identifier: offsetAccess.notFound
 			count: 1
 			path: inc/woocommerce.php
 
@@ -7772,6 +6992,12 @@ parameters:
 
 		-
 			message: '#^Parameter \#1 \$price of function wc_price expects float, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: inc/woocommerce.php
+
+		-
+			message: '#^Parameter \#1 \$product of function ppom_hooks_load_input_scripts expects int\|WC_Product, WC_Product\|false\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: inc/woocommerce.php

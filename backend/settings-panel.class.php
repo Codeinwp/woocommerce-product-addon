@@ -947,15 +947,15 @@ class PPOM_SettingsFramework {
 	/**
 	 * Inserts an item into an array at a fixed position.
 	 *
-	 * @param array $array    Source array.
+	 * @param array $items    Source array.
 	 * @param array $item     Item to insert.
 	 * @param int   $position Numeric insertion offset.
 	 *
 	 * @return array
 	 */
-	public function insert_at( $array = array(), $item = array(), $position = 0 ) {
-		$previous_items = array_slice( $array, 0, $position, true );
-		$next_items     = array_slice( $array, $position, null, true );
+	public function insert_at( $items = array(), $item = array(), $position = 0 ) {
+		$previous_items = array_slice( $items, 0, $position, true );
+		$next_items     = array_slice( $items, $position, null, true );
 
 		return $previous_items + $item + $next_items;
 	}

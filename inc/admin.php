@@ -299,7 +299,8 @@ function ppom_admin_show_notices() {
  */
 function ppom_admin_save_form_meta() {
 
-	$db_version = floatval( get_option( 'personalizedproduct_db_version' ) );
+	$db_version      = floatval( get_option( 'personalizedproduct_db_version' ) );
+	$ppom_form_nonce = isset( $_POST['ppom_form_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_form_nonce'] ) ) : '';
 
 	if ( $db_version < 22.1 ) {
 		$resp = array(
@@ -312,8 +313,8 @@ function ppom_admin_save_form_meta() {
 
 	// print_r($_REQUEST); exit;
 
-	if ( ! isset( $_POST['ppom_form_nonce'] )
-	|| ! wp_verify_nonce( $_POST['ppom_form_nonce'], 'ppom_form_nonce_action' )
+	if ( empty( $ppom_form_nonce )
+	|| ! wp_verify_nonce( $ppom_form_nonce, 'ppom_form_nonce_action' )
 	|| ! ppom_security_role()
 	) {
 		$resp = array(
@@ -482,8 +483,9 @@ function ppom_admin_save_form_meta() {
 function ppom_admin_update_form_meta() {
 
 
-	$return_page    = isset( $_REQUEST['ppom_meta'] ) ? 'ppom-energy' : 'ppom';
-	$productmeta_id = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
+	$return_page     = isset( $_REQUEST['ppom_meta'] ) ? 'ppom-energy' : 'ppom';
+	$productmeta_id  = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
+	$ppom_form_nonce = isset( $_POST['ppom_form_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_form_nonce'] ) ) : '';
 
 	$ppom_args   = array(
 		'page'           => $return_page,
@@ -506,8 +508,8 @@ function ppom_admin_update_form_meta() {
 	}
 
 
-	if ( ! isset( $_POST['ppom_form_nonce'] )
-	|| ! wp_verify_nonce( $_POST['ppom_form_nonce'], 'ppom_form_nonce_action' )
+	if ( empty( $ppom_form_nonce )
+	|| ! wp_verify_nonce( $ppom_form_nonce, 'ppom_form_nonce_action' )
 	|| ! ppom_security_role()
 	) {
 		$resp = array(
@@ -683,8 +685,10 @@ function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
  */
 function ppom_admin_delete_meta() {
 
-	if ( ! isset( $_POST['ppom_meta_nonce'] )
-	|| ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
+	$ppom_meta_nonce = isset( $_POST['ppom_meta_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_meta_nonce'] ) ) : '';
+
+	if ( empty( $ppom_meta_nonce )
+	|| ! wp_verify_nonce( $ppom_meta_nonce, 'ppom_meta_nonce_action' )
 	|| ! ppom_security_role()
 	) {
 		$response = array(
@@ -730,8 +734,10 @@ function ppom_admin_delete_meta() {
  */
 function ppom_admin_delete_selected_meta() {
 
-	if ( ! isset( $_POST['ppom_meta_nonce'] )
-	|| ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
+	$ppom_meta_nonce = isset( $_POST['ppom_meta_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_meta_nonce'] ) ) : '';
+
+	if ( empty( $ppom_meta_nonce )
+	|| ! wp_verify_nonce( $ppom_meta_nonce, 'ppom_meta_nonce_action' )
 	|| ! ppom_security_role()
 	|| ! array_key_exists( 'productmeta_ids', $_POST )
 	|| ! is_array( $_POST['productmeta_ids'] )
