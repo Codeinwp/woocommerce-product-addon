@@ -13,21 +13,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 global $args, $wpdb;
 
 $suffix = isset( $args[0] ) ? sanitize_key( $args[0] ) : (string) time();
+$product_name = 'PPOM Quantity Matrix Product';
 
 $product_id = (int) $wpdb->get_var(
 	$wpdb->prepare(
 		"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND post_title = %s ORDER BY ID DESC LIMIT 1",
 		'product',
 		'publish',
-		'Product 1'
+		$product_name
 	)
 );
+
+if ( ! $product_id ) {
+	$product = new WC_Product_Simple();
+	$product->set_name( $product_name );
+	$product->set_status( 'publish' );
+	$product->set_catalog_visibility( 'visible' );
+	$product->set_regular_price( '9.99' );
+	$product_id = $product->save();
+}
 
 if ( ! $product_id ) {
 	echo wp_json_encode(
 		array(
 			'status'  => 'error',
-			'message' => 'Product 1 not found',
+			'message' => 'Quantity matrix product could not be created',
 		)
 	);
 	exit( 1 );
@@ -115,7 +125,7 @@ echo wp_json_encode(
 		'status'            => 'success',
 		'meta_id'           => $meta_id,
 		'product_id'        => $product_id,
-		'product_name'      => get_the_title( $product_id ),
+		'product_name'      => $product_name,
 		'product_permalink' => get_permalink( $product_id ),
 		'quantity_field_id' => 'seat_quantity_' . $suffix,
 	)
