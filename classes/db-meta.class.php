@@ -30,7 +30,7 @@ class PPOM_Meta_DB {
 	/**
 	 * Get a single PPOM meta block by ID.
 	 *
-	 * @param int $id
+	 * @param int|string $id
 	 * @return object|null
 	 */
 	public static function get( $id ) {
@@ -57,8 +57,8 @@ class PPOM_Meta_DB {
 	/**
 	 * Get multiple PPOM meta blocks by an array of IDs.
 	 *
-	 * @param array $ids
-	 * @return array
+	 * @param array<int|string> $ids
+	 * @return array<object>
 	 */
 	public static function get_multiple( $ids ) {
 		$ids = array_map( 'absint', $ids );
@@ -124,7 +124,7 @@ class PPOM_Meta_DB {
 	/**
 	 * Get all categories and tags lookup.
 	 *
-	 * @return array
+	 * @return array<object>
 	 */
 	public static function get_categories_lookup() {
 		$cache_key = 'ppom_meta_lookup_categories';
@@ -145,7 +145,7 @@ class PPOM_Meta_DB {
 	 * Invalidate cache for a specific PPOM Meta ID.
 	 * Call this when a row is modified or deleted.
 	 *
-	 * @param int $id
+	 * @param int|string $id
 	 * @return void
 	 */
 	public static function invalidate_cache( $id ) {
@@ -161,8 +161,8 @@ class PPOM_Meta_DB {
 	/**
 	 * Insert a new PPOM meta block.
 	 *
-	 * @param array $data
-	 * @param array|string|null $format
+	 * @param array<string,mixed> $data
+	 * @param array<int,string>|string|null $format
 	 * @return int|false
 	 */
 	public static function insert( $data, $format = null ) {
@@ -181,10 +181,10 @@ class PPOM_Meta_DB {
 	/**
 	 * Update an existing PPOM meta block.
 	 *
-	 * @param int $id
-	 * @param array $data
-	 * @param array|string|null $format
-	 * @param array|string|null $where_format
+	 * @param int|string $id
+	 * @param array<string,mixed> $data
+	 * @param array<int,string>|string|null $format
+	 * @param array<int,string>|string|null $where_format
 	 * @return int|false
 	 */
 	public static function update( $id, $data, $format = null, $where_format = null ) {
@@ -213,8 +213,8 @@ class PPOM_Meta_DB {
 	/**
 	 * Delete a PPOM meta block.
 	 *
-	 * @param int|array $id
-	 * @param array|string|null $where_format
+	 * @param int|string|array<int|string> $id
+	 * @param array<int,string>|string|null $where_format
 	 * @return int|false
 	 */
 	public static function delete( $id, $where_format = null ) {

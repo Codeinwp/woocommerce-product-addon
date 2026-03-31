@@ -689,7 +689,6 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		PPOM_Meta_DB::update(
 			$ppom_id,
 			$data_to_update,
-			array( 'productmeta_id' => $ppom_id ), // Where clause
 			array( '%s' ), // Data format
 			array( '%d' )  // Where format
 		);
