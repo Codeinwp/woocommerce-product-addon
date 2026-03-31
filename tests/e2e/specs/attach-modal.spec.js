@@ -84,11 +84,14 @@ test.describe( 'Attach Modal', () => {
 
 		for ( const cat of categoriesToUse ) {
 			await page.goto( `/?product_cat=${ cat }` );
-			await page.locator( 'a.add_to_cart_button' ).first().click();
+			await page
+				.locator( '.products .product a.woocommerce-LoopProduct-link' )
+				.first()
+				.click();
 
-			const elements = page.locator( `.ppom-id-${ ppomId }` );
-			const count = await elements.count();
-			expect( count ).toBeGreaterThan( 0 );
+			await expect(
+				page.locator( `.ppom-id-${ ppomId }` ).first()
+			).toBeVisible();
 		}
 	} );
 

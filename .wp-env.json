@@ -4,6 +4,9 @@
       "https://downloads.wordpress.org/plugin/woocommerce.zip",
       "."
   ],
+  "lifecycleScripts": {
+    "afterStart": "bash ./bin/wp-env-after-start.sh"
+  },
   "phpVersion": "8.1",
   "autoPort": true
 }

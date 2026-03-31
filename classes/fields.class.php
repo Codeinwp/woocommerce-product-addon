@@ -109,7 +109,7 @@ class PPOM_Fields_Meta {
 		wp_enqueue_script( 'ppom-popup', PPOM_URL . '/js/popup.js', array(), PPOM_VERSION, true );
 
 		// PPOM Meta Table File
-		wp_enqueue_script( 'ppom-meta-table', PPOM_URL . '/js/admin/ppom-meta-table.js', array( 'jquery', 'ppom-popup' ), PPOM_VERSION, true );
+		wp_enqueue_script( 'ppom-meta-table', PPOM_URL . '/js/admin/ppom-meta-table.js', array( 'jquery', 'ppom-popup', 'ppom-select2' ), PPOM_VERSION, true );
 
 		// Font-awesome File
 		if ( ppom_load_fontawesome() ) {

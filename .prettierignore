@@ -1,5 +1,6 @@
 **/*.min.js
 **/*.bundle.js
 js/inputmask/**
+js/select2.js
 js/sweetalert/**
 backend/assets/**

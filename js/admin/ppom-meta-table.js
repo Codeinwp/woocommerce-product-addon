@@ -9,6 +9,19 @@
  * @see window.ppomPopup in js/popup.js
  */
 jQuery( function ( $ ) {
+	/**
+	 * Initialize Select2 on the product search dropdowns in the "attach to products" modal.
+	 *
+	 * @return {void}
+	 */
+	function initAttachSelects() {
+		const attachSelects = $( '.ppom-attach-container-item select' );
+
+		if ( typeof $.fn.select2 === 'function' ) {
+			attachSelects.select2();
+		}
+	}
+
 	// DataTables provides the searchable/sortable shell, while PPOM injects its
 	// own action toolbar into the custom `ppom-toolbar` slot defined in `dom`.
 	$( '#ppom-meta-table' ).DataTable( {
@@ -116,7 +129,7 @@ jQuery( function ( $ ) {
 
 			$.get( get_url, function ( html ) {
 				$( '#ppom-product-modal .ppom-modal-body' ).html( html );
-				$( '.ppom-attach-container-item select' )?.select2();
+				initAttachSelects();
 				$( '#ppom_id' ).val( ppom_id );
 				$( 'body' ).append( append_overly_model );
 				$( '#' + model_id ).fadeIn();
