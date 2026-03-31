@@ -2,8 +2,6 @@
 /**
  * PPOM Meta DB Class
  * Repository for accessing PPOM meta data with individual row caching.
- *
- * @since version 15.0+ (refactored)
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,7 +29,21 @@ class PPOM_Meta_DB {
 	 * Get a single PPOM meta block by ID.
 	 *
 	 * @param int|string $id
-	 * @return object|null
+	 * @return object{
+	 *   productmeta_id: int,
+	 *   productmeta_name: string,
+	 *   productmeta_validation: string|null,
+	 *   dynamic_price_display: string|null,
+	 *   send_file_attachment: string,
+	 *   show_cart_thumb: string|null,
+	 *   aviary_api_key: string|null,
+	 *   productmeta_style: string|null,
+	 *   productmeta_js: string|null,
+	 *   productmeta_categories: string|null,
+	 *   productmeta_tags: string|null,
+	 *   the_meta: string,
+	 *   productmeta_created: string
+	 * }|null
 	 */
 	public static function get( $id ) {
 		$id = absint( trim( $id ) );
@@ -58,7 +70,21 @@ class PPOM_Meta_DB {
 	 * Get multiple PPOM meta blocks by an array of IDs.
 	 *
 	 * @param array<int|string> $ids
-	 * @return array<object>
+	 * @return array<object{
+	 *   productmeta_id: int,
+	 *   productmeta_name: string,
+	 *   productmeta_validation: string|null,
+	 *   dynamic_price_display: string|null,
+	 *   send_file_attachment: string,
+	 *   show_cart_thumb: string|null,
+	 *   aviary_api_key: string|null,
+	 *   productmeta_style: string|null,
+	 *   productmeta_js: string|null,
+	 *   productmeta_categories: string|null,
+	 *   productmeta_tags: string|null,
+	 *   the_meta: string,
+	 *   productmeta_created: string
+	 * }>
 	 */
 	public static function get_multiple( $ids ) {
 		$ids = array_map( 'absint', $ids );
@@ -124,7 +150,11 @@ class PPOM_Meta_DB {
 	/**
 	 * Get all categories and tags lookup.
 	 *
-	 * @return array<object>
+	 * @return list<object{
+	 *   productmeta_id: int,
+	 *   productmeta_categories: string|null,
+	 *   productmeta_tags: string|null
+	 * }>
 	 */
 	public static function get_categories_lookup() {
 		$cache_key = 'ppom_meta_lookup_categories';

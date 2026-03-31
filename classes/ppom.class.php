@@ -287,7 +287,7 @@ class PPOM_Meta {
 		$metas       = PPOM_Meta_DB::get_multiple( $meta_ids );
 
 		foreach ( $metas as $meta ) {
-			if ( empty( $meta->the_meta ) || ! is_string( $meta->the_meta ) ) {
+			if ( ! is_string( $meta->the_meta ) ) {
 				continue;
 			}
 			$fields = json_decode( $meta->the_meta, true );
@@ -319,7 +319,7 @@ class PPOM_Meta {
 		$metas    = PPOM_Meta_DB::get_multiple( $ppom_ids );
 
 		foreach ( $metas as $meta ) {
-			if ( empty( $meta->the_meta ) || ! is_string( $meta->the_meta ) ) {
+			if ( ! is_string( $meta->the_meta ) ) {
 				continue;
 			}
 			$fields = json_decode( $meta->the_meta, true );
