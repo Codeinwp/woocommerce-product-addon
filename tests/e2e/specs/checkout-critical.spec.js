@@ -5,6 +5,8 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 import {
 	addNewField,
+	attachGroupToProduct,
+	clearCart,
 	fillFieldNameAndId,
 	pickFieldTypeInModal,
 	saveFieldInModal,
@@ -48,39 +50,6 @@ function formatPrice( priceText, amount ) {
 		/-?\d[\d,.]*/,
 		Number( amount ).toFixed( 2 )
 	);
-}
-
-async function clearCart( page ) {
-	await page.goto( '/cart/' );
-	await page.waitForLoadState( 'networkidle' );
-
-	const removeButtons = page.getByRole( 'button', {
-		name: /Remove .* from cart/,
-	} );
-
-	while ( await removeButtons.count() ) {
-		const buttonCount = await removeButtons.count();
-		await removeButtons.first().click();
-		await expect( removeButtons ).toHaveCount( buttonCount - 1 );
-	}
-}
-
-async function attachGroupToProduct( page, productName ) {
-	await page.getByText( 'Attach to Products' ).click( { force: true } );
-	await page.waitForLoadState( 'networkidle' );
-
-	const productSelector = page.locator(
-		'select[name="ppom-attach-to-products\\[\\]"]'
-	);
-
-	await productSelector.selectOption( { label: productName } );
-
-	const productId = await productSelector.inputValue();
-
-	await page.getByRole( 'button', { name: 'Save', exact: true } ).click();
-	await page.waitForLoadState( 'networkidle' );
-
-	return productId;
 }
 
 async function fillCheckoutAddress( page ) {
@@ -157,9 +126,13 @@ test.describe( 'Critical Checkout Flow', () => {
 			parsePrice( priceText ) + Number( FIELD_PRICE )
 		);
 
-		const addToCartButton = page.getByRole( 'button', {
-			name: 'Add to cart',
-		} );
+		const addToCartButton = page.locator( 'form.cart' ).getByRole(
+			'button',
+			{
+				name: 'Add to cart',
+				exact: true,
+			}
+		);
 
 		await addToCartButton.click();
 		await expect( page.locator( 'body' ) ).toContainText(

@@ -1,3 +1,5 @@
+import { expect } from '@wordpress/e2e-test-utils-playwright';
+
 /**
  * Pick the field type in the inputs modal.
  *
@@ -180,4 +182,49 @@ export async function saveFieldInModal( page, modelId ) {
 			`.ppom_sort_id_${ modelId } :is(.ppom-add-field, .ppom-update-field)`
 		)
 		.click();
+}
+
+/**
+ * Remove all current cart items for the logged-in browser session.
+ *
+ * @param {import("@playwright/test").Page} page The page.
+ */
+export async function clearCart( page ) {
+	await page.goto( '/cart/' );
+	await page.waitForLoadState( 'networkidle' );
+
+	const removeButtons = page.getByRole( 'button', {
+		name: /Remove .* from cart/,
+	} );
+
+	while ( await removeButtons.count() ) {
+		const buttonCount = await removeButtons.count();
+		await removeButtons.first().click();
+		await expect( removeButtons ).toHaveCount( buttonCount - 1 );
+	}
+}
+
+/**
+ * Attach the current field group to a known WooCommerce product.
+ *
+ * @param {import("@playwright/test").Page} page        The page.
+ * @param {string}                          productName Product label in the attach select.
+ * @return {Promise<string>} Attached product ID.
+ */
+export async function attachGroupToProduct( page, productName ) {
+	await page.getByText( 'Attach to Products' ).click( { force: true } );
+	await page.waitForLoadState( 'networkidle' );
+
+	const productSelector = page.locator(
+		'select[name="ppom-attach-to-products\\[\\]"]'
+	);
+
+	await productSelector.selectOption( { label: productName } );
+
+	const productId = await productSelector.inputValue();
+
+	await page.getByRole( 'button', { name: 'Save', exact: true } ).click();
+	await page.waitForLoadState( 'networkidle' );
+
+	return productId;
 }
