@@ -115,6 +115,7 @@ echo wp_json_encode(
 		'status'            => 'success',
 		'meta_id'           => $meta_id,
 		'product_id'        => $product_id,
+		'product_name'      => get_the_title( $product_id ),
 		'product_permalink' => get_permalink( $product_id ),
 		'quantity_field_id' => 'seat_quantity_' . $suffix,
 	)

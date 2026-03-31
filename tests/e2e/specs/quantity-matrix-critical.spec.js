@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 /**
  * WordPress dependencies
@@ -10,38 +11,27 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 import { clearCart } from '../utils';
 
-const RUN_SUFFIX = Date.now().toString();
+const SEEDED_GROUP_PATH = path.join(
+	process.cwd(),
+	'tests/e2e/fixtures/generated/quantity-matrix-group.json'
+);
 
-function seedQuantityMatrixGroup() {
-	const output = execFileSync(
-		'./node_modules/.bin/wp-env',
-		[
-			'run',
-			'cli',
-			'wp',
-			'eval-file',
-			'./wp-content/plugins/woocommerce-product-addon/tests/e2e/fixtures/create-quantity-matrix-group.php',
-			RUN_SUFFIX,
-		],
-		{
-			cwd: process.cwd(),
-			encoding: 'utf8',
-		}
-	).trim();
-	const jsonLine = output
-		.split( '\n' )
-		.map( ( line ) => line.trim() )
-		.filter( Boolean )
-		.at( -1 );
-
-	return JSON.parse( jsonLine );
+function readSeededQuantityMatrixGroup() {
+	try {
+		return JSON.parse( readFileSync( SEEDED_GROUP_PATH, 'utf8' ) );
+	} catch ( error ) {
+		throw new Error(
+			`Missing quantity-matrix fixture data at ${ SEEDED_GROUP_PATH }. Run "bash ./bin/e2e-after-setup.sh" after starting wp-env.`,
+			{ cause: error }
+		);
+	}
 }
 
 test.describe( 'Quantity Matrix', () => {
 	test( '@critical quantity limits and matrix pricing stay aligned', async ( {
 		page,
 	} ) => {
-		const seededGroup = seedQuantityMatrixGroup();
+		const seededGroup = readSeededQuantityMatrixGroup();
 
 		expect( seededGroup.status ).toBe( 'success' );
 
@@ -73,7 +63,7 @@ test.describe( 'Quantity Matrix', () => {
 		await page.goto( '/cart/' );
 		await expect(
 			page.getByRole( 'spinbutton', {
-				name: 'Quantity of Product 1 in your cart.',
+				name: `Quantity of ${ seededGroup.product_name } in your cart.`,
 			} )
 		).toHaveValue( '2' );
 		await expect( page.locator( 'body' ) ).toContainText( '$16.00' );
@@ -90,7 +80,7 @@ test.describe( 'Quantity Matrix', () => {
 		await page.goto( '/cart/' );
 		await expect(
 			page.getByRole( 'spinbutton', {
-				name: 'Quantity of Product 1 in your cart.',
+				name: `Quantity of ${ seededGroup.product_name } in your cart.`,
 			} )
 		).toHaveValue( '4' );
 		await expect( page.locator( 'body' ) ).toContainText( '$28.00' );
