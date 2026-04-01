@@ -454,8 +454,7 @@ class PPOM_Rest {
 			delete_post_meta( $product_id, PPOM_PRODUCT_META_KEY );
 
 			// Deleting all fields
-			$where_format       = array( '%d' );
-			$res                = PPOM_Meta_DB::delete( $ppom_meta->productmeta_id, $where_format );
+			$res                = PPOM_Meta_DB::delete_product_option_group( $ppom_meta->productmeta_id );
 			$delete_fields_resp = array( 'ppom_id' => $ppom_meta->productmeta_id );
 
 			$resp = array(

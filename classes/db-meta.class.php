@@ -111,12 +111,17 @@ class PPOM_Meta_DB {
 			}
 		}
 
+		if ( ! is_array( $cached ) ) {
+			$cached = array();
+		}
+
 		$uncached_ids = array();
 
 		foreach ( $ids as $id ) {
 			$key = "ppom_meta_{$id}";
-			if ( array_key_exists( $key, $cached ) ) {
-				if ( null !== $cached[ $key ] && false !== $cached[ $key ] ) {
+			
+			if ( array_key_exists( $key, $cached ) && false !== $cached[ $key ] ) {
+				if ( null !== $cached[ $key ] ) {
 					$results[ $id ] = $cached[ $key ];
 				}
 			} else {
@@ -247,48 +252,55 @@ class PPOM_Meta_DB {
 	}
 
 	/**
-	 * Delete a PPOM meta block.
+	 * Delete a single PPOM product option group by ID.
 	 *
-	 * @param int|string|array<int|string> $id
-	 * @param array<int,string>|string|null $where_format
-	 * @return int|false
+	 * @param int|string $id
+	 * @return int|false Number of rows deleted, or false on error.
 	 */
-	public static function delete( $id, $where_format = null ) {
+	public static function delete_product_option_group( $id ) {
 		global $wpdb;
 		$table = self::get_table_name();
-		
-		if ( is_array( $id ) ) {
-			$ids = array_map( 'absint', $id );
-			$ids = array_filter( $ids );
-			if ( empty( $ids ) ) {
-				return 0;
-			}
 
-			$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-			$result       = $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE productmeta_id IN ($placeholders)", $ids ) );
-			
-			if ( false !== $result ) {
-				foreach ( $ids as $deleted_id ) {
-					self::invalidate_cache( $deleted_id );
-				}
-			}
-			return $result;
-		}
-		
-		if ( null === $where_format ) {
-			$where_format = array( '%d' );
-		}
-		
 		$result = $wpdb->delete(
 			$table,
-			array( 'productmeta_id' => $id ),
-			$where_format
+			array( 'productmeta_id' => absint( $id ) ),
+			array( '%d' )
 		);
-		
+
 		if ( false !== $result ) {
 			self::invalidate_cache( $id );
 		}
-		
+
+		return $result;
+	}
+
+	/**
+	 * Delete multiple PPOM product option groups by an array of IDs.
+	 *
+	 * @param array<int|string> $ids
+	 * @return int|false Number of rows deleted, or false on error.
+	 */
+	public static function delete_product_option_groups( $ids ) {
+		global $wpdb;
+		$table = self::get_table_name();
+
+		$ids = array_map( 'absint', $ids );
+		$ids = array_filter( $ids );
+		$ids = array_unique( $ids );
+
+		if ( empty( $ids ) ) {
+			return 0;
+		}
+
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$result       = $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE productmeta_id IN ({$placeholders})", $ids ) );
+
+		if ( false !== $result ) {
+			foreach ( $ids as $deleted_id ) {
+				self::invalidate_cache( $deleted_id );
+			}
+		}
+
 		return $result;
 	}
 }

@@ -617,9 +617,8 @@ function ppom_admin_delete_meta() {
 
 	$productmeta_id = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
 	$ppom_id        = intval( $productmeta_id );
-	$where_format   = array( '%d' );
 
-	$res = PPOM_Meta_DB::delete( $ppom_id, $where_format );
+	$res = PPOM_Meta_DB::delete_product_option_group( $ppom_id );
 
 
 	$response = [];
@@ -654,18 +653,13 @@ function ppom_admin_delete_selected_meta() {
 	}
 
 	$del_ids = [];
-	$del_ids_ph = [];
 
-	// for the performance wise, prefer to use foreach instead of array_map-array_filter-array_fill stack.
-	foreach( $_POST['productmeta_ids'] as $id ) {
+	foreach ( $_POST['productmeta_ids'] as $id ) {
 		$id = absint( $id );
-
-		if( 0 === $id ) {
+		if ( 0 === $id ) {
 			continue;
 		}
-
 		$del_ids[] = $id;
-		$del_ids_ph[] = '%d';
 	}
 
 	if ( empty( $del_ids ) ) {
@@ -673,9 +667,7 @@ function ppom_admin_delete_selected_meta() {
 		die( 0 );
 	}
 
-	$del_ids_ph = implode( ', ', $del_ids_ph );
-
-	$res = PPOM_Meta_DB::delete( $del_ids, $del_ids_ph );
+	$res = PPOM_Meta_DB::delete_product_option_groups( $del_ids );
 
 	if ( $res ) {
 		_e( 'Meta deleted successfully', 'woocommerce-product-addon' );
