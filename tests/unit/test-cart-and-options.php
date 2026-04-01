@@ -18,16 +18,8 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 		$product = $this->create_simple_product();
 		$meta_id = $this->insert_ppom_meta(
 			array(
-				array(
-					'type'      => 'text',
-					'title'     => 'Engraving',
-					'data_name' => 'engraving',
-				),
-				array(
-					'type'      => 'text',
-					'title'     => 'Hidden Note',
-					'data_name' => 'hidden_note',
-				),
+				$this->build_text_field( 'engraving', 'Engraving' ),
+				$this->build_text_field( 'hidden_note', 'Hidden Note' ),
 			),
 			$product->get_id()
 		);
@@ -163,16 +155,15 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 
 		$meta_id = $this->insert_ppom_meta(
 			array(
-				array(
-					'type'      => 'select',
-					'title'     => 'Plan',
-					'data_name' => 'plan',
-					'options'   => array(
+				$this->build_select_field(
+					'plan',
+					'Plan',
+					array(
 						array(
 							'option' => 'Gold',
 							'price'  => '12.5',
 						),
-					),
+					)
 				),
 			),
 			$product->get_id()

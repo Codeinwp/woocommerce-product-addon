@@ -876,8 +876,9 @@ class PPOM_Rest {
 				$formatted_data['value'] = $meta_data->value;
 
 				if ( isset( $ppom_meta[ $meta_data->key ] ) ) {
-					$formatted_data['display'] = $ppom_meta[ $meta_data->key ]['display'];
-					$formatted_data['value']   = $ppom_meta[ $meta_data->key ]['value'];
+					$formatted_value           = isset( $ppom_meta[ $meta_data->key ]['value'] ) ? $ppom_meta[ $meta_data->key ]['value'] : $meta_data->value;
+					$formatted_data['display'] = isset( $ppom_meta[ $meta_data->key ]['display'] ) ? $ppom_meta[ $meta_data->key ]['display'] : $formatted_value;
+					$formatted_data['value']   = $formatted_value;
 				}
 
 				$meta_info[] = $formatted_data;

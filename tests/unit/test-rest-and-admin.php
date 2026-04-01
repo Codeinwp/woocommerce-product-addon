@@ -16,15 +16,17 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 	 */
 	public function testPPOMSaveMetaProductReturnsNoFields() {
 		$product = $this->create_simple_product();
-		$this->set_ppom_option( 'ppom_rest_secret_key', 'secret-key' );
 
 		$rows_before = $this->ppom_meta_row_count();
-		$request     = new WP_REST_Request( 'POST', '/ppom/v1/set/product/' );
-		$request->set_param( 'product_id', $product->get_id() );
-		$request->set_param( 'secret_key', 'secret-key' );
-
-		$response = ( new PPOM_Rest() )->ppom_save_meta_product( $request );
-		$data     = $response->get_data();
+		$response    = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/set/product/',
+			array(
+				'product_id' => $product->get_id(),
+				'secret_key' => 'secret-key',
+			)
+		);
+		$data        = $response->get_data();
 
 		$this->assertSame( 'no_fields', $data['status'] );
 		$this->assertSame( $rows_before, $this->ppom_meta_row_count() );
@@ -38,27 +40,23 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 	 */
 	public function testPPOMSaveMetaProductRejectsInvalidSecretKeyWithoutCreatingMeta() {
 		$product = $this->create_simple_product();
-		$this->set_ppom_option( 'ppom_rest_secret_key', 'expected-secret' );
 
 		$rows_before = $this->ppom_meta_row_count();
-		$request     = new WP_REST_Request( 'POST', '/ppom/v1/set/product/' );
-		$request->set_param( 'product_id', $product->get_id() );
-		$request->set_param( 'secret_key', 'wrong-secret' );
-		$request->set_param(
-			'fields',
-			wp_json_encode(
-				array(
+		$response    = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/set/product/',
+			array(
+				'product_id' => $product->get_id(),
+				'secret_key' => 'wrong-secret',
+				'fields'     => wp_json_encode(
 					array(
-						'type'      => 'text',
-						'title'     => 'Engraving',
-						'data_name' => 'engraving',
-					),
-				)
-			)
+						$this->build_text_field( 'engraving', 'Engraving' ),
+					)
+				),
+			),
+			'expected-secret'
 		);
-
-		$response = ( new PPOM_Rest() )->ppom_save_meta_product( $request );
-		$data     = $response->get_data();
+		$data        = $response->get_data();
 
 		$this->assertSame( 'key_not_valid', $data['status'] );
 		$this->assertSame( $rows_before, $this->ppom_meta_row_count() );
@@ -72,34 +70,68 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 	 */
 	public function testPPOMSaveMetaProductCreatesMetaWhenSecretIsValid() {
 		$product = $this->create_simple_product();
-		$this->set_ppom_option( 'ppom_rest_secret_key', 'expected-secret' );
 
 		$rows_before = $this->ppom_meta_row_count();
-		$request     = new WP_REST_Request( 'POST', '/ppom/v1/set/product/' );
-		$request->set_param( 'product_id', $product->get_id() );
-		$request->set_param( 'secret_key', 'expected-secret' );
-		$request->set_param(
-			'fields',
-			wp_json_encode(
-				array(
+		$response    = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/set/product/',
+			array(
+				'product_id' => $product->get_id(),
+				'secret_key' => 'expected-secret',
+				'fields'     => wp_json_encode(
 					array(
-						'type'      => 'text',
-						'title'     => 'Engraving',
-						'data_name' => 'engraving',
-					),
-				)
-			)
+						$this->build_text_field( 'engraving', 'Engraving' ),
+					)
+				),
+			),
+			'expected-secret'
 		);
-
-		$response = ( new PPOM_Rest() )->ppom_save_meta_product( $request );
-		$data     = $response->get_data();
-		$meta_id  = (int) $data['meta_id'];
+		$data        = $response->get_data();
+		$meta_id     = (int) $data['meta_id'];
 
 		$this->assertSame( 'success', $data['status'] );
 		$this->assertGreaterThan( 0, $meta_id );
 		$this->assertSame( $rows_before + 1, $this->ppom_meta_row_count() );
 		$this->assertSame( $meta_id, (int) get_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, true ) );
 		$this->assertNotNull( $this->get_ppom_meta_row( $meta_id ) );
+	}
+
+	/**
+	 * Ensure REST product writes merge new fields into existing metadata.
+	 *
+	 * @return void
+	 */
+	public function testPPOMSaveMetaProductMergesFieldsIntoExistingMeta() {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/set/product/',
+			array(
+				'product_id' => $product->get_id(),
+				'secret_key' => 'expected-secret',
+				'fields'     => wp_json_encode(
+					array(
+						$this->build_text_field( 'size', 'Size' ),
+					)
+				),
+			),
+			'expected-secret'
+		);
+		$data     = $response->get_data();
+		$fields   = wp_list_pluck( $this->get_ppom_fields_for_product( $product->get_id() ), 'data_name' );
+
+		sort( $fields );
+
+		$this->assertSame( 'success', $data['status'] );
+		$this->assertSame( $meta_id, (int) $data['meta_id'] );
+		$this->assertSame( array( 'engraving', 'size' ), $fields );
 	}
 
 	/**
@@ -111,28 +143,150 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 		$product = $this->create_simple_product();
 		$meta_id = $this->insert_ppom_meta(
 			array(
-				array(
-					'type'      => 'text',
-					'title'     => 'Engraving',
-					'data_name' => 'engraving',
-				),
+				$this->build_text_field( 'engraving', 'Engraving' ),
 			),
 			$product->get_id()
 		);
 
-		$this->set_ppom_option( 'ppom_rest_secret_key', 'expected-secret' );
-
-		$request = new WP_REST_Request( 'POST', '/ppom/v1/delete/product/' );
-		$request->set_param( 'product_id', $product->get_id() );
-		$request->set_param( 'secret_key', 'expected-secret' );
-		$request->set_param( 'fields', wp_json_encode( array( '__all_keys' ) ) );
-
-		$response = ( new PPOM_Rest() )->delete_ppom_fields_product( $request );
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/delete/product/',
+			array(
+				'product_id' => $product->get_id(),
+				'secret_key' => 'expected-secret',
+				'fields'     => wp_json_encode( array( '__all_keys' ) ),
+			),
+			'expected-secret'
+		);
 		$data     = $response->get_data();
 
 		$this->assertSame( 'success', $data['status'] );
 		$this->assertEmpty( get_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, true ) );
 		$this->assertNull( $this->get_ppom_meta_row( $meta_id ) );
+	}
+
+	/**
+	 * Ensure the order read route returns the formatted PPOM item metadata.
+	 *
+	 * @return void
+	 */
+	public function testGetPPOMMetaInfoOrderReturnsFormattedMetadata() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$order    = $this->create_order_with_ppom_item(
+			$product,
+			array(
+				'engraving' => 'Hello',
+			)
+		);
+		$response = $this->dispatch_ppom_rest_request(
+			'GET',
+			'/ppom/v1/get/order/',
+			array(
+				'order_id' => $order->get_id(),
+			)
+		);
+		$data     = $response->get_data();
+
+		$this->assertSame( 'success', $data['status'] );
+		$this->assertSame( $product->get_id(), $data['order_items_meta'][0]['product_id'] );
+		$this->assertSame( 'engraving', $data['order_items_meta'][0]['product_meta_data'][0]['key'] );
+		$this->assertSame( 'Hello', $data['order_items_meta'][0]['product_meta_data'][0]['value'] );
+	}
+
+	/**
+	 * Ensure the order update route updates metadata for the matching product line item.
+	 *
+	 * @return void
+	 */
+	public function testPPOMUpdateMetaOrderUpdatesLineItemMetadata() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$order = $this->create_order_with_ppom_item(
+			$product,
+			array(
+				'engraving' => 'Hello',
+			)
+		);
+
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/set/order/',
+			array(
+				'order_id'   => $order->get_id(),
+				'secret_key' => 'expected-secret',
+				'fields'     => wp_json_encode(
+					array(
+						$product->get_id() => array(
+							'engraving' => 'Updated',
+						),
+					)
+				),
+			),
+			'expected-secret'
+		);
+		$data     = $response->get_data();
+		$item     = $this->get_first_order_item( wc_get_order( $order->get_id() ) );
+
+		$this->assertSame( 'success', $data['status'] );
+		$this->assertSame( 'Updated', $item->get_meta( 'engraving', true ) );
+	}
+
+	/**
+	 * Ensure the order delete route removes the selected metadata keys.
+	 *
+	 * @return void
+	 */
+	public function testDeletePPOMFieldsOrderRemovesSelectedMetadata() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$order = $this->create_order_with_ppom_item(
+			$product,
+			array(
+				'engraving' => 'Hello',
+			)
+		);
+
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/delete/order/',
+			array(
+				'order_id'   => $order->get_id(),
+				'secret_key' => 'expected-secret',
+				'fields'     => wp_json_encode(
+					array(
+						$product->get_id() => array( 'engraving' ),
+					)
+				),
+			),
+			'expected-secret'
+		);
+		$data     = $response->get_data();
+		$item     = $this->get_first_order_item( wc_get_order( $order->get_id() ) );
+
+		$this->assertSame( 'success', $data['status'] );
+		$this->assertSame( '', $item->get_meta( 'engraving', true ) );
 	}
 
 	/**
@@ -197,11 +351,7 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 	public function testSaveCategoriesAndTagsSerializesTagsWhenArrayPassed() {
 		$meta_id = $this->insert_ppom_meta(
 			array(
-				array(
-					'type'      => 'text',
-					'title'     => 'Field',
-					'data_name' => 'field',
-				),
+				$this->build_text_field( 'field', 'Field' ),
 			)
 		);
 

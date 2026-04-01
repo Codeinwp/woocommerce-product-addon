@@ -43,20 +43,21 @@ class Test_Validation_And_Pricing extends PPOM_Test_Case {
 						'qty_step' => '2',
 					)
 				),
-				array(
-					'type'         => 'quantities',
-					'title'        => 'Seats',
-					'data_name'    => 'seat_quantity',
-					'view_control' => 'simple_view',
-					'min_qty'      => '3',
-					'max_qty'      => '4',
-					'options'      => array(
+				$this->build_quantities_field(
+					'seat_quantity',
+					'Seats',
+					array(
 						array(
 							'option' => 'seat',
 							'price'  => '',
 							'stock'  => '',
 						),
 					),
+					array(
+						'view_control' => 'simple_view',
+						'min_qty'      => '3',
+						'max_qty'      => '4',
+					)
 				),
 			),
 			$product->get_id()
@@ -363,27 +364,5 @@ class Test_Validation_And_Pricing extends PPOM_Test_Case {
 		);
 
 		$this->assertSame( array(), $cart_item['ppom']['price_matrix_found'] );
-	}
-
-	/**
-	 * Build a price matrix field definition.
-	 *
-	 * @param string $data_name Field data name.
-	 * @param array  $options   Matrix options.
-	 * @param array  $overrides Field overrides.
-	 *
-	 * @return array
-	 */
-	private function build_price_matrix_field( $data_name, $options, $overrides = array() ) {
-		return array_merge(
-			array(
-				'type'      => 'pricematrix',
-				'title'     => 'Matrix Pricing',
-				'data_name' => $data_name,
-				'qty_step'  => '1',
-				'options'   => $options,
-			),
-			$overrides
-		);
 	}
 }

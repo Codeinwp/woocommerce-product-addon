@@ -8,6 +8,13 @@
 abstract class PPOM_Test_Case extends WP_UnitTestCase {
 
 	/**
+	 * Original WooCommerce cart instance.
+	 *
+	 * @var mixed
+	 */
+	protected $original_wc_cart;
+
+	/**
 	 * Reset globals and settings used by the helper-heavy tests.
 	 *
 	 * @return void
@@ -23,6 +30,9 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		$this->unset_ppom_option( 'ppom_api_enable' );
 		$this->unset_ppom_option( 'ppom_enable_client_validation' );
 		$this->unset_ppom_option( 'ppom_taxable_option_price' );
+
+		$this->original_wc_cart = function_exists( 'WC' ) && isset( WC()->cart ) ? WC()->cart : null;
+		wc_clear_notices();
 	}
 
 	/**
@@ -34,6 +44,11 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		$_POST    = array();
 		$_GET     = array();
 		$_REQUEST = array();
+		wc_clear_notices();
+
+		if ( function_exists( 'WC' ) ) {
+			WC()->cart = $this->original_wc_cart;
+		}
 
 		parent::tearDown();
 	}
@@ -72,6 +87,71 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		$product_id = $product->save();
 
 		return wc_get_product( $product_id );
+	}
+
+	/**
+	 * Create and persist an order containing the given product.
+	 *
+	 * @param WC_Product $product  Product to add.
+	 * @param int        $quantity Item quantity.
+	 *
+	 * @return WC_Order
+	 */
+	protected function create_order_with_product( $product, $quantity = 1 ) {
+		$order   = wc_create_order();
+		$item_id = $order->add_product( $product, $quantity );
+
+		$this->assertNotFalse( $item_id );
+
+		$order->save();
+
+		return wc_get_order( $order->get_id() );
+	}
+
+	/**
+	 * Return the first order item for an order.
+	 *
+	 * @param WC_Order $order Order instance.
+	 *
+	 * @return WC_Order_Item_Product
+	 */
+	protected function get_first_order_item( $order ) {
+		$items = $order->get_items();
+
+		$this->assertNotEmpty( $items );
+
+		return reset( $items );
+	}
+
+	/**
+	 * Create a PPOM-backed order item with stored line-item metadata.
+	 *
+	 * @param WC_Product $product Product to add.
+	 * @param array      $fields  PPOM field values.
+	 * @param int        $quantity Item quantity.
+	 *
+	 * @return WC_Order
+	 */
+	protected function create_order_with_ppom_item( $product, $fields, $quantity = 1 ) {
+		$order = $this->create_order_with_product( $product, $quantity );
+		$item  = $this->get_first_order_item( $order );
+
+		ppom_woocommerce_order_item_meta(
+			$item,
+			'ppom-test-cart-key',
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields' => $fields,
+				),
+			),
+			$order
+		);
+
+		$item->save();
+		$order->save();
+
+		return wc_get_order( $order->get_id() );
 	}
 
 	/**
@@ -119,6 +199,92 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Build a basic text field definition.
+	 *
+	 * @param string $data_name Field data name.
+	 * @param string $title     Field title.
+	 * @param array  $overrides Field overrides.
+	 *
+	 * @return array
+	 */
+	protected function build_text_field( $data_name, $title = 'Text', $overrides = array() ) {
+		return array_merge(
+			array(
+				'type'      => 'text',
+				'title'     => $title,
+				'data_name' => $data_name,
+			),
+			$overrides
+		);
+	}
+
+	/**
+	 * Build a basic select field definition.
+	 *
+	 * @param string $data_name Field data name.
+	 * @param string $title     Field title.
+	 * @param array  $options   Field options.
+	 * @param array  $overrides Field overrides.
+	 *
+	 * @return array
+	 */
+	protected function build_select_field( $data_name, $title = 'Select', $options = array(), $overrides = array() ) {
+		return array_merge(
+			array(
+				'type'      => 'select',
+				'title'     => $title,
+				'data_name' => $data_name,
+				'options'   => $options,
+			),
+			$overrides
+		);
+	}
+
+	/**
+	 * Build a price matrix field definition.
+	 *
+	 * @param string $data_name Field data name.
+	 * @param array  $options   Matrix options.
+	 * @param array  $overrides Field overrides.
+	 *
+	 * @return array
+	 */
+	protected function build_price_matrix_field( $data_name, $options, $overrides = array() ) {
+		return array_merge(
+			array(
+				'type'      => 'pricematrix',
+				'title'     => 'Matrix Pricing',
+				'data_name' => $data_name,
+				'qty_step'  => '1',
+				'options'   => $options,
+			),
+			$overrides
+		);
+	}
+
+	/**
+	 * Build a quantities field definition.
+	 *
+	 * @param string $data_name Field data name.
+	 * @param string $title     Field title.
+	 * @param array  $options   Field options.
+	 * @param array  $overrides Field overrides.
+	 *
+	 * @return array
+	 */
+	protected function build_quantities_field( $data_name, $title = 'Quantities', $options = array(), $overrides = array() ) {
+		return array_merge(
+			array(
+				'type'      => 'quantities',
+				'title'     => $title,
+				'data_name' => $data_name,
+				'options'   => $options,
+			),
+			$overrides
+		);
+	}
+
+	/**
 	 * Count PPOM field-group rows.
 	 *
 	 * @return int
@@ -150,6 +316,19 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 			),
 			ARRAY_A
 		);
+	}
+
+	/**
+	 * Return the field definitions attached to a product.
+	 *
+	 * @param int $product_id Product ID.
+	 *
+	 * @return array
+	 */
+	protected function get_ppom_fields_for_product( $product_id ) {
+		$ppom = new PPOM_Meta( $product_id );
+
+		return is_array( $ppom->fields ) ? $ppom->fields : array();
 	}
 
 	/**
@@ -191,5 +370,71 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 			unset( $saved_settings[ $key ] );
 			update_option( 'ppom-settings_panel', $saved_settings );
 		}
+	}
+
+	/**
+	 * Register the PPOM REST routes for the current test.
+	 *
+	 * @param string $secret_key REST secret key.
+	 *
+	 * @return PPOM_Rest
+	 */
+	protected function register_ppom_rest_routes( $secret_key = 'secret-key' ) {
+		$this->set_ppom_option( 'ppom_api_enable', 'yes' );
+		$this->set_ppom_option( 'ppom_rest_secret_key', $secret_key );
+
+		$rest        = new PPOM_Rest();
+		$rest_server = rest_get_server();
+
+		do_action( 'rest_api_init', $rest_server );
+
+		return $rest;
+	}
+
+	/**
+	 * Dispatch a PPOM REST request through the registered route table.
+	 *
+	 * @param string $method     HTTP method.
+	 * @param string $route      Route path.
+	 * @param array  $params     Request params.
+	 * @param string $secret_key Expected secret key.
+	 *
+	 * @return WP_REST_Response
+	 */
+	protected function dispatch_ppom_rest_request( $method, $route, $params = array(), $secret_key = 'secret-key' ) {
+		$this->register_ppom_rest_routes( $secret_key );
+
+		$response = $this->dispatch_rest_request_to_route( $method, $route, $params );
+		$data     = $response->get_data();
+
+		if ( isset( $data['code'] ) && 'rest_no_route' === $data['code'] ) {
+			$alternate_route = untrailingslashit( $route );
+
+			if ( $alternate_route === $route ) {
+				$alternate_route = trailingslashit( $route );
+			}
+
+			$response = $this->dispatch_rest_request_to_route( $method, $alternate_route, $params );
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Dispatch a REST request to a specific route string.
+	 *
+	 * @param string $method HTTP method.
+	 * @param string $route  Route path.
+	 * @param array  $params Request params.
+	 *
+	 * @return WP_REST_Response
+	 */
+	protected function dispatch_rest_request_to_route( $method, $route, $params = array() ) {
+		$request = new WP_REST_Request( $method, $route );
+		foreach ( $params as $key => $value ) {
+			$request->set_param( $key, $value );
+		}
+
+		return rest_get_server()->dispatch( $request );
 	}
 }
