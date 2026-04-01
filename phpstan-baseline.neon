@@ -937,24 +937,6 @@ parameters:
 			path: classes/fields.class.php
 
 		-
-			message: '#^Cannot access property \$fields on array\.$#'
-			identifier: property.nonObject
-			count: 2
-			path: classes/form.class.php
-
-		-
-			message: '#^Cannot access property \$meta_id on array\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: classes/form.class.php
-
-		-
-			message: '#^Class PPOM_Form constructor invoked with 0 parameters, 2 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: classes/form.class.php
-
-		-
 			message: '#^Method PPOM_Form\:\:__construct\(\) has parameter \$args with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -1021,12 +1003,6 @@ parameters:
 			path: classes/form.class.php
 
 		-
-			message: '#^Method PPOM_Form\:\:get_instance\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/form.class.php
-
-		-
 			message: '#^Method PPOM_Form\:\:has_ppom_fields\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -1045,7 +1021,7 @@ parameters:
 			path: classes/form.class.php
 
 		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, float\|int given\.$#'
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
 			identifier: argument.type
 			count: 1
 			path: classes/form.class.php
@@ -1059,24 +1035,6 @@ parameters:
 		-
 			message: '#^Property PPOM_Form\:\:\$args type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: classes/form.class.php
-
-		-
-			message: '#^Property PPOM_Form\:\:\$ins has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/form.class.php
-
-		-
-			message: '#^Property PPOM_Form\:\:\$ppom type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/form.class.php
-
-		-
-			message: '#^Static property PPOM_Form\:\:\$ppom \(array\) does not accept PPOM_Meta\.$#'
-			identifier: assign.propertyType
 			count: 1
 			path: classes/form.class.php
 
@@ -2689,25 +2647,13 @@ parameters:
 			path: classes/ppom.class.php
 
 		-
-			message: '#^Cannot access property \$dynamic_price_display on array\.$#'
+			message: '#^Cannot access property \$dynamic_price_display on array\|object\.$#'
 			identifier: property.nonObject
 			count: 1
 			path: classes/ppom.class.php
 
 		-
-			message: '#^Cannot access property \$productmeta_js on array\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: classes/ppom.class.php
-
-		-
-			message: '#^Cannot access property \$productmeta_name on array\.$#'
-			identifier: property.nonObject
-			count: 1
-			path: classes/ppom.class.php
-
-		-
-			message: '#^Cannot access property \$productmeta_style on array\.$#'
+			message: '#^Cannot access property \$productmeta_name on array\|object\.$#'
 			identifier: property.nonObject
 			count: 1
 			path: classes/ppom.class.php
@@ -2887,7 +2833,7 @@ parameters:
 			path: classes/ppom.class.php
 
 		-
-			message: '#^Property PPOM_Meta\:\:\$ppom_settings \(array\) does not accept object\|null\.$#'
+			message: '#^Property PPOM_Meta\:\:\$ppom_settings \(array\|object\) does not accept object\|null\.$#'
 			identifier: assign.propertyType
 			count: 1
 			path: classes/ppom.class.php
@@ -6397,13 +6343,13 @@ parameters:
 			path: inc/rest.class.php
 
 		-
-			message: '#^Parameter \#1 \$ppom_meta of method PPOM_Rest\:\:delete_meta_data\(\) expects object, array given\.$#'
+			message: '#^Parameter \#1 \$ppom_meta of method PPOM_Rest\:\:delete_meta_data\(\) expects object, array\|object given\.$#'
 			identifier: argument.type
 			count: 1
 			path: inc/rest.class.php
 
 		-
-			message: '#^Parameter \#1 \$ppom_meta of method PPOM_Rest\:\:update_meta_data\(\) expects object, array given\.$#'
+			message: '#^Parameter \#1 \$ppom_meta of method PPOM_Rest\:\:update_meta_data\(\) expects object, array\|object given\.$#'
 			identifier: argument.type
 			count: 1
 			path: inc/rest.class.php
