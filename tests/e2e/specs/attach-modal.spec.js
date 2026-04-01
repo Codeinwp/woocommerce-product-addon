@@ -2,35 +2,41 @@
  * WordPress dependencies
  */
 import { test, expect } from "@wordpress/e2e-test-utils-playwright";
+import {
+	createProductCategory,
+	createSimpleProduct,
+} from "../fixtures/index.js";
 import { addNewField, createSimpleGroupField, fillFieldNameAndId, pickFieldTypeInModal, saveFieldInModal, saveFields } from "../utils";
 
 test.describe("Attach Modal", () => {
+	async function saveAttachModal(page) {
+		page.once("dialog", (dialog) => dialog.accept());
+		await page
+			.locator("#ppom-product-form")
+			.getByRole("button", { name: "Save", exact: true })
+			.click();
+		await page.locator("#ppom-product-modal").waitFor({ state: "hidden" });
+	}
+
 	/**
 	 * Attach a new group field to the first product in list then check if it is rendered.
 	 */
-	test("attach to products and check", async ({ page, admin }) => {
-		await createSimpleGroupField(admin, page);
-		await page.waitForTimeout(500);
-		await admin.visitAdminPage("admin.php?page=ppom");
+	test("attach to products and check", async ({ page, admin, requestUtils }) => {
+		const product = await createSimpleProduct(requestUtils);
 
-		const firstRow = page
-			.locator("#ppom-groups-export-form tbody tr")
-			.first();
-		const ppomId = await firstRow.locator("td").nth(1).innerText();
-		await firstRow.getByText("Attach to Products").click();
+		const { ppomId } = await createSimpleGroupField(admin, page);
+		await page.locator(".ppom-products-modal").click();
+		await page.locator("#ppom-product-form").waitFor({ state: "visible" });
 
 		const productSelector = page
 			.locator("#ppom-product-form div")
 			.filter({ hasText: "Display on Specific Products" })
 			.first()
 			.locator('select[name="ppom-attach-to-products\\[\\]"]');
-		await productSelector.selectOption({ index: 0 });
+		await productSelector.selectOption(String(product.id));
 
 		const selectedOption = await productSelector.inputValue();
-		console.log("Selected option value:", selectedOption);
-		await page.getByRole("button", { name: "Save" }).click();
-
-		await page.waitForLoadState("networkidle");
+		await saveAttachModal(page);
 		await page.goto(`/?p=${selectedOption}`);
 
 		const elements = page.locator(`.ppom-id-${ppomId}`);
@@ -43,19 +49,23 @@ test.describe("Attach Modal", () => {
 	/**
 	 * Attach a new group to multiple categories then check.
 	 */
-	test("attach to multiple categories", async ({ page, admin }) => {
-		const categoriesToUse = ["test_cat_1", "test_cat_2"];
+	test("attach to multiple categories", async ({ page, admin, requestUtils }) => {
+		const categoriesToUse = await Promise.all([
+			createProductCategory(requestUtils),
+			createProductCategory(requestUtils),
+		]);
+		const productsToCheck = await Promise.all(
+			categoriesToUse.map((category, index) =>
+				createSimpleProduct(requestUtils, {
+					name: `Attach Modal Product ${index + 1}`,
+					categories: [{ id: category.id }],
+				}),
+			),
+		);
 
-		await createSimpleGroupField(admin, page);
-		await page.waitForTimeout(500);
-		await admin.visitAdminPage("admin.php?page=ppom");
-
-		const firstRow = page
-			.locator("#ppom-groups-export-form tbody tr")
-			.first();
-		const ppomId = await firstRow.locator("td").nth(1).innerText();
-		await firstRow.getByText("Attach to Products").click();
-		await page.waitForLoadState("networkidle");
+		const { ppomId } = await createSimpleGroupField(admin, page);
+		await page.locator(".ppom-products-modal").click();
+		await page.locator("#ppom-product-form").waitFor({ state: "visible" });
 
 		await page.evaluate(() => {
 			document.querySelector('#attach-to-categories > div.postbox').classList.remove('closed');
@@ -64,22 +74,18 @@ test.describe("Attach Modal", () => {
 		const categoriesSelector = page.locator(
 			'#ppom-product-modal select[name="ppom-attach-to-categories\\[\\]"]',
 		);
-	
-		// NOTE: categories created by `create-prodcuts.sh`
-		await categoriesSelector.selectOption(
-			categoriesToUse.map((c) => ({ value: c })),
-		);
-		await page.getByRole("button", { name: "Save" }).click();
-		await page.waitForLoadState("networkidle");
-		await page.reload();
 
-		for (const cat of categoriesToUse) {
-			await page.goto(`/?product_cat=${cat}`);
-			await page.locator('a.add_to_cart_button').first().click();
+		await categoriesSelector.selectOption(
+			categoriesToUse.map((category) => ({ value: category.slug })),
+		);
+		await saveAttachModal(page);
+
+		for (const product of productsToCheck) {
+			await page.goto(`/?p=${product.id}`);
 
 			const elements = page.locator(`.ppom-id-${ppomId}`);
 			const count = await elements.count();
-			expect(count ).toBeGreaterThan(0);
+			expect(count).toBeGreaterThan(0);
 		}
 	});
 

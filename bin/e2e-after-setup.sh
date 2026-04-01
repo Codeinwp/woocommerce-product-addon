@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
+
 # Run after `npm run wp-env start`
-
-# Add some woocommerce products.
-npm run wp-env run tests-cli bash ./wp-content/plugins/woocommerce-product-addon/bin/env/create-products.sh
-
+#
+# E2E setup is fixture-driven now, so no shared catalog bootstrap is required here.
+exit 0
