@@ -56,7 +56,7 @@ function ppom_woocommerce_show_fields_on_product( $product_id, $args = null ) {
 
 	if ( ! $ppom->has_unique_datanames() ) {
 
-		printf( '<div class="error">' . __( 'Some of your fields has duplicated datanames, please fix it', 'woocommerce-product-addon' ) . '</div>', 'ppom' );
+		echo '<div class="error">' . esc_html__( 'Some of your fields has duplicated datanames, please fix it', 'woocommerce-product-addon' ) . '</div>';
 
 		return;
 	}

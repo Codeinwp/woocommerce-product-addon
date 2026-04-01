@@ -117,6 +117,7 @@ function ppom_sanitize_array_data( $data ) {
 			$value = sanitize_text_field( $value );
 		}
 	}
+	unset( $value );
 
 	return $data;
 }

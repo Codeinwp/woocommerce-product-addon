@@ -134,7 +134,7 @@ const PPOM_Validate = {
 		const $ul_container = jQuery( '<ul/>' )
 			.addClass( 'woocommerce-error' )
 			.appendTo( $container );
-		invalid_fields.map( ( f ) =>
+		invalid_fields.forEach( ( f ) =>
 			$ul_container.append(
 				`<li>${ PPOM_Validate.get_message( f ) }</li>`
 			)

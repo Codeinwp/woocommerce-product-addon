@@ -28,7 +28,7 @@ jQuery( function ( $ ) {
 		pageLength: 50,
 		dom: 'f<"ppom-toolbar"><"top">rt<"bottom">lpi',
 	} );
-	const append_overly_model =
+	const append_overlay_modal =
 		"<div class='ppom-modal-overlay ppom-js-modal-close'></div>";
 
 	// Bulk delete is confirmation-driven because it removes saved field groups,
@@ -131,7 +131,7 @@ jQuery( function ( $ ) {
 				$( '#ppom-product-modal .ppom-modal-body' ).html( html );
 				initAttachSelects();
 				$( '#ppom_id' ).val( ppom_id );
-				$( 'body' ).append( append_overly_model );
+				$( 'body' ).append( append_overlay_modal );
 				$( '#' + model_id ).fadeIn();
 				$( '#attach-to-products input' ).focus();
 			} );
