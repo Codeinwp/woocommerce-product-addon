@@ -90,6 +90,54 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Create and persist a variable product with one variation.
+	 *
+	 * @param array $product_args   Parent product overrides.
+	 * @param array $variation_args Variation overrides.
+	 *
+	 * @return array{product: WC_Product_Variable, variation: WC_Product_Variation}
+	 */
+	protected function create_variable_product_with_variation( $product_args = array(), $variation_args = array() ) {
+		$product = new WC_Product_Variable();
+
+		$name = isset( $product_args['name'] ) ? $product_args['name'] : 'PPOM Variable Product ' . wp_generate_password( 6, false );
+
+		$product->set_name( $name );
+		$product->set_status( 'publish' );
+		$product->set_catalog_visibility( 'visible' );
+		$product->save();
+
+		$variation = new WC_Product_Variation();
+
+		$regular_price = isset( $variation_args['regular_price'] ) ? (string) $variation_args['regular_price'] : '12';
+
+		$variation->set_parent_id( $product->get_id() );
+		$variation->set_status( 'publish' );
+		$variation->set_regular_price( $regular_price );
+		$variation->set_price( $regular_price );
+		$variation->set_attributes( isset( $variation_args['attributes'] ) ? $variation_args['attributes'] : array() );
+
+		if ( ! empty( $variation_args['manage_stock'] ) ) {
+			$variation->set_manage_stock( true );
+		}
+
+		if ( isset( $variation_args['stock_quantity'] ) ) {
+			$variation->set_stock_quantity( (int) $variation_args['stock_quantity'] );
+		}
+
+		if ( isset( $variation_args['backorders'] ) ) {
+			$variation->set_backorders( $variation_args['backorders'] ? 'yes' : 'no' );
+		}
+
+		$variation->save();
+
+		return array(
+			'product'   => wc_get_product( $product->get_id() ),
+			'variation' => wc_get_product( $variation->get_id() ),
+		);
+	}
+
+	/**
 	 * Create and persist an order containing the given product.
 	 *
 	 * @param WC_Product $product  Product to add.
@@ -106,6 +154,32 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		$order->save();
 
 		return wc_get_order( $order->get_id() );
+	}
+
+	/**
+	 * Restore a cart item through the WooCommerce session filters.
+	 *
+	 * @param WC_Product $product         Product object.
+	 * @param array      $ppom_fields     PPOM posted fields.
+	 * @param int        $quantity        Product quantity.
+	 * @param string     $hidden_fields   Conditionally hidden fields.
+	 * @param int        $variation_id    Variation ID.
+	 *
+	 * @return array
+	 */
+	protected function restore_cart_item_from_session( $product, $ppom_fields = array(), $quantity = 1, $hidden_fields = '', $variation_id = 0 ) {
+		$cart_item = array(
+			'data'         => $product,
+			'product_id'   => ppom_get_product_id( $product ),
+			'variation_id' => $variation_id,
+			'quantity'     => $quantity,
+			'ppom'         => array(
+				'fields'               => $ppom_fields,
+				'conditionally_hidden' => $hidden_fields,
+			),
+		);
+
+		return apply_filters( 'woocommerce_get_cart_item_from_session', $cart_item, $cart_item );
 	}
 
 	/**
@@ -241,6 +315,28 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Build a basic file field definition.
+	 *
+	 * @param string $data_name Field data name.
+	 * @param string $title     Field title.
+	 * @param array  $overrides Field overrides.
+	 *
+	 * @return array
+	 */
+	protected function build_file_field( $data_name, $title = 'File', $overrides = array() ) {
+		return array_merge(
+			array(
+				'type'       => 'file',
+				'title'      => $title,
+				'data_name'  => $data_name,
+				'file_types' => 'txt,jpg,png,pdf',
+				'file_size'  => '1mb',
+			),
+			$overrides
+		);
+	}
+
+	/**
 	 * Build a price matrix field definition.
 	 *
 	 * @param string $data_name Field data name.
@@ -329,6 +425,29 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		$ppom = new PPOM_Meta( $product_id );
 
 		return is_array( $ppom->fields ) ? $ppom->fields : array();
+	}
+
+	/**
+	 * Delete PPOM upload artifacts for a file name.
+	 *
+	 * @param string $file_name File name.
+	 *
+	 * @return void
+	 */
+	protected function remove_ppom_upload_artifacts( $file_name ) {
+		$paths = array(
+			ppom_get_dir_path() . $file_name,
+			ppom_get_dir_path( 'thumbs' ) . $file_name,
+			ppom_get_dir_path( 'cropped' ) . $file_name,
+			ppom_get_dir_path( 'edits' ) . $file_name,
+			ppom_get_dir_path( 'edits/thumbs' ) . $file_name,
+		);
+
+		foreach ( $paths as $path ) {
+			if ( $path && file_exists( $path ) ) {
+				unlink( $path );
+			}
+		}
 	}
 
 	/**

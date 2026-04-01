@@ -34,7 +34,7 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 	}
 
 	/**
-	 * Ensure invalid REST secrets do not create product PPOM rows.
+	 * Ensure invalid REST secrets do not create product metadata.
 	 *
 	 * @return void
 	 */
@@ -58,9 +58,42 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 		);
 		$data        = $response->get_data();
 
+		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 'key_not_valid', $data['status'] );
 		$this->assertSame( $rows_before, $this->ppom_meta_row_count() );
 		$this->assertEmpty( get_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, true ) );
+	}
+
+	/**
+	 * Ensure invalid REST secrets do not delete product metadata.
+	 *
+	 * @return void
+	 */
+	public function testDeletePPOMFieldsProductRejectsInvalidSecretKeyWithoutDeletingMeta() {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/delete/product/',
+			array(
+				'product_id' => $product->get_id(),
+				'secret_key' => 'wrong-secret',
+				'fields'     => wp_json_encode( array( '__all_keys' ) ),
+			),
+			'expected-secret'
+		);
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'key_not_valid', $data['status'] );
+		$this->assertSame( $meta_id, (int) get_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, true ) );
+		$this->assertNotNull( $this->get_ppom_meta_row( $meta_id ) );
 	}
 
 	/**
@@ -247,6 +280,52 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Ensure invalid REST secrets do not update order metadata.
+	 *
+	 * @return void
+	 */
+	public function testPPOMUpdateMetaOrderRejectsInvalidSecretKeyWithoutChangingMetadata() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$order = $this->create_order_with_ppom_item(
+			$product,
+			array(
+				'engraving' => 'Hello',
+			)
+		);
+
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/set/order/',
+			array(
+				'order_id'   => $order->get_id(),
+				'secret_key' => 'wrong-secret',
+				'fields'     => wp_json_encode(
+					array(
+						$product->get_id() => array(
+							'engraving' => 'Updated',
+						),
+					)
+				),
+			),
+			'expected-secret'
+		);
+		$data     = $response->get_data();
+		$item     = $this->get_first_order_item( wc_get_order( $order->get_id() ) );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'key_not_valid', $data['status'] );
+		$this->assertSame( 'Hello', $item->get_meta( 'engraving', true ) );
+	}
+
+	/**
 	 * Ensure the order delete route removes the selected metadata keys.
 	 *
 	 * @return void
@@ -287,6 +366,50 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 
 		$this->assertSame( 'success', $data['status'] );
 		$this->assertSame( '', $item->get_meta( 'engraving', true ) );
+	}
+
+	/**
+	 * Ensure invalid REST secrets do not delete order metadata.
+	 *
+	 * @return void
+	 */
+	public function testDeletePPOMFieldsOrderRejectsInvalidSecretKeyWithoutDeletingMetadata() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$order = $this->create_order_with_ppom_item(
+			$product,
+			array(
+				'engraving' => 'Hello',
+			)
+		);
+
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/delete/order/',
+			array(
+				'order_id'   => $order->get_id(),
+				'secret_key' => 'wrong-secret',
+				'fields'     => wp_json_encode(
+					array(
+						$product->get_id() => array( 'engraving' ),
+					)
+				),
+			),
+			'expected-secret'
+		);
+		$data     = $response->get_data();
+		$item     = $this->get_first_order_item( wc_get_order( $order->get_id() ) );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'key_not_valid', $data['status'] );
+		$this->assertSame( 'Hello', $item->get_meta( 'engraving', true ) );
 	}
 
 	/**
