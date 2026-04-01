@@ -26,7 +26,10 @@ class FlakyTestsReporter {
 		try {
 			fs.mkdirSync( 'flaky-tests' );
 		} catch ( err ) {
-			if ( err instanceof Error && err.code === 'EEXIST' ) {
+			if (
+				err instanceof Error &&
+				err.code === 'EEXIST'
+			) {
 				// Ignore the error if the directory already exists.
 			} else {
 				throw err;
