@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Coordinates the PPOM admin UI and field-group attachment workflows.
+ * Coordinates the PPOM admin UI, settings flows, and field-group attachment workflows.
  *
  * Registers the PPOM menu pages, AJAX attach handlers, legacy WooCommerce
  * settings tab, and admin initialization hooks that prepare the PPOM schema.

@@ -154,6 +154,51 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Ensure repeated restores of the same session payload keep a stable addon-adjusted price.
+	 *
+	 * @return void
+	 */
+	public function testWooCommerceGetCartItemFromSessionKeepsStablePriceAcrossRepeatedRestores() {
+		$product = $this->create_simple_product(
+			array(
+				'regular_price' => '10',
+			)
+		);
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_select_field(
+					'plan',
+					'Plan',
+					array(
+						array(
+							'option' => 'Premium',
+							'price'  => '5',
+						),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$first_restore  = $this->restore_cart_item_from_session(
+			wc_get_product( $product->get_id() ),
+			array(
+				'plan' => 'Premium',
+			)
+		);
+		$second_restore = $this->restore_cart_item_from_session(
+			wc_get_product( $product->get_id() ),
+			array(
+				'plan' => 'Premium',
+			)
+		);
+
+		$this->assertSame( 15.0, (float) $first_restore['data']->get_price() );
+		$this->assertSame( 15.0, (float) $second_restore['data']->get_price() );
+	}
+
+	/**
 	 * Ensure session restore recalculates addon pricing for variations using parent PPOM fields.
 	 *
 	 * @return void
@@ -242,6 +287,106 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Ensure hidden price-matrix fields are ignored during session restore repricing.
+	 *
+	 * @return void
+	 */
+	public function testWooCommerceGetCartItemFromSessionIgnoresHiddenPriceMatrix() {
+		$product = $this->create_simple_product(
+			array(
+				'regular_price' => '10',
+			)
+		);
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_price_matrix_field(
+					'price_matrix',
+					array(
+						array(
+							'option' => '1-2',
+							'price'  => '8',
+							'label'  => 'Hidden range',
+							'id'     => 'hidden_range',
+						),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$restored = $this->restore_cart_item_from_session( wc_get_product( $product->get_id() ), array(), 1, 'price_matrix' );
+
+		$this->assertSame( 10.0, (float) $restored['data']->get_price() );
+		$this->assertSame( array(), $restored['ppom']['price_matrix_found'] );
+	}
+
+	/**
+	 * Ensure unknown option values do not affect restored product pricing.
+	 *
+	 * @return void
+	 */
+	public function testWooCommerceGetCartItemFromSessionIgnoresUnknownOptionValue() {
+		$product = $this->create_simple_product(
+			array(
+				'regular_price' => '10',
+			)
+		);
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_select_field(
+					'plan',
+					'Plan',
+					array(
+						array(
+							'option' => 'Premium',
+							'price'  => '5',
+						),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$restored = $this->restore_cart_item_from_session(
+			wc_get_product( $product->get_id() ),
+			array(
+				'plan' => 'Unknown',
+			)
+		);
+
+		$this->assertSame( 10.0, (float) $restored['data']->get_price() );
+	}
+
+	/**
+	 * Ensure variation restores without a parent PPOM schema keep the base variation price.
+	 *
+	 * @return void
+	 */
+	public function testWooCommerceGetCartItemFromSessionLeavesVariationBasePriceWithoutParentMeta() {
+		$products  = $this->create_variable_product_with_variation(
+			array(),
+			array(
+				'regular_price' => '12',
+			)
+		);
+		$variation = $products['variation'];
+
+		$restored = $this->restore_cart_item_from_session(
+			$variation,
+			array(
+				'plan' => 'Premium',
+			),
+			1,
+			'',
+			$variation->get_id()
+		);
+
+		$this->assertSame( 12.0, (float) $restored['data']->get_price() );
+	}
+
+	/**
 	 * Ensure order line item metadata stores formatted display values and raw PPOM payload.
 	 *
 	 * @return void
@@ -326,5 +471,56 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 
 		$this->assertSame( 'Variation Hello', $item->get_meta( 'engraving', true ) );
 		$this->assertSame( 'Variation Hello', $item->get_meta( '_ppom_fields', true )['fields']['engraving'] );
+	}
+
+	/**
+	 * Ensure checkbox selections persist as display text and raw array payloads on order items.
+	 *
+	 * @return void
+	 */
+	public function testWooCommerceOrderItemMetaStoresCheckboxSelections() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field(
+					'extras',
+					'Extras',
+					array(
+						array(
+							'option' => 'Red',
+						),
+						array(
+							'option' => 'Blue',
+						),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$order = $this->create_order_with_product( $product );
+		$item  = $this->get_first_order_item( $order );
+
+		ppom_woocommerce_order_item_meta(
+			$item,
+			'ppom-test-cart-key',
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields' => array(
+						'extras' => array( 'Red', 'Blue' ),
+					),
+				),
+			),
+			$order
+		);
+
+		$item->save();
+
+		$stored_payload = $item->get_meta( '_ppom_fields', true );
+
+		$this->assertSame( 'Red, Blue', $item->get_meta( 'extras', true ) );
+		$this->assertSame( array( 'Red', 'Blue' ), $stored_payload['fields']['extras'] );
 	}
 }

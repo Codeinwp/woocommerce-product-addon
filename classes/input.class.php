@@ -1,6 +1,6 @@
 <?php
 /**
- * Loads PPOM input classes and frontend asset dependencies.
+ * Loads PPOM input classes and optional add-on input classes.
  *
  * @package PPOM
  * @subpackage Inputs
@@ -9,7 +9,7 @@
  */
 
 /**
- * Loads PPOM input classes and their script registrations.
+ * Loads PPOM input classes and related add-on integrations.
  */
 class PPOM_Inputs {
 

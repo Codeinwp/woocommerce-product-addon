@@ -64,11 +64,13 @@ The plugin is not PSR-4 for its runtime code. The main file manually includes th
 | --- | --- | --- |
 | Bootstrap | [`woocommerce-product-addon.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/woocommerce-product-addon.php) | Defines constants, loads the plugin, registers top-level hooks |
 | Main runtime | [`classes/plugin.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/plugin.class.php) | Registers WooCommerce hooks for rendering, validation, pricing, cart, orders, admin AJAX, cron, and loop behavior |
-| Product field resolver | [`classes/ppom.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/ppom.class.php) | Resolves applicable PPOM field groups for a product and loads settings and fields from the custom DB table |
+| Product field resolver | [`classes/ppom.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/ppom.class.php) | Resolves applicable PPOM field groups for a product, merges their fields, and derives the runtime settings row from the custom DB table |
 | Frontend form renderer | [`classes/form.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/form.class.php) | Renders modern template-based product fields and hidden runtime state |
 | Input registry | [`classes/input.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/input.class.php) | Loads input-type classes and add-on input classes |
 | Admin field UI | [`classes/fields.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/fields.class.php) | Powers the field-group builder UI and admin-side assets |
+| Admin coordinator | [`classes/admin.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/admin.class.php) | Registers PPOM admin menus, settings integration, attach flows, and admin initialization hooks |
 | Frontend asset loader | [`classes/frontend-scripts.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/frontend-scripts.class.php) | Registers and localizes frontend JS and CSS for pricing, uploads, validation, conditions, and field widgets |
+| Script registry | [`classes/scripts.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/scripts.class.php) | Shared wrapper for registering, enqueuing, localizing, and inlining PPOM frontend assets |
 | WooCommerce flow functions | [`inc/woocommerce.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/woocommerce.php) | Product-page rendering, validation, cart item payloads, order item metadata, file finalization |
 | Pricing engine | [`inc/prices.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/prices.php) | Server-side option pricing, matrix pricing, cart fee calculation, line-item price updates |
 | Upload subsystem | [`inc/files.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/files.php) | AJAX upload and delete handlers, thumbnails, cropped files, confirmed-file storage, cleanup cron |
@@ -88,7 +90,7 @@ Each row contains both group-level settings and the full field definition payloa
 - `productmeta_style`
 - `productmeta_js`
 - `productmeta_categories`
-- `productmeta_tags`
+- `productmeta_tags` when extensions or add-ons use tag-aware assignment
 - `the_meta` as JSON
 
 Products are linked to PPOM groups through the normal post meta key:
@@ -97,14 +99,14 @@ Products are linked to PPOM groups through the normal post meta key:
 
 That value may contain one or more field-group IDs.
 
-`PPOM_Meta` is the resolution layer. For a given product, it:
+`PPOM_Meta` is the read-side resolution layer. For a given product, it:
 
 1. reads `_product_meta_id`
 2. checks category-linked groups
 3. merges or overrides group IDs through filters
 4. loads the matching row or rows from the custom table
-5. decodes `the_meta` into the active field list
-6. exposes group settings such as inline CSS, inline JS, price-display mode, and group title
+5. merges field definitions from all matched groups
+6. derives one active settings row for runtime values such as inline CSS, inline JS, price-display mode, and group title
 
 ```mermaid
 flowchart TD
@@ -116,8 +118,8 @@ flowchart TD
     E --> F["Apply merge / override filters"]
     F --> G["Load rows from {prefix}_nm_personalized"]
     G --> H["Decode the_meta JSON"]
-    H --> I["Active PPOM fields"]
-    H --> J["Group settings"]
+    H --> I["Merged active PPOM fields"]
+    H --> J["Derived runtime settings row"]
     I --> K["Frontend rendering"]
     I --> L["Validation and pricing lookup"]
     J --> M["Inline CSS / JS / display mode"]
@@ -220,7 +222,7 @@ The modern path renders:
 
 - the active field groups
 - a price-table container
-- hidden inputs for group IDs, current product ID, option-price state, conditional-hide state, and cart-edit state
+- hidden inputs and wrapper state through `PPOM_Form::form_contents()`
 
 That hidden form state is what keeps the frontend JS and backend PHP in sync.
 
@@ -361,11 +363,13 @@ The admin side has two main responsibilities:
 - field-group CRUD
 - settings and permissions
 
-Field-group management is provided by `NM_PersonalizedProduct_Admin`, `PPOM_Fields_Meta`, and the AJAX CRUD handlers in [`inc/admin.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/admin.php). That layer lets admins:
+Field-group management is split across `NM_PersonalizedProduct_Admin`, `PPOM_Fields_Meta`, and the AJAX CRUD handlers in [`inc/admin.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/admin.php):
 
 - create, edit, clone, and delete field groups
 - bulk-attach field groups to products
 - choose which group is attached on the product edit screen
+
+`PPOM_Meta` is not the CRUD layer. It resolves product-side field groups and reads their settings/fields at runtime.
 
 Settings use two storage models:
 
@@ -435,7 +439,7 @@ The API supports:
 - updating order PPOM metadata
 - deleting order PPOM metadata
 
-The important implementation detail is that the routes use open permission callbacks, but write operations validate a PPOM secret key inside the handler. That makes the API optional and configuration-gated, but still part of the plugin's public integration surface.
+The important implementation detail is that the routes use open permission callbacks, while write operations validate a PPOM secret key inside the handler. That makes the API optional and configuration-gated, but still part of the plugin's public integration surface.
 
 ## Extension and Compatibility Model
 
@@ -473,7 +477,7 @@ PPOM stores data in several WordPress and WooCommerce persistence layers.
 ### Custom database table
 
 - `{prefix}_nm_personalized`
-  Stores PPOM field-group definitions and group-level settings such as `productmeta_name`, `dynamic_price_display`, `productmeta_style`, `productmeta_js`, category/tag assignment, and `the_meta` JSON.
+  Stores PPOM field-group definitions and group-level settings such as `productmeta_name`, `dynamic_price_display`, `productmeta_style`, `productmeta_js`, category assignment, optional tag data for extensions/add-ons, and `the_meta` JSON.
 
 ### WordPress post meta
 

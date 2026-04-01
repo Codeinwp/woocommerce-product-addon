@@ -15,6 +15,20 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	protected $original_wc_cart;
 
 	/**
+	 * Original WooCommerce session instance.
+	 *
+	 * @var mixed
+	 */
+	protected $original_wc_session;
+
+	/**
+	 * Original WooCommerce customer instance.
+	 *
+	 * @var mixed
+	 */
+	protected $original_wc_customer;
+
+	/**
 	 * Reset globals and settings used by the helper-heavy tests.
 	 *
 	 * @return void
@@ -31,7 +45,9 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		$this->unset_ppom_option( 'ppom_enable_client_validation' );
 		$this->unset_ppom_option( 'ppom_taxable_option_price' );
 
-		$this->original_wc_cart = function_exists( 'WC' ) && isset( WC()->cart ) ? WC()->cart : null;
+		$this->original_wc_cart     = function_exists( 'WC' ) && isset( WC()->cart ) ? WC()->cart : null;
+		$this->original_wc_session  = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session : null;
+		$this->original_wc_customer = function_exists( 'WC' ) && isset( WC()->customer ) ? WC()->customer : null;
 		wc_clear_notices();
 	}
 
@@ -47,7 +63,9 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		wc_clear_notices();
 
 		if ( function_exists( 'WC' ) ) {
-			WC()->cart = $this->original_wc_cart;
+			WC()->cart     = $this->original_wc_cart;
+			WC()->session  = $this->original_wc_session;
+			WC()->customer = $this->original_wc_customer;
 		}
 
 		parent::tearDown();
@@ -71,6 +89,10 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		$product->set_catalog_visibility( 'visible' );
 		$product->set_regular_price( $regular_price );
 		$product->set_price( $regular_price );
+
+		if ( ! empty( $args['virtual'] ) ) {
+			$product->set_virtual( true );
+		}
 
 		if ( ! empty( $args['manage_stock'] ) ) {
 			$product->set_manage_stock( true );
@@ -116,6 +138,10 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		$variation->set_regular_price( $regular_price );
 		$variation->set_price( $regular_price );
 		$variation->set_attributes( isset( $variation_args['attributes'] ) ? $variation_args['attributes'] : array() );
+
+		if ( ! empty( $variation_args['virtual'] ) ) {
+			$variation->set_virtual( true );
+		}
 
 		if ( ! empty( $variation_args['manage_stock'] ) ) {
 			$variation->set_manage_stock( true );
@@ -180,6 +206,93 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		);
 
 		return apply_filters( 'woocommerce_get_cart_item_from_session', $cart_item, $cart_item );
+	}
+
+	/**
+	 * Initialize a real WooCommerce session, customer, and cart for integration-style checkout tests.
+	 *
+	 * @return void
+	 */
+	protected function initialize_woocommerce_checkout_context() {
+		WC()->initialize_session();
+		WC()->initialize_cart();
+		WC()->payment_gateways();
+
+		WC()->customer->set_billing_country( 'US' );
+		WC()->customer->set_shipping_country( 'US' );
+
+		if ( method_exists( WC()->cart, 'empty_cart' ) ) {
+			WC()->cart->empty_cart( true );
+		}
+	}
+
+	/**
+	 * Add a product to the real WooCommerce cart with posted PPOM payload.
+	 *
+	 * @param int   $product_id      Product ID.
+	 * @param array $ppom_payload    Posted PPOM payload.
+	 * @param int   $quantity        Quantity.
+	 * @param int   $variation_id    Variation ID.
+	 * @param array $variation_attrs Variation attributes.
+	 *
+	 * @return string|false
+	 */
+	protected function add_product_to_real_cart( $product_id, $ppom_payload, $quantity = 1, $variation_id = 0, $variation_attrs = array() ) {
+		$_POST['ppom_cart_key'] = '';
+		$_POST['ppom']          = $ppom_payload;
+
+		return WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation_attrs );
+	}
+
+	/**
+	 * Simulate WooCommerce session reload for current cart contents.
+	 *
+	 * @return array
+	 */
+	protected function reload_real_cart_from_session() {
+		$reloaded_contents = array();
+
+		foreach ( WC()->cart->get_cart() as $cart_item_key => $values ) {
+			$session_data                 = $values;
+			$session_data['data']         = wc_get_product( $values['variation_id'] ? $values['variation_id'] : $values['product_id'] );
+			$reloaded_contents[ $cart_item_key ] = apply_filters( 'woocommerce_get_cart_item_from_session', $session_data, $values, $cart_item_key );
+		}
+
+		WC()->cart->set_cart_contents( $reloaded_contents );
+
+		return $reloaded_contents;
+	}
+
+	/**
+	 * Create an order from the current WooCommerce cart.
+	 *
+	 * @param array $overrides Checkout data overrides.
+	 *
+	 * @return WC_Order
+	 */
+	protected function create_order_from_real_cart( $overrides = array() ) {
+		$checkout_data = array_merge(
+			array(
+				'payment_method'   => 'cod',
+				'billing_email'    => 'buyer@example.com',
+				'billing_first_name' => 'Test',
+				'billing_last_name'  => 'Buyer',
+				'billing_country'    => 'US',
+				'billing_address_1'  => '123 Test Street',
+				'billing_city'       => 'Testville',
+				'billing_state'      => 'CA',
+				'billing_postcode'   => '90210',
+				'billing_phone'      => '5551234567',
+			),
+			$overrides
+		);
+
+		$order_id = WC()->checkout()->create_order( $checkout_data );
+
+		$this->assertNotWPError( $order_id );
+		$this->assertGreaterThan( 0, $order_id );
+
+		return wc_get_order( $order_id );
 	}
 
 	/**
@@ -315,6 +428,28 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Build a basic checkbox field definition.
+	 *
+	 * @param string $data_name Field data name.
+	 * @param string $title     Field title.
+	 * @param array  $options   Field options.
+	 * @param array  $overrides Field overrides.
+	 *
+	 * @return array
+	 */
+	protected function build_checkbox_field( $data_name, $title = 'Checkbox', $options = array(), $overrides = array() ) {
+		return array_merge(
+			array(
+				'type'      => 'checkbox',
+				'title'     => $title,
+				'data_name' => $data_name,
+				'options'   => $options,
+			),
+			$overrides
+		);
+	}
+
+	/**
 	 * Build a basic file field definition.
 	 *
 	 * @param string $data_name Field data name.
@@ -331,6 +466,28 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 				'data_name'  => $data_name,
 				'file_types' => 'txt,jpg,png,pdf',
 				'file_size'  => '1mb',
+			),
+			$overrides
+		);
+	}
+
+	/**
+	 * Build a basic cropper field definition.
+	 *
+	 * @param string $data_name Field data name.
+	 * @param string $title     Field title.
+	 * @param array  $options   Field options.
+	 * @param array  $overrides Field overrides.
+	 *
+	 * @return array
+	 */
+	protected function build_cropper_field( $data_name, $title = 'Cropper', $options = array(), $overrides = array() ) {
+		return array_merge(
+			array(
+				'type'      => 'cropper',
+				'title'     => $title,
+				'data_name' => $data_name,
+				'options'   => $options,
 			),
 			$overrides
 		);

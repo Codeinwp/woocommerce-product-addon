@@ -7,7 +7,7 @@
  */
 
 /**
- * Resolves product-level PPOM metadata.
+ * Resolves product-level PPOM metadata for frontend and cart/order flows.
  *
  * @since version 15.0
  */
@@ -18,23 +18,26 @@ class PPOM_Meta {
 	public static $product_id;
 
 	/**
-	 * Plugin category data.
+	 * Resolved category-based PPOM group IDs for the current product.
 	 *
 	 * @var array $category_meta
 	 */
 	public $category_meta = array();
 
 	/**
-	 * Plugin category array.
+	 * Candidate group rows that include category or tag assignments.
+	 *
+	 * Tags are fetched here as stored data, but core resolution matches
+	 * categories directly and leaves tag-based behavior to extension filters.
 	 *
 	 * @var array $ppom_categories_and_tags_row
 	 */
 	public $ppom_categories_and_tags_row = array();
 
 	/**
-	 * Plugin settings.
+	 * Runtime settings row selected from the resolved PPOM groups.
 	 *
-	 * @var array $ppom_settings
+	 * @var object|array $ppom_settings
 	 */
 	public $ppom_settings = array();
 

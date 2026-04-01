@@ -59,15 +59,15 @@ You can read more about it on `./ARCHITECTURE.md`, but here’s a high-level ove
 
 `woocommerce-product-addon.php` — defines constants, loads Composer autoload, manually `require_once`s all class/include files (no PSR-4 autoloading for plugin code), then hooks `PPOM()` on `woocommerce_init`.
 
-### Core Classes (all singleton pattern via `get_instance()`)
+### Core Classes
 
 | Class | File | Role |
 |---|---|---|
 | `NM_PersonalizedProduct` | `classes/plugin.class.php` | Main plugin — registers all WooCommerce hooks, loads input types |
-| `NM_PersonalizedProduct_Admin` | `classes/admin.class.php` | Admin-only — loaded only in `is_admin()` |
-| `PPOM_Meta` | `classes/ppom.class.php` | Field group CRUD against custom DB table |
+| `NM_PersonalizedProduct_Admin` | `classes/admin.class.php` | Admin-only coordinator for menus, settings, attach flows, and admin AJAX |
+| `PPOM_Meta` | `classes/ppom.class.php` | Product-side field-group resolver that reads attached groups and loads settings/fields from the custom DB table |
 | `PPOM_Form` | `classes/form.class.php` | Frontend form rendering |
-| `PPOM_Fields_Meta` | `classes/fields.class.php` | Field type registry and metadata |
+| `PPOM_Fields_Meta` | `classes/fields.class.php` | Admin field-builder UI, modals, and builder asset loading |
 | `PPOM_Inputs` | `classes/input.class.php` | Input type manager |
 
 ### Input Type System

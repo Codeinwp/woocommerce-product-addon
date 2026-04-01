@@ -127,6 +127,116 @@ class Test_Validation_And_Pricing extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Ensure backorders preserve the configured PPOM max quantity.
+	 *
+	 * @return void
+	 */
+	public function testValidationProductLimitsKeepsConfiguredMaxWhenBackordersAllowed() {
+		$product = $this->create_simple_product(
+			array(
+				'regular_price'  => '10',
+				'manage_stock'   => true,
+				'stock_quantity' => 3,
+				'backorders'     => true,
+			)
+		);
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_price_matrix_field(
+					'price_matrix',
+					array(
+						array(
+							'option' => '2-2',
+							'price'  => '8',
+							'label'  => 'Qty 2',
+							'id'     => 'qty_2',
+						),
+						array(
+							'option' => '4-4',
+							'price'  => '7',
+							'label'  => 'Qty 4',
+							'id'     => 'qty_4',
+						),
+					),
+					array(
+						'qty_step' => '2',
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$validated = ppom_validation_product_limits(
+			array(
+				'min_value' => 1,
+				'max_value' => 0,
+				'step'      => 1,
+			),
+			$product
+		);
+
+		$this->assertSame( 2, $validated['min_value'] );
+		$this->assertSame( 4, $validated['max_value'] );
+		$this->assertSame( 2, $validated['step'] );
+	}
+
+	/**
+	 * Ensure configured max quantity is preserved when stock exactly matches the matrix boundary.
+	 *
+	 * @return void
+	 */
+	public function testValidationProductLimitsPreservesConfiguredMaxWhenStockEqualsBoundary() {
+		$product = $this->create_simple_product(
+			array(
+				'regular_price'  => '10',
+				'manage_stock'   => true,
+				'stock_quantity' => 4,
+				'backorders'     => false,
+			)
+		);
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_price_matrix_field(
+					'price_matrix',
+					array(
+						array(
+							'option' => '2-2',
+							'price'  => '8',
+							'label'  => 'Qty 2',
+							'id'     => 'qty_2',
+						),
+						array(
+							'option' => '4-4',
+							'price'  => '7',
+							'label'  => 'Qty 4',
+							'id'     => 'qty_4',
+						),
+					),
+					array(
+						'qty_step' => '2',
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$validated = ppom_validation_product_limits(
+			array(
+				'min_value' => 1,
+				'max_value' => 0,
+				'step'      => 1,
+			),
+			$product
+		);
+
+		$this->assertSame( 2, $validated['min_value'] );
+		$this->assertSame( 4, $validated['max_value'] );
+		$this->assertSame( 2, $validated['step'] );
+	}
+
+	/**
 	 * Ensure variation validation uses parent PPOM limits and variation stock.
 	 *
 	 * @return void
@@ -329,6 +439,47 @@ class Test_Validation_And_Pricing extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Ensure matrix matching includes the upper boundary and excludes the next quantity.
+	 *
+	 * @return void
+	 */
+	public function testPriceHasDiscountMatrixMatchesUpperBoundaryAndRejectsNextQuantity() {
+		$product = $this->create_simple_product(
+			array(
+				'regular_price' => '100',
+			)
+		);
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_price_matrix_field(
+					'price_matrix',
+					array(
+						array(
+							'option' => '2-4',
+							'price'  => '10%',
+							'label'  => 'Discount range',
+							'id'     => 'discount_range',
+						),
+					),
+					array(
+						'discount'      => 'on',
+						'discount_type' => 'both',
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$boundary_matrix = ppom_price_has_discount_matrix( $product, 4 );
+		$over_boundary   = ppom_price_has_discount_matrix( $product, 5 );
+
+		$this->assertSame( 'both', $boundary_matrix['discount'] );
+		$this->assertSame( '10%', $boundary_matrix['percent'] );
+		$this->assertFalse( $over_boundary );
+	}
+
+	/**
 	 * Ensure hidden price matrices are not attached to cart state.
 	 *
 	 * @return void
@@ -364,5 +515,87 @@ class Test_Validation_And_Pricing extends PPOM_Test_Case {
 		);
 
 		$this->assertSame( array(), $cart_item['ppom']['price_matrix_found'] );
+	}
+
+	/**
+	 * Ensure checkbox validation fails when fewer than the minimum selections are submitted.
+	 *
+	 * @return void
+	 */
+	public function testCheckValidationRejectsCheckboxSelectionsBelowMinChecked() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field(
+					'extras',
+					'Extras',
+					array(
+						array(
+							'option' => 'Red',
+						),
+						array(
+							'option' => 'Blue',
+						),
+					),
+					array(
+						'min_checked' => '2',
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$_POST['ppom'] = array(
+			'fields' => array(
+				'extras' => array( 'Red' ),
+			),
+		);
+
+		$passed = ppom_check_validation( $product->get_id(), $_POST );
+
+		$this->assertFalse( $passed );
+		$this->assertSame( 1, wc_notice_count( 'error' ) );
+	}
+
+	/**
+	 * Ensure checkbox validation fails when more than the maximum selections are submitted.
+	 *
+	 * @return void
+	 */
+	public function testCheckValidationRejectsCheckboxSelectionsAboveMaxChecked() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field(
+					'extras',
+					'Extras',
+					array(
+						array(
+							'option' => 'Red',
+						),
+						array(
+							'option' => 'Blue',
+						),
+					),
+					array(
+						'max_checked' => '1',
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$_POST['ppom'] = array(
+			'fields' => array(
+				'extras' => array( 'Red', 'Blue' ),
+			),
+		);
+
+		$passed = ppom_check_validation( $product->get_id(), $_POST );
+
+		$this->assertFalse( $passed );
+		$this->assertSame( 1, wc_notice_count( 'error' ) );
 	}
 }

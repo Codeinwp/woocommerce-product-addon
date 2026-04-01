@@ -49,6 +49,169 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Ensure checkbox arrays are rendered as a readable comma-separated value.
+	 *
+	 * @return void
+	 */
+	public function testMakeMetaDataFormatsCheckboxArrays() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field(
+					'extras',
+					'Extras',
+					array(
+						array(
+							'option' => 'Red',
+						),
+						array(
+							'option' => 'Blue',
+						),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$meta = ppom_make_meta_data(
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields' => array(
+						'extras' => array( 'Red', 'Blue' ),
+					),
+				),
+			),
+			'cart'
+		);
+
+		$this->assertSame( 'Extras', $meta['extras']['name'] );
+		$this->assertSame( 'Red, Blue', $meta['extras']['value'] );
+	}
+
+	/**
+	 * Ensure file and cropper fields render HTML previews in cart context.
+	 *
+	 * @return void
+	 */
+	public function testMakeMetaDataFormatsFileAndCropperFieldsForCartContext() {
+		$product          = $this->create_simple_product();
+		$file_name        = 'document.txt';
+		$crop_source_name = 'canvas.txt';
+		$cropped_name     = ppom_file_get_name( $crop_source_name, $product->get_id() );
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_file_field( 'attachment', 'Attachment' ),
+				$this->build_cropper_field(
+					'avatar',
+					'Avatar',
+					array(
+						array(
+							'option' => 'Square',
+							'id'     => 'avatar_square',
+							'width'  => '120',
+							'height' => '120',
+						),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		file_put_contents( ppom_get_dir_path() . $file_name, 'document body' );
+		file_put_contents( ppom_get_dir_path() . $crop_source_name, 'source body' );
+		file_put_contents( ppom_get_dir_path( 'cropped' ) . $cropped_name, 'cropped body' );
+
+		try {
+			$meta = ppom_make_meta_data(
+				array(
+					'data' => $product,
+					'ppom' => array(
+						'fields' => array(
+							'attachment' => array(
+								'file_1' => array(
+									'org' => $file_name,
+								),
+							),
+							'avatar'     => array(
+								'ratio'  => 'avatar_square',
+								'file_1' => array(
+									'org' => $crop_source_name,
+								),
+							),
+						),
+					),
+				),
+				'cart'
+			);
+		} finally {
+			$this->remove_ppom_upload_artifacts( $file_name );
+			$this->remove_ppom_upload_artifacts( $crop_source_name );
+			if ( file_exists( ppom_get_dir_path( 'cropped' ) . $cropped_name ) ) {
+				unlink( ppom_get_dir_path( 'cropped' ) . $cropped_name );
+			}
+		}
+
+		$this->assertStringContainsString( '<table', $meta['attachment']['value'] );
+		$this->assertStringContainsString( $file_name, $meta['attachment']['value'] );
+		$this->assertStringContainsString( $crop_source_name, $meta['avatar']['value'] );
+		$this->assertStringContainsString( 'Your image-Square', $meta['avatar']['value'] );
+	}
+
+	/**
+	 * Ensure file and cropper fields collapse to uploaded file names in order context.
+	 *
+	 * @return void
+	 */
+	public function testMakeMetaDataFormatsFileAndCropperFieldsForOrderContext() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_file_field( 'attachment', 'Attachment' ),
+				$this->build_cropper_field(
+					'avatar',
+					'Avatar',
+					array(
+						array(
+							'option' => 'Square',
+							'id'     => 'avatar_square',
+						),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$meta = ppom_make_meta_data(
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields' => array(
+						'attachment' => array(
+							'file_1' => array(
+								'org' => 'document.txt',
+							),
+						),
+						'avatar'     => array(
+							'ratio'  => 'avatar_square',
+							'file_1' => array(
+								'org' => 'canvas.txt',
+							),
+						),
+					),
+				),
+			),
+			'order'
+		);
+
+		$this->assertSame( 'document.txt', $meta['attachment']['value'] );
+		$this->assertSame( 'canvas.txt', $meta['avatar']['value'] );
+	}
+
+	/**
 	 * Ensure invalid conditional rules are filtered before HTML attributes are rendered.
 	 *
 	 * @return void

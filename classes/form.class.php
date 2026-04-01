@@ -17,33 +17,31 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class PPOM_Form {
 
-	private static $ins = null;
-
 	/**
-	 * Return all ppom attach meta data
+	 * Resolved PPOM metadata for the current product render.
 	 *
-	 * @var array
+	 * @var PPOM_Meta
 	 */
 	public static $ppom;
 
 	/**
-	 * Return the product ID
+	 * Current product ID.
 	 *
-	 * @var number
+	 * @var int
 	 */
 	public $product_id;
 
 	/**
-	 * Return wc product object
+	 * Current WooCommerce product object.
 	 *
-	 * @var object
+	 * @var WC_Product
 	 */
 	public $product;
 
 	/**
-	 * Return templates args
+	 * Rendering arguments passed to the form template.
 	 *
-	 * @var array
+	 * @var array|null
 	 */
 	public static $args;
 
@@ -56,14 +54,6 @@ class PPOM_Form {
 		self::$ppom = new PPOM_Meta( $this->product_id );
 
 		self::$args = $args;
-	}
-
-	public static function get_instance() {
-
-		// create a new object if it doesn't exist.
-		is_null( self::$ins ) && self::$ins = new self();
-
-		return self::$ins;
 	}
 
 	/**
