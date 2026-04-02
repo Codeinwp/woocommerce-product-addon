@@ -2,10 +2,13 @@ import { request as playwrightRequest } from '@playwright/test';
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 import {
+	attachPpomGroupToCategories,
 	attachPpomGroupToProducts,
 	buildTextField,
 	createPpomGroup,
+	createProductCategory,
 	createProductVariation,
+	createSimpleProduct,
 	createVariableProduct,
 } from '../fixtures/index.js';
 import { getE2EBootstrapNonce } from '../fixtures/internal.js';
@@ -78,6 +81,53 @@ test.describe( 'Bootstrap Fixtures', () => {
 
 		await expect( page.locator( 'button.single_add_to_cart_button' ) ).toBeEnabled();
 		await expect( page.getByLabel( 'Monogram' ) ).toBeVisible();
+	} );
+
+	test( 'inherits a category-attached PPOM group across multiple products', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const suffix = Date.now();
+		const category = await createProductCategory( requestUtils, {
+			name: `Inherited Category ${ suffix }`,
+			slug: `ppom-category-inheritance-${ suffix }`,
+		} );
+		const products = await Promise.all( [
+			createSimpleProduct( requestUtils, {
+				name: `Inherited Product A ${ suffix }`,
+				categories: [ { id: category.id } ],
+			} ),
+			createSimpleProduct( requestUtils, {
+				name: `Inherited Product B ${ suffix }`,
+				categories: [ { id: category.id } ],
+			} ),
+		] );
+
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: `Inherited Group ${ suffix }`,
+			fields: [
+				buildTextField( {
+					title: 'Gift Note',
+					dataName: `gift_note_${ suffix }`,
+				} ),
+			],
+		} );
+
+		const attachResult = await attachPpomGroupToCategories( requestUtils, {
+			ppomId,
+			categorySlugs: [ category.slug ],
+		} );
+
+		expect( attachResult.updated_categories ).toBe( 1 );
+		expect( attachResult.updated_products ).toBe( 0 );
+
+		for ( const product of products ) {
+			await page.goto( `/?p=${ product.id }` );
+			await expect( page.locator( '.single-product' ) ).toBeVisible();
+			await expect( page.locator( `.ppom-id-${ ppomId }` ) ).toBeVisible();
+			await expect( page.getByLabel( 'Gift Note' ) ).toBeVisible();
+			await expect( page.locator( 'button.single_add_to_cart_button' ) ).toBeVisible();
+		}
 	} );
 
 	test( 'enforces bootstrap nonce and capability checks', async ( {

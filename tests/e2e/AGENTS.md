@@ -6,6 +6,7 @@ This folder contains Playwright tests for PPOM behavior in WordPress/WooCommerce
 
 - Prefer stable server-side setup over admin UI setup.
 - Use the `fixtures/` helpers for storefront, cart, checkout, rendering, pricing, and conditional-logic tests.
+- For complex setup needs, extend the wp-env bootstrap MU plugin at `bin/wp-env/mu-plugins/ppom-e2e-bootstrap.php` and then expose that behavior through `fixtures/`.
 - Use `utils.js` only when the admin builder UI or attach modal UI is the feature under test.
 - Keep UI setup smoke coverage thin. Do not make every E2E test create fields by clicking through the dashboard.
 
@@ -25,10 +26,10 @@ Current fixture modules are split by concern:
 
 Current fixture helpers support:
 
-- WooCommerce product creation through `wc/v3/products`
-- Product category creation through `wc/v3/products/categories`
-- PPOM group creation through `ppom_save_form_meta`
-- PPOM attachment through `ppom_attach_ppoms`
+- WooCommerce simple and variable product creation through the E2E bootstrap MU plugin
+- WooCommerce variation and category creation through the E2E bootstrap MU plugin
+- PPOM group creation and attachment through the E2E bootstrap MU plugin
+- Environment cleanup/reset through the E2E bootstrap MU plugin
 
 ## Use `utils.js` When
 
@@ -39,18 +40,19 @@ Current fixture helpers support:
 ## Setup Rules
 
 - Do not create products through wp-admin UI unless the UI is the thing being tested.
-- For product setup, prefer authenticated REST requests through `requestUtils`.
-- For PPOM group setup, prefer admin AJAX through the existing plugin callbacks instead of direct DB writes.
+- For product, variation, category, and PPOM setup, prefer the `fixtures/` layer backed by the bootstrap MU plugin.
+- If an existing fixture cannot express the scenario, add or extend a bootstrap action in `bin/wp-env/mu-plugins/ppom-e2e-bootstrap.php`, then wrap it in `fixtures/`.
+- Do not put raw setup calls directly in specs when the same behavior belongs in a reusable fixture helper.
+- Use the bootstrap reset path for cleanup; do not rely on leftover state from previous runs.
 - Do not persist raw fixture assumptions that bypass plugin save hooks unless the test explicitly targets a lower layer.
 - Admin UI specs can still use WooCommerce fixtures for prerequisite products and categories.
 
-## Nonce Notes
+## Complex Scenarios
 
-- `ppom_form_nonce` is available on `wp-admin/admin.php?page=ppom&action=new`.
-- `ppom_attached_nonce` is not present on the main PPOM index page.
-- To attach groups, fetch the popup HTML from:
-  `wp-admin/admin-ajax.php?action=ppom_get_products&ppom_id=<ppomId>`
-- Scrape the attach nonce from that response before calling `ppom_attach_ppoms`.
+- When a test needs a richer state shape such as variable products, multi-entity attachments, cleanup/reset, or future seeded catalog flows, modify the bootstrap MU plugin first and keep the spec itself fixture-driven.
+- Add composable bootstrap primitives rather than one-off scenario code inside a spec whenever the setup could be reused.
+- Keep the public fixture API stable where possible: specs should import from `fixtures/index.js`, not know bootstrap action names.
+- If a scenario truly belongs to admin UI coverage, keep the setup minimal and use `utils.js` only for the UI portion under test.
 
 ## Flake Reduction
 
@@ -72,6 +74,7 @@ Current fixture helpers support:
 - If local E2E fails before tests start, check whether the WordPress env is reachable before debugging the spec.
 - The current suite expects the wp-env site to be available and global setup to authenticate successfully.
 - When changing fixtures, run the smallest spec set that exercises the changed helper first.
+- When changing the bootstrap MU plugin, rerun the smallest fixture-driven spec that uses the new action plus the bootstrap-specific smoke coverage.
 - If `wp-admin/admin.php?page=ppom` returns `403` while `wp-admin/profile.php` still works, treat that as an environment bootstrap issue first.
 - In practice that usually means WooCommerce or PPOM is inactive in the local env, not that Playwright logged the user out.
 
