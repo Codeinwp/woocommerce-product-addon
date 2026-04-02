@@ -9,4 +9,9 @@ export {
 	buildSelectField,
 	buildTextField,
 } from './fields.js';
-export { createProductCategory, createSimpleProduct } from './woocommerce.js';
+export {
+	createProductCategory,
+	createProductVariation,
+	createSimpleProduct,
+	createVariableProduct,
+} from './woocommerce.js';

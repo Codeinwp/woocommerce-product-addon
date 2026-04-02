@@ -4,6 +4,9 @@
       "https://downloads.wordpress.org/plugin/woocommerce.zip",
       "."
   ],
+  "mappings": {
+      "wp-content/mu-plugins": "./bin/wp-env/mu-plugins"
+  },
   "phpVersion": "8.1",
   "autoPort": true
 }
