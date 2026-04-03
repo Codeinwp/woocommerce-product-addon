@@ -901,6 +901,8 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 		// new filter with cart $value
 		$meta_data_field   = apply_filters( 'ppom_fields_cart_meta', $meta_data_field, $key, $field_meta, $product_id, $ppom_cart_fields );
 		$ppom_meta[ $key ] = $meta_data_field;
+
+		$ppom_meta[ $key ]['type'] = $field_type;
 	}
 
 	return $ppom_meta;
