@@ -322,7 +322,11 @@ function ppom_check_validation( $product_id, $post_data, $passed = true ) {
 			continue;
 		}
 
-		if ( ! ppom_has_posted_field_value( $ppom_posted_fields, $field ) ) {
+		$max_min_validation = ppom_posted_field_max_min_value_validation( $ppom_posted_fields, $field );
+		if ( ! empty( $max_min_validation ) ) {
+			ppom_wc_add_notice( $max_min_validation );
+			$passed = false;
+		} elseif ( isset( $field['required'] ) && 'on' === $field['required'] && ! ppom_has_posted_field_value( $ppom_posted_fields, $field ) ) {
 
 			// Note: Checkbox is being validate by hook: ppom_has_posted_field_value
 			// $error_message = isset($field['error_message']) ? $field['error_message'] : '';
@@ -417,7 +421,7 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 	$ppom_item_order_qty = floatval( $cart_items['quantity'] );
 
 	// Getting option price
-	$option_prices = json_decode( stripslashes( $values['ppom']['ppom_option_price'] ), true );
+	$option_prices = json_decode( wp_unslash( $values['ppom']['ppom_option_price'] ), true );
 	// ppom_pa($option_prices);
 	$total_option_price = 0;
 	$ppom_matrix_price  = 0;
@@ -647,7 +651,7 @@ function ppom_woocommerce_add_fixed_fee( $cart ) {
 		}
 
 		// Getting option price
-		$option_prices = json_decode( stripslashes( $item['ppom']['ppom_option_price'] ), true );
+		$option_prices = json_decode( wp_unslash( $item['ppom']['ppom_option_price'] ), true );
 
 		if ( $option_prices ) {
 			foreach ( $option_prices as $fee ) {
@@ -736,13 +740,22 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 			$hidden = true;
 		}
 
+		$allowed_input_fields = array( 'text', 'textarea', 'number' );
+		$is_allowed_field     = in_array( $meta['type'], $allowed_input_fields, true );
 
-		// If no value
-		if ( ! $display ) {
+		if ( $is_allowed_field && '' === $display ) {
+			// Allow 0 and '0', skip only truly empty values
+			continue;
+		} elseif ( ! $is_allowed_field && empty( $display ) ) {
+			// For other fields, treat 0 as empty as well
 			continue;
 		}
 
 		if ( ! empty( $meta_name ) ) {
+
+			if ( ! is_scalar( $meta_value ) ) {
+				$meta_value = wp_json_encode( $meta_value );
+			}
 
 			if ( apply_filters( 'ppom_show_option_price_cart', false ) && isset( $meta['price'] ) ) {
 				$meta_value .= ' (' . wc_price( $meta['price'] ) . ')';
@@ -1035,7 +1048,7 @@ function ppom_woocommerce_control_cart_quantity_legacy( $quantity, $cart_item_ke
 	}
 
 	// Getting option price
-	$option_prices       = json_decode( stripslashes( $cart_item['ppom']['ppom_option_price'] ), true );
+	$option_prices       = json_decode( wp_unslash( $cart_item['ppom']['ppom_option_price'] ), true );
 	$ppom_has_quantities = 0;
 	// ppom_pa($option_prices);
 
@@ -1099,7 +1112,7 @@ function ppom_woocommerce_item_subtotal( $item_subtotal, $cart_item, $cart_item_
 	}
 
 	// Getting option price.
-	$option_prices = json_decode( stripslashes( $cart_item['ppom']['ppom_option_price'] ), true );
+	$option_prices = json_decode( wp_unslash( $cart_item['ppom']['ppom_option_price'] ), true );
 
 	if ( empty( $option_prices ) ) {
 		return $item_subtotal;

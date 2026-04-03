@@ -924,6 +924,8 @@ function ppom_generate_cart_meta( $ppom_cart_items, $product_id, $ppom_meta_ids 
 		// new filter with cart $value
 		$meta_data_field   = apply_filters( 'ppom_fields_cart_meta', $meta_data_field, $key, $field_meta, $product_id, $ppom_cart_fields );
 		$ppom_meta[ $key ] = $meta_data_field;
+
+		$ppom_meta[ $key ]['type'] = $field_type;
 	}
 
 	return $ppom_meta;
@@ -987,7 +989,7 @@ function ppom_has_posted_field_value( $posted_fields, $field ) {
 
 	if ( ! empty( $posted_fields ) ) {
 		foreach ( $posted_fields as $field_key => $value ) {
-			$field_key = explode( '__clone__', $field_key );
+			$field_key = explode( '__clone_', $field_key );
 
 			if ( in_array( $data_name, $field_key, true ) ) {
 
@@ -1685,7 +1687,16 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 
 // return html for images selected
 function ppom_generate_html_for_images( $images ) {
+	global $post;
 
+	static $ppom_has_cart_block = null;
+	if ( is_null( $ppom_has_cart_block ) ) {
+		$ppom_has_cart_block = has_block( 'woocommerce/cart', $post );
+	}
+
+	if ( $ppom_has_cart_block ) {
+		return ppom_get_image_name( $images );
+	}
 
 	$ppom_html = '<table class="table table-bordered">';
 	foreach ( $images as $id => $images_meta ) {
@@ -2393,7 +2404,7 @@ function ppom_get_conditional_data_attributes( $meta ) {
 
 		$bound      = isset( $conditions['bound'] ) ? ppom_wpml_translate( $conditions['bound'], 'PPOM' ) : '';
 		$visibility = isset( $conditions['visibility'] ) ? ppom_wpml_translate( $conditions['visibility'], 'PPOM' ) : '';
-		
+
 		$conditions['rules'] = array_filter(
 			$conditions['rules'],
 			function ( $rule ) {
@@ -2518,4 +2529,104 @@ function ppom_is_legacy_user() {
 		return false;
 	}
 	return 'no' === get_option( 'ppom_legacy_user', '' );
+}
+
+/**
+ * Validate max and min value.
+ *
+ * @param array<string, mixed> $posted_fields Posted fields data.
+ * @param array<string, mixed> $field        Field meta data.
+ * @return string Validation message if validation fails, empty string otherwise.
+ */
+function ppom_posted_field_max_min_value_validation( $posted_fields, $field ) {
+	if ( empty( $field['max_checked'] ) && empty( $field['min_checked'] ) ) {
+		return '';
+	}
+
+	$data_name     = isset( $field['data_name'] ) ? sanitize_key( $field['data_name'] ) : '';
+	$title         = isset( $field['title'] ) ? sanitize_text_field( $field['title'] ) : '';
+	$min_check     = isset( $field['min_checked'] ) ? intval( $field['min_checked'] ) : 0;
+	$max_check     = isset( $field['max_checked'] ) ? intval( $field['max_checked'] ) : 0;
+	$error_message = isset( $field['error_message'] ) ? sanitize_text_field( $field['error_message'] ) : '';
+
+	if ( $min_check ) {
+		$has_field_value = isset( $posted_fields[ $data_name ] );
+		if ( ! $has_field_value ) {
+			foreach ( $posted_fields as $field_key => $field_value ) {
+				$field_key = explode( '__clone__', $field_key );
+				if ( in_array( $data_name, $field_key, true ) ) {
+					$has_field_value = true;
+					break;
+				}
+			}
+		}
+		if ( ! $has_field_value ) {
+			$message = '' !== $error_message
+				? sprintf( '%1$s: %2$s', $title, $error_message )
+				: sprintf(
+					// translators: %1$s is minimum checked value, %2$s is Field label.
+					__('You must select at least %1$s options for %2$s field.', 'woocommerce-product-addon'),
+					$min_check,
+					$title
+				);
+			return apply_filters( 'ppom_posted_field_min_value_validation_message', $message, $posted_fields, $field );
+		}
+	}
+
+	foreach ( $posted_fields as $field_key => $field_value ) {
+		$field_key = explode( '__clone__', $field_key );
+
+		if ( in_array( $data_name, $field_key, true ) && is_array( $field_value ) ) {
+			$count = count( $field_value );
+			if ( $max_check && $count > $max_check ) {
+				$message = '' !== $error_message
+						? sprintf( '%1$s: %2$s', $title, $error_message )
+						: sprintf(
+							// translators: %1$s is maximum checked value, %2$s is Field label
+							__( 'You can select maximum %1$s options for %2$s field.', 'woocommerce-product-addon' ),
+							$max_check,
+							$title
+						);
+				return apply_filters( 'ppom_posted_field_max_value_validation_message', $message, $posted_fields, $field );
+			} elseif ( $min_check && $count < $min_check ) {
+				$message = '' !== $error_message
+						? sprintf( '%1$s: %2$s', $title, $error_message )
+						: sprintf(
+							// translators: %1$s is minimum checked value, %2$s is Field label
+							__( 'You must select at least %1$s options for %2$s field.', 'woocommerce-product-addon' ),
+							$min_check,
+							$title
+						);
+				return apply_filters( 'ppom_posted_field_min_value_validation_message', $message, $posted_fields, $field );
+			}
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Get image name from images array.
+ * @param mixed $images
+ * @return string
+ */
+function ppom_get_image_name( $images ) {
+	$updated_value = '';
+
+	if ( is_array( $images ) ) {
+		$total_images = count( $images );
+
+		foreach ( $images as $image_key => $image ) {
+			$image_data = json_decode( stripslashes( $image ), true );
+			if ( isset( $image_data['raw'] ) ) {
+				$updated_value .= $image_data['raw'];
+			}
+
+			if ( $image_key < $total_images - 1 ) {
+				$updated_value .= ', ';
+			}
+		}
+	}
+
+	return $updated_value;
 }

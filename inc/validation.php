@@ -203,6 +203,7 @@ function ppom_validation_product_limits( $data, $product ) {
 		$data['min_value'] = $limits['step'];
 	}
 
+	$data['input_value'] = $data['min_value'];
 
 	return $data;
 }

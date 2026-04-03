@@ -112,7 +112,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 							data-usebase_price="<?php echo esc_attr( $usebaseprice ); ?>"
 							<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 							value="<?php echo esc_attr( $selected_val ); ?>"
-							style="width:50px;text-align:center"
+							style="width:50px;text-align:center;padding-right:0;"
 							<?php echo esc_attr( $required ); ?>
 					>
 
