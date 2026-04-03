@@ -333,7 +333,7 @@ function ppom_woocommerce_update_cart_fees( $cart_items, $values ) {
 	$ppom_item_order_qty = floatval( $cart_items['quantity'] );
 
 	// Getting option price
-	$option_prices = json_decode( stripslashes( $values['ppom']['ppom_option_price'] ), true );
+	$option_prices = json_decode( wp_unslash( $values['ppom']['ppom_option_price'] ), true );
 	// ppom_pa($option_prices);
 	$total_option_price = 0;
 	$ppom_matrix_price  = 0;
@@ -563,7 +563,7 @@ function ppom_woocommerce_add_fixed_fee( $cart ) {
 		}
 
 		// Getting option price
-		$option_prices = json_decode( stripslashes( $item['ppom']['ppom_option_price'] ), true );
+		$option_prices = json_decode( wp_unslash( $item['ppom']['ppom_option_price'] ), true );
 
 		if ( $option_prices ) {
 			foreach ( $option_prices as $fee ) {
@@ -956,7 +956,7 @@ function ppom_woocommerce_control_cart_quantity_legacy( $quantity, $cart_item_ke
 	}
 
 	// Getting option price
-	$option_prices       = json_decode( stripslashes( $cart_item['ppom']['ppom_option_price'] ), true );
+	$option_prices       = json_decode( wp_unslash( $cart_item['ppom']['ppom_option_price'] ), true );
 	$ppom_has_quantities = 0;
 	// ppom_pa($option_prices);
 
@@ -1020,7 +1020,7 @@ function ppom_woocommerce_item_subtotal( $item_subtotal, $cart_item, $cart_item_
 	}
 
 	// Getting option price.
-	$option_prices = json_decode( stripslashes( $cart_item['ppom']['ppom_option_price'] ), true );
+	$option_prices = json_decode( wp_unslash( $cart_item['ppom']['ppom_option_price'] ), true );
 
 	if ( empty( $option_prices ) ) {
 		return $item_subtotal;
