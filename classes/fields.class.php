@@ -1175,7 +1175,7 @@ class PPOM_Fields_Meta {
 						$html_input .= '<input type="hidden" name="ppom[' . esc_attr( $field_index ) . '][images][' . esc_attr( $opt_index ) . '][id]" value="' . esc_attr( $image_id ) . '" data-opt-index="' . esc_attr( $opt_index ) . '" data-metatype="id">';
 						$html_input .= '<input class="form-control ppom-image-option-title" type="text" placeholder="Title" value="' . esc_attr( stripslashes( $pre_uploaded_image['title'] ) ) . '" name="ppom[' . esc_attr( $field_index ) . '][images][' . esc_attr( $opt_index ) . '][title]" data-opt-index="' . esc_attr( $opt_index ) . '" data-metatype="title">';
 						$html_input .= '<input class="form-control" type="text" placeholder="Price" value="' . esc_attr( stripslashes( $pre_uploaded_image['price'] ) ) . '" name="ppom[' . esc_attr( $field_index ) . '][images][' . esc_attr( $opt_index ) . '][price]" data-opt-index="' . esc_attr( $opt_index ) . '" data-metatype="price">';
-						$html_input .= '<input class="form-control" type="text" placeholder="' . __( 'Stock', 'woocommerce-product-addon' ) .'" value="' . esc_attr( $image_stock ) . '" name="ppom[' . esc_attr( $field_index ) . '][images][' . esc_attr( $opt_index ) . '][stock]" data-opt-index="' . esc_attr( $opt_index ) . '" data-metatype="stock">';
+						$html_input .= '<input class="form-control" type="text" placeholder="' . __( 'Stock', 'woocommerce-product-addon' ) . '" value="' . esc_attr( $image_stock ) . '" name="ppom[' . esc_attr( $field_index ) . '][images][' . esc_attr( $opt_index ) . '][stock]" data-opt-index="' . esc_attr( $opt_index ) . '" data-metatype="stock">';
 						$html_input .= '<input class="form-control" type="text" placeholder="Description" value="' . esc_attr( $image_description ) . '" name="ppom[' . esc_attr( $field_index ) . '][images][' . esc_attr( $opt_index ) . '][description]" data-opt-index="' . esc_attr( $opt_index ) . '" data-metatype="description">';
 						$html_input .= '<button class="btn btn-danger ppom-pre-upload-delete" style="height: 35px;"><i class="fa fa-times" aria-hidden="true"></i></button>';
 						$html_input .= '</div>';
@@ -1310,7 +1310,7 @@ class PPOM_Fields_Meta {
 				$html_input .= '<button class="btn btn-info ppom-edit-bulk-json">' . esc_html__( 'Edit Changing', 'woocommerce-product-addon' ) . '</button>';
 
 				if ( ! empty( $bulk_data ) ) {
-					$html_input .= "<input type='hidden' name='ppom[" . esc_attr( $field_index ) . "][options]' class='ppom-saved-bulk-data ppom-meta-field' value='" . wp_json_encode( $bulk_data ) . "' data-metatype='options'>";
+					$html_input .= "<input type='hidden' name='ppom[" . esc_attr( strval( $field_index ) ) . "][options]' class='ppom-saved-bulk-data ppom-meta-field' value='" . wp_json_encode( $bulk_data ) . "' data-metatype='options'>";
 				} else {
 					$html_input .= "<input type='hidden' class='ppom-saved-bulk-data ppom-meta-field' data-metatype='options'>";
 				}

@@ -23,6 +23,18 @@ if ( ! defined( 'PPOM_E2E_META_IDS_OPTION' ) ) {
 }
 
 /**
+ * The attach modal only enables tag selection when the license filter returns valid.
+ * wp-env runs the free build without a store key; unlock valid for automated admin UI tests.
+ */
+add_filter(
+	'product_ppom_license_status',
+	static function () {
+		return 'valid';
+	},
+	5
+);
+
+/**
  * Ensure the current request is authorized to manage E2E bootstrap data.
  *
  * @return void
@@ -612,6 +624,108 @@ add_action( 'wp_ajax_ppom_e2e_create_product_category', 'ppom_e2e_create_product
 add_action( 'wp_ajax_nopriv_ppom_e2e_create_product_category', 'ppom_e2e_create_product_category' );
 
 /**
+ * Create a WooCommerce product tag for fixtures.
+ *
+ * @return void
+ */
+function ppom_e2e_create_product_tag() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$name = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+	$slug = isset( $_POST['slug'] ) ? sanitize_title( wp_unslash( $_POST['slug'] ) ) : '';
+
+	if ( '' === $name ) {
+		wp_send_json_error(
+			array(
+				'message' => 'Tag name is required.',
+			),
+			400
+		);
+	}
+
+	$term = wp_insert_term(
+		$name,
+		'product_tag',
+		array(
+			'slug' => $slug,
+		)
+	);
+
+	if ( is_wp_error( $term ) ) {
+		ppom_e2e_send_wp_error( $term );
+	}
+
+	ppom_e2e_mark_fixture_term( $term['term_id'] );
+
+	$created_term = get_term( $term['term_id'], 'product_tag' );
+
+	wp_send_json_success(
+		array(
+			'id'   => (int) $created_term->term_id,
+			'name' => $created_term->name,
+			'slug' => $created_term->slug,
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_create_product_tag', 'ppom_e2e_create_product_tag' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_create_product_tag', 'ppom_e2e_create_product_tag' );
+
+/**
+ * Read category/tag attachment columns for a PPOM group (E2E assertions).
+ *
+ * @return void
+ */
+function ppom_e2e_get_ppom_attach_row() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$ppom_id = isset( $_POST['ppom_id'] ) ? absint( wp_unslash( $_POST['ppom_id'] ) ) : 0;
+
+	if ( $ppom_id <= 0 ) {
+		wp_send_json_error(
+			array(
+				'message' => 'A valid ppom_id is required.',
+			),
+			400
+		);
+	}
+
+	if ( ! defined( 'PPOM_TABLE_META' ) ) {
+		wp_send_json_error(
+			array(
+				'message' => 'PPOM meta table constant is unavailable.',
+			),
+			500
+		);
+	}
+
+	global $wpdb;
+
+	$table = $wpdb->prefix . PPOM_TABLE_META;
+	$row   = $wpdb->get_row(
+		$wpdb->prepare(
+			"SELECT productmeta_categories, productmeta_tags FROM {$table} WHERE productmeta_id = %d",
+			$ppom_id
+		),
+		ARRAY_A
+	);
+
+	if ( empty( $row ) || ! is_array( $row ) ) {
+		wp_send_json_error(
+			array(
+				'message' => 'PPOM row not found.',
+			),
+			404
+		);
+	}
+
+	wp_send_json_success( $row );
+}
+add_action( 'wp_ajax_ppom_e2e_get_ppom_attach_row', 'ppom_e2e_get_ppom_attach_row' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_get_ppom_attach_row', 'ppom_e2e_get_ppom_attach_row' );
+
+/**
  * Create a WooCommerce simple product for fixtures.
  *
  * @return void
@@ -983,24 +1097,29 @@ function ppom_e2e_reset_state() {
 		}
 	}
 
-	$fixture_term_ids = get_terms(
-		array(
-			'taxonomy'   => 'product_cat',
-			'hide_empty' => false,
-			'fields'     => 'ids',
-			'meta_query' => array(
-				array(
-					'key'   => PPOM_E2E_FIXTURE_MARKER_META_KEY,
-					'value' => '1',
-				),
-			),
-		)
-	);
-
 	$deleted_terms = 0;
-	if ( ! is_wp_error( $fixture_term_ids ) ) {
+
+	foreach ( array( 'product_cat', 'product_tag' ) as $fixture_taxonomy ) {
+		$fixture_term_ids = get_terms(
+			array(
+				'taxonomy'   => $fixture_taxonomy,
+				'hide_empty' => false,
+				'fields'     => 'ids',
+				'meta_query' => array(
+					array(
+						'key'   => PPOM_E2E_FIXTURE_MARKER_META_KEY,
+						'value' => '1',
+					),
+				),
+			)
+		);
+
+		if ( is_wp_error( $fixture_term_ids ) ) {
+			continue;
+		}
+
 		foreach ( $fixture_term_ids as $fixture_term_id ) {
-			$deleted_term = wp_delete_term( $fixture_term_id, 'product_cat' );
+			$deleted_term = wp_delete_term( $fixture_term_id, $fixture_taxonomy );
 
 			if ( ! is_wp_error( $deleted_term ) && $deleted_term ) {
 				++$deleted_terms;

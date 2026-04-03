@@ -696,8 +696,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$updated_cat          = count( $categories_to_attach );
 
 		// +----- Attach Field to Tags -----+
-		$tags_to_attach = isset( $_POST['ppom-attach-to-tags'] ) && is_array( $_POST['ppom-attach-to-tags'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-tags'] ) : false;
-		$updated_tags   = is_array( $tags_to_attach ) ? count( $tags_to_attach ) : 0;
+		// Match categories: unchecked tag checkboxes are omitted from POST, so default to [] (clear stored tags), not false (skip update). See ppom-pro#625.
+		$tags_to_attach = isset( $_POST['ppom-attach-to-tags'] ) && is_array( $_POST['ppom-attach-to-tags'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-tags'] ) : array();
+		$updated_tags   = count( $tags_to_attach );
 
 		self::save_categories_and_tags( $ppom_id, $categories_to_attach, $tags_to_attach );
 
@@ -720,7 +721,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 *
 	 * @param int        $ppom_id    PPOM field-group ID.
 	 * @param array      $categories Category slugs attached to the field group.
-	 * @param array|bool $tags       Tag slugs attached to the field group.
+	 * @param array|false $tags      Serialized tag slugs, an empty array to clear tags, or false to leave tags unchanged.
 	 *
 	 * @return void
 	 */
@@ -732,10 +733,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			'productmeta_categories' => implode( "\r\n", $categories ), // NOTE: Keep the backward compatible format.
 		);
 
-		if ( is_array( $tags ) ) {
-			$data_to_update['productmeta_tags'] = serialize( $tags );
-		} else if ( ! $tags ) {
-			$data_to_update['productmeta_tags'] = '';
+		// false = caller chose not to change tags (e.g. E2E partial update); omit column from UPDATE.
+		if ( false !== $tags && is_array( $tags ) ) {
+			$data_to_update['productmeta_tags'] = empty( $tags ) ? '' : serialize( $tags );
 		}
 
 		$wpdb->update(

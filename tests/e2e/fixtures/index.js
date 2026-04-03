@@ -3,6 +3,7 @@ export {
 	attachPpomGroupToProducts,
 	createPpomGroup,
 	createSimpleTextGroup,
+	getPpomAttachRowMeta,
 } from './ppom.js';
 export {
 	buildCheckboxField,
@@ -11,6 +12,7 @@ export {
 } from './fields.js';
 export {
 	createProductCategory,
+	createProductTag,
 	createProductVariation,
 	createSimpleProduct,
 	createVariableProduct,

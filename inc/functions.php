@@ -2565,7 +2565,7 @@ function ppom_posted_field_max_min_value_validation( $posted_fields, $field ) {
 				? sprintf( '%1$s: %2$s', $title, $error_message )
 				: sprintf(
 					// translators: %1$s is minimum checked value, %2$s is Field label.
-					__('You must select at least %1$s options for %2$s field.', 'woocommerce-product-addon'),
+					__( 'You must select at least %1$s options for %2$s field.', 'woocommerce-product-addon' ),
 					$min_check,
 					$title
 				);
@@ -2607,6 +2607,7 @@ function ppom_posted_field_max_min_value_validation( $posted_fields, $field ) {
 
 /**
  * Get image name from images array.
+ *
  * @param mixed $images
  * @return string
  */

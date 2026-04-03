@@ -86,9 +86,16 @@ async function attachPpomGroupToCategories(
 	} );
 }
 
+async function getPpomAttachRowMeta( requestUtils, { ppomId } ) {
+	return postBootstrapAction( requestUtils, 'ppom_e2e_get_ppom_attach_row', {
+		ppom_id: ppomId,
+	} );
+}
+
 export {
 	attachPpomGroupToCategories,
 	attachPpomGroupToProducts,
 	createPpomGroup,
 	createSimpleTextGroup,
+	getPpomAttachRowMeta,
 };

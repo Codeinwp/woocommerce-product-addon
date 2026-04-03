@@ -31,6 +31,15 @@ async function createProductCategory( requestUtils, overrides = {} ) {
 	);
 }
 
+async function createProductTag( requestUtils, overrides = {} ) {
+	const suffix = uniqueSuffix();
+
+	return postBootstrapAction( requestUtils, 'ppom_e2e_create_product_tag', {
+		name: overrides.name ?? `Tag ${ suffix }`,
+		slug: overrides.slug ?? `ppom-e2e-tag-${ suffix }`,
+	} );
+}
+
 async function createSimpleProduct( requestUtils, overrides = {} ) {
 	const suffix = uniqueSuffix();
 
@@ -87,6 +96,7 @@ async function createProductVariation( requestUtils, overrides = {} ) {
 
 export {
 	createProductCategory,
+	createProductTag,
 	createProductVariation,
 	createSimpleProduct,
 	createVariableProduct,

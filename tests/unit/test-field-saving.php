@@ -38,4 +38,32 @@ class Test_Field_Saving extends PPOM_Test_Case {
         $expected_tags = 'a:1:{i:0;s:8:"test-tag";}';
         $this->assertEquals( $expected_tags, $saved_data['productmeta_tags'] );
     }
+
+    /**
+     * Detaching all tags submits an empty array; stored tags must clear (see PR #527).
+     *
+     * @return void
+     */
+    public function test_saving_empty_tags_array_clears_column() {
+        $field_id = $this->insert_ppom_meta(
+            array(
+                $this->build_text_field( 'test_cat', 'Test Cat' ),
+            ),
+            0,
+            array(
+                'productmeta_name'       => 'Test Tags Clear',
+                'productmeta_validation' => '',
+                'productmeta_style'      => 'selector { }',
+                'productmeta_categories' => 'accessories',
+                'productmeta_tags'       => 'a:1:{i:0;s:8:"test-tag";}',
+            )
+        );
+
+        NM_PersonalizedProduct_Admin::save_categories_and_tags( $field_id, array( 'accessories' ), array() );
+
+        $saved_data = $this->get_ppom_meta_row( $field_id );
+
+        $this->assertSame( 'accessories', $saved_data['productmeta_categories'] );
+        $this->assertSame( '', $saved_data['productmeta_tags'] );
+    }
 }
