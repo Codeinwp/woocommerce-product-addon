@@ -83,7 +83,7 @@ To set-up the environment you can follow the example from `test-php.yml` or the 
 To run with Docker:
 
 ```bash
-npm run test:unit:php:setup # start the wordpress instance
+npm run env:setup # start the wordpress instance
 npm run test:unit:php # run the wp tests inside the tests-wordpress container
 ```
 

@@ -719,8 +719,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	/**
 	 * Stores category and tag attachment rules on a PPOM field-group row.
 	 *
-	 * @param int        $ppom_id    PPOM field-group ID.
-	 * @param array      $categories Category slugs attached to the field group.
+	 * @param int         $ppom_id    PPOM field-group ID.
+	 * @param array       $categories Category slugs attached to the field group.
 	 * @param array|false $tags      Serialized tag slugs, an empty array to clear tags, or false to leave tags unchanged.
 	 *
 	 * @return void
@@ -734,7 +734,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		);
 
 		// false = caller chose not to change tags (e.g. E2E partial update); omit column from UPDATE.
-		if ( false !== $tags && is_array( $tags ) ) {
+		if ( is_array( $tags ) ) {
 			$data_to_update['productmeta_tags'] = empty( $tags ) ? '' : serialize( $tags );
 		}
 

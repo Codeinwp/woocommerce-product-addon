@@ -22,7 +22,7 @@ npm run dist
 
 ```bash
 # PHPUnit — requires Docker (wp-env)
-npm run test:unit:php:setup          # Start WordPress Docker environment
+npm run env:setup          # Start WordPress Docker environment
 bash ./bin/e2e-after-setup.sh        # Prepare database/test data
 npm run test:unit:php                # Run PHPUnit tests
 
@@ -61,14 +61,14 @@ You can read more about it on `./ARCHITECTURE.md`, but here’s a high-level ove
 
 ### Core Classes
 
-| Class | File | Role |
-|---|---|---|
-| `NM_PersonalizedProduct` | `classes/plugin.class.php` | Main plugin — registers all WooCommerce hooks, loads input types |
-| `NM_PersonalizedProduct_Admin` | `classes/admin.class.php` | Admin-only coordinator for menus, settings, attach flows, and admin AJAX |
-| `PPOM_Meta` | `classes/ppom.class.php` | Product-side field-group resolver that reads attached groups and loads settings/fields from the custom DB table |
-| `PPOM_Form` | `classes/form.class.php` | Frontend form rendering |
-| `PPOM_Fields_Meta` | `classes/fields.class.php` | Admin field-builder UI, modals, and builder asset loading |
-| `PPOM_Inputs` | `classes/input.class.php` | Input type manager |
+| Class                          | File                       | Role                                                                                                            |
+| ------------------------------ | -------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `NM_PersonalizedProduct`       | `classes/plugin.class.php` | Main plugin — registers all WooCommerce hooks, loads input types                                                |
+| `NM_PersonalizedProduct_Admin` | `classes/admin.class.php`  | Admin-only coordinator for menus, settings, attach flows, and admin AJAX                                        |
+| `PPOM_Meta`                    | `classes/ppom.class.php`   | Product-side field-group resolver that reads attached groups and loads settings/fields from the custom DB table |
+| `PPOM_Form`                    | `classes/form.class.php`   | Frontend form rendering                                                                                         |
+| `PPOM_Fields_Meta`             | `classes/fields.class.php` | Admin field-builder UI, modals, and builder asset loading                                                       |
+| `PPOM_Inputs`                  | `classes/input.class.php`  | Input type manager                                                                                              |
 
 ### Input Type System
 
@@ -77,6 +77,7 @@ Each input type has a class in `classes/inputs/` (e.g. `input.text.php`, `input.
 ### Include Files (`inc/`)
 
 Procedural utility code organized by concern:
+
 - `functions.php` — general helpers
 - `hooks.php` — filter/action callbacks
 - `validation.php` — server-side field validation
