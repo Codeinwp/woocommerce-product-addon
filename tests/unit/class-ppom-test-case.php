@@ -29,6 +29,23 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	protected $original_wc_customer;
 
 	/**
+	 * Whether test license filters are registered.
+	 *
+	 * @var bool
+	 */
+	protected $ppom_test_license_filters_active = false;
+
+	/**
+	 * @var bool
+	 */
+	protected $ppom_test_license_want_valid = true;
+
+	/**
+	 * @var int
+	 */
+	protected $ppom_test_license_plan_value = 1;
+
+	/**
 	 * Reset globals and settings used by the helper-heavy tests.
 	 *
 	 * @return void
@@ -68,7 +85,61 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 			WC()->customer = $this->original_wc_customer;
 		}
 
+		$this->remove_ppom_license_filters();
+
 		parent::tearDown();
+	}
+
+	/**
+	 * Stub Themeisle-style license filters for the current test.
+	 *
+	 * @param string $status Use 'valid' or 'invalid'.
+	 * @param int    $plan   Plan id 1–3 when valid (Essential / Plus / VIP tiers via get_license_category).
+	 *
+	 * @return void
+	 */
+	protected function with_ppom_license_filters( $status, $plan = 1 ) {
+		$this->remove_ppom_license_filters();
+		$this->ppom_test_license_want_valid = ( 'valid' === $status );
+		$this->ppom_test_license_plan_value = max( 1, min( 3, (int) $plan ) );
+		$priority                           = PHP_INT_MAX - 10;
+
+		add_filter( 'product_ppom_license_status', array( $this, 'ppom_test_filter_license_status' ), $priority, 1 );
+		add_filter( 'product_ppom_license_plan', array( $this, 'ppom_test_filter_license_plan' ), $priority, 1 );
+		$this->ppom_test_license_filters_active = true;
+	}
+
+	/**
+	 * Remove license filters registered by with_ppom_license_filters().
+	 *
+	 * @return void
+	 */
+	protected function remove_ppom_license_filters() {
+		if ( ! $this->ppom_test_license_filters_active ) {
+			return;
+		}
+		$priority = PHP_INT_MAX - 10;
+		remove_filter( 'product_ppom_license_status', array( $this, 'ppom_test_filter_license_status' ), $priority );
+		remove_filter( 'product_ppom_license_plan', array( $this, 'ppom_test_filter_license_plan' ), $priority );
+		$this->ppom_test_license_filters_active = false;
+	}
+
+	/**
+	 * @param mixed $value Prior filter value.
+	 *
+	 * @return string
+	 */
+	public function ppom_test_filter_license_status( $value ) {
+		return $this->ppom_test_license_want_valid ? 'valid' : '';
+	}
+
+	/**
+	 * @param mixed $value Prior filter value.
+	 *
+	 * @return int
+	 */
+	public function ppom_test_filter_license_plan( $value ) {
+		return $this->ppom_test_license_want_valid ? $this->ppom_test_license_plan_value : 0;
 	}
 
 	/**

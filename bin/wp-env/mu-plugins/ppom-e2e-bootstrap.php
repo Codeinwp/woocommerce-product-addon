@@ -22,16 +22,82 @@ if ( ! defined( 'PPOM_E2E_META_IDS_OPTION' ) ) {
 	define( 'PPOM_E2E_META_IDS_OPTION', 'ppom_e2e_fixture_meta_ids' );
 }
 
+if ( ! defined( 'PPOM_E2E_LICENSE_FIXTURE_OPTION' ) ) {
+	define( 'PPOM_E2E_LICENSE_FIXTURE_OPTION', 'ppom_e2e_license_fixture' );
+}
+
+if ( ! defined( 'PPOM_E2E_LICENSE_FILTER_PRIORITY' ) ) {
+	// Late priority so E2E overrides win over in-plugin license hooks.
+	define( 'PPOM_E2E_LICENSE_FILTER_PRIORITY', PHP_INT_MAX - 10 );
+}
+
+/**
+ * Default license fixture: valid Essential plan (wp-env has no store key).
+ *
+ * @return array{status:string,plan:int}
+ */
+function ppom_e2e_default_license_fixture() {
+	return array(
+		'status' => 'valid',
+		'plan'   => 1,
+	);
+}
+
+/**
+ * Resolved license fixture for filters and AJAX responses.
+ *
+ * @return array{status:string,plan:int}
+ */
+function ppom_e2e_get_license_fixture() {
+	$defaults = ppom_e2e_default_license_fixture();
+	$stored   = get_option( PPOM_E2E_LICENSE_FIXTURE_OPTION, null );
+
+	if ( ! is_array( $stored ) ) {
+		return $defaults;
+	}
+
+	$status = isset( $stored['status'] ) && 'invalid' === $stored['status'] ? 'invalid' : 'valid';
+	$plan   = isset( $stored['plan'] ) ? max( 1, min( 3, absint( $stored['plan'] ) ) ) : $defaults['plan'];
+
+	return array(
+		'status' => $status,
+		'plan'   => $plan,
+	);
+}
+
 /**
  * The attach modal only enables tag selection when the license filter returns valid.
  * wp-env runs the free build without a store key; unlock valid for automated admin UI tests.
+ * Use ppom_e2e_set_license_fixture to simulate inactive licenses in E2E.
  */
 add_filter(
 	'product_ppom_license_status',
-	static function () {
-		return 'valid';
+	static function ( $value ) {
+		$config = ppom_e2e_get_license_fixture();
+
+		if ( 'valid' === $config['status'] ) {
+			return 'valid';
+		}
+
+		return '';
 	},
-	5
+	PPOM_E2E_LICENSE_FILTER_PRIORITY,
+	1
+);
+
+add_filter(
+	'product_ppom_license_plan',
+	static function ( $value ) {
+		$config = ppom_e2e_get_license_fixture();
+
+		if ( 'valid' !== $config['status'] ) {
+			return 0;
+		}
+
+		return (int) $config['plan'];
+	},
+	PPOM_E2E_LICENSE_FILTER_PRIORITY,
+	1
 );
 
 /**
@@ -1045,6 +1111,47 @@ add_action( 'wp_ajax_ppom_e2e_attach_ppom_group', 'ppom_e2e_attach_ppom_group' )
 add_action( 'wp_ajax_nopriv_ppom_e2e_attach_ppom_group', 'ppom_e2e_attach_ppom_group' );
 
 /**
+ * Set PPOM license fixture for E2E (drives product_ppom_license_* filters).
+ *
+ * @return void
+ */
+function ppom_e2e_set_license_fixture() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$status_raw = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
+	$plan_raw   = isset( $_POST['plan'] ) ? absint( wp_unslash( $_POST['plan'] ) ) : 0;
+
+	$status = ( 'invalid' === $status_raw ) ? 'invalid' : 'valid';
+	$plan   = max( 1, min( 3, $plan_raw > 0 ? $plan_raw : 1 ) );
+
+	$stored = array(
+		'status' => $status,
+		'plan'   => $plan,
+	);
+
+	update_option( PPOM_E2E_LICENSE_FIXTURE_OPTION, $stored, false );
+
+	wp_send_json_success( ppom_e2e_get_license_fixture() );
+}
+add_action( 'wp_ajax_ppom_e2e_set_license_fixture', 'ppom_e2e_set_license_fixture' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_set_license_fixture', 'ppom_e2e_set_license_fixture' );
+
+/**
+ * Read the current PPOM license fixture (for E2E assertions).
+ *
+ * @return void
+ */
+function ppom_e2e_read_license_fixture() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	wp_send_json_success( ppom_e2e_get_license_fixture() );
+}
+add_action( 'wp_ajax_ppom_e2e_read_license_fixture', 'ppom_e2e_read_license_fixture' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_read_license_fixture', 'ppom_e2e_read_license_fixture' );
+
+/**
  * Reset PPOM E2E fixture state.
  *
  * @return void
@@ -1074,6 +1181,7 @@ function ppom_e2e_reset_state() {
 	}
 
 	delete_option( PPOM_E2E_META_IDS_OPTION );
+	delete_option( PPOM_E2E_LICENSE_FIXTURE_OPTION );
 
 	if ( defined( 'PPOM_PRODUCT_META_KEY' ) ) {
 		delete_post_meta_by_key( PPOM_PRODUCT_META_KEY );

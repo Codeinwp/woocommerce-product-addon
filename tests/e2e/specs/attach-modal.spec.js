@@ -7,6 +7,7 @@ import {
 	createProductTag,
 	createSimpleProduct,
 	getPpomAttachRowMeta,
+	setPpomLicenseFixture,
 } from "../fixtures/index.js";
 import { addNewField, createSimpleGroupField, fillFieldNameAndId, pickFieldTypeInModal, saveFieldInModal, saveFields } from "../utils";
 
@@ -109,6 +110,8 @@ test.describe("Attach Modal", () => {
 		admin,
 		requestUtils,
 	} ) => {
+		await setPpomLicenseFixture( requestUtils, { valid: true, plan: 1 } );
+
 		// --- Setup: catalog tag term + PPOM group (no product is tagged here) ---
 		const tag = await createProductTag( requestUtils );
 		const { ppomId } = await createSimpleGroupField( admin, page );

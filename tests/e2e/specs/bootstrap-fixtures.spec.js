@@ -10,8 +10,10 @@ import {
 	createProductVariation,
 	createSimpleProduct,
 	createVariableProduct,
+	getPpomLicenseFixture,
+	setPpomLicenseFixture,
 } from '../fixtures/index.js';
-import { getE2EBootstrapNonce } from '../fixtures/internal.js';
+import { getE2EBootstrapNonce, resetE2EState } from '../fixtures/internal.js';
 
 async function postAjax( requestContext, params ) {
 	const response = await requestContext.fetch( 'wp-admin/admin-ajax.php', {
@@ -201,5 +203,29 @@ test.describe( 'Bootstrap Fixtures', () => {
 		} finally {
 			await anonymousRequest.dispose();
 		}
+	} );
+
+	test( 'license fixture toggles via bootstrap AJAX and reset restores defaults', async ( {
+		requestUtils,
+	} ) => {
+		await setPpomLicenseFixture( requestUtils, { valid: false } );
+
+		let snapshot = await getPpomLicenseFixture( requestUtils );
+
+		expect( snapshot.status ).toBe( 'invalid' );
+
+		await setPpomLicenseFixture( requestUtils, { valid: true, plan: 3 } );
+
+		snapshot = await getPpomLicenseFixture( requestUtils );
+
+		expect( snapshot.status ).toBe( 'valid' );
+		expect( snapshot.plan ).toBe( 3 );
+
+		await resetE2EState( requestUtils );
+
+		snapshot = await getPpomLicenseFixture( requestUtils );
+
+		expect( snapshot.status ).toBe( 'valid' );
+		expect( snapshot.plan ).toBe( 1 );
 	} );
 } );
