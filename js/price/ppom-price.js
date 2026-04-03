@@ -9,7 +9,9 @@ var ppom_product_base_price = ppom_input_vars.wc_product_price;
 
 jQuery(function($) {
 
-    ppom_update_option_prices();
+    $(window).on('load', function() {
+        ppom_update_option_prices();
+    });
 
     // If quantity is changing with some -/+ elements
     $("form.cart .quantity").on('click', function(e) {
