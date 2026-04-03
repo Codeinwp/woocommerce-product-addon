@@ -63,8 +63,6 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 			<?php
 			if ( $options && count( $options ) > 0 ) {
 
-				$croppie_options = ppom_get_croppie_options( $field_meta );
-
 				$select_css  = 'width:100%;';
 				$select_css .= 'margin:5px auto;display:none;';
 

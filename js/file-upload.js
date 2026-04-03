@@ -344,7 +344,6 @@ function ppom_set_croppie_options(file_name, viewport, image_id) {
             option = get_responsive_croppie_options(option, file_list_preview_containers[file_name]['container_width']);
             // console.log($filelist_DIV[file_name]['croppie'][image_id]);
             file_list_preview_containers[file_name]['croppie'][image_id].croppie(option);
-            file_list_preview_containers[file_name]['croppie'][image_id].find('.ppom-cropping-size').css('width', '100%');
         }
     });
 }
@@ -746,26 +745,25 @@ function ppom_generate_cropper_data_for_cart(field_name) {
 function get_responsive_croppie_options(baseOptions, max_width) {
     const boundary = baseOptions.boundary || {};
 
-    if ( boundary.width && boundary.height && max_width >= boundary.width ) {
+    const boundaryWidthOriginal = Number(boundary.width);
+    const boundaryHeightOriginal = Number(boundary.height);
+    if ( !Number.isFinite(boundaryWidthOriginal) || !Number.isFinite(boundaryHeightOriginal) || boundaryWidthOriginal <= 0 || boundaryHeightOriginal <= 0 ) {
         return baseOptions;
     }
-
+    if ( max_width >= boundaryWidthOriginal ) {
+        return baseOptions;
+    }
+    if ( !Number.isFinite(max_width) ) {
+        return baseOptions;
+    }
     // Use container width as the boundary.
-    const aspectRatio = boundary.height / boundary.width || 1; // original height/width ratio
+    const aspectRatio = boundaryHeightOriginal / boundaryWidthOriginal || 1; // original height/width ratio
     const boundaryWidth = Math.floor(max_width);
     const boundaryHeight = Math.floor(boundaryWidth * aspectRatio);
 
-    if ( baseOptions.viewport && baseOptions.viewport.width && baseOptions.viewport.height ) {
-        const scale = boundaryWidth / boundary.width;
-        const viewportWidth = Math.floor(baseOptions.viewport.width * scale);
-        const viewportHeight = Math.floor(baseOptions.viewport.height * scale);
-
-        // Scale viewport proportionally and ensure it fits within the new boundary.
-        baseOptions.viewport.width = Math.min(viewportWidth, boundaryWidth - 2);
-        baseOptions.viewport.height = Math.min(viewportHeight, boundaryHeight - 2);
-    }
-
-    return {
+    // Build the result as a new object so baseOptions (and its nested viewport,
+    // which is a live reference into ppom_file_vars.croppie_options) is never mutated.
+    const result = {
         ...baseOptions,
         boundary: {
             ...baseOptions.boundary,
@@ -773,4 +771,19 @@ function get_responsive_croppie_options(baseOptions, max_width) {
             height: boundaryHeight,
         },
     };
+
+    if ( baseOptions.viewport && baseOptions.viewport.width && baseOptions.viewport.height ) {
+        const scale = boundaryWidth / boundaryWidthOriginal;
+        const viewportWidth = Math.floor(baseOptions.viewport.width * scale);
+        const viewportHeight = Math.floor(baseOptions.viewport.height * scale);
+
+        // Scale viewport proportionally and ensure it fits within the new boundary.
+        result.viewport = {
+            ...baseOptions.viewport,
+            width: Math.min(viewportWidth, boundaryWidth - 2),
+            height: Math.min(viewportHeight, boundaryHeight - 2),
+        };
+    }
+
+    return result;
 }
