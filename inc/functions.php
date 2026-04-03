@@ -1650,7 +1650,16 @@ function ppom_generate_html_for_files( $file_names, $input_type, $item ) {
 
 // return html for images selected
 function ppom_generate_html_for_images( $images ) {
+	global $post;
 
+	static $ppom_has_cart_block = null;
+	if ( is_null( $ppom_has_cart_block ) ) {
+		$ppom_has_cart_block = has_block( 'woocommerce/cart', $post );
+	}
+
+	if ( $ppom_has_cart_block ) {
+		return ppom_get_image_name( $images );
+	}
 
 	$ppom_html = '<table class="table table-bordered">';
 	foreach ( $images as $id => $images_meta ) {
@@ -2359,7 +2368,7 @@ function ppom_get_conditional_data_attributes( $meta ) {
 
 		$bound      = isset( $conditions['bound'] ) ? ppom_wpml_translate( $conditions['bound'], 'PPOM' ) : '';
 		$visibility = isset( $conditions['visibility'] ) ? ppom_wpml_translate( $conditions['visibility'], 'PPOM' ) : '';
-		
+
 		$conditions['rules'] = array_filter(
 			$conditions['rules'],
 			function( $rule ) {
@@ -2558,4 +2567,30 @@ function ppom_posted_field_max_min_value_validation( $posted_fields, $field ) {
 	}
 
 	return '';
+}
+
+/**
+ * Get image name from images array.
+ * @param mixed $images
+ * @return string
+ */
+function ppom_get_image_name( $images ) {
+	$updated_value = '';
+
+	if ( is_array( $images ) ) {
+		$total_images = count( $images );
+
+		foreach ( $images as $image_key => $image ) {
+			$image_data = json_decode( stripslashes( $image ), true );
+			if ( isset( $image_data['raw'] ) ) {
+				$updated_value .= $image_data['raw'];
+			}
+
+			if ( $image_key < $total_images - 1 ) {
+				$updated_value .= ', ';
+			}
+		}
+	}
+
+	return $updated_value;
 }

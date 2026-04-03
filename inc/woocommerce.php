@@ -665,6 +665,10 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 
 		if ( ! empty( $meta_name ) ) {
 
+			if ( ! is_scalar( $meta_value ) ) {
+				$meta_value = wp_json_encode( $meta_value );
+			}
+
 			if ( apply_filters( 'ppom_show_option_price_cart', false ) && isset( $meta['price'] ) ) {
 				$meta_value .= ' (' . wc_price( $meta['price'] ) . ')';
 			}
