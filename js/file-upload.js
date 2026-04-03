@@ -267,6 +267,7 @@ function save_edited_photo(img_id, photo_url) {
 // Cropping image with Croppie
 function ppom_show_cropped_preview(file_name, image_url, image_id, file_input) {
 
+    const container_width = jQuery("#ppom-file-container-" + file_name).width();
     var cropp_preview_container = jQuery(".ppom-croppie-wrapper-" + file_name);
     // Enable size option
     cropp_preview_container.find('.ppom-cropping-size').prop('disabled', false);
@@ -322,6 +323,7 @@ function ppom_show_cropped_preview(file_name, image_url, image_id, file_input) {
     file_list_preview_containers[file_name]['croppie'][image_id] = croppie_container;
     file_list_preview_containers[file_name]['image_id'] = image_id;
     file_list_preview_containers[file_name]['image_url'] = image_url;
+    file_list_preview_containers[file_name]['container_width'] = container_width;
 
     ppom_set_croppie_options(file_name, undefined, image_id);
 }
@@ -339,8 +341,10 @@ function ppom_set_croppie_options(file_name, viewport, image_id) {
                 option.viewport = viewport;
             }
 
+            option = get_responsive_croppie_options(option, file_list_preview_containers[file_name]['container_width']);
             // console.log($filelist_DIV[file_name]['croppie'][image_id]);
             file_list_preview_containers[file_name]['croppie'][image_id].croppie(option);
+            file_list_preview_containers[file_name]['croppie'][image_id].find('.ppom-cropping-size').css('width', '100%');
         }
     });
 }
@@ -737,4 +741,36 @@ function ppom_generate_cropper_data_for_cart(field_name) {
 
         });
     });
+}
+
+function get_responsive_croppie_options(baseOptions, max_width) {
+    const boundary = baseOptions.boundary || {};
+
+    if ( boundary.width && boundary.height && max_width >= boundary.width ) {
+        return baseOptions;
+    }
+
+    // Use container width as the boundary.
+    const aspectRatio = boundary.height / boundary.width || 1; // original height/width ratio
+    const boundaryWidth = Math.floor(max_width);
+    const boundaryHeight = Math.floor(boundaryWidth * aspectRatio);
+
+    if ( baseOptions.viewport && baseOptions.viewport.width && baseOptions.viewport.height ) {
+        const scale = boundaryWidth / boundary.width;
+        const viewportWidth = Math.floor(baseOptions.viewport.width * scale);
+        const viewportHeight = Math.floor(baseOptions.viewport.height * scale);
+
+        // Scale viewport proportionally and ensure it fits within the new boundary.
+        baseOptions.viewport.width = Math.min(viewportWidth, boundaryWidth - 2);
+        baseOptions.viewport.height = Math.min(viewportHeight, boundaryHeight - 2);
+    }
+
+    return {
+        ...baseOptions,
+        boundary: {
+            ...baseOptions.boundary,
+            width: boundaryWidth,
+            height: boundaryHeight,
+        },
+    };
 }
