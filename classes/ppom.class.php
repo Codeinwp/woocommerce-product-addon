@@ -254,14 +254,9 @@ class PPOM_Meta {
 			return null;
 		}
 
-		global $wpdb;
+		$meta_ids      = is_array( $meta_id ) ? $meta_id : array( $meta_id );
+		$meta_settings = PPOM_Meta_DB::get_multiple( $meta_ids );
 
-		if ( is_array( $meta_id ) ) {
-			$meta_id = implode( ',', $meta_id );
-		}
-
-		$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id IN($meta_id)";
-		$meta_settings = $wpdb->get_results( $qry );
 		$filter_meta   = array_filter(
 			$meta_settings,
 			function( $meta ) {
@@ -288,28 +283,17 @@ class PPOM_Meta {
 		}
 
 		$meta_fields = array();
-		global $wpdb;
-		if ( $this->has_multiple_meta() ) {
+		$meta_ids    = $this->has_multiple_meta() ? $this->meta_id : array( $this->meta_id );
+		$metas       = PPOM_Meta_DB::get_multiple( $meta_ids );
 
-			foreach ( $this->meta_id as $meta_id ) {
-				$qry    = 'SELECT the_meta FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
-				$fields = $wpdb->get_var( $qry );
-
-				if ( ! is_string( $fields ) || empty( $fields ) ) {
-					continue;
-				}
-
-				$fields = json_decode( $fields, true );
-
-				if ( is_array( $fields ) ) {
-					$meta_fields = array_merge( $meta_fields, $fields );
-				}
+		foreach ( $metas as $meta ) {
+			if ( ! is_string( $meta->the_meta ) ) {
+				continue;
 			}
-		} else {
-			$meta_id     = $this->meta_id;
-			$qry         = 'SELECT the_meta FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
-			$fields      = $wpdb->get_var( $qry );
-			$meta_fields = json_decode( $fields, true );
+			$fields = json_decode( $meta->the_meta, true );
+			if ( is_array( $fields ) ) {
+				$meta_fields = array_merge( $meta_fields, $fields );
+			}
 		}
 
 		// Filter fields which are active only
@@ -329,27 +313,21 @@ class PPOM_Meta {
 	function get_fields_by_id( $ppom_id ) {
 
 		$meta_fields = array();
-		global $wpdb;
 
 		$ppom_ids = explode( ',', $ppom_id );
-		foreach ( $ppom_ids as $meta_id ) {
+		$metas    = PPOM_Meta_DB::get_multiple( $ppom_ids );
 
-			$table  = $wpdb->prefix . PPOM_TABLE_META;
-			$fields = $wpdb->get_var( $wpdb->prepare( "SELECT the_meta FROM $table WHERE productmeta_id = %d", $meta_id ) );
-			$fields = json_decode( $fields, true );
+		foreach ( $metas as $meta ) {
+			if ( ! is_string( $meta->the_meta ) ) {
+				continue;
+			}
+			$fields = json_decode( $meta->the_meta, true );
 			if ( is_array( $fields ) ) {
 				$meta_fields = array_merge( $meta_fields, $fields );
 			}
 		}
 
 		// Filter fields which are active only
-		$meta_fields = array_filter(
-			$meta_fields,
-			function ( $field ) {
-				return ! isset( $field['status'] ) || $field['status'] == 'on';
-			}
-		);
-
 		$meta_fields = array_filter(
 			$meta_fields,
 			function ( $field ) {
@@ -394,13 +372,7 @@ class PPOM_Meta {
 	}
 
 	function all_ppom_with_categories() {
-
-		global $wpdb;
-		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-
-		$qry = "SELECT productmeta_id, productmeta_categories, productmeta_tags FROM {$ppom_table} WHERE productmeta_categories != '' OR productmeta_tags != ''";
-
-		return $wpdb->get_results( $qry );
+		return PPOM_Meta_DB::get_categories_lookup();
 	}
 
 	// check meta settings: ajax validation
@@ -563,13 +535,8 @@ class PPOM_Meta {
 	/* ============== Get settings by metaid  ================= */
 	function get_settings_by_id( $meta_id ) {
 
-		global $wpdb;
-
-		$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
-		$table         = $wpdb->prefix . PPOM_TABLE_META;
-		$meta_settings = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE productmeta_id = %d", $meta_id ) );
-
-		$meta_settings = empty( $meta_settings ) ? null : $meta_settings;
+		$meta_id       = absint( trim( $meta_id ) );
+		$meta_settings = PPOM_Meta_DB::get( $meta_id );
 
 		return apply_filters( 'ppom_get_settings_by_id', $meta_settings, $meta_id, $this );
 	}
