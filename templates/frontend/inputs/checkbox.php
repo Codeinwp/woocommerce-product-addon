@@ -60,6 +60,7 @@ $wrapper_class = $has_discount ? 'form-check' : 'form-check-inline';
 $check_wrapper_class = apply_filters( 'ppom_checkbox_wrapper_class', $wrapper_class );
 $product_type        = $product->get_type();
 $icon_color          = ppom_get_option( 'ppom_input_tooltip_iconclr', '#000000' );
+$is_tooltip_enabled  = isset( $field_meta['desc_tooltip'] ) && 'on' === $field_meta['desc_tooltip'] ? true : false;
 
 // change checkbox input form name 
 // add_filter('ppom_input_name_attr', function($form_name, $meta){
@@ -92,6 +93,7 @@ $icon_color          = ppom_get_option( 'ppom_input_tooltip_iconclr', '#000000' 
 		$option_id      = $value['option_id'];
 		$dom_id         = apply_filters( 'ppom_dom_option_id', $option_id, $field_meta );
 		$opt_percent    = isset( $value['percent'] ) ? $value['percent'] : '';
+		$option_tooltip = isset( $value['tooltip'] ) ? $value['tooltip'] : '';
 
 		// if discount price set
 		if ( $has_discount ) {
@@ -145,7 +147,11 @@ $icon_color          = ppom_get_option( 'ppom_input_tooltip_iconclr', '#000000' 
 				>
 
 
-				<span class="ppom-input-option-label ppom-label-checkbox"><?php echo $option_label; ?></span>
+				<span class="ppom-input-option-label ppom-label-checkbox"><?php echo $option_label; ?>
+				<?php if ( $is_tooltip_enabled && ! empty( $option_tooltip ) ) : ?>
+				<span data-ppom-tooltip="ppom_tooltip" class="ppom-tooltip" title="<?php echo esc_attr( $option_tooltip ); ?>"><span class="ppom-tooltip-icon" style="background-color:<?php echo esc_attr( $icon_color ); ?>;"></span></span>
+				<?php endif; ?>
+				</span>
 			</label>
 		</div>
 
