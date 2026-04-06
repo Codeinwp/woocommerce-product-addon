@@ -4,8 +4,6 @@
  *
  * @package PPOM
  * @subpackage Frontend
- *
- * @see ppom_woocommerce_template_base_inputs_rendering()
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

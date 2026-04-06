@@ -4,8 +4,6 @@
  *
  * @package PPOM
  * @subpackage Fields
- *
- * @see ppom_admin_save_form_meta()
  */
 
 /*

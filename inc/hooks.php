@@ -4,8 +4,6 @@
  *
  * @package PPOM
  * @subpackage Hooks
- *
- * @see PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id()
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

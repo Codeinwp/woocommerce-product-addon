@@ -21,8 +21,6 @@
  *
  * @package PPOM
  * @subpackage Bootstrap
- *
- * @see NM_PersonalizedProduct::__construct()
  */
 
 // @since 6.1

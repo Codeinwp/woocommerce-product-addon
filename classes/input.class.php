@@ -4,8 +4,6 @@
  *
  * @package PPOM
  * @subpackage Inputs
- *
- * @see PPOM_Form::render_input_template()
  */
 
 /**

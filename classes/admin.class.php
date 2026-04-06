@@ -4,8 +4,6 @@
  *
  * @package PPOM
  * @subpackage Admin
- *
- * @see ppom_admin_save_form_meta()
  */
 
 /*
@@ -607,18 +605,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 	/**
-	 * Ajax handler for "Attach to Product" feature.
-	 * Attaches products to the PPOM Field Group.
-	 * Removes prodducts from the PPOM Field Group.
-	 *
-	 * @return void
-	 */
-	/**
-	 * Persists product, category, and tag attachments for a field group.
+	 * AJAX handler for attaching products, categories, and tags to a PPOM field group.
 	 *
 	 * Reconciles the submitted attach selections against the stored
 	 * {@see PPOM_PRODUCT_META_KEY} product assignments and then stores the
 	 * category and tag rules on the PPOM custom-table row.
+	 *
+	 * Product edit screen: the same meta key is saved from the product metabox via
+	 * ppom_admin_process_product_meta(); this handler does not call that function.
 	 *
 	 * @return void
 	 *

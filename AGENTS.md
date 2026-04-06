@@ -49,6 +49,7 @@ Password: password
 - **PHP standard**: Themeisle ruleset (WordPress-based) via `phpcs.xml`. Text domain: `woocommerce-product-addon`.
 - **PHPStan**: Level 8 with a large baseline file (`phpstan-baseline.neon`). Scans `inc/`, `classes/`, `backend/`, `templates/`, and the main plugin file.
 - **Min PHP**: 7.4
+- **PHPDoc `@see`**: Use for cross-file related entry points (especially `inc/` versus `classes/`). Optional file-level docblocks may list **two to four** canonical functions or methods as a small index; avoid long or misleading lists—use `./ARCHITECTURE.md` and the overview above for layout.
 
 ## Architecture
 
