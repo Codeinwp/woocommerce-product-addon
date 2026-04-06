@@ -23,7 +23,6 @@ npm run dist
 ```bash
 # PHPUnit — requires Docker (wp-env)
 npm run env:setup          # Start WordPress Docker environment
-bash ./bin/e2e-after-setup.sh        # Prepare database/test data
 npm run test:unit:php                # Run PHPUnit tests
 
 # Run a single PHPUnit test file
