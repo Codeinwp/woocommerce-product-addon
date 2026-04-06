@@ -362,7 +362,7 @@ class PPOM_Fields_Meta {
 		$plugin_meta = ppom_get_plugin_meta();
 		$html_input  = '';
 
-		if ( ! is_array( $values ) ) {
+		if ( 'input_mask' !== $name && ! is_array( $values ) ) {
 			$values        = stripslashes( $values );
 			$decode_values = json_decode( $values, true );
 			$values        = is_array( $decode_values ) ? $decode_values : $values;
