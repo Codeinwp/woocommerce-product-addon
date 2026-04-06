@@ -331,6 +331,348 @@ ul.ppom-options-container li {
 
 
 /*
+    3.5- Advanced Settings Toggle CSS
+*/
+
+.ppom-advanced-toggle-wrap {
+    padding: 5px 15px 0;
+    margin-top: 5px;
+}
+
+.ppom-advanced-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 14px;
+    background: #f0f0f1;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    color: #50575e;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ppom-advanced-toggle:hover {
+    background: #e0e0e0;
+    color: #1d2327;
+    text-decoration: none;
+}
+
+.ppom-advanced-toggle:focus {
+    text-decoration: none;
+    color: #50575e;
+}
+
+.ppom-advanced-toggle .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+}
+
+.ppom-advanced-arrow {
+    transition: transform 0.2s ease;
+}
+
+.ppom-advanced-open .ppom-advanced-arrow {
+    transform: rotate(180deg);
+}
+
+.ppom-advanced-fields-wrapper {
+    padding: 10px 0 0;
+    margin-top: 5px;
+    border-top: 1px dashed #c3c4c7;
+}
+
+/*
+    3.6- Empty State CSS
+*/
+
+.ppom-empty-state {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.ppom-empty-state-icon {
+    margin-bottom: 15px;
+}
+
+.ppom-empty-state-icon .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #c3c4c7;
+}
+
+.ppom-empty-state h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    color: #1d2327;
+}
+
+.ppom-empty-state p {
+    margin: 0 0 20px;
+    color: #646970;
+    font-size: 13px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ppom-empty-state-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 4px;
+}
+
+.ppom-empty-state-btn .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+}
+
+/*
+    3.7- Inline Product/Category Assignment CSS
+*/
+
+.ppom-inline-attach-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.ppom-inline-attach-heading {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.ppom-inline-attach-status {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #00a32a;
+    font-style: italic;
+}
+
+.ppom-inline-attach-section .select2-container {
+    width: 100% !important;
+}
+
+.ppom-inline-attach-section .select2-container--default .select2-selection--multiple {
+    border-color: #8c8f94;
+    border-radius: 4px;
+    min-height: 36px;
+}
+
+/*
+    3.8- Live Preview Section CSS
+*/
+
+.ppom-live-preview-section {
+    margin-top: 20px;
+    padding-top: 15px;
+}
+
+.ppom-live-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.ppom-live-preview-header h2 {
+    margin: 0;
+}
+
+.ppom-preview-badge {
+    font-size: 11px;
+    background: #dba617;
+    color: #fff;
+    padding: 1px 8px;
+    border-radius: 10px;
+    vertical-align: middle;
+    font-weight: normal;
+}
+
+.ppom-preview-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ppom-preview-controls label {
+    font-size: 13px;
+    color: #646970;
+    white-space: nowrap;
+}
+
+.ppom-live-preview-container {
+    position: relative;
+}
+
+.ppom-preview-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    background: rgba(255,255,255,0.9);
+    padding: 20px;
+    border-radius: 4px;
+}
+
+.ppom-preview-hint {
+    color: #646970;
+    font-size: 13px;
+    margin-top: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.ppom-preview-hint .dashicons {
+    color: #c3c4c7;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+}
+
+.ppom-preview-notice {
+    background: #fff8e5;
+    border-left: 4px solid #dba617;
+    padding: 14px 18px;
+    border-radius: 0 4px 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: #1d2327;
+}
+
+.ppom-preview-notice .dashicons {
+    color: #dba617;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/*
+    3.9- Style Preset Buttons
+*/
+
+.ppom-css-preset.active {
+    background: #2271b1 !important;
+    border-color: #2271b1 !important;
+    color: #fff !important;
+}
+
+.ppom-presets-locked .ppom-style-preset-buttons .btn {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ppom-presets-locked .ppom-style-preset-buttons .btn:hover {
+    opacity: 0.7;
+}
+
+/*
+    3.10- Resizable CodeMirror Editors
+*/
+
+.ppom-basic-setting-section .CodeMirror {
+    height: 200px;
+    resize: vertical;
+    overflow: auto !important;
+    min-height: 100px;
+    max-height: 600px;
+    border-radius: 4px;
+}
+
+/* Style tab locked overlay */
+.ppom-style-locked-wrapper {
+    position: relative;
+}
+
+.ppom-style-locked-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.75);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.ppom-style-locked-wrapper:hover .ppom-style-locked-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ppom-style-locked-cta {
+    text-align: center;
+    padding: 24px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    max-width: 320px;
+}
+
+.ppom-style-locked-cta .dashicons {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: #2271b1;
+    margin-bottom: 8px;
+}
+
+.ppom-style-locked-cta strong {
+    display: block;
+    font-size: 15px;
+    color: #1d2327;
+    margin-bottom: 6px;
+}
+
+.ppom-style-locked-cta p {
+    font-size: 13px;
+    color: #646970;
+    margin: 0 0 12px;
+}
+
+.ppom-style-locked-cta .btn-primary {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+    padding: 6px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.ppom-style-locked-cta .btn-primary:hover {
+    background: #135e96;
+    color: #fff;
+    text-decoration: none;
+}
+
+/*
     4- Checkbox Design CSS
 */
 
@@ -428,7 +770,10 @@ ul.ppom-options-container li {
 }
 
 .ppom-wrapper .CodeMirror {
-    height: 139px !important;
+    height: 200px;
+    min-height: 100px;
+    max-height: 600px;
+    resize: vertical;
 }
 
 /*.CodeMirror pre {*/

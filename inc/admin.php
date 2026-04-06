@@ -218,6 +218,7 @@ function ppom_meta_list( $post ) {
 	echo '<div class="ppom_extra_options_panel">';
 	do_action( 'ppom_meta_box_after_list', $post );
 	echo '</div>';
+
 }
 
 /*
@@ -330,8 +331,8 @@ function ppom_admin_save_form_meta() {
 	$send_file_attachment   = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
 	$show_cart_thumb        = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
 	$aviary_api_key         = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
-	$productmeta_style      = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
-	$productmeta_js         = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
+	$productmeta_style      = isset( $_REQUEST['productmeta_style'] ) ? wp_unslash( $_REQUEST['productmeta_style'] ) : '';
+	$productmeta_js         = isset( $_REQUEST['productmeta_js'] ) ? wp_unslash( $_REQUEST['productmeta_js'] ) : '';
 	$product_id             = isset( $_REQUEST['product_id'] ) ? intval( $_REQUEST['product_id'] ) : 0;
 
 	if ( strlen( $productmeta_name ) > 50 ) {
@@ -500,8 +501,8 @@ function ppom_admin_update_form_meta() {
 	$send_file_attachment   = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
 	$show_cart_thumb        = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
 	$aviary_api_key         = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
-	$productmeta_style      = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
-	$productmeta_js         = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
+	$productmeta_style      = isset( $_REQUEST['productmeta_style'] ) ? wp_unslash( $_REQUEST['productmeta_style'] ) : '';
+	$productmeta_js         = isset( $_REQUEST['productmeta_js'] ) ? wp_unslash( $_REQUEST['productmeta_js'] ) : '';
 
 	if ( strlen( $productmeta_name ) > 50 ) {
 		$resp = array(

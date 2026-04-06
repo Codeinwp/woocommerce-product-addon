@@ -101,6 +101,10 @@ require_once PPOM_PATH . '/classes/input-meta.class.php';
 require_once PPOM_PATH . '/classes/legacy-meta.class.php';
 require_once PPOM_PATH . '/classes/integrations/elementor/elementor.class.php';
 
+require_once PPOM_PATH . '/classes/ai-service.class.php';
+require_once PPOM_PATH . '/classes/template-library.class.php';
+require_once PPOM_PATH . '/classes/onboarding-wizard.class.php';
+
 if ( is_admin() ) {
 
 	include_once PPOM_PATH . '/classes/admin.class.php';

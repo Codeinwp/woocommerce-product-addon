@@ -204,6 +204,37 @@ class PPOM_Meta {
 			}
 		}
 
+		// Auto-cleanup: remove stale group IDs that no longer exist in the database
+		if ( ! empty( $ppom_product_id ) ) {
+			global $wpdb;
+			$ppom_table   = $wpdb->prefix . PPOM_TABLE_META;
+			$ids_to_check = is_array( $ppom_product_id ) ? $ppom_product_id : array( $ppom_product_id );
+			$valid_ids    = array();
+
+			foreach ( $ids_to_check as $gid ) {
+				if ( ! is_numeric( $gid ) ) {
+					continue;
+				}
+				$exists = $wpdb->get_var( $wpdb->prepare(
+					"SELECT productmeta_id FROM $ppom_table WHERE productmeta_id = %d",
+					$gid
+				) );
+				if ( $exists ) {
+					$valid_ids[] = (int) $gid;
+				}
+			}
+
+			// If stale IDs were found, update the product meta
+			if ( count( $valid_ids ) !== count( $ids_to_check ) ) {
+				if ( ! empty( $valid_ids ) ) {
+					update_post_meta( $product_id, PPOM_PRODUCT_META_KEY, $valid_ids );
+				} else {
+					delete_post_meta( $product_id, PPOM_PRODUCT_META_KEY );
+				}
+				$ppom_product_id = ! empty( $valid_ids ) ? $valid_ids : null;
+			}
+		}
+
 		return apply_filters( 'ppom_product_meta_id', is_array( $ppom_product_id ) ? array_unique( $ppom_product_id ) : $ppom_product_id, $product_id );
 	}
 
@@ -420,7 +451,7 @@ class PPOM_Meta {
 		return apply_filters( 'ppom_ajax_validation_enabled', $validation_enabled, $this );
 	}
 
-	// check meta settings: styels
+	// check meta settings: styles
 	function inline_css() {
 
 		$inline_css = '';
@@ -434,30 +465,38 @@ class PPOM_Meta {
 			return null;
 		}
 
-		if (
-			isset( $this->ppom_settings->productmeta_style ) &&
-			is_string( $this->ppom_settings->productmeta_style ) &&
-			$this->ppom_settings->productmeta_style !== ''
-		) {
-			$selector = '';
-			$template = stripslashes( strip_tags( $this->ppom_settings->productmeta_style ) );
+		// Collect CSS from ALL attached meta groups, not just the first one
+		$meta_ids = is_array( $this->meta_id ) ? $this->meta_id : array( $this->meta_id );
 
-			if ( is_array( $this->meta_id ) ) {
-				$field_selector = [];
-				foreach( $this->meta_id as $field_id ) {
-					$field_selector[] = ".ppom-id-" . $field_id;
-				}
-				$selector = ':where(' . implode( ', ', $field_selector ) . ')';
-			} else if ( is_numeric( $this->meta_id ) ) {
-				$selector = ".ppom-id-" . $this->meta_id;
+		global $wpdb;
+		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
+
+		foreach ( $meta_ids as $mid ) {
+			$style = $wpdb->get_var( $wpdb->prepare(
+				"SELECT productmeta_style FROM $ppom_table WHERE productmeta_id = %d",
+				$mid
+			) );
+
+			if ( empty( $style ) || ! is_string( $style ) ) {
+				continue;
 			}
-			$inline_css = str_replace( 'selector', $selector, $template );
+
+			$template = stripslashes( strip_tags( $style ) );
+
+			// Skip empty/default styles
+			$trimmed = preg_replace( '/\s+/', '', $template );
+			if ( empty( $trimmed ) || $trimmed === 'selector{}' ) {
+				continue;
+			}
+
+			$selector   = '.ppom-id-' . $mid;
+			$inline_css .= str_replace( 'selector', $selector, $template ) . "\n";
 		}
 
 		return apply_filters( 'ppom_inline_css', $inline_css, $this );
 	}
 
-	// check meta settings: styels
+	// check meta settings: custom JS
 	function inline_js() {
 
 		$inline_js = '';
@@ -471,8 +510,27 @@ class PPOM_Meta {
 			return null;
 		}
 
-		if ( isset( $this->ppom_settings->productmeta_js ) && $this->ppom_settings->productmeta_js != '' ) {
-			$inline_js = stripslashes( strip_tags( $this->ppom_settings->productmeta_js ) );
+		// Collect JS from ALL attached meta groups
+		$meta_ids = is_array( $this->meta_id ) ? $this->meta_id : array( $this->meta_id );
+
+		global $wpdb;
+		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
+
+		foreach ( $meta_ids as $mid ) {
+			$js = $wpdb->get_var( $wpdb->prepare(
+				"SELECT productmeta_js FROM $ppom_table WHERE productmeta_id = %d",
+				$mid
+			) );
+
+			if ( empty( $js ) || ! is_string( $js ) ) {
+				continue;
+			}
+
+			$js = stripslashes( $js );
+
+			if ( ! empty( trim( $js ) ) ) {
+				$inline_js .= $js . "\n";
+			}
 		}
 
 		return apply_filters( 'ppom_inline_js', $inline_js, $this );

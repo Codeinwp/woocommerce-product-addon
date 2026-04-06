@@ -99,6 +99,10 @@ class PPOM_Form {
 		$fields        = array_filter(
 			self::$ppom->fields,
 			function( $field ) use ( $meta_id ) {
+				// If ppom_id is not set, include the field (backwards compatibility for imported/legacy fields)
+				if ( ! isset( $field['ppom_id'] ) ) {
+					return true;
+				}
 				return (int) $meta_id === (int) $field['ppom_id'];
 			}
 		);

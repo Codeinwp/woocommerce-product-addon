@@ -131,9 +131,16 @@ jQuery(function($) {
 
         $('.ppom-unsave-data').remove();
 
+        // Sync ALL CodeMirror editors back to their textareas before serialization
+        document.querySelectorAll('.CodeMirror').forEach(function(cmEl) {
+            if (cmEl.CodeMirror) {
+                cmEl.CodeMirror.save();
+            }
+        });
+
         const formData = new FormData();
         const ppomFields = new URLSearchParams();
-        
+
         /*
             NOTE: since the request is to big for small values of `max_input_vars`, we will send the PPOM fields as a single string.
             
@@ -377,6 +384,9 @@ jQuery(function($) {
         html += '</tr>';
         html = $.parseHTML(html);
         // console.log(copy_model_id);
+        // Remove empty state row when first field is added
+        $('.ppom-empty-state-row').remove();
+
         if (copy_model_id != '' && copy_model_id != undefined) {
             $(html).find('.ppom_field_table tbody').end().insertAfter('#ppom_sort_id_' + copy_model_id + '');
         }
