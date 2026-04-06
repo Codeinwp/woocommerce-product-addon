@@ -811,11 +811,6 @@ parameters:
 			path: classes/fields.class.php
 
 		-
-			message: "#^Parameter \\#1 \\$text of function esc_attr expects string, \\(float\\|int\\) given\\.$#"
-			count: 7
-			path: classes/fields.class.php
-
-		-
 			message: "#^Parameter \\#1 \\$text of function esc_attr expects string, int given\\.$#"
 			count: 2
 			path: classes/fields.class.php
@@ -842,11 +837,6 @@ parameters:
 
 		-
 			message: "#^Undefined variable\\: \\$value$#"
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: "#^Variable \\$values in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: classes/fields.class.php
 
