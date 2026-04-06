@@ -195,5 +195,7 @@ jQuery(function($){
 
 	const btn = `<a class="btn btn-success btn-sm float-right mr-4" href="${ppom_vars.i18n.addGroupUrl}"><span class="dashicons dashicons-plus"></span>${ppom_vars.i18n.addGroupLabel}</a>`;
 
-	$('div.ppom-toolbar').html(`<div class="">${bulkActions} ${importBtn} <span id="ppom-toolbar-extra"></span> ${btn}</div>`);
+	const wizardBtn = `<button type="button" class="btn btn-primary btn-sm float-right mr-2 ppom-wizard-trigger">Quick Setup</button>`;
+
+	$('div.ppom-toolbar').html(`<div class="">${bulkActions} ${importBtn} <span id="ppom-toolbar-extra"></span> ${wizardBtn} ${btn}</div>`);
 });

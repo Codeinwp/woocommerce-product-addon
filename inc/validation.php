@@ -299,7 +299,7 @@ function ppom_get_product_limits( $product_id, $variation_id ) {
 
 			$last_range   = end( $ranges );
 			$qty_ranges   = explode( '-', $last_range['raw'] );
-			$max_quantity = $qty_ranges[1];
+			$max_quantity = isset( $qty_ranges[1] ) ? $qty_ranges[1] : $qty_ranges[0];
 		}
 	}
 

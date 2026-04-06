@@ -96,6 +96,25 @@ function ppom_load_free_options() {
 			'title' => __( 'Option Total Suffix', 'woocommerce-product-addon' ),
 			'desc'  => __( 'Specify the label to display tax or VAT information, such as \'VAT Included\' or \'Tax Applied,\' inside the price table.', 'woocommerce-product-addon' ),
 		),
+		'ppom_ai_section'                     => array(
+			'type'  => 'section',
+			'title' => __( 'AI Assistant Settings', 'woocommerce-product-addon' ),
+		),
+		'ppom_ai_provider'                    => array(
+			'type'    => 'select',
+			'title'   => __( 'AI Provider', 'woocommerce-product-addon' ),
+			'desc'    => __( 'Select the AI provider to use for the formula builder, onboarding wizard, and template suggestions.', 'woocommerce-product-addon' ),
+			'default' => 'openai',
+			'options' => array(
+				'openai'    => 'OpenAI (GPT)',
+				'anthropic' => 'Anthropic (Claude)',
+			),
+		),
+		'ppom_ai_api_key'                     => array(
+			'type'  => 'text',
+			'title' => __( 'AI API Key', 'woocommerce-product-addon' ),
+			'desc'  => __( 'Enter your OpenAI or Anthropic API key to enable AI-powered features: formula builder, onboarding wizard, and smart template suggestions.', 'woocommerce-product-addon' ),
+		),
 	);
 
 	/**

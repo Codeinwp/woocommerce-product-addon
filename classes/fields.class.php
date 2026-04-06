@@ -286,6 +286,22 @@ class PPOM_Fields_Meta {
 		$html .= '</div>';
 		if ( $field_meta ) {
 
+			// Essential field settings shown by default; everything else is "Advanced"
+			$essential_keys = array( 'title', 'data_name', 'description', 'placeholder', 'required', 'price', 'options', 'images', 'audio', 'fonts', 'custom_fonts', 'logic', 'conditions' );
+			$essential_keys = apply_filters( 'ppom_essential_field_settings', $essential_keys, $fields_type );
+
+			$advanced_opened = false;
+			$has_advanced    = false;
+
+			// Check if there are any advanced (non-essential) fields in the Fields tab
+			foreach ( $field_meta as $key => $meta ) {
+				$has_tabs_class = isset( $meta['tabs_class'] );
+				if ( ! $has_tabs_class && ! in_array( $key, $essential_keys, true ) ) {
+					$has_advanced = true;
+					break;
+				}
+			}
+
 			foreach ( $field_meta as $fields_meta_key => $meta ) {
 
 				$title  = isset( $meta['title'] ) ? $meta['title'] : '';
@@ -319,6 +335,22 @@ class PPOM_Fields_Meta {
 					$panel_classes = implode( ' ', $panel_classes );
 				}
 
+				// Insert the "Advanced Settings" collapsible wrapper before the first non-essential Fields-tab setting
+				$is_fields_tab = ! isset( $meta['tabs_class'] );
+				$is_advanced   = $is_fields_tab && ! in_array( $fields_meta_key, $essential_keys, true );
+
+				if ( $has_advanced && $is_advanced && ! $advanced_opened ) {
+					$advanced_opened = true;
+					$html .= '<div class="col-md-12 ppom_handle_fields_tab ppom-control-all-fields-tabs ppom-advanced-toggle-wrap">';
+					$html .= '<a href="#" class="ppom-advanced-toggle" onclick="event.preventDefault(); var w=this.closest(\'.ppom-advanced-toggle-wrap\').nextElementSibling; if(w){w.style.display=w.style.display===\'none\'?\'flex\':\'none\';} this.classList.toggle(\'ppom-advanced-open\');">';
+					$html .= '<span class="dashicons dashicons-admin-generic"></span> ';
+					$html .= esc_html__( 'Advanced Settings', 'woocommerce-product-addon' );
+					$html .= ' <span class="dashicons dashicons-arrow-down-alt2 ppom-advanced-arrow"></span>';
+					$html .= '</a>';
+					$html .= '</div>';
+					$html .= '<div class="ppom-advanced-fields-wrapper" style="display:none; flex-wrap:wrap; width:100%;">';
+				}
+
 				$html .= '<div data-meta-id="' . esc_attr( $fields_meta_key ) . '" class="' . esc_attr( $panel_classes ) . '">';
 				$html .= '<div class="form-group">';
 
@@ -336,6 +368,11 @@ class PPOM_Fields_Meta {
 				$html .= '</div>';
 				$html .= '</div>';
 
+			}
+
+			// Close the advanced wrapper if it was opened
+			if ( $advanced_opened ) {
+				$html .= '</div>'; // close .ppom-advanced-fields-wrapper
 			}
 		}
 
@@ -817,10 +854,12 @@ class PPOM_Fields_Meta {
 					$condition_rules = isset( $values['rules'] ) ? $values['rules'] : array();
 					$last_array_id   = max( array_keys( $condition_rules ) );
 
-					$visibility_show = ( $values['visibility'] === 'Show' ) ? 'selected="selected"' : '';
-					$visibility_hide = ( $values['visibility'] === 'Hide' ) ? 'selected="selected"' : '';
-					$bound_all       = ( $values['bound'] === 'All' ) ? 'selected="selected"' : '';
-					$bound_any       = ( $values['bound'] === 'Any' ) ? 'selected="selected"' : '';
+					$vis_val         = isset( $values['visibility'] ) ? $values['visibility'] : 'Show';
+					$bound_val       = isset( $values['bound'] ) ? $values['bound'] : ( isset( $values['relation'] ) ? $values['relation'] : 'All' );
+					$visibility_show = ( strcasecmp( $vis_val, 'Show' ) === 0 ) ? 'selected="selected"' : '';
+					$visibility_hide = ( strcasecmp( $vis_val, 'Hide' ) === 0 ) ? 'selected="selected"' : '';
+					$bound_all       = ( strcasecmp( $bound_val, 'All' ) === 0 || strcasecmp( $bound_val, 'AND' ) === 0 ) ? 'selected="selected"' : '';
+					$bound_any       = ( strcasecmp( $bound_val, 'Any' ) === 0 || strcasecmp( $bound_val, 'OR' ) === 0 ) ? 'selected="selected"' : '';
 
 					$html_input  = '<div class="row ppom-condition-style-wrap">';
 					$html_input .= '<div class="col-md-3 col-sm-3">';

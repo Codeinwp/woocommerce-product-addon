@@ -7,6 +7,96 @@
   width: 100%;
 }
 
+/** Field Layout — Consistent alignment and spacing **/
+
+.ppom-rendering-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch !important; /* Override align-items-center for equal height columns */
+}
+
+.ppom-field-wrapper.ppom-col {
+  padding: 0 8px !important;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ppom-field-wrapper.ppom-col > .ppom-input-wrapper,
+.ppom-field-wrapper.ppom-col > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ppom-field-wrapper.ppom-col label {
+  margin-bottom: 4px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.ppom-field-wrapper.ppom-col input[type="text"],
+.ppom-field-wrapper.ppom-col input[type="number"],
+.ppom-field-wrapper.ppom-col input[type="email"],
+.ppom-field-wrapper.ppom-col input[type="tel"],
+.ppom-field-wrapper.ppom-col select,
+.ppom-field-wrapper.ppom-col textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  background: #fff;
+  color: #1f2937;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.ppom-field-wrapper.ppom-col input:focus,
+.ppom-field-wrapper.ppom-col select:focus,
+.ppom-field-wrapper.ppom-col textarea:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.ppom-field-wrapper.ppom-col textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.ppom-field-wrapper.ppom-col .show_description {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/** Checkbox and Radio — cleaner layout **/
+
+.ppom-field-wrapper.ppom-col .ppom-checkbox-option,
+.ppom-field-wrapper.ppom-col .ppom-radio-option {
+  margin-bottom: 6px;
+}
+
+.ppom-field-wrapper.ppom-col .ppom-checkbox-option label,
+.ppom-field-wrapper.ppom-col .ppom-radio-option label {
+  font-weight: normal;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+/** Full-width fields get a subtle separator when after half-width fields **/
+
+.ppom-field-wrapper.col-md-12 {
+  width: 100%;
+}
+
 .ppom-wrapper span.show_description {
   font-size: 11px;
   color: #999;
