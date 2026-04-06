@@ -11,7 +11,7 @@
  * Requires PHP: 7.2
  *
  * WC requires at least: 6.5
- * WC tested up to: 8.0
+ * WC tested up to: 10.5
  *
  * WordPress Available:  yes
  * Requires License:     no
@@ -195,6 +195,7 @@ add_action(
 	function () {
 		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
 			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, false );
 		}
 	}
 );

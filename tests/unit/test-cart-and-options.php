@@ -390,6 +390,67 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 	}
 
 	/**
+	 * ppom_woocommerce_add_cart_item_data() must not fatal when WC()->cart is null.
+	 *
+	 * Simulates the WC 10.5+ blocks-cart scenario where WC()->cart is null during
+	 * REST-initiated add-to-cart requests. The function should return early without
+	 * touching remove_cart_item().
+	 *
+	 * @return void
+	 */
+	public function testAddCartItemDataDoesNotFatalWhenCartIsNull() {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array( $this->build_text_field( 'note', 'Note' ) ),
+			$product->get_id()
+		);
+
+		// Null out the cart to mimic WC 10.5+ REST/blocks context.
+		WC()->cart = null;
+
+		$_POST['ppom'] = array(
+			'fields' => array(
+				'id'   => (string) $meta_id,
+				'note' => 'Hello',
+			),
+		);
+
+		// ppom_woocommerce_add_cart_item_data() should not throw when cart is null.
+		$result = ppom_woocommerce_add_cart_item_data( array(), $product->get_id() );
+
+		// The ppom key should still be populated in the returned cart data.
+		$this->assertArrayHasKey( 'ppom', $result );
+	}
+
+	/**
+	 * ppom_woocommerce_add_cart_item_data() must not fatal when ppom_cart_key is missing.
+	 *
+	 * When the browser does not post a ppom_cart_key the remove_cart_item() call must
+	 * be skipped entirely rather than passing null/false to the method.
+	 *
+	 * @return void
+	 */
+	public function testAddCartItemDataSkipsRemoveWhenCartKeyAbsent() {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array( $this->build_text_field( 'note', 'Note' ) ),
+			$product->get_id()
+		);
+
+		$_POST['ppom'] = array(
+			'fields' => array(
+				'id'   => (string) $meta_id,
+				'note' => 'World',
+			),
+		);
+		// Intentionally omit $_POST['ppom_cart_key'].
+
+		$result = ppom_woocommerce_add_cart_item_data( array(), $product->get_id() );
+
+		$this->assertArrayHasKey( 'ppom', $result );
+	}
+
+	/**
 	 * Ensure quantity stock handling subtracts the requested amount from matched options.
 	 *
 	 * @return void
