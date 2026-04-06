@@ -393,8 +393,8 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 	 * ppom_woocommerce_add_cart_item_data() must not fatal when WC()->cart is null.
 	 *
 	 * Simulates the WC 10.5+ blocks-cart scenario where WC()->cart is null during
-	 * REST-initiated add-to-cart requests. The function should return early without
-	 * touching remove_cart_item().
+	 * REST-initiated add-to-cart requests. The function should skip remove_cart_item()
+	 * entirely and still return populated cart data.
 	 *
 	 * @return void
 	 */
@@ -408,17 +408,18 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 		// Null out the cart to mimic WC 10.5+ REST/blocks context.
 		WC()->cart = null;
 
-		$_POST['ppom'] = array(
+		$_POST['ppom_cart_key'] = 'abc123';
+		$_POST['ppom']          = array(
 			'fields' => array(
 				'id'   => (string) $meta_id,
 				'note' => 'Hello',
 			),
 		);
 
-		// ppom_woocommerce_add_cart_item_data() should not throw when cart is null.
+		// Should not throw a fatal even though cart is null and a cart key was posted.
 		$result = ppom_woocommerce_add_cart_item_data( array(), $product->get_id() );
 
-		// The ppom key should still be populated in the returned cart data.
+		// Cart data must still be populated.
 		$this->assertArrayHasKey( 'ppom', $result );
 	}
 
@@ -437,6 +438,20 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 			$product->get_id()
 		);
 
+		// Attach a spy cart that records whether remove_cart_item() is called.
+		$remove_called = false;
+		$spy_cart      = new class( $remove_called ) {
+			/** @var bool */
+			private $called;
+			public function __construct( bool &$called ) {
+				$this->called = &$called;
+			}
+			public function remove_cart_item( string $key ): void {
+				$this->called = true;
+			}
+		};
+		WC()->cart = $spy_cart;
+
 		$_POST['ppom'] = array(
 			'fields' => array(
 				'id'   => (string) $meta_id,
@@ -448,6 +463,7 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 		$result = ppom_woocommerce_add_cart_item_data( array(), $product->get_id() );
 
 		$this->assertArrayHasKey( 'ppom', $result );
+		$this->assertFalse( $remove_called, 'remove_cart_item() must not be called when ppom_cart_key is absent.' );
 	}
 
 	/**
