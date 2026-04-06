@@ -427,12 +427,12 @@ class PPOM_Rest {
 			'%s',
 			'%s',
 			'%s',
+			'%s',
+			'%s',
+			'%s',
 		);
 
-		global $wpdb;
-		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-		$wpdb->insert( $ppom_table, $dt, $format );
-		$res_id = $wpdb->insert_id;
+		$res_id = ppom_meta_repository()->insert_group( $dt, $format );
 
 		$ppom_fields = apply_filters( 'ppom_meta_data_saving', $ppom_fields, $res_id );
 		// Updating PPOM Meta with ppom_id in each meta array
@@ -506,9 +506,13 @@ class PPOM_Rest {
 		$format       = array( '%s' );
 		$where_format = array( '%d' );
 
-		global $wpdb;
-		$ppom_table    = $wpdb->prefix . PPOM_TABLE_META;
-		$rows_effected = $wpdb->update( $ppom_table, $data, $where, $format, $where_format );
+		ppom_meta_repository()->update_group(
+			(int) $ppom_meta->productmeta_id,
+			$data,
+			$format,
+			$where,
+			$where_format
+		);
 
 		$resp = array(
 			'status'     => 'success',
@@ -533,7 +537,6 @@ class PPOM_Rest {
 
 		$existing_fields = json_decode( $ppom_meta->the_meta );
 
-		global $wpdb;
 		$merger_array = array();
 
 		// Check if all feilds request exist
@@ -543,8 +546,7 @@ class PPOM_Rest {
 			delete_post_meta( $product_id, PPOM_PRODUCT_META_KEY );
 
 			// Deleting all fields
-			$ppom_table         = $wpdb->prefix . PPOM_TABLE_META;
-			$res                = $wpdb->query( $wpdb->prepare( "DELETE FROM $ppom_table WHERE productmeta_id = %d", $ppom_meta->productmeta_id ) );
+			$res                = ppom_meta_repository()->delete_by_id( (int) $ppom_meta->productmeta_id );
 			$delete_fields_resp = array( 'ppom_id' => $ppom_meta->productmeta_id );
 
 			$resp = array(
@@ -580,8 +582,13 @@ class PPOM_Rest {
 		$format       = array( '%s' );
 		$where_format = array( '%d' );
 
-		$ppom_table    = $wpdb->prefix . PPOM_TABLE_META;
-		$rows_effected = $wpdb->update( $ppom_table, $data, $where, $format, $where_format );
+		ppom_meta_repository()->update_group(
+			(int) $ppom_meta->productmeta_id,
+			$data,
+			$format,
+			$where,
+			$where_format
+		);
 
 		$resp = array(
 			'status'     => 'success',

@@ -98,6 +98,8 @@ require_once PPOM_PATH . '/classes/input.class.php';
 require_once PPOM_PATH . '/classes/fields.class.php';
 // include_once PPOM_PATH . "/classes/field.class.php"; // Fronend PPOM Fields
 require_once PPOM_PATH . '/classes/ppom.class.php';
+require_once PPOM_PATH . '/classes/class-ppom-meta-repository.php';
+require_once PPOM_PATH . '/inc/ppom-meta-repository-functions.php';
 require_once PPOM_PATH . '/classes/plugin.class.php';
 require_once PPOM_PATH . '/classes/scripts.class.php';
 require_once PPOM_PATH . '/classes/frontend-scripts.class.php';

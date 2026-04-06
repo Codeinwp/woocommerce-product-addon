@@ -510,22 +510,14 @@ function ppom_e2e_insert_ppom_group( $args ) {
 
 	$dt = apply_filters( 'ppom_settings_meta_data_new', $ppom_settings_meta_data );
 
-	global $wpdb;
-	$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-	$inserted   = $wpdb->insert(
-		$ppom_table,
-		$dt,
-		array_fill( 0, count( $dt ), '%s' )
-	);
+	$ppom_id = ppom_meta_repository()->insert_group( $dt, array_fill( 0, count( $dt ), '%s' ) );
 
-	if ( false === $inserted ) {
+	if ( $ppom_id <= 0 ) {
 		return new WP_Error(
 			'meta_insert_failed',
 			__( 'PPOM group could not be saved.', 'woocommerce-product-addon' )
 		);
 	}
-
-	$ppom_id      = (int) $wpdb->insert_id;
 	$final_fields = ppom_e2e_prepare_form_meta_fields( $ppom_fields, $ppom_id );
 
 	if ( is_wp_error( $final_fields ) ) {
@@ -766,16 +758,7 @@ function ppom_e2e_get_ppom_attach_row() {
 		);
 	}
 
-	global $wpdb;
-
-	$table = $wpdb->prefix . PPOM_TABLE_META;
-	$row   = $wpdb->get_row(
-		$wpdb->prepare(
-			"SELECT productmeta_categories, productmeta_tags FROM {$table} WHERE productmeta_id = %d",
-			$ppom_id
-		),
-		ARRAY_A
-	);
+	$row = ppom_meta_repository()->get_categories_and_tags_columns( $ppom_id );
 
 	if ( empty( $row ) || ! is_array( $row ) ) {
 		wp_send_json_error(
@@ -1164,16 +1147,7 @@ function ppom_e2e_reset_state() {
 	$tracked_meta_ids  = ppom_e2e_get_tracked_meta_ids();
 
 	if ( ! empty( $tracked_meta_ids ) && defined( 'PPOM_TABLE_META' ) ) {
-		global $wpdb;
-
-		$ppom_table     = $wpdb->prefix . PPOM_TABLE_META;
-		$placeholders   = implode( ',', array_fill( 0, count( $tracked_meta_ids ), '%d' ) );
-		$deleted_result = $wpdb->query(
-			$wpdb->prepare(
-				"DELETE FROM {$ppom_table} WHERE productmeta_id IN ({$placeholders})",
-				$tracked_meta_ids
-			)
-		);
+		$deleted_result = ppom_meta_repository()->delete_by_ids( $tracked_meta_ids );
 
 		if ( false !== $deleted_result ) {
 			$deleted_meta_rows = (int) $deleted_result;
