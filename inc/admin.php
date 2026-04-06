@@ -41,10 +41,12 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 				$total_items  = count( $ppom->meta_id ); // Get the total number of items.
 				$current_item = 0; // Counter to track the current iteration.
 				$has_fields   = false;
+				$settings_map = $ppom->get_settings_by_ids( (array) $ppom->meta_id );
 				foreach ( $ppom->meta_id as $meta_id ) {
 					++$current_item; // Increment the counter.
 
-					$ppom_setting = $ppom->get_settings_by_id( $meta_id );
+					$mid          = absint( $meta_id );
+					$ppom_setting = ( $mid > 0 && isset( $settings_map[ $mid ] ) ) ? $settings_map[ $mid ] : null;
 					if ( $ppom_setting ) {
 						$meta_title = stripslashes( $ppom_setting->productmeta_name );
 						$url_edit   = add_query_arg(
@@ -103,7 +105,7 @@ function ppom_admin_product_meta_metabox() {
 function ppom_meta_list( $post ) {
 
 	$ppom         = new PPOM_Meta( $post->ID );
-	$all_meta     = PPOM()->get_product_meta_all();
+	$all_meta     = PPOM()->get_product_meta_list_for_ui();
 	$ppom_setting = admin_url( 'admin.php?page=ppom' );
 	
 	$html = '<div class="options_group ppom-settings-container" style="max-height:375px; overflow:auto;">';
@@ -325,8 +327,6 @@ function ppom_admin_save_form_meta() {
 		wp_send_json( $resp );
 	}
 
-	global $wpdb;
-
 	$send_file_attachment = 'NA';
 	$aviary_api_key       = 'NA';
 	$show_cart_thumb      = 'NA';
@@ -408,12 +408,7 @@ function ppom_admin_save_form_meta() {
 		'%s',
 	);
 
-	global $wpdb;
-	$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-	$wpdb->insert( $ppom_table, $dt, $format );
-
-
-	$ppom_id = $wpdb->insert_id;
+	$ppom_id = ppom_meta_repository()->insert_group( $dt, $format );
 	if ( is_string( $ppom ) ) {
 		$ppom_encoded = $ppom;
 		parse_str( $ppom_encoded, $ppom_decoded );
@@ -519,7 +514,6 @@ function ppom_admin_update_form_meta() {
 
 		wp_send_json( $resp );
 	}
-	global $wpdb;
 
 	if ( is_string( $_REQUEST['ppom'] ) ) {
 		$ppom_encoded = $_REQUEST['ppom'];
@@ -592,9 +586,7 @@ function ppom_admin_update_form_meta() {
 		'%d',
 	);
 
-	global $wpdb;
-	$ppom_table    = $wpdb->prefix . PPOM_TABLE_META;
-	$rows_effected = $wpdb->update( $ppom_table, $dt, $where, $format, $where_format );
+	$rows_effected = ppom_meta_repository()->update_group( (int) $productmeta_id, $dt, $format, $where, $where_format );
 
 	// $wpdb->show_errors(); $wpdb->print_error();
 
@@ -639,38 +631,13 @@ function ppom_admin_update_form_meta() {
  */
 function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 
-	// print_r($_REQUEST); exit;
-	global $wpdb;
-
-	$dt = array(
-		'the_meta' => wp_json_encode( ppom_sanitize_array_data( $ppom_meta ) ),
-	);
-
-	// ppom_pa($dt); exit;
-
-	$where = array(
-		'productmeta_id' => $ppom_id,
-	);
-
-	$format       = array(
-		'%s',
-	);
-	$where_format = array(
-		'%d',
-	);
-
-	global $wpdb;
-	$ppom_table    = $wpdb->prefix . PPOM_TABLE_META;
-	$rows_effected = $wpdb->update( $ppom_table, $dt, $where, $format, $where_format );
-
-	// $wpdb->show_errors(); $wpdb->print_error();
-
-	if ( $rows_effected ) {
-
-		return true;
-	} else {
+	$json = wp_json_encode( ppom_sanitize_array_data( $ppom_meta ) );
+	if ( false === $json ) {
 		return false;
 	}
+	$rows_effected = ppom_meta_repository()->update_the_meta_only( (int) $ppom_id, $json );
+
+	return (bool) $rows_effected;
 }
 
 // Field group deletion.
@@ -699,13 +666,10 @@ function ppom_admin_delete_meta() {
 		wp_send_json( $response );
 	}
 
-	global $wpdb;
-
 	$productmeta_id = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
 
-	$tbl_name = $wpdb->prefix . PPOM_TABLE_META;
-	$ppom_id  = intval( $productmeta_id );
-	$res      = $wpdb->query( $wpdb->prepare( "DELETE FROM {$tbl_name} WHERE productmeta_id = %d", $productmeta_id ) );
+	$ppom_id = intval( $productmeta_id );
+	$res     = ppom_meta_repository()->delete_by_id( $ppom_id );
 
 
 	$response = array();
@@ -746,10 +710,7 @@ function ppom_admin_delete_selected_meta() {
 		die( 0 );
 	}
 
-	global $wpdb;
-
-	$del_ids    = array();
-	$del_ids_ph = array();
+	$del_ids = array();
 
 	// for the performance wise, prefer to use foreach instead of array_map-array_filter-array_fill stack.
 	foreach ( $_POST['productmeta_ids'] as $id ) {
@@ -759,15 +720,12 @@ function ppom_admin_delete_selected_meta() {
 			continue;
 		}
 
-		$del_ids[]    = $id;
-		$del_ids_ph[] = '%d';
+		$del_ids[] = $id;
 	}
 
-	$del_ids_ph = implode( ', ', $del_ids_ph );
+	global $wpdb;
 
-	$tbl_name = $wpdb->prefix . PPOM_TABLE_META;
-
-	$res = $wpdb->query( $wpdb->prepare( "DELETE FROM {$tbl_name} WHERE productmeta_id IN ({$del_ids_ph})", $del_ids ) );
+	$res = ppom_meta_repository()->delete_by_ids( $del_ids );
 
 	if ( $res ) {
 		_e( 'Meta deleted successfully', 'woocommerce-product-addon' );
@@ -879,7 +837,7 @@ function ppom_admin_bar_menu() {
 		)
 	);
 
-	$all_meta = PPOM()->get_product_meta_all();
+	$all_meta = PPOM()->get_product_meta_list_for_ui();
 	foreach ( $all_meta as $meta ) {
 
 		$apply_link = admin_url( 'admin-post.php' );
