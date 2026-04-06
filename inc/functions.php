@@ -1002,7 +1002,9 @@ function ppom_has_posted_field_value( $posted_fields, $field ) {
 				break;
 
 			default:
-				if ( '' !== $instance_value ) {
+				if ( is_array( $instance_value ) ) {
+					$instance_has_value = ! empty( $instance_value );
+				} elseif ( '' !== trim( (string) $instance_value ) ) {
 					$instance_has_value = true;
 				}
 				break;
