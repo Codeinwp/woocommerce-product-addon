@@ -20,6 +20,29 @@ use PPOM\Support\Helpers;
  */
 final class ProductHandler {
 
+	/**
+	 * Whether the field participates in add-to-cart validation (required / min-max option checks).
+	 *
+	 * @param array $field PPOM field definition.
+	 *
+	 * @return bool
+	 */
+	public static function field_requires_add_to_cart_schema_checks( array $field ) {
+		if ( empty( $field['data_name'] ) ) {
+			return false;
+		}
+
+		if (
+			( ! isset( $field['required'] ) || 'on' !== $field['required'] ) &&
+			empty( $field['min_checked'] ) &&
+			empty( $field['max_checked'] )
+		) {
+			return false;
+		}
+
+		return true;
+	}
+
 	// Rendering.
 	/**
 	 * Renders field if legacy input rendering mode is on
@@ -307,14 +330,7 @@ final class ProductHandler {
 				continue;
 			}
 
-			if (
-			empty( $field['data_name'] ) ||
-			(
-				( ! isset( $field['required'] ) || 'on' !== $field['required'] ) &&
-				empty( $field['min_checked'] ) &&
-				empty( $field['max_checked'] )
-			)
-			) {
+			if ( ! self::field_requires_add_to_cart_schema_checks( $field ) ) {
 				continue;
 			}
 

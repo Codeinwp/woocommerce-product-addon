@@ -71,11 +71,26 @@ final class OrderHandler {
 			}
 		}
 
-		$no_base64                = array_diff_key( $values ['ppom']['fields'], array_flip( $cropper_fields ) );
-		$values['ppom']['fields'] = $no_base64;
+		$values['ppom']['fields'] = self::posted_fields_without_cropper_payloads( $values['ppom']['fields'], $cropper_fields );
 
 		// Since 15.2, saving all fields as another meta
 		$item->update_meta_data( '_ppom_fields', $values ['ppom'] );
+	}
+
+	/**
+	 * Resolves admin-facing label for an order line meta key using saved field meta.
+	 *
+	 * @param string     $display_key Current meta key / data name.
+	 * @param array|bool $field_meta  Field row from `Helpers::get_field_meta_by_dataname()` or false.
+	 *
+	 * @return string
+	 */
+	public static function order_meta_display_key_from_field_meta( $display_key, $field_meta ) {
+		if ( is_array( $field_meta ) && isset( $field_meta['title'] ) && $field_meta['title'] != '' ) {
+			return stripslashes( $field_meta['title'] );
+		}
+
+		return $display_key;
 	}
 
 	// Changing order item meta key to label
@@ -86,11 +101,8 @@ final class OrderHandler {
 		}
 
 		$field_meta = Helpers::get_field_meta_by_dataname( $item->get_product_id(), $display_key );
-		if ( isset( $field_meta['title'] ) && $field_meta['title'] != '' ) {
-			$display_key = stripslashes( $field_meta['title'] );
-		}
 
-		return $display_key;
+		return self::order_meta_display_key_from_field_meta( $display_key, $field_meta );
 	}
 
 	/**
@@ -150,6 +162,22 @@ final class OrderHandler {
 		return $display_value;
 	}
 
+
+	/**
+	 * Strips cropper field entries from posted PPOM fields so large base64 payloads are not stored on the line item.
+	 *
+	 * @param array $posted_fields Field map keyed by data name.
+	 * @param array $cropper_keys  Data names for fields of type `cropper`.
+	 *
+	 * @return array
+	 */
+	public static function posted_fields_without_cropper_payloads( array $posted_fields, array $cropper_keys ) {
+		if ( empty( $cropper_keys ) ) {
+			return $posted_fields;
+		}
+
+		return array_diff_key( $posted_fields, array_flip( $cropper_keys ) );
+	}
 
 	// Hiding some ppom meta like ppom_has_quantities
 	public static function hide_order_meta( $formatted_meta, $order_item ) {
