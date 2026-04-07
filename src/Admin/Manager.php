@@ -8,6 +8,7 @@
 
 namespace PPOM\Admin;
 
+use PPOM_Meta;
 use PPOM\Meta\MetaRepositoryAccessor;
 use PPOM\Support\Helpers;
 use PPOM\Validation\Validator;

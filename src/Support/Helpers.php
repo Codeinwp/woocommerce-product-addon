@@ -12,6 +12,7 @@
 
 namespace PPOM\Support;
 
+use PPOM_Meta;
 use PPOM\Arrays\Settings;
 use PPOM\Files\Handler;
 use PPOM\Hooks\Callbacks;
@@ -2081,7 +2082,7 @@ final class Helpers {
 
 		if ( self::settings_migrated() ) {
 
-			$value = PPOM_SettingsFramework::get_saved_settings( $key, $default_val );
+			$value = \PPOM_SettingsFramework::get_saved_settings( $key, $default_val );
 		} else {
 
 			$value = get_option( $key );

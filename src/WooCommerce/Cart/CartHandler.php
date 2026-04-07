@@ -10,6 +10,7 @@
 
 namespace PPOM\WooCommerce\Cart;
 
+use PPOM_Meta;
 use PPOM\Hooks\Callbacks;
 use PPOM\Pricing\Engine;
 use PPOM\Support\Helpers;
