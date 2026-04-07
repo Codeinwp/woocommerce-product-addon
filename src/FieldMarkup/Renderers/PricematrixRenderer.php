@@ -18,8 +18,8 @@ final class PricematrixRenderer extends AbstractInputRenderer {
 	public function render( $args, $default_value ) {
 		$args = $this->coerceArgs( $args );
 
-		$id    = $this->context->getAttributeValue( 'id', $args );
-		$label = $this->context->getAttributeValue( 'label', $args );
+		$id        = $this->context->getAttributeValue( 'id', $args );
+		$label     = $this->context->getAttributeValue( 'label', $args );
 		$ranges    = $args['ranges'];
 		$discount  = $args['discount'];
 		$is_hidden = ( isset( $args['hide_matrix'] ) && 'on' === $args['hide_matrix'] );

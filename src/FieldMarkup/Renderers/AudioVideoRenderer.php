@@ -18,9 +18,9 @@ final class AudioVideoRenderer extends AbstractInputRenderer {
 	public function render( $args, $default_value ) {
 		$args = $this->coerceArgs( $args );
 
-		$type    = $this->context->getAttributeValue( 'type', $args );
-		$id      = $this->context->getAttributeValue( 'id', $args );
-		$name    = $this->context->getAttributeValue( 'name', $args );
+		$type  = $this->context->getAttributeValue( 'type', $args );
+		$id    = $this->context->getAttributeValue( 'id', $args );
+		$name  = $this->context->getAttributeValue( 'name', $args );
 		$label = $this->context->getAttributeValue( 'label', $args );
 
 		$title = $args['title'];

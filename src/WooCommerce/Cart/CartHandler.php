@@ -82,27 +82,28 @@ final class CartHandler {
 
 		foreach ( $option_prices as $option ) {
 			if ( isset( $option['apply'] ) && $option['apply'] == 'quantities' ) {
-				$ppom_total_quantities += isset( $option['quantity'] ) ? $option['quantity'] : 0;
+				$qty = isset( $option['quantity'] ) ? $option['quantity'] : 0;
+				$ppom_total_quantities += intval( $qty );
 				$ppom_item_order_qty    = $ppom_total_quantities;
 			}
 		}
 
 		return array(
-			'total_quantities'   => $ppom_total_quantities,
-			'matrix_order_qty'   => $ppom_item_order_qty,
+			'total_quantities' => $ppom_total_quantities,
+			'matrix_order_qty' => $ppom_item_order_qty,
 		);
 	}
 
 	/**
 	 * Applies a resolved price-matrix chunk to base price and/or discount accumulator (legacy cart line).
 	 *
-	 * @param array      $matrix_found                 Chunk from `Helpers::get_price_matrix_chunk()`.
-	 * @param float|int  $ppom_item_org_price          Product base subtotal before matrix override.
-	 * @param float|int  $total_option_price           Summed variable option prices.
-	 * @param float|int  $ppon_onetime_cost            Summed onetime option prices.
-	 * @param float|int  $ppom_quantities_price        Quantities / bulk line component.
-	 * @param bool       $ppom_quantities_usebaseprice Bulk quantity “use base” flag.
-	 * @param float|int  $ppom_item_order_qty          Quantity used when splitting fixed matrix discounts.
+	 * @param array     $matrix_found                 Chunk from `Helpers::get_price_matrix_chunk()`.
+	 * @param float|int $ppom_item_org_price          Product base subtotal before matrix override.
+	 * @param float|int $total_option_price           Summed variable option prices.
+	 * @param float|int $ppon_onetime_cost            Summed onetime option prices.
+	 * @param float|int $ppom_quantities_price        Quantities / bulk line component.
+	 * @param bool      $ppom_quantities_usebaseprice Bulk quantity “use base” flag.
+	 * @param float|int $ppom_item_order_qty          Quantity used when splitting fixed matrix discounts.
 	 *
 	 * @return array{replace_org_price: bool, org_price: float|int|string, discount_delta: float|int|string}
 	 */
@@ -137,10 +138,10 @@ final class CartHandler {
 
 			if ( $matrix_found['discount'] == 'both' ) {
 				$total_price_to_be_discount = $total_with_options + floatval( $ppom_quantities_price );
-				$discount_delta            = Engine::get_amount_after_percentage( $total_price_to_be_discount, $matrix_found['percent'] );
+				$discount_delta             = Engine::get_amount_after_percentage( $total_price_to_be_discount, $matrix_found['percent'] );
 			} elseif ( $matrix_found['discount'] == 'base' ) {
 				$total_price_to_be_discount = floatval( $ppom_item_org_price ) + floatval( $ppom_quantities_price );
-				$discount_delta            = Engine::get_amount_after_percentage( $total_price_to_be_discount, $matrix_found['percent'] );
+				$discount_delta             = Engine::get_amount_after_percentage( $total_price_to_be_discount, $matrix_found['percent'] );
 			}
 
 			return array(
@@ -220,7 +221,7 @@ final class CartHandler {
 	 * @param float|int|string $ppom_quantities_price Quantities / bulk component.
 	 * @param float|int|string $ppom_total_discount   Matrix discount component.
 	 *
-	 * @return float|int
+	 * @return float
 	 */
 	public static function legacy_cart_line_total_from_components(
 		$ppom_item_org_price,
@@ -228,7 +229,10 @@ final class CartHandler {
 		$ppom_quantities_price,
 		$ppom_total_discount
 	) {
-		return $ppom_item_org_price + $total_option_price + $ppom_quantities_price - $ppom_total_discount;
+		return floatval( $ppom_item_org_price )
+			+ floatval( $total_option_price )
+			+ floatval( $ppom_quantities_price )
+			- floatval( $ppom_total_discount );
 	}
 
 	/**
@@ -259,12 +263,12 @@ final class CartHandler {
 		switch ( $option['apply'] ) {
 
 			case 'variable':
-				$option_price = null !== $resolved ? $resolved : $option['price'];
+				$option_price                 = null !== $resolved ? $resolved : $option['price'];
 				$state['total_option_price'] += wc_format_decimal( $option_price, $decimals );
 				break;
 
 			case 'onetime':
-				$option_price = null !== $resolved ? $resolved : $option['price'];
+				$option_price                = null !== $resolved ? $resolved : $option['price'];
 				$state['ppon_onetime_cost'] += wc_format_decimal( $option_price, $decimals );
 				break;
 
@@ -288,7 +292,11 @@ final class CartHandler {
 
 			case 'bulkquantity':
 				$state['ppom_quantities_price'] += wc_format_decimal( ( $option['price'] * $option['quantity'] ), $decimals );
-				$state['ppom_quantities_price'] += isset( $option['base'] ) ? $option['base'] : 0;
+				$base_addon = 0.0;
+				if ( isset( $option['base'] ) && is_scalar( $option['base'] ) ) {
+					$base_addon = floatval( $option['base'] );
+				}
+				$state['ppom_quantities_price'] += $base_addon;
 
 				if ( isset( $option['usebase_price'] ) && $option['usebase_price'] == 'yes' ) {
 					$state['ppom_quantities_usebaseprice'] = true;
@@ -301,8 +309,8 @@ final class CartHandler {
 				break;
 
 			case 'measure':
-				$measer_qty       = isset( $option['qty'] ) ? intval( $option['qty'] ) : 0;
-				$price_multiplier = isset( $option['price_multiplier'] ) ? floatval( $option['price_multiplier'] ) : 1;
+				$measer_qty               = isset( $option['qty'] ) ? intval( $option['qty'] ) : 0;
+				$price_multiplier         = isset( $option['price_multiplier'] ) ? floatval( $option['price_multiplier'] ) : 1;
 				$state['ppomm_measures'] *= $measer_qty * $price_multiplier;
 				break;
 
@@ -430,9 +438,9 @@ final class CartHandler {
 					$option,
 					$pricing_state,
 					array(
-						'matrix_found'          => $matrix_found,
-						'option_prices'         => $option_prices,
-						'resolved_line_price'   => $resolved_line_price,
+						'matrix_found'        => $matrix_found,
+						'option_prices'       => $option_prices,
+						'resolved_line_price' => $resolved_line_price,
 					)
 				);
 
@@ -449,14 +457,14 @@ final class CartHandler {
 			}
 		}
 
-		$ppom_item_org_price           = $pricing_state['ppom_item_org_price'];
-		$ppom_item_order_qty           = $pricing_state['ppom_item_order_qty'];
-		$total_option_price            = $pricing_state['total_option_price'];
-		$ppon_onetime_cost             = $pricing_state['ppon_onetime_cost'];
-		$ppom_quantities_price         = $pricing_state['ppom_quantities_price'];
-		$ppom_quantities_usebaseprice  = $pricing_state['ppom_quantities_usebaseprice'];
-		$ppom_quantities_include_base  = $pricing_state['ppom_quantities_include_base'];
-		$ppomm_measures                = $pricing_state['ppomm_measures'];
+		$ppom_item_org_price          = $pricing_state['ppom_item_org_price'];
+		$ppom_item_order_qty          = $pricing_state['ppom_item_order_qty'];
+		$total_option_price           = $pricing_state['total_option_price'];
+		$ppon_onetime_cost            = $pricing_state['ppon_onetime_cost'];
+		$ppom_quantities_price        = $pricing_state['ppom_quantities_price'];
+		$ppom_quantities_usebaseprice = $pricing_state['ppom_quantities_usebaseprice'];
+		$ppom_quantities_include_base = $pricing_state['ppom_quantities_include_base'];
+		$ppomm_measures               = $pricing_state['ppomm_measures'];
 
 
 		// ppom_pa($matrix_found);
@@ -567,8 +575,7 @@ final class CartHandler {
 			}
 			// var_dump($fee);
 			$fixed_fee_html .= '<tr>';
-			$fixed_fee_html .= '<td class="subtotal-text">' . esc_html( $fee->name );
-			'</td>';
+			$fixed_fee_html .= '<td class="subtotal-text">' . esc_html( $fee->name ) . '</td>';
 			$fixed_fee_html .= '<td class="subtotal-price">' . wc_price( $item_fee ) . '</td>';
 			$fixed_fee_html .= '</tr>';
 		}

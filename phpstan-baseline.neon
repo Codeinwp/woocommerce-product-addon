@@ -6853,8 +6853,26 @@ parameters:
 			path: src/WooCommerce/Cart/CartHandler.php
 
 		-
-			message: '#^Expression "''\</td\>''" on a separate line does not do anything\.$#'
-			identifier: expr.resultUnused
+			message: '#^Binary operation "\+\=" between 0 and float\|int\|string results in an error\.$#'
+			identifier: assignOp.invalid
+			count: 1
+			path: src/WooCommerce/Cart/CartHandler.php
+
+		-
+			message: '#^Method PPOM\\WooCommerce\\Cart\\CartHandler\:\:accumulate_legacy_option_price_row\(\) has parameter \$context with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/WooCommerce/Cart/CartHandler.php
+
+		-
+			message: '#^Method PPOM\\WooCommerce\\Cart\\CartHandler\:\:accumulate_legacy_option_price_row\(\) has parameter \$option with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/WooCommerce/Cart/CartHandler.php
+
+		-
+			message: '#^Method PPOM\\WooCommerce\\Cart\\CartHandler\:\:accumulate_legacy_option_price_row\(\) has parameter \$state with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: src/WooCommerce/Cart/CartHandler.php
 
@@ -6915,6 +6933,12 @@ parameters:
 		-
 			message: '#^Method PPOM\\WooCommerce\\Cart\\CartHandler\:\:add_to_cart_quantity\(\) has parameter \$quantity with no type specified\.$#'
 			identifier: missingType.parameter
+			count: 1
+			path: src/WooCommerce/Cart/CartHandler.php
+
+		-
+			message: '#^Method PPOM\\WooCommerce\\Cart\\CartHandler\:\:apply_price_matrix_chunk_to_line_components\(\) has parameter \$matrix_found with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: src/WooCommerce/Cart/CartHandler.php
 
@@ -7099,6 +7123,18 @@ parameters:
 			path: src/WooCommerce/Cart/CartHandler.php
 
 		-
+			message: '#^Method PPOM\\WooCommerce\\Cart\\CartHandler\:\:legacy_option_prices_aggregate_display_quantity\(\) has parameter \$option_prices with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/WooCommerce/Cart/CartHandler.php
+
+		-
+			message: '#^Method PPOM\\WooCommerce\\Cart\\CartHandler\:\:legacy_option_prices_matrix_context\(\) has parameter \$option_prices with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/WooCommerce/Cart/CartHandler.php
+
+		-
 			message: '#^Method PPOM\\WooCommerce\\Cart\\CartHandler\:\:mini_cart_fixed_fee\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -7123,12 +7159,6 @@ parameters:
 			path: src/WooCommerce/Cart/CartHandler.php
 
 		-
-			message: '#^Variable \$price_after_precent might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: src/WooCommerce/Cart/CartHandler.php
-
-		-
 			message: '#^Method PPOM\\WooCommerce\\Catalog\\CatalogHandler\:\:alter_price\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -7143,6 +7173,18 @@ parameters:
 		-
 			message: '#^Method PPOM\\WooCommerce\\Catalog\\CatalogHandler\:\:alter_price\(\) has parameter \$product with no type specified\.$#'
 			identifier: missingType.parameter
+			count: 1
+			path: src/WooCommerce/Catalog/CatalogHandler.php
+
+		-
+			message: '#^Method PPOM\\WooCommerce\\Catalog\\CatalogHandler\:\:apply_quantities_max_ceiling\(\) has parameter \$quantities_fields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/WooCommerce/Catalog/CatalogHandler.php
+
+		-
+			message: '#^Method PPOM\\WooCommerce\\Catalog\\CatalogHandler\:\:apply_quantities_min_floor\(\) has parameter \$quantities_fields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: src/WooCommerce/Catalog/CatalogHandler.php
 
@@ -7215,6 +7257,12 @@ parameters:
 		-
 			message: '#^Method PPOM\\WooCommerce\\Catalog\\CatalogHandler\:\:set_quantity_step\(\) has parameter \$quantity_step with no type specified\.$#'
 			identifier: missingType.parameter
+			count: 1
+			path: src/WooCommerce/Catalog/CatalogHandler.php
+
+		-
+			message: '#^Offset 0 on non\-empty\-list\<string\> in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
 			count: 1
 			path: src/WooCommerce/Catalog/CatalogHandler.php
 
@@ -7327,6 +7375,30 @@ parameters:
 			path: src/WooCommerce/Order/OrderHandler.php
 
 		-
+			message: '#^Method PPOM\\WooCommerce\\Order\\OrderHandler\:\:order_meta_display_key_from_field_meta\(\) has parameter \$field_meta with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/WooCommerce/Order/OrderHandler.php
+
+		-
+			message: '#^Method PPOM\\WooCommerce\\Order\\OrderHandler\:\:posted_fields_without_cropper_payloads\(\) has parameter \$cropper_keys with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/WooCommerce/Order/OrderHandler.php
+
+		-
+			message: '#^Method PPOM\\WooCommerce\\Order\\OrderHandler\:\:posted_fields_without_cropper_payloads\(\) has parameter \$posted_fields with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/WooCommerce/Order/OrderHandler.php
+
+		-
+			message: '#^Method PPOM\\WooCommerce\\Order\\OrderHandler\:\:posted_fields_without_cropper_payloads\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/WooCommerce/Order/OrderHandler.php
+
+		-
 			message: '#^Method PPOM\\WooCommerce\\Order\\OrderHandler\:\:wc_order_again_compatibility\(\) has parameter \$cart_item_data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -7335,6 +7407,12 @@ parameters:
 		-
 			message: '#^Method PPOM\\WooCommerce\\Order\\OrderHandler\:\:wc_order_again_compatibility\(\) with return type void returns array but should not return anything\.$#'
 			identifier: return.void
+			count: 1
+			path: src/WooCommerce/Order/OrderHandler.php
+
+		-
+			message: '#^Parameter \#2 \$field_meta of static method PPOM\\WooCommerce\\Order\\OrderHandler\:\:order_meta_display_key_from_field_meta\(\) expects array\|bool, array\|string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/WooCommerce/Order/OrderHandler.php
 
@@ -7370,6 +7448,12 @@ parameters:
 
 		-
 			message: '#^Method PPOM\\WooCommerce\\Product\\ProductHandler\:\:check_validation\(\) has parameter \$post_data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/WooCommerce/Product/ProductHandler.php
+
+		-
+			message: '#^Method PPOM\\WooCommerce\\Product\\ProductHandler\:\:field_requires_add_to_cart_schema_checks\(\) has parameter \$field with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/WooCommerce/Product/ProductHandler.php

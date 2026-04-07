@@ -53,7 +53,7 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 		 * Get the data used for the survey.
 		 *
 		 * @param array<string, mixed> $data       Incoming SDK payload.
-		 * @param string                 $page_slug  Current admin page slug.
+		 * @param string               $page_slug  Current admin page slug.
 		 *
 		 * @return array<string, mixed>
 		 * @see survey.js

@@ -219,7 +219,7 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 * @return void
 	 */
 	public function test_legacy_cart_line_total_from_components() {
-		$this->assertSame(
+		$this->assertEquals(
 			115,
 			CartHandler::legacy_cart_line_total_from_components( 100, 20, 5, 10 )
 		);

@@ -60,8 +60,8 @@ final class FileRenderer extends AbstractInputRenderer {
 
 				$html .= $file_preview;
 
-				$file_name = $file['org'];
-				$data_name = 'ppom[fields][' . $args['id'] . '][' . $key . '][org]';
+				$file_name  = $file['org'];
+				$data_name  = 'ppom[fields][' . $args['id'] . '][' . $key . '][org]';
 				$file_class = 'ppom-file-cb ppom-file-cb-' . $args['id'];
 
 				$html .= '<input checked="checked" name="' . esc_attr( $data_name ) . '" ';

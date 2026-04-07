@@ -10,9 +10,9 @@ namespace PPOM\FieldMarkup;
 final class FieldChrome {
 
 	/**
-	 * @param FormAttributeContext   $context
-	 * @param string                 $id
-	 * @param array<string, mixed>   $args
+	 * @param FormAttributeContext $context
+	 * @param string               $id
+	 * @param array<string, mixed> $args
 	 * @return string
 	 */
 	public static function inputWrapperClass( $context, $id, $args ) {
