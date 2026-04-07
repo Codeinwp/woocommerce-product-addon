@@ -10,6 +10,7 @@
 
 namespace PPOM\WooCommerce\Catalog;
 
+use PPOM_Meta;
 use PPOM\Pricing\Engine;
 use PPOM\Support\Helpers;
 

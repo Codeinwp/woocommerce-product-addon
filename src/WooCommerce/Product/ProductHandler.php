@@ -10,6 +10,7 @@
 
 namespace PPOM\WooCommerce\Product;
 
+use PPOM_Meta;
 use PPOM\Hooks\Callbacks;
 use PPOM\Support\Helpers;
 
