@@ -39,7 +39,11 @@ class PPOM_Meta {
 	/**
 	 * Runtime settings row selected from the resolved PPOM groups.
 	 *
-	 * @var object|array $ppom_settings
+	 * Empty `array()` before resolution; otherwise a DB row object (see {@see settings()}).
+	 *
+	 * @var object|array|null $ppom_settings
+	 *
+	 * @phpstan-var object|array|null $ppom_settings
 	 */
 	public $ppom_settings = array();
 
@@ -276,7 +280,17 @@ class PPOM_Meta {
 	/**
 	 * Loads the primary settings row for the resolved PPOM group.
 	 *
-	 * @return object|null
+	 * Returns a full `SELECT *` row from the PPOM meta table (same shape as
+	 * {@see PPOM_Meta_Repository::get_row_by_id()} and the repository’s
+	 * `PPOM_Meta_Group_Row` PHPStan alias),
+	 * or null when no group is resolved. Filtered with {@see 'ppom_meta_settings'}.
+	 *
+	 * Typed as generic `object` for static analysis so callers may mutate properties
+	 * (e.g. `productmeta_validation`) like a `stdClass` row.
+	 *
+	 * @return object|null Row object with PPOM meta columns, or null.
+	 *
+	 * @phpstan-return object|null
 	 */
 	public function settings() {
 

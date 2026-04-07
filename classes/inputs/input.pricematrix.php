@@ -1,11 +1,14 @@
 <?php
-/*
- * Followig class handling price matrix based on quantity provied in range
- * like 1-25
-* dependencies. Do not make changes in code
-* Create on: 9 November, 2013
-*/
+/**
+ * Price matrix field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * Quantity-tiered pricing matrix with optional slider, discounts, and per-unit display options.
+ */
 class NM_PriceMatrix_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -18,6 +21,11 @@ class NM_PriceMatrix_wooproduct extends PPOM_Inputs {
 	*/
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata and loads the field settings schema.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -28,6 +36,11 @@ class NM_PriceMatrix_wooproduct extends PPOM_Inputs {
 		$this->settings = self::get_settings();
 	}
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 
 		$input_meta = array(

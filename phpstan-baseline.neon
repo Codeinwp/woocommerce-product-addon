@@ -1,18 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Method PPOM_Changelog_Handler\:\:get_changelog\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: backend/changelog_handler.php
-
-		-
-			message: '#^Method PPOM_Changelog_Handler\:\:parse_changelog\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: backend/changelog_handler.php
-
-		-
 			message: '#^Method PPOM_Changelog_Handler\:\:parse_md_and_clean\(\) should return string but returns string\|null\.$#'
 			identifier: return.type
 			count: 1
@@ -37,158 +25,8 @@ parameters:
 			path: backend/settings-panel.class.php
 
 		-
-			message: '#^Function PPOMSETTINGS\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:_get\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:_get\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:_get\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:add_admin_menu\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:add_settings_tab\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:add_settings_tab\(\) has parameter \$settings_tabs with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:border_style\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:css_editor_options\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
 			message: '#^Method PPOM_SettingsFramework\:\:generate_css\(\) has parameter \$settings_meta with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:generate_css_editor_output_css\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:generate_css_editor_output_css\(\) has parameter \$css_val with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:generate_css_editor_output_css\(\) has parameter \$settings with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:generate_typograpy_output_css\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:generate_typograpy_output_css\(\) has parameter \$css_val with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:generate_typograpy_output_css\(\) has parameter \$settings with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:get_config\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:get_config\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:get_form_name\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:get_form_name\(\) has parameter \$id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:get_instance\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:get_saved_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:get_saved_settings\(\) has parameter \$default with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:get_saved_settings\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:get_scripts\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:get_styles\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: backend/settings-panel.class.php
 
@@ -211,108 +49,6 @@ parameters:
 			path: backend/settings-panel.class.php
 
 		-
-			message: '#^Method PPOM_SettingsFramework\:\:load_inputs\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:load_inputs\(\) has parameter \$input_meta with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:load_template\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:load_template\(\) has parameter \$file_name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:load_template\(\) has parameter \$variables with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:register_config\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:register_panel\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:register_panel\(\) has parameter \$panels with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:register_panel\(\) has parameter \$tab_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:register_setting\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:register_tabs\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:register_tabs\(\) has parameter \$tabs with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:remove_admin_notices\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:reposition_array_element\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:reposition_array_element\(\) has parameter \$arr with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:reposition_array_element\(\) has parameter \$find with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:reposition_array_element\(\) has parameter \$move with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
 			message: '#^Method PPOM_SettingsFramework\:\:set_localize_data\(\) has parameter \$global_js_vars with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -325,80 +61,14 @@ parameters:
 			path: backend/settings-panel.class.php
 
 		-
-			message: '#^Method PPOM_SettingsFramework\:\:settings_position_controller\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:settings_position_controller\(\) has parameter \$settings with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Method PPOM_SettingsFramework\:\:typography_options\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
 			message: '#^Parameter \#3 \$length of function array_splice expects int, int\<0, max\>\|false given\.$#'
 			identifier: argument.type
 			count: 1
 			path: backend/settings-panel.class.php
 
 		-
-			message: '#^Property PPOM_SettingsFramework\:\:\$assets_url has unknown class url as its type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Property PPOM_SettingsFramework\:\:\$config type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
 			message: '#^Property PPOM_SettingsFramework\:\:\$ins has no type specified\.$#'
 			identifier: missingType.property
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Property PPOM_SettingsFramework\:\:\$panels type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Property PPOM_SettingsFramework\:\:\$scripts_class has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Property PPOM_SettingsFramework\:\:\$settings_array type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Property PPOM_SettingsFramework\:\:\$tabs type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Static property PPOM_SettingsFramework\:\:\$assets_url \(url\) does not accept default value of type string\.$#'
-			identifier: property.defaultValue
-			count: 1
-			path: backend/settings-panel.class.php
-
-		-
-			message: '#^Static property PPOM_SettingsFramework\:\:\$assets_url \(url\) does not accept string\.$#'
-			identifier: assign.propertyType
 			count: 1
 			path: backend/settings-panel.class.php
 
@@ -715,30 +385,6 @@ parameters:
 			path: classes/attach-popup/container-item.class.php
 
 		-
-			message: '#^Method PPOM\\Attach\\ContainerItem\:\:__construct\(\) has parameter \$id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/attach-popup/container-item.class.php
-
-		-
-			message: '#^Method PPOM\\Attach\\ContainerItem\:\:__construct\(\) has parameter \$renderer with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/attach-popup/container-item.class.php
-
-		-
-			message: '#^Method PPOM\\Attach\\ContainerView\:\:set_id\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/attach-popup/container-view.class.php
-
-		-
-			message: '#^Property PPOM\\Attach\\ContainerView\:\:\$id has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/attach-popup/container-view.class.php
-
-		-
 			message: '#^Method PPOM\\Attach\\SelectComponent\:\:get_select\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -772,12 +418,6 @@ parameters:
 			message: '#^Argument of an invalid type array\<mixed\>\|string supplied for foreach, only iterables are supported\.$#'
 			identifier: foreach.nonIterable
 			count: 7
-			path: classes/fields.class.php
-
-		-
-			message: '#^Cannot call method get_freemium_cfr_content\(\) on null\.$#'
-			identifier: method.nonObject
-			count: 1
 			path: classes/fields.class.php
 
 		-
@@ -907,12 +547,6 @@ parameters:
 			path: classes/fields.class.php
 
 		-
-			message: '#^Result of static method PPOM_Freemium\:\:get_instance\(\) \(void\) is used\.$#'
-			identifier: staticMethod.void
-			count: 1
-			path: classes/fields.class.php
-
-		-
 			message: '#^Undefined variable\: \$value$#'
 			identifier: variable.undefined
 			count: 1
@@ -1033,50 +667,14 @@ parameters:
 			path: classes/form.class.php
 
 		-
-			message: '#^Method PPOM_Freemium\:\:add_locked_cfr_tab\(\) has parameter \$tabs with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/freemium.class.php
-
-		-
-			message: '#^Method PPOM_Freemium\:\:add_locked_cfr_tab\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 1
 			path: classes/freemium.class.php
 
 		-
 			message: '#^Method PPOM_Freemium\:\:get_freemium_cfr_content\(\) should return string but returns string\|false\.$#'
 			identifier: return.type
-			count: 1
-			path: classes/freemium.class.php
-
-		-
-			message: '#^Method PPOM_Freemium\:\:get_instance\(\) with return type void returns mixed but should not return anything\.$#'
-			identifier: return.void
-			count: 1
-			path: classes/freemium.class.php
-
-		-
-			message: '#^Method PPOM_Freemium\:\:get_pro_fields\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/freemium.class.php
-
-		-
-			message: '#^Method PPOM_Freemium\:\:locked_cfr_register_form_elements\(\) has parameter \$inputs with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/freemium.class.php
-
-		-
-			message: '#^Method PPOM_Freemium\:\:locked_cfr_register_form_elements\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/freemium.class.php
-
-		-
-			message: '#^Property PPOM_Freemium\:\:\$instance has no type specified\.$#'
-			identifier: missingType.property
 			count: 1
 			path: classes/freemium.class.php
 
@@ -1111,18 +709,6 @@ parameters:
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:get_scripts\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:get_styles\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
 			message: '#^Method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) has parameter \$global_js_vars with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1141,32 +727,20 @@ parameters:
 			path: classes/frontend-scripts.class.php
 
 		-
+			message: '#^Parameter \#2 \$css of static method PPOM_SCRIPTS\:\:inline_style\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: classes/frontend-scripts.class.php
+
+		-
 			message: '#^Parameter \#3 \$product of static method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) expects WC_Product, WC_Product\|false\|null given\.$#'
 			identifier: argument.type
 			count: 5
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Property PPOM_FRONTEND_SCRIPTS\:\:\$scripts_class has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Property PPOM_FRONTEND_SCRIPTS\:\:\$scripts_url has unknown class URL as its type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
 			message: '#^Static property PPOM_FRONTEND_SCRIPTS\:\:\$scripts_class is unused\.$#'
 			identifier: property.unused
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Static property PPOM_FRONTEND_SCRIPTS\:\:\$scripts_url \(URL\) does not accept default value of type string\.$#'
-			identifier: property.defaultValue
 			count: 1
 			path: classes/frontend-scripts.class.php
 
@@ -1177,200 +751,14 @@ parameters:
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Method PPOM_InputManager\:\:__construct\(\) has parameter \$input_meta with no type specified\.$#'
-			identifier: missingType.parameter
+			message: '#^Method PPOM_InputManager\:\:input_classes_array\(\) should return list\<string\> but returns \(array\|null\)\.$#'
+			identifier: return.type
 			count: 1
 			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:__construct\(\) has parameter \$input_type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:audio_video\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:checkbox_label_classes\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:data_name\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:desc\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:enable_tooltip\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:error_msg\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:field_inner_wrapper_classes\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:field_label\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:field_label\(\) has parameter \$asterisk with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:field_label\(\) has parameter \$desc with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:field_label\(\) has parameter \$tooltip with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:form_name\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:get_meta_value\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:get_meta_value\(\) has parameter \$default with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:get_meta_value\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:images\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:input_classes\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:input_classes_array\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:label_classes\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:options\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:placeholder\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:radio_label_classes\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:required\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:title\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Method PPOM_InputManager\:\:tooltip\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Property PPOM_InputManager\:\:\$input_meta type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/input-meta.class.php
-
-		-
-			message: '#^Function PPOM_Inputs\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input.class.php
 
 		-
 			message: '#^If condition is always false\.$#'
 			identifier: if.alwaysFalse
-			count: 1
-			path: classes/input.class.php
-
-		-
-			message: '#^Method PPOM_Inputs\:\:current_page_url\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input.class.php
-
-		-
-			message: '#^Method PPOM_Inputs\:\:get_addon\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input.class.php
-
-		-
-			message: '#^Method PPOM_Inputs\:\:get_addon\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: classes/input.class.php
 
@@ -1381,61 +769,7 @@ parameters:
 			path: classes/input.class.php
 
 		-
-			message: '#^Method PPOM_Inputs\:\:get_instance\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input.class.php
-
-		-
-			message: '#^Method PPOM_Inputs\:\:if_browser_is_ie\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input.class.php
-
-		-
-			message: '#^Method PPOM_Inputs\:\:load_input_scripts\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/input.class.php
-
-		-
-			message: '#^PHPDoc tag @param has invalid value \(\)\: Unexpected token "\\n\\t ", expected type at offset 67 on line 6$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: classes/input.class.php
-
-		-
-			message: '#^Property PPOM_Inputs\:\:\$input_scripts has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/input.class.php
-
-		-
-			message: '#^Property PPOM_Inputs\:\:\$ins has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/input.class.php
-
-		-
-			message: '#^Property PPOM_Inputs\:\:\$plugin_meta has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/input.class.php
-
-		-
-			message: '#^Method NM_Audio_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.audio.php
-
-		-
 			message: '#^Property NM_Audio_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.audio.php
-
-		-
-			message: '#^Property NM_Audio_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.audio.php
@@ -1453,19 +787,7 @@ parameters:
 			path: classes/inputs/input.audio.php
 
 		-
-			message: '#^Method NM_Checkbox_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.checkbox.php
-
-		-
 			message: '#^Property NM_Checkbox_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.checkbox.php
-
-		-
-			message: '#^Property NM_Checkbox_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.checkbox.php
@@ -1483,19 +805,7 @@ parameters:
 			path: classes/inputs/input.checkbox.php
 
 		-
-			message: '#^Method NM_Color_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.color.php
-
-		-
 			message: '#^Property NM_Color_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.color.php
-
-		-
-			message: '#^Property NM_Color_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.color.php
@@ -1513,19 +823,7 @@ parameters:
 			path: classes/inputs/input.color.php
 
 		-
-			message: '#^Method NM_Cropper_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.cropper.php
-
-		-
 			message: '#^Property NM_Cropper_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.cropper.php
-
-		-
-			message: '#^Property NM_Cropper_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.cropper.php
@@ -1543,19 +841,7 @@ parameters:
 			path: classes/inputs/input.cropper.php
 
 		-
-			message: '#^Method NM_Date_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.date.php
-
-		-
 			message: '#^Property NM_Date_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.date.php
-
-		-
-			message: '#^Property NM_Date_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.date.php
@@ -1573,19 +859,7 @@ parameters:
 			path: classes/inputs/input.date.php
 
 		-
-			message: '#^Method NM_Daterange_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.daterange.php
-
-		-
 			message: '#^Property NM_Daterange_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.daterange.php
-
-		-
-			message: '#^Property NM_Daterange_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.daterange.php
@@ -1603,31 +877,7 @@ parameters:
 			path: classes/inputs/input.daterange.php
 
 		-
-			message: '#^Method NM_Divider_wooproduct\:\:border_style\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.divider.php
-
-		-
-			message: '#^Method NM_Divider_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.divider.php
-
-		-
-			message: '#^Method NM_Divider_wooproduct\:\:ppom_divider_style\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.divider.php
-
-		-
 			message: '#^Property NM_Divider_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.divider.php
-
-		-
-			message: '#^Property NM_Divider_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.divider.php
@@ -1645,19 +895,7 @@ parameters:
 			path: classes/inputs/input.divider.php
 
 		-
-			message: '#^Method NM_Email_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.email.php
-
-		-
 			message: '#^Property NM_Email_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.email.php
-
-		-
-			message: '#^Property NM_Email_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.email.php
@@ -1675,19 +913,7 @@ parameters:
 			path: classes/inputs/input.email.php
 
 		-
-			message: '#^Method NM_File_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.file.php
-
-		-
 			message: '#^Property NM_File_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.file.php
-
-		-
-			message: '#^Property NM_File_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.file.php
@@ -1705,19 +931,7 @@ parameters:
 			path: classes/inputs/input.file.php
 
 		-
-			message: '#^Method NM_Hidden_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.hidden.php
-
-		-
 			message: '#^Property NM_Hidden_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.hidden.php
-
-		-
-			message: '#^Property NM_Hidden_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.hidden.php
@@ -1735,19 +949,7 @@ parameters:
 			path: classes/inputs/input.hidden.php
 
 		-
-			message: '#^Method NM_Image_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.image.php
-
-		-
 			message: '#^Property NM_Image_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.image.php
-
-		-
-			message: '#^Property NM_Image_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.image.php
@@ -1765,49 +967,7 @@ parameters:
 			path: classes/inputs/input.image.php
 
 		-
-			message: '#^Method NM_Measure_wooproduct\:\:change_option_label\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.measure.php
-
-		-
-			message: '#^Method NM_Measure_wooproduct\:\:change_option_label\(\) has parameter \$label with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/inputs/input.measure.php
-
-		-
-			message: '#^Method NM_Measure_wooproduct\:\:change_option_label\(\) has parameter \$meta with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/inputs/input.measure.php
-
-		-
-			message: '#^Method NM_Measure_wooproduct\:\:change_option_label\(\) has parameter \$option with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/inputs/input.measure.php
-
-		-
-			message: '#^Method NM_Measure_wooproduct\:\:change_option_label\(\) has parameter \$product with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/inputs/input.measure.php
-
-		-
-			message: '#^Method NM_Measure_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.measure.php
-
-		-
 			message: '#^Property NM_Measure_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.measure.php
-
-		-
-			message: '#^Property NM_Measure_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.measure.php
@@ -1825,19 +985,7 @@ parameters:
 			path: classes/inputs/input.measure.php
 
 		-
-			message: '#^Method NM_Number_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.number.php
-
-		-
 			message: '#^Property NM_Number_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.number.php
-
-		-
-			message: '#^Property NM_Number_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.number.php
@@ -1855,19 +1003,7 @@ parameters:
 			path: classes/inputs/input.number.php
 
 		-
-			message: '#^Method NM_Palettes_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.palettes.php
-
-		-
 			message: '#^Property NM_Palettes_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.palettes.php
-
-		-
-			message: '#^Property NM_Palettes_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.palettes.php
@@ -1885,19 +1021,7 @@ parameters:
 			path: classes/inputs/input.palettes.php
 
 		-
-			message: '#^Method NM_PriceMatrix_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.pricematrix.php
-
-		-
 			message: '#^Property NM_PriceMatrix_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.pricematrix.php
-
-		-
-			message: '#^Property NM_PriceMatrix_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.pricematrix.php
@@ -1915,25 +1039,7 @@ parameters:
 			path: classes/inputs/input.pricematrix.php
 
 		-
-			message: '#^Method NM_Quantities_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.quantities.php
-
-		-
-			message: '#^Method NM_Quantities_wooproduct\:\:variation_layout\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.quantities.php
-
-		-
 			message: '#^Property NM_Quantities_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.quantities.php
-
-		-
-			message: '#^Property NM_Quantities_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.quantities.php
@@ -1951,19 +1057,7 @@ parameters:
 			path: classes/inputs/input.quantities.php
 
 		-
-			message: '#^Method NM_Radio_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.radio.php
-
-		-
 			message: '#^Property NM_Radio_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.radio.php
-
-		-
-			message: '#^Property NM_Radio_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.radio.php
@@ -1981,12 +1075,6 @@ parameters:
 			path: classes/inputs/input.radio.php
 
 		-
-			message: '#^Method NM_Section_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.section.php
-
-		-
 			message: '#^Property NM_Section_wooproduct\:\:\$desc has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -1994,12 +1082,6 @@ parameters:
 
 		-
 			message: '#^Property NM_Section_wooproduct\:\:\$is_section_stared has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.section.php
-
-		-
-			message: '#^Property NM_Section_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.section.php
@@ -2017,19 +1099,7 @@ parameters:
 			path: classes/inputs/input.section.php
 
 		-
-			message: '#^Method NM_Select_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.select.php
-
-		-
 			message: '#^Property NM_Select_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.select.php
-
-		-
-			message: '#^Property NM_Select_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.select.php
@@ -2047,19 +1117,7 @@ parameters:
 			path: classes/inputs/input.select.php
 
 		-
-			message: '#^Method NM_Text_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.text.php
-
-		-
 			message: '#^Property NM_Text_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.text.php
-
-		-
-			message: '#^Property NM_Text_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.text.php
@@ -2077,19 +1135,7 @@ parameters:
 			path: classes/inputs/input.text.php
 
 		-
-			message: '#^Method NM_Textarea_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.textarea.php
-
-		-
 			message: '#^Property NM_Textarea_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.textarea.php
-
-		-
-			message: '#^Property NM_Textarea_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.textarea.php
@@ -2107,19 +1153,7 @@ parameters:
 			path: classes/inputs/input.textarea.php
 
 		-
-			message: '#^Method NM_Timezone_wooproduct\:\:get_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/inputs/input.timezone.php
-
-		-
 			message: '#^Property NM_Timezone_wooproduct\:\:\$desc has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/inputs/input.timezone.php
-
-		-
-			message: '#^Property NM_Timezone_wooproduct\:\:\$plugin_meta has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: classes/inputs/input.timezone.php
@@ -2137,128 +1171,8 @@ parameters:
 			path: classes/inputs/input.timezone.php
 
 		-
-			message: '#^Method PPOM_ELEMENTOR\:\:init\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/integrations/elementor/elementor.class.php
-
-		-
-			message: '#^Method PPOM_ELEMENTOR\:\:init_widgets\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/integrations/elementor/elementor.class.php
-
-		-
-			message: '#^Method PPOM_ELEMENTOR\:\:instance\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/integrations/elementor/elementor.class.php
-
-		-
-			message: '#^Method PPOM_ELEMENTOR\:\:is_compatible\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/integrations/elementor/elementor.class.php
-
-		-
-			message: '#^Method PPOM_ELEMENTOR\:\:load\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/integrations/elementor/elementor.class.php
-
-		-
-			message: '#^Method PPOM_ELEMENTOR\:\:widget_styles\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/integrations/elementor/elementor.class.php
-
-		-
-			message: '#^Property PPOM_ELEMENTOR\:\:\$_instance has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/integrations/elementor/elementor.class.php
-
-		-
-			message: '#^Method PPOM_Elementor_Shortcode_Widget\:\:_register_controls\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/integrations/elementor/shortcode-widget.php
-
-		-
-			message: '#^Method PPOM_Elementor_Shortcode_Widget\:\:get_categories\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/integrations/elementor/shortcode-widget.php
-
-		-
-			message: '#^Method PPOM_Elementor_Shortcode_Widget\:\:render\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/integrations/elementor/shortcode-widget.php
-
-		-
-			message: '#^Method PPOM_Legacy_InputManager\:\:__construct\(\) has parameter \$input_meta with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/legacy-meta.class.php
-
-		-
-			message: '#^Method PPOM_Legacy_InputManager\:\:__construct\(\) has parameter \$input_type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/legacy-meta.class.php
-
-		-
-			message: '#^Method PPOM_Legacy_InputManager\:\:data_name\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/legacy-meta.class.php
-
-		-
-			message: '#^Method PPOM_Legacy_InputManager\:\:desc\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/legacy-meta.class.php
-
-		-
-			message: '#^Method PPOM_Legacy_InputManager\:\:field_label\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/legacy-meta.class.php
-
-		-
-			message: '#^Method PPOM_Legacy_InputManager\:\:input_classes_array\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/legacy-meta.class.php
-
-		-
-			message: '#^Method PPOM_Legacy_InputManager\:\:options\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/legacy-meta.class.php
-
-		-
-			message: '#^Method PPOM_Legacy_InputManager\:\:required\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/legacy-meta.class.php
-
-		-
-			message: '#^Method PPOM_Legacy_InputManager\:\:title\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/legacy-meta.class.php
-
-		-
-			message: '#^Method PPOM_Legacy_InputManager\:\:width\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/legacy-meta.class.php
-
-		-
-			message: '#^Property PPOM_Legacy_InputManager\:\:\$input_meta type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
+			message: '#^Method PPOM_Legacy_InputManager\:\:input_classes_array\(\) should return list\<string\> but returns \(array\|null\)\.$#'
+			identifier: return.type
 			count: 1
 			path: classes/legacy-meta.class.php
 
@@ -2791,12 +1705,6 @@ parameters:
 			path: classes/ppom.class.php
 
 		-
-			message: '#^Property PPOM_Meta\:\:\$ppom_settings \(array\|object\) does not accept object\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: classes/ppom.class.php
-
-		-
 			message: '#^Property PPOM_Meta\:\:\$ppom_settings type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -2819,330 +1727,6 @@ parameters:
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 1
 			path: classes/ppom.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:enqueue_script\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:enqueue_script\(\) has parameter \$deps with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:enqueue_script\(\) has parameter \$handle with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:enqueue_script\(\) has parameter \$in_footer with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:enqueue_script\(\) has parameter \$path with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:enqueue_script\(\) has parameter \$version with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:enqueue_style\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:enqueue_style\(\) has parameter \$deps with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:enqueue_style\(\) has parameter \$handle with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:enqueue_style\(\) has parameter \$media with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:enqueue_style\(\) has parameter \$path with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:enqueue_style\(\) has parameter \$version with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:get_instance\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:get_url\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:get_version\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:init\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:inline_script\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:inline_script\(\) has parameter \$handle with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:inline_script\(\) has parameter \$js with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:inline_style\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:inline_style\(\) has parameter \$css with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:inline_style\(\) has parameter \$handle with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:localize_script\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:localize_script\(\) has parameter \$handle with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:localize_script\(\) has parameter \$js_var_data with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:localize_script\(\) has parameter \$js_var_name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_script\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_script\(\) has parameter \$deps with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_script\(\) has parameter \$handle with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_script\(\) has parameter \$in_footer with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_script\(\) has parameter \$path with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_script\(\) has parameter \$version with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_scripts\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_scripts\(\) has parameter \$register_scripts with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_style\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_style\(\) has parameter \$deps with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_style\(\) has parameter \$handle with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_style\(\) has parameter \$media with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_style\(\) has parameter \$path with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_style\(\) has parameter \$version with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_styles\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_SCRIPTS\:\:register_styles\(\) has parameter \$register_styles with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Property PPOM_SCRIPTS\:\:\$ins has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Property PPOM_SCRIPTS\:\:\$scripts_url has unknown class URL as its type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Static method PPOM_SCRIPTS\:\:register_style\(\) invoked with 6 parameters, 2\-5 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Static property PPOM_SCRIPTS\:\:\$scripts_url \(URL\) does not accept default value of type string\.$#'
-			identifier: property.defaultValue
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Undefined variable\: \$has_rtl$#'
-			identifier: variable.undefined
-			count: 1
-			path: classes/scripts.class.php
-
-		-
-			message: '#^Method PPOM_Survey\:\:get_instance\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/survey.class.php
-
-		-
-			message: '#^Method PPOM_Survey\:\:get_survey_metadata\(\) has parameter \$data with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/survey.class.php
-
-		-
-			message: '#^Method PPOM_Survey\:\:get_survey_metadata\(\) has parameter \$page_slug with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: classes/survey.class.php
-
-		-
-			message: '#^Method PPOM_Survey\:\:get_survey_metadata\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/survey.class.php
-
-		-
-			message: '#^Method PPOM_Survey\:\:init\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/survey.class.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(\[PPOM_Survey\]\)\: Unexpected token "\[", expected type at offset 56 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: classes/survey.class.php
-
-		-
-			message: '#^Property PPOM_Survey\:\:\$instance has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: classes/survey.class.php
 
 		-
 			message: '#^Function ppom_add_black_friday_data\(\) has no return type specified\.$#'
@@ -4765,522 +3349,6 @@ parameters:
 			path: inc/hooks.php
 
 		-
-			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Cannot call method get_price\(\) on WC_Product\|false\|null\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Cannot call method get_type\(\) on WC_Product\|false\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Function NMForm\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Loose comparison using \!\= between non\-falsy\-string and '''' will always evaluate to true\.$#'
-			identifier: notEqual.alwaysTrue
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Audio_video\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Audio_video\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Audio_video\(\) has parameter \$default_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Checkbox\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Checkbox\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Checkbox\(\) has parameter \$checked_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Cropper\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Cropper\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Cropper\(\) has parameter \$selected_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Custom\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Custom\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Custom\(\) has parameter \$default_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:File\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:File\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:File\(\) has parameter \$default_files with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Image\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Image\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Image\(\) has parameter \$default_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Input\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Input\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Input\(\) has parameter \$default_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Measure\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Measure\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Measure\(\) has parameter \$default_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Palettes\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Palettes\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Palettes\(\) has parameter \$default_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Pricematrix\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Pricematrix\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Pricematrix\(\) has parameter \$default_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Quantities\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Quantities\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Quantities\(\) has parameter \$default_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Radio\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Radio\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Radio\(\) has parameter \$checked_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Regular\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Regular\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Regular\(\) has parameter \$default_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Section\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Section\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Section\(\) has parameter \$default_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Select\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Select\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Select\(\) has parameter \$selected_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Textarea\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Textarea\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Textarea\(\) has parameter \$default_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Timezone\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Timezone\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:Timezone\(\) has parameter \$selected_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:adjust_attributes_values\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:adjust_attributes_values\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:adjust_attributes_values\(\) has parameter \$attr with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:adjust_attributes_values\(\) has parameter \$attr_value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:get_attribute_value\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:get_attribute_value\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:get_attribute_value\(\) has parameter \$attr with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:get_default_setting_value\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:get_default_setting_value\(\) has parameter \$field_id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:get_default_setting_value\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:get_default_setting_value\(\) has parameter \$setting_type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:get_instance\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:get_property\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Method NM_Form\:\:get_property\(\) has parameter \$property with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Parameter \#1 \$price of function wc_price expects float, int\|string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, int\|string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, string\|false given\.$#'
-			identifier: argument.type
-			count: 7
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Parameter \#1 \$url of function esc_url expects string, string\|false given\.$#'
-			identifier: argument.type
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Property NM_Form\:\:\$defaults has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Property NM_Form\:\:\$defaults is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Property NM_Form\:\:\$echoable has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Property NM_Form\:\:\$echoable is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Property NM_Form\:\:\$ins has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Undefined variable\: \$key$#'
-			identifier: variable.undefined
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Undefined variable\: \$onetime$#'
-			identifier: variable.undefined
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Undefined variable\: \$option_price$#'
-			identifier: variable.undefined
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
-			message: '#^Variable \$input_html might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: inc/nmInput.class.php
-
-		-
 			message: '#^Function ppom_before_calculate_totals\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -5585,36 +3653,6 @@ parameters:
 			identifier: staticMethod.void
 			count: 1
 			path: inc/prices.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$productmeta_id\.$#'
-			identifier: property.notFound
-			count: 10
-			path: src/Rest/ProductFieldGroupService.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$the_meta\.$#'
-			identifier: property.notFound
-			count: 2
-			path: src/Rest/ProductFieldGroupService.php
-
-		-
-			message: '#^Call to an undefined method WC_Order_Item\:\:get_product_id\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Rest/OrderItemMetaPresenter.php
-
-		-
-			message: '#^Call to an undefined method WC_Order_Item\:\:get_product_id\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: src/Rest/OrderMetaController.php
-
-		-
-			message: '#^Cannot call method get_items\(\) on WC_Order\|WC_Order_Refund\|false\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: src/Rest/OrderItemMetaPresenter.php
 
 		-
 			message: '#^Function ppom_fields_with_html\(\) return type has no value type specified in iterable type array\.$#'
@@ -6515,6 +4553,36 @@ parameters:
 			identifier: class.notFound
 			count: 1
 			path: src/Admin/Manager.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int\|string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/FieldMarkup/Renderers/AudioVideoRenderer.php
+
+		-
+			message: '#^Cannot call method get_price\(\) on WC_Product\|false\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/FieldMarkup/Renderers/ImageRenderer.php
+
+		-
+			message: '#^Parameter \#1 \$url of function esc_url expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/FieldMarkup/Renderers/ImageRenderer.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: src/FieldMarkup/Renderers/MeasureInputRenderer.php
+
+		-
+			message: '#^Cannot call method get_type\(\) on WC_Product\|false\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/FieldMarkup/Renderers/SelectRenderer.php
 
 		-
 			message: '#^Cannot use array destructuring on array\<int\|string, int\|string\>\|false\.$#'
@@ -7763,6 +5831,36 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: src/Pricing/Engine.php
+
+		-
+			message: '#^Call to an undefined method WC_Order_Item\:\:get_product_id\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Rest/OrderItemMetaPresenter.php
+
+		-
+			message: '#^Cannot call method get_items\(\) on WC_Order\|WC_Order_Refund\|false\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Rest/OrderItemMetaPresenter.php
+
+		-
+			message: '#^Call to an undefined method WC_Order_Item\:\:get_product_id\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Rest/OrderMetaController.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$productmeta_id\.$#'
+			identifier: property.notFound
+			count: 10
+			path: src/Rest/ProductFieldGroupService.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$the_meta\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Rest/ProductFieldGroupService.php
 
 		-
 			message: '#^Access to property \$fields on an unknown class PPOM\\Support\\PPOM_Meta\.$#'
