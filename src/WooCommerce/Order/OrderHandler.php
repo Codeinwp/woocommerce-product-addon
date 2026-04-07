@@ -10,6 +10,9 @@
 
 namespace PPOM\WooCommerce\Order;
 
+use PPOM\Files\Handler;
+use PPOM\Support\Helpers;
+
 /**
  * @internal
  */
@@ -30,8 +33,8 @@ final class OrderHandler {
 	 *
 	 * @return void
 	 *
-	 * @see ppom_make_meta_data()
-	 * @see ppom_get_field_meta_by_dataname()
+	 * @see Helpers::make_meta_data()
+	 * @see Helpers::get_field_meta_by_dataname()
 	 * @see self::order_value()
 	 */
 	public static function order_item_meta( $item, $cart_item_key, $values, $order ) {
@@ -44,7 +47,7 @@ final class OrderHandler {
 			return;
 		}
 
-		$ppom_meta = ppom_make_meta_data( $values, 'order' );
+		$ppom_meta = Helpers::make_meta_data( $values, 'order' );
 		// ppom_pa($item->get_product_id()); exit;
 
 		$cropper_fields = array();
@@ -55,14 +58,14 @@ final class OrderHandler {
 			}
 
 			// WPML
-			$meta_key = ppom_wpml_translate( $key, 'PPOM' );
+			$meta_key = Helpers::wpml_translate( $key, 'PPOM' );
 
 			$meta_value = isset( $meta['display'] ) ? $meta['display'] : $meta['value'];
 			$item->update_meta_data( $key, $meta_value );
 
 			// Since 24.5: Removing the image cropper base64 data
 			// Reason: https://clients.najeebmedia.com/forums/topic/order-search-in-woocommerce-not-working/
-			$meta = ppom_get_field_meta_by_dataname( $item->get_product_id(), $key );
+			$meta = Helpers::get_field_meta_by_dataname( $item->get_product_id(), $key );
 			if ( isset( $meta['type'] ) && $meta['type'] == 'cropper' ) {
 				$cropper_fields[] = $key;
 			}
@@ -82,7 +85,7 @@ final class OrderHandler {
 			return $display_key;
 		}
 
-		$field_meta = ppom_get_field_meta_by_dataname( $item->get_product_id(), $display_key );
+		$field_meta = Helpers::get_field_meta_by_dataname( $item->get_product_id(), $display_key );
 		if ( isset( $field_meta['title'] ) && $field_meta['title'] != '' ) {
 			$display_key = stripslashes( $field_meta['title'] );
 		}
@@ -99,8 +102,8 @@ final class OrderHandler {
 	 *
 	 * @return mixed
 	 *
-	 * @see ppom_generate_html_for_files()
-	 * @see ppom_get_field_meta_by_dataname()
+	 * @see Helpers::generate_html_for_files()
+	 * @see Helpers::get_field_meta_by_dataname()
 	 * @see self::order_item_meta()
 	 */
 	public static function order_value( $display_value, $meta = null, $item = null ) {
@@ -113,7 +116,7 @@ final class OrderHandler {
 			return $display_value;
 		}
 
-		$field_meta = ppom_get_field_meta_by_dataname( $item->get_product_id(), $meta->key );
+		$field_meta = Helpers::get_field_meta_by_dataname( $item->get_product_id(), $meta->key );
 
 		// if( ! isset($field_meta['type']) ) return $display_value;
 
@@ -129,7 +132,7 @@ final class OrderHandler {
 				 *
 				 * @since: 10.10
 				 */
-				$display_value = ppom_generate_html_for_files( $meta->value, $input_type, $item );
+				$display_value = Helpers::generate_html_for_files( $meta->value, $input_type, $item );
 				break;
 
 			case 'image':
@@ -181,9 +184,9 @@ final class OrderHandler {
 	 *
 	 * @return void
 	 *
-	 * @see ppom_get_dir_path()
-	 * @see ppom_get_field_meta_by_dataname()
-	 * @see ppom_get_file_download_url()
+	 * @see Handler::get_dir_path()
+	 * @see Helpers::get_field_meta_by_dataname()
+	 * @see Handler::get_file_download_url()
 	 */
 	public static function rename_files( $order_id, $posted_data, $order ) {
 
@@ -214,8 +217,8 @@ final class OrderHandler {
 					continue;
 				}
 
-				$field_meta = ppom_get_field_meta_by_dataname( $product_id, $key );
-				if ( ! $field_meta ) {
+				$field_meta = Helpers::get_field_meta_by_dataname( $product_id, $key );
+				if ( ! is_array( $field_meta ) ) {
 					continue;
 				}
 
@@ -225,10 +228,10 @@ final class OrderHandler {
 
 				if ( $field_type == 'file' || $field_type == 'cropper' ) {
 
-					$base_dir_path      = ppom_get_dir_path();
+					$base_dir_path      = Handler::get_dir_path();
 					$confirm_dir        = 'confirmed/' . $order_id;
-					$confirmed_dir_path = ppom_get_dir_path( $confirm_dir );
-					$edits_dir_path     = ppom_get_dir_path( 'edits' );
+					$confirmed_dir_path = Handler::get_dir_path( $confirm_dir );
+					$edits_dir_path     = Handler::get_dir_path( 'edits' );
 
 					foreach ( $values as $file_id => $file_data ) {
 						if ( ! isset( $file_data['org'] ) ) {
@@ -237,7 +240,7 @@ final class OrderHandler {
 						$file_name    = $file_data['org'];
 						$file_cropped = isset( $file_data['cropped'] ) ? true : false;
 
-						$new_filename     = ppom_file_get_name( $file_name, $product_id, $cart_item );
+						$new_filename     = Handler::file_get_name( $file_name, $product_id, $cart_item );
 						$source_file      = $base_dir_path . $file_name;
 						$destination_path = $confirmed_dir_path . $new_filename;
 

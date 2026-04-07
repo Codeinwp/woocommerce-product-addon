@@ -3403,12 +3403,6 @@ parameters:
 			path: inc/compat/functions-embedded.php
 
 		-
-			message: '#^Parameter \#2 \$version2 of function version_compare expects string, float given\.$#'
-			identifier: argument.type
-			count: 1
-			path: inc/compat/functions-embedded.php
-
-		-
 			message: '#^Function ppom_file_get_name\(\) has parameter \$cart_item with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -7237,12 +7231,6 @@ parameters:
 			path: src/Hooks/Callbacks.php
 
 		-
-			message: '#^Parameter \#1 \$product of function ppom_array_get_js_input_vars expects WC_Product, int\|WC_Product given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Hooks/Callbacks.php
-
-		-
 			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
 			identifier: argument.type
 			count: 1
@@ -9471,12 +9459,6 @@ parameters:
 		-
 			message: '#^Call to method has_unique_datanames\(\) on an unknown class PPOM\\WooCommerce\\Product\\PPOM_Meta\.$#'
 			identifier: class.notFound
-			count: 1
-			path: src/WooCommerce/Product/ProductHandler.php
-
-		-
-			message: '#^Cannot call method get_id\(\) on WC_Product\|false\|null\.$#'
-			identifier: method.nonObject
 			count: 1
 			path: src/WooCommerce/Product/ProductHandler.php
 

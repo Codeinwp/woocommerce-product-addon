@@ -7,6 +7,8 @@
 
 namespace PPOM\Files;
 
+use PPOM\Support\Helpers;
+
 /**
  * @internal
  */
@@ -78,8 +80,8 @@ final class Handler {
 
 		if ( is_admin() && $post_type == 'shop_order' ) {
 
-			$file_thumb_url = ppom_get_confirmed_dir_thumbs( $order_id, $file_name, $product_id, $thumb = true );
-			$file_dir_path  = ppom_get_confirmed_dir_thumbs( $order_id, $file_name, $product_id, $thumb = false );
+			$file_thumb_url = Helpers::get_confirmed_dir_thumbs( $order_id, $file_name, $product_id, $thumb = true );
+			$file_dir_path  = Helpers::get_confirmed_dir_thumbs( $order_id, $file_name, $product_id, $thumb = false );
 		} else {
 
 			$file_dir_path  = self::get_dir_path() . $file_name;
@@ -106,7 +108,7 @@ final class Handler {
 			$file_link = self::get_dir_url() . $file_name;
 		}
 
-		$ppom_cart_meta_thumb_size = ppom_get_thumbs_size();
+		$ppom_cart_meta_thumb_size = Helpers::get_thumbs_size();
 
 		$thumb_html = '<img class="img-thumbnail" style="width:' . esc_attr( $ppom_cart_meta_thumb_size ) . '" src="' . esc_url( $file_thumb_url ) . '" alt="' . esc_attr( $file_name ) . '">';
 
@@ -248,7 +250,7 @@ final class Handler {
 		$extension = $file_type['ext'];
 
 		$default_restricted = 'php,php4,php5,php6,php7,phtml,exe,shtml';
-		$restricted_type    = ppom_get_option( 'ppom_restricted_file_type', $default_restricted );
+		$restricted_type    = Helpers::get_option( 'ppom_restricted_file_type', $default_restricted );
 		$restricted_type    = explode( ',', $restricted_type );
 
 		if ( empty( $extension ) || in_array( strtolower( $extension ), $restricted_type ) ) {
@@ -367,12 +369,12 @@ final class Handler {
 
 			$product_id = intval( $_REQUEST['product_id'] );
 			$data_name  = sanitize_key( $_REQUEST['data_name'] );
-			$file_meta  = ppom_get_field_meta_by_dataname( $product_id, $data_name );
+			$file_meta  = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
 
 			// making thumb if images
 			if ( self::is_file_image( $file_path ) ) {
 
-				$thumb_size     = ppom_get_thumbs_size();
+				$thumb_size     = Helpers::get_thumbs_size();
 				$thumb_dir_path = self::create_image_thumb( $file_dir_path, $file_name, $thumb_size );
 				if ( file_exists( $thumb_dir_path ) ) {
 					list( $fw, $fh ) = getimagesize( $file_path );
@@ -542,7 +544,7 @@ final class Handler {
 
 			list( $fw, $fh ) = getimagesize( $file_path );
 			$file_meta       = $fw . '(w) x ' . $fh . '(h)';
-			$file_meta      .= ' - ' . __( 'Size: ', 'woocommerce-product-addon' ) . ppom_get_filesize_in_kb( $file_name );
+			$file_meta      .= ' - ' . __( 'Size: ', 'woocommerce-product-addon' ) . Helpers::get_filesize_in_kb( $file_name );
 
 			$thumb_url = self::get_dir_url( true ) . $file_name . '?nocache=' . time();
 
@@ -557,7 +559,7 @@ final class Handler {
 				'image_title' => $file_name,
 			);
 			ob_start();
-			ppom_load_template( 'v10/file-modals.php', $modal_vars );
+			Helpers::load_template( 'v10/file-modals.php', $modal_vars );
 			$html .= ob_get_clean();
 
 			// Tools group
@@ -574,7 +576,7 @@ final class Handler {
 
 		} else {
 
-			$file_meta .= __( 'Size: ', 'woocommerce-product-addon' ) . ppom_get_filesize_in_kb( $file_name );
+			$file_meta .= __( 'Size: ', 'woocommerce-product-addon' ) . Helpers::get_filesize_in_kb( $file_name );
 			$thumb_url  = PPOM_URL . '/images/file.png';
 
 			// Tools group
@@ -591,7 +593,7 @@ final class Handler {
 		$html .= '<label style="margin-top: 8px;display: block;text-align: center;">
 				<div class="pre_upload_image collapse_dropdown_id" data-ppom-tooltip="ppom_tooltip" title="' . $short_name . '">
 					
-					<img class="img-thumbnail" style="width:' . esc_attr( ppom_get_thumbs_size() ) . '" data-filename="' . esc_attr( $file_name ) . '" id="' . esc_attr( $file_id ) . '" src="' . esc_url( $thumb_url ) . '" />
+					<img class="img-thumbnail" style="width:' . esc_attr( Helpers::get_thumbs_size() ) . '" data-filename="' . esc_attr( $file_name ) . '" id="' . esc_attr( $file_id ) . '" src="' . esc_url( $thumb_url ) . '" />
 				</div>
 			</label>';
 		$html .= $file_tools;
