@@ -24,9 +24,9 @@ abstract class AbstractInputRenderer implements InputRendererInterface {
 	}
 
 	/**
-	 * @param string                 $html
-	 * @param array<string, mixed>   $args
-	 * @param mixed                  $value Passed to `nmforms_input_html`.
+	 * @param string               $html
+	 * @param array<string, mixed> $args
+	 * @param mixed                $value Passed to `nmforms_input_html`.
 	 * @return string
 	 */
 	protected function applyOutputFilter( $html, $args, $value ) {
