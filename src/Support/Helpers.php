@@ -12,6 +12,11 @@
 
 namespace PPOM\Support;
 
+use PPOM\Arrays\Settings;
+use PPOM\Files\Handler;
+use PPOM\Hooks\Callbacks;
+use PPOM\Pricing\Engine;
+
 /**
  * @internal
  */
@@ -27,6 +32,52 @@ final class Helpers {
 		echo '<pre>';
 		print_r( $arr );
 		echo '</pre>';
+	}
+
+	/**
+	 * WooCommerce notice helper (legacy WC 2.1+ / pre-2.1 paths).
+	 *
+	 * @param string $string Message.
+	 * @param string $type   Notice type.
+	 *
+	 * @return void
+	 */
+	public static function wc_add_notice( $string, $type = 'error' ) {
+
+		global $woocommerce;
+		if ( version_compare( $woocommerce->version, '2.1', '>=' ) ) {
+			wc_add_notice( $string, $type );
+		} else {
+			$woocommerce->add_error( $string );
+		}
+	}
+
+	/**
+	 * WPML / Polylang string translation for PPOM-authored labels.
+	 *
+	 * @param mixed  $field_value String or array (arrays pass through).
+	 * @param string $domain      Text domain / WPML context.
+	 *
+	 * @return mixed
+	 */
+	public static function wpml_translate( $field_value, $domain ) {
+
+		if ( is_array( $field_value ) ) {
+			return $field_value;
+		}
+
+		$field_name  = $domain . ' - ' . sanitize_key( $field_value );
+		$field_value = stripslashes( $field_value );
+
+		if ( has_filter( 'wpml_translate_single_string' ) ) {
+			$field_value = apply_filters( 'wpml_translate_single_string', $field_value, $domain, $field_name );
+		}
+
+		if ( function_exists( 'pll__' ) ) {
+			$field_value = pll__( $field_value );
+		}
+
+		return $field_value;
 	}
 
 	// Get field column
@@ -51,11 +102,11 @@ final class Helpers {
 			return $option;
 		}
 
-		$option['option'] = ppom_wpml_translate( $option['option'], 'PPOM' );
+		$option['option'] = self::wpml_translate( $option['option'], 'PPOM' );
 
 		// if label is set
 		if ( isset( $option['label'] ) ) {
-			$option['label'] = ppom_wpml_translate( $option['label'], 'PPOM' );
+			$option['label'] = self::wpml_translate( $option['label'], 'PPOM' );
 		}
 
 		return $option;
@@ -458,7 +509,7 @@ final class Helpers {
 						$file_thumbs_html = '';
 						foreach ( $value as $file_id => $file_uploaded ) {
 							$file_name         = $file_uploaded['org'];
-							$file_thumbs_html .= ppom_create_thumb_for_meta( $file_name, $product_id );
+							$file_thumbs_html .= Handler::create_thumb_for_meta( $file_name, $product_id );
 						}
 						// $ppom_meta['ppom_has_files'][$key] = $value;
 						$meta_data = array(
@@ -478,7 +529,7 @@ final class Helpers {
 						$fomatted_data = json_decode( stripcslashes( $image_data ), true );
 
 						$imageURL = isset( $fomatted_data['imageURL'] ) ? $fomatted_data['imageURL'] : '';
-						$imageURL = ppom_get_dir_url() . 'cropped/' . $imageURL;
+						$imageURL = Handler::get_dir_url() . 'cropped/' . $imageURL;
 						$fileName = isset( $fomatted_data['fileName'] ) ? $fomatted_data['fileName'] : '';
 
 						$fileName = substr( $fileName, 0, strrpos( $fileName, '.' ) );
@@ -497,7 +548,7 @@ final class Helpers {
 							$label     = ! empty( $cropped_meta['label'] ) ? $cropped_meta['label'] : __( 'Cropped', 'woocommerce-product-addon' );
 
 							$qtylabel    = "{$label} x {$qty}";
-							$cropped_url = ppom_get_dir_url() . 'cropped/' . $file_name;
+							$cropped_url = Handler::get_dir_url() . 'cropped/' . $file_name;
 
 							$ppom_html .= '<tr>';
 							$ppom_html .= '<td>';
@@ -559,7 +610,7 @@ final class Helpers {
 								continue;
 							}
 							$file_name         = isset( $file_cropped['org'] ) ? $file_cropped['org'] : '';
-							$file_thumbs_html .= ppom_create_thumb_for_meta( $file_name, $product_id, true, $crop_size );
+							$file_thumbs_html .= Handler::create_thumb_for_meta( $file_name, $product_id, true, $crop_size );
 
 							// Adding ratio to cart
 						}
@@ -655,7 +706,7 @@ final class Helpers {
 					foreach ( $option_posted as $posted_value ) {
 						foreach ( $options_filter as $option_key => $option ) {
 
-							$option_value = stripslashes( ppom_wpml_translate( $option['raw'], 'PPOM' ) );
+							$option_value = stripslashes( self::wpml_translate( $option['raw'], 'PPOM' ) );
 
 							if ( stripcslashes( $posted_value ) === $option_value ) {
 								$option_label_array[] = $option['label'];
@@ -694,7 +745,7 @@ final class Helpers {
 
 					foreach ( $options_filter as $option_key => $option ) {
 
-						$option_value = stripslashes( ppom_wpml_translate( $option['raw'], 'PPOM' ) );
+						$option_value = stripslashes( self::wpml_translate( $option['raw'], 'PPOM' ) );
 
 						if ( $posted_value == $option_value ) {
 							$option_price  = $option['label'];
@@ -732,7 +783,7 @@ final class Helpers {
 						foreach ( $options_filter as $option_key => $option ) {
 
 							$option_raw   = isset( $option['raw'] ) ? $option['raw'] : '';
-							$option_value = stripslashes( ppom_wpml_translate( $option_raw, 'PPOM' ) );
+							$option_value = stripslashes( self::wpml_translate( $option_raw, 'PPOM' ) );
 
 							if ( $option_value === $selected_opt ) {
 
@@ -1167,12 +1218,12 @@ final class Helpers {
 
 				// Currency swithcer
 				$product_price = self::get_product_price( $product );
-				$product_price = ppom_hooks_convert_price_back( $product_price );
+				$product_price = Callbacks::convert_price_back( $product_price );
 
 				// For quantities if default price is set
 				if ( $meta['type'] == 'quantities' ) {
 					$quantities_dp = '';
-					if ( ppom_is_field_has_price( $meta ) ) {
+					if ( Engine::is_field_has_price( $meta ) ) {
 						$quantities_dp = isset( $meta['default_price'] ) && $meta['default_price'] != '' ? $meta['default_price'] : '';
 					}
 
@@ -1183,7 +1234,7 @@ final class Helpers {
 
 
 				if ( strpos( $option_price, '%' ) !== false ) {
-					$option_price   = ppom_get_amount_after_percentage( $product_price, $option_price );
+					$option_price   = Engine::get_amount_after_percentage( $product_price, $option_price );
 					$option_percent = $option_raw_price;
 				}
 
@@ -1208,7 +1259,7 @@ final class Helpers {
 
 				// check if price in percent
 				if(strpos($option_price,'%') !== false){
-					$option_price = ppom_get_amount_after_percentage($product_price, $option_price);
+					$option_price = Engine::get_amount_after_percentage($product_price, $option_price);
 					// check if price is fixed and taxable
 					if(isset($meta['onetime']) && $meta['onetime'] == 'on' && isset($meta['onetime_taxable']) && $meta['onetime_taxable'] == 'on') {
 						$option_price_without_tax = $option_price;
@@ -1264,7 +1315,7 @@ final class Helpers {
 
 		if ( ! empty( $meta['first_option'] ) ) {
 
-			$fo_labeld    = ppom_wpml_translate( $meta['first_option'], 'PPOM' );
+			$fo_labeld    = self::wpml_translate( $meta['first_option'], 'PPOM' );
 			$first_option = array(
 				'' => array(
 					'label'       => $fo_labeld,
@@ -1493,7 +1544,7 @@ final class Helpers {
 	// Return file size in kb
 	public static function get_filesize_in_kb( $file_name ) {
 
-		$base_dir  = ppom_get_dir_path();
+		$base_dir  = Handler::get_dir_path();
 		$file_path = $base_dir . 'confirmed/' . $file_name;
 
 		if ( file_exists( $file_path ) ) {
@@ -1515,12 +1566,12 @@ final class Helpers {
 		$order_html = '<table>';
 		foreach ( $file_name_array as $file_name ) {
 
-			$file_edit_path = ppom_get_dir_path( 'edits' ) . ppom_file_get_name( $file_name, $item->get_product_id() );
+			$file_edit_path = Handler::get_dir_path( 'edits' ) . Handler::file_get_name( $file_name, $item->get_product_id() );
 			// Making file thumb download with new path
-			$ppom_file_url = ppom_get_file_download_url( $file_name, $item->get_order_id(), $item->get_product_id() );
+			$ppom_file_url = Handler::get_file_download_url( $file_name, $item->get_order_id(), $item->get_product_id() );
 
-			$file_path           = ppom_get_dir_url( true ) . $file_name;
-			$is_image_file       = ppom_is_file_image( $file_path );
+			$file_path           = Handler::get_dir_url( true ) . $file_name;
+			$is_image_file       = Handler::is_file_image( $file_path );
 			$ppom_file_thumb_url = $is_image_file ? $file_path : PPOM_URL . '/images/file.png';
 			$order_html         .= '<tr><td class="ppom-files-display">';
 			$order_html         .= '<a target="_blank" href="' . esc_url( $ppom_file_url ) . '">';
@@ -1540,8 +1591,8 @@ final class Helpers {
 
 			if ( $input_type == 'cropper' ) {
 
-				$cropped_file_name = ppom_file_get_name( $file_name, $item->get_product_id() );
-				$cropped_url       = ppom_get_dir_url() . 'cropped/' . $cropped_file_name;
+				$cropped_file_name = Handler::file_get_name( $file_name, $item->get_product_id() );
+				$cropped_url       = Handler::get_dir_url() . 'cropped/' . $cropped_file_name;
 				$order_html       .= '<tr><td><a target="_blank" href="' . esc_url( $cropped_url ) . '">';
 				$order_html       .= '<img style="width:' . esc_attr( self::get_thumbs_size() ) . '" class="img-thumbnail" src="' . esc_url( $cropped_url ) . '">';
 				$order_html       .= '</a></td>';
@@ -1557,9 +1608,9 @@ final class Helpers {
 
 			} elseif ( file_exists( $file_edit_path ) ) {
 
-				$edit_file_name = ppom_file_get_name( $file_name, $item->get_product_id() );
-				$edit_url       = ppom_get_dir_url() . 'edits/' . $edit_file_name;
-				$edit_thumb_url = ppom_get_dir_url() . 'edits/thumbs/' . $file_name;
+				$edit_file_name = Handler::file_get_name( $file_name, $item->get_product_id() );
+				$edit_url       = Handler::get_dir_url() . 'edits/' . $edit_file_name;
+				$edit_thumb_url = Handler::get_dir_url() . 'edits/thumbs/' . $file_name;
 				$order_html    .= '<tr><td><a target="_blank"  href="' . esc_url( $edit_url ) . '">';
 				$order_html    .= '<img style="width:' . esc_attr( self::get_thumbs_size() ) . '" class="img-thumbnail" src="' . esc_url( $edit_thumb_url ) . '">';
 				$order_html    .= '</a></td>';
@@ -1596,7 +1647,7 @@ final class Helpers {
 			$image_html  = '<img class="img-thumbnail" style="width:' . esc_attr( self::get_thumbs_size( 75 ) ) . '" src="' . esc_url( $image_url ) . '" title="' . esc_attr( $image_label ) . '">';
 
 			$ppom_html .= '<tr><td><a href="' . esc_url( $image_url ) . '" class="lightbox" itemprop="image" title="' . esc_attr( $image_label ) . '">' . $image_html . '</a></td>';
-			$ppom_html .= '<td>' . esc_attr( ppom_files_trim_name( $image_label ) ) . '</td>';
+			$ppom_html .= '<td>' . esc_attr( Handler::files_trim_name( $image_label ) ) . '</td>';
 			$ppom_html .= '</tr>';
 
 		}
@@ -1670,7 +1721,7 @@ final class Helpers {
 						if ( $image_id == $option_id && isset( $option['price'] ) && $option['price'] != '' ) {
 
 							if ( strpos( $option['price'], '%' ) !== false ) {
-								$option_price = ppom_get_amount_after_percentage( $product->get_price(), $option['price'] );
+								$option_price = Engine::get_amount_after_percentage( $product->get_price(), $option['price'] );
 							} else {
 								// For currency switcher
 								// $option_price = apply_filters('ppom_option_price', $option['price']);
@@ -1688,7 +1739,7 @@ final class Helpers {
 						if ( $option['id'] == $option_id && isset( $option['price'] ) && $option['price'] != '' ) {
 
 							if ( strpos( $option['price'], '%' ) !== false ) {
-								$option_price = ppom_get_amount_after_percentage( $product->get_price(), $option['price'] );
+								$option_price = Engine::get_amount_after_percentage( $product->get_price(), $option['price'] );
 							} else {
 								// For currency switcher
 								// $option_price = apply_filters('ppom_option_price', $option['price']);
@@ -2163,7 +2214,7 @@ final class Helpers {
 			if ( ( $field['type'] == 'quantities' && ! $unlinked ) ||
 			$field['type'] == 'eventcalendar' ||
 			$field['type'] == 'vm' ||
-			( $field['type'] == 'vqmatrix' && ppom_is_field_has_price( $field ) ) ||
+			( $field['type'] == 'vqmatrix' && Engine::is_field_has_price( $field ) ) ||
 			$field['type'] == 'bulkquantity_zzz'    // bulkquantity should not be in there ... TESTING.
 			) {
 
@@ -2199,8 +2250,8 @@ final class Helpers {
 			$unlinked = isset( $field['unlink_order_qty'] ) ? true : false;
 
 			if ( $field['type'] == 'vm' ||
-			( $field['type'] == 'quantities' && ppom_is_field_has_price( $field ) && ! $unlinked ) ||
-			( $field['type'] == 'vqmatrix' && ppom_is_field_has_price( $field ) )
+			( $field['type'] == 'quantities' && Engine::is_field_has_price( $field ) && ! $unlinked ) ||
+			( $field['type'] == 'vqmatrix' && Engine::is_field_has_price( $field ) )
 			) {
 
 				$reset_qty = true;
@@ -2220,14 +2271,14 @@ final class Helpers {
 	public static function get_confirmed_dir_thumbs( $order_id, $file_name, $product_id, $thumb = false ) {
 
 		$confirm_dir = 'confirmed/' . $order_id;
-		$file_name   = ppom_file_get_name( $file_name, $product_id );
+		$file_name   = Handler::file_get_name( $file_name, $product_id );
 
 		$file = '';
 		if ( $thumb ) {
-			$file_path = ppom_get_dir_url() . $confirm_dir . '/' . $file_name;
-			$file      = ppom_is_file_image( $file_path ) ? $file_path : PPOM_URL . '/images/file.png';
+			$file_path = Handler::get_dir_url() . $confirm_dir . '/' . $file_name;
+			$file      = Handler::is_file_image( $file_path ) ? $file_path : PPOM_URL . '/images/file.png';
 		} else {
-			$file = ppom_get_dir_path( $confirm_dir ) . $file_name;
+			$file = Handler::get_dir_path( $confirm_dir ) . $file_name;
 		}
 
 		return $file;
@@ -2279,9 +2330,9 @@ final class Helpers {
 	// generating ppom conditional data attributes
 	public static function get_conditional_data_attributes( $meta ) {
 
-		$logic      = isset( $meta['logic'] ) ? ppom_wpml_translate( $meta['logic'], 'PPOM' ) : '';
-		$conditions = isset( $meta['conditions'] ) ? ppom_wpml_translate( $meta['conditions'], 'PPOM' ) : '';
-		$type       = isset( $meta['type'] ) ? ppom_wpml_translate( $meta['type'], 'PPOM' ) : '';
+		$logic      = isset( $meta['logic'] ) ? self::wpml_translate( $meta['logic'], 'PPOM' ) : '';
+		$conditions = isset( $meta['conditions'] ) ? self::wpml_translate( $meta['conditions'], 'PPOM' ) : '';
+		$type       = isset( $meta['type'] ) ? self::wpml_translate( $meta['type'], 'PPOM' ) : '';
 
 		$attr_html = '';
 
@@ -2291,8 +2342,8 @@ final class Helpers {
 
 		if ( isset( $conditions['rules'] ) && $logic === 'on' ) {
 
-			$bound      = isset( $conditions['bound'] ) ? ppom_wpml_translate( $conditions['bound'], 'PPOM' ) : '';
-			$visibility = isset( $conditions['visibility'] ) ? ppom_wpml_translate( $conditions['visibility'], 'PPOM' ) : '';
+			$bound      = isset( $conditions['bound'] ) ? self::wpml_translate( $conditions['bound'], 'PPOM' ) : '';
+			$visibility = isset( $conditions['visibility'] ) ? self::wpml_translate( $conditions['visibility'], 'PPOM' ) : '';
 
 			$conditions['rules'] = array_filter(
 				$conditions['rules'],
@@ -2339,10 +2390,10 @@ final class Helpers {
 				$input        = 'input' . $counter;
 				$value        = 'val' . $counter;
 				$opr          = 'operator' . $counter;
-				$element      = isset( $rule['elements'] ) ? ppom_wpml_translate( $rule['elements'], 'PPOM' ) : '';
-				$element_val  = isset( $rule['element_values'] ) ? ppom_wpml_translate( $rule['element_values'], 'PPOM' ) : '';
-				$constant_val = isset( $rule['element_constant'] ) ? ppom_wpml_translate( $rule['element_constant'], 'PPOM' ) : '';
-				$operator     = isset( $rule['operators'] ) ? ppom_wpml_translate( $rule['operators'], 'PPOM' ) : '';
+				$element      = isset( $rule['elements'] ) ? self::wpml_translate( $rule['elements'], 'PPOM' ) : '';
+				$element_val  = isset( $rule['element_values'] ) ? self::wpml_translate( $rule['element_values'], 'PPOM' ) : '';
+				$constant_val = isset( $rule['element_constant'] ) ? self::wpml_translate( $rule['element_constant'], 'PPOM' ) : '';
+				$operator     = isset( $rule['operators'] ) ? self::wpml_translate( $rule['operators'], 'PPOM' ) : '';
 
 				$attr_html .= ' data-cond-' . $input . '="' . esc_attr( $element ) . '"';
 				$attr_html .= ' data-cond-' . $value . '="' . esc_attr( $element_val ) . '"';
@@ -2365,7 +2416,7 @@ final class Helpers {
 	// Check if given type is an addon
 	public static function is_field_addon( $type ) {
 
-		$ppom_meta = ppom_get_plugin_meta();
+		$ppom_meta = Settings::get_plugin_meta();
 
 		$is_addon = false;
 		if ( isset( $ppom_meta[ $type ] ) && $ppom_meta[ $type ]['is_addon'] ) {

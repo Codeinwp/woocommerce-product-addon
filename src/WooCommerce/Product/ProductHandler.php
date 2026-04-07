@@ -10,6 +10,9 @@
 
 namespace PPOM\WooCommerce\Product;
 
+use PPOM\Hooks\Callbacks;
+use PPOM\Support\Helpers;
+
 /**
  * @internal
  */
@@ -25,7 +28,7 @@ final class ProductHandler {
 
 		global $product;
 
-		$product_id = ppom_get_product_id( $product );
+		$product_id = Helpers::get_product_id( $product );
 
 		self::show_fields_on_product( $product_id );
 	}
@@ -40,14 +43,14 @@ final class ProductHandler {
 	 * @return string|void
 	 *
 	 * @see PPOM_Meta::__construct()
-	 * @see ppom_load_template()
+	 * @see Helpers::load_template()
 	 * @see self::template_base_inputs_rendering()
 	 */
 	public static function show_fields_on_product( $product_id, $args = null ) {
 
 		$product = wc_get_product( $product_id );
 
-		$product_id = ppom_get_product_id( $product );
+		$product_id = Helpers::get_product_id( $product );
 		$ppom       = new PPOM_Meta( $product_id );
 
 		if ( ! $ppom->fields ) {
@@ -65,7 +68,7 @@ final class ProductHandler {
 		$ppom_box_id = is_array( $ppom->meta_id ) ? implode( '-', $ppom->meta_id ) : $ppom->meta_id;
 		$ppom_html   = '<div id="ppom-box-' . esc_attr( $ppom_box_id ) . '" class="ppom-wrapper">';
 
-		if ( ppom_get_price_table_location() === 'before' ) {
+		if ( Helpers::get_price_table_location() === 'before' ) {
 			$ppom_html .= '<div id="ppom-price-container"></div>';
 		}
 
@@ -77,10 +80,10 @@ final class ProductHandler {
 			'args'             => $args,
 		);
 		ob_start();
-		ppom_load_template( 'render-fields.php', $template_vars );
+		Helpers::load_template( 'render-fields.php', $template_vars );
 		$ppom_html .= ob_get_clean();
 
-		if ( ppom_get_price_table_location() === 'after' ) {
+		if ( Helpers::get_price_table_location() === 'after' ) {
 			$ppom_html .= '<div id="ppom-price-container"></div>';
 		}
 
@@ -96,7 +99,7 @@ final class ProductHandler {
 
 		global $product;
 
-		$product_id = ppom_get_product_id( $product );
+		$product_id = Helpers::get_product_id( $product );
 
 		$args = apply_filters( 'ppom_rendering_template_args', array( 'enable_add_to_cart_id' => false ), $product );
 
@@ -112,7 +115,7 @@ final class ProductHandler {
 	 * @return string|void
 	 *
 	 * @see PPOM_Form::ppom_fields_render()
-	 * @see ppom_load_input_templates()
+	 * @see Helpers::load_input_templates()
 	 * @see self::show_fields_on_product()
 	 */
 	public static function template_base_inputs_rendering( $product_id, $args = null ) {
@@ -131,7 +134,7 @@ final class ProductHandler {
 		$template_vars = array( 'form_obj' => $form_obj );
 
 		ob_start();
-		ppom_load_input_templates( 'frontend/ppom-fields.php', $template_vars );
+		Helpers::load_input_templates( 'frontend/ppom-fields.php', $template_vars );
 		$ppom_html .= ob_get_clean();
 
 		echo apply_filters( 'ppom_fields_html', $ppom_html, $product );
@@ -145,6 +148,9 @@ final class ProductHandler {
 
 		global $post;
 		$product = wc_get_product( $post->ID );
+		if ( ! $product ) {
+			return '';
+		}
 
 		$ppom = new PPOM_Meta( $product->get_id() );
 
@@ -154,7 +160,7 @@ final class ProductHandler {
 		}
 
 		// Loading all required scripts/css for inputs like datepicker, fileupload etc
-		ppom_hooks_load_input_scripts( $product );
+		Callbacks::load_input_scripts( $product );
 
 		do_action( 'ppom_after_scripts_loaded', $ppom, $product );
 	}
@@ -184,13 +190,13 @@ final class ProductHandler {
 			$passed = self::check_validation( $product_id, $_POST );
 		}
 
-		if ( ppom_get_price_mode() == 'legacy' && isset( $_POST['ppom']['fields'] ) ) {
+		if ( Helpers::get_price_mode() == 'legacy' && isset( $_POST['ppom']['fields'] ) ) {
 
-			if ( ppom_is_price_attached_with_fields( $_POST['ppom']['fields'] ) &&
+			if ( Helpers::is_price_attached_with_fields( $_POST['ppom']['fields'] ) &&
 			empty( $_POST['ppom']['ppom_option_price'] )
 			) {
 				$error_message = __( 'Sorry, an error has occurred. Please enable JavaScript or contact site owner.', 'woocommerce-product-addon' );
-				ppom_wc_add_notice( $error_message );
+				Helpers::wc_add_notice( $error_message );
 				$passed = false;
 
 				return $passed;
@@ -274,7 +280,7 @@ final class ProductHandler {
 	 * @return bool
 	 *
 	 * @see PPOM_Meta::get_fields()
-	 * @see ppom_has_posted_field_value()
+	 * @see Helpers::has_posted_field_value()
 	 * @see ppom_woocommerce_add_cart_item_data()
 	 */
 	public static function check_validation( $product_id, $post_data, $passed = true ) {
@@ -295,7 +301,7 @@ final class ProductHandler {
 			// ppom_pa($field);
 
 			// Check field Visibility settings
-			if ( ! ppom_is_field_visible( $field ) ) {
+			if ( ! Helpers::is_field_visible( $field ) ) {
 				continue;
 			}
 
@@ -316,17 +322,17 @@ final class ProductHandler {
 
 			$title = isset( $field['title'] ) ? $field['title'] : '';
 
-			// var_dump($data_name, ppom_is_field_hidden_by_condition($data_name));
+			// var_dump($data_name, Helpers::is_field_hidden_by_condition($data_name));
 			// Check if field is required by hidden by condition
-			if ( ppom_is_field_hidden_by_condition( $data_name ) ) {
+			if ( Helpers::is_field_hidden_by_condition( $data_name ) ) {
 				continue;
 			}
 
-			$max_min_validation = ppom_posted_field_max_min_value_validation( $ppom_posted_fields, $field );
+			$max_min_validation = Helpers::posted_field_max_min_value_validation( $ppom_posted_fields, $field );
 			if ( ! empty( $max_min_validation ) ) {
-				ppom_wc_add_notice( $max_min_validation );
+				Helpers::wc_add_notice( $max_min_validation );
 				$passed = false;
-			} elseif ( isset( $field['required'] ) && 'on' === $field['required'] && ! ppom_has_posted_field_value( $ppom_posted_fields, $field ) ) {
+			} elseif ( isset( $field['required'] ) && 'on' === $field['required'] && ! Helpers::has_posted_field_value( $ppom_posted_fields, $field ) ) {
 
 				// Note: Checkbox is being validate by hook: ppom_has_posted_field_value
 				// $error_message = isset($field['error_message']) ? $field['error_message'] : '';
@@ -341,7 +347,7 @@ final class ProductHandler {
 				);
 				$error_message = $error_message;
 				$error_message = stripslashes( $error_message );
-				ppom_wc_add_notice( $error_message );
+				Helpers::wc_add_notice( $error_message );
 				$passed = false;
 			}
 		}

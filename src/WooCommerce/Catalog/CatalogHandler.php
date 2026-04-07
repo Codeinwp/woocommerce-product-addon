@@ -10,6 +10,9 @@
 
 namespace PPOM\WooCommerce\Catalog;
 
+use PPOM\Pricing\Engine;
+use PPOM\Support\Helpers;
+
 /**
  * @internal
  */
@@ -18,14 +21,14 @@ final class CatalogHandler {
 	// alter price on shop page if price matrix found
 	public static function alter_price( $price, $product ) {
 
-		$product_id = ppom_get_product_id( $product );
+		$product_id = Helpers::get_product_id( $product );
 
 		if ( class_exists( 'sitepress' ) ) {
 			$default_lang = apply_filters( 'wpml_default_language', null );
 			$product      = wc_get_product( apply_filters( 'wpml_object_id', $product->get_id(), 'product', true, $default_lang ) );
 		}
 
-		$price_matrix_found = ppom_has_field_by_type( $product_id, 'pricematrix' );
+		$price_matrix_found = Helpers::has_field_by_type( $product_id, 'pricematrix' );
 		if ( empty( $price_matrix_found ) && apply_filters( 'ppom_hide_product_price_if_zero', true, $product ) ) {
 			if ( $product->get_price() <= 0 ) {
 				return '';
@@ -47,14 +50,14 @@ final class CatalogHandler {
 
 				// ppom_pa($meta);
 
-				if ( ! ppom_is_field_visible( $meta ) ) {
+				if ( ! Helpers::is_field_visible( $meta ) ) {
 					continue;
 				}
 
 				if ( $meta['type'] == 'pricematrix' ) {
 
 					$options = $meta['options'];
-					$ranges  = ppom_convert_options_to_key_val( $options, $meta, $product );
+					$ranges  = Helpers::convert_options_to_key_val( $options, $meta, $product );
 					// ppom_pa($ranges);
 
 					if ( isset( $meta['discount'] ) && $meta['discount'] == 'on' ) {
@@ -64,7 +67,7 @@ final class CatalogHandler {
 
 						if ( ! empty( $last_discount['percent'] ) ) {
 							$max_discount = $last_discount['percent'];
-							$least_price  = ppom_get_amount_after_percentage( $product->get_price(), $max_discount );
+							$least_price  = Engine::get_amount_after_percentage( $product->get_price(), $max_discount );
 						}
 
 						$least_price = floatval( $product->get_price() ) - $least_price;
@@ -112,13 +115,13 @@ final class CatalogHandler {
 			return $args;
 		}
 
-		$product_id = ppom_get_product_id( $product );
+		$product_id = Helpers::get_product_id( $product );
 		$ppom       = new PPOM_Meta( $product_id );
 		if ( ! $ppom->is_exists ) {
 			return $args;
 		}
 
-		$ppom_matrix_found = ppom_has_field_by_type( $product_id, 'pricematrix' );
+		$ppom_matrix_found = Helpers::has_field_by_type( $product_id, 'pricematrix' );
 
 		if ( $ppom_matrix_found ) {
 
@@ -126,7 +129,7 @@ final class CatalogHandler {
 			// If it is Discount Matrix, do not set min quantity
 			// if( isset($meta['discount']) && $meta['discount'] == 'on' ) continue;
 			$options = $price_matrix['options'];
-			$ranges  = ppom_convert_options_to_key_val( $options, $price_matrix, $product );
+			$ranges  = Helpers::convert_options_to_key_val( $options, $price_matrix, $product );
 			if ( ! empty( $ranges ) ) {
 				$first_range         = reset( $ranges );
 				$qty_ranges          = explode( '-', $first_range['raw'] );
@@ -140,20 +143,20 @@ final class CatalogHandler {
 	// Set min quantity for price matrix
 	public static function set_min_quantity( $min_quantity, $product ) {
 
-		$product_id = ppom_get_product_id( $product );
+		$product_id = Helpers::get_product_id( $product );
 		$ppom       = new PPOM_Meta( $product_id );
 		if ( ! $ppom->is_exists ) {
 			return $min_quantity;
 		}
 
-		$ppom_matrix_found = ppom_has_field_by_type( $product_id, 'pricematrix' );
+		$ppom_matrix_found = Helpers::has_field_by_type( $product_id, 'pricematrix' );
 		if ( $ppom_matrix_found ) {
 			foreach ( $ppom_matrix_found as $meta ) {
 
 				// If it is Discount Matrix, do not set min quantity
 				// if( isset($meta['discount']) && $meta['discount'] == 'on' ) continue;
 				$options = $meta['options'];
-				$ranges  = ppom_convert_options_to_key_val( $options, $meta, $product );
+				$ranges  = Helpers::convert_options_to_key_val( $options, $meta, $product );
 
 				if ( empty( $ranges ) ) {
 					continue;
@@ -166,7 +169,7 @@ final class CatalogHandler {
 		}
 
 		// Check min quantity for variations
-		$ppom_quantities_found = ppom_has_field_by_type( $product_id, 'quantities' );
+		$ppom_quantities_found = Helpers::has_field_by_type( $product_id, 'quantities' );
 		if ( $ppom_quantities_found ) {
 			foreach ( $ppom_quantities_found as $qty ) {
 				if ( ! $qty['min_qty'] ) {
@@ -185,7 +188,7 @@ final class CatalogHandler {
 	// Set max quantity for price matrix
 	public static function set_max_quantity( $max_quantity, $product ) {
 
-		$product_id = ppom_get_product_id( $product );
+		$product_id = Helpers::get_product_id( $product );
 		$ppom       = new PPOM_Meta( $product_id );
 		if ( ! $ppom->is_exists ) {
 			return $max_quantity;
@@ -193,7 +196,7 @@ final class CatalogHandler {
 
 		$last_range = array();
 
-		$ppom_matrix_found = ppom_has_field_by_type( $product_id, 'pricematrix' );
+		$ppom_matrix_found = Helpers::has_field_by_type( $product_id, 'pricematrix' );
 
 		if ( $ppom_matrix_found ) {
 			foreach ( $ppom_matrix_found as $meta ) {
@@ -205,7 +208,7 @@ final class CatalogHandler {
 
 				$options = $meta['options'];
 				// ppom_pa($options);
-				$ranges = ppom_convert_options_to_key_val( $options, $meta, $product );
+				$ranges = Helpers::convert_options_to_key_val( $options, $meta, $product );
 
 				if ( empty( $ranges ) ) {
 					continue;
@@ -218,7 +221,7 @@ final class CatalogHandler {
 		}
 
 		// Check min quantity for variations
-		$ppom_quantities_found = ppom_has_field_by_type( $product_id, 'quantities' );
+		$ppom_quantities_found = Helpers::has_field_by_type( $product_id, 'quantities' );
 		if ( $ppom_quantities_found ) {
 			foreach ( $ppom_quantities_found as $qty ) {
 				if ( ! $qty['max_qty'] ) {
@@ -237,7 +240,7 @@ final class CatalogHandler {
 	// Set quantity step for price matrix
 	public static function set_quantity_step( $quantity_step, $product ) {
 
-		$product_id = ppom_get_product_id( $product );
+		$product_id = Helpers::get_product_id( $product );
 		$ppom       = new PPOM_Meta( $product_id );
 		if ( ! $ppom->is_exists ) {
 			return $quantity_step;
@@ -245,7 +248,7 @@ final class CatalogHandler {
 
 		$last_range = array();
 
-		$ppom_matrix_found = ppom_has_field_by_type( $product_id, 'pricematrix' );
+		$ppom_matrix_found = Helpers::has_field_by_type( $product_id, 'pricematrix' );
 		if ( $ppom_matrix_found ) {
 			foreach ( $ppom_matrix_found as $meta ) {
 

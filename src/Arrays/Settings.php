@@ -7,6 +7,7 @@
 
 namespace PPOM\Arrays;
 
+use PPOM\Support\Helpers;
 use PPOM_Meta;
 use WC_Product;
 
@@ -314,7 +315,7 @@ final class Settings {
 				'label'       => __( 'Button', 'woocommerce-product-addon' ),
 				'default'     => 'administrator',
 				'placeholder' => 'choose role',
-				'options'     => ppom_get_all_editable_roles(),
+				'options'     => Helpers::get_all_editable_roles(),
 				'id'          => 'ppom_permission_mfields',
 				'desc'        => __( 'You can set permissions here to allow different roles to manage PPOM fields.', 'woocommerce-product-addon' ),
 				'desc_tip'    => true,
@@ -531,7 +532,7 @@ final class Settings {
 		$show_price_per_unit = $args['show_price_per_unit'];
 		$ppom_id             = isset( $args['ppom_id'] ) ? $args['ppom_id'] : null;
 
-		$product_id         = ppom_get_product_id( $product );
+		$product_id         = Helpers::get_product_id( $product );
 		$ppom               = new PPOM_Meta( $product_id );
 		$ppom_meta_settings = $ppom->ppom_settings;
 		$ppom_meta_fields   = $ppom->fields;
@@ -614,14 +615,14 @@ final class Settings {
 		$js_vars['wc_no_decimal']             = $decimal_palces;
 		$variation_id                         = '';
 		$context                              = 'product';
-		$js_vars['wc_product_price']          = ppom_get_product_price( $product, $variation_id, $context );
-		$js_vars['wc_product_regular_price']  = ppom_get_product_regular_price( $product );
-		$ppom_label_discount_price            = ppom_get_option( 'ppom_label_discount_price', __( 'Discount Price', 'woocommerce-product-addon' ) );
-		$ppom_label_product_price             = ppom_get_option( 'ppom_label_product_price', __( 'Product Price', 'woocommerce-product-addon' ) );
-		$ppom_label_option_total              = ppom_get_option( 'ppom_label_option_total', __( 'Option Total', 'woocommerce-product-addon' ) );
-		$ppom_label_fixed_fee                 = ppom_get_option( 'ppom_label_fixed_fee', __( 'Fixed Fee', 'woocommerce-product-addon' ) );
-		$ppom_label_total_discount            = ppom_get_option( 'ppom_label_total_discount', __( 'Total Discount', 'woocommerce-product-addon' ) );
-		$ppom_label_total                     = ppom_get_option( 'ppom_label_total', __( 'Total', 'woocommerce-product-addon' ) );
+		$js_vars['wc_product_price']          = Helpers::get_product_price( $product, $variation_id, $context );
+		$js_vars['wc_product_regular_price']  = Helpers::get_product_regular_price( $product );
+		$ppom_label_discount_price            = Helpers::get_option( 'ppom_label_discount_price', __( 'Discount Price', 'woocommerce-product-addon' ) );
+		$ppom_label_product_price             = Helpers::get_option( 'ppom_label_product_price', __( 'Product Price', 'woocommerce-product-addon' ) );
+		$ppom_label_option_total              = Helpers::get_option( 'ppom_label_option_total', __( 'Option Total', 'woocommerce-product-addon' ) );
+		$ppom_label_fixed_fee                 = Helpers::get_option( 'ppom_label_fixed_fee', __( 'Fixed Fee', 'woocommerce-product-addon' ) );
+		$ppom_label_total_discount            = Helpers::get_option( 'ppom_label_total_discount', __( 'Total Discount', 'woocommerce-product-addon' ) );
+		$ppom_label_total                     = Helpers::get_option( 'ppom_label_total', __( 'Total', 'woocommerce-product-addon' ) );
 		$js_vars['total_discount_label']      = $ppom_label_total_discount;
 		$js_vars['price_matrix_heading']      = $ppom_label_discount_price;
 		$js_vars['product_base_label']        = $ppom_label_product_price;
@@ -636,7 +637,7 @@ final class Settings {
 		$js_vars['show_option_price']         = $ppom->price_display;
 		$js_vars['is_shortcode']              = 'no';
 		$js_vars['plugin_url']                = PPOM_URL;
-		$js_vars['is_mobile']                 = ppom_is_mobile();
+		$js_vars['is_mobile']                 = Helpers::is_mobile();
 		$js_vars['product_id']                = $product_id;
 		$js_vars['tax_prefix']                = self::tax_label_display();
 
@@ -655,7 +656,7 @@ final class Settings {
 		return sprintf("%s", get_option( 'woocommerce_price_display_suffix' ));
 		}*/
 
-		$suffix = ppom_get_option( 'ppom_label_option_total_suffex' );
+		$suffix = Helpers::get_option( 'ppom_label_option_total_suffex' );
 		if ( wc_tax_enabled() && $suffix !== '' ) {
 			return $suffix;
 		}

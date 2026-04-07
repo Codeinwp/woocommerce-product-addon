@@ -7,6 +7,8 @@
 
 namespace PPOM\Validation;
 
+use PPOM\Support\Helpers;
+
 use PPOM_Meta;
 use WC_Product;
 use WC_Product_Variable;
@@ -140,7 +142,7 @@ final class Validator {
 	 */
 	public static function validation_product_limits( $data, $product ) {
 
-		if ( ppom_is_client_validation_enabled() ) {
+		if ( Helpers::is_client_validation_enabled() ) {
 			return $data;
 		}
 
@@ -207,7 +209,7 @@ final class Validator {
 	 */
 	public static function validation_variation_limits( $data, $product, $variation ) {
 
-		if ( ppom_is_client_validation_enabled() ) {
+		if ( Helpers::is_client_validation_enabled() ) {
 			return $data;
 		}
 
@@ -290,14 +292,14 @@ final class Validator {
 			return $limits;
 		}
 
-		$ppom_matrix_found = ppom_has_field_by_type( $product_id, 'pricematrix' );
+		$ppom_matrix_found = Helpers::has_field_by_type( $product_id, 'pricematrix' );
 		if ( $ppom_matrix_found ) {
 			foreach ( $ppom_matrix_found as $meta ) {
 
 				// If it is Discount Matrix, do not set min quantity
 				// if( isset($meta['discount']) && $meta['discount'] == 'on' ) continue;
 				$options = $meta['options'];
-				$ranges  = ppom_convert_options_to_key_val( $options, $meta, $product );
+				$ranges  = Helpers::convert_options_to_key_val( $options, $meta, $product );
 
 				if ( empty( $ranges ) ) {
 					continue;
@@ -319,7 +321,7 @@ final class Validator {
 
 				$options = $meta['options'];
 				// ppom_pa($options);
-				$ranges = ppom_convert_options_to_key_val( $options, $meta, $product );
+				$ranges = Helpers::convert_options_to_key_val( $options, $meta, $product );
 
 				if ( empty( $ranges ) ) {
 					continue;
@@ -332,7 +334,7 @@ final class Validator {
 		}
 
 		// Check min quantity for variations
-		$ppom_quantities_found = ppom_has_field_by_type( $product_id, 'quantities' );
+		$ppom_quantities_found = Helpers::has_field_by_type( $product_id, 'quantities' );
 		if ( $ppom_quantities_found ) {
 			foreach ( $ppom_quantities_found as $qty ) {
 				if ( ! $qty['min_qty'] ) {
@@ -361,7 +363,7 @@ final class Validator {
 			// If it is Discount Matrix, do not set min quantity
 			// if( isset($meta['discount']) && $meta['discount'] == 'on' ) continue;
 			$options = $price_matrix['options'];
-			$ranges  = ppom_convert_options_to_key_val( $options, $price_matrix, $product );
+			$ranges  = Helpers::convert_options_to_key_val( $options, $price_matrix, $product );
 			if ( ! empty( $ranges ) ) {
 				$first_range = reset( $ranges );
 				$qty_ranges  = explode( '-', $first_range['raw'] );

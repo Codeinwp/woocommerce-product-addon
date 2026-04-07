@@ -13,6 +13,9 @@
 
 namespace PPOM\Pricing;
 
+use PPOM\Hooks\Callbacks;
+use PPOM\Support\Helpers;
+
 /**
  * @internal
  */
@@ -44,7 +47,7 @@ final class Engine {
 		}
 
 		$wc_product        = $cart_item['data'];
-		$product_id        = ppom_get_product_id( $wc_product );
+		$product_id        = Helpers::get_product_id( $wc_product );
 		$variation_id      = isset( $cart_item['variation_id'] ) ? $cart_item['variation_id'] : '';
 		$ppom_fields_post  = $values['ppom']['fields'];
 		$product_quantity  = floatval( $cart_item['quantity'] );
@@ -119,7 +122,7 @@ final class Engine {
 			$product_price = apply_filters( 'ppom_product_price_on_cart', $wc_product->get_price(), $cart_item );
 
 			// $context     = 'cart';
-			// $product_price   = ppom_get_product_price( $product, $variation_id, $context);
+			// $product_price   = Helpers::get_product_price( $product, $variation_id, $context);
 
 			// return array with: price, source
 			$price_info = self::price_get_product_base(
@@ -163,7 +166,7 @@ final class Engine {
 	 *
 	 * @return array
 	 *
-	 * @see ppom_get_field_meta_by_dataname()
+	 * @see Helpers::get_field_meta_by_dataname()
 	 * @see self::price_get_product_base()
 	 * @see self::price_cart_fee()
 	 */
@@ -187,7 +190,7 @@ final class Engine {
 
 			$value = ! is_array( $value ) ? stripcslashes( $value ) : $value;
 
-			$field_meta = ppom_get_field_meta_by_dataname( $product_id, $data_name, $ppom_meta_ids );
+			$field_meta = Helpers::get_field_meta_by_dataname( $product_id, $data_name, $ppom_meta_ids );
 			$product    = wc_get_product( $product_id );
 
 			$field_type  = isset( $field_meta['type'] ) ? $field_meta['type'] : '';
@@ -197,7 +200,7 @@ final class Engine {
 			$charge = $charge == 'on' ? 'cart_fee' : 'addon';
 
 			$context       = 'cart';
-			$product_price = ppom_get_product_price( $product, $variation_id, $context );
+			$product_price = Helpers::get_product_price( $product, $variation_id, $context );
 
 			$options = array();
 
@@ -212,13 +215,13 @@ final class Engine {
 					$options = isset( $field_meta['options'] ) ? json_decode( stripcslashes( $field_meta['options'] ), true ) : array();
 					break;
 				case 'image':
-					$options = isset( $field_meta['images'] ) ? ppom_convert_options_to_key_val( $field_meta['images'], $field_meta, $product ) : array();
+					$options = isset( $field_meta['images'] ) ? Helpers::convert_options_to_key_val( $field_meta['images'], $field_meta, $product ) : array();
 					break;
 				case 'audio':
-					$options = isset( $field_meta['audio'] ) ? ppom_convert_options_to_key_val( $field_meta['audio'], $field_meta, $product ) : array();
+					$options = isset( $field_meta['audio'] ) ? Helpers::convert_options_to_key_val( $field_meta['audio'], $field_meta, $product ) : array();
 					break;
 				case 'imageselect':
-					$options = isset( $field_meta['images'] ) ? ppom_convert_options_to_key_val( $field_meta['images'], $field_meta, $product ) : array();
+					$options = isset( $field_meta['images'] ) ? Helpers::convert_options_to_key_val( $field_meta['images'], $field_meta, $product ) : array();
 					break;
 				case 'eventcalendar':
 					$disbl_global_price = isset( $field_meta['disabled_global_price'] ) ? $field_meta['disabled_global_price'] : '';
@@ -243,7 +246,7 @@ final class Engine {
 				case 'vm':
 					$vm_options = array();
 
-					$options = isset( $field_meta['options'] ) ? ppom_convert_options_to_key_val( $field_meta['options'], $field_meta, $product ) : array();
+					$options = isset( $field_meta['options'] ) ? Helpers::convert_options_to_key_val( $field_meta['options'], $field_meta, $product ) : array();
 
 					$row_options = isset( $field_meta['row_options'] ) ? explode( PHP_EOL, $field_meta['row_options'] ) : array();
 
@@ -288,7 +291,7 @@ final class Engine {
 
 					break;
 				default:
-					$options = isset( $field_meta['options'] ) ? ppom_convert_options_to_key_val( $field_meta['options'], $field_meta, $product ) : array();
+					$options = isset( $field_meta['options'] ) ? Helpers::convert_options_to_key_val( $field_meta['options'], $field_meta, $product ) : array();
 					break;
 			}
 
@@ -298,7 +301,7 @@ final class Engine {
 			$field_price     = '';
 			$option_quantity = 1;
 
-			if ( ppom_reset_cart_quantity_to_one( $product_id ) ) {
+			if ( Helpers::reset_cart_quantity_to_one( $product_id ) ) {
 				$option_quantity = self::price_get_total_quantities( $ppom_fields_post, $product_id );
 			}
 
@@ -319,7 +322,7 @@ final class Engine {
 				case 'radio':
 					foreach ( $options as $option ) {
 
-						$option_raw = ppom_wpml_translate( $option['raw'], 'PPOM' );
+						$option_raw = Helpers::wpml_translate( $option['raw'], 'PPOM' );
 						if ( $option_raw == stripcslashes( $value ) ) {
 
 							$option_price   = isset( $option['raw_price'] ) ? $option['raw_price'] : '';
@@ -349,7 +352,7 @@ final class Engine {
 						if ( $value ) {
 							foreach ( $value as $val ) {
 
-								$option_raw = ppom_wpml_translate( $option['raw'], 'PPOM' );
+								$option_raw = Helpers::wpml_translate( $option['raw'], 'PPOM' );
 								if ( $option_raw == stripcslashes( $val ) ) {
 
 									$option_price = isset( $option['raw_price'] ) ? $option['raw_price'] : '';
@@ -384,7 +387,7 @@ final class Engine {
 
 						foreach ( $options as $option ) {
 
-							$option_raw = ppom_wpml_translate( $option['raw'], 'PPOM' );
+							$option_raw = Helpers::wpml_translate( $option['raw'], 'PPOM' );
 
 							if ( $option_raw == $opt_label ) {
 
@@ -594,7 +597,7 @@ final class Engine {
 						// Check if matrix used
 						$option_price      = $product_price;
 						$option            = array();
-						$pricematrix_field = ppom_has_field_by_type( ppom_get_product_id( $product ), 'pricematrix' );
+						$pricematrix_field = Helpers::has_field_by_type( Helpers::get_product_id( $product ), 'pricematrix' );
 						if ( $pricematrix_field ) {
 							$matrix_found = self::price_matrix_chunk( $product, $pricematrix_field, $product_quantity );
 
@@ -697,7 +700,7 @@ final class Engine {
 						// Check if matrix used
 						$option_price      = $product_price;
 						$option            = array();
-						$pricematrix_field = ppom_has_field_by_type( ppom_get_product_id( $product ), 'pricematrix' );
+						$pricematrix_field = Helpers::has_field_by_type( Helpers::get_product_id( $product ), 'pricematrix' );
 						if ( $pricematrix_field ) {
 							$matrix_found = self::price_matrix_chunk( $product, $pricematrix_field, $product_quantity );
 
@@ -715,7 +718,7 @@ final class Engine {
 				case 'bulkquantity':
 					// THIS SHOULD BE CHECK ON TOP AFTER FOREACH LOOP
 					$conditionally_hidden = $item['ppom']['conditionally_hidden'];
-					if ( ppom_is_field_hidden_by_condition( $data_name, $conditionally_hidden ) ) {
+					if ( Helpers::is_field_hidden_by_condition( $data_name, $conditionally_hidden ) ) {
 						continue 2;
 					}
 
@@ -785,6 +788,9 @@ final class Engine {
 
 				case 'textcounter':
 					// ppom_pa($field_meta);
+					if ( ! is_array( $field_meta ) || ! isset( $field_meta['count_type'] ) ) {
+						break;
+					}
 					$count_type    = $field_meta['count_type'];
 					$enabled_space = isset( $field_meta['enabled_space'] ) ? $field_meta['enabled_space'] : false;
 
@@ -802,7 +808,7 @@ final class Engine {
 
 					}
 
-					if ( $field_meta['count_price'] && $field_meta['count_price'] != '' ) {
+					if ( ! empty( $field_meta['count_price'] ) ) {
 
 						$price          = $field_meta['count_price'] * $length;
 						$field_prices[] = self::generate_field_price( $price, $field_meta, $charge, $options, 1 );
@@ -925,7 +931,7 @@ final class Engine {
 				continue;
 			}
 
-			$field_meta = ppom_get_field_meta_by_dataname( $product_id, $data_name );
+			$field_meta = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
 			$field_type = isset( $field_meta['type'] ) ? $field_meta['type'] : '';
 
 			switch ( $field_type ) {
@@ -992,7 +998,7 @@ final class Engine {
 		// checking for base price
 		$product_price = 0;
 		foreach ( $ppom_fields_post as $dataname => $val ) {
-			$meta = ppom_get_field_meta_by_dataname( $product->get_id(), $dataname );
+			$meta = Helpers::get_field_meta_by_dataname( $product->get_id(), $dataname );
 			if ( isset( $meta['type'] ) && $meta['type'] == 'bulkquantity' ) {
 				$includeprice = apply_filters( 'ppom_bulkquantity_includeprice', '', $meta, $product );
 				if ( $includeprice === 'on' ) {
@@ -1092,13 +1098,13 @@ final class Engine {
 	) {
 
 		// converting back to org price if Currency Switcher is used
-		$base_price = ppom_hooks_convert_price_back( $product_price );
+		$base_price = Callbacks::convert_price_back( $product_price );
 		// $base_price  = $product->get_price();
 		// $base_price = floatval($base_price);
 		// $base_price  = $product->get_price();
 		// ppom_pa($product);   
 		// var_dump($product_quantity);
-		$product_id = ppom_get_product_id( $product );
+		$product_id = Helpers::get_product_id( $product );
 		// var_dump('varia',$product_id);
 
 		$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
@@ -1140,7 +1146,7 @@ final class Engine {
 		// If quantities found
 		if ( $quantities_found > 0 ) {
 
-			if ( ! ppom_is_cart_quantity_updatable( $product_id ) ) {
+			if ( ! Helpers::is_cart_quantity_updatable( $product_id ) ) {
 				// if quantities has price then no need to multiply with total quantities
 				// just use 1
 				$qty        = 1;
@@ -1187,16 +1193,16 @@ final class Engine {
 			foreach ( $pricematrix_fields as $pm ) {
 
 				$pm_dataname = isset( $pm['data_name'] ) ? $pm['data_name'] : '';
-				// var_dump($pm_dataname, ppom_is_field_hidden_by_condition( $pm_dataname ));
+				// var_dump($pm_dataname, Helpers::is_field_hidden_by_condition( $pm_dataname ));
 
-				if ( ppom_is_field_hidden_by_condition( $pm_dataname ) ) {
+				if ( Helpers::is_field_hidden_by_condition( $pm_dataname ) ) {
 					continue;
 				}
 
 				$pm_applied = $pm;
 				break;
 			}
-			$matrix_found = ppom_extract_matrix_by_quantity( $pm_applied, $product, $product_quantity );
+			$matrix_found = Helpers::extract_matrix_by_quantity( $pm_applied, $product, $product_quantity );
 			// ppom_pa($matrix_found); exit;
 		}
 
@@ -1241,7 +1247,7 @@ final class Engine {
 			foreach ( $fixedprice_options as $fp ) {
 
 				$fp_dataname = isset( $fp['data_name'] ) ? $fp['data_name'] : '';
-				if ( ppom_is_field_hidden_by_condition( $fp_dataname ) ) {
+				if ( Helpers::is_field_hidden_by_condition( $fp_dataname ) ) {
 					continue;
 				}
 
@@ -1293,7 +1299,7 @@ final class Engine {
 
 				// $price_tobe_discount = $cart_item_price * $quantity; NOTE: This has to be check
 				$native_product      = wc_get_product( $product_id );
-				$price_tobe_discount = ppom_get_product_price( $native_product ) * $quantity;
+				$price_tobe_discount = Helpers::get_product_price( $native_product ) * $quantity;
 				if ( $matrix_found['discount'] == 'both' ) {
 					$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
 					$total_cart_fee_price = self::price_get_cart_fee_total( $ppom_field_prices );
@@ -1334,7 +1340,7 @@ final class Engine {
 					$fee_price = $fee['without_tax'];
 				}
 
-				$taxable = ppom_get_option( 'ppom_taxable_fixed_price' );
+				$taxable = Helpers::get_option( 'ppom_taxable_fixed_price' );
 				$taxable = $taxable == 'yes' ? true : false;
 				// var_dump($taxable);
 
@@ -1367,7 +1373,7 @@ final class Engine {
 		$matrix_discount = 0.0;
 		$matrix_price    = 0.0;
 		// Check if Price Matrix is used
-		$pricematrix_field = ppom_has_field_by_type( ppom_get_product_id( $product ), 'pricematrix' );
+		$pricematrix_field = Helpers::has_field_by_type( Helpers::get_product_id( $product ), 'pricematrix' );
 		if ( ! $pricematrix_field ) {
 			return null;
 		}
@@ -1406,7 +1412,7 @@ final class Engine {
 
 		$matrix_discount = 0.0;
 		$matrix_price    = 0.0;
-		$matrix_found    = ppom_extract_matrix_by_quantity( $ppom_pricematrix, $product, $product_quantity );
+		$matrix_found    = Helpers::extract_matrix_by_quantity( $ppom_pricematrix, $product, $product_quantity );
 		// ppom_pa($matrix_found);
 		if ( isset( $matrix_found['discount'] ) ) {
 			if ( ! empty( $matrix_found['percent'] ) ) {
@@ -1500,7 +1506,7 @@ final class Engine {
 	// Return percent
 	public static function price_has_discount_matrix( $product, $quantity ) {
 
-		$pricematrix_field = ppom_has_field_by_type( ppom_get_product_id( $product ), 'pricematrix' );
+		$pricematrix_field = Helpers::has_field_by_type( Helpers::get_product_id( $product ), 'pricematrix' );
 		if ( ! $pricematrix_field ) {
 			return false;
 		}
@@ -1535,9 +1541,9 @@ final class Engine {
 		// ppom_pa($cart_items);
 
 		$wc_product = $cart_items['data'];
-		$product_id = ppom_get_product_id( $wc_product );
+		$product_id = Helpers::get_product_id( $wc_product );
 
-		$pricematrix_field = ppom_has_field_by_type( $product_id, 'pricematrix' );
+		$pricematrix_field = Helpers::has_field_by_type( $product_id, 'pricematrix' );
 		if ( ! $pricematrix_field ) {
 			return $cart_items;
 		}
@@ -1546,9 +1552,9 @@ final class Engine {
 		foreach ( $pricematrix_field as $pm ) {
 
 			$pm_dataname = isset( $pm['data_name'] ) ? $pm['data_name'] : '';
-			// var_dump($pm_dataname, ppom_is_field_hidden_by_condition( $pm_dataname ));
+			// var_dump($pm_dataname, Helpers::is_field_hidden_by_condition( $pm_dataname ));
 			$conditionally_hidden = $cart_items['ppom']['conditionally_hidden'];
-			if ( ppom_is_field_hidden_by_condition( $pm_dataname, $conditionally_hidden ) ) {
+			if ( Helpers::is_field_hidden_by_condition( $pm_dataname, $conditionally_hidden ) ) {
 				continue;
 			}
 
@@ -1557,7 +1563,7 @@ final class Engine {
 		}
 
 		// ppom_pa($pm_applied);
-		// $matrix_found = ppom_extract_matrix_by_quantity($pm_applied, $wc_product, $product_quantity);
+		// $matrix_found = Helpers::extract_matrix_by_quantity($pm_applied, $wc_product, $product_quantity);
 		$cart_items['ppom']['price_matrix_found'] = apply_filters( 'ppom_price_marix_found', $matrix_found, $cart_items );
 
 		return $cart_items;
@@ -1569,7 +1575,7 @@ final class Engine {
 			return $option_price;
 		}
 
-		if ( 'yes' != ppom_get_option( 'ppom_taxable_option_price' ) ) {
+		if ( 'yes' != Helpers::get_option( 'ppom_taxable_option_price' ) ) {
 			return $option_price;
 		}
 

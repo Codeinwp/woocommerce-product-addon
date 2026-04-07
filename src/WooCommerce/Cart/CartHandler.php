@@ -10,6 +10,10 @@
 
 namespace PPOM\WooCommerce\Cart;
 
+use PPOM\Hooks\Callbacks;
+use PPOM\Pricing\Engine;
+use PPOM\Support\Helpers;
+
 /**
  * @internal
  */
@@ -30,7 +34,7 @@ final class CartHandler {
 	 *
 	 * @see ppom_check_validation()
 	 * @see ppom_price_controller()
-	 * @see ppom_make_meta_data()
+	 * @see Helpers::make_meta_data()
 	 */
 	public static function add_cart_item_data( $cart, $product_id ) {
 
@@ -68,7 +72,7 @@ final class CartHandler {
 		}
 
 		$wc_product = $cart_items['data'];
-		$product_id = ppom_get_product_id( $wc_product );
+		$product_id = Helpers::get_product_id( $wc_product );
 
 		$ppom_meta_ids = '';
 		// removing id field
@@ -78,7 +82,7 @@ final class CartHandler {
 		}
 
 		// converting back to org price if Currency Switcher is used
-		$ppom_item_org_price = ppom_hooks_convert_price_back( $wc_product->get_price() );
+		$ppom_item_org_price = Callbacks::convert_price_back( $wc_product->get_price() );
 		// $ppom_item_org_price = $wc_product->get_price();
 
 		$ppom_item_order_qty = floatval( $cart_items['quantity'] );
@@ -113,7 +117,7 @@ final class CartHandler {
 
 
 		// Check if price is set by matrix
-		$matrix_found = ppom_get_price_matrix_chunk( $wc_product, $option_prices, $ppom_item_order_qty );
+		$matrix_found = Helpers::get_price_matrix_chunk( $wc_product, $option_prices, $ppom_item_order_qty );
 		// ppom_pa($matrix_found);
 
 		// Calculating option prices
@@ -132,7 +136,7 @@ final class CartHandler {
 						// verify prices from server due to security
 						if ( isset( $option['data_name'] ) && isset( $option['option_id'] ) ) {
 
-							$option_price = ppom_get_field_option_price_by_id( $option, $wc_product, $ppom_meta_ids );
+							$option_price = Helpers::get_field_option_price_by_id( $option, $wc_product, $ppom_meta_ids );
 						}
 
 						$total_option_price += wc_format_decimal( $option_price, wc_get_price_decimals() );
@@ -143,7 +147,7 @@ final class CartHandler {
 						// verify prices from server due to security
 						if ( isset( $option['data_name'] ) && isset( $option['option_id'] ) ) {
 
-							$option_price = ppom_get_field_option_price_by_id( $option, $wc_product, $ppom_meta_ids );
+							$option_price = Helpers::get_field_option_price_by_id( $option, $wc_product, $ppom_meta_ids );
 						}
 						$ppon_onetime_cost += wc_format_decimal( $option_price, wc_get_price_decimals() );
 						break;
@@ -205,8 +209,8 @@ final class CartHandler {
 				/**
 				 * @since 15.4: Updating options weight
 				 */
-				if ( ppom_pro_is_installed() ) {
-					$option_weight = ppom_get_field_option_weight_by_id( $option, $ppom_meta_ids );
+				if ( Helpers::pro_is_installed() ) {
+					$option_weight = Helpers::get_field_option_weight_by_id( $option, $ppom_meta_ids );
 					if ( $option_weight > 0 ) {
 						$new_weight = $wc_product->get_weight() + $option_weight;
 						$wc_product->set_weight( $new_weight );
@@ -235,11 +239,11 @@ final class CartHandler {
 						// Also adding quantities price if used
 						$total_price_to_be_discount = $total_with_options + $ppom_quantities_price;
 
-						$price_after_precent = ppom_get_amount_after_percentage( $total_price_to_be_discount, $matrix_found['percent'] );
+						$price_after_precent = Engine::get_amount_after_percentage( $total_price_to_be_discount, $matrix_found['percent'] );
 					} elseif ( $matrix_found['discount'] == 'base' ) {
 
 						$total_price_to_be_discount = $ppom_item_org_price + $ppom_quantities_price;
-						$price_after_precent        = ppom_get_amount_after_percentage( $total_price_to_be_discount, $matrix_found['percent'] );
+						$price_after_precent        = Engine::get_amount_after_percentage( $total_price_to_be_discount, $matrix_found['percent'] );
 					}
 
 					$ppom_total_discount += $price_after_precent;
@@ -390,7 +394,7 @@ final class CartHandler {
 			return $item_meta;
 		}
 
-		$ppom_meta = ppom_make_meta_data( $cart_item );
+		$ppom_meta = Helpers::make_meta_data( $cart_item );
 		// ppom_pa($ppom_meta);
 
 		foreach ( $ppom_meta as $key => $meta ) {
@@ -427,7 +431,7 @@ final class CartHandler {
 				$meta_key = stripslashes( $meta_name );
 
 				// WPML
-				$meta_key = ppom_wpml_translate( $meta_key, 'PPOM' );
+				$meta_key = Helpers::wpml_translate( $meta_key, 'PPOM' );
 
 				$item_meta[] = array(
 					'name'    => wp_strip_all_tags( $meta_key ),
@@ -451,7 +455,7 @@ final class CartHandler {
 	// When quantities is used then reset quantity to 1
 	public static function add_to_cart_quantity( $quantity, $product_id ) {
 
-		if ( ppom_reset_cart_quantity_to_one( $product_id ) ) {
+		if ( Helpers::reset_cart_quantity_to_one( $product_id ) ) {
 			$quantity = 1;
 		}
 
@@ -510,11 +514,11 @@ final class CartHandler {
 		$ppom_fields_post = $cart_item['ppom']['fields'];
 		$product_id       = $cart_item['product_id'];
 
-		if ( ppom_is_cart_quantity_updatable( $product_id ) ) {
+		if ( Helpers::is_cart_quantity_updatable( $product_id ) ) {
 			return $quantity;
 		}
 
-		$ppom_has_quantities = ppom_price_get_total_quantities( $ppom_fields_post, $product_id );
+		$ppom_has_quantities = Engine::price_get_total_quantities( $ppom_fields_post, $product_id );
 
 		// var_dump(!$ppom_quantitiles_allow_update_cart);
 		// If no quantity updated then return default
@@ -542,7 +546,7 @@ final class CartHandler {
 
 		$price = 0;
 		foreach ( $option_prices as $option ) {
-			$option       = ppom_translation_options( $option );
+			$option       = Helpers::translation_options( $option );
 			$option_price = isset( $option['price'] ) ? $option['price'] : 0;
 			if ( 0 === $option_price || ( ! isset( $option['apply'] ) || 'onetime' !== $option['apply'] ) ) {
 				continue;
@@ -562,7 +566,7 @@ final class CartHandler {
 		$product_data  = new \WC_Product( $product_id );
 		$product_price = floatval( $product_data->get_price() ) * $quantity;
 		$item_subtotal = $product_price + $price;
-		return ppom_price( $item_subtotal );
+		return Helpers::price( $item_subtotal );
 	}
 
 	public static function control_checkout_quantity( $quantity, $cart_item, $cart_item_key ) {
@@ -575,11 +579,11 @@ final class CartHandler {
 		$ppom_fields_post = $cart_item['ppom']['fields'];
 		$product_id       = $cart_item['product_id'];
 
-		if ( ppom_is_cart_quantity_updatable( $product_id ) ) {
+		if ( Helpers::is_cart_quantity_updatable( $product_id ) ) {
 			return $quantity;
 		}
 
-		$ppom_has_quantities = ppom_price_get_total_quantities( $ppom_fields_post, $product_id );
+		$ppom_has_quantities = Engine::price_get_total_quantities( $ppom_fields_post, $product_id );
 
 		// If no quantity updated then return default
 		if ( $ppom_has_quantities > 0 ) {
@@ -602,11 +606,11 @@ final class CartHandler {
 
 		$ppom_fields_post = $ppom_fields_post['fields'];
 
-		if ( ppom_is_cart_quantity_updatable( $product_id ) ) {
+		if ( Helpers::is_cart_quantity_updatable( $product_id ) ) {
 			return $quantity;
 		}
 
-		$ppom_has_quantities = ppom_price_get_total_quantities( $ppom_fields_post, $product_id );
+		$ppom_has_quantities = Engine::price_get_total_quantities( $ppom_fields_post, $product_id );
 
 		if ( $ppom_has_quantities > 0 ) {
 			$quantity = '<strong class="product-quantity">' . sprintf( '&times; %s', $ppom_has_quantities ) . '</strong>';
@@ -628,11 +632,11 @@ final class CartHandler {
 
 		$ppom_fields_post = $ppom_fields_post['fields'];
 
-		if ( ppom_is_cart_quantity_updatable( $product_id ) ) {
+		if ( Helpers::is_cart_quantity_updatable( $product_id ) ) {
 			return $quantity;
 		}
 
-		$ppom_has_quantities = ppom_price_get_total_quantities( $ppom_fields_post, $product_id );
+		$ppom_has_quantities = Engine::price_get_total_quantities( $ppom_fields_post, $product_id );
 
 		if ( $ppom_has_quantities > 0 ) {
 			$quantity = '<strong class="product-quantity">' . esc_html( $ppom_has_quantities ) . '</strong>';
@@ -654,11 +658,11 @@ final class CartHandler {
 
 		$ppom_fields_post = $ppom_fields_post['fields'];
 
-		if ( ppom_is_cart_quantity_updatable( $product_id ) ) {
+		if ( Helpers::is_cart_quantity_updatable( $product_id ) ) {
 			return $quantity;
 		}
 
-		$ppom_has_quantities = ppom_price_get_total_quantities( $ppom_fields_post, $product_id );
+		$ppom_has_quantities = Engine::price_get_total_quantities( $ppom_fields_post, $product_id );
 
 		if ( $ppom_has_quantities > 0 ) {
 			$quantity = $ppom_has_quantities;
@@ -669,7 +673,7 @@ final class CartHandler {
 
 	public static function cart_update_validate( $cart_validated, $cart_item_key, $values, $quantity ) {
 
-		$max_quantity = ppom_get_cart_item_max_quantity( $values );
+		$max_quantity = Helpers::get_cart_item_max_quantity( $values );
 
 		if ( ! is_null( $max_quantity ) && $quantity > intval( $max_quantity ) ) {
 

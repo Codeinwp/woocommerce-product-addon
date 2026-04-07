@@ -8,6 +8,10 @@
 
 namespace PPOM\Admin;
 
+use PPOM\Meta\MetaRepositoryAccessor;
+use PPOM\Support\Helpers;
+use PPOM\Validation\Validator;
+
 /**
  * @internal
  */
@@ -299,8 +303,8 @@ final class Manager {
 	 *
 	 * @return void
 	 *
-	 * @see ppom_sanitize_array_data()
-	 * @see ppom_attach_fields_to_product()
+	 * @see Validator::sanitize_array_data()
+	 * @see Helpers::attach_fields_to_product()
 	 */
 	public static function save_form_meta() {
 
@@ -320,7 +324,7 @@ final class Manager {
 
 		if ( empty( $ppom_form_nonce )
 		|| ! wp_verify_nonce( $ppom_form_nonce, 'ppom_form_nonce_action' )
-		|| ! ppom_security_role()
+		|| ! Helpers::security_role()
 		) {
 			$resp = array(
 				'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
@@ -354,7 +358,7 @@ final class Manager {
 		}
 
 		$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );
-		$product_meta = ppom_sanitize_array_data( $product_meta );
+		$product_meta = Validator::sanitize_array_data( $product_meta );
 		$product_meta = array_filter(
 			$product_meta,
 			function ( $pm ) {
@@ -392,7 +396,7 @@ final class Manager {
 			'productmeta_created'   => current_time( 'mysql' ),
 		);
 
-		if ( ! ppom_is_legacy_user() ) {
+		if ( ! Helpers::is_legacy_user() ) {
 			$ppom_settings_meta_data['productmeta_style'] = $productmeta_style;
 			$ppom_settings_meta_data['productmeta_js']    = $productmeta_js;
 		}
@@ -411,7 +415,7 @@ final class Manager {
 			'%s',
 		);
 
-		$ppom_id = ppom_meta_repository()->insert_group( $dt, $format );
+		$ppom_id = MetaRepositoryAccessor::instance()->insert_group( $dt, $format );
 		if ( is_string( $ppom ) ) {
 			$ppom_encoded = $ppom;
 			parse_str( $ppom_encoded, $ppom_decoded );
@@ -419,7 +423,7 @@ final class Manager {
 		}
 
 		$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom, $ppom_id );
-		$product_meta = ppom_sanitize_array_data( $product_meta );
+		$product_meta = Validator::sanitize_array_data( $product_meta );
 		$product_meta = array_filter(
 			$product_meta,
 			function ( $pm ) {
@@ -443,7 +447,7 @@ final class Manager {
 
 
 		if ( ! empty( $product_id ) ) {
-			ppom_attach_fields_to_product( $ppom_id, $product_id );
+			Helpers::attach_fields_to_product( $ppom_id, $product_id );
 			$redirect_to = get_permalink( $product_id );
 		}
 
@@ -476,7 +480,7 @@ final class Manager {
 	 *
 	 * @return void
 	 *
-	 * @see ppom_sanitize_array_data()
+	 * @see Validator::sanitize_array_data()
 	 */
 	public static function update_form_meta() {
 
@@ -508,7 +512,7 @@ final class Manager {
 
 		if ( empty( $ppom_form_nonce )
 		|| ! wp_verify_nonce( $ppom_form_nonce, 'ppom_form_nonce_action' )
-		|| ! ppom_security_role()
+		|| ! Helpers::security_role()
 		) {
 			$resp = array(
 				'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
@@ -526,7 +530,7 @@ final class Manager {
 
 		$ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];
 		$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );
-		$product_meta = ppom_sanitize_array_data( $product_meta );
+		$product_meta = Validator::sanitize_array_data( $product_meta );
 		// Remove the meta row if the type or data_name is empty.
 		$product_meta = array_filter(
 			$product_meta,
@@ -561,7 +565,7 @@ final class Manager {
 			'aviary_api_key'        => trim( $aviary_api_key ),
 			'the_meta'              => $product_meta,
 		);
-		if ( ! ppom_is_legacy_user() ) {
+		if ( ! Helpers::is_legacy_user() ) {
 			$ppom_settings_meta_data['productmeta_style'] = $productmeta_style;
 			$ppom_settings_meta_data['productmeta_js']    = $productmeta_js;
 		}
@@ -589,7 +593,7 @@ final class Manager {
 			'%d',
 		);
 
-		$rows_effected = ppom_meta_repository()->update_group( (int) $productmeta_id, $dt, $format, $where, $where_format );
+		$rows_effected = MetaRepositoryAccessor::instance()->update_group( (int) $productmeta_id, $dt, $format, $where, $where_format );
 
 		// $wpdb->show_errors(); $wpdb->print_error();
 
@@ -634,11 +638,11 @@ final class Manager {
 	 */
 	public static function update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 
-		$json = wp_json_encode( ppom_sanitize_array_data( $ppom_meta ) );
+		$json = wp_json_encode( Validator::sanitize_array_data( $ppom_meta ) );
 		if ( false === $json ) {
 			return false;
 		}
-		$rows_effected = ppom_meta_repository()->update_the_meta_only( (int) $ppom_id, $json );
+		$rows_effected = MetaRepositoryAccessor::instance()->update_the_meta_only( (int) $ppom_id, $json );
 
 		return (bool) $rows_effected;
 	}
@@ -659,7 +663,7 @@ final class Manager {
 
 		if ( empty( $ppom_meta_nonce )
 		|| ! wp_verify_nonce( $ppom_meta_nonce, 'ppom_meta_nonce_action' )
-		|| ! ppom_security_role()
+		|| ! Helpers::security_role()
 		) {
 			$response = array(
 				'status'  => 'error',
@@ -672,7 +676,7 @@ final class Manager {
 		$productmeta_id = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
 
 		$ppom_id = intval( $productmeta_id );
-		$res     = ppom_meta_repository()->delete_by_id( $ppom_id );
+		$res     = MetaRepositoryAccessor::instance()->delete_by_id( $ppom_id );
 
 
 		$response = array();
@@ -705,7 +709,7 @@ final class Manager {
 
 		if ( empty( $ppom_meta_nonce )
 		|| ! wp_verify_nonce( $ppom_meta_nonce, 'ppom_meta_nonce_action' )
-		|| ! ppom_security_role()
+		|| ! Helpers::security_role()
 		|| ! array_key_exists( 'productmeta_ids', $_POST )
 		|| ! is_array( $_POST['productmeta_ids'] )
 		) {
@@ -728,7 +732,7 @@ final class Manager {
 
 		global $wpdb;
 
-		$res = ppom_meta_repository()->delete_by_ids( $del_ids );
+		$res = MetaRepositoryAccessor::instance()->delete_by_ids( $del_ids );
 
 		if ( $res ) {
 			_e( 'Meta deleted successfully', 'woocommerce-product-addon' );
@@ -804,7 +808,7 @@ final class Manager {
 	 * @return void
 	 *
 	 * @see PPOM_Meta::__construct()
-	 * @see ppom_attach_fields_to_product()
+	 * @see Helpers::attach_fields_to_product()
 	 */
 	public static function bar_menu() {
 
@@ -814,7 +818,7 @@ final class Manager {
 
 		global $wp_admin_bar, $product;
 
-		$product_id = ppom_get_product_id( $product );
+		$product_id = Helpers::get_product_id( $product );
 		$ppom       = new PPOM_Meta( $product_id );
 
 		if ( ! $ppom->is_exists ) {

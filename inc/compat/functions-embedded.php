@@ -13,13 +13,7 @@
 if ( ! function_exists( 'ppom_wc_add_notice' ) ) {
 	function ppom_wc_add_notice( $string, $type = 'error' ) {
 
-		global $woocommerce;
-		if ( version_compare( $woocommerce->version, 2.1, '>=' ) ) {
-			wc_add_notice( $string, $type );
-			// Use new, updated functions
-		} else {
-			$woocommerce->add_error( $string );
-		}
+		\PPOM\Support\Helpers::wc_add_notice( $string, $type );
 	}
 }
 
@@ -65,30 +59,7 @@ if ( ! function_exists( 'ppom_wpml_translate' ) ) {
 
 	function ppom_wpml_translate( $field_value, $domain ) {
 
-		// $field_value is array then return
-		if ( is_array( $field_value ) ) {
-			return $field_value;
-		}
-
-		$field_name  = $domain . ' - ' . sanitize_key( $field_value );
-		$field_value = stripslashes( $field_value );
-
-		// WMPL
-		/**
-		 * register strings for translation
-		 * source: https://wpml.org/wpml-hook/wpml_translate_single_string/
-		 */
-		if ( has_filter( 'wpml_translate_single_string' ) ) {
-			$field_value = apply_filters( 'wpml_translate_single_string', $field_value, $domain, $field_name );
-		}
-
-
-		// Polylang
-		if ( function_exists( 'pll__' ) ) {
-			$field_value = pll__( $field_value );
-		}
-
-		return $field_value;
+		return \PPOM\Support\Helpers::wpml_translate( $field_value, $domain );
 	}
 }
 

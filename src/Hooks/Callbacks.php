@@ -7,6 +7,10 @@
 
 namespace PPOM\Hooks;
 
+use PPOM\Arrays\Settings;
+use PPOM\Files\Handler;
+use PPOM\Support\Helpers;
+use PPOM\WooCommerce\Product\ProductHandler;
 use PPOM_Meta;
 use WC_Order;
 use WC_Product;
@@ -24,7 +28,7 @@ final class Callbacks {
 
 		$product_id = intval( $posted_data['ppom_product_id'] );
 
-		$cropped_fields = ppom_has_field_by_type( $product_id, 'cropper' );
+		$cropped_fields = Helpers::has_field_by_type( $product_id, 'cropper' );
 		if ( empty( $cropped_fields ) ) {
 			return $ppom_fields;
 		}
@@ -52,15 +56,15 @@ final class Callbacks {
 					// Verify uploaded file type.
 					$allowed_types = isset( $cropper['file_types'] ) && ! empty( $cropper['file_types'] ) ? sanitize_text_field( $cropper['file_types'] ) : 'jpg,png';
 					$allowed_types = explode( ',', $allowed_types );
-					$dir_path      = ppom_get_dir_path();
+					$dir_path      = Handler::get_dir_path();
 					$file_type     = wp_check_filetype_and_ext( $dir_path . $file_name, $file_name );
 
 					if ( ! in_array( $file_type['ext'], $allowed_types, true ) ) {
 						continue;
 					}
 
-					$file_name = ppom_file_get_name( $file_name, $product_id );
-					ppom_save_data_url_to_image( $image_data, $file_name );
+					$file_name = Handler::file_get_name( $file_name, $product_id );
+					Handler::save_data_url_to_image( $image_data, $file_name );
 				}
 				// Saving cropped data to image
 			}
@@ -152,7 +156,7 @@ final class Callbacks {
 			$options_display = $option['option'];
 
 			if ( $price != '' ) {
-				$options_display .= '(' . ppom_price( $price ) . ')';
+				$options_display .= '(' . Helpers::price( $price ) . ')';
 			}
 
 			$option_display_values[] = $options_display;
@@ -179,7 +183,7 @@ final class Callbacks {
 
 		$ppom_attribtues = array();
 
-		$ppom_attribtues['data-errormsg'] = isset( $field_meta['error_message'] ) ? ppom_wpml_translate( $field_meta['error_message'], 'PPOM' ) : null;
+		$ppom_attribtues['data-errormsg'] = isset( $field_meta['error_message'] ) ? Helpers::wpml_translate( $field_meta['error_message'], 'PPOM' ) : null;
 
 		switch ( $type ) {
 
@@ -218,11 +222,18 @@ final class Callbacks {
 	 *
 	 * @see PPOM_Meta::__construct()
 	 * @see PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id()
-	 * @see ppom_woocommerce_template_base_inputs_rendering()
+	 * @see ProductHandler::template_base_inputs_rendering()
 	 */
 	public static function load_input_scripts( $product, $ppom_id = null ) {
 
-		$product_id = ppom_get_product_id( $product );
+		$product_id = Helpers::get_product_id( $product );
+		if ( ! $product instanceof WC_Product ) {
+			$resolved_product = wc_get_product( (int) $product_id );
+			if ( ! $resolved_product ) {
+				return '';
+			}
+			$product = $resolved_product;
+		}
 
 		$ppom               = new PPOM_Meta( $product_id );
 		$ppom_meta_settings = $ppom->ppom_settings;
@@ -256,7 +267,7 @@ final class Callbacks {
 		}
 
 		// If Bootstrap is enabled
-		if ( ppom_load_bootstrap_css() ) {
+		if ( Helpers::load_bootstrap_css() ) {
 
 			// Boostrap 4.0
 			$ppom_bs_css = PPOM_URL . '/css/bootstrap/bootstrap.css';
@@ -272,13 +283,13 @@ final class Callbacks {
 		}
 
 		// Font-awesome
-		if ( ppom_load_fontawesome() ) {
+		if ( Helpers::load_fontawesome() ) {
 			wp_enqueue_style( 'prefix-font-awesome', '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css' );
 		}
 
 		// Price display controller
-		$ppom_price_js = ppom_get_price_table_calculation();
-		$dependencies  = ppom_get_price_table_js_dependencies();
+		$ppom_price_js = Helpers::get_price_table_calculation();
+		$dependencies  = Helpers::get_price_table_js_dependencies();
 		wp_enqueue_script(
 			'ppom-price',
 			PPOM_URL . "/js/price/{$ppom_price_js}",
@@ -309,7 +320,7 @@ final class Callbacks {
 
 				// var_dump($field['options']);
 				if ( isset( $field['options'] ) && $type != 'bulkquantity' ) {
-					$field['options'] = ppom_convert_options_to_key_val( $field['options'], $field, $product );
+					$field['options'] = Helpers::convert_options_to_key_val( $field['options'], $field, $product );
 				}
 
 
@@ -389,7 +400,7 @@ final class Callbacks {
 						}
 
 						// Croppie options
-						$croppie_options[ $data_name ] = ppom_get_croppie_options( $field );
+						$croppie_options[ $data_name ] = Handler::get_croppie_options( $field );
 
 						wp_enqueue_script( 'ppom-croppie', $ppom_croppie_api, '', PPOM_VERSION );
 						wp_enqueue_script( 'ppom-exif', $ppom_exif, '', PPOM_VERSION );
@@ -402,12 +413,12 @@ final class Callbacks {
 						$ppom_file_vars           = array(
 							'ajaxurl'                => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
 							'plugin_url'             => PPOM_URL,
-							'file_upload_path_thumb' => ppom_get_dir_url( true ),
-							'file_upload_path'       => ppom_get_dir_url(),
+							'file_upload_path_thumb' => Handler::get_dir_url( true ),
+							'file_upload_path'       => Handler::get_dir_url(),
 							'mesage_max_files_limit' => __( ' files allowed only', 'woocommerce-product-addon' ),
 							'file_inputs'            => $ppom_file_inputs,
 							'delete_file_msg'        => __( 'Are you sure?', 'woocommerce-product-addon' ),
-							'plupload_runtime'       => ( ppom_if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
+							'plupload_runtime'       => ( Helpers::if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
 							'croppie_options'        => $croppie_options,
 							'ppom_file_upload_nonce' => wp_create_nonce( $file_upload_nonce_action ),
 							'ppom_file_delete_nonce' => wp_create_nonce( $file_delete_nonce_action ),
@@ -430,13 +441,13 @@ final class Callbacks {
 						$ppom_file_vars           = array(
 							'ajaxurl'                => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
 							'plugin_url'             => PPOM_URL,
-							'file_upload_path_thumb' => ppom_get_dir_url( true ),
-							'file_upload_path'       => ppom_get_dir_url(),
+							'file_upload_path_thumb' => Handler::get_dir_url( true ),
+							'file_upload_path'       => Handler::get_dir_url(),
 							'mesage_max_files_limit' => __( ' files allowed only', 'woocommerce-product-addon' ),
 							'file_inputs'            => $ppom_file_inputs,
 							'delete_file_msg'        => __( 'Are you sure?', 'woocommerce-product-addon' ),
 							'aviary_api_key'         => '',
-							'plupload_runtime'       => ( ppom_if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
+							'plupload_runtime'       => ( Helpers::if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
 							'ppom_file_upload_nonce' => wp_create_nonce( $file_upload_nonce_action ),
 							'ppom_file_delete_nonce' => wp_create_nonce( $file_delete_nonce_action ),
 							'enable_file_rename'     => $enable_file_rename,
@@ -472,7 +483,7 @@ final class Callbacks {
 						if ( ! isset( $field_conditions['rules'][ $rule_index ]['element_values'] ) ) {
 							continue;
 						}
-						$field_conditions['rules'][ $rule_index ]['element_values'] = ppom_wpml_translate( $rule['element_values'], 'PPOM' );
+						$field_conditions['rules'][ $rule_index ]['element_values'] = Helpers::wpml_translate( $rule['element_values'], 'PPOM' );
 						++$rule_index;
 					}
 
@@ -503,7 +514,7 @@ final class Callbacks {
 			'wc_no_decimal'       => $decimal_palces,
 			'show_price_per_unit' => $show_price_per_unit,
 		);
-		$ppom_input_vars = ppom_array_get_js_input_vars( $product, $vars_args );
+		$ppom_input_vars = Settings::get_js_input_vars( $product, $vars_args );
 
 		wp_localize_script( 'ppom-inputs', 'ppom_input_vars', $ppom_input_vars );
 		wp_localize_script( 'ppom-price', 'ppom_input_vars', $ppom_input_vars );
@@ -512,7 +523,7 @@ final class Callbacks {
 		if ( ! empty( $ppom_conditional_fields ) || apply_filters( 'ppom_enqueue_conditions_js', false ) ) {
 			$ppom_input_vars['conditions'] = $ppom_conditional_fields;
 
-			$ppom_conditions_script = ppom_get_conditions_mode() === 'new' ? 'ppom-conditions-v2' : 'ppom-conditions';
+			$ppom_conditions_script = Helpers::get_conditions_mode() === 'new' ? 'ppom-conditions-v2' : 'ppom-conditions';
 			$ppom_conditions_script = apply_filters( 'ppom_conditional_script_file', $ppom_conditions_script, $product );
 			wp_enqueue_script(
 				"ppom-{$ppom_conditions_script}",
@@ -558,7 +569,7 @@ final class Callbacks {
 			$field_setting['max'] = ! empty( $field_meta['max'] ) ? $field_meta['max'] : '';
 		}
 
-		$field_setting['product_id'] = ppom_get_product_id( $product );
+		$field_setting['product_id'] = Helpers::get_product_id( $product );
 
 		return $field_setting;
 	}
@@ -710,7 +721,7 @@ final class Callbacks {
 						isset( $option['label'] ) && nm_wpml_register( $option['label'], 'PPOM' );
 
 						// If Option ID is not provided then generate it.
-						$option['id'] = ppom_get_option_id( $option );
+						$option['id'] = Helpers::get_option_id( $option );
 
 						return $option;
 					},
@@ -785,7 +796,7 @@ final class Callbacks {
 	 *
 	 * @return string
 	 *
-	 * @see ppom_get_conditions_mode()
+	 * @see Helpers::get_conditions_mode()
 	 */
 	public static function input_wrapper_class_new( $input_wrapper_class, $field_meta ) {
 		// var_dump($input_wrapper_class);
@@ -866,7 +877,7 @@ final class Callbacks {
 	 */
 	public static function update_cart_weight( $ppom_field_prices, $ppom_fields_post, $cart_items ) {
 
-		if ( ppom_pro_is_installed() ) {
+		if ( Helpers::pro_is_installed() ) {
 			// ppom_pa($ppom_field_prices);
 			$option_weights = 0;
 			foreach ( $ppom_field_prices as $option ) {
@@ -878,9 +889,9 @@ final class Callbacks {
 				$ppom_meta_ids = isset( $ppom_fields_post['id'] ) ? $ppom_fields_post['id'] : '';
 				// ppom_pa($cart_items);
 				if ( isset( $option['quantity'] ) && $option['quantity'] > 0 ) {
-					$option_weights += ppom_get_field_option_weight_by_id( $option, $ppom_meta_ids ) * $option['quantity'];
+					$option_weights += Helpers::get_field_option_weight_by_id( $option, $ppom_meta_ids ) * $option['quantity'];
 				} else {
-					$option_weights += ppom_get_field_option_weight_by_id( $option, $ppom_meta_ids );
+					$option_weights += Helpers::get_field_option_weight_by_id( $option, $ppom_meta_ids );
 
 				}
 			}
@@ -949,8 +960,8 @@ final class Callbacks {
 	 * @return string|null
 	 *
 	 * @see PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id()
-	 * @see ppom_woocommerce_show_fields_on_product()
-	 * @see ppom_woocommerce_template_base_inputs_rendering()
+	 * @see ProductHandler::show_fields_on_product()
+	 * @see ProductHandler::template_base_inputs_rendering()
 	 */
 	public static function render_shortcode( $attr ) {
 
@@ -983,10 +994,11 @@ final class Callbacks {
 				action="<?php echo esc_url( apply_filters( 'woocommerce_add_to_cart_form_action', $product->get_permalink() ) ); ?>"
 				method="post" enctype='multipart/form-data'>
 			<?php
-			if ( ppom_is_legacy_mode() ) {
-				ppom_woocommerce_show_fields_on_product( $params['product_id'] );
+			$shortcode_product_id = (int) $params['product_id'];
+			if ( Helpers::is_legacy_mode() ) {
+				ProductHandler::show_fields_on_product( $shortcode_product_id );
 			} else {
-				ppom_woocommerce_template_base_inputs_rendering( $params['product_id'] );
+				ProductHandler::template_base_inputs_rendering( $shortcode_product_id );
 			}
 
 			if ( apply_filters( 'ppom_shortcode_show_quantity', true, $product ) ) {
