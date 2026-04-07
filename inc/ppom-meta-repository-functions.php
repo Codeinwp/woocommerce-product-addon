@@ -11,5 +11,5 @@
  * @return PPOM_Meta_Repository
  */
 function ppom_meta_repository() {
-	return PPOM_Meta_Repository::instance();
+	return \PPOM\Meta\MetaRepositoryAccessor::instance();
 }

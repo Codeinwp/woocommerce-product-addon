@@ -1,382 +1,47 @@
 <?php
 /**
- * Orders: line item meta, display, email, upload finalization, order again.
+ * Order item meta and files — compatibility wrappers.
  *
  * @package PPOM
  * @subpackage WooCommerce
- *
- * @see woocommerce.php Parent loader under inc/.
  */
-// Order persistence.
 
-/**
- * Stores PPOM metadata on an order line item.
- *
- * Saves formatted display values as line-item meta and preserves the raw PPOM
- * payload in `_ppom_fields` for later formatting and replay.
- *
- * @param WC_Order_Item_Product $item          Order line item.
- * @param string                $cart_item_key Cart item key.
- * @param array                 $values        Cart item values.
- * @param WC_Order              $order         Order being created.
- *
- * @return void
- *
- * @see ppom_make_meta_data()
- * @see ppom_get_field_meta_by_dataname()
- * @see ppom_woocommerce_order_value()
- */
+if ( ! defined( 'ABSPATH' ) ) {
+	die( 'Not Allowed.' );
+}
+
 function ppom_woocommerce_order_item_meta( $item, $cart_item_key, $values, $order ) {
-
-	if ( ! isset( $values ['ppom']['fields'] ) ) {
-		return;
-	}
-	// ADDED WC BUNDLES COMPATIBILITY
-	if ( function_exists( 'wc_pb_is_bundled_cart_item' ) && wc_pb_is_bundled_cart_item( $values ) ) {
-		return;
-	}
-
-	$ppom_meta = ppom_make_meta_data( $values, 'order' );
-	// ppom_pa($item->get_product_id()); exit;
-
-	$cropper_fields = array();
-	foreach ( $ppom_meta as $key => $meta ) {
-
-		if ( ! isset( $meta['value'] ) ) {
-			continue;
-		}
-
-		// WPML
-		$meta_key = ppom_wpml_translate( $key, 'PPOM' );
-
-		$meta_value = isset( $meta['display'] ) ? $meta['display'] : $meta['value'];
-		$item->update_meta_data( $key, $meta_value );
-
-		// Since 24.5: Removing the image cropper base64 data
-		// Reason: https://clients.najeebmedia.com/forums/topic/order-search-in-woocommerce-not-working/
-		$meta = ppom_get_field_meta_by_dataname( $item->get_product_id(), $key );
-		if ( isset( $meta['type'] ) && $meta['type'] == 'cropper' ) {
-			$cropper_fields[] = $key;
-		}
-	}
-
-	$no_base64                = array_diff_key( $values ['ppom']['fields'], array_flip( $cropper_fields ) );
-	$values['ppom']['fields'] = $no_base64;
-
-	// Since 15.2, saving all fields as another meta
-	$item->update_meta_data( '_ppom_fields', $values ['ppom'] );
+	\PPOM\WooCommerce\Order\OrderHandler::order_item_meta( $item, $cart_item_key, $values, $order );
 }
 
-// Changing order item meta key to label
 function ppom_woocommerce_order_key( $display_key, $meta, $item ) {
-
-	if ( $item->get_type() != 'line_item' ) {
-		return $display_key;
-	}
-
-	$field_meta = ppom_get_field_meta_by_dataname( $item->get_product_id(), $display_key );
-	if ( isset( $field_meta['title'] ) && $field_meta['title'] != '' ) {
-		$display_key = stripslashes( $field_meta['title'] );
-	}
-
-	return $display_key;
+	return \PPOM\WooCommerce\Order\OrderHandler::order_key( $display_key, $meta, $item );
 }
 
-/**
- * Formats PPOM order item meta for display.
- *
- * @param mixed              $display_value Formatted value from WooCommerce.
- * @param object|null        $meta          Order item meta object.
- * @param WC_Order_Item|null $item   Order item.
- *
- * @return mixed
- *
- * @see ppom_generate_html_for_files()
- * @see ppom_get_field_meta_by_dataname()
- * @see ppom_woocommerce_order_item_meta()
- */
 function ppom_woocommerce_order_value( $display_value, $meta = null, $item = null ) {
-
-	if ( is_null( $item ) ) {
-		return $display_value;
-	}
-
-	if ( $item->get_type() != 'line_item' ) {
-		return $display_value;
-	}
-
-	$field_meta = ppom_get_field_meta_by_dataname( $item->get_product_id(), $meta->key );
-
-	// if( ! isset($field_meta['type']) ) return $display_value;
-
-	$input_type = isset( $field_meta['type'] ) ? $field_meta['type'] : '';
-
-	switch ( $input_type ) {
-
-		case 'file':
-		case 'cropper':
-			/**
-			 * File upload and croppers now save only filename in meta
-			 * seperated by commas, now here we will build it's html to show thumbs in item orde
-			 *
-			 * @since: 10.10
-			 */
-			$display_value = ppom_generate_html_for_files( $meta->value, $input_type, $item );
-			break;
-
-		case 'image':
-			$display_value = $meta->value;
-			break;
-
-		default:
-			// Important hook: changing order value format using local hooks
-			// Also being used for export order lite
-			$display_value = apply_filters( 'ppom_order_display_value', $display_value, $meta, $item );
-			break;
-
-	}
-
-	return $display_value;
+	return \PPOM\WooCommerce\Order\OrderHandler::order_value( $display_value, $meta, $item );
 }
 
-
-// Hiding some ppom meta like ppom_has_quantities
 function ppom_woocommerce_hide_order_meta( $formatted_meta, $order_item ) {
-
-	if ( empty( $formatted_meta ) ) {
-		return $formatted_meta;
-	}
-
-	$ppom_meta_searching = $formatted_meta;
-	// ppom_has_quantities
-	foreach ( $ppom_meta_searching as $meta_id => $meta_data ) {
-
-		if ( $meta_data->key == 'ppom_has_quantities' ) {
-			unset( $formatted_meta[ $meta_id ] );
-		}
-	}
-
-	return $formatted_meta;
+	return \PPOM\WooCommerce\Order\OrderHandler::hide_order_meta( $formatted_meta, $order_item );
 }
 
-// Upload finalization.
-
-/**
- * Moves uploaded PPOM files into the confirmed order directory.
- *
- * File names and destination paths are resolved on the server from the cart
- * payload and the saved field schema.
- *
- * @param int      $order_id    Order ID.
- * @param mixed    $posted_data Posted checkout data.
- * @param WC_Order $order       Processed order.
- *
- * @return void
- *
- * @see ppom_get_dir_path()
- * @see ppom_get_field_meta_by_dataname()
- * @see ppom_get_file_download_url()
- */
 function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
-
-	global $woocommerce;
-
-	// getting product id in cart
-	$cart = WC()->cart->get_cart();
-
-	// ppom_pa($cart); exit;
-
-
-	// since 8.1, files will be send to email as attachment
-
-	// ppom_pa($cart); exit;
-	foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-
-		// ppom_pa($cart_item); exit;
-		if ( ! isset( $cart_item['ppom']['fields'] ) ) {
-			continue;
-		}
-
-		$product_id      = $cart_item['product_id'];
-		$all_moved_files = array();
-
-		foreach ( $cart_item['ppom']['fields'] as $key => $values ) {
-
-			if ( $key == 'id' ) {
-				continue;
-			}
-
-			$field_meta = ppom_get_field_meta_by_dataname( $product_id, $key );
-			if ( ! $field_meta ) {
-				continue;
-			}
-
-			$field_type  = $field_meta['type'];
-			$field_label = isset( $field_meta['title'] ) ? $field_meta['title'] : $field_meta['data_name'];
-			$moved_files = array();
-
-			if ( $field_type == 'file' || $field_type == 'cropper' ) {
-
-				$base_dir_path      = ppom_get_dir_path();
-				$confirm_dir        = 'confirmed/' . $order_id;
-				$confirmed_dir_path = ppom_get_dir_path( $confirm_dir );
-				$edits_dir_path     = ppom_get_dir_path( 'edits' );
-
-				foreach ( $values as $file_id => $file_data ) {
-					if ( ! isset( $file_data['org'] ) ) {
-						continue;
-					}
-					$file_name    = $file_data['org'];
-					$file_cropped = isset( $file_data['cropped'] ) ? true : false;
-
-					$new_filename     = ppom_file_get_name( $file_name, $product_id, $cart_item );
-					$source_file      = $base_dir_path . $file_name;
-					$destination_path = $confirmed_dir_path . $new_filename;
-
-
-					if ( file_exists( $destination_path ) ) {
-						break;
-					}
-
-					/*
-					$moved_files[] = array('path' => $destination_path,
-											'file_name' => $file_name,
-											'product_id' => $product_id);*/
-
-					if ( file_exists( $source_file ) ) {
-
-						if ( ! rename( $source_file, $destination_path ) ) {
-							die( 'Error while re-naming order image ' . $source_file );
-						}
-					}
-
-					// renaming edited files
-					$source_file_edit      = $edits_dir_path . $file_name;
-					$destination_path_edit = '';
-
-					$file_edited = false;
-					if ( file_exists( $source_file_edit ) ) {
-
-						$destination_path_edit = $edits_dir_path . $new_filename;
-						if ( ! rename( $source_file_edit, $destination_path_edit ) ) {
-							die( 'Error while re-naming order image ' . $source_file_edit );
-						} else {
-							$file_edited = true;
-						}
-					}
-
-					$moved_files[] = array(
-						'path'           => $destination_path,
-						'file_name'      => $file_name,
-						'file_label'     => $field_label,
-						'file_cropped'   => $file_cropped,
-						'file_edited'    => $file_edited,
-						'file_edit_path' => $destination_path_edit,
-						'product_id'     => $product_id,
-						'field_name'     => $key,
-					);
-
-					// $moved_files['file_edited'] = $file_edited;
-				}
-
-				$all_moved_files[ $key ] = $moved_files;
-			}
-		}
-
-		do_action( 'ppom_after_files_moved', $all_moved_files, $order_id, $order );
-	}
+	\PPOM\WooCommerce\Order\OrderHandler::rename_files( $order_id, $posted_data, $order );
 }
 
-/**
- * Responsible from the adding a support for Order Again functionality in the WooCommerce My Account -> Order View page.
- * The method adds PPOM Fields to the given order item from the provided order. (Clones the PPOM data of data order item to the new cart)
- *
- * @param  array                  $cart_item_data Current custom item data.
- * @param  \WC_Order_Item_Product $item Order Item Product
- * @param  \WC_Order              $order
- * @return void
- */
 function ppom_wc_order_again_compatibility( $cart_item_data, $item, $order ) {
-	$ppom_data = $item->get_meta( '_ppom_fields' );
-
-	if ( is_array( $ppom_data ) && array_key_exists( 'fields', $ppom_data ) ) {
-		$cart_item_data['ppom'] = $ppom_data;
-	}
-
-	return $cart_item_data;
+	return \PPOM\WooCommerce\Order\OrderHandler::wc_order_again_compatibility( $cart_item_data, $item, $order );
 }
 
-/**
- * Outputs the formatted meta data for WooCommerce order items.
- *
- * @param int                    $item_id The item ID.
- * @param \WC_Order_Item_Product $item The order item object.
- */
 function ppom_woocommerce_order_item_meta_html( $item_id, $item ) {
-	$formatted_meta = $item->get_formatted_meta_data();
-
-	$strings        = array();
-	$meta_item_html = '';
-	$output_args    = apply_filters(
-		'ppom_woocommerce_item_meta_args',
-		array(
-			'before'       => '<ul class="wc-item-meta"><li>',
-			'after'        => '</li></ul>',
-			'separator'    => '</li><li>',
-			'label_before' => '<strong class="wc-item-meta-label">',
-			'label_after'  => ':</strong> ',
-		)
-	);
-	foreach ( $formatted_meta as $meta ) {
-		$strings[] = $output_args['label_before'] . wp_kses_post( $meta->display_key ) . $output_args['label_after'] . ppom_woocommerce_order_value( $meta->display_value, $meta, $item );
-	}
-
-	if ( $strings ) {
-		$meta_item_html = $output_args['before'] . implode( $output_args['separator'], $strings ) . $output_args['after'];
-	}
-	echo wp_kses_post( $meta_item_html );
+	\PPOM\WooCommerce\Order\OrderHandler::order_item_meta_html( $item_id, $item );
 }
 
-/**
- * Check if the email improvements feature is enabled.
- *
- * @return bool
- */
 function ppom_wc_email_improvements_enabled() {
-	return 'yes' === get_option( 'woocommerce_feature_email_improvements_enabled', 'no' );
+	return \PPOM\WooCommerce\Order\OrderHandler::wc_email_improvements_enabled();
 }
 
-/**
- * Outputs the formatted meta data for invoice or packing slips.
- *
- * @param string                 $html HTML of the item meta data 
- * @param \WC_Order_Item_Product $item The order item object.
- * @param array                  $args arguments for display the html.
- */
 function ppom_invoice_packing_slips_html( $html, $item, $args = array() ) {
-	$strings = array();
-	$args    = wp_parse_args(
-		$args,
-		array(
-			'before'       => '<ul class="wc-item-meta"><li>',
-			'after'        => '</li></ul>',
-			'separator'    => '</li><li>',
-			'echo'         => true,
-			'autop'        => false,
-			'label_before' => '<strong class="wc-item-meta-label">',
-			'label_after'  => ':</strong> ',
-		)
-	);
-
-	foreach ( $item->get_all_formatted_meta_data() as $meta_id => $meta ) {
-		$meta_value = ppom_woocommerce_order_value( $meta->display_value, $meta, $item );
-		$value      = $args['autop'] ? wp_kses_post( $meta_value ) : wp_kses_post( make_clickable( trim( $meta_value ) ) );
-		$strings[]  = $args['label_before'] . wp_kses_post( $meta->display_key ) . $args['label_after'] . $value;
-	}
-
-	if ( $strings ) {
-		$html = $args['before'] . implode( $args['separator'], $strings ) . $args['after'];
-	}
-
-	return $html;
+	return \PPOM\WooCommerce\Order\OrderHandler::invoice_packing_slips_html( $html, $item, $args );
 }
