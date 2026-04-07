@@ -19,6 +19,82 @@ use PPOM\Support\Helpers;
  */
 final class CatalogHandler {
 
+	/**
+	 * Parses a price-matrix quantity range `raw` label (e.g. `1-10`) into min/max segments.
+	 *
+	 * @param string $raw Raw range string from matrix options.
+	 *
+	 * @return array{min: string, max: string|null} Max is null when no second segment exists.
+	 */
+	public static function price_matrix_range_parts( $raw ) {
+		$raw   = (string) $raw;
+		$parts = explode( '-', $raw );
+
+		return array(
+			'min' => isset( $parts[0] ) ? trim( $parts[0] ) : '',
+			'max' => isset( $parts[1] ) ? trim( $parts[1] ) : null,
+		);
+	}
+
+	/**
+	 * Raises the effective min quantity using `quantities` field definitions (same rules as loop hooks).
+	 *
+	 * @param int|float|string $matrix_min        Current minimum (from matrix or WooCommerce default).
+	 * @param array            $quantities_fields Field meta rows of type `quantities`.
+	 *
+	 * @return int|float|string
+	 */
+	public static function apply_quantities_min_floor( $matrix_min, array $quantities_fields ) {
+		$min_quantity = $matrix_min;
+
+		foreach ( $quantities_fields as $qty ) {
+			if ( empty( $qty['min_qty'] ) ) {
+				continue;
+			}
+
+			if ( $min_quantity < floatval( $qty['min_qty'] ) ) {
+				$min_quantity = $qty['min_qty'];
+			}
+		}
+
+		return $min_quantity;
+	}
+
+	/**
+	 * Raises the effective max quantity using `quantities` field definitions.
+	 *
+	 * @param int|float|string $matrix_max        Current maximum (from matrix or WooCommerce default).
+	 * @param array            $quantities_fields Field meta rows of type `quantities`.
+	 *
+	 * @return int|float|string
+	 */
+	public static function apply_quantities_max_ceiling( $matrix_max, array $quantities_fields ) {
+		$max_quantity = $matrix_max;
+
+		foreach ( $quantities_fields as $qty ) {
+			if ( empty( $qty['max_qty'] ) ) {
+				continue;
+			}
+
+			if ( $max_quantity < floatval( $qty['max_qty'] ) ) {
+				$max_quantity = $qty['max_qty'];
+			}
+		}
+
+		return $max_quantity;
+	}
+
+	/**
+	 * Matrix qty_step fallback when empty (matches prior `empty( $meta['qty_step'] ) ? 1 : …` behavior).
+	 *
+	 * @param mixed $qty_step Stored step value.
+	 *
+	 * @return int|string|float
+	 */
+	public static function normalized_price_matrix_qty_step( $qty_step ) {
+		return empty( $qty_step ) ? 1 : $qty_step;
+	}
+
 	// alter price on shop page if price matrix found
 	public static function alter_price( $price, $product ) {
 
@@ -133,8 +209,8 @@ final class CatalogHandler {
 			$ranges  = Helpers::convert_options_to_key_val( $options, $price_matrix, $product );
 			if ( ! empty( $ranges ) ) {
 				$first_range         = reset( $ranges );
-				$qty_ranges          = explode( '-', $first_range['raw'] );
-				$args['input_value'] = $qty_ranges[0];
+				$bounds              = self::price_matrix_range_parts( $first_range['raw'] );
+				$args['input_value'] = $bounds['min'];
 			}
 		}
 
@@ -164,23 +240,15 @@ final class CatalogHandler {
 				}
 
 				$first_range  = reset( $ranges );
-				$qty_ranges   = explode( '-', $first_range['raw'] );
-				$min_quantity = $qty_ranges[0];
+				$bounds       = self::price_matrix_range_parts( $first_range['raw'] );
+				$min_quantity = $bounds['min'];
 			}
 		}
 
 		// Check min quantity for variations
 		$ppom_quantities_found = Helpers::has_field_by_type( $product_id, 'quantities' );
 		if ( $ppom_quantities_found ) {
-			foreach ( $ppom_quantities_found as $qty ) {
-				if ( ! $qty['min_qty'] ) {
-					continue;
-				}
-
-				if ( $min_quantity < floatval( $qty['min_qty'] ) ) {
-					$min_quantity = $qty['min_qty'];
-				}
-			}
+			$min_quantity = self::apply_quantities_min_floor( $min_quantity, $ppom_quantities_found );
 		}
 
 		return $min_quantity;
@@ -194,8 +262,6 @@ final class CatalogHandler {
 		if ( ! $ppom->is_exists ) {
 			return $max_quantity;
 		}
-
-		$last_range = array();
 
 		$ppom_matrix_found = Helpers::has_field_by_type( $product_id, 'pricematrix' );
 
@@ -215,24 +281,18 @@ final class CatalogHandler {
 					continue;
 				}
 
-				$last_range   = end( $ranges );
-				$qty_ranges   = explode( '-', $last_range['raw'] );
-				$max_quantity = $qty_ranges[1];
+				$last_range = end( $ranges );
+				$bounds     = self::price_matrix_range_parts( $last_range['raw'] );
+				if ( null !== $bounds['max'] && '' !== $bounds['max'] ) {
+					$max_quantity = $bounds['max'];
+				}
 			}
 		}
 
 		// Check min quantity for variations
 		$ppom_quantities_found = Helpers::has_field_by_type( $product_id, 'quantities' );
 		if ( $ppom_quantities_found ) {
-			foreach ( $ppom_quantities_found as $qty ) {
-				if ( ! $qty['max_qty'] ) {
-					continue;
-				}
-
-				if ( $max_quantity < floatval( $qty['max_qty'] ) ) {
-					$max_quantity = $qty['max_qty'];
-				}
-			}
+			$max_quantity = self::apply_quantities_max_ceiling( $max_quantity, $ppom_quantities_found );
 		}
 
 		return $max_quantity;
@@ -247,13 +307,11 @@ final class CatalogHandler {
 			return $quantity_step;
 		}
 
-		$last_range = array();
-
 		$ppom_matrix_found = Helpers::has_field_by_type( $product_id, 'pricematrix' );
 		if ( $ppom_matrix_found ) {
 			foreach ( $ppom_matrix_found as $meta ) {
 
-				$quantity_step = empty( $meta['qty_step'] ) ? 1 : $meta['qty_step'];
+				$quantity_step = self::normalized_price_matrix_qty_step( $meta['qty_step'] );
 			}
 		}
 
