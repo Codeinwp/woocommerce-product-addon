@@ -855,6 +855,27 @@ function ppom_generate_field_price( $field_price, $field_meta, $apply, $option =
 	);
 }
 
+/**
+ * Normalize any user-configured price string into a float.
+ *
+ * Accepts values that may include currency symbols, spaces, or thousands
+ * separators and converts them to a numeric amount.
+ *
+ * @param mixed $raw_price Raw price value coming from field meta/options.
+ *
+ * @return float
+ */
+function ppom_price_normalize_amount( $raw_price ) {
+
+	if ( ! function_exists( 'wc_format_decimal' ) ) {
+		return floatval( $raw_price );
+	}
+
+	$normalized_price = is_numeric( $raw_price ) ? $raw_price : wc_format_decimal( $raw_price, wc_get_price_decimals() );
+
+	return floatval( $normalized_price );
+}
+
 // Get total addon price of given Price Array
 function ppom_price_get_addon_total( $price_array ) {
 
@@ -870,13 +891,14 @@ function ppom_price_get_addon_total( $price_array ) {
 				continue;
 			}
 
-			$the_price = floatval( $price['price'] );
+			$the_price = ppom_price_normalize_amount( $price['price'] );
+			$quantity  = isset( $price['quantity'] ) && is_numeric( $price['quantity'] ) ? floatval( $price['quantity'] ) : 1;
 
-			$total_addon += ( $the_price * $price['quantity'] );
+			$total_addon += ( $the_price * $quantity );
 
 			/*
 			if( $price['type'] == 'quantities' || $price['type'] == 'bulkquantity' ) {
-				$total_addon += ($price['price'] * $price['quantity']);
+			$total_addon += ($price['price'] * $price['quantity']);
 			} else {
 				$total_addon += $price['price'];
 			}*/
@@ -894,9 +916,15 @@ function ppom_price_get_cart_fee_total( $price_array ) {
 	if ( $price_array ) {
 		foreach ( $price_array as $price ) {
 
-			if ( $price['apply'] == 'cart_fee' ) {
-				$total_cart_fee += $price['price'];
+			if ( $price['apply'] !== 'cart_fee' ) {
+				continue;
 			}
+
+			if ( ! isset( $price['price'] ) ) {
+				continue;
+			}
+
+			$total_cart_fee += ppom_price_normalize_amount( $price['price'] );
 		}
 	}
 

@@ -49,8 +49,42 @@ class Test_Functions extends WP_UnitTestCase {
 					'cropped' => 'data:image/png;base64,iVBORw0KGgoAAAAN'
 				]
 			]
-		];
+			];
 
 		$this->assertEquals( $expected, ppom_recursive_sanitization( $input ) );
+	}
+
+	/**
+	 * Cart fee price should handle currency symbols gracefully.
+	 *
+	 * @return void
+	 */
+	public function testCartFeePriceParsesCurrencySymbol() {
+		$price_array = [
+			[
+				'apply'    => 'cart_fee',
+				'price'    => '$10',
+				'quantity' => 1,
+			],
+		];
+
+		$this->assertEquals( 10.0, ppom_price_get_cart_fee_total( $price_array ) );
+	}
+
+	/**
+	 * Addon price should normalize currency symbols and respect quantity.
+	 *
+	 * @return void
+	 */
+	public function testAddonPriceParsesCurrencySymbolWithQuantity() {
+		$price_array = [
+			[
+				'apply'    => 'addon',
+				'price'    => 'USD 15',
+				'quantity' => '2',
+			],
+		];
+
+		$this->assertEquals( 30.0, ppom_price_get_addon_total( $price_array ) );
 	}
 }
