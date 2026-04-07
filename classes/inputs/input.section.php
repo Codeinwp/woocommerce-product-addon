@@ -30,7 +30,6 @@ class NM_Section_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'HTML content', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-code" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 

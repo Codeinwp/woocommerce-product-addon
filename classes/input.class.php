@@ -1,10 +1,14 @@
 <?php
-/*
- * Followig class handling all inputs control and their 
- * dependencies. Do not make changes in code
- * Create on: 9 November, 2013 
+/**
+ * Loads PPOM input classes and optional add-on input classes.
+ *
+ * @package PPOM
+ * @subpackage Inputs
  */
 
+/**
+ * Loads PPOM input classes and related add-on integrations.
+ */
 class PPOM_Inputs {
 
 	/*
@@ -51,8 +55,14 @@ class PPOM_Inputs {
 		return self::$ins;
 	}
 
-	/*
-	 * returning relevant input object
+	/**
+	 * Loads the input class for a field type.
+	 *
+	 * @param string $type Field type.
+	 *
+	 * @return object|null
+	 *
+	 * @see PPOM_Form::render_input_template()
 	 */
 	function get_input( $type ) {
 

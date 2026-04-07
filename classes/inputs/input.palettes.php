@@ -25,7 +25,6 @@ class NM_Palettes_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'color boxes', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-user-plus" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 	private function get_settings() {

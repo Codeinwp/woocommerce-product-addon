@@ -20,15 +20,25 @@ if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
 require_once $_tests_dir . '/includes/functions.php';
 
 /**
+ * Ensure WooCommerce is active for plugin unit tests.
+ *
+ * @return array
+ */
+function _activate_woocommerce() {
+	return array( 'woocommerce/woocommerce.php' );
+}
+
+/**
  * Registers theme
  */
 function _register_module() {
-	require_once dirname( dirname( __FILE__ ) ) . '/woocommerce-product-addon.php';
+	require_once dirname( dirname( dirname( __FILE__ ) ) ) . '/woocommerce-product-addon.php';
 	include_once PPOM_PATH . '/classes/admin.class.php';
 
 	$ppom_admin = new NM_PersonalizedProduct_Admin();
 }
 
+tests_add_filter( 'pre_option_active_plugins', '_activate_woocommerce' );
 tests_add_filter( 'muplugins_loaded', '_register_module' );
 
 // Start up the WP testing environment.

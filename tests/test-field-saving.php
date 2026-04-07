@@ -35,7 +35,7 @@ class Test_Field_Saving extends WP_UnitTestCase {
         
         $field_id = $wpdb->insert_id;
 
-        NM_PersonalizedProduct_Admin::save_categories_and_tags( $field_id, ['accessories', 'clothing', 'test-cat'], array( 'test-tag' ) );
+        NM_PersonalizedProduct_Admin::save_categories_and_tags( $field_id, ['accessories', 'clothing', 'test-cat'], false );
         
         $saved_data = $wpdb->get_row( $wpdb->prepare( "SELECT productmeta_categories, productmeta_tags FROM $table_name WHERE productmeta_id = %d", $field_id ), ARRAY_A );
        

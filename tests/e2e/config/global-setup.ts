@@ -9,6 +9,11 @@ import type { FullConfig } from '@playwright/test';
  */
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
+/**
+ * Internal dependencies
+ */
+import { resetE2EState } from '../fixtures/internal.js';
+
 async function globalSetup( config: FullConfig ) {
 	const { storageState, baseURL } = config.projects[ 0 ].use;
 	const storageStatePath =
@@ -24,6 +29,8 @@ async function globalSetup( config: FullConfig ) {
 
 	// Authenticate and save the storageState to disk.
 	await requestUtils.setupRest();
+
+	await resetE2EState( requestUtils );
 
 	// Reset the test environment before running the tests.
 	await Promise.all( [

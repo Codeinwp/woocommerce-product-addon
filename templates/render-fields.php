@@ -51,7 +51,7 @@ $allow_nextprev        = ppom_get_option( 'ppom-collapse-nextprev' );
 
 $collapse_fields = array_filter(
 	$ppom_fields_meta,
-	function( $collapse_field ) {
+	function ( $collapse_field ) {
 		return isset( $collapse_field['type'] ) && 'collapse' === $collapse_field['type'];
 	}
 );
@@ -70,7 +70,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 	$default_value = ( isset( $meta['default_value'] ) ? $meta['default_value'] : '' );
 	$classes       = ( isset( $meta['class'] ) ? $meta['class'] : '' );
 
-	$ppom_field_counter ++;
+	++$ppom_field_counter;
 
 	// @since: 12.4
 	// checking field visibility
@@ -85,7 +85,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 	}
 
 	// If conditional field repeater is enabled, render a notice about the Conditional Field Repeater doesn't work with the legacy input rendering.
-	if( ppom_check_pro_compatibility('cond_field_repeat') && isset( $meta['cond_field_repeater_enable'] ) && $meta['cond_field_repeater_enable'] === 'on' ) {?>
+	if ( ppom_check_pro_compatibility( 'cond_field_repeat' ) && isset( $meta['cond_field_repeater_enable'] ) && $meta['cond_field_repeater_enable'] === 'on' ) {?>
 		<span class="ppom-option-notice">
 			<?php
 				printf(
@@ -225,7 +225,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 		}
 
 		$section_started = true;
-		$ppom_collapse_counter ++;
+		++$ppom_collapse_counter;
 	}
 
 	// skip collapse div
@@ -621,8 +621,8 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'title'            => $title,
 				/*
 				'legacy_view' => (isset($meta['legacy_view'])) ? $meta['legacy_view'] : '',
-				'popup_width'	=> $popup_width,
-				'popup_height'	=> $popup_height,*/
+				'popup_width'   => $popup_width,
+				'popup_height'  => $popup_height,*/
 				'multiple_allowed' => $multiple_allowed,
 				'audios'           => $audios,
 
@@ -669,7 +669,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'aviary_apikey' => $ppom_settings->aviary_api_key,
 				/*
 				'popupwidth'          => $popup_width,
-				'popup-height'			=> $popup_height,*/
+				'popup-height'          => $popup_height,*/
 				'file_cost'     => $file_cost,
 				'taxable'       => $taxable,
 				'language'      => $language,
@@ -732,7 +732,6 @@ foreach ( $ppom_fields_meta as $meta ) {
 			break;
 
 		case 'hidden':
-
 			$field_name = "ppom[fields][{$data_name}]";
 			$hidden_val = isset( $meta['field_value'] ) ? $meta['field_value'] : '';
 
