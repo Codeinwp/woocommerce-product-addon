@@ -4411,48 +4411,6 @@ parameters:
 			path: src/Admin/Manager.php
 
 		-
-			message: '#^Access to property \$is_exists on an unknown class PPOM\\Admin\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Admin/Manager.php
-
-		-
-			message: '#^Access to property \$meta_id on an unknown class PPOM\\Admin\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 9
-			path: src/Admin/Manager.php
-
-		-
-			message: '#^Access to property \$meta_title on an unknown class PPOM\\Admin\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 2
-			path: src/Admin/Manager.php
-
-		-
-			message: '#^Access to property \$ppom_settings on an unknown class PPOM\\Admin\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Admin/Manager.php
-
-		-
-			message: '#^Access to property \$single_meta_id on an unknown class PPOM\\Admin\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Admin/Manager.php
-
-		-
-			message: '#^Call to method get_settings_by_ids\(\) on an unknown class PPOM\\Admin\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Admin/Manager.php
-
-		-
-			message: '#^Call to method has_multiple_meta\(\) on an unknown class PPOM\\Admin\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Admin/Manager.php
-
-		-
 			message: '#^Cannot access offset ''class'' on true\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
@@ -4462,12 +4420,6 @@ parameters:
 			message: '#^Cannot access offset ''message'' on true\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
-			path: src/Admin/Manager.php
-
-		-
-			message: '#^Instantiated class PPOM\\Admin\\PPOM_Meta not found\.$#'
-			identifier: class.notFound
-			count: 3
 			path: src/Admin/Manager.php
 
 		-
@@ -5863,9 +5815,9 @@ parameters:
 			path: src/Rest/ProductFieldGroupService.php
 
 		-
-			message: '#^Access to property \$fields on an unknown class PPOM\\Support\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 9
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
 			path: src/Support/Helpers.php
 
 		-
@@ -5883,12 +5835,6 @@ parameters:
 		-
 			message: '#^Call to function method_exists\(\) with ''WWP_Wholesale_Prices'' and ''get_product…'' will always evaluate to false\.$#'
 			identifier: function.impossibleType
-			count: 1
-			path: src/Support/Helpers.php
-
-		-
-			message: '#^Call to method get_fields_by_id\(\) on an unknown class PPOM\\Support\\PPOM_Meta\.$#'
-			identifier: class.notFound
 			count: 1
 			path: src/Support/Helpers.php
 
@@ -5923,12 +5869,6 @@ parameters:
 			path: src/Support/Helpers.php
 
 		-
-			message: '#^Call to static method get_saved_settings\(\) on an unknown class PPOM\\Support\\PPOM_SettingsFramework\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Support/Helpers.php
-
-		-
 			message: '#^Call to static method get_tax_total\(\) on an unknown class PPOM\\Support\\WC_Tax\.$#'
 			identifier: class.notFound
 			count: 1
@@ -5956,12 +5896,6 @@ parameters:
 			message: '#^Constant WOOCOMMERCE_VERSION not found\.$#'
 			identifier: constant.notFound
 			count: 1
-			path: src/Support/Helpers.php
-
-		-
-			message: '#^Instantiated class PPOM\\Support\\PPOM_Meta not found\.$#'
-			identifier: class.notFound
-			count: 5
 			path: src/Support/Helpers.php
 
 		-
@@ -6913,12 +6847,6 @@ parameters:
 			path: src/Validation/Validator.php
 
 		-
-			message: '#^Access to property \$ppom_settings on an unknown class PPOM\\WooCommerce\\Cart\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/WooCommerce/Cart/CartHandler.php
-
-		-
 			message: '#^Binary operation "\+" between float and ''''\|''0''\|array\{\}\|float\|false results in an error\.$#'
 			identifier: binaryOp.invalid
 			count: 1
@@ -6927,12 +6855,6 @@ parameters:
 		-
 			message: '#^Expression "''\</td\>''" on a separate line does not do anything\.$#'
 			identifier: expr.resultUnused
-			count: 1
-			path: src/WooCommerce/Cart/CartHandler.php
-
-		-
-			message: '#^Instantiated class PPOM\\WooCommerce\\Cart\\PPOM_Meta not found\.$#'
-			identifier: class.notFound
 			count: 1
 			path: src/WooCommerce/Cart/CartHandler.php
 
@@ -7207,18 +7129,6 @@ parameters:
 			path: src/WooCommerce/Cart/CartHandler.php
 
 		-
-			message: '#^Access to property \$is_exists on an unknown class PPOM\\WooCommerce\\Catalog\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 4
-			path: src/WooCommerce/Catalog/CatalogHandler.php
-
-		-
-			message: '#^Instantiated class PPOM\\WooCommerce\\Catalog\\PPOM_Meta not found\.$#'
-			identifier: class.notFound
-			count: 4
-			path: src/WooCommerce/Catalog/CatalogHandler.php
-
-		-
 			message: '#^Method PPOM\\WooCommerce\\Catalog\\CatalogHandler\:\:alter_price\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -7457,54 +7367,6 @@ parameters:
 			identifier: class.notFound
 			count: 1
 			path: src/WooCommerce/Order/OrderHandler.php
-
-		-
-			message: '#^Access to property \$ajax_validation_enabled on an unknown class PPOM\\WooCommerce\\Product\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/WooCommerce/Product/ProductHandler.php
-
-		-
-			message: '#^Access to property \$fields on an unknown class PPOM\\WooCommerce\\Product\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 5
-			path: src/WooCommerce/Product/ProductHandler.php
-
-		-
-			message: '#^Access to property \$meta_id on an unknown class PPOM\\WooCommerce\\Product\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 4
-			path: src/WooCommerce/Product/ProductHandler.php
-
-		-
-			message: '#^Access to property \$ppom_settings on an unknown class PPOM\\WooCommerce\\Product\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/WooCommerce/Product/ProductHandler.php
-
-		-
-			message: '#^Call to method has_ppom_fields\(\) on an unknown class PPOM\\WooCommerce\\Product\\PPOM_Form\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/WooCommerce/Product/ProductHandler.php
-
-		-
-			message: '#^Call to method has_unique_datanames\(\) on an unknown class PPOM\\WooCommerce\\Product\\PPOM_Meta\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/WooCommerce/Product/ProductHandler.php
-
-		-
-			message: '#^Instantiated class PPOM\\WooCommerce\\Product\\PPOM_Form not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/WooCommerce/Product/ProductHandler.php
-
-		-
-			message: '#^Instantiated class PPOM\\WooCommerce\\Product\\PPOM_Meta not found\.$#'
-			identifier: class.notFound
-			count: 4
-			path: src/WooCommerce/Product/ProductHandler.php
 
 		-
 			message: '#^Method PPOM\\WooCommerce\\Product\\ProductHandler\:\:check_validation\(\) has parameter \$post_data with no value type specified in iterable type array\.$#'
