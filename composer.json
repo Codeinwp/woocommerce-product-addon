@@ -37,6 +37,9 @@
         "codeinwp/themeisle-sdk": "^3.2"
     },
     "autoload": {
+        "psr-4": {
+            "PPOM\\": "src/"
+        },
         "files": [
             "vendor/codeinwp/themeisle-sdk/load.php"
         ]

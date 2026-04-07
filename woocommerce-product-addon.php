@@ -70,16 +70,7 @@ function ppom_i18n_setup() {
 	load_plugin_textdomain( 'woocommerce-product-addon', false, basename( __DIR__ ) . '/languages' );
 }
 
-require_once PPOM_PATH . '/inc/functions.php';
-require_once PPOM_PATH . '/inc/validation.php';
-require_once PPOM_PATH . '/inc/deprecated.php';
-require_once PPOM_PATH . '/inc/arrays.php';
-require_once PPOM_PATH . '/inc/hooks.php';
-require_once PPOM_PATH . '/inc/woocommerce.php';
-require_once PPOM_PATH . '/inc/admin.php';
-require_once PPOM_PATH . '/inc/files.php';
-require_once PPOM_PATH . '/inc/nmInput.class.php';
-require_once PPOM_PATH . '/inc/prices.php';
+require_once PPOM_PATH . '/inc/compat/load.php';
 
 if ( is_admin() ) {
 	require_once PPOM_PATH . '/classes/freemium.class.php';
