@@ -75,7 +75,7 @@ The plugin is not PSR-4 for its runtime code. The main file manually includes th
 | Pricing engine | [`inc/prices.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/prices.php) | Server-side option pricing, matrix pricing, cart fee calculation, line-item price updates |
 | Upload subsystem | [`inc/files.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/files.php) | AJAX upload and delete handlers, thumbnails, cropped files, confirmed-file storage, cleanup cron |
 | Admin CRUD | [`inc/admin.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/admin.php) | Field-group create/update/delete handlers and product-attachment UI |
-| REST API | [`inc/rest.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/rest.class.php) | Optional product and order PPOM API surface under `/wp-json/ppom/v1/` |
+| REST API | [`src/Rest/`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/src/Rest/) (`Routes`, controllers, services) | Optional product and order PPOM API surface under `/wp-json/ppom/v1/` |
 
 ### Data and Resolution Model
 
@@ -426,7 +426,7 @@ flowchart TD
 
 ### REST API
 
-If API access is enabled, `PPOM_Rest` registers routes under:
+If API access is enabled, `PPOM\Rest\Routes` (legacy alias `PPOM_Rest`) registers routes under:
 
 - `/wp-json/ppom/v1/`
 

@@ -96,7 +96,7 @@ require_once PPOM_PATH . '/classes/scripts.class.php';
 require_once PPOM_PATH . '/classes/frontend-scripts.class.php';
 require_once PPOM_PATH . '/backend/settings-panel.class.php';
 require_once PPOM_PATH . '/backend/options.php';
-require_once PPOM_PATH . '/inc/rest.class.php';
+new \PPOM\Rest\Routes();
 
 // New Files Inlcude
 require_once PPOM_PATH . '/classes/form.class.php';

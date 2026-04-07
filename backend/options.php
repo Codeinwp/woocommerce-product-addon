@@ -159,7 +159,7 @@ add_action( 'init', 'ppom_load_free_options' );
  * @see PPOMSETTINGS()
  * @see PPOM_SettingsFramework::register_panel()
  * @see PPOM_SettingsFramework::register_setting()
- * @see PPOM_Rest::init_api()
+ * @see \PPOM\Rest\Routes::init_api()
  */
 function ppom_load_pro_options() {
 	$pro_settings = array(
