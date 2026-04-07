@@ -24,19 +24,23 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 		/**
 		 * Reference to singleton insance.
 		 *
-		 * @var [PPOM_Survey]
+		 * @var self|null
 		 */
 		public static $instance = null;
 
 		/**
-		 * Init hooks.
+		 * Registers Themeisle SDK survey filter.
+		 *
+		 * @return void
 		 */
 		public function init() {
 			add_filter( 'themeisle-sdk/survey/' . PPOM_PRODUCT_SLUG, array( $this, 'get_survey_metadata' ), 10, 2 );
 		}
 
 		/**
-		 * Get instance
+		 * Singleton accessor.
+		 *
+		 * @return self
 		 */
 		public static function get_instance() {
 			if ( is_null( self::$instance ) ) {
@@ -48,7 +52,10 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 		/**
 		 * Get the data used for the survey.
 		 *
-		 * @return array
+		 * @param array<string, mixed> $data       Incoming SDK payload.
+		 * @param string                 $page_slug  Current admin page slug.
+		 *
+		 * @return array<string, mixed>
 		 * @see survey.js
 		 */
 		public function get_survey_metadata( $data, $page_slug ) {

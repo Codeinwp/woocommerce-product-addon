@@ -16,17 +16,26 @@ class PPOM_ELEMENTOR {
 
 	/**
 	 * Class Instance var
+	 *
+	 * @var self|null
 	 */
 	private static $_instance = null;
 
 
+	/**
+	 * Hooks Elementor integration after plugins load.
+	 *
+	 * @return void
+	 */
 	public function __construct() {
 		add_action( 'plugins_loaded', array( $this, 'load' ) );
 	}
 
 
 	/**
-	 * An instance of the class.
+	 * Singleton accessor.
+	 *
+	 * @return self
 	 */
 	public static function instance() {
 
@@ -40,6 +49,8 @@ class PPOM_ELEMENTOR {
 
 	/**
 	 * Checks if Elementor has installed & loaded
+	 *
+	 * @return void
 	 */
 	public function load() {
 
@@ -51,6 +62,8 @@ class PPOM_ELEMENTOR {
 
 	/**
 	 * Compatibility Checks
+	 *
+	 * @return bool
 	 */
 	public function is_compatible() {
 
@@ -65,6 +78,8 @@ class PPOM_ELEMENTOR {
 
 	/**
 	 * Initialize the Class
+	 *
+	 * @return void
 	 */
 	public function init() {
 
@@ -85,6 +100,8 @@ class PPOM_ELEMENTOR {
 	 * Init Widgets
 	 *
 	 * Include widgets files and register them
+	 *
+	 * @return void
 	 */
 	public function init_widgets() {
 
@@ -98,6 +115,8 @@ class PPOM_ELEMENTOR {
 
 	/**
 	 * Load Widgets Styles
+	 *
+	 * @return void
 	 */
 	public function widget_styles() {
 		wp_enqueue_style( 'ppom-main' );

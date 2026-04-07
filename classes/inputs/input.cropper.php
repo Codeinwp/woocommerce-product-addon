@@ -1,8 +1,14 @@
 <?php
-/*
- * Followig class handling image cropping
-*/
+/**
+ * Image cropper field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * Customer image upload with Croppie viewport options, file limits, optional fee, and conditional logic.
+ */
 class NM_Cropper_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -16,6 +22,11 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 	 */
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata and loads the field settings schema.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -29,6 +40,11 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 
 	// 'link' => __ ( '<a href="https://github.com/RobinHerbots/Inputmask" target="_blank">Options</a>', 'woocommerce-product-addon' ) 
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 
 		$input_meta = array(

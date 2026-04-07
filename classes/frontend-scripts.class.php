@@ -24,9 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class PPOM_FRONTEND_SCRIPTS {
 
 	/**
-	 * Return scripts URL.
+	 * Base URL for plugin scripts and styles.
 	 *
-	 * @var URL
+	 * @var string
 	 */
 	private static $scripts_url = '';
 
@@ -39,7 +39,9 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
-	 * Return main scripts framework class.
+	 * Reserved reference to the script helper (legacy; unused in static API).
+	 *
+	 * @var mixed|null
 	 */
 	private static $scripts_class;
 
@@ -61,7 +63,7 @@ class PPOM_FRONTEND_SCRIPTS {
 	/**
 	 * Returns the script registry used by the modern frontend loader.
 	 *
-	 * @return array
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}>
 	 */
 	private static function get_scripts() {
 
@@ -158,7 +160,7 @@ class PPOM_FRONTEND_SCRIPTS {
 	/**
 	 * Returns the style registry used by the modern frontend loader.
 	 *
-	 * @return array
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}>
 	 */
 	private static function get_styles() {
 
