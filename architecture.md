@@ -45,11 +45,11 @@ flowchart TD
 
 ### Bootstrap
 
-The bootstrap lives in [`woocommerce-product-addon.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/woocommerce-product-addon.php). It:
+The bootstrap lives in [`woocommerce-product-addon.php`](woocommerce-product-addon.php). It:
 
 - defines plugin constants such as `PPOM_PATH`, `PPOM_URL`, `PPOM_VERSION`, `PPOM_PRODUCT_META_KEY`, `PPOM_TABLE_META`, and `PPOM_UPLOAD_DIR_NAME`
-- loads Composer autoload plus the procedural runtime files under [`inc/`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc)
-- loads the class files under [`classes/`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes) and the settings framework under [`backend/`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/backend)
+- loads Composer autoload plus the procedural runtime files under [`inc/`](inc/)
+- loads the class files under [`classes/`](classes/) and the settings framework under [`backend/`](backend/)
 - registers translation loading on `init`
 - declares HPOS compatibility on `before_woocommerce_init`
 - instantiates admin-only services when `is_admin()`
@@ -62,20 +62,20 @@ The plugin is not PSR-4 for its runtime code. The main file manually includes th
 
 | Component | File | Responsibility |
 | --- | --- | --- |
-| Bootstrap | [`woocommerce-product-addon.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/woocommerce-product-addon.php) | Defines constants, loads the plugin, registers top-level hooks |
-| Main runtime | [`classes/plugin.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/plugin.class.php) | Registers WooCommerce hooks for rendering, validation, pricing, cart, orders, admin AJAX, cron, and loop behavior |
-| Product field resolver | [`classes/ppom.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/ppom.class.php) | Resolves applicable PPOM field groups for a product, merges their fields, and derives the runtime settings row from the custom DB table |
-| Frontend form renderer | [`classes/form.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/form.class.php) | Renders modern template-based product fields and hidden runtime state |
-| Input registry | [`classes/input.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/input.class.php) | Loads input-type classes and add-on input classes |
-| Admin field UI | [`classes/fields.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/fields.class.php) | Powers the field-group builder UI and admin-side assets |
-| Admin coordinator | [`classes/admin.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/admin.class.php) | Registers PPOM admin menus, settings integration, attach flows, and admin initialization hooks |
-| Frontend asset loader | [`classes/frontend-scripts.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/frontend-scripts.class.php) | Registers and localizes frontend JS and CSS for pricing, uploads, validation, conditions, and field widgets |
-| Script registry | [`classes/scripts.class.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/scripts.class.php) | Shared wrapper for registering, enqueuing, localizing, and inlining PPOM frontend assets |
-| WooCommerce flow functions | [`inc/woocommerce.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/woocommerce.php) | Product-page rendering, validation, cart item payloads, order item metadata, file finalization |
-| Pricing engine | [`inc/prices.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/prices.php) | Server-side option pricing, matrix pricing, cart fee calculation, line-item price updates |
-| Upload subsystem | [`inc/files.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/files.php) | AJAX upload and delete handlers, thumbnails, cropped files, confirmed-file storage, cleanup cron |
-| Admin CRUD | [`inc/admin.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/admin.php) | Field-group create/update/delete handlers and product-attachment UI |
-| REST API | [`src/Rest/`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/src/Rest/) (`Routes`, controllers, services) | Optional product and order PPOM API surface under `/wp-json/ppom/v1/` |
+| Bootstrap | [`woocommerce-product-addon.php`](woocommerce-product-addon.php) | Defines constants, loads the plugin, registers top-level hooks |
+| Main runtime | [`classes/plugin.class.php`](classes/plugin.class.php) | Registers WooCommerce hooks for rendering, validation, pricing, cart, orders, admin AJAX, cron, and loop behavior |
+| Product field resolver | [`classes/ppom.class.php`](classes/ppom.class.php) | Resolves applicable PPOM field groups for a product, merges their fields, and derives the runtime settings row from the custom DB table |
+| Frontend form renderer | [`classes/form.class.php`](classes/form.class.php) | Renders modern template-based product fields and hidden runtime state |
+| Input registry | [`classes/input.class.php`](classes/input.class.php) | Loads input-type classes and add-on input classes |
+| Admin field UI | [`classes/fields.class.php`](classes/fields.class.php) | Powers the field-group builder UI and admin-side assets |
+| Admin coordinator | [`classes/admin.class.php`](classes/admin.class.php) | Registers PPOM admin menus, settings integration, attach flows, and admin initialization hooks |
+| Frontend asset loader | [`classes/frontend-scripts.class.php`](classes/frontend-scripts.class.php) | Registers and localizes frontend JS and CSS for pricing, uploads, validation, conditions, and field widgets |
+| Script registry | [`classes/scripts.class.php`](classes/scripts.class.php) | Shared wrapper for registering, enqueuing, localizing, and inlining PPOM frontend assets |
+| WooCommerce flow functions | [`inc/woocommerce.php`](inc/woocommerce.php) | Product-page rendering, validation, cart item payloads, order item metadata, file finalization |
+| Pricing engine | [`inc/prices.php`](inc/prices.php) | Server-side option pricing, matrix pricing, cart fee calculation, line-item price updates |
+| Upload subsystem | [`inc/files.php`](inc/files.php) | AJAX upload and delete handlers, thumbnails, cropped files, confirmed-file storage, cleanup cron |
+| Admin CRUD | [`inc/admin.php`](inc/admin.php) | Field-group create/update/delete handlers and product-attachment UI |
+| REST API | [`src/Rest/`](src/Rest/) (`Routes`, controllers, services) | Optional product and order PPOM API surface under `/wp-json/ppom/v1/` |
 
 ### Data and Resolution Model
 
@@ -136,8 +136,8 @@ The stable key throughout the whole runtime is the field `data_name`. PPOM uses 
 
 The input system is split into two sides:
 
-- PHP input classes in [`classes/inputs/`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/classes/inputs)
-- frontend templates in [`templates/frontend/inputs/`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/templates/frontend/inputs)
+- PHP input classes in [`classes/inputs/`](classes/inputs/)
+- frontend templates in [`templates/frontend/inputs/`](templates/frontend/inputs/)
 
 `PPOM_Inputs` loads input classes dynamically from files such as `input.text.php`, `input.select.php`, `input.file.php`, and add-on input classes through filters like `nm_input_class-{type}`.
 
@@ -215,8 +215,8 @@ The main runtime hooks into WooCommerce product pages through `woocommerce_befor
 
 PPOM supports two rendering modes:
 
-- legacy mode via `ppom_woocommerce_show_fields()` and [`templates/render-fields.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/templates/render-fields.php)
-- modern mode via `ppom_woocommerce_inputs_template_base()`, `PPOM_Form`, and [`templates/frontend/ppom-fields.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/templates/frontend/ppom-fields.php)
+- legacy mode via `ppom_woocommerce_show_fields()` and [`templates/render-fields.php`](templates/render-fields.php)
+- modern mode via `ppom_woocommerce_inputs_template_base()`, `PPOM_Form`, and [`templates/frontend/ppom-fields.php`](templates/frontend/ppom-fields.php)
 
 The modern path renders:
 
@@ -363,7 +363,7 @@ The admin side has two main responsibilities:
 - field-group CRUD
 - settings and permissions
 
-Field-group management is split across `NM_PersonalizedProduct_Admin`, `PPOM_Fields_Meta`, and the AJAX CRUD handlers in [`inc/admin.php`](/Users/robert/Desktop/sites/plugins-dev/web/app/plugins/woocommerce-product-addon/inc/admin.php):
+Field-group management is split across `NM_PersonalizedProduct_Admin`, `PPOM_Fields_Meta`, and the AJAX CRUD handlers in [`inc/admin.php`](inc/admin.php):
 
 - create, edit, clone, and delete field groups
 - bulk-attach field groups to products

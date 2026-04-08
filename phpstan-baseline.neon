@@ -4507,12 +4507,6 @@ parameters:
 			path: src/Admin/Manager.php
 
 		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, int\|string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: src/FieldMarkup/Renderers/AudioVideoRenderer.php
-
-		-
 			message: '#^Cannot call method get_price\(\) on WC_Product\|false\|null\.$#'
 			identifier: method.nonObject
 			count: 2

@@ -7,6 +7,7 @@
 
 use PPOM\FieldMarkup\FormAttributeContext;
 use PPOM\FieldMarkup\InputRendererRegistry;
+use PPOM\FieldMarkup\Renderers\CustomRenderer;
 use PPOM\FieldMarkup\Renderers\RegularInputRenderer;
 use PPOM\FieldMarkup\Renderers\SelectRenderer;
 use PPOM\FieldMarkup\Renderers\TextareaRenderer;
@@ -32,8 +33,57 @@ class Test_Input_Renderer_Registry extends WP_UnitTestCase {
 	/**
 	 * @return void
 	 */
-	public function test_render_unknown_type_returns_empty_string() {
-		$this->assertSame( '', $this->registry->render( 'nonexistent_type_xyz', array(), null ) );
+	public function test_render_unknown_type_falls_back_to_custom_renderer() {
+		$output = $this->registry->render(
+			'nonexistent_type_xyz',
+			array(
+				'id'   => 'f1',
+				'type' => 'nonexistent_type_xyz',
+			),
+			null
+		);
+
+		$this->assertIsString( $output );
+		$this->assertStringContainsString( 'form-group', $output );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_render_custom_type_uses_custom_renderer() {
+		$this->assertInstanceOf( CustomRenderer::class, $this->registry->getCustomRenderer() );
+
+		$output = $this->registry->render(
+			'custom',
+			array(
+				'id'   => 'c1',
+				'type' => 'custom',
+			),
+			null
+		);
+
+		$this->assertIsString( $output );
+		$this->assertStringContainsString( 'form-group', $output );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_render_hidden_outputs_hidden_input() {
+		$output = $this->registry->render(
+			'hidden',
+			array(
+				'id'          => 'h1',
+				'type'        => 'hidden',
+				'name'        => 'ppom[fields][h1]',
+				'field_value' => 'x',
+			),
+			''
+		);
+
+		$this->assertStringContainsString( 'type="hidden"', $output );
+		$this->assertStringContainsString( 'name="ppom[fields][h1]"', $output );
+		$this->assertStringContainsString( 'value="x"', $output );
 	}
 
 	/**

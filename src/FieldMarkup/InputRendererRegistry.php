@@ -11,7 +11,9 @@ use PPOM\FieldMarkup\Renderers\AudioVideoRenderer;
 use PPOM\FieldMarkup\Renderers\CheckboxRenderer;
 use PPOM\FieldMarkup\Renderers\CropperRenderer;
 use PPOM\FieldMarkup\Renderers\CustomRenderer;
+use PPOM\FieldMarkup\Renderers\DividerRenderer;
 use PPOM\FieldMarkup\Renderers\FileRenderer;
+use PPOM\FieldMarkup\Renderers\HiddenInputRenderer;
 use PPOM\FieldMarkup\Renderers\ImageRenderer;
 use PPOM\FieldMarkup\Renderers\MeasureInputRenderer;
 use PPOM\FieldMarkup\Renderers\PalettesRenderer;
@@ -107,6 +109,20 @@ final class InputRendererRegistry {
 	private $custom;
 
 	/**
+	 * Hidden input renderer.
+	 *
+	 * @var HiddenInputRenderer
+	 */
+	private $hidden;
+
+	/**
+	 * Divider field renderer.
+	 *
+	 * @var DividerRenderer
+	 */
+	private $divider;
+
+	/**
 	 * @param FormAttributeContext $context
 	 */
 	public function __construct( $context ) {
@@ -126,6 +142,8 @@ final class InputRendererRegistry {
 		$this->file        = new FileRenderer( $context );
 		$this->cropper     = new CropperRenderer( $context );
 		$this->custom      = new CustomRenderer( $context );
+		$this->hidden      = new HiddenInputRenderer( $context );
+		$this->divider     = new DividerRenderer( $context );
 	}
 
 	/**
@@ -191,8 +209,30 @@ final class InputRendererRegistry {
 			case 'cropper':
 				return $this->cropper->render( $args, $value );
 
+			case 'hidden':
+				return $this->hidden->render( $args, $value );
+
+			case 'divider':
+				return $this->divider->render( $args, $value );
+
+			case 'custom':
+				return $this->custom->render( $args, $value );
+
 			default:
-				return '';
+				/**
+				 * Allow replacing fallback markup for unregistered field types.
+				 *
+				 * @param string|null $html          Null before filter; return a non-empty string to skip CustomRenderer.
+				 * @param string      $type          Field type key.
+				 * @param array       $args          Field arguments.
+				 * @param mixed       $default_value Render context value.
+				 */
+				$filtered = apply_filters( 'ppom_input_renderer_fallback_html', null, $type, $args, $value );
+				if ( is_string( $filtered ) && '' !== $filtered ) {
+					return $filtered;
+				}
+
+				return $this->custom->render( $args, $value );
 		}
 	}
 
@@ -306,5 +346,23 @@ final class InputRendererRegistry {
 	 */
 	public function getCustomRenderer() {
 		return $this->custom;
+	}
+
+	/**
+	 * Returns the hidden input renderer.
+	 *
+	 * @return HiddenInputRenderer
+	 */
+	public function getHiddenInputRenderer() {
+		return $this->hidden;
+	}
+
+	/**
+	 * Returns the divider renderer.
+	 *
+	 * @return DividerRenderer
+	 */
+	public function getDividerRenderer() {
+		return $this->divider;
 	}
 }
