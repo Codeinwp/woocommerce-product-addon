@@ -29,10 +29,18 @@ jobs:
       - name: Install NPM deps
         run: |
           npm ci
+      - name: Install Playwright
+        run: |
           npm install -g playwright-cli
           npx playwright install --with-deps chromium
+      - name: Setup PHP with tools
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          extensions: xdebug, intl, mbstring, curl, gd
+          tools: php-cs-fixer, phpunit, wp-cli, phpcs, mago, phpstan
       - name: Install composer deps
-        run: composer install --no-dev
-      - name: Install environment
+        run: composer install --no-progress
+      - name: Start the WordPress environment via wp-env
         run: |
           npm run wp-env start
