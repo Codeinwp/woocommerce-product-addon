@@ -657,9 +657,9 @@ class NM_PersonalizedProduct {
 
 	/**
 	 * Get the count of all the created PPOM Group fields.
-	 * 
-	 * @param int $limit Optional limit on number of results to count
-	 * @return int - The number of group fields in the database.
+	 *
+	 * @param int|null $limit When set, returns at most this many (capped count for bounded metrics).
+	 * @return int Number of group rows, or capped count when `$limit` is provided.
 	 */
 	public static function get_product_meta_count( $limit = null ) {
 

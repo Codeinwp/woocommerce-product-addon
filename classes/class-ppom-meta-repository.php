@@ -280,20 +280,24 @@ class PPOM_Meta_Repository {
 	}
 
 	/**
-	 * Count of rows, with optional LIMIT (legacy survey usage).
+	 * Count of rows. With `$limit`, returns how many rows exist up to that cap (survey / bounded metrics).
 	 *
-	 * @param int|null $limit Optional SQL LIMIT; negative values are clamped to 0.
+	 * @param int|null $limit When set, count is `min( actual_row_count, $limit )`; negative values are clamped to 0.
 	 * @return int
 	 */
 	public function count_rows( $limit = null ) {
 		$table = $this->table_name();
-		$sql   = "SELECT COUNT(*) FROM `{$table}`";
 		$lim   = null === $limit ? null : max( 0, (int) $limit );
-		if ( null !== $lim ) {
-			$sql .= ' LIMIT ' . $lim;
+
+		if ( null === $lim ) {
+			$sql = "SELECT COUNT(*) FROM `{$table}`";
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- table name is internal trusted constant.
+			return (int) $this->wpdb->get_var( $sql );
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- table name is internal; optional LIMIT is cast to int.
+		$sql = "SELECT COUNT(*) FROM ( SELECT 1 FROM `{$table}` ORDER BY productmeta_id ASC LIMIT {$lim} ) AS ppom_count_capped";
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- table name internal; LIMIT is cast int.
 		return (int) $this->wpdb->get_var( $sql );
 	}
 
