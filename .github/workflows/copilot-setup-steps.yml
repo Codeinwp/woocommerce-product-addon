@@ -17,22 +17,22 @@ jobs:
 
     # You can define any steps you want, and they will run before the agent starts.
     steps:
-    - uses: actions/checkout@v6
-    - uses: actions/setup-node@v6
-      with:
-        node-version: "20"
-        cache: "npm"
-    - name: Install Agent Browser
-      run: |
-        npm install -g agent-browser
-        agent-browser install
-    - name: Install NPM deps
-      run: |
-        npm ci
-        npm install -g playwright-cli
-        npx playwright install --with-deps chromium
-    - name: Install composer deps
-      run: composer install --no-dev
-    - name: Install environment
-      run: |
-        npm run wp-env start
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install Agent Browser
+        run: |
+          npm install -g agent-browser
+          agent-browser install
+      - name: Install NPM deps
+        run: |
+          npm ci
+          npm install -g playwright-cli
+          npx playwright install --with-deps chromium
+      - name: Install composer deps
+        run: composer install --no-dev
+      - name: Install environment
+        run: |
+          npm run wp-env start
