@@ -903,12 +903,18 @@ class NM_PersonalizedProduct {
 		}
 
 		$ppom_meta = json_decode( $ppom_meta );
-		$ppom_meta = self::ppom_decode_entities( $ppom_meta );
 
-		if ( empty( $ppom_meta ) || ! is_array( $ppom_meta ) ) {
+		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $ppom_meta ) ) {
 			return;
 		}
-		// ppom_pa( $ppom_meta ); exit;
+
+		$ppom_meta = self::ppom_decode_entities( $ppom_meta );
+
+		if ( empty( $ppom_meta ) ) {
+			return;
+		}
+
+		$inserted = 0;
 
 		foreach ( $ppom_meta as $meta ) {
 
@@ -931,11 +937,17 @@ class NM_PersonalizedProduct {
 			}
 
 			if ( ! empty( $data ) ) {
-				$wpdb->insert( $table, $data, $format );
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$result = $wpdb->insert( $table, $data, $format );
+				if ( false !== $result ) {
+					++$inserted;
+				}
 			}
 		}
 
-		update_option( 'ppom_demo_meta_installed', 1 );
+		if ( $inserted > 0 ) {
+			update_option( 'ppom_demo_meta_installed', 1 );
+		}
 	}
 
 
