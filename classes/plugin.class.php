@@ -903,40 +903,51 @@ class NM_PersonalizedProduct {
 		}
 
 		$ppom_meta = json_decode( $ppom_meta );
-		$ppom_meta = self::ppom_decode_entities( $ppom_meta );
-		// ppom_pa( $ppom_meta ); exit;
 
-		$meta_count = 0;
+		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $ppom_meta ) ) {
+			return;
+		}
+
+		$ppom_meta = self::ppom_decode_entities( $ppom_meta );
+
+		if ( empty( $ppom_meta ) ) {
+			return;
+		}
+
+		$inserted = 0;
+
 		foreach ( $ppom_meta as $meta ) {
 
-			$table = $wpdb->prefix . PPOM_TABLE_META;
-			$qry   = "INSERT INTO {$table} SET ";
-			++$meta_count;
+			$table  = $wpdb->prefix . PPOM_TABLE_META;
+			$data   = array();
+			$format = array();
 
 			foreach ( $meta as $key => $val ) {
 
-				if ( $key == 'productmeta_id' ) {
+				if ( $key === 'productmeta_id' ) {
 					continue;
 				}
 
-				if ( $key == 'productmeta_name' ) {
+				if ( $key === 'productmeta_name' ) {
 					$val = 'PPOM Demo Field';
 				}
 
-				$qry .= "{$key}='{$val}',";
+				$data[ $key ] = $val;
+				$format[]     = '%s';
 			}
 
-			$qry = substr( $qry, 0, - 1 );
-			// print $qry; exit;
-			$res = $wpdb->query( $qry );
-
-			/*
-			$wpdb->show_errors();
-			$wpdb->print_error();
-			exit;*/
+			if ( ! empty( $data ) ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$result = $wpdb->insert( $table, $data, $format );
+				if ( false !== $result ) {
+					++$inserted;
+				}
+			}
 		}
 
-		update_option( 'ppom_demo_meta_installed', 1 );
+		if ( $inserted > 0 ) {
+			update_option( 'ppom_demo_meta_installed', 1 );
+		}
 	}
 
 
