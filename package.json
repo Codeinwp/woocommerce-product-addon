@@ -14,7 +14,10 @@
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
+    "@wordpress/data": "^10.43.0",
+    "@wordpress/dom-ready": "^4.43.0",
     "@wordpress/e2e-test-utils-playwright": "^1.9.0",
+    "@wordpress/element": "^6.43.0",
     "@wordpress/env": "^11.2.0",
     "@wordpress/eslint-plugin": "^24.4.0",
     "@wordpress/scripts": "31.7.0",
@@ -35,6 +38,8 @@
     "release": "npx semantic-release",
     "build:makepot": "bash ./bin/makepot.sh",
     "build:grunt": "grunt build",
+    "build:admin-field-modal": "wp-scripts build ./packages/admin/field-modal/src/index.js --output-path=./packages/admin/field-modal/build --config ./packages/admin/field-modal/webpack.config.cjs",
+    "watch:admin-field-modal": "wp-scripts start ./packages/admin/field-modal/src/index.js --output-path=./packages/admin/field-modal/build --config ./packages/admin/field-modal/webpack.config.cjs",
     "grunt": "grunt",
     "wp-env": "wp-env",
     "test:e2e": "wp-scripts test-playwright --config tests/e2e/playwright.config.js",
@@ -45,5 +50,11 @@
     "lint": "wp-scripts lint-js ./js/",
     "lint:fix": "wp-scripts lint-js --fix ./js",
     "format": "wp-scripts format ./js"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.10.9",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "framer-motion": "^12.38.0"
   }
 }

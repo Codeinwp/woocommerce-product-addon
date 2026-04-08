@@ -296,3 +296,21 @@ function ppom_posted_field_max_min_value_validation( ...$args ) {
 function ppom_get_image_name( ...$args ) {
 	return \PPOM\Support\Helpers::get_image_name( ...$args );
 }
+
+require_once __DIR__ . '/admin-field-type-groups.php';
+
+/**
+ * Whether the React admin field modal (beta) is enabled for the current request.
+ *
+ * Default off. Enable with `PPOM_USE_REACT_FIELD_MODAL` constant, `?ppom_react_modal=1` on PPOM admin URLs, or `ppom_use_react_field_modal` filter.
+ *
+ * @return bool
+ */
+function ppom_use_react_field_modal() {
+	if ( defined( 'PPOM_USE_REACT_FIELD_MODAL' ) && PPOM_USE_REACT_FIELD_MODAL ) {
+		return true;
+	}
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only opt-in flag for admin UI; no state change.
+	$from_query = isset( $_GET['ppom_react_modal'] ) && '1' === sanitize_text_field( wp_unslash( (string) $_GET['ppom_react_modal'] ) );
+	return (bool) apply_filters( 'ppom_use_react_field_modal', $from_query );
+}

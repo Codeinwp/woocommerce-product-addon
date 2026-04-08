@@ -1,0 +1,99 @@
+<?php
+/**
+ * Admin field modal REST routes.
+ *
+ * @package woocommerce-product-addon
+ */
+
+require_once __DIR__ . '/class-ppom-test-case.php';
+
+/**
+ * @coversNothing
+ */
+class Test_Field_Modal_Rest extends PPOM_Test_Case {
+
+	/**
+	 * @return void
+	 */
+	public function test_context_forbidden_when_logged_out() {
+		wp_set_current_user( 0 );
+		$this->reset_rest_server();
+
+		$request  = new WP_REST_Request( 'GET', '/ppom/v1/admin/field-groups/context' );
+		$request->set_query_params( array( 'productmeta_id' => 0 ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 403, $response->get_status(), 'Logged-out users must not load editor context.' );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_context_ok_for_administrator() {
+		$admin_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin_id );
+		$this->reset_rest_server();
+
+		$request  = new WP_REST_Request( 'GET', '/ppom/v1/admin/field-groups/context' );
+		$request->set_query_params( array( 'productmeta_id' => 0 ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertIsArray( $data );
+		$this->assertArrayHasKey( 'catalog', $data );
+		$this->assertArrayHasKey( 'fields', $data );
+		$this->assertArrayHasKey( 'group', $data );
+		$this->assertArrayHasKey( 'type_schemas', $data );
+		$this->assertIsArray( $data['type_schemas'] );
+		$this->assertArrayHasKey( 'catalog_groups', $data );
+		$this->assertIsArray( $data['catalog_groups'] );
+		$this->assertNotEmpty( $data['catalog_groups'], 'catalog_groups must mirror admin field picker groups.' );
+		$this->assertArrayHasKey( 'license', $data );
+		$this->assertArrayHasKey( 'upsell', $data );
+		$this->assertArrayHasKey( 'conditions_pro_enabled', $data );
+		$this->assertIsBool( $data['conditions_pro_enabled'] );
+		$this->assertNotEmpty( $data['catalog'], 'Flat catalog must list field types for the modal.' );
+
+		$first_group = $data['catalog_groups'][0];
+		$this->assertArrayHasKey( 'id', $first_group );
+		$this->assertArrayHasKey( 'label', $first_group );
+		$this->assertArrayHasKey( 'fields', $first_group );
+		$this->assertNotEmpty( $first_group['fields'] );
+		$field0 = $first_group['fields'][0];
+		$this->assertArrayHasKey( 'slug', $field0 );
+		$this->assertArrayHasKey( 'locked', $field0 );
+	}
+
+	/**
+	 * Lazy schema route returns settings for a free core type.
+	 *
+	 * @return void
+	 */
+	public function test_schema_route_returns_text_settings() {
+		$admin_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin_id );
+		$this->reset_rest_server();
+
+		$request  = new WP_REST_Request( 'GET', '/ppom/v1/admin/field-groups/schema/text' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$body = $response->get_data();
+		$this->assertIsArray( $body );
+		$this->assertArrayHasKey( 'schema', $body );
+		$this->assertArrayHasKey( 'settings', $body['schema'] );
+	}
+
+	/**
+	 * Reset REST server routes (FieldModal registers on rest_api_init).
+	 *
+	 * @return void
+	 */
+	private function reset_rest_server() {
+		global $wp_rest_server;
+		$wp_rest_server = null;
+		$server         = rest_get_server();
+		do_action( 'rest_api_init', $server );
+	}
+}

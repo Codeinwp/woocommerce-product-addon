@@ -39,12 +39,13 @@ define( 'PPOM_PRODUCT_META_KEY', '_product_meta_id' );
 define( 'PPOM_TABLE_META', 'nm_personalized' );
 define( 'PPOM_UPLOAD_DIR_NAME', 'ppom_files' );
 define( 'PPOM_GROUPS_COUNT_CACHE_KEY', 'ppom_groups_count_cache' );
+define( 'PPOM_USE_REACT_FIELD_MODAL', true );
 define(
 	'PPOM_COMPATIBILITY_FEATURES',
 	array(
 		'pro_cond_field_repeat'       => true, // Compatibility for Conditional Field Repeater feature
 		'pgfbdfm_wp_filter_param_fix' => true, // Fix for the wrong params of the ppom_get_field_by_dataname__field_meta WP filter .
-	) 
+	)
 );
 
 require PPOM_PATH . '/vendor/autoload.php';
@@ -97,6 +98,7 @@ require_once PPOM_PATH . '/classes/frontend-scripts.class.php';
 require_once PPOM_PATH . '/backend/settings-panel.class.php';
 require_once PPOM_PATH . '/backend/options.php';
 new \PPOM\Rest\Routes();
+( new \PPOM\Admin\FieldModal\FieldModalRegistrar() )->register();
 
 // New Files Inlcude
 require_once PPOM_PATH . '/classes/form.class.php';
@@ -146,7 +148,7 @@ add_filter(
 			'location' => 'ppom',
 			'logo'     => PPOM_URL . '/images/logo.jpg',
 		);
-	} 
+	}
 );
 add_filter(
 	'woocommerce_product_addon_float_widget_metadata',
@@ -173,7 +175,7 @@ add_filter(
 			'logo'       => PPOM_URL . '/images/logo.jpg',
 			'cta_link'   => 'https://rviv.ly/fJhjZN',
 		);
-	} 
+	}
 );
 add_filter(
 	'woocommerce_product_addon_welcome_upsell_message',

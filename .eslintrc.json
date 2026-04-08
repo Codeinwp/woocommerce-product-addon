@@ -7,5 +7,5 @@
   "rules": {
     "camelcase": "off"
   },
-  "ignorePatterns": ["**/*.min.js", "**/*.bundle.js", "js/inputmask/**", "js/sweetalert/**", "tests/e2e/**", "backend/assets/**"]
+  "ignorePatterns": ["**/*.min.js", "**/*.bundle.js", "js/inputmask/**", "js/sweetalert/**", "tests/e2e/**", "backend/assets/**", "packages/admin/field-modal/**"]
 }
