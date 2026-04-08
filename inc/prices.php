@@ -895,13 +895,6 @@ function ppom_price_get_addon_total( $price_array ) {
 			$quantity  = isset( $price['quantity'] ) && is_numeric( $price['quantity'] ) ? floatval( $price['quantity'] ) : 1;
 
 			$total_addon += ( $the_price * $quantity );
-
-			/*
-			if( $price['type'] == 'quantities' || $price['type'] == 'bulkquantity' ) {
-			$total_addon += ($price['price'] * $price['quantity']);
-			} else {
-				$total_addon += $price['price'];
-			}*/
 		}
 	}
 
