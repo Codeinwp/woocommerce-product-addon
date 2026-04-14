@@ -14,6 +14,9 @@
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@wordpress/api-fetch": "^7.43.0",
     "@wordpress/data": "^10.43.0",
     "@wordpress/dom-ready": "^4.43.0",
     "@wordpress/e2e-test-utils-playwright": "^1.9.0",
@@ -30,7 +33,8 @@
     "npm-run-all": "^4.1.5",
     "replace-in-file": "^6.3.5",
     "semantic-release": "^19.0.3",
-    "semantic-release-slack-bot": "^3.5.3"
+    "semantic-release-slack-bot": "^3.5.3",
+    "typescript": "^6.0.2"
   },
   "scripts": {
     "build": "npm-run-all build:*",
@@ -38,8 +42,8 @@
     "release": "npx semantic-release",
     "build:makepot": "bash ./bin/makepot.sh",
     "build:grunt": "grunt build",
-    "build:admin-field-modal": "wp-scripts build ./packages/admin/field-modal/src/index.js --output-path=./packages/admin/field-modal/build --config ./packages/admin/field-modal/webpack.config.cjs",
-    "watch:admin-field-modal": "wp-scripts start ./packages/admin/field-modal/src/index.js --output-path=./packages/admin/field-modal/build --config ./packages/admin/field-modal/webpack.config.cjs",
+    "build:admin-field-modal": "wp-scripts build ./packages/admin/field-modal/src/index.tsx --output-path=./packages/admin/field-modal/build --config ./packages/admin/field-modal/webpack.config.cjs",
+    "watch:admin-field-modal": "wp-scripts start ./packages/admin/field-modal/src/index.tsx --output-path=./packages/admin/field-modal/build --config ./packages/admin/field-modal/webpack.config.cjs",
     "grunt": "grunt",
     "wp-env": "wp-env",
     "test:e2e": "wp-scripts test-playwright --config tests/e2e/playwright.config.js",

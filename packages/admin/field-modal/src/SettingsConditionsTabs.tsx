@@ -1,6 +1,7 @@
 /**
  * Top-level Settings / Conditions tabs for field modal editors.
  */
+import type { ReactNode } from 'react';
 import {
 	Tabs,
 	TabList,
@@ -8,20 +9,21 @@ import {
 	Tab,
 	TabPanel,
 } from '@chakra-ui/react';
+import type { I18nDict } from './types/fieldModal';
 
-/**
- * @param {Object}            props
- * @param {Object}            props.i18n
- * @param {boolean}           props.hasConditions When false, renders `settings` only (no tab chrome).
- * @param {import('react').ReactNode} props.settings
- * @param {import('react').ReactNode} props.conditions
- */
+export interface SettingsConditionsTabsProps {
+	i18n: I18nDict;
+	hasConditions: boolean;
+	settings: ReactNode;
+	conditions: ReactNode;
+}
+
 export function SettingsConditionsTabs( {
 	i18n,
 	hasConditions,
 	settings,
 	conditions,
-} ) {
+}: SettingsConditionsTabsProps ) {
 	const settingsLabel = i18n.settingsTab || 'Settings';
 	const conditionsLabel = i18n.conditionsTab || 'Conditions';
 

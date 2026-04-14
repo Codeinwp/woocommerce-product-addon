@@ -20,6 +20,16 @@ import {
 	OPERATORS_FIELD_COMPATIBILITY,
 	PRO_OPERATOR_VALUES,
 } from './conditionsConstants';
+import type { Dispatch, SetStateAction } from 'react';
+import type { FieldRow, I18nDict } from './types/fieldModal';
+
+type ConditionRule = Record< string, unknown >;
+
+interface ConditionsState {
+	visibility: string;
+	bound: string;
+	rules: Record< string, ConditionRule >;
+}
 
 const controlSurface = {
 	bg: 'white',
@@ -39,7 +49,7 @@ const labelProps = {
 	mb: 1,
 };
 
-function emptyRule() {
+function emptyRule(): ConditionRule {
 	return {
 		elements: '',
 		operators: 'is',
@@ -49,7 +59,7 @@ function emptyRule() {
 	};
 }
 
-function normalizeConditions( raw ) {
+function normalizeConditions( raw: unknown ): ConditionsState {
 	if ( ! raw || typeof raw !== 'object' ) {
 		return {
 			visibility: 'Show',
@@ -57,36 +67,49 @@ function normalizeConditions( raw ) {
 			rules: { 0: emptyRule() },
 		};
 	}
+	const rawObj = raw as Record< string, unknown >;
 	const visibility =
-		raw.visibility === 'Hide' ? 'Hide' : 'Show';
-	const bound = raw.bound === 'Any' ? 'Any' : 'All';
-	let rules = raw.rules;
+		rawObj.visibility === 'Hide' ? 'Hide' : 'Show';
+	const bound = rawObj.bound === 'Any' ? 'Any' : 'All';
+	let rules = rawObj.rules;
 	if ( ! rules || typeof rules !== 'object' ) {
 		rules = { 0: emptyRule() };
 	} else {
-		const keys = Object.keys( rules );
+		const ruleMap = rules as Record< string, unknown >;
+		const keys = Object.keys( ruleMap );
 		if ( keys.length === 0 ) {
 			rules = { 0: emptyRule() };
 		} else {
-			const next = {};
+			const next: Record< string, ConditionRule > = {};
 			keys.forEach( ( k ) => {
-				const r = rules[ k ];
+				const r = ruleMap[ k ];
+				const between =
+					r &&
+					typeof r === 'object' &&
+					r !== null &&
+					'cond-between-interval' in r &&
+					typeof ( r as Record< string, unknown > )[ 'cond-between-interval' ] ===
+						'object'
+						? ( r as Record< string, unknown > )[ 'cond-between-interval' ] as Record<
+								string,
+								unknown
+						  >
+						: null;
 				next[ k ] =
 					r && typeof r === 'object'
 						? {
 								...emptyRule(),
 								...r,
 								'cond-between-interval':
-									r[ 'cond-between-interval' ] &&
-									typeof r[ 'cond-between-interval' ] === 'object'
+									between
 										? {
 												from:
-													r[ 'cond-between-interval' ].from != null
-														? String( r[ 'cond-between-interval' ].from )
+													between.from != null
+														? String( between.from )
 														: '',
 												to:
-													r[ 'cond-between-interval' ].to != null
-														? String( r[ 'cond-between-interval' ].to )
+													between.to != null
+														? String( between.to )
 														: '',
 										  }
 										: { from: '', to: '' },
@@ -96,27 +119,27 @@ function normalizeConditions( raw ) {
 			rules = next;
 		}
 	}
-	return { visibility, bound, rules };
+	return { visibility, bound, rules: rules as Record< string, ConditionRule > };
 }
 
-function reindexRules( rules ) {
+function reindexRules( rules: Record< string, ConditionRule > ) {
 	const sorted = Object.keys( rules )
 		.map( ( k ) => ( { n: Number( k ), v: rules[ k ] } ) )
 		.filter( ( x ) => ! Number.isNaN( x.n ) )
 		.sort( ( a, b ) => a.n - b.n );
-	const out = {};
+	const out: Record< string, ConditionRule > = {};
 	sorted.forEach( ( x, i ) => {
 		out[ String( i ) ] = x.v;
 	} );
 	return out;
 }
 
-function nextRuleIndex( rules ) {
+function nextRuleIndex( rules: Record< string, ConditionRule > ) {
 	const nums = Object.keys( rules ).map( Number );
 	return ( nums.length ? Math.max( ...nums ) : -1 ) + 1;
 }
 
-function canUseFieldType( fieldType ) {
+function canUseFieldType( fieldType: string ) {
 	if ( ! fieldType ) {
 		return false;
 	}
@@ -125,16 +148,12 @@ function canUseFieldType( fieldType ) {
 	);
 }
 
-/**
- * @param {Object} field PPOM field row
- * @return {string[]}
- */
-function getComparisonOptionValues( field ) {
+function getComparisonOptionValues( field: Record< string, unknown > ) {
 	if ( ! field || typeof field !== 'object' ) {
 		return [];
 	}
-	const out = [];
-	const push = ( v ) => {
+	const out: string[] = [];
+	const push = ( v: unknown ) => {
 		const s = String( v || '' ).trim();
 		if ( s ) {
 			out.push( s );
@@ -143,24 +162,24 @@ function getComparisonOptionValues( field ) {
 
 	const opts = field.options;
 	if ( Array.isArray( opts ) ) {
-		opts.forEach( ( o ) => {
-			if ( o && typeof o === 'object' && o.option != null ) {
-				push( o.option );
+		opts.forEach( ( o: unknown ) => {
+			if ( o && typeof o === 'object' && 'option' in o && ( o as { option?: unknown } ).option != null ) {
+				push( ( o as { option: unknown } ).option );
 			}
 		} );
 	} else if ( opts && typeof opts === 'object' ) {
-		Object.values( opts ).forEach( ( o ) => {
-			if ( o && typeof o === 'object' && o.option != null ) {
-				push( o.option );
+		Object.values( opts as Record< string, unknown > ).forEach( ( o ) => {
+			if ( o && typeof o === 'object' && 'option' in o && ( o as { option?: unknown } ).option != null ) {
+				push( ( o as { option: unknown } ).option );
 			}
 		} );
 	}
 
 	const imgs = field.images;
 	if ( Array.isArray( imgs ) ) {
-		imgs.forEach( ( img ) => {
-			if ( img && img.title != null ) {
-				push( img.title );
+		imgs.forEach( ( img: unknown ) => {
+			if ( img && typeof img === 'object' && 'title' in img && ( img as { title?: unknown } ).title != null ) {
+				push( ( img as { title: unknown } ).title );
 			}
 		} );
 	}
@@ -168,7 +187,7 @@ function getComparisonOptionValues( field ) {
 	return [ ...new Set( out ) ];
 }
 
-function findFieldType( builderFields, dataName ) {
+function findFieldType( builderFields: FieldRow[], dataName: unknown ) {
 	const id = String( dataName || '' ).trim();
 	if ( ! id ) {
 		return '';
@@ -179,7 +198,7 @@ function findFieldType( builderFields, dataName ) {
 	return row && row.type ? String( row.type ) : '';
 }
 
-function operatorAllowedForTarget( operator, targetType ) {
+function operatorAllowedForTarget( operator: string, targetType: string ) {
 	if ( ! targetType ) {
 		return true;
 	}
@@ -190,15 +209,15 @@ function operatorAllowedForTarget( operator, targetType ) {
 	return allowed.includes( targetType );
 }
 
-/**
- * @param {Object} props
- * @param {Object} props.meta          Schema meta for `conditions` (title, desc).
- * @param {Object} props.values        Full field row.
- * @param {Function} props.onChange   ( nextRow ) => void
- * @param {Object} props.i18n
- * @param {Array<Object>} props.builderFields  All fields in the group (incl. clientId).
- * @param {boolean} props.conditionsProEnabled Pro license unlocks advanced operators.
- */
+export interface ConditionsEditorProps {
+	meta: Record< string, unknown >;
+	values: FieldRow;
+	onChange: Dispatch< SetStateAction< FieldRow | null > >;
+	i18n: I18nDict;
+	builderFields?: FieldRow[];
+	conditionsProEnabled?: boolean;
+}
+
 export function ConditionsEditor( {
 	meta,
 	values,
@@ -206,7 +225,7 @@ export function ConditionsEditor( {
 	i18n,
 	builderFields = [],
 	conditionsProEnabled = false,
-} ) {
+}: ConditionsEditorProps ) {
 	const title = meta.title ? String( meta.title ) : 'Conditions';
 	const desc = meta.desc ? String( meta.desc ) : '';
 
@@ -218,7 +237,7 @@ export function ConditionsEditor( {
 	const selfId = String( values.data_name || '' ).trim();
 
 	const targets = builderFields
-		.map( ( f ) => {
+		.map( ( f: FieldRow ) => {
 			const fieldId = String( f.data_name || '' ).trim();
 			const fieldLabel = String( f.title || fieldId || '' ).trim();
 			const fieldType = f.type ? String( f.type ) : '';
@@ -236,11 +255,11 @@ export function ConditionsEditor( {
 				t.canUse
 		);
 
-	const setConditions = ( nextCond ) => {
+	const setConditions = ( nextCond: unknown ) => {
 		onChange( { ...values, conditions: nextCond } );
 	};
 
-	const updateRule = ( ruleKey, patch ) => {
+	const updateRule = ( ruleKey: string, patch: Record< string, unknown > ) => {
 		const rules = { ...cond.rules };
 		rules[ ruleKey ] = { ...rules[ ruleKey ], ...patch };
 		setConditions( { ...cond, rules } );
@@ -252,7 +271,7 @@ export function ConditionsEditor( {
 		setConditions( { ...cond, rules } );
 	};
 
-	const removeRule = ( ruleKey ) => {
+	const removeRule = ( ruleKey: string ) => {
 		const keys = Object.keys( cond.rules );
 		if ( keys.length <= 1 ) {
 			setConditions( { ...cond, rules: { 0: emptyRule() } } );
@@ -379,16 +398,19 @@ export function ConditionsEditor( {
 				</HStack>
 
 				{ ruleEntries.map( ( { key: ruleKey, rule }, idx ) => {
+					const betweenIv = rule[ 'cond-between-interval' ] as
+						| { from?: string; to?: string }
+						| undefined;
 					const targetType = findFieldType(
 						builderFields,
 						rule.elements
 					);
 					const optionValues = getComparisonOptionValues(
-						builderFields.find(
+						( builderFields.find(
 							( f ) =>
 								String( f.data_name || '' ).trim() ===
 								String( rule.elements || '' ).trim()
-						) || null
+						) ?? {} ) as Record< string, unknown >
 					);
 
 					const op = String( rule.operators || 'is' );
@@ -510,7 +532,9 @@ export function ConditionsEditor( {
 										value={ op }
 										onChange={ ( e ) => {
 											const operators = e.target.value;
-											const patch = { operators };
+											const patch: Record< string, unknown > = {
+												operators,
+											};
 											if (
 												HIDE_COMPARISON_INPUT_FIELD.includes(
 													operators
@@ -662,18 +686,12 @@ export function ConditionsEditor( {
 										<Input
 											size="sm"
 											type="number"
-											value={ String(
-												rule[ 'cond-between-interval' ]
-													?.from ?? ''
-											) }
+											value={ String( betweenIv?.from ?? '' ) }
 											onChange={ ( e ) =>
 												updateRule( ruleKey, {
 													'cond-between-interval': {
 														from: e.target.value,
-														to:
-															rule[
-																'cond-between-interval'
-															]?.to ?? '',
+														to: betweenIv?.to ?? '',
 													},
 												} )
 											}
@@ -685,17 +703,11 @@ export function ConditionsEditor( {
 										<Input
 											size="sm"
 											type="number"
-											value={ String(
-												rule[ 'cond-between-interval' ]
-													?.to ?? ''
-											) }
+											value={ String( betweenIv?.to ?? '' ) }
 											onChange={ ( e ) =>
 												updateRule( ruleKey, {
 													'cond-between-interval': {
-														from:
-															rule[
-																'cond-between-interval'
-															]?.from ?? '',
+														from: betweenIv?.from ?? '',
 														to: e.target.value,
 													},
 												} )

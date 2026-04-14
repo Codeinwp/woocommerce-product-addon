@@ -1,0 +1,144 @@
+/**
+ * Shared types for the admin field modal (REST payloads and UI state).
+ */
+import type { ComponentType, Dispatch, SetStateAction } from 'react';
+
+/** UI strings from REST `i18n` payload. */
+export type I18nDict = Record<string, string>;
+
+/** One field row in the modal; server may omit `clientId` until `withClientIds` runs. */
+export type FieldRow = Record<string, unknown> & {
+	clientId: string;
+	type?: string;
+	title?: string;
+	data_name?: string;
+	status?: string;
+};
+
+export interface CatalogItem {
+	slug: string;
+	title?: string;
+	locked?: boolean;
+	description?: string;
+	icon?: string;
+	[key: string]: unknown;
+}
+
+export interface CatalogGroup {
+	id?: string | number;
+	label?: string;
+	title?: string;
+	fields?: CatalogItem[];
+	[ key: string ]: unknown;
+}
+
+/** REST upsell payload for field type picker sidebar. */
+export interface ModalUpsellPayload {
+	title?: string;
+	intro?: string;
+	features?: string[];
+	cta_url?: string;
+	cta_label?: string;
+	[ key: string ]: unknown;
+}
+
+export type LicensePayload = Record< string, unknown >;
+
+/** `GET ppom/v1/admin/field-groups/context` response. */
+export interface FieldModalContextPayload {
+	i18n?: I18nDict;
+	fields?: FieldRow[];
+	catalog?: CatalogItem[];
+	catalog_groups?: CatalogGroup[];
+	group?: Record<string, unknown>;
+	conditions_pro_enabled?: boolean;
+	upsell?: ModalUpsellPayload | null;
+	license?: LicensePayload | null;
+}
+
+export interface ModalContextValue {
+	builderFields: FieldRow[];
+	conditionsProEnabled: boolean;
+}
+
+export type SchemaObject = Record<string, unknown>;
+
+/** Props for typed field editors and schema fallback form. */
+export interface FieldEditorBaseProps {
+	schema?: SchemaObject | null;
+	values: FieldRow;
+	onChange: Dispatch< SetStateAction< FieldRow | null > >;
+	i18n: I18nDict;
+	ppomFieldIndex: number;
+	fieldType?: string;
+	modalContext?: ModalContextValue | null;
+	isFallback?: boolean;
+}
+
+export type FieldEditorComponent = ComponentType< FieldEditorBaseProps >;
+
+export interface GroupedFieldSectionsProps extends FieldEditorBaseProps {
+	sections: Array< { label: string; keys: string[] } >;
+}
+
+export interface FieldSettingsFormProps extends FieldEditorBaseProps {
+	fieldType: string;
+}
+
+export interface SettingRowContext {
+	values: FieldRow;
+	onChange: Dispatch< SetStateAction< FieldRow | null > >;
+	i18n: I18nDict;
+	ppomFieldIndex: number;
+	builderFields?: FieldRow[];
+	conditionsProEnabled?: boolean;
+}
+
+export interface PpomFieldModalBoot {
+	nonce: string;
+	productmetaId?: number;
+}
+
+export type PpomFieldModalEditorsMap = Record< string, FieldEditorComponent >;
+
+/** Loading / error surface for the modal body shell. */
+export interface FieldModalBodyStatus {
+	loading: boolean;
+	error: string;
+}
+
+/** Picker step: passed through to `FieldPickerPanel`. */
+export interface FieldModalPickerStepProps {
+	modalEntry: 'picker' | 'manage';
+	i18n: I18nDict;
+	catalogGroups: CatalogGroup[];
+	pickerQuery: string;
+	onPickerQueryChange: ( q: string ) => void;
+	onBackOrCancel: () => void;
+	onPickType: ( slug: string ) => void;
+	upsell?: ModalUpsellPayload | null;
+	license?: LicensePayload | null;
+}
+
+/** Manage step: passed through to `FieldManagePanel`. */
+export interface FieldModalManageStepProps {
+	i18n: I18nDict;
+	fields: FieldRow[];
+	selectedId: string | null;
+	editDraft: FieldRow | null;
+	schemaLoading: boolean;
+	activeSchema: SchemaObject | null;
+	TypedEditor: FieldEditorComponent | null;
+	onEditDraftChange: Dispatch< SetStateAction< FieldRow | null > >;
+	ppomFieldIndex: number;
+	modalContext: ModalContextValue;
+	onOpenPicker: () => void;
+}
+
+export interface FieldModalBodyProps {
+	status: FieldModalBodyStatus;
+	ctx: FieldModalContextPayload | null;
+	pickerOpen: boolean;
+	picker: FieldModalPickerStepProps;
+	manage: FieldModalManageStepProps;
+}

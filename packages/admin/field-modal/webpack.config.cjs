@@ -6,7 +6,10 @@
  */
 function allowChakraInBabel( rule ) {
 	const testStr = rule.test ? rule.test.toString() : '';
-	if ( ! rule.exclude || ! testStr.includes( 'jsx?' ) ) {
+	/** Matches wp-scripts `/\.m?(j|t)sx?$/` and legacy `jsx?` babel app-code rules. */
+	const isAppJsTsRule =
+		testStr.includes( 'jsx?' ) || testStr.includes( '(j|t)sx' );
+	if ( ! rule.exclude || ! isAppJsTsRule ) {
 		return rule;
 	}
 	return {
@@ -26,6 +29,11 @@ const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 
 module.exports = {
 	...defaultConfig,
+	output: {
+		...defaultConfig.output,
+		/** Keep stable `index.js` / `index.asset.php` for PHP enqueue (entry is `index.tsx`). */
+		filename: 'index.js',
+	},
 	module: {
 		...defaultConfig.module,
 		rules: defaultConfig.module.rules.map( allowChakraInBabel ),

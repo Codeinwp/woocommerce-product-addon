@@ -3,12 +3,14 @@
  */
 import { Grid, GridItem } from '@chakra-ui/react';
 import { renderSettingRow } from './schemaSettingControl';
+import type { SettingRowContext } from './types/fieldModal';
 
-/**
- * @param {Array<{ key: string, meta: Object }>} entries
- * @param {Object}                              ctx  Passed to renderSettingRow.
- */
-export function ResponsiveFieldGrid( { entries, ctx } ) {
+export interface ResponsiveFieldGridProps {
+	entries: Array< { key: string; meta: Record< string, unknown > } >;
+	ctx: SettingRowContext;
+}
+
+export function ResponsiveFieldGrid( { entries, ctx }: ResponsiveFieldGridProps ) {
 	if ( ! entries.length ) {
 		return null;
 	}
@@ -18,7 +20,7 @@ export function ResponsiveFieldGrid( { entries, ctx } ) {
 			columnGap={ { base: 3, md: 4 } }
 			rowGap={ 3 }
 		>
-			{ entries.map( ( { key, meta } ) => {
+			{ entries.map( ( { key, meta }: { key: string; meta: Record< string, unknown > } ) => {
 				const type = meta.type ? String( meta.type ) : 'text';
 				const fullRow =
 					type === 'textarea' ||

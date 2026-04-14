@@ -49,12 +49,18 @@ export const fieldModalTheme = extendTheme( {
 						fontWeight: '600',
 						fontSize: '1.05rem',
 						color: '#1d2327',
-						paddingBottom: '0.75rem',
+						/* Match .ppom-modal-box header (ppom-admin.css). */
+						pt: '1.25em',
+						pb: '1.25em',
+						px: '1.5em',
 					},
 					footer: {
 						bg: '#FAFAFA',
 						borderTopWidth: '1px',
 						borderTopColor: '#EFEFEF',
+						/* Match .ppom-modal-box footer padding. */
+						px: '1em',
+						py: '1em',
 					},
 				},
 			},

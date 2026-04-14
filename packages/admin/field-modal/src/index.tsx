@@ -1,11 +1,12 @@
 /**
  * Entry: React field modal (admin, opt-in).
  */
-import { createRoot } from '@wordpress/element';
+import { createRoot, StrictMode } from '@wordpress/element';
 import domReady from '@wordpress/dom-ready';
 import apiFetch from '@wordpress/api-fetch';
 import { ChakraProvider } from '@chakra-ui/react';
 import { App } from './App';
+import { FieldModalErrorBoundary } from './components/FieldModalErrorBoundary';
 import { fieldModalTheme } from './theme';
 
 domReady( () => {
@@ -19,8 +20,12 @@ domReady( () => {
 
 	const root = createRoot( el );
 	root.render(
-		<ChakraProvider theme={ fieldModalTheme }>
-			<App productmetaId={ boot.productmetaId } />
-		</ChakraProvider>
+		<StrictMode>
+			<ChakraProvider theme={ fieldModalTheme }>
+				<FieldModalErrorBoundary>
+					<App productmetaId={ boot.productmetaId } />
+				</FieldModalErrorBoundary>
+			</ChakraProvider>
+		</StrictMode>
 	);
 } );

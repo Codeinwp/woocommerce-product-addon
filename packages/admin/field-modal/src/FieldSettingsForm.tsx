@@ -7,37 +7,10 @@ import { classifySettingTab } from './schemaTabs';
 import { renderSettingRow, openLegacyFieldModal } from './schemaSettingControl';
 import { ResponsiveFieldGrid } from './ResponsiveFieldGrid';
 import { SettingsConditionsTabs } from './SettingsConditionsTabs';
+import { GroupedFieldSections } from './editors/GroupedFieldSections';
+import { buildFallbackGroupedSections } from './fieldSettingSectionBlueprint';
+import type { FieldSettingsFormProps } from './types/fieldModal';
 
-function sectionCardTitle( text ) {
-	return (
-		<Text
-			as="h3"
-			fontSize="11px"
-			fontWeight="700"
-			color="gray.500"
-			textTransform="uppercase"
-			letterSpacing="0.08em"
-			mb={ 3 }
-			pb={ 1.5 }
-			borderBottomWidth="1px"
-			borderBottomColor="gray.100"
-		>
-			{ text }
-		</Text>
-	);
-}
-
-/**
- * @param {Object}   props
- * @param {Object}   props.schema      { settings: {}, tabs: {} }
- * @param {Object}   props.values      Current field row (editDraft).
- * @param {Function} props.onChange    ( next: Object ) => void
- * @param {string}   props.fieldType
- * @param {Object}   props.i18n
- * @param {number}   props.ppomFieldIndex 1-based row index for legacy modal.
- * @param {boolean}  props.isFallback    Distinct chrome for non-typed types.
- * @param {Object}   [props.modalContext] Passed into setting rows (conditions editor).
- */
 export function FieldSettingsForm( {
 	schema,
 	values,
@@ -47,32 +20,41 @@ export function FieldSettingsForm( {
 	ppomFieldIndex,
 	isFallback = false,
 	modalContext = null,
-} ) {
+}: FieldSettingsFormProps ) {
 	const buckets = useMemo( () => {
-		const settings =
+		const settings: Record< string, unknown > =
 			schema && schema.settings && typeof schema.settings === 'object'
-				? schema.settings
+				? ( schema.settings as Record< string, unknown > )
 				: {};
-		const fields = [];
-		const conditions = [];
-		const unsupported = [];
+		const conditions: Array< {
+			key: string;
+			meta: Record< string, unknown >;
+		} > = [];
+		const unsupported: Array< {
+			key: string;
+			meta: Record< string, unknown >;
+		} > = [];
 		Object.keys( settings ).forEach( ( key ) => {
 			const meta = settings[ key ];
 			if ( ! meta || typeof meta !== 'object' ) {
 				return;
 			}
-			const bucket = classifySettingTab( key, meta, fieldType );
-			const entry = { key, meta };
+			const metaRecord = meta as Record< string, unknown >;
+			const bucket = classifySettingTab( key, metaRecord, fieldType );
+			const entry = { key, meta: metaRecord };
 			if ( bucket === 'conditions' ) {
 				conditions.push( entry );
 			} else if ( bucket === 'unsupported' ) {
 				unsupported.push( entry );
-			} else {
-				fields.push( entry );
 			}
 		} );
-		return { fields, conditions, unsupported };
+		return { conditions, unsupported };
 	}, [ schema, fieldType ] );
+
+	const fallbackSections = useMemo(
+		() => buildFallbackGroupedSections( schema, fieldType, i18n ),
+		[ schema, fieldType, i18n ]
+	);
 
 	const ctx = {
 		values,
@@ -114,25 +96,22 @@ export function FieldSettingsForm( {
 			</Alert>
 		) : null;
 
-	const fieldsCard = (
-		<Box
-			bg="white"
-			borderWidth="1px"
-			borderColor="gray.200"
-			borderRadius="md"
-			px={ { base: 3, md: 4 } }
-			py={ 3 }
-			boxShadow="0 1px 2px rgba(0, 0, 0, 0.04)"
-		>
-			{ ! hasConditions ? sectionCardTitle( i18n.fieldsTab ) : null }
-			<ResponsiveFieldGrid entries={ buckets.fields } ctx={ ctx } />
-		</Box>
-	);
+	const groupedEditorProps = {
+		schema,
+		values,
+		onChange,
+		i18n,
+		ppomFieldIndex,
+		modalContext,
+	};
 
 	const settingsPanel = (
 		<VStack align="stretch" spacing={ 3 }>
 			{ unsupportedAlert }
-			{ fieldsCard }
+			<GroupedFieldSections
+				{ ...groupedEditorProps }
+				sections={ fallbackSections }
+			/>
 		</VStack>
 	);
 

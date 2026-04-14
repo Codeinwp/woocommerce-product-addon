@@ -37,7 +37,7 @@ export const HIDE_COMPARISON_INPUT_FIELD = [
 	'even-number',
 ];
 
-export const OPERATORS_FIELD_COMPATIBILITY = {
+export const OPERATORS_FIELD_COMPATIBILITY: Record< string, string[] > = {
 	is: [
 		...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS,
 		...FIELDS_COMPATIBLE_WITH_TEXT,

@@ -3,17 +3,8 @@
  */
 import { Box, Text, VStack } from '@chakra-ui/react';
 import { ResponsiveFieldGrid } from '../ResponsiveFieldGrid';
+import type { GroupedFieldSectionsProps } from '../types/fieldModal';
 
-/**
- * @param {Object}   props
- * @param {Object}   props.schema
- * @param {Object}   props.values
- * @param {Function} props.onChange
- * @param {Object}   props.i18n
- * @param {number}   props.ppomFieldIndex
- * @param {Object}   [props.modalContext]  e.g. { builderFields, conditionsProEnabled } for conditions UI.
- * @param {Array<{ label: string, keys: string[] }>} props.sections
- */
 export function GroupedFieldSections( {
 	schema,
 	values,
@@ -22,10 +13,10 @@ export function GroupedFieldSections( {
 	ppomFieldIndex,
 	modalContext = null,
 	sections,
-} ) {
-	const settings =
+}: GroupedFieldSectionsProps ) {
+	const settings: Record< string, Record< string, unknown > > =
 		schema && schema.settings && typeof schema.settings === 'object'
-			? schema.settings
+			? ( schema.settings as Record< string, Record< string, unknown > > )
 			: {};
 	const ctx = {
 		values,
@@ -39,10 +30,10 @@ export function GroupedFieldSections( {
 
 	return (
 		<VStack align="stretch" spacing={ 3 }>
-			{ sections.map( ( sec ) => {
+			{ sections.map( ( sec: { label: string; keys: string[] } ) => {
 				const entries = sec.keys
-					.filter( ( k ) => settings[ k ] && typeof settings[ k ] === 'object' )
-					.map( ( k ) => ( { key: k, meta: settings[ k ] } ) );
+					.filter( ( k: string ) => settings[ k ] && typeof settings[ k ] === 'object' )
+					.map( ( k: string ) => ( { key: k, meta: settings[ k ] } ) );
 				if ( entries.length === 0 ) {
 					return null;
 				}

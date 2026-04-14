@@ -1,25 +1,22 @@
 /** Setting keys grouped into the Conditions tab in typed field editors. */
 export const CONDITION_EDITOR_KEYS = new Set( [ 'logic', 'conditions' ] );
 
-/**
- * @param {{ keys: string[] }} section Section from a typed editor config.
- * @return {boolean} True if this section should appear under Conditions.
- */
-export function editorSectionIsConditions( section ) {
+/** True when a typed editor section belongs on the Conditions tab. */
+export function editorSectionIsConditions( section: { keys: string[] } ): boolean {
 	return section.keys.some( ( k ) => CONDITION_EDITOR_KEYS.has( k ) );
 }
 
-/**
- * Map PPOM setting meta to editor tabs (mirrors admin CSS tab classes).
- *
- * @param {string} key    Setting key.
- * @param {Object} meta   Setting definition from schema.
- * @param {string} fieldType Field type slug.
- * @return {'fields'|'conditions'|'unsupported'}
- */
-export function classifySettingTab( key, meta, fieldType ) {
+/** Map PPOM setting meta to editor tabs (mirrors admin CSS tab classes). */
+export function classifySettingTab(
+	key: string,
+	meta: Record<string, unknown> | null | undefined,
+	fieldType: string
+): 'fields' | 'conditions' | 'unsupported' {
 	const type = meta && meta.type ? String( meta.type ) : '';
-	const tabsClass = meta && Array.isArray( meta.tabs_class ) ? meta.tabs_class : [];
+	const tabsClass =
+		meta && Array.isArray( meta.tabs_class )
+			? ( meta.tabs_class as string[] )
+			: [];
 	const classStr = tabsClass.join( ' ' );
 	if ( classStr.includes( 'ppom_handle_condition_tab' ) ) {
 		return 'conditions';
@@ -49,20 +46,17 @@ export function classifySettingTab( key, meta, fieldType ) {
 		return 'unsupported';
 	}
 
-	if ( meta && meta.hidden ) {
+	if ( meta && Boolean( meta.hidden ) ) {
 		return 'fields';
 	}
 
 	return 'fields';
 }
 
-/**
- * Normalize select options from PPOM (object or array) to { value, label }[].
- *
- * @param {*} raw Options from schema.
- * @return {Array<{value: string, label: string}>}
- */
-export function normalizeSelectOptions( raw ) {
+/** Normalize select options from PPOM (object or array) to `{ value, label }[]`. */
+export function normalizeSelectOptions(
+	raw: unknown
+): Array< { value: string; label: string } > {
 	if ( ! raw ) {
 		return [];
 	}
@@ -77,10 +71,10 @@ export function normalizeSelectOptions( raw ) {
 			return { value: String( item ), label: String( item ) };
 		} );
 	}
-	if ( typeof raw === 'object' ) {
+	if ( typeof raw === 'object' && raw !== null ) {
 		return Object.keys( raw ).map( ( k ) => ( {
 			value: String( k ),
-			label: String( raw[ k ] ),
+			label: String( ( raw as Record<string, unknown> )[ k ] ),
 		} ) );
 	}
 	return [];

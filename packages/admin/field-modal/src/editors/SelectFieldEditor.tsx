@@ -6,16 +6,8 @@ import { editorSectionIsConditions } from '../schemaTabs';
 import { SettingsConditionsTabs } from '../SettingsConditionsTabs';
 import { GroupedFieldSections } from './GroupedFieldSections';
 import { openLegacyFieldModal } from '../schemaSettingControl';
+import type { FieldEditorBaseProps } from '../types/fieldModal';
 
-/**
- * @param {Object}   props
- * @param {Object}   props.schema
- * @param {Object}   props.values
- * @param {Function} props.onChange
- * @param {Object}   props.i18n
- * @param {number}   props.ppomFieldIndex
- * @param {Object}   [props.modalContext]
- */
 export function SelectFieldEditor( {
 	schema,
 	values,
@@ -23,12 +15,12 @@ export function SelectFieldEditor( {
 	i18n,
 	ppomFieldIndex,
 	modalContext,
-} ) {
-	const settings =
+}: FieldEditorBaseProps ) {
+	const settings: Record< string, unknown > =
 		schema && schema.settings && typeof schema.settings === 'object'
-			? schema.settings
+			? ( schema.settings as Record< string, unknown > )
 			: {};
-	const optionsMeta = settings.options;
+	const optionsMeta = settings.options as Record< string, unknown > | undefined;
 	const needsLegacyOptions =
 		optionsMeta &&
 		optionsMeta.type &&

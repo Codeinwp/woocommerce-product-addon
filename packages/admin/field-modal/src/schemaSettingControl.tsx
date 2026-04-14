@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { normalizeSelectOptions } from './schemaTabs';
 import { ConditionsEditor } from './ConditionsEditor';
+import type { SettingRowContext } from './types/fieldModal';
 
 const controlSurface = {
 	bg: 'white',
@@ -43,10 +44,7 @@ const labelProps = {
 	mb: 0.5,
 };
 
-/**
- * @param {number} ppomFieldIndex 1-based index matching legacy `#ppom_field_model_{n}`.
- */
-export function openLegacyFieldModal( ppomFieldIndex ) {
+export function openLegacyFieldModal( ppomFieldIndex: number ) {
 	if ( ! ppomFieldIndex || ppomFieldIndex < 1 ) {
 		return;
 	}
@@ -56,20 +54,14 @@ export function openLegacyFieldModal( ppomFieldIndex ) {
 	if ( ! btn ) {
 		return;
 	}
-	btn.click();
+	( btn as HTMLElement ).click();
 }
 
-/**
- * @param {string}   key
- * @param {Object}   meta
- * @param {Object}   ctx
- * @param {Object}   ctx.values
- * @param {Function} ctx.onChange
- * @param {Object}   ctx.i18n
- * @param {number}   ctx.ppomFieldIndex
- * @return {import('react').ReactNode|null}
- */
-export function renderSettingRow( key, meta, ctx ) {
+export function renderSettingRow(
+	key: string,
+	meta: Record< string, unknown >,
+	ctx: SettingRowContext
+) {
 	const { values, onChange, i18n, ppomFieldIndex } = ctx;
 	const type = meta.type ? String( meta.type ) : 'text';
 	const title = meta.title ? String( meta.title ) : key;
@@ -77,7 +69,7 @@ export function renderSettingRow( key, meta, ctx ) {
 	const raw = values[ key ];
 	const value = raw == null ? '' : raw;
 
-	const setKey = ( k, val ) => {
+	const setKey = ( k: string, val: unknown ) => {
 		onChange( { ...values, [ k ]: val } );
 	};
 

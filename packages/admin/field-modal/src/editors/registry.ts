@@ -4,18 +4,15 @@
 import { TextFieldEditor } from './TextFieldEditor';
 import { TextareaFieldEditor } from './TextareaFieldEditor';
 import { SelectFieldEditor } from './SelectFieldEditor';
+import type { FieldEditorComponent } from '../types/fieldModal';
 
-const coreEditors = {
+const coreEditors: Record< string, FieldEditorComponent > = {
 	text: TextFieldEditor,
 	textarea: TextareaFieldEditor,
 	select: SelectFieldEditor,
 };
 
-/**
- * @param {string} slug Field type from PPOM (e.g. text, email).
- * @return {import('react').ComponentType<any>|null}
- */
-export function getFieldEditor( slug ) {
+export function getFieldEditor( slug: string ): FieldEditorComponent | null {
 	const t = String( slug || '' ).toLowerCase();
 	const extra =
 		typeof window !== 'undefined' &&
@@ -23,6 +20,9 @@ export function getFieldEditor( slug ) {
 		typeof window.ppomFieldModalEditors === 'object'
 			? window.ppomFieldModalEditors
 			: {};
-	const merged = { ...coreEditors, ...extra };
+	const merged: Record< string, FieldEditorComponent > = {
+		...coreEditors,
+		...extra,
+	};
 	return merged[ t ] || null;
 }

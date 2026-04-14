@@ -1,27 +1,19 @@
 /**
- * Textarea field type: grouped settings editor.
+ * Text field type: grouped settings editor.
  */
 import { editorSectionIsConditions } from '../schemaTabs';
 import { SettingsConditionsTabs } from '../SettingsConditionsTabs';
 import { GroupedFieldSections } from './GroupedFieldSections';
+import type { FieldEditorBaseProps } from '../types/fieldModal';
 
-/**
- * @param {Object}   props
- * @param {Object}   props.schema
- * @param {Object}   props.values
- * @param {Function} props.onChange
- * @param {Object}   props.i18n
- * @param {number}   props.ppomFieldIndex
- * @param {Object}   [props.modalContext]
- */
-export function TextareaFieldEditor( {
+export function TextFieldEditor( {
 	schema,
 	values,
 	onChange,
 	i18n,
 	ppomFieldIndex,
 	modalContext,
-} ) {
+}: FieldEditorBaseProps ) {
 	const sections = [
 		{
 			label: i18n.editorSectionBasic || 'Basic',
@@ -34,16 +26,20 @@ export function TextareaFieldEditor( {
 			],
 		},
 		{
+			label: i18n.editorSectionValidation || 'Validation',
+			keys: [ 'maxlength', 'minlength' ],
+		},
+		{
 			label: i18n.editorSectionDefaultPrice || 'Default & pricing',
-			keys: [ 'default_value', 'max_length', 'price' ],
+			keys: [ 'default_value', 'price' ],
 		},
 		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
-			keys: [ 'class', 'width', 'visibility' ],
+			keys: [ 'class', 'input_mask', 'width', 'visibility' ],
 		},
 		{
 			label: i18n.editorSectionBehavior || 'Behavior',
-			keys: [ 'rich_editor', 'desc_tooltip', 'required' ],
+			keys: [ 'onetime', 'use_regex', 'desc_tooltip', 'required' ],
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
