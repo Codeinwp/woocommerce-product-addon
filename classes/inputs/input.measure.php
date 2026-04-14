@@ -54,6 +54,7 @@ class NM_Measure_wooproduct extends PPOM_Inputs {
 		}
 
 		$price = isset( $option['price'] ) ? $option['price'] : 0;
+		$price = apply_filters( 'ppom_option_price', $price );
 		$price = wc_price( $price );
 		$label = $price . '/' . $option['option'];
 

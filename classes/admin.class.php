@@ -121,6 +121,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @return array
 	 */
 	public function upgrade_to_pro_plugin_action( $actions, $plugin_file ) {
+		if ( apply_filters( 'themeisle_sdk_is_black_friday_sale', false ) ) {
+			return $actions;
+		}
+
 		if ( apply_filters( 'product_ppom_license_status', '' ) === 'valid' || apply_filters( 'product_ppom_license_status', '' ) === 'active_expired' ) {
 			return $actions;
 		}

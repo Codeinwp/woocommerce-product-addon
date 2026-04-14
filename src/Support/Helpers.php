@@ -2494,7 +2494,7 @@ final class Helpers {
 			$has_field_value = isset( $posted_fields[ $data_name ] );
 			if ( ! $has_field_value ) {
 				foreach ( $posted_fields as $field_key => $field_value ) {
-					$field_key = explode( '__clone__', $field_key );
+					$field_key = explode( '__clone_', $field_key );
 					if ( in_array( $data_name, $field_key, true ) ) {
 						$has_field_value = true;
 						break;
@@ -2515,7 +2515,7 @@ final class Helpers {
 		}
 
 		foreach ( $posted_fields as $field_key => $field_value ) {
-			$field_key = explode( '__clone__', $field_key );
+			$field_key = explode( '__clone_', $field_key );
 
 			if ( in_array( $data_name, $field_key, true ) && is_array( $field_value ) ) {
 				$count = count( $field_value );

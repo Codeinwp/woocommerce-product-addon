@@ -835,6 +835,8 @@ final class Engine {
 		$option_label = isset( $option['raw'] ) ? $option['raw'] : '';
 		$without_tax  = isset( $option['without_tax'] ) ? $option['without_tax'] : '';
 
+		$field_price = apply_filters( 'ppom_option_price', $field_price );
+
 		$label_price = "{$field_title} - " . wc_price( $field_price );
 		// For bulkquantity
 		$base_price = isset( $option['Base Price'] ) ? $option['Base Price'] : '';
@@ -1314,10 +1316,18 @@ final class Engine {
 				} else {
 					$matrix_discount = $matrix_found['raw_price'];
 				}
-				$discount_label   = $cart_counter . '-' . $matrix_found['label'];
+				$discount_label   = $matrix_found['label'];
 				$matrix_discount  = floatval( $matrix_discount );
 				$discount_taxable = apply_filters( 'ppom_matrix_discount_taxable', false, $item, $cart );
-				$cart->add_fee( esc_html( $discount_label ), - $matrix_discount, $discount_taxable );
+				$cart->fees_api()->add_fee(
+					array(
+						'id'        => 'ppom_matrix_fee_' . $cart_counter,
+						'name'      => esc_html( $discount_label ),
+						'amount'    => -abs( (float) $matrix_discount ),
+						'taxable'   => $discount_taxable,
+						'tax_class' => '',
+					)
+				);
 				// ppom_pa($discount_label);
 			}
 
@@ -1332,7 +1342,10 @@ final class Engine {
 				$fee_price    = apply_filters( 'ppom_option_price', $fee['price'] );
 				$taxable      = $fee['taxable']; // deprecated soon
 
-				$label = "{$fee_no}-{$label} ({$option_label})";
+				$label = "{$label}";
+				if ( $option_label ) {
+					$label .= " ({$option_label})";
+				}
 				$label = apply_filters( 'ppom_fixed_fee_label', $label, $fee, $item );
 
 
@@ -1358,7 +1371,15 @@ final class Engine {
 						$fee_price = $fee_price - $total_tax;
 					}
 
-					$cart->add_fee( esc_html( $label ), $fee_price, $taxable, $tax_class );
+					$cart->fees_api()->add_fee(
+						array(
+							'id'        => 'ppom_fee_' . $fee_no,
+							'name'      => esc_html( $label ),
+							'amount'    => (float) $fee_price,
+							'taxable'   => $taxable,
+							'tax_class' => $tax_class,
+						)
+					);
 					++$fee_no;
 				}
 			}
