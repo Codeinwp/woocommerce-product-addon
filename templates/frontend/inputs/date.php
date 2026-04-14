@@ -21,6 +21,7 @@ $taxable    = $fm->get_meta_value( 'onetime_taxable' );
 $input_attr = $fm->get_meta_value( 'attributes' );
 $jquery_dp  = $fm->get_meta_value( 'jquery_dp' );
 $price      = $fm->get_meta_value( 'price' );
+$price      = apply_filters( 'ppom_option_price', $price );
 
 $price_without_tax = '';
 if ( $onetime == 'on' && $taxable == 'on' ) {

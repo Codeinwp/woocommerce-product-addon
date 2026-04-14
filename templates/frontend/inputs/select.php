@@ -64,7 +64,7 @@ $product_type = $product->get_type();
 		foreach ( $options as $key => $value ) {
 
 			$option_label  = $value['label'];
-			$option_price  = $value['price'];
+			$option_price  = apply_filters( 'ppom_option_price', $value['price'] );
 			$option_id     = isset( $value['id'] ) ? $value['id'] : '';
 			$raw_label     = $value['raw'];
 			$without_tax   = $value['without_tax'];

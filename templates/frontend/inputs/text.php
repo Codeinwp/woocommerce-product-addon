@@ -21,6 +21,7 @@ $input_mask = $fm->get_meta_value( 'input_mask' );
 $onetime    = $fm->get_meta_value( 'onetime' );
 $taxable    = $fm->get_meta_value( 'onetime_taxable' );
 $price      = $fm->get_meta_value( 'price' );
+$price      = apply_filters( 'ppom_option_price', $price );
 $input_attr = $fm->get_meta_value( 'attributes' );
 
 // Regex-Input Mask (Since 18.0)
