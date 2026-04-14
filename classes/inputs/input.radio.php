@@ -25,7 +25,6 @@ class NM_Radio_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'regular radio input', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-dot-circle-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 	private function get_settings() {

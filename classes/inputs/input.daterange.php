@@ -25,7 +25,6 @@ class NM_Daterange_wooproduct extends PPOM_Inputs {
 		$this->desc     = '<a href="https://www.daterangepicker.com/" target="_blank">' . __( 'More detail', 'woocommerce-product-addon' ) . '</a>';
 		$this->icon     = '<i class="fa fa-table" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 	private function get_settings() {

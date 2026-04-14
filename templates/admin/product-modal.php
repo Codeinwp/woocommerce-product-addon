@@ -15,7 +15,7 @@
 
 		<footer>
 			<button type="button"
-			        class="btn btn-default close-model ppom-js-modal-close"><?php _e( 'Close', 'woocommerce-product-addon' ); ?></button>
+					class="btn btn-default close-model ppom-js-modal-close"><?php _e( 'Close', 'woocommerce-product-addon' ); ?></button>
 			<button type="submit" class="btn btn-success"><?php _e( 'Save', 'woocommerce-product-addon' ); ?></button>
 		</footer>
 	</form>

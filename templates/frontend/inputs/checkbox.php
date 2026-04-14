@@ -77,7 +77,7 @@ $is_tooltip_enabled  = isset( $field_meta['desc_tooltip'] ) && 'on' === $field_m
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 
@@ -93,6 +93,8 @@ $is_tooltip_enabled  = isset( $field_meta['desc_tooltip'] ) && 'on' === $field_m
 		$option_id      = $value['option_id'];
 		$dom_id         = apply_filters( 'ppom_dom_option_id', $option_id, $field_meta );
 		$opt_percent    = isset( $value['percent'] ) ? $value['percent'] : '';
+		$option_price   = apply_filters( 'ppom_option_price', $option_price );
+		$discount_price = apply_filters( 'ppom_option_price', $discount_price );
 		$option_tooltip = isset( $value['tooltip'] ) ? $value['tooltip'] : '';
 
 		// if discount price set
@@ -126,7 +128,7 @@ $is_tooltip_enabled  = isset( $field_meta['desc_tooltip'] ) && 'on' === $field_m
 		?>
 		<div class="<?php echo esc_attr( $check_wrapper_class ); ?>">
 			<label class="<?php echo esc_attr( $fm->checkbox_label_classes() ); ?>"
-				   for="<?php echo esc_attr( $dom_id ); ?>">
+					for="<?php echo esc_attr( $dom_id ); ?>">
 
 				<input
 						type="checkbox"

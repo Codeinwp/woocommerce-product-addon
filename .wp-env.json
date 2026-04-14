@@ -1,7 +1,12 @@
 {
-    "plugins": [
-        "https://downloads.wordpress.org/plugin/woocommerce.9.3.3.zip",
-        "."
-    ],
-    "phpVersion": "8.1"
+  "$schema": "https://schemas.wp.org/trunk/wp-env.json",
+  "plugins": [
+      "https://downloads.wordpress.org/plugin/woocommerce.zip",
+      "."
+  ],
+  "mappings": {
+      "wp-content/mu-plugins": "./bin/wp-env/mu-plugins"
+  },
+  "phpVersion": "8.1",
+  "autoPort": true
 }
