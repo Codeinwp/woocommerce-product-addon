@@ -982,52 +982,61 @@ function ppom_get_editing_tools( $editing_tools ) {
  **/
 function ppom_has_posted_field_value( $posted_fields, $field ) {
 
-	$has_value = false;
-
 	$data_name = sanitize_key( $field['data_name'] );
 	$type      = $field['type'];
 
+	$matching_keys = array();
 	if ( ! empty( $posted_fields ) ) {
 		foreach ( $posted_fields as $field_key => $value ) {
-			$field_key = explode( '__clone_', $field_key );
+			$key_parts = explode( '__clone_', $field_key );
 
-			if ( in_array( $data_name, $field_key, true ) ) {
-
-				switch ( $type ) {
-
-					case 'quantities':
-						$quantities_field = $value;
-						$quantity         = 0;
-						foreach ( $quantities_field as $option => $qty ) {
-							$quantity += intval( $qty );
-						}
-
-						if ( $quantity > 0 ) {
-							$has_value = true;
-						}
-
-						break;
-
-					case 'fonts':
-						if ( isset( $value['font'] ) && $value['font'] != '' ) {
-							$has_value = true;
-						}
-
-						break;
-
-					default:
-						if ( $value != '' ) {
-							$has_value = true;
-						}
-						break;
-
-				}
-
-
-				if ( $has_value ) {
-					break;
-				}
+			if ( in_array( $data_name, $key_parts, true ) ) {
+				$matching_keys[ $field_key ] = $value;
 			}
+		}
+	}
+
+	if ( empty( $matching_keys ) ) {
+		return apply_filters( 'ppom_has_posted_field_value', false, $posted_fields, $field );
+	}
+
+	// Every instance (the original field AND every clone) must have a value.
+	$has_value = true;
+	foreach ( $matching_keys as $instance_value ) {
+
+		$instance_has_value = false;
+
+		switch ( $type ) {
+
+			case 'quantities':
+				$quantity = 0;
+				foreach ( (array) $instance_value as $qty ) {
+					$quantity += intval( $qty );
+				}
+				if ( $quantity > 0 ) {
+					$instance_has_value = true;
+				}
+				break;
+
+			case 'fonts':
+				if ( isset( $instance_value['font'] ) && '' !== $instance_value['font'] ) {
+					$instance_has_value = true;
+				}
+				break;
+
+			default:
+				if ( is_array( $instance_value ) ) {
+					$instance_has_value = ! empty( $instance_value );
+				} elseif ( '' !== trim( (string) $instance_value ) ) {
+					$instance_has_value = true;
+				}
+				break;
+
+		}
+
+		if ( ! $instance_has_value ) {
+			$has_value = false;
+			break;
 		}
 	}
 
@@ -2553,7 +2562,7 @@ function ppom_posted_field_max_min_value_validation( $posted_fields, $field ) {
 		$has_field_value = isset( $posted_fields[ $data_name ] );
 		if ( ! $has_field_value ) {
 			foreach ( $posted_fields as $field_key => $field_value ) {
-				$field_key = explode( '__clone__', $field_key );
+				$field_key = explode( '__clone_', $field_key );
 				if ( in_array( $data_name, $field_key, true ) ) {
 					$has_field_value = true;
 					break;
@@ -2574,7 +2583,7 @@ function ppom_posted_field_max_min_value_validation( $posted_fields, $field ) {
 	}
 
 	foreach ( $posted_fields as $field_key => $field_value ) {
-		$field_key = explode( '__clone__', $field_key );
+		$field_key = explode( '__clone_', $field_key );
 
 		if ( in_array( $data_name, $field_key, true ) && is_array( $field_value ) ) {
 			$count = count( $field_value );
