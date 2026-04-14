@@ -55,8 +55,6 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 		$out_of_stock = $manage_stock && $stock < 1 ? true : false;
 		$disabled     = $out_of_stock ? 'disabled="disabled"' : '';
 		$min          = $out_of_stock ? 0 : $min;
-
-		$the_price    = isset( $opt['price'] ) ? $opt['price'] : $default_price;
 		$usebaseprice = isset( $opt['price'] ) ? 'no' : 'yes';
 
 		$label = $opt['raw'];
@@ -86,6 +84,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 			<?php
 			// Price need to filter for currency switcher here not in wc_price
 			$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
+			$the_price = apply_filters( 'ppom_option_price', $the_price );
 			?>
 
 			<span class="ppom-quantity-qty-section">

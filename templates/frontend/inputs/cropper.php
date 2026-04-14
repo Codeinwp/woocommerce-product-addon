@@ -23,6 +23,7 @@ $file_cost    = $fm->get_meta_value( 'file_cost' );
 $btn_class    = $fm->get_meta_value( 'button_class' );
 $btn_label    = $fm->get_meta_value( 'button_label_select' );
 $first_option = $fm->get_meta_value( 'first_option' );
+$file_cost    = apply_filters( 'ppom_option_price', $file_cost );
 
 $field_label = ( $file_cost == '' ) ? $fm->field_label() : $fm->field_label() . ' - ' . wc_price( $file_cost );
 $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-addon' ) : $btn_label );
@@ -91,6 +92,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 						$raw_label    = $size['raw'];
 						$without_tax  = $size['without_tax'];
 						$option_id    = $size['option_id'];
+						$option_price = apply_filters( 'ppom_option_price', $option_price );
 
 						$selected_opt = selected( $default_value, $key, false );
 

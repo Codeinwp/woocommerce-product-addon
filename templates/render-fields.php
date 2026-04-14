@@ -649,6 +649,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			$file_cost     = ( isset( $meta ['file_cost'] ) ? $meta ['file_cost'] : '' );
 			$taxable       = ( isset( $meta['onetime_taxable'] ) ? $meta['onetime_taxable'] : '' );
 			$language      = ( isset( $meta['language_opt'] ) ? $meta['language_opt'] : '' );
+			$file_cost     = apply_filters( 'ppom_option_price', $file_cost );
 
 			$field_label = ( $file_cost == '' ) ? $field_label : $field_label . ' - ' . wc_price( $file_cost );
 
@@ -693,6 +694,7 @@ foreach ( $ppom_fields_meta as $meta ) {
 			$taxable      = ( isset( $meta['onetime_taxable'] ) ? $meta['onetime_taxable'] : '' );
 			$language     = ( isset( $meta['language_opt'] ) ? $meta['language_opt'] : '' );
 			$file_cost    = ( isset( $meta ['file_cost'] ) ? $meta ['file_cost'] : '' );
+			$file_cost    = apply_filters( 'ppom_option_price', $file_cost );
 			$field_label  = ( $file_cost == '' ) ? $field_label : $field_label . ' - ' . wc_price( $file_cost );
 			$first_option = isset( $meta['first_option'] ) ? $meta['first_option'] : '';
 			$options      = ppom_convert_options_to_key_val( $options, $meta, $product );

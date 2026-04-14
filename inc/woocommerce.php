@@ -701,7 +701,7 @@ function ppom_woocommerce_mini_cart_fixed_fee() {
 
 			$item_fee = $fee->total + $fee->tax;
 		}
-		// var_dump($fee);
+		$item_fee        = apply_filters( 'ppom_option_price', $item_fee );
 		$fixed_fee_html .= '<tr>';
 		$fixed_fee_html .= '<td class="subtotal-text">' . esc_html( $fee->name );
 		'</td>';
@@ -736,6 +736,8 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 		$meta_name  = isset( $meta['name'] ) ? $meta['name'] : '';
 		$meta_value = isset( $meta['value'] ) ? $meta['value'] : '';
 		$display    = isset( $meta['display'] ) ? $meta['display'] : $meta_value;
+		$meta_price = isset( $meta['price'] ) ? $meta['price'] : 0;
+		$meta_price = apply_filters( 'ppom_option_price', $meta_price );
 		if ( $key == 'ppom_has_quantities' ) {
 			$hidden = true;
 		}
@@ -757,8 +759,8 @@ function ppom_woocommerce_add_item_meta( $item_meta, $cart_item ) {
 				$meta_value = wp_json_encode( $meta_value );
 			}
 
-			if ( apply_filters( 'ppom_show_option_price_cart', false ) && isset( $meta['price'] ) ) {
-				$meta_value .= ' (' . wc_price( $meta['price'] ) . ')';
+			if ( apply_filters( 'ppom_show_option_price_cart', false ) && ! empty( $meta_price ) ) {
+				$meta_value .= ' (' . wc_price( $meta_price ) . ')';
 			}
 
 			$meta_key = stripslashes( $meta_name );
@@ -839,8 +841,8 @@ function ppom_woocommerce_alter_price( $price, $product ) {
 
 					$least_price = floatval( $product->get_price() ) - $least_price;
 					$least_price = wc_format_decimal( $least_price, wc_get_price_decimals() );
-					// var_dump($least_price);
-					$price = wc_price( $least_price ) . '-' . $price;
+					$least_price = apply_filters( 'ppom_option_price', $least_price );
+					$price       = wc_price( $least_price ) . '-' . $price;
 				} else {
 
 					foreach ( $ranges as $range ) {

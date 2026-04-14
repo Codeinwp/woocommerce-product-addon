@@ -76,6 +76,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 
 				// Price need to filter for currency switcher here not in wc_price
 				$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
+				$the_price = apply_filters( 'ppom_option_price', $the_price );
 
 				$usebaseprice = isset( $opt['price'] ) ? 'no' : 'yes';
 				$required     = ( $fm->required() == 'on' ? 'required' : '' );

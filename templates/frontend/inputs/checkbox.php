@@ -92,6 +92,8 @@ $icon_color          = ppom_get_option( 'ppom_input_tooltip_iconclr', '#000000' 
 		$option_id      = $value['option_id'];
 		$dom_id         = apply_filters( 'ppom_dom_option_id', $option_id, $field_meta );
 		$opt_percent    = isset( $value['percent'] ) ? $value['percent'] : '';
+		$option_price   = apply_filters( 'ppom_option_price', $option_price );
+		$discount_price = apply_filters( 'ppom_option_price', $discount_price );
 
 		// if discount price set
 		if ( $has_discount ) {
