@@ -37,7 +37,7 @@ if ( $divider_styles == 'style1' ) {
 
 
 	$custom_css .= '.' . $fm->data_name() . ' .ppom-divider-line-clr:before,' .
-				   '.' . $fm->data_name() . ' .ppom-divider-line-clr:after {
+					'.' . $fm->data_name() . ' .ppom-divider-line-clr:after {
                         border-top: ' . $divider_height . ' ' . $style1_border . ' ' . $divider_color . ' !important;
                     }';
 }

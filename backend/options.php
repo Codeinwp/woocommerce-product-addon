@@ -1,6 +1,11 @@
 <?php
 /**
- * Plugin Admin Settings
+ * Registers PPOM settings-panel tabs, panels, and field definitions.
+ *
+ * @package PPOM
+ * @subpackage Settings
+ *
+ * @see PPOM_SettingsFramework::register_setting()
  */
 
 /* 
@@ -15,11 +20,21 @@ if ( ! class_exists( 'PPOM_SettingsFramework' ) ) {
 	return;
 }
 
-/**
- * Register Settings Panel
- * --------------------------
- */
+// Core settings registration.
 
+/**
+ * Registers the free PPOM settings-panel tabs, panels, and fields.
+ *
+ * Defines the base admin, pricing-label, and permission settings that are
+ * always available once the settings framework has been initialized.
+ *
+ * @return void
+ *
+ * @see PPOMSETTINGS()
+ * @see PPOM_SettingsFramework::register_tabs()
+ * @see PPOM_SettingsFramework::register_panel()
+ * @see PPOM_SettingsFramework::register_setting()
+ */
 function ppom_load_free_options() {
 
 	/**
@@ -50,7 +65,7 @@ function ppom_load_free_options() {
 		'ppom_legacy_price'                   => array(
 			'type'  => 'checkbox',
 			'title' => __( 'Enable Legacy Price Calculations', 'woocommerce-product-addon' ),
-			'desc'	=> __( 'Enable this option to use the legacy method for price calculations.', 'woocommerce-product-addon' ),
+			'desc'  => __( 'Enable this option to use the legacy method for price calculations.', 'woocommerce-product-addon' ),
 		),
 		'ppom_permission_mfields'             => array(
 			'type'        => 'select',
@@ -131,6 +146,21 @@ function ppom_load_free_options() {
 }
 add_action( 'init', 'ppom_load_free_options' );
 
+// Pro and integration settings registration.
+
+/**
+ * Registers the pro, styling, addon, and integration settings definitions.
+ *
+ * Extends the base settings panel with advanced pricing, style output, REST
+ * API, and addon-specific settings that are consumed by the PPOM runtime.
+ *
+ * @return void
+ *
+ * @see PPOMSETTINGS()
+ * @see PPOM_SettingsFramework::register_panel()
+ * @see PPOM_SettingsFramework::register_setting()
+ * @see PPOM_Rest::init_api()
+ */
 function ppom_load_pro_options() {
 	$pro_settings = array(
 		'ppom_pro_basics'                    => array(
@@ -648,30 +678,30 @@ function ppom_load_pro_options() {
 		'ppom_repeater_clone_mode'     => array(
 			'type'         => 'select',
 			'is_available' => false,
-			'options'      => [
+			'options'      => array(
 				'first_box' => 'Clone from first box only',
 				'each_box'  => 'Clone from each box',
-			],
+			),
 			'title'        => __( 'Clone Mode', 'woocommerce-product-addon' ),
 			'desc'         => __( 'How to clone the fields', 'woocommerce-product-addon' ),
 		),
 		'ppom_repeater_clone_position' => array(
 			'type'         => 'select',
 			'is_available' => false,
-			'options'      => [
+			'options'      => array(
 				'top'    => 'Top',
 				'bottom' => 'Bottom',
-			],
+			),
 			'title'        => __( 'Clone Icons Position', 'woocommerce-product-addon' ),
 			'desc'         => __( 'Set the placement of the clone icons within the repeater fields.', 'woocommerce-product-addon' ),
 		),
 		'ppom_repeater_icon_lib'       => array(
 			'type'         => 'select',
 			'is_available' => false,
-			'options'      => [
+			'options'      => array(
 				'dashicons'   => 'Dashicons',
 				'fontawesome' => 'FontAwesome',
-			],
+			),
 			'title'        => __( 'Icons Library', 'woocommerce-product-addon' ),
 			'desc'         => __( 'Select the icon library to be used for displaying icons.', 'woocommerce-product-addon' ),
 		),
@@ -693,10 +723,10 @@ function ppom_load_pro_options() {
 			'default'      => 'Bulk Quantity Standard',
 			'options'      => array(
 				'bq_standard' => __( 'Bulk Quantity Standard', 'woocommerce-product-addon' ),
-				'bq_packaged' => __( 'Bulk Quantity Packaged', 'woocommerce-product-addon' )
+				'bq_packaged' => __( 'Bulk Quantity Packaged', 'woocommerce-product-addon' ),
 			),
 			'desc'         => __( 'Choose how bulk quantities are displayed. Select \'Bulk Quantity Standard\' for standard bulk orders or \'Bulk Quantity Packaged\' for pre-packaged bulk quantities.', 'woocommerce-product-addon' ),
-		)
+		),
 	);
 
 	PPOMSETTINGS()->register_setting( 'ppom_admin_fields_settings', $settings );
@@ -746,9 +776,8 @@ function ppom_load_pro_options() {
 			'is_available' => false,
 			'title'        => __( 'Integrations', 'woocommerce-product-addon' ),
 			'is_sabpanel'  => true,
-		)
+		),
 	);
 	PPOMSETTINGS()->register_panel( 'ppom_general_tab', $panels )->register_setting( 'ppom_integrations', $integration_settings );
-
 }
-add_action('init', 'ppom_load_pro_options', 99);
+add_action( 'init', 'ppom_load_pro_options', 99 );

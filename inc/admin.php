@@ -1,13 +1,16 @@
 <?php
 /**
- * admin related functions/hooks
+ * Registers PPOM admin product and field-group management callbacks.
  *
- * @since 10.0
- **/
+ * @package PPOM
+ * @subpackage Admin
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed.' );
 }
+
+// Product edit integration.
 
 /**
  * Adding column in product list.
@@ -35,11 +38,11 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 			$ppom_settings_url = admin_url( 'admin.php?page=ppom' );
 
 			if ( $ppom->has_multiple_meta() ) {
-				$total_items = count( $ppom->meta_id ); // Get the total number of items.
+				$total_items  = count( $ppom->meta_id ); // Get the total number of items.
 				$current_item = 0; // Counter to track the current iteration.
-                $has_fields = false;
+				$has_fields   = false;
 				foreach ( $ppom->meta_id as $meta_id ) {
-					$current_item++; // Increment the counter.
+					++$current_item; // Increment the counter.
 
 					$ppom_setting = $ppom->get_settings_by_id( $meta_id );
 					if ( $ppom_setting ) {
@@ -51,18 +54,17 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 							),
 							$ppom_settings_url
 						);
-						echo sprintf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $meta_title );
+						printf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $meta_title );
 						// Add a comma only if it's not the last item
 						if ( $current_item < $total_items ) {
 							echo ', ';
 						}
-                        $has_fields = true;
-					}
-
+						$has_fields = true;
+					}               
 				}
-                if( ! $has_fields  ) {
-                    echo sprintf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
-                }
+				if ( ! $has_fields ) {
+					printf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
+				}
 			} elseif ( $ppom->ppom_settings ) {
 				$url_edit = add_query_arg(
 					array(
@@ -71,9 +73,9 @@ function ppom_admin_product_meta_column( $column, $post_id ) {
 					),
 					$ppom_settings_url
 				);
-				echo sprintf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $ppom->meta_title );
+				printf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $ppom->meta_title );
 			} else {
-				echo sprintf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
+				printf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
 			}
 
 			break;
@@ -86,13 +88,25 @@ function ppom_admin_product_meta_metabox() {
 	add_meta_box( 'ppom-select-meta', __( 'Select PPOM Meta', 'woocommerce-product-addon' ), 'ppom_meta_list', 'product', 'side', 'default' );
 }
 
+/**
+ * Renders the product edit metabox for selecting a PPOM field group.
+ *
+ * Reads the current product assignment from {@see PPOM_Meta} and lists every
+ * available group returned by {@see PPOM()} for attachment.
+ *
+ * @param WP_Post $post Product post being edited.
+ *
+ * @return void
+ *
+ * @see PPOM_Meta::__construct()
+ */
 function ppom_meta_list( $post ) {
 
 	$ppom         = new PPOM_Meta( $post->ID );
 	$all_meta     = PPOM()->get_product_meta_all();
 	$ppom_setting = admin_url( 'admin.php?page=ppom' );
 	
-	$html  = '<div class="options_group ppom-settings-container" style="max-height:375px; overflow:auto;">';
+	$html = '<div class="options_group ppom-settings-container" style="max-height:375px; overflow:auto;">';
 
 	if ( count( $all_meta ) > 1 ) {
 		// UP-SELL
@@ -103,7 +117,7 @@ function ppom_meta_list( $post ) {
 	}
 	// PPOM Fields select table.
 	$html .= '<table id="ppom_meta_sortable" class="wp-list-table widefat fixed striped">';
-	//Hide search if we don't have many metas
+	// Hide search if we don't have many metas
 
 	$html .= '<div class="ppom-search-meta" style="text-align: right;">';
 	if ( count( $all_meta ) > 3 ) {
@@ -118,7 +132,7 @@ function ppom_meta_list( $post ) {
 	$html .= '<th>' . __( 'Group Name', 'woocommerce-product-addon' ) . '</th>';
 	$html .= '<th>' . __( 'Edit', 'woocommerce-product-addon' ) . '</th>';
 	$html .= '</tr></thead>';
-	
+
 	foreach ( $all_meta as $meta ) {
 		$html .= '<tr data-ppom-search="' . esc_attr( sanitize_key( $meta->productmeta_name ) ) . '" style="cursor: move;">';
 
@@ -171,7 +185,7 @@ function ppom_meta_list( $post ) {
 	$html .= '<hr>';
 	$html .= '<div class="ppom-settings-container">';
 	$html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input type="checkbox" disabled>' . __( 'Enable Pop-up.', 'woocommerce-product-addon' ) . '<span class="woocommerce-help-tip" data-tip="' . __( 'Enable this option to display product fields in a popup instead of directly on the product page.', 'woocommerce-product-addon' ) . '"></span><i>' . sprintf(
-		// translators: %1$s the opening link HTML tag, %2$s the close link HTML tag.
+	// translators: %1$s the opening link HTML tag, %2$s the close link HTML tag.
 		__( 'Available in the %1$sPremium%2$s version.', 'woocommerce-product-addon' ),
 		'<a target="_blank" href="' . tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'enable-popup', 'metabox' ) . '">',
 		'</a>'
@@ -181,14 +195,13 @@ function ppom_meta_list( $post ) {
 	$html .= '<hr>';
 	$html .= '<div class="ppom-settings-container">';
 	$html .= '<label class="ppom-settings-container-item ppom-disabled-text"><input disabled type="checkbox">' . __( 'Enable Enquiry Form', 'woocommerce-product-addon' ) . '<span class="woocommerce-help-tip" data-tip="' . __( 'Enhances your product pages by adding a customizable enquiry button. It allows customers to send inquiries directly to the admin about products with PPOM Fields via email.', 'woocommerce-product-addon' ) . '"></span><i>' . sprintf(
-		// translators: %1$s the link to Store with label: 'Premium'.
+	// translators: %1$s the link to Store with label: 'Premium'.
 		__( 'Available in the %1$s version.', 'woocommerce-product-addon' ),
 		sprintf(
 			'<a href="%s" target="_blank">%s</a>',
 			esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'enable-enquiry', 'metabox' ) ),
 			__( 'Premium', 'woocommerce-product-addon' )
 		)
-		
 	) . '</i></label>';
 	$html .= '</div>';
 
@@ -213,29 +226,39 @@ function ppom_meta_list( $post ) {
 	</script>
 	<?php
 
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Filtered metabox markup is expected here.
 	echo apply_filters( 'ppom_select_meta_in_product', $html, $ppom, $all_meta );
 
-	echo '<div class="ppom_extra_options_panel">';
-	do_action( 'ppom_meta_box_after_list', $post );
-	echo '</div>';
+		echo '<div class="ppom_extra_options_panel">';
+		do_action( 'ppom_meta_box_after_list', $post );
+		echo '</div>';
 }
 
-/*
- * saving meta data against product
+// Product-field assignment persistence.
+
+/**
+ * Persists the selected PPOM field group IDs on a WooCommerce product.
+ *
+ * Normalizes the submitted `ppom_product_meta` payload to an integer array and
+ * stores it under {@see PPOM_PRODUCT_META_KEY}.
+ *
+ * @param int $post_id Product ID receiving the PPOM assignment.
+ *
+ * @return void
  */
 function ppom_admin_process_product_meta( $post_id ) {
 
 
 	$ppom_meta_selected = isset( $_POST ['ppom_product_meta'] ) ? $_POST ['ppom_product_meta'] : array();
-	
+
 	if ( is_numeric( $ppom_meta_selected ) ) {
 		$ppom_meta_selected = array( $ppom_meta_selected );
-	} else if ( ! is_array( $ppom_meta_selected ) ) {
+	} elseif ( ! is_array( $ppom_meta_selected ) ) {
 		$ppom_meta_selected = array();
 	}
-	
+
 	$ppom_meta_selected = array_map( 'intval', $ppom_meta_selected );
-	
+
 	// ppom_pa($ppom_meta_selected); exit;
 	update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $ppom_meta_selected );
 
@@ -259,12 +282,25 @@ function ppom_admin_show_notices() {
 	}
 }
 
-/*
- * saving form meta in admin call
+// Field group create and update.
+
+/**
+ * Creates a PPOM field group from the admin builder request.
+ *
+ * Verifies the admin nonce and capability, sanitizes the submitted field
+ * schema, inserts the field-group row into the PPOM custom table, then updates
+ * each field entry with the generated PPOM ID. When a product ID is submitted,
+ * the new field group is attached to that product.
+ *
+ * @return void
+ *
+ * @see ppom_sanitize_array_data()
+ * @see ppom_attach_fields_to_product()
  */
 function ppom_admin_save_form_meta() {
 
-	$db_version = floatval( get_option( 'personalizedproduct_db_version' ) );
+	$db_version      = floatval( get_option( 'personalizedproduct_db_version' ) );
+	$ppom_form_nonce = isset( $_POST['ppom_form_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_form_nonce'] ) ) : '';
 
 	if ( $db_version < 22.1 ) {
 		$resp = array(
@@ -277,9 +313,9 @@ function ppom_admin_save_form_meta() {
 
 	// print_r($_REQUEST); exit;
 
-	if ( ! isset( $_POST['ppom_form_nonce'] )
-		 || ! wp_verify_nonce( $_POST['ppom_form_nonce'], 'ppom_form_nonce_action' )
-		 || ! ppom_security_role()
+	if ( empty( $ppom_form_nonce )
+	|| ! wp_verify_nonce( $ppom_form_nonce, 'ppom_form_nonce_action' )
+	|| ! ppom_security_role()
 	) {
 		$resp = array(
 			'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
@@ -300,16 +336,16 @@ function ppom_admin_save_form_meta() {
 
 	if ( is_string( $_REQUEST['ppom'] ) ) {
 		$ppom_encoded = $_REQUEST['ppom'];
-		parse_str( $ppom_encoded, $ppom_decoded);
+		parse_str( $ppom_encoded, $ppom_decoded );
 		$ppom = $ppom_decoded['ppom'];
 	}
 
-	$ppom_meta    = isset($_REQUEST['ppom_meta']) ? $_REQUEST['ppom_meta'] : $ppom;
+	$ppom_meta = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $ppom;
 
 	if ( empty( $ppom_meta ) ) {
 		$resp = array(
-			'message'        => __( 'No fields found.', 'woocommerce-product-addon' ),
-			'status'         => 'error',
+			'message' => __( 'No fields found.', 'woocommerce-product-addon' ),
+			'status'  => 'error',
 		);
 		wp_send_json( $resp );
 	}
@@ -318,21 +354,21 @@ function ppom_admin_save_form_meta() {
 	$product_meta = ppom_sanitize_array_data( $product_meta );
 	$product_meta = array_filter(
 		$product_meta,
-		function( $pm ) {
+		function ( $pm ) {
 			return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] );
 		}
 	);
 	$product_meta = json_encode( $product_meta );
 
 	// sanitize
-	$productmeta_name       = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
-	$dynamic_price_hide     = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
-	$send_file_attachment   = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
-	$show_cart_thumb        = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
-	$aviary_api_key         = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
-	$productmeta_style      = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
-	$productmeta_js         = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
-	$product_id             = isset( $_REQUEST['product_id'] ) ? intval( $_REQUEST['product_id'] ) : 0;
+	$productmeta_name     = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
+	$dynamic_price_hide   = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
+	$send_file_attachment = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
+	$show_cart_thumb      = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
+	$aviary_api_key       = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
+	$productmeta_style    = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
+	$productmeta_js       = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
+	$product_id           = isset( $_REQUEST['product_id'] ) ? intval( $_REQUEST['product_id'] ) : 0;
 
 	if ( strlen( $productmeta_name ) > 50 ) {
 		$resp = array(
@@ -344,13 +380,13 @@ function ppom_admin_save_form_meta() {
 	}
 
 	$ppom_settings_meta_data = array(
-		'productmeta_name'       => $productmeta_name,
-		'dynamic_price_display'  => $dynamic_price_hide,
-		'send_file_attachment'   => $send_file_attachment,
-		'show_cart_thumb'        => $show_cart_thumb,
-		'aviary_api_key'         => trim( $aviary_api_key ),
-		'the_meta'               => $product_meta,
-		'productmeta_created'    => current_time( 'mysql' ),
+		'productmeta_name'      => $productmeta_name,
+		'dynamic_price_display' => $dynamic_price_hide,
+		'send_file_attachment'  => $send_file_attachment,
+		'show_cart_thumb'       => $show_cart_thumb,
+		'aviary_api_key'        => trim( $aviary_api_key ),
+		'the_meta'              => $product_meta,
+		'productmeta_created'   => current_time( 'mysql' ),
 	);
 
 	if ( ! ppom_is_legacy_user() ) {
@@ -380,7 +416,7 @@ function ppom_admin_save_form_meta() {
 	$ppom_id = $wpdb->insert_id;
 	if ( is_string( $ppom ) ) {
 		$ppom_encoded = $ppom;
-		parse_str( $ppom_encoded, $ppom_decoded);
+		parse_str( $ppom_encoded, $ppom_decoded );
 		$ppom = $ppom_decoded['ppom'];
 	}
 
@@ -388,11 +424,11 @@ function ppom_admin_save_form_meta() {
 	$product_meta = ppom_sanitize_array_data( $product_meta );
 	$product_meta = array_filter(
 		$product_meta,
-		function( $pm ) {
+		function ( $pm ) {
 			return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] );
 		}
 	);
-	
+
 	// Updating PPOM Meta with ppom_id in each meta array
 	ppom_admin_update_ppom_meta_only( $ppom_id, $product_meta );
 
@@ -434,14 +470,22 @@ function ppom_admin_save_form_meta() {
 	wp_send_json( $resp );
 }
 
-/*
- * updating form meta in admin call
+/**
+ * Updates an existing PPOM field group from the admin builder request.
+ *
+ * Rebuilds the stored `the_meta` JSON payload from the submitted field schema
+ * and updates the field-group settings row in the PPOM custom table.
+ *
+ * @return void
+ *
+ * @see ppom_sanitize_array_data()
  */
 function ppom_admin_update_form_meta() {
 
 
-	$return_page    = isset( $_REQUEST['ppom_meta'] ) ? 'ppom-energy' : 'ppom';
-	$productmeta_id = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
+	$return_page     = isset( $_REQUEST['ppom_meta'] ) ? 'ppom-energy' : 'ppom';
+	$productmeta_id  = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
+	$ppom_form_nonce = isset( $_POST['ppom_form_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_form_nonce'] ) ) : '';
 
 	$ppom_args   = array(
 		'page'           => $return_page,
@@ -464,9 +508,9 @@ function ppom_admin_update_form_meta() {
 	}
 
 
-	if ( ! isset( $_POST['ppom_form_nonce'] )
-		 || ! wp_verify_nonce( $_POST['ppom_form_nonce'], 'ppom_form_nonce_action' )
-		 || ! ppom_security_role()
+	if ( empty( $ppom_form_nonce )
+	|| ! wp_verify_nonce( $ppom_form_nonce, 'ppom_form_nonce_action' )
+	|| ! ppom_security_role()
 	) {
 		$resp = array(
 			'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
@@ -479,7 +523,7 @@ function ppom_admin_update_form_meta() {
 
 	if ( is_string( $_REQUEST['ppom'] ) ) {
 		$ppom_encoded = $_REQUEST['ppom'];
-		parse_str( $ppom_encoded, $ppom_decoded);
+		parse_str( $ppom_encoded, $ppom_decoded );
 		$_REQUEST['ppom'] = $ppom_decoded['ppom'];
 	}
 
@@ -489,19 +533,19 @@ function ppom_admin_update_form_meta() {
 	// Remove the meta row if the type or data_name is empty.
 	$product_meta = array_filter(
 		$product_meta,
-		function( $pm ) {
+		function ( $pm ) {
 			return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] );
 		}
 	);
 	$product_meta = json_encode( $product_meta );
 	
-	$productmeta_name       = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
-	$dynamic_price_hide     = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
-	$send_file_attachment   = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
-	$show_cart_thumb        = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
-	$aviary_api_key         = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
-	$productmeta_style      = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
-	$productmeta_js         = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
+	$productmeta_name     = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
+	$dynamic_price_hide   = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
+	$send_file_attachment = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
+	$show_cart_thumb      = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
+	$aviary_api_key       = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
+	$productmeta_style    = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
+	$productmeta_js       = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
 
 	if ( strlen( $productmeta_name ) > 50 ) {
 		$resp = array(
@@ -513,12 +557,12 @@ function ppom_admin_update_form_meta() {
 	}
 
 	$ppom_settings_meta_data = array(
-		'productmeta_name'       => $productmeta_name,
-		'dynamic_price_display'  => $dynamic_price_hide,
-		'send_file_attachment'   => $send_file_attachment,
-		'show_cart_thumb'        => $show_cart_thumb,
-		'aviary_api_key'         => trim( $aviary_api_key ),
-		'the_meta'               => $product_meta,
+		'productmeta_name'      => $productmeta_name,
+		'dynamic_price_display' => $dynamic_price_hide,
+		'send_file_attachment'  => $send_file_attachment,
+		'show_cart_thumb'       => $show_cart_thumb,
+		'aviary_api_key'        => trim( $aviary_api_key ),
+		'the_meta'              => $product_meta,
 	);
 	if ( ! ppom_is_legacy_user() ) {
 		$ppom_settings_meta_data['productmeta_style'] = $productmeta_style;
@@ -585,7 +629,14 @@ function ppom_admin_update_form_meta() {
 	wp_send_json( $resp );
 }
 
-// Update PPOM Fields Only
+/**
+ * Rewrites only the stored PPOM field schema for a field group.
+ *
+ * @param int   $ppom_id   PPOM field-group ID.
+ * @param array $ppom_meta Normalized field definitions for `the_meta`.
+ *
+ * @return bool
+ */
 function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 
 	// print_r($_REQUEST); exit;
@@ -620,17 +671,25 @@ function ppom_admin_update_ppom_meta_only( $ppom_id, $ppom_meta ) {
 	} else {
 		return false;
 	}
-
 }
 
-/*
- * delete meta
+// Field group deletion.
+
+/**
+ * Deletes a single PPOM field group from the admin UI.
+ *
+ * Verifies the admin nonce and capability before removing the row from the
+ * PPOM custom table.
+ *
+ * @return void
  */
 function ppom_admin_delete_meta() {
 
-	if ( ! isset( $_POST['ppom_meta_nonce'] )
-		 || ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
-		 || ! ppom_security_role()
+	$ppom_meta_nonce = isset( $_POST['ppom_meta_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_meta_nonce'] ) ) : '';
+
+	if ( empty( $ppom_meta_nonce )
+	|| ! wp_verify_nonce( $ppom_meta_nonce, 'ppom_meta_nonce_action' )
+	|| ! ppom_security_role()
 	) {
 		$response = array(
 			'status'  => 'error',
@@ -649,7 +708,7 @@ function ppom_admin_delete_meta() {
 	$res      = $wpdb->query( $wpdb->prepare( "DELETE FROM {$tbl_name} WHERE productmeta_id = %d", $productmeta_id ) );
 
 
-	$response = [];
+	$response = array();
 	if ( $res ) {
 		$response = array(
 			'status'  => 'success',
@@ -665,16 +724,23 @@ function ppom_admin_delete_meta() {
 	wp_send_json( $response );
 }
 
-/*
- * delete meta
+/**
+ * Deletes multiple PPOM field groups from the admin list table.
+ *
+ * Sanitizes the submitted field-group IDs and removes the matching rows from
+ * the PPOM custom table in a single prepared query.
+ *
+ * @return void
  */
 function ppom_admin_delete_selected_meta() {
 
-	if ( ! isset( $_POST['ppom_meta_nonce'] )
-		 || ! wp_verify_nonce( $_POST['ppom_meta_nonce'], 'ppom_meta_nonce_action' )
-		 || ! ppom_security_role()
-		 || ! array_key_exists( 'productmeta_ids', $_POST )
-		 || ! is_array( $_POST['productmeta_ids'] )
+	$ppom_meta_nonce = isset( $_POST['ppom_meta_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_meta_nonce'] ) ) : '';
+
+	if ( empty( $ppom_meta_nonce )
+	|| ! wp_verify_nonce( $ppom_meta_nonce, 'ppom_meta_nonce_action' )
+	|| ! ppom_security_role()
+	|| ! array_key_exists( 'productmeta_ids', $_POST )
+	|| ! is_array( $_POST['productmeta_ids'] )
 	) {
 		_e( 'Sorry, you are not allowed to perform this action', 'woocommerce-product-addon' );
 		die( 0 );
@@ -682,24 +748,24 @@ function ppom_admin_delete_selected_meta() {
 
 	global $wpdb;
 
-	$del_ids = [];
-	$del_ids_ph = [];
+	$del_ids    = array();
+	$del_ids_ph = array();
 
 	// for the performance wise, prefer to use foreach instead of array_map-array_filter-array_fill stack.
-	foreach( $_POST['productmeta_ids'] as $id ) {
+	foreach ( $_POST['productmeta_ids'] as $id ) {
 		$id = absint( $id );
 
-		if( 0 === $id ) {
+		if ( 0 === $id ) {
 			continue;
 		}
 
-		$del_ids[] = $id;
+		$del_ids[]    = $id;
 		$del_ids_ph[] = '%d';
 	}
 
 	$del_ids_ph = implode( ', ', $del_ids_ph );
 
-	$tbl_name        = $wpdb->prefix . PPOM_TABLE_META;
+	$tbl_name = $wpdb->prefix . PPOM_TABLE_META;
 
 	$res = $wpdb->query( $wpdb->prepare( "DELETE FROM {$tbl_name} WHERE productmeta_id IN ({$del_ids_ph})", $del_ids ) );
 
@@ -766,7 +832,19 @@ function ppom_admin_simplify_meta( $meta ) {
 	return $html;
 }
 
-// Showing PPOM Edit on Product Page
+// Admin product-page shortcuts.
+
+/**
+ * Adds PPOM edit and attach shortcuts to the product admin bar.
+ *
+ * Builds links from the current product's resolved PPOM assignment so store
+ * managers can jump straight to the field-group editor or attach another group.
+ *
+ * @return void
+ *
+ * @see PPOM_Meta::__construct()
+ * @see ppom_attach_fields_to_product()
+ */
 function ppom_admin_bar_menu() {
 
 	if ( ! is_product() ) {
@@ -835,29 +913,48 @@ function ppom_admin_bar_menu() {
 function ppom_add_black_friday_data( $configs ) {
 	$config = $configs['default'];
 
-	// translators: %1$s - HTML tag, %2$s - discount, %3$s - HTML tag, %4$s - product name.
-	$message_template = __( 'Our biggest sale of the year: %1$sup to %2$s OFF%3$s on %4$s. Don\'t miss this limited-time offer.', 'woocommerce-product-addon' );
-	$product_label    = 'PPOM';
-	$discount         = '70%';
+	$message   = __( 'Conditional fields, file uploads, pricing formulas. Let customers configure products the way they need. Exclusively for existing PPOM users.', 'woocommerce-product-addon' );
+	$cta_label = __( 'Get PPOM Pro', 'woocommerce-product-addon' );
 
-	$plan    = apply_filters( 'product_ppom_license_plan', 0 );
-	$license = apply_filters( 'product_ppom_license_key', false );
-	$is_pro  = 0 < $plan;
+	$plan             = apply_filters( 'product_ppom_license_plan', 0 );
+	$license          = apply_filters( 'product_ppom_license_key', false );
+	$status           = apply_filters( 'product_ppom_license_status', false );
+	$pro_product_slug = defined( 'PPOM_PRO_BASENAME' ) ? PPOM_PRO_BASENAME : '';
+
+	$is_pro     = 'valid' === $status;
+	$is_expired = 'expired' === $status || 'active-expired' === $status;
 
 	if ( $is_pro ) {
-		// translators: %1$s - HTML tag, %2$s - discount, %3$s - HTML tag, %4$s - product name.
-		$message_template = __( 'Get %1$sup to %2$s off%3$s when you upgrade your %4$s plan or renew early.', 'woocommerce-product-addon' );
-		$product_label    = 'PPOM Pro';
-		$discount         = '30%';
+		// translators: %s is the discount percentage.
+		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - up to %s off', 'woocommerce-product-addon' ), '30%' );
+		// translators: %1$s - discount, %2$s - discount.
+		$message   = sprintf( __( 'Upgrade your PPOM Pro plan: %1$s off this week. Already on the plan you need? Renew early and save up to %2$s.', 'woocommerce-product-addon' ), '30%', '20%' );
+		$cta_label = __( 'See your options', 'woocommerce-product-addon' );
+	} elseif ( $is_expired ) {
+		// translators: %s is the discount percentage.
+		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - %s off', 'woocommerce-product-addon' ), '50%' );
+		$message                       = __( 'Your PPOM Pro features are still here, just locked. Renew at a reduced rate this week.', 'woocommerce-product-addon' );
+		$cta_label                     = __( 'Reactivate now', 'woocommerce-product-addon' );
+	} else {
+		// translators: %s is the discount percentage.
+		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - %s off', 'woocommerce-product-addon' ), '60%' );
+		// translators: %s - discount.
+		$config['title'] = sprintf( __( 'PPOM Pro: %s off this week', 'woocommerce-product-addon' ), '60%' );
 	}
-	
-	$product_label = sprintf( '<strong>%s</strong>', $product_label );
-	$url_params    = array(
+
+	$url_params = array(
 		'utm_term' => $is_pro ? 'plan-' . $plan : 'free',
 		'lkey'     => ! empty( $license ) ? $license : false,
+		'expired'  => $is_expired ? '1' : false,
 	);
-	
-	$config['message']  = sprintf( $message_template, '<strong>', $discount, '</strong>', $product_label );
+
+	if ( ( $is_pro || $is_expired ) && ! empty( $pro_product_slug ) ) {
+		$config['plugin_meta_targets'] = array( $pro_product_slug );
+	}
+
+	$config['message']   = $message;
+	$config['cta_label'] = $cta_label;
+
 	$config['sale_url'] = add_query_arg(
 		$url_params,
 		tsdk_translate_link( tsdk_utmify( 'https://themeisle.link/ppom-bf', 'bfcm', 'ppom' ) )
@@ -867,4 +964,5 @@ function ppom_add_black_friday_data( $configs ) {
 
 	return $configs;
 }
+
 add_filter( 'themeisle_sdk_blackfriday_data', 'ppom_add_black_friday_data' );

@@ -21,7 +21,7 @@ class PPOM_ELEMENTOR {
 
 
 	public function __construct() {
-		add_action( 'plugins_loaded', [ $this, 'load' ] );
+		add_action( 'plugins_loaded', array( $this, 'load' ) );
 	}
 
 
@@ -44,7 +44,7 @@ class PPOM_ELEMENTOR {
 	public function load() {
 
 		if ( $this->is_compatible() ) {
-			add_action( 'elementor/init', [ $this, 'init' ] );
+			add_action( 'elementor/init', array( $this, 'init' ) );
 		}
 	}
 
@@ -71,13 +71,13 @@ class PPOM_ELEMENTOR {
 		// $frontend = \Elementor\Plugin::$instance->frontend->has_elementor_in_page();
 
 		// Register New Weidget
-		add_action( 'elementor/widgets/widgets_registered', [ $this, 'init_widgets' ] );
+		add_action( 'elementor/widgets/widgets_registered', array( $this, 'init_widgets' ) );
 
 		// Register New Controls
 		// add_action( 'elementor/controls/controls_registered', [ $this, 'init_controls' ] );
 
 		// Register Widget Styles
-		add_action( 'elementor/frontend/after_enqueue_styles', [ $this, 'widget_styles' ] );
+		add_action( 'elementor/frontend/after_enqueue_styles', array( $this, 'widget_styles' ) );
 	}
 
 

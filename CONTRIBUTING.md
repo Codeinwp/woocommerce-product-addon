@@ -83,7 +83,7 @@ To set-up the environment you can follow the example from `test-php.yml` or the 
 To run with Docker:
 
 ```bash
-npm run test:unit:php:setup # start the wordpress instance
+npm run env:setup # start the wordpress instance
 npm run test:unit:php # run the wp tests inside the tests-wordpress container
 ```
 
@@ -97,7 +97,6 @@ npm install -g playwright-cli
 npx playwright install --with-deps chromium
 
 npm run wp-env start # start the wordpress instance
-bash ./bin/e2e-after-setup.sh # create some woocommerce products (run it only once if you do not delete the previous instance) on the test instance
 npm run test:e2e # run the tests in the CLI
 ```
 

@@ -1,11 +1,16 @@
 <?php
 /**
- * PPOM Meta Class
- * Manages a PPOM Fields Group
+ * Resolves PPOM field groups and settings for products.
+ *
+ * @package PPOM
+ * @subpackage Metadata
+ */
+
+/**
+ * Resolves product-level PPOM metadata for frontend and cart/order flows.
  *
  * @since version 15.0
  */
-
 class PPOM_Meta {
 
 	protected static $wc_product;
@@ -13,23 +18,26 @@ class PPOM_Meta {
 	public static $product_id;
 
 	/**
-	 * Plugin category data.
+	 * Resolved category-based PPOM group IDs for the current product.
 	 *
 	 * @var array $category_meta
 	 */
 	public $category_meta = array();
 
 	/**
-	 * Plugin category array.
+	 * Candidate group rows that include category or tag assignments.
+	 *
+	 * Tags are fetched here as stored data, but core resolution matches
+	 * categories directly and leaves tag-based behavior to extension filters.
 	 *
 	 * @var array $ppom_categories_and_tags_row
 	 */
 	public $ppom_categories_and_tags_row = array();
 
 	/**
-	 * Plugin settings.
+	 * Runtime settings row selected from the resolved PPOM groups.
 	 *
-	 * @var array $ppom_settings
+	 * @var object|array $ppom_settings
 	 */
 	public $ppom_settings = array();
 
@@ -99,11 +107,18 @@ class PPOM_Meta {
 	// QM-5
 	var $meta_id;
 
+	/**
+	 * Resolves field groups, settings, and derived flags for a product.
+	 *
+	 * @param int|null $product_id Product ID used to resolve attached field groups.
+	 *
+	 * @return void
+	 */
 	// $product_id can be null if get instance to get data by meta_id
 	function __construct( $product_id = null ) {
 
 		self::$wc_product                   = wc_get_product( $product_id );
-		$this->category_meta                = [];
+		$this->category_meta                = array();
 		$this->ppom_categories_and_tags_row = $this->all_ppom_with_categories();
 		$this->meta_id                      = $this->get_meta_id( $product_id );
 		self::$product_id                   = $product_id;
@@ -150,8 +165,19 @@ class PPOM_Meta {
 		return self::$ins;
 	}
 
-	// QM-5
-	function get_meta_id( $product_id ) {
+	/**
+	 * Resolves PPOM meta IDs for a product.
+	 *
+	 * Reads direct product assignments and category assignments before applying
+	 * merge and override filters.
+	 *
+	 * @param int|null $product_id Product ID being resolved.
+	 *
+	 * @return array|int|null
+	 *
+	 * @see PPOM_PRODUCT_META_KEY
+	 */
+	public function get_meta_id( $product_id ) {
 
 		$ppom_product_id = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
 
@@ -226,8 +252,8 @@ class PPOM_Meta {
 
 		$single_meta = ( $this->meta_id == 0 || $this->meta_id == 'None' || empty( $this->meta_id ) ) ? null : $this->meta_id;
 
-		if ( is_array( $single_meta) && 0 < count( $single_meta ) ) {
-			$single_meta =  $single_meta[0];
+		if ( is_array( $single_meta ) && 0 < count( $single_meta ) ) {
+			$single_meta = $single_meta[0];
 		}
 
 		return $single_meta;
@@ -244,9 +270,12 @@ class PPOM_Meta {
 		return $multiple_meta;
 	}
 
-	// getting settings
-	// QM-5
-	function settings() {
+	/**
+	 * Loads the primary settings row for the resolved PPOM group.
+	 *
+	 * @return object|null
+	 */
+	public function settings() {
 
 		$meta_id = $this->single_meta_id();
 
@@ -264,7 +293,7 @@ class PPOM_Meta {
 		$meta_settings = $wpdb->get_results( $qry );
 		$filter_meta   = array_filter(
 			$meta_settings,
-			function( $meta ) {
+			function ( $meta ) {
 				return 'on' === $meta->productmeta_validation ? $meta : false;
 			}
 		);
@@ -275,8 +304,14 @@ class PPOM_Meta {
 		return apply_filters( 'ppom_meta_settings', $meta_settings, $this );
 	}
 
-	// getting fields
-	function get_fields() {
+	/**
+	 * Loads active field definitions for the resolved PPOM group or groups.
+	 *
+	 * @return array|null
+	 *
+	 * @see ppom_get_field_meta_by_dataname()
+	 */
+	public function get_fields() {
 
 		if ( ! $this->is_exists() ) {
 			return null;
@@ -362,7 +397,7 @@ class PPOM_Meta {
 		return apply_filters( 'ppom_meta_fields_by_id', $meta_fields, $ppom_ids, $this );
 	}
 
-	function ppom_has_category_meta($product_id ) {
+	function ppom_has_category_meta( $product_id ) {
 
 		$product_categories = get_the_terms( $product_id, 'product_cat' );
 
@@ -375,7 +410,7 @@ class PPOM_Meta {
 				} else {
 					// making array of meta cats
 
-					$meta_cat_array = preg_split('/\r\n|\n/', $row->productmeta_categories);
+					$meta_cat_array = preg_split( '/\r\n|\n/', $row->productmeta_categories );
 					// Now iterating the product_categories to check it's slug in meta cats
 					foreach ( $product_categories as $cat ) {
 						if ( in_array( $cat->slug, $meta_cat_array ) ) {
@@ -443,13 +478,13 @@ class PPOM_Meta {
 			$template = stripslashes( strip_tags( $this->ppom_settings->productmeta_style ) );
 
 			if ( is_array( $this->meta_id ) ) {
-				$field_selector = [];
-				foreach( $this->meta_id as $field_id ) {
-					$field_selector[] = ".ppom-id-" . $field_id;
+				$field_selector = array();
+				foreach ( $this->meta_id as $field_id ) {
+					$field_selector[] = '.ppom-id-' . $field_id;
 				}
 				$selector = ':where(' . implode( ', ', $field_selector ) . ')';
-			} else if ( is_numeric( $this->meta_id ) ) {
-				$selector = ".ppom-id-" . $this->meta_id;
+			} elseif ( is_numeric( $this->meta_id ) ) {
+				$selector = '.ppom-id-' . $this->meta_id;
 			}
 			$inline_css = str_replace( 'selector', $selector, $template );
 		}
@@ -573,5 +608,4 @@ class PPOM_Meta {
 
 		return apply_filters( 'ppom_get_settings_by_id', $meta_settings, $meta_id, $this );
 	}
-
 }

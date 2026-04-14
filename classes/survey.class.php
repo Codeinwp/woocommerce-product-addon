@@ -69,13 +69,13 @@ if ( ! class_exists( 'PPOM_Survey' ) ) {
 			$install_days_number = intval( ( time() - get_option( 'woocommerce_product_addon_install', time() ) ) / DAY_IN_SECONDS );
 
 			$data = array(
-				'environmentId'     => 'clza3s4zm000h10km1699nlli',
-				'attributes'        => array(
+				'environmentId' => 'clza3s4zm000h10km1699nlli',
+				'attributes'    => array(
 					'install_days_number' => $install_days_number,
 					'free_version'        => PPOM_VERSION,
 					'license_status'      => $license_status,
-					'field_groups_count'  => intval( $group_fields_count )
-				)
+					'field_groups_count'  => intval( $group_fields_count ),
+				),
 			);
 
 			if ( 1 <= $license_plan ) {

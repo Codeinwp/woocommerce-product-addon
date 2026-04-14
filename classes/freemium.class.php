@@ -19,8 +19,7 @@ class PPOM_Freemium {
 	 *
 	 * @return void
 	 */
-	private function __construct()
-	{
+	private function __construct() {
 		add_filter( 'ppom_fields_tabs_show', array( $this, 'add_locked_cfr_tab' ), 10, 1 );
 		add_filter( 'ppom_all_inputs', array( $this, 'locked_cfr_register_form_elements' ), PHP_INT_MAX );
 	}
@@ -31,7 +30,7 @@ class PPOM_Freemium {
 	 * @return void
 	 */
 	public static function get_instance() {
-		if( is_null( self::$instance ) ) {
+		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
 		}
 
@@ -48,10 +47,10 @@ class PPOM_Freemium {
 		if ( ppom_pro_is_installed() && PPOM()->is_license_of_type( 'plus' ) ) {
 			return $tabs;
 		}
-		$tabs[self::TAB_KEY_FREEMIUM_CFR] = array(
-			'label' => __( 'Conditional Repeater', 'woocommerce-product-addon' ). ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')',
-			'class' => array( 'ppom-tabs-label' ),
-			'field_depend' => array( 'all' )
+		$tabs[ self::TAB_KEY_FREEMIUM_CFR ] = array(
+			'label'        => __( 'Conditional Repeater', 'woocommerce-product-addon' ) . ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')',
+			'class'        => array( 'ppom-tabs-label' ),
+			'field_depend' => array( 'all' ),
 		);
 		return $tabs;
 	}
@@ -82,151 +81,154 @@ class PPOM_Freemium {
 	}
 
 	/**
-     * Adds admin setting fields to all input types.
-     *
-     * @param  array $inputs current input classes
-     * @return array
-     */
-    public function locked_cfr_register_form_elements( $inputs ) {
-        return array_map( function($input_class) {
-            if( ! is_object( $input_class ) || ! property_exists( $input_class, 'settings' ) || !is_array($input_class->settings) ) {
-                return $input_class;
-            }
+	 * Adds admin setting fields to all input types.
+	 *
+	 * @param  array $inputs current input classes
+	 * @return array
+	 */
+	public function locked_cfr_register_form_elements( $inputs ) {
+		return array_map(
+			function ( $input_class ) {
+				if ( ! is_object( $input_class ) || ! property_exists( $input_class, 'settings' ) || ! is_array( $input_class->settings ) ) {
+						return $input_class;
+				}
 
-            $input_class->settings['locked_cfr'] = array(
-                'type' => 'checkbox',
-                'title' => __( 'Enable Conditional Repeat', 'woocommerce-product-addon' ),
-				'disabled' => true,
-                'desc' => '',
-				'tabs_class' => array( 'ppom_handle_' . self::TAB_KEY_FREEMIUM_CFR )
-            );
+				$input_class->settings['locked_cfr'] = array(
+					'type'       => 'checkbox',
+					'title'      => __( 'Enable Conditional Repeat', 'woocommerce-product-addon' ),
+					'disabled'   => true,
+					'desc'       => '',
+					'tabs_class' => array( 'ppom_handle_' . self::TAB_KEY_FREEMIUM_CFR ),
+				);
 
-            return $input_class;
-        }, $inputs );
-    }
+				return $input_class;
+			},
+			$inputs 
+		);
+	}
 
 	public function get_pro_fields() {
-		return [
-			[
+		return array(
+			array(
 				'title' => __( 'Collapse', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-money" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Emojis', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-user-plus" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Phone Input', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-check" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Chained Input', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-check" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Conditional Images', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-picture-o" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Domain', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-server" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Fonts Picker', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-font" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Personalization Preview', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-keyboard-o" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Text Counter', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-comments-o" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Fixed Price', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-money" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Select Option Quantity', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-list-ol" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Image DropDown', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-file-image-o" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Super List', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-check" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Quantity Option', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-money" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Quantities Pack', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-list-alt" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Radio Switcher', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-dot-circle-o" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Variation Matrix', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-list-alt" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'DateRange Input', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-table" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Color picker', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-modx" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'File Input', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-file" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Image Cropper', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-crop" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Timezone Input', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-clock-o" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Variation Quantity', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-list-ol" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Images', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-picture-o" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Price Matrix', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-usd" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'HTML', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-code" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Color Palettes', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-user-plus" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Audio / Video', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-file-video-o" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Measure Input', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-building-o" aria-hidden="true"></i>',
-			],
-			[
+			),
+			array(
 				'title' => __( 'Divider', 'woocommerce-product-addon' ),
 				'icon'  => '<i class="fa fa-pencil-square-o" aria-hidden="true"></i>',
-			],
-		];
+			),
+		);
 	}
 }

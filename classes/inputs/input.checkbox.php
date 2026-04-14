@@ -25,7 +25,6 @@ class NM_Checkbox_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'regular checkbox input', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 	private function get_settings() {
