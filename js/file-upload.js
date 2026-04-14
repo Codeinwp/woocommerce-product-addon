@@ -39,6 +39,67 @@ const featherEditor = '';
 const uploaderInstances = {};
 const Cropped_Data_Captured = false;
 
+// Track nonce refresh state to avoid duplicate requests
+let nonceRefreshPromise = null;
+let lastNonceRefreshTime = 0;
+const NONCE_CACHE_DURATION = 300000; // 5 minutes in milliseconds
+
+/**
+ * Fetches fresh nonces from the REST API endpoint.
+ *
+ * This function is called before file operations to ensure nonces are valid,
+ * solving the issue of stale nonces in cached pages or long-lived browser tabs.
+ *
+ * @returns {Promise<Object>} Promise that resolves with fresh nonce data.
+ */
+async function ppom_refresh_file_nonces() {
+	// If we have a pending refresh request, return it instead of making a new one
+	if ( nonceRefreshPromise ) {
+		return nonceRefreshPromise;
+	}
+
+	// If nonces were refreshed recently (within cache duration), skip refresh
+	const now = Date.now();
+	if ( now - lastNonceRefreshTime < NONCE_CACHE_DURATION ) {
+		return Promise.resolve( {
+			ppom_file_upload_nonce: ppom_file_vars.ppom_file_upload_nonce,
+			ppom_file_delete_nonce: ppom_file_vars.ppom_file_delete_nonce,
+		} );
+	}
+
+	nonceRefreshPromise = fetch( ppom_file_vars.rest_url, {
+		method: 'GET',
+		credentials: 'same-origin',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	} )
+		.then( ( response ) => {
+			if ( ! response.ok ) {
+				throw new Error( 'Failed to refresh nonces' );
+			}
+			return response.json();
+		} )
+		.then( ( data ) => {
+			if ( data.status === 'success' ) {
+				// Update the global nonce variables
+				ppom_file_vars.ppom_file_upload_nonce =
+					data.ppom_file_upload_nonce;
+				ppom_file_vars.ppom_file_delete_nonce =
+					data.ppom_file_delete_nonce;
+				lastNonceRefreshTime = Date.now();
+				return data;
+			}
+			throw new Error( 'Invalid nonce response' );
+		} )
+		.finally( () => {
+			// Clear the promise so next request can proceed
+			nonceRefreshPromise = null;
+		} );
+
+	return nonceRefreshPromise;
+}
+
 jQuery( function ( $ ) {
 	// Keep cropper previews, price recalculation, and modal placement aligned
 	// with the rest of the PPOM product form lifecycle.
@@ -192,6 +253,17 @@ jQuery( function ( $ ) {
 			);
 			if ( imageElement ) {
 				imageElement.src = `${ ppom_file_vars.plugin_url }/images/loading.gif`;
+			}
+
+			// Refresh nonces before delete operation
+			try {
+				await ppom_refresh_file_nonces();
+			} catch ( error ) {
+				// Continue with existing nonce if refresh fails
+				console.warn(
+					'Failed to refresh nonce, using existing:',
+					error
+				);
 			}
 
 			const data = new URLSearchParams( {
@@ -818,6 +890,26 @@ function ppom_setup_file_upload_input( file_input ) {
 					file_resp: obj_resp,
 					time: new Date(),
 				} );
+			},
+
+			async BeforeUpload( up, file ) {
+				// Refresh nonces before upload to handle stale nonces in cached pages
+				try {
+					await ppom_refresh_file_nonces();
+					// Update the multipart_params with the fresh nonce
+					up.setOption( 'multipart_params', {
+						action: 'ppom_upload_file',
+						data_name: file_data_name,
+						ppom_nonce: ppom_file_vars.ppom_file_upload_nonce,
+						product_id: ppom_file_vars.product_id,
+					} );
+				} catch ( error ) {
+					// Log warning but continue with existing nonce
+					console.warn(
+						'Failed to refresh upload nonce, using existing:',
+						error
+					);
+				}
 			},
 
 			UploadProgress( up, file ) {
