@@ -854,8 +854,16 @@ class NM_PersonalizedProduct {
 		}
 
 		$ppom_meta = json_decode( $ppom_meta );
+
+		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $ppom_meta ) ) {
+			return;
+		}
+
 		$ppom_meta = self::ppom_decode_entities( $ppom_meta );
-		// ppom_pa( $ppom_meta ); exit;
+
+		if ( empty( $ppom_meta ) ) {
+			return;
+		}
 
 		$repo = ppom_meta_repository();
 		foreach ( $ppom_meta as $meta ) {
