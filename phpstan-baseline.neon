@@ -775,12 +775,6 @@ parameters:
 			path: classes/attach-popup/select-component.class.php
 
 		-
-			message: '#^Argument of an invalid type array\<mixed\>\|string supplied for foreach, only iterables are supported\.$#'
-			identifier: foreach.nonIterable
-			count: 7
-			path: classes/fields.class.php
-
-		-
 			message: '#^Cannot call method get_freemium_cfr_content\(\) on null\.$#'
 			identifier: method.nonObject
 			count: 1
@@ -841,30 +835,6 @@ parameters:
 			path: classes/fields.class.php
 
 		-
-			message: '#^Offset ''visibility'' might not exist on non\-empty\-array\<mixed\>\|non\-falsy\-string\.$#'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Parameter \#1 \$encoded_string of function parse_str expects string, array\<mixed\>\|string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Parameter \#1 \$input of function array_keys expects array, array\<mixed\>\|string given\.$#'
-			identifier: argument.type
-			count: 7
-			path: classes/fields.class.php
-
-		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, \(float\|int\) given\.$#'
-			identifier: argument.type
-			count: 7
-			path: classes/fields.class.php
-
-		-
 			message: '#^Parameter \#1 \$text of function esc_attr expects string, array\|float\|int\|string\|false\|null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -889,15 +859,9 @@ parameters:
 			path: classes/fields.class.php
 
 		-
-			message: '#^Parameter \#1 \$text of function esc_html expects string, array\<mixed\>\|string given\.$#'
-			identifier: argument.type
-			count: 3
-			path: classes/fields.class.php
-
-		-
 			message: '#^Parameter \#1 \.\.\.\$arg1 of function max expects non\-empty\-array, list\<int\|string\> given\.$#'
 			identifier: argument.type
-			count: 1
+			count: 8
 			path: classes/fields.class.php
 
 		-
@@ -927,12 +891,6 @@ parameters:
 		-
 			message: '#^Undefined variable\: \$value$#'
 			identifier: variable.undefined
-			count: 1
-			path: classes/fields.class.php
-
-		-
-			message: '#^Variable \$values in isset\(\) always exists and is not nullable\.$#'
-			identifier: isset.variable
 			count: 1
 			path: classes/fields.class.php
 
