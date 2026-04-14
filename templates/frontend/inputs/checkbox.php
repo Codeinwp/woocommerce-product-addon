@@ -149,10 +149,10 @@ $is_tooltip_enabled  = isset( $field_meta['desc_tooltip'] ) && 'on' === $field_m
 				>
 
 
-				<span class="ppom-input-option-label ppom-label-checkbox"><?php echo $option_label; ?>
+				<span class="ppom-input-option-label ppom-label-checkbox"><?php echo wp_kses_post( $option_label ); ?>
 				<?php
 				if ( $is_tooltip_enabled && ! empty( $option_tooltip ) ) :
-					$tooltip_description_id = esc_attr( $dom_id . '-tooltip-description' );
+					$tooltip_description_id = $dom_id . '-tooltip-description';
 					?>
 					<span
 						data-ppom-tooltip="ppom_tooltip"
@@ -160,12 +160,12 @@ $is_tooltip_enabled  = isset( $field_meta['desc_tooltip'] ) && 'on' === $field_m
 						title="<?php echo esc_attr( $option_tooltip ); ?>"
 						tabindex="0"
 						role="button"
-						aria-label="<?php echo wp_strip_all_tags( $raw_label ); ?>"
-						aria-describedby="<?php echo $tooltip_description_id; ?>"
+						aria-label="<?php echo esc_attr( wp_strip_all_tags( $raw_label ) ); ?>"
+						aria-describedby="<?php echo esc_attr( $tooltip_description_id ); ?>"
 					>
 						<span class="ppom-tooltip-icon" style="background-color:<?php echo esc_attr( $icon_color ); ?>;"></span>
 					</span>
-					<span id="<?php echo $tooltip_description_id; ?>" class="screen-reader-text"><?php echo esc_html( $option_tooltip ); ?></span>
+					<span id="<?php echo esc_attr( $tooltip_description_id ); ?>" class="screen-reader-text"><?php echo esc_html( $option_tooltip ); ?></span>
 				<?php endif; ?>
 				</span>
 			</label>
