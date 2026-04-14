@@ -21,6 +21,7 @@ $taxable    = $fm->get_meta_value( 'onetime_taxable' );
 $input_attr = $fm->get_meta_value( 'attributes' );
 $jquery_dp  = $fm->get_meta_value( 'jquery_dp' );
 $price      = $fm->get_meta_value( 'price' );
+$price      = apply_filters( 'ppom_option_price', $price );
 
 $price_without_tax = '';
 if ( $onetime == 'on' && $taxable == 'on' ) {
@@ -49,7 +50,7 @@ $default_value = strip_tags( $default_value );
 	<!-- If title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 	<input
@@ -74,7 +75,7 @@ $default_value = strip_tags( $default_value );
 				echo $key . '="' . $val . '"';
 			}
 			?>
-			<?php if( 'on' === $jquery_dp ) { ?>
+			<?php if ( 'on' === $jquery_dp ) { ?>
 			readonly
 			<?php } ?>
 	>

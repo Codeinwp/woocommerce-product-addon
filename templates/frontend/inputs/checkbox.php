@@ -76,7 +76,7 @@ $icon_color          = ppom_get_option( 'ppom_input_tooltip_iconclr', '#000000' 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 
@@ -92,6 +92,8 @@ $icon_color          = ppom_get_option( 'ppom_input_tooltip_iconclr', '#000000' 
 		$option_id      = $value['option_id'];
 		$dom_id         = apply_filters( 'ppom_dom_option_id', $option_id, $field_meta );
 		$opt_percent    = isset( $value['percent'] ) ? $value['percent'] : '';
+		$option_price   = apply_filters( 'ppom_option_price', $option_price );
+		$discount_price = apply_filters( 'ppom_option_price', $discount_price );
 
 		// if discount price set
 		if ( $has_discount ) {
@@ -124,7 +126,7 @@ $icon_color          = ppom_get_option( 'ppom_input_tooltip_iconclr', '#000000' 
 		?>
 		<div class="<?php echo esc_attr( $check_wrapper_class ); ?>">
 			<label class="<?php echo esc_attr( $fm->checkbox_label_classes() ); ?>"
-				   for="<?php echo esc_attr( $dom_id ); ?>">
+					for="<?php echo esc_attr( $dom_id ); ?>">
 
 				<input
 						type="checkbox"

@@ -1,27 +1,43 @@
 <?php
 /**
- * PPOM Rest API
- * Basic operations
- * -- Add/update text,radio,select,checkbox,date,email
- * -- Adding field to product
- * --- Endpoint: site_url/wp-json/ppom/v1/add-field/product/{product_id}
- * --- Method: Post
- * --- Params: data_name, title, type, required
- * --- Example []
- **/
+ * Registers PPOM REST API routes for field groups and order metadata.
+ *
+ * @package PPOM
+ * @subpackage REST
+ */
 
+/**
+ * Serves PPOM field-group and order metadata through the `ppom/v1` namespace.
+ *
+ * Resolves product field groups through {@see PPOM_Meta} and exposes the same
+ * `_ppom_fields` order metadata generated during the WooCommerce lifecycle.
+ */
 class PPOM_Rest {
 
-	function __construct() {
+	// Route registration.
+
+	/**
+	 * Hooks PPOM REST route registration when the API setting is enabled.
+	 *
+	 * @return void
+	 */
+	public function __construct() {
 
 		if ( ppom_is_api_enable() ) {
 			add_action( 'rest_api_init', array( $this, 'init_api' ) );
 		}
-
 	}
 
 
-	function init_api() {
+	/**
+	 * Registers the public `ppom/v1` routes for products and orders.
+	 *
+	 * Write routes still validate the submitted `secret_key` inside their
+	 * callbacks before mutating PPOM field groups or order item metadata.
+	 *
+	 * @return void
+	 */
+	public function init_api() {
 
 		// getting ppom fields against product
 		register_rest_route(
@@ -104,8 +120,18 @@ class PPOM_Rest {
 	}
 
 
-	// Getting ppom meta info
-	function get_ppom_meta_info_product( WP_REST_Request $request ) {
+	// Product meta read and write routes.
+
+	/**
+	 * Returns the PPOM field schema attached to a product.
+	 *
+	 * @param WP_REST_Request $request REST request containing `product_id`.
+	 *
+	 * @return WP_REST_Response
+	 *
+	 * @see PPOM_Meta::__construct()
+	 */
+	public function get_ppom_meta_info_product( WP_REST_Request $request ) {
 
 		$this->set_headers();
 
@@ -156,7 +182,16 @@ class PPOM_Rest {
 		return $response;
 	}
 
-	function get_ppom_meta_by_id( WP_REST_Request $request ) {
+	/**
+	 * Returns a PPOM field schema by field-group ID.
+	 *
+	 * @param WP_REST_Request $request REST request containing `id`.
+	 *
+	 * @return WP_REST_Response
+	 *
+	 * @see PPOM_Meta::get_fields_by_id()
+	 */
+	public function get_ppom_meta_by_id( WP_REST_Request $request ) {
 
 		$this->set_headers();
 
@@ -193,9 +228,18 @@ class PPOM_Rest {
 		return $response;
 	}
 
-	// Save meta against product
-	// Getting ppom meta info
-	function ppom_save_meta_product( WP_REST_Request $request ) {
+	/**
+	 * Creates or updates the PPOM field group attached to a product.
+	 *
+	 * The submitted `fields` payload is JSON-decoded, validated against the
+	 * configured secret key, and then written into the PPOM field-group table.
+	 *
+	 * @param WP_REST_Request $request REST request containing `product_id`,
+	 *                                 `secret_key`, and `fields`.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function ppom_save_meta_product( WP_REST_Request $request ) {
 
 		$this->set_headers();
 
@@ -251,18 +295,18 @@ class PPOM_Rest {
 		// ppom_pa($ppom_fields);
 
 		return new WP_REST_Response( $meta_response );
-
 	}
 
 
 	/**
-	 * Delete fields against product
-	 * params:
-	 * product_id: integer
-	 * secret_key: string
-	 * fields   : array()
-	 **/
-	function delete_ppom_fields_product( WP_REST_Request $request ) {
+	 * Deletes selected PPOM fields from the field group attached to a product.
+	 *
+	 * @param WP_REST_Request $request REST request containing `product_id`,
+	 *                                 `secret_key`, and `fields`.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function delete_ppom_fields_product( WP_REST_Request $request ) {
 
 		$this->set_headers();
 
@@ -312,12 +356,17 @@ class PPOM_Rest {
 		// ppom_pa($ppom_fields);
 
 		return new WP_REST_Response( $meta_response );
-
 	}
 
 
-	// Check if secret key is set and matched
-	function is_secret_key_valid( $secretkey ) {
+	/**
+	 * Validates the shared PPOM REST secret key.
+	 *
+	 * @param string $secretkey Secret key submitted by the API client.
+	 *
+	 * @return bool
+	 */
+	public function is_secret_key_valid( $secretkey ) {
 
 		$api_key = ppom_get_option( 'ppom_rest_secret_key', true );
 
@@ -330,8 +379,20 @@ class PPOM_Rest {
 		return $key_valide;
 	}
 
-	// build new meta entry
-	function save_new_meta_data( $product_id, $ppom_fields ) {
+	/**
+	 * Creates a new PPOM field group for a product through the REST API.
+	 *
+	 * Inserts the initial field-group row, writes the normalized field schema,
+	 * and attaches the new PPOM ID to the product post meta.
+	 *
+	 * @param int   $product_id  Product ID receiving the new field group.
+	 * @param array $ppom_fields Field definitions decoded from the request.
+	 *
+	 * @return array
+	 *
+	 * @see ppom_admin_update_ppom_meta_only()
+	 */
+	public function save_new_meta_data( $product_id, $ppom_fields ) {
 
 		$product = new WC_Product( $product_id );
 
@@ -402,7 +463,16 @@ class PPOM_Rest {
 		return $resp;
 	}
 
-	function update_meta_data( $ppom_meta, $ppom_fields, $product_id ) {
+	/**
+	 * Merges submitted REST fields into an existing PPOM field group.
+	 *
+	 * @param object $ppom_meta   Existing PPOM settings row.
+	 * @param array  $ppom_fields Field definitions decoded from the request.
+	 * @param int    $product_id  Product ID attached to the field group.
+	 *
+	 * @return array
+	 */
+	public function update_meta_data( $ppom_meta, $ppom_fields, $product_id ) {
 
 		$existing_fields = json_decode( $ppom_meta->the_meta, true );
 		// var_dump($ppom_meta); exit;
@@ -450,7 +520,16 @@ class PPOM_Rest {
 		return $resp;
 	}
 
-	function delete_meta_data( $ppom_meta, $delete_fields, $product_id ) {
+	/**
+	 * Removes selected fields, or an entire field group, from a product.
+	 *
+	 * @param object $ppom_meta     Existing PPOM settings row.
+	 * @param array  $delete_fields Field keys requested for deletion.
+	 * @param int    $product_id    Product ID attached to the field group.
+	 *
+	 * @return array
+	 */
+	public function delete_meta_data( $ppom_meta, $delete_fields, $product_id ) {
 
 		$existing_fields = json_decode( $ppom_meta->the_meta );
 
@@ -514,14 +593,16 @@ class PPOM_Rest {
 		return $resp;
 	}
 
-	/**
-	 * ====================================================================
-	 * ========================== ORDERS ==================================
-	 * ====================================================================
-	 * */
+	// Order meta routes.
 
-	// Getting ppom meta info
-	function get_ppom_meta_info_order( WP_REST_Request $request ) {
+	/**
+	 * Returns formatted PPOM order item metadata for an order.
+	 *
+	 * @param WP_REST_Request $request REST request containing `order_id`.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function get_ppom_meta_info_order( WP_REST_Request $request ) {
 
 		$this->set_headers();
 
@@ -558,8 +639,15 @@ class PPOM_Rest {
 		return $response;
 	}
 
-	// update meta against order
-	function ppom_update_meta_order( WP_REST_Request $request ) {
+	/**
+	 * Updates PPOM order item metadata for matching order products.
+	 *
+	 * @param WP_REST_Request $request REST request containing `order_id`,
+	 *                                 `secret_key`, and `fields`.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function ppom_update_meta_order( WP_REST_Request $request ) {
 
 		$this->set_headers();
 
@@ -660,13 +748,14 @@ class PPOM_Rest {
 	}
 
 	/**
-	 * Delete fields against order
-	 * params:
-	 * order_id: integer
-	 * secret_key: string
-	 * fields   : array()
-	 **/
-	function delete_ppom_fields_order( WP_REST_Request $request ) {
+	 * Deletes selected PPOM order item metadata keys for an order.
+	 *
+	 * @param WP_REST_Request $request REST request containing `order_id`,
+	 *                                 `secret_key`, and `fields`.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function delete_ppom_fields_order( WP_REST_Request $request ) {
 
 		$this->set_headers();
 
@@ -742,12 +831,22 @@ class PPOM_Rest {
 		);
 
 		return new WP_REST_Response( $response_info );
-
 	}
 
 
-	// Return all order items' meta
-	function get_order_item_meta( $order_id ) {
+	// Response formatting and transport helpers.
+
+	/**
+	 * Returns formatted PPOM metadata for every order item in an order.
+	 *
+	 * @param int $order_id WooCommerce order ID.
+	 *
+	 * @return array
+	 *
+	 * @see ppom_generate_cart_meta()
+	 * @see ppom_get_field_meta_by_dataname()
+	 */
+	public function get_order_item_meta( $order_id ) {
 
 		$order = wc_get_order( $order_id );
 
@@ -777,8 +876,9 @@ class PPOM_Rest {
 				$formatted_data['value'] = $meta_data->value;
 
 				if ( isset( $ppom_meta[ $meta_data->key ] ) ) {
-					$formatted_data['display'] = $ppom_meta[ $meta_data->key ]['display'];
-					$formatted_data['value']   = $ppom_meta[ $meta_data->key ]['value'];
+					$formatted_value           = isset( $ppom_meta[ $meta_data->key ]['value'] ) ? $ppom_meta[ $meta_data->key ]['value'] : $meta_data->value;
+					$formatted_data['display'] = isset( $ppom_meta[ $meta_data->key ]['display'] ) ? $ppom_meta[ $meta_data->key ]['display'] : $formatted_value;
+					$formatted_data['value']   = $formatted_value;
 				}
 
 				$meta_info[] = $formatted_data;
@@ -795,7 +895,14 @@ class PPOM_Rest {
 	}
 
 
-	function filter_required_keys_only( $ppom_fields ) {
+	/**
+	 * Reduces field definitions to the keys exposed by the REST read routes.
+	 *
+	 * @param array $ppom_fields Full PPOM field definitions.
+	 *
+	 * @return array
+	 */
+	public function filter_required_keys_only( $ppom_fields ) {
 
 		$new_ppom_fields = array();
 		if ( $ppom_fields ) {
@@ -835,7 +942,11 @@ class PPOM_Rest {
 		return apply_filters( 'ppom_rest_fields', $new_ppom_fields, $ppom_fields );
 	}
 
-	// settings headers
+	/**
+	 * Sends CORS headers for PPOM REST responses and OPTIONS requests.
+	 *
+	 * @return void
+	 */
 	public function set_headers() {
 
 		if ( isset( $_SERVER['HTTP_ORIGIN'] ) ) {
@@ -857,7 +968,6 @@ class PPOM_Rest {
 
 			exit( 0 );
 		}
-
 	}
 }
 

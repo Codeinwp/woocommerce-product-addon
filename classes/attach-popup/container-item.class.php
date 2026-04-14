@@ -19,7 +19,7 @@ class ContainerItem {
 	public $renderer;
 
 	public function __construct( $id, $renderer ) {
-		$this->id = $id;
+		$this->id       = $id;
 		$this->renderer = $renderer;
 	}
 

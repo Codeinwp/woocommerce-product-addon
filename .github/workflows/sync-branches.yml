@@ -2,7 +2,7 @@ name: Sync branches
 on:
   push:
     branches:
-      - 'master'
+      - "master"
 jobs:
   sync-branch:
     runs-on: ubuntu-latest
