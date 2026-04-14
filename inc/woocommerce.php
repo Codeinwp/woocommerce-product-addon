@@ -701,7 +701,7 @@ function ppom_woocommerce_mini_cart_fixed_fee() {
 
 			$item_fee = $fee->total + $fee->tax;
 		}
-		$item_fee = apply_filters( 'ppom_option_price', $item_fee );
+		$item_fee        = apply_filters( 'ppom_option_price', $item_fee );
 		$fixed_fee_html .= '<tr>';
 		$fixed_fee_html .= '<td class="subtotal-text">' . esc_html( $fee->name );
 		'</td>';
@@ -842,7 +842,7 @@ function ppom_woocommerce_alter_price( $price, $product ) {
 					$least_price = floatval( $product->get_price() ) - $least_price;
 					$least_price = wc_format_decimal( $least_price, wc_get_price_decimals() );
 					$least_price = apply_filters( 'ppom_option_price', $least_price );
-					$price = wc_price( $least_price ) . '-' . $price;
+					$price       = wc_price( $least_price ) . '-' . $price;
 				} else {
 
 					foreach ( $ranges as $range ) {

@@ -1101,19 +1101,19 @@ class NM_PersonalizedProduct {
 	 * Convert price using active multi-currency plugin's filter or function.
 	 *
 	 * @param float|int|string|null $price The price to convert.
- 	 * @return float|int|string|null The converted price.
+	 * @return float|int|string|null The converted price.
 	 */
 	public function ppom_convert_price( $price ) {
 		if ( '' === $price || null === $price ) {
- 			return $price;
- 		}
- 		if ( is_string( $price ) && false !== strpos( $price, '%' ) ) {
- 			return $price;
- 		}
- 		if ( ! is_numeric( $price ) ) {
- 			return $price;
- 		}
- 		$numeric_price = (float) $price;
+			return $price;
+		}
+		if ( is_string( $price ) && false !== strpos( $price, '%' ) ) {
+			return $price;
+		}
+		if ( ! is_numeric( $price ) ) {
+			return $price;
+		}
+		$numeric_price = (float) $price;
 
 		// WCML.
 		if ( has_filter( 'wcml_raw_price_amount' ) ) {
