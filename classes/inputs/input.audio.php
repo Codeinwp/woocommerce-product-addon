@@ -25,7 +25,6 @@ class NM_Audio_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'Audio File Selection', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-file-video-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 	private function get_settings() {

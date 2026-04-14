@@ -1,10 +1,13 @@
 <?php
 /**
- * N-Media Settings Panel Framework
+ * Registers the PPOM admin settings framework and settings-page assets.
  *
- * @version 1.0
+ * @package PPOM
+ * @subpackage Settings
+ *
+ * @see ppom_load_free_options()
+ * @see ppom_load_pro_options()
  */
-
 
 /* 
 **========== Block direct access =========== 
@@ -14,6 +17,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
+/**
+ * Stores settings-panel structure and persists PPOM admin settings.
+ *
+ * Registers the PPOM settings page, tracks tabs, panels, and fields, and
+ * generates the saved CSS output consumed by the frontend runtime.
+ */
 class PPOM_SettingsFramework {
 
 	private static $ins = null;
@@ -37,28 +46,28 @@ class PPOM_SettingsFramework {
 	 *
 	 * @var array
 	 */
-	public $tabs = [];
+	public $tabs = array();
 
 	/**
 	 * Return setting panels.
 	 *
 	 * @var array
 	 */
-	public $panels = [];
+	public $panels = array();
 
 	/**
 	 * Return panels setting.
 	 *
 	 * @var array
 	 */
-	public $settings_array = [];
+	public $settings_array = array();
 
 	/**
 	 * Return settings config array.
 	 *
 	 * @var array
 	 */
-	public $config = [];
+	public $config = array();
 
 	/**
 	 * Return current settings panel assets URL.
@@ -72,7 +81,12 @@ class PPOM_SettingsFramework {
 	 */
 	var $scripts_class;
 
-	function __construct() {
+	/**
+	 * Registers the settings framework hooks and save endpoints.
+	 *
+	 * @return void
+	 */
+	public function __construct() {
 		$this->config = array(
 			'id'         => 'ppom',
 			'plugin_url' => PPOM_URL,
@@ -104,6 +118,8 @@ class PPOM_SettingsFramework {
 		// add_action( 'in_admin_header', array( $this, 'remove_admin_notices' ), 99 );
 		// delete_option('ppom_settings_migration_done');
 	}
+
+	// Settings structure registration.
 
 
 	/**
@@ -170,9 +186,11 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Render settings panel template
+	 * Renders the configured PPOM settings tabs and panels.
+	 *
+	 * @return void
 	 */
-	function render_settings_panel() {
+	public function render_settings_panel() {
 
 		wp_dequeue_script( 'woocommerce_settings' );
 
@@ -211,7 +229,7 @@ class PPOM_SettingsFramework {
 		// only used for store all Panels on single array
 		$this->panels = array_merge( $this->panels, $panels );
 
-		$existing_panels                 = ! isset( $this->tabs[ $tab_id ]['panels'] ) ? [] : $this->tabs[ $tab_id ]['panels'];
+		$existing_panels                 = ! isset( $this->tabs[ $tab_id ]['panels'] ) ? array() : $this->tabs[ $tab_id ]['panels'];
 		$this->tabs[ $tab_id ]['panels'] = array_merge( $existing_panels, $panels );
 
 		return $this;
@@ -219,7 +237,15 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Register Panel Settings
+	 * Registers settings definitions under a panel.
+	 *
+	 * @param string $panel_id Panel ID that receives the settings.
+	 * @param array  $settings Settings definitions keyed by setting ID.
+	 *
+	 * @return self
+	 *
+	 * @see ppom_load_free_options()
+	 * @see ppom_load_pro_options()
 	 */
 	public function register_setting( $panel_id, $settings ) {
 
@@ -230,8 +256,8 @@ class PPOM_SettingsFramework {
 		$this->tabs = array_map(
 			function ( $tab ) use ( $panel_id, $settings ) {
 				if ( isset( $tab['panels'] ) && isset( $tab['panels'][ $panel_id ] ) ) {
-					  $existing_settings                      = ! isset( $tab['panels'][ $panel_id ]['settings'] ) ? [] : $tab['panels'][ $panel_id ]['settings'];
-					  $tab['panels'][ $panel_id ]['settings'] = array_merge( $existing_settings, $settings );
+						$existing_settings                      = ! isset( $tab['panels'][ $panel_id ]['settings'] ) ? array() : $tab['panels'][ $panel_id ]['settings'];
+						$tab['panels'][ $panel_id ]['settings'] = array_merge( $existing_settings, $settings );
 				}
 
 				return $tab;
@@ -241,6 +267,8 @@ class PPOM_SettingsFramework {
 
 		return $this;
 	}
+
+	// Settings persistence and CSS generation.
 
 
 	/**
@@ -289,7 +317,7 @@ class PPOM_SettingsFramework {
 			return $arr;
 		}
 
-		$elem  = [ $move => $arr[ $move ] ];
+		$elem  = array( $move => $arr[ $move ] );
 		$start = array_splice( $arr, 0, array_search( $find, array_keys( $arr ) ) );
 		unset( $start[ $move ] );
 
@@ -298,13 +326,19 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Save all settings action callback
+	 * Persists the submitted PPOM settings-panel payload.
+	 *
+	 * Sanitizes the submitted settings array, regenerates the aggregated
+	 * frontend CSS output, and writes the normalized settings into the panel
+	 * option key.
+	 *
+	 * @return void
 	 */
-	function save_settings() {
+	public function save_settings() {
 
 		if ( ! isset( $_POST['ppom_settings_nonce'] )
-			 || ! wp_verify_nonce( $_POST['ppom_settings_nonce'], 'ppom_settings_nonce_action' )
-			 || ! ppom_security_role()
+			|| ! wp_verify_nonce( $_POST['ppom_settings_nonce'], 'ppom_settings_nonce_action' )
+			|| ! ppom_security_role()
 		) {
 			$response = array(
 				'status'  => 'error',
@@ -317,9 +351,13 @@ class PPOM_SettingsFramework {
 
 		$response = array();
 		if ( isset( $_REQUEST[ self::$save_key ] ) ) {
-			$_REQUEST[ self::$save_key ]  = array_filter( $_REQUEST[ self::$save_key ] , function ( $key ) {
-				return strpos( $key, '_locked' ) === false;
-			}, ARRAY_FILTER_USE_KEY );
+			$_REQUEST[ self::$save_key ] = array_filter(
+				$_REQUEST[ self::$save_key ],
+				function ( $key ) {
+					return strpos( $key, '_locked' ) === false;
+				},
+				ARRAY_FILTER_USE_KEY 
+			);
 			// $settings_meta = $_REQUEST[self::$save_key];
 			$settings_meta = array_map(
 				function ( $setting ) {
@@ -353,9 +391,15 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Generate output css
+	 * Regenerates the CSS output derived from settings-panel fields.
+	 *
+	 * @param array $settings_meta Sanitized settings-panel values.
+	 *
+	 * @return void
+	 *
+	 * @see PPOM_FRONTEND_SCRIPTS::add_inline_css()
 	 */
-	function generate_css( $settings_meta ) {
+	public function generate_css( $settings_meta ) {
 
 		$setting_fields = array_intersect_key( $this->settings_array, $settings_meta );
 
@@ -447,13 +491,16 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Migration process
-	 * It only used for PPOM plugin
+	 * Migrates legacy PPOM options into the settings-panel option format.
+	 *
+	 * @return void
+	 *
+	 * @see ppom_settings_migrated()
 	 */
-	function ppom_migrate_settings_panel() {
+	public function ppom_migrate_settings_panel() {
 
 		if ( ! isset( $_GET['ppom_migrate_nonce'] )
-			 || ! wp_verify_nonce( $_GET['ppom_migrate_nonce'], 'ppom_migrate_nonce_action' )
+			|| ! wp_verify_nonce( $_GET['ppom_migrate_nonce'], 'ppom_migrate_nonce_action' )
 		) {
 			wp_die( 'Sorry, you are not allowed to clone', 'ppom' );
 		}
@@ -478,7 +525,7 @@ class PPOM_SettingsFramework {
 			exit;
 		} else {
 
-			$legacy_values = [];
+			$legacy_values = array();
 			$panel_fields  = $this->settings_array;
 
 			// Getting the keys
@@ -494,6 +541,8 @@ class PPOM_SettingsFramework {
 			exit;
 		}
 	}
+
+	// Settings-page assets and helpers.
 
 
 	/**
@@ -593,10 +642,8 @@ class PPOM_SettingsFramework {
 				if ( isset( $css_val[ $key ], $css_val['style'], $css_val['color'] ) && $css_val[ $key ] != '' && $css_val['color'] != '' && $css_val['style'] != 'none' ) {
 					$css_prop .= $mode . '-' . $key . '-style:' . $css_val['style'] . '!important;';
 				}
-			} else {
-				if ( isset( $css_val[ $key ] ) && $css_val[ $key ] != '' ) {
+			} elseif ( isset( $css_val[ $key ] ) && $css_val[ $key ] != '' ) {
 					$css_prop .= $mode . '-' . $key . ':' . $css_val[ $key ] . '!important;';
-				}
 			}
 		}
 
@@ -693,7 +740,7 @@ class PPOM_SettingsFramework {
 	/**
 	 * Register settings panel scripts
 	 */
-	function get_scripts() {
+	public function get_scripts() {
 
 		$register_scripts = array(
 			'nmsf-notifications-lib'   => array(
@@ -735,7 +782,7 @@ class PPOM_SettingsFramework {
 	/**
 	 * Register settings panel styles
 	 */
-	function get_styles() {
+	public function get_styles() {
 
 		$register_styles = array(
 			'nmsf-notifications-lib' => array(
@@ -770,7 +817,9 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Load styles/scripts on settings page
+	 * Loads the PPOM settings-page scripts, styles, and localized data.
+	 *
+	 * @return string|void
 	 */
 	public function load_scripts() {
 
@@ -800,14 +849,14 @@ class PPOM_SettingsFramework {
 		PPOM_SCRIPTS::enqueue_style( 'nmsf-tooltip-lib' );
 		PPOM_SCRIPTS::enqueue_script( 'nmsf-tooltip-lib' );
 
-		// Videopopup library	
+		// Videopopup library   
 		PPOM_SCRIPTS::enqueue_style( 'nmsf-videopopup-lib' );
 		PPOM_SCRIPTS::enqueue_script( 'nmsf-videopopup-lib' );
 
-		// nmsf grid library	
+		// nmsf grid library    
 		PPOM_SCRIPTS::enqueue_style( 'nmsf-grid-lib' );
 
-		// Condition base settings library	
+		// Condition base settings library  
 		PPOM_SCRIPTS::enqueue_script( 'nmsf-deps-lib' );
 
 		// Settings panel scripts
@@ -821,17 +870,24 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Localize scripts data
+	 * Localizes runtime data for the settings-panel scripts.
+	 *
+	 * @param string $handle         Script handle receiving the data.
+	 * @param string $var_name       JS variable name.
+	 * @param array  $js_vars        Handle-specific JS vars.
+	 * @param array  $global_js_vars Shared JS vars.
+	 *
+	 * @return void
 	 */
 	public function set_localize_data( $handle, $var_name, $js_vars = array(), $global_js_vars = array() ) {
 
 		switch ( $handle ) {
 
 			case 'nmsf-settings-panel':
-				$localize_data = [
+				$localize_data = array(
 					'migrate_back_msg'                     => __( 'Are you sure?', 'woocommerce-product-addon' ),
 					'administrator_role_cannot_be_removed' => esc_html__( 'The administrator role cannot be removed.', 'woocommerce-product-addon' ),
-				];
+				);
 
 				break;
 		}
@@ -847,7 +903,7 @@ class PPOM_SettingsFramework {
 	/**
 	 * Remove all admin notices
 	 */
-	function remove_admin_notices() {
+	public function remove_admin_notices() {
 
 		$is_settings_page = $this->is_settings_page();
 
@@ -859,9 +915,11 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Is admin settings page
+	 * Determines whether the current admin request targets the PPOM settings page.
+	 *
+	 * @return bool
 	 */
-	function is_settings_page() {
+	public function is_settings_page() {
 
 		$current_screen = get_current_screen();
 
@@ -886,14 +944,28 @@ class PPOM_SettingsFramework {
 	}
 
 
-	function insert_at( $array = [], $item = [], $position = 0 ) {
-		$previous_items = array_slice( $array, 0, $position, true );
-		$next_items     = array_slice( $array, $position, null, true );
+	/**
+	 * Inserts an item into an array at a fixed position.
+	 *
+	 * @param array $items    Source array.
+	 * @param array $item     Item to insert.
+	 * @param int   $position Numeric insertion offset.
+	 *
+	 * @return array
+	 */
+	public function insert_at( $items = array(), $item = array(), $position = 0 ) {
+		$previous_items = array_slice( $items, 0, $position, true );
+		$next_items     = array_slice( $items, $position, null, true );
 
 		return $previous_items + $item + $next_items;
 	}
 }
 
+/**
+ * Returns the shared PPOM settings framework instance.
+ *
+ * @return PPOM_SettingsFramework
+ */
 PPOMSETTINGS();
 function PPOMSETTINGS() {
 	return PPOM_SettingsFramework::get_instance();

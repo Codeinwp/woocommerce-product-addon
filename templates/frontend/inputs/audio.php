@@ -33,7 +33,7 @@ if ( ! $fm->audio_video() ) {
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 	<div class="ppom_audio_box">

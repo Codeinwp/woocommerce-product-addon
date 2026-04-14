@@ -76,7 +76,7 @@ $icon_color          = ppom_get_option( 'ppom_input_tooltip_iconclr', '#000000' 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 
@@ -126,7 +126,7 @@ $icon_color          = ppom_get_option( 'ppom_input_tooltip_iconclr', '#000000' 
 		?>
 		<div class="<?php echo esc_attr( $check_wrapper_class ); ?>">
 			<label class="<?php echo esc_attr( $fm->checkbox_label_classes() ); ?>"
-				   for="<?php echo esc_attr( $dom_id ); ?>">
+					for="<?php echo esc_attr( $dom_id ); ?>">
 
 				<input
 						type="checkbox"

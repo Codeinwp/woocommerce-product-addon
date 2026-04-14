@@ -31,7 +31,7 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 
 
 <div id="ppom-file-container-<?php echo esc_attr( $fm->data_name() ); ?>"
-	 class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
+	class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
 
 	<!-- if title of field exist -->
 	<?php if ( $field_label ) : ?>
@@ -56,7 +56,7 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 	</div> <!-- ppom-file-container -->
 
 	<div id="filelist-<?php echo esc_attr( $fm->data_name() ); ?>"
-		 class="filelist <?php echo esc_attr( $fm->data_name() ); ?>">
+		class="filelist <?php echo esc_attr( $fm->data_name() ); ?>">
 
 		<?php
 		if ( ! empty( $default_value ) ) {
@@ -74,7 +74,7 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 				?>
 
 				<div class="u_i_c_box" id="u_i_c_<?php echo esc_attr( $key ); ?>"
-					 data-fileid="<?php echo esc_attr( $key ); ?>">
+					data-fileid="<?php echo esc_attr( $key ); ?>">
 
 					<?php echo $file_preview; ?>
 

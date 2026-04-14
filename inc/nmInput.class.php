@@ -118,7 +118,6 @@ class NM_Form {
 	 * 4. Number
 	 * 5. color
 	 **/
-
 	public function Regular( $args, $default_value = '' ) {
 
 		$product = isset( $args['product_id'] ) ? wc_get_product( $args['product_id'] ) : null;
@@ -156,7 +155,16 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= wp_kses( $label, array( 'span' => array( 'class' => true, 'data-*' => true, 'title' => true ) ) ) . '</label>';
+			$html .= wp_kses(
+				$label,
+				array(
+					'span' => array(
+						'class'  => true,
+						'data-*' => true,
+						'title'  => true,
+					),
+				) 
+			) . '</label>';
 		}
 
 		if ( $price !== '' ) {
@@ -236,7 +244,16 @@ class NM_Form {
 		$html                = '<div class="' . esc_attr( $input_wrapper_class ) . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= wp_kses( $label, array( 'span' => array( 'class' => true, 'data-*' => true, 'title' => true ) ) ) . '</label>';
+			$html .= wp_kses(
+				$label,
+				array(
+					'span' => array(
+						'class'  => true,
+						'data-*' => true,
+						'title'  => true,
+					),
+				) 
+			) . '</label>';
 		}
 
 		$classes .= ' ppom-measure-input';
@@ -352,7 +369,7 @@ class NM_Form {
 
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .=  $label . '</label>';
+			$html .= $label . '</label>';
 		}
 
 		if ( $rich_editor == 'on' ) {
@@ -401,7 +418,6 @@ class NM_Form {
 
 		// filter: nmforms_input_htmls
 		return apply_filters( 'nmforms_input_html', $html, $args, $default_value );
-
 	}
 
 	/**
@@ -821,7 +837,7 @@ class NM_Form {
 		$html               .= '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .=  $label . '</label>';
+			$html .= $label . '</label>';
 		}
 		// ppom_pa($options);
 		$html .= '<div class="ppom-palettes ppom-palettes-' . esc_attr( $id ) . '">';
@@ -1124,17 +1140,15 @@ class NM_Form {
 							$image_url = wp_get_attachment_thumb_url( $image['image_id'] );
 							$html     .= '<img data-image-tooltip="' . wp_get_attachment_url( $image['image_id'] ) . '" class="img-thumbnail ppom-zoom-' . esc_attr( $id ) . '" src="' . esc_url( $image_url ) . '" />';
 						}                   
-					} else {
-						if ( isset( $image['url'] ) && $image['url'] != '' ) {
+					} elseif ( isset( $image['url'] ) && $image['url'] != '' ) {
 							$html .= '<a href="' . $image['url'] . '"><img width="150" height="150" src="' . esc_url( $image['link'] ) . '" /></a>';
-						} else {
-							$html .= '<img class="img-thumbnail ppom-zoom-' . esc_attr( $id ) . '" data-image-tooltip="' . esc_url( $image['link'] ) . '" src="' . esc_url( $image['link'] ) . '" />';
-						}
+					} else {
+						$html .= '<img class="img-thumbnail ppom-zoom-' . esc_attr( $id ) . '" data-image-tooltip="' . esc_url( $image['link'] ) . '" src="' . esc_url( $image['link'] ) . '" />';
 					}
 
 					$html .= '</div></label>';
 
-					$img_index ++;
+					++$img_index;
 				}
 			}
 
@@ -1603,7 +1617,16 @@ class NM_Form {
 		$html                = '<div class="' . $input_wrapper_class . '">';
 		if ( $label ) {
 			$html .= '<label class="' . $this->get_default_setting_value( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= wp_kses( $label, array( 'span' => array( 'class' => true, 'data-*' => true, 'title' => true ) ) ) . '</label>';
+			$html .= wp_kses(
+				$label,
+				array(
+					'span' => array(
+						'class'  => true,
+						'data-*' => true,
+						'title'  => true,
+					),
+				) 
+			) . '</label>';
 		}
 
 		$html .= apply_filters( 'nmform_custom_input', $html, $args, $default_value );
@@ -1709,14 +1732,12 @@ class NM_Form {
 		}
 
 		return apply_filters( "nmform_property-{$property}", $value );
-
 	}
 
 
 	/**
 	 * ====================== FILTERS =====================================
 	 * */
-
 	public function adjust_attributes_values( $attr_value, $attr, $args ) {
 
 		switch ( $attr ) {
@@ -1754,7 +1775,6 @@ class NM_Form {
 	/**
 	 * ====================== ENDs FILTERS =====================================
 	 * */
-
 	public static function get_instance() {
 		// create a new object if it doesn't exist.
 		is_null( self::$ins ) && self::$ins = new self();

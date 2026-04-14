@@ -39,7 +39,7 @@ if ( ! $ranges ) {
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 	<!-- Check if price matrix table is not hidden by settings -->
@@ -68,7 +68,7 @@ if ( ! $ranges ) {
 			<div class="ppom-pricematrix-range ppom-range-<?php echo esc_attr( $range_id ); ?>">
 				<span class="pm-range"> <?php echo apply_filters( 'ppom_matrix_item_label', stripslashes( trim( $label ) ), $opt ); ?></span>
 				<span class="pm-price"
-					  style="float:right"><?php echo apply_filters( 'ppom_matrix_item_price', $price, $opt ); ?></span>
+						style="float:right"><?php echo apply_filters( 'ppom_matrix_item_price', $price, $opt ); ?></span>
 			</div>
 			<?php
 		}

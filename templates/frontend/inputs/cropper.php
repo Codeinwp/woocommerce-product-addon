@@ -37,12 +37,12 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 
 
 <div id="ppom-file-container-<?php echo esc_attr( $fm->data_name() ); ?>"
-	 class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
+	class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
 
 	<!-- if title of field exist -->
 	<?php if ( $field_label ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo ppom_esc_html( $field_label ); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo ppom_esc_html( $field_label ); ?></label>
 	<?php endif ?>
 
 
@@ -82,7 +82,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 					<?php
 
 					if ( $first_option ) {
-						echo sprintf( '<option value="">%s</option>', $first_option );
+						printf( '<option value="">%s</option>', $first_option );
 					}
 
 					foreach ( $options as $key => $size ) {

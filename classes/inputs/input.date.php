@@ -25,7 +25,6 @@ class NM_Date_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'regular date input', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-calendar" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 	private function get_settings() {
@@ -103,7 +102,7 @@ class NM_Date_wooproduct extends PPOM_Inputs {
 				'title'       => __( 'Year Range', 'woocommerce-product-addon' ),
 				'desc'        => sprintf(
 					// translators: %1%s: the current year date, %2%s the next yar date.
-					esc_html__( '[ This feature requires jQuery datePicker ] Years to allow date selections. Example: c-10:c+10. TIP: The letter "c" indicates the current year so "c+1" will indicate next year.  Thus c:c+1 will be %1$s:%2$s', 'woocommerce-product-addon'),
+					esc_html__( '[ This feature requires jQuery datePicker ] Years to allow date selections. Example: c-10:c+10. TIP: The letter "c" indicates the current year so "c+1" will indicate next year.  Thus c:c+1 will be %1$s:%2$s', 'woocommerce-product-addon' ),
 					date( 'Y' ),
 					date( 'Y', strtotime( '+1 year' ) )
 				),

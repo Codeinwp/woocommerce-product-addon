@@ -41,7 +41,7 @@ $product_type        = $product->get_type();
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 
@@ -76,7 +76,7 @@ $product_type        = $product->get_type();
 		?>
 		<div class="<?php echo esc_attr( $radio_wrapper_class ); ?>">
 			<label class="<?php echo esc_attr( $fm->radio_label_classes() ); ?>"
-				   for="<?php echo esc_attr( $dom_id ); ?>">
+					for="<?php echo esc_attr( $dom_id ); ?>">
 
 				<input
 						type="radio"

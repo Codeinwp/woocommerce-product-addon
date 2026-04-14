@@ -230,6 +230,12 @@ PPOM is open-source. Contribute on [GitHub](https://github.com/Codeinwp/woocomme
 - Read more about WordPress on our [blog](https://themeisle.com/blog/).
 - Interested in our other plugins? Take a look [here](https://themeisle.com/wordpress-plugins/?utm_source=wordpressorg&utm_medium=readme&utm_campaign=PPOM).
 
+### How to report a security issue?
+ 
+Plugin security is a core priority for us. If you identify a potential vulnerability, we ask that you disclose it responsibly.
+
+Please follow the reporting protocols outlined on our [Security Page](https://themeisle.com/security/).
+
 == Installation ==
 1. Upload the plugin directory to the `/wp-content/plugins/` directory
 2. Activate the plugin through the `Plugins` menu in WordPress

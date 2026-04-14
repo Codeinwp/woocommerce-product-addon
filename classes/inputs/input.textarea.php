@@ -25,7 +25,6 @@ class NM_Textarea_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'regular textarea input', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-file-text-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 

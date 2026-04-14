@@ -147,18 +147,18 @@ if ( isset( $args['view_control'] ) && $args['view_control'] == 'horizontal' ) {
 				</div>
 				<span class="ppom-quantity-qty-section">
 				<input min="<?php echo esc_attr( $min ); ?>"
-					   max="<?php echo esc_attr( $max ); ?>"
-					   data-data_name="<?php echo esc_attr( $dataname ); ?>"
-					   id="<?php echo esc_attr( $dom_id ); ?>"
-					   data-optionid="<?php echo esc_attr( $option_id ); ?>"
-					   data-min="<?php echo esc_attr( $args['min_qty'] ); ?>"
-					   data-max="<?php echo esc_attr( $args['max_qty'] ); ?>"
-					   data-label="<?php echo esc_attr( $label ); ?>"
-					   data-includeprice="<?php echo esc_attr( $include_productprice ); ?>"
-					   name="<?php echo htmlentities( $name ); ?>" type="number" class="ppom-quantity"
-					   data-usebase_price="<?php echo esc_attr( $usebaseprice ); ?>"
-					   value="<?php echo esc_attr( $selected_val ); ?>" placeholder="0"
-					   data-price="<?php echo esc_attr( $the_price ); ?>" <?php echo esc_attr( $required ); ?> style="width: 50%;">
+						max="<?php echo esc_attr( $max ); ?>"
+						data-data_name="<?php echo esc_attr( $dataname ); ?>"
+						id="<?php echo esc_attr( $dom_id ); ?>"
+						data-optionid="<?php echo esc_attr( $option_id ); ?>"
+						data-min="<?php echo esc_attr( $args['min_qty'] ); ?>"
+						data-max="<?php echo esc_attr( $args['max_qty'] ); ?>"
+						data-label="<?php echo esc_attr( $label ); ?>"
+						data-includeprice="<?php echo esc_attr( $include_productprice ); ?>"
+						name="<?php echo htmlentities( $name ); ?>" type="number" class="ppom-quantity"
+						data-usebase_price="<?php echo esc_attr( $usebaseprice ); ?>"
+						value="<?php echo esc_attr( $selected_val ); ?>" placeholder="0"
+						data-price="<?php echo esc_attr( $the_price ); ?>" <?php echo esc_attr( $required ); ?> style="width: 50%;">
 			</span>
 			</div>
 		<?php } ?>
