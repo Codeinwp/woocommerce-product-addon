@@ -1311,7 +1311,7 @@ function ppom_price_cart_fee( $cart ) {
 					'name'      => esc_html( $discount_label ),
 					'amount'    => -abs( (float) $matrix_discount ),
 					'taxable'   => $discount_taxable,
-					'tax_class' => ''
+					'tax_class' => '',
 				)
 			);
 			// ppom_pa($discount_label);
@@ -1363,7 +1363,7 @@ function ppom_price_cart_fee( $cart ) {
 						'name'      => esc_html( $label ),
 						'amount'    => (float) $fee_price,
 						'taxable'   => $taxable,
-						'tax_class' => $tax_class
+						'tax_class' => $tax_class,
 					)
 				);
 				++$fee_no;

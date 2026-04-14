@@ -680,10 +680,10 @@ function ppom_woocommerce_add_fixed_fee( $cart ) {
 				if ( $fee_price != 0 ) {
 					$cart->fees_api()->add_fee(
 						array(
-							'id'        => 'ppom_fee_' . $fee_no,
-							'name'      => esc_html( $label ),
-							'amount'    => (float) $fee_price,
-							'taxable'   => $taxable,
+							'id'      => 'ppom_fee_' . $fee_no,
+							'name'    => esc_html( $label ),
+							'amount'  => (float) $fee_price,
+							'taxable' => $taxable,
 						)
 					);
 					++$fee_no;
