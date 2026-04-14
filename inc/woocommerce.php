@@ -661,7 +661,7 @@ function ppom_woocommerce_add_fixed_fee( $cart ) {
 				}
 
 
-				$label = $fee_no . '-' . $fee['product_title'] . ': ' . $fee['label'];
+				$label = $fee['product_title'] . ': ' . $fee['label'];
 				$label = apply_filters( 'ppom_fixed_fee_label', $label, $fee, $item );
 
 				$taxable   = ( isset( $fee['taxable'] ) && $fee['taxable'] == 'on' ) ? true : false;
@@ -678,7 +678,14 @@ function ppom_woocommerce_add_fixed_fee( $cart ) {
 				$fee_price = apply_filters( 'ppom_cart_fixed_fee', $fee_price, $fee, $cart );
 
 				if ( $fee_price != 0 ) {
-					$cart->add_fee( esc_html( $label ), $fee_price, $taxable );
+					$cart->fees_api()->add_fee(
+						array(
+							'id'      => 'ppom_fee_' . $fee_no,
+							'name'    => esc_html( $label ),
+							'amount'  => (float) $fee_price,
+							'taxable' => $taxable,
+						)
+					);
 					++$fee_no;
 				}
 			}
