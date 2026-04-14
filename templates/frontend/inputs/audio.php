@@ -33,7 +33,7 @@ if ( ! $fm->audio_video() ) {
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 	<div class="ppom_audio_box">
@@ -44,6 +44,7 @@ if ( ! $fm->audio_video() ) {
 			$audio_id    = isset( $audio['id'] ) ? $audio['id'] : 0;
 			$audio_title = isset( $audio['title'] ) ? stripslashes( $audio['title'] ) : 0;
 			$audio_price = isset( $audio['price'] ) ? $audio['price'] : 0;
+			$audio_price = apply_filters( 'ppom_option_price', $audio_price );
 
 			// Actually image URL is link
 			$audio_url         = wp_get_attachment_url( $audio_id );

@@ -3,7 +3,6 @@
  * Changleog Handler
  *
  * Handles parsing for Changelog files.
- *
  */
 
 /**
@@ -20,11 +19,11 @@ class PPOM_Changelog_Handler {
 	public function get_changelog( $changelog_path ) {
 
 		if ( ! is_file( $changelog_path ) ) {
-			return [];
+			return array();
 		}
 
 		if ( ! WP_Filesystem() ) {
-			return [];
+			return array();
 		}
 
 		return $this->parse_changelog( $changelog_path );
@@ -45,7 +44,7 @@ class PPOM_Changelog_Handler {
 			$changelog = '';
 		}
 		$changelog     = explode( PHP_EOL, $changelog );
-		$releases      = [];
+		$releases      = array();
 		$release_count = 0;
 
 		foreach ( $changelog as $changelog_line ) {
@@ -53,7 +52,7 @@ class PPOM_Changelog_Handler {
 				continue;
 			}
 			if ( substr( ltrim( $changelog_line ), 0, 4 ) === '####' ) {
-				$release_count ++;
+				++$release_count;
 
 				preg_match( '/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/', $changelog_line, $found_v );
 				preg_match( '/[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/', $changelog_line, $found_d );

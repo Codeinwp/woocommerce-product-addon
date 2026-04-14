@@ -25,7 +25,6 @@ class NM_Divider_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'regular divider input', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-pencil-square-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 	function ppom_divider_style() {

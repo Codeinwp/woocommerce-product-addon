@@ -23,6 +23,7 @@ $file_cost    = $fm->get_meta_value( 'file_cost' );
 $btn_class    = $fm->get_meta_value( 'button_class' );
 $btn_label    = $fm->get_meta_value( 'button_label_select' );
 $first_option = $fm->get_meta_value( 'first_option' );
+$file_cost    = apply_filters( 'ppom_option_price', $file_cost );
 
 $field_label = ( $file_cost == '' ) ? $fm->field_label() : $fm->field_label() . ' - ' . wc_price( $file_cost );
 $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-addon' ) : $btn_label );
@@ -36,12 +37,12 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 
 
 <div id="ppom-file-container-<?php echo esc_attr( $fm->data_name() ); ?>"
-	 class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
+	class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
 
 	<!-- if title of field exist -->
 	<?php if ( $field_label ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo ppom_esc_html( $field_label ); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo ppom_esc_html( $field_label ); ?></label>
 	<?php endif ?>
 
 
@@ -63,9 +64,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 			<?php
 			if ( $options && count( $options ) > 0 ) {
 
-				$croppie_options = ppom_get_croppie_options( $field_meta );
-
-				$select_css  = 'width:' . $croppie_options['boundary']['width'] . 'px;';
+				$select_css  = 'width:100%;';
 				$select_css .= 'margin:5px auto;display:none;';
 
 				?>
@@ -81,7 +80,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 					<?php
 
 					if ( $first_option ) {
-						echo sprintf( '<option value="">%s</option>', $first_option );
+						printf( '<option value="">%s</option>', $first_option );
 					}
 
 					foreach ( $options as $key => $size ) {
@@ -91,6 +90,7 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 						$raw_label    = $size['raw'];
 						$without_tax  = $size['without_tax'];
 						$option_id    = $size['option_id'];
+						$option_price = apply_filters( 'ppom_option_price', $option_price );
 
 						$selected_opt = selected( $default_value, $key, false );
 
