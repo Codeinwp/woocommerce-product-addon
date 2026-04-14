@@ -1,8 +1,8 @@
 /**
  * Manage step: empty state or active field editor (typed, fallback, or unsupported).
  */
-import { Box, Button, VStack, Text, Alert, AlertIcon, Skeleton } from '@chakra-ui/react';
-import { FieldSettingsForm } from '../FieldSettingsForm';
+import { Box, Button, VStack, Text } from '@chakra-ui/react';
+import { FieldManageEditorBridge } from './FieldManageEditorBridge';
 import type { FieldModalManageStepProps } from '../types/fieldModal';
 
 export type FieldManagePanelProps = FieldModalManageStepProps;
@@ -44,43 +44,19 @@ export function FieldManagePanel( {
 				</VStack>
 			) }
 			{ fields.length > 0 && selectedId && editDraft && (
-				<VStack align="stretch" spacing={ 3 }>
-					{ schemaLoading && ! activeSchema && (
-						<VStack spacing={ 2 } align="stretch">
-							<Skeleton height="36px" />
-							<Skeleton height="36px" />
-							<Skeleton height="72px" />
-						</VStack>
-					) }
-					{ activeSchema && TypedEditor && (
-						<TypedEditor
-							schema={ activeSchema }
-							values={ editDraft }
-							onChange={ onEditDraftChange }
-							i18n={ i18n }
-							ppomFieldIndex={ ppomFieldIndex }
-							modalContext={ modalContext }
-						/>
-					) }
-					{ activeSchema && ! TypedEditor && (
-						<FieldSettingsForm
-							schema={ activeSchema }
-							values={ editDraft }
-							onChange={ onEditDraftChange }
-							fieldType={ editDraft.type || '' }
-							i18n={ i18n }
-							ppomFieldIndex={ ppomFieldIndex }
-							modalContext={ modalContext }
-							isFallback
-						/>
-					) }
-					{ ! schemaLoading && ! activeSchema && editDraft.type && (
-						<Alert status="info">
-							<AlertIcon />
-							{ i18n.unsupportedControl }
-						</Alert>
-					) }
-				</VStack>
+				<FieldManageEditorBridge
+					i18n={ i18n }
+					fields={ fields }
+					selectedId={ selectedId }
+					editDraft={ editDraft }
+					schemaLoading={ schemaLoading }
+					activeSchema={ activeSchema }
+					TypedEditor={ TypedEditor }
+					onEditDraftChange={ onEditDraftChange }
+					ppomFieldIndex={ ppomFieldIndex }
+					modalContext={ modalContext }
+					onOpenPicker={ onOpenPicker }
+				/>
 			) }
 		</Box>
 	);
