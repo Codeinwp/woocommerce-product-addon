@@ -130,8 +130,15 @@ function ppom_array_get_timezone_list( $selected_regions, $show_time ) {
 
 	$timezone_offsets = array();
 	foreach ( $timezones as $timezone ) {
-		$tz                            = new DateTimeZone( $timezone );
-		$timezone_offsets[ $timezone ] = $tz->getOffset( new DateTime() );
+		try {
+			$tz                            = new DateTimeZone( $timezone );
+			$timezone_offsets[ $timezone ] = $tz->getOffset( new DateTime() );
+		} catch ( Exception $e ) {
+			// Skip timezones unsupported by the current PHP/system timezone DB (e.g. America/Ciudad_Juarez
+			// on servers with an outdated tzdata). Catching the base Exception covers both the legacy
+			// warning-turned-exception behaviour and the DateInvalidTimeZoneException added in PHP 8.3.
+			continue;
+		}
 	}
 
 	// sort timezone by timezone name
@@ -144,9 +151,16 @@ function ppom_array_get_timezone_list( $selected_regions, $show_time ) {
 
 		$pretty_offset = "UTC$offset_prefix$offset_formatted";
 
-		$t            = new DateTimeZone( $timezone );
-		$c            = new DateTime( null, $t );
-		$current_time = $c->format( 'g:i A' );
+		try {
+			$t            = new DateTimeZone( $timezone );
+			$c            = new DateTime( null, $t );
+			$current_time = $c->format( 'g:i A' );
+		} catch ( Exception $e ) {
+			// Skip timezones unsupported by the current PHP/system timezone DB (e.g. America/Ciudad_Juarez
+			// on servers with an outdated tzdata). Catching the base Exception covers both the legacy
+			// warning-turned-exception behaviour and the DateInvalidTimeZoneException added in PHP 8.3.
+			continue;
+		}
 
 		if ( $show_time == 'on' ) {
 			$timezone_list[ $timezone ] = "($pretty_offset) $timezone - $current_time";
