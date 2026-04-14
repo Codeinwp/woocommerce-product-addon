@@ -1,16 +1,26 @@
 <?php
 /**
- * PPOM Frontend Scripts Class
+ * Registers and localizes frontend assets for PPOM fields.
  *
- * It will register/enqueue all ppom scripts to frontent.
+ * @package PPOM
+ * @subpackage Frontend
+ *
+ * @see ppom_hooks_load_input_scripts()
+ * @see ppom_woocommerce_template_base_inputs_rendering()
  */
-
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 
+/**
+ * Coordinates product-scoped asset registration and localization.
+ *
+ * Resolves the scripts and styles required by the current PPOM field set and
+ * localizes the frontend data structures used for pricing, uploads, conditions,
+ * and validation.
+ */
 class PPOM_FRONTEND_SCRIPTS {
 
 	/**
@@ -35,7 +45,9 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
-	 * Main Init
+	 * Boots frontend asset loading for product requests.
+	 *
+	 * @return void
 	 */
 	public static function init() {
 
@@ -47,7 +59,9 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
-	 * Register all PPOM Scripts.
+	 * Returns the script registry used by the modern frontend loader.
+	 *
+	 * @return array
 	 */
 	private static function get_scripts() {
 
@@ -142,7 +156,9 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
-	 * Register Styles
+	 * Returns the style registry used by the modern frontend loader.
+	 *
+	 * @return array
 	 */
 	private static function get_styles() {
 
@@ -205,7 +221,9 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
-	 * Load Frontend Scripts.
+	 * Registers PPOM assets on frontend requests and loads product-specific ones.
+	 *
+	 * @return void
 	 */
 	public static function load_scripts() {
 
@@ -238,7 +256,20 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
-	 * Load Frontend Scripts by product ID.
+	 * Loads the asset set required by the resolved PPOM field definitions.
+	 *
+	 * Builds the JS payloads used by the template renderer, upload handlers,
+	 * pricing logic, and conditional fields for a single product context.
+	 *
+	 * @param int      $product_id       Product ID being rendered.
+	 * @param int|null $ppom_id          Optional field-group ID override.
+	 * @param string   $display_location Render location such as shortcode.
+	 *
+	 * @return void|string
+	 *
+	 * @see PPOM_Meta::__construct()
+	 * @see PPOM_Form::ppom_fields_render()
+	 * @see ppom_woocommerce_template_base_inputs_rendering()
 	 */
 	public static function load_scripts_by_product_id( $product_id, $ppom_id = null, $display_location = '' ) {
 
@@ -296,10 +327,10 @@ class PPOM_FRONTEND_SCRIPTS {
 
 				/* Global JS Inputs Vars */
 				$global_js_vars = array(
-					'ajaxurl'    => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
-					'plugin_url' => PPOM_URL,
-					'product_id' => $product_id,
-					'sp_force_display_block'  => apply_filters( 'ppom_sp_ac_force_css_display_block', true ) ? 'on' : 'off' // force display:block instead of display:flex for add to cart form of the single product page
+					'ajaxurl'                => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
+					'plugin_url'             => PPOM_URL,
+					'product_id'             => $product_id,
+					'sp_force_display_block' => apply_filters( 'ppom_sp_ac_force_css_display_block', true ) ? 'on' : 'off', // force display:block instead of display:flex for add to cart form of the single product page
 				);
 
 				$decimal_palces = wc_get_price_decimals();
@@ -464,7 +495,7 @@ class PPOM_FRONTEND_SCRIPTS {
 								}
 
 								$field_conditions['rules'][ $rule_index ]['element_values'] = ppom_wpml_translate( $rule['element_values'], 'PPOM' );
-								$rule_index ++;
+								++$rule_index;
 							}
 
 							$ppom_conditional_fields[ $data_name ] = $field_conditions;
@@ -533,6 +564,17 @@ class PPOM_FRONTEND_SCRIPTS {
 	}
 
 
+	/**
+	 * Localizes runtime data onto an enqueued PPOM frontend script handle.
+	 *
+	 * @param string     $handle         Registered script handle.
+	 * @param string     $var_name       JS variable name.
+	 * @param WC_Product $product        Product in the current render context.
+	 * @param array      $js_vars        Handle-specific JS vars.
+	 * @param array      $global_js_vars Shared JS vars.
+	 *
+	 * @return void
+	 */
 	private static function set_localize_data( $handle, $var_name, $product, $js_vars = array(), $global_js_vars = array() ) {
 
 		if ( ! wp_script_is( $handle ) ) {
@@ -611,6 +653,14 @@ class PPOM_FRONTEND_SCRIPTS {
 	}
 
 
+	/**
+	 * Appends inline CSS generated from PPOM field presentation settings.
+	 *
+	 * @param string $type       Inline CSS variant to include.
+	 * @param array  $field_meta Optional field definition for field-specific CSS.
+	 *
+	 * @return void
+	 */
 	public static function add_inline_css( $type, $field_meta = array() ) {
 
 		ob_start();

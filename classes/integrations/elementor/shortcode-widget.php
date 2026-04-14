@@ -37,7 +37,7 @@ class PPOM_Elementor_Shortcode_Widget extends \Elementor\Widget_Base {
 	 * Set this widget to category
 	 */
 	public function get_categories() {
-		return [ 'general' ];
+		return array( 'general' );
 	}
 
 
@@ -48,19 +48,19 @@ class PPOM_Elementor_Shortcode_Widget extends \Elementor\Widget_Base {
 
 		$this->start_controls_section(
 			'content_section',
-			[
+			array(
 				'label' => __( 'Product Details', 'woocommerce-product-addon' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
-			]
+			)
 		);
 
 		$this->add_control(
 			'ppom_product_id',
-			[
+			array(
 				'label'       => __( 'Product ID', 'woocommerce-product-addon' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
 				'placeholder' => __( 'Provide Product ID', 'woocommerce-product-addon' ),
-			]
+			)
 		);
 
 		$this->end_controls_section();

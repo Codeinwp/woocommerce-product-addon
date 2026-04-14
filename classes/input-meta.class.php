@@ -70,7 +70,7 @@ class PPOM_InputManager {
 		$desc = apply_filters( 'ppom_description_content', $desc, self::$input_meta );
 		$desc = apply_filters( 'ppom_input_meta_desc', $desc, self::$input_meta );
 
-		return do_shortcode($desc);
+		return do_shortcode( $desc );
 	}
 
 
@@ -256,7 +256,7 @@ class PPOM_InputManager {
 	 */
 	function field_inner_wrapper_classes() {
 
-		$classes         = [ 'form-group' ];
+		$classes         = array( 'form-group' );
 		$wrapper_classes = implode( ' ', $classes );
 
 		// return apply_filters_deprecated( 'ppom_input_wrapper_class', array( $wrapper_classes, self::$input_meta ), '21.3', 'ppom_input_wrapper_classes' );
@@ -271,7 +271,7 @@ class PPOM_InputManager {
 	 */
 	function label_classes() {
 
-		$classes = [ 'form-control-label' ];
+		$classes = array( 'form-control-label' );
 
 		$label_classes = apply_filters( 'ppom_input_label_classes', $classes, self::$input_meta );
 
@@ -313,7 +313,7 @@ class PPOM_InputManager {
 		}
 
 		if ( ( $this->input_type == 'radio' && ( $key = array_search( 'form-control', $classes ) ) !== false ) ||
-			 $this->input_type == 'checkbox' && ( $key = array_search( 'form-control', $classes ) ) !== false ) {
+			$this->input_type == 'checkbox' && ( $key = array_search( 'form-control', $classes ) ) !== false ) {
 			unset( $classes[ $key ] );
 			$classes[] = 'ppom-check-input';
 		}
@@ -355,7 +355,7 @@ class PPOM_InputManager {
 	 */
 	function radio_label_classes() {
 
-		$classes = [ 'form-check-label' ];
+		$classes = array( 'form-check-label' );
 
 		$label_class = apply_filters( 'ppom_radio_input_label_classes', $classes, self::$input_meta );
 
@@ -372,7 +372,7 @@ class PPOM_InputManager {
 	 */
 	function checkbox_label_classes() {
 
-		$classes = [ 'form-check-label' ];
+		$classes = array( 'form-check-label' );
 
 		$label_class = apply_filters( 'ppom_checkbox_input_label_classes', $classes, self::$input_meta );
 

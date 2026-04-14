@@ -8,7 +8,7 @@ $modal_id = 'modalFile' . $file_id;
 ?>
 
 <div class="modal ppom-modals fade" id="<?php echo esc_attr( $modal_id ); ?>" tabindex="-1" role="dialog"
-	 aria-labelledby="exampleModalLabel" aria-hidden="true">
+	aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">

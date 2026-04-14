@@ -1,9 +1,23 @@
 <?php
 /**
- * WordPress Escaping and Sanitization
- **/
+ * Resolves PPOM sanitization rules and WooCommerce quantity limits.
+ *
+ * @package PPOM
+ * @subpackage Validation
+ */
 
-// esc html content before rendering
+// Sanitization and allowed HTML.
+
+/**
+ * Sanitizes field-builder content while preserving the HTML keys PPOM stores.
+ *
+ * Expands the allowed tag map for the current request and then applies
+ * `wp_kses()` to the submitted content.
+ *
+ * @param string $content Raw field-builder content.
+ *
+ * @return string
+ */
 function ppom_esc_html( $content ) {
 
 	global $allowedposttags;
@@ -75,46 +89,66 @@ function ppom_esc_html( $content ) {
 	$allowedposttags['b']        = $allowed_atts;
 	$allowedposttags['i']        = $allowed_atts;
 	$allowedposttags['br']       = $allowed_atts;
-	$allowed_tags = wp_kses_allowed_html( 'post' );
+	$allowed_tags                = wp_kses_allowed_html( 'post' );
 
 	return wp_kses( stripslashes_deep( $content ), $allowed_tags );
 }
 
-// sanitization array data before saving data
-function ppom_sanitize_array_data( $array ) {
-	foreach ( $array as $key => &$value ) {
+	/**
+	 * Recursively sanitizes PPOM field definitions before they are stored.
+	 *
+	 * Keys that allow stored HTML are sanitized with `ppom_esc_html()`. All other
+	 * scalar values are reduced to plain text.
+	 *
+	 * @param array $data Untrusted field-definition array.
+	 *
+	 * @return array
+	 *
+	 * @see ppom_admin_save_form_meta()
+	 * @see ppom_admin_update_form_meta()
+	 */
+function ppom_sanitize_array_data( $data ) {
+	foreach ( $data as $key => &$value ) {
 		if ( is_array( $value ) ) {
 			$value = ppom_sanitize_array_data( $value );
+		} elseif ( in_array( $key, ppom_fields_with_html(), true ) ) {
+			$value = ppom_esc_html( $value );
 		} else {
-			if ( in_array( $key, ppom_fields_with_html(), true ) ) {
-				$value = ppom_esc_html( $value );
-			} else {
-				$value = sanitize_text_field( $value );
-			}
+			$value = sanitize_text_field( $value );
 		}
 	}
+	unset( $value );
 
-	return $array;
+	return $data;
 }
 
 
-// ppom_fields keys requires html
+	/**
+	 * Returns field-definition keys that store sanitized HTML instead of plain text.
+	 *
+	 * @return array
+	 */
 function ppom_fields_with_html() {
 
-	$have_html = [ 'description', 'tooltip', 'heading', 'html', 'error_message', 'checked', 'disable_custom_dates' ];
+	$have_html = array( 'description', 'tooltip', 'heading', 'html', 'error_message', 'checked', 'disable_custom_dates' );
 
 	return apply_filters( 'ppom_fields_with_html', $have_html );
 }
 
+// Quantity limit resolution.
+
 /**
- * Updates the quantity arguments.
+ * Applies PPOM quantity limits to WooCommerce quantity input arguments.
+ *
+ * Resolves the effective min, max, and step values from the current product's
+ * PPOM field definitions and merges them into WooCommerce's server-side
+ * quantity args.
  *
  * @param array       $data List of data to update.
  * @param \WC_Product $product Product object.
  *
  * @return array
  */
-
 function ppom_validation_product_limits( $data, $product ) {
 
 	if ( ppom_is_client_validation_enabled() ) {
@@ -169,13 +203,14 @@ function ppom_validation_product_limits( $data, $product ) {
 		$data['min_value'] = $limits['step'];
 	}
 
+	$data['input_value'] = $data['min_value'];
 
 	return $data;
 }
 
 
 /**
- * Adds variation min max settings to be used by JS.
+ * Adds PPOM quantity limits to the variation data passed to the frontend.
  *
  * @param array                $data Available variation data.
  * @param \WC_Product          $product Product object.
@@ -241,6 +276,20 @@ function ppom_validation_variation_limits( $data, $product, $variation ) {
 	return $data;
 }
 
+/**
+ * Derives quantity limits from PPOM quantity and price-matrix fields.
+ *
+ * Builds the canonical `min_qty`, `max_qty`, `step`, and `input_value` payload
+ * used by both server-side quantity validation and variation JS data.
+ *
+ * @param int $product_id   Parent product ID.
+ * @param int $variation_id Variation ID when resolving variation-specific data.
+ *
+ * @return array
+ *
+ * @see PPOM_Meta::__construct()
+ * @see ppom_has_field_by_type()
+ */
 function ppom_get_product_limits( $product_id, $variation_id ) {
 
 	$product = wc_get_product( $product_id );
@@ -349,28 +398,23 @@ function ppom_get_product_limits( $product_id, $variation_id ) {
 	return $limits;
 }
 
+// Safe CSS overrides.
+
 /**
- * By default, WordPress strips CSS values that contain \ ( & } = or comments, such as rgb()
- * and rgba(), because the core regex in safecss_filter_attr() flags them as unsafe.
- *
- * This filter overrides that behavior by checking if the CSS string contains
- * "rgb(" or "rgba(" and explicitly allows it. All other CSS values still pass
- * through the normal WordPress sanitization process.
- *
- * @since 1.0.0
+ * Allows CSS declarations containing `rgb()` and `rgba()` values.
  *
  * @param bool   $allow_css  Whether the CSS in the string is considered safe.
  * @param string $css_string The full CSS declaration.
  *
- * @return bool  True if the CSS is safe and should be allowed, false otherwise.
+ * @return bool
  */
 function ppom_safecss_filter_attr( $allow_css, $css_string ) {
 
-    // If the CSS string contains rgb() or rgba(), mark it as safe.
-    if ( stripos( $css_string, 'rgb(' ) !== false || stripos( $css_string, 'rgba(' ) !== false ) {
-        return true;
-    }
+	// If the CSS string contains rgb() or rgba(), mark it as safe.
+	if ( stripos( $css_string, 'rgb(' ) !== false || stripos( $css_string, 'rgba(' ) !== false ) {
+		return true;
+	}
 
-    return $allow_css;
+	return $allow_css;
 }
 add_filter( 'safecss_filter_attr_allow_css', 'ppom_safecss_filter_attr', 10, 2 );

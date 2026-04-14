@@ -63,14 +63,14 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 				$the_price    = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
 				$usebaseprice = isset( $opt['price'] ) ? 'no' : 'yes';
 
-				$min          = ( ! empty( $opt['min'] ) ? $opt['min'] : 0 );
-				$max          = ( ! empty( $opt['max'] ) ? intval( $opt['max'] ) : 10000 );
-				$stock        = $opt['stock'] !== '' ? intval( $opt['stock'] ) : '';
-				$max          = $max > $stock && $manage_stock ? $stock : $max;
-				$required     = ( $fm->required() == 'on' ? 'required' : '' );
-				$label        = $opt['raw'];
-				$name         = $fm->form_name() . '[' . htmlentities( $label ) . ']';
-				$in_stock     = $manage_stock ? sprintf(
+				$min      = ( ! empty( $opt['min'] ) ? $opt['min'] : 0 );
+				$max      = ( ! empty( $opt['max'] ) ? intval( $opt['max'] ) : 10000 );
+				$stock    = $opt['stock'] !== '' ? intval( $opt['stock'] ) : '';
+				$max      = $max > $stock && $manage_stock ? $stock : $max;
+				$required = ( $fm->required() == 'on' ? 'required' : '' );
+				$label    = $opt['raw'];
+				$name     = $fm->form_name() . '[' . htmlentities( $label ) . ']';
+				$in_stock = $manage_stock ? sprintf(
 					/* translators: %s: stock quantity */
 					__( '%s in stock', 'woocommerce-product-addon' ),
 					$stock
@@ -112,7 +112,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 							data-usebase_price="<?php echo esc_attr( $usebaseprice ); ?>"
 							<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
 							value="<?php echo esc_attr( $selected_val ); ?>"
-							style="width:50px;text-align:center"
+							style="width:50px;text-align:center;padding-right:0;"
 							<?php echo esc_attr( $required ); ?>
 					>
 

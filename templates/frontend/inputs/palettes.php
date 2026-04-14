@@ -60,7 +60,7 @@ echo '</style>';
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 	<!-- Palettes Box -->
@@ -83,9 +83,9 @@ echo '</style>';
 			$raw_label    = $value['raw'];
 			$without_tax  = $value['without_tax'];
 
-			$option_id = $value['option_id'];
-			$option_classes = sprintf('%s ppom-option-%s', $input_classes, $option_id);
-			$dom_id    = apply_filters( 'ppom_dom_option_id', $option_id, $field_meta );
+			$option_id      = $value['option_id'];
+			$option_classes = sprintf( '%s ppom-option-%s', $input_classes, $option_id );
+			$dom_id         = apply_filters( 'ppom_dom_option_id', $option_id, $field_meta );
 
 			// Checked value selected
 			$checked_option = '';

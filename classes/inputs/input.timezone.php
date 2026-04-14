@@ -25,7 +25,6 @@ class NM_Timezone_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'Show Timezone', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-clock-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 	private function get_settings() {
