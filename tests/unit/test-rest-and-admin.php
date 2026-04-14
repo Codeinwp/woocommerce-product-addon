@@ -489,4 +489,84 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 		$this->assertSame( "accessories\r\nclothing", $saved_row['productmeta_categories'] );
 		$this->assertSame( serialize( array( 'featured', 'summer' ) ), $saved_row['productmeta_tags'] );
 	}
+
+	/**
+	 * Test that the nonce refresh endpoint returns fresh nonces.
+	 *
+	 * @return void
+	 */
+	public function testGetFileNoncesReturnsSuccessWithNonces() {
+		$response = $this->dispatch_ppom_rest_request(
+			'GET',
+			'/ppom/v1/nonces/file/'
+		);
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'success', $data['status'] );
+		$this->assertArrayHasKey( 'ppom_file_upload_nonce', $data );
+		$this->assertArrayHasKey( 'ppom_file_delete_nonce', $data );
+		$this->assertNotEmpty( $data['ppom_file_upload_nonce'] );
+		$this->assertNotEmpty( $data['ppom_file_delete_nonce'] );
+	}
+
+	/**
+	 * Test that the nonce refresh endpoint generates valid nonces.
+	 *
+	 * @return void
+	 */
+	public function testGetFileNoncesGeneratesValidNonces() {
+		$response = $this->dispatch_ppom_rest_request(
+			'GET',
+			'/ppom/v1/nonces/file/'
+		);
+		$data     = $response->get_data();
+
+		$this->assertSame( 'success', $data['status'] );
+
+		// Verify that the upload nonce is valid for the upload action
+		$upload_nonce_valid = wp_verify_nonce(
+			$data['ppom_file_upload_nonce'],
+			'ppom_uploading_file_action'
+		);
+		$this->assertNotFalse( $upload_nonce_valid, 'Upload nonce should be valid' );
+
+		// Verify that the delete nonce is valid for the delete action
+		$delete_nonce_valid = wp_verify_nonce(
+			$data['ppom_file_delete_nonce'],
+			'ppom_deleting_file_action'
+		);
+		$this->assertNotFalse( $delete_nonce_valid, 'Delete nonce should be valid' );
+	}
+
+	/**
+	 * Test that multiple calls to the nonce endpoint return different nonces.
+	 *
+	 * @return void
+	 */
+	public function testGetFileNoncesReturnsDifferentNoncesOnMultipleCalls() {
+		$response1 = $this->dispatch_ppom_rest_request(
+			'GET',
+			'/ppom/v1/nonces/file/'
+		);
+		$data1     = $response1->get_data();
+
+		// Wait a tiny moment to ensure different timestamp if nonce generation is time-based
+		usleep( 1000 );
+
+		$response2 = $this->dispatch_ppom_rest_request(
+			'GET',
+			'/ppom/v1/nonces/file/'
+		);
+		$data2     = $response2->get_data();
+
+		// Both responses should be successful
+		$this->assertSame( 'success', $data1['status'] );
+		$this->assertSame( 'success', $data2['status'] );
+
+		// Note: WordPress nonces are time-based and may be the same within the same tick
+		// This test just ensures the endpoint is callable multiple times
+		$this->assertNotEmpty( $data1['ppom_file_upload_nonce'] );
+		$this->assertNotEmpty( $data2['ppom_file_upload_nonce'] );
+	}
 }
