@@ -132,7 +132,7 @@ function ppom_meta_list( $post ) {
 	$html .= '<th>' . __( 'Group Name', 'woocommerce-product-addon' ) . '</th>';
 	$html .= '<th>' . __( 'Edit', 'woocommerce-product-addon' ) . '</th>';
 	$html .= '</tr></thead>';
-	
+
 	foreach ( $all_meta as $meta ) {
 		$html .= '<tr data-ppom-search="' . esc_attr( sanitize_key( $meta->productmeta_name ) ) . '" style="cursor: move;">';
 
@@ -250,15 +250,15 @@ function ppom_admin_process_product_meta( $post_id ) {
 
 
 	$ppom_meta_selected = isset( $_POST ['ppom_product_meta'] ) ? $_POST ['ppom_product_meta'] : array();
-	
+
 	if ( is_numeric( $ppom_meta_selected ) ) {
 		$ppom_meta_selected = array( $ppom_meta_selected );
 	} elseif ( ! is_array( $ppom_meta_selected ) ) {
 		$ppom_meta_selected = array();
 	}
-	
+
 	$ppom_meta_selected = array_map( 'intval', $ppom_meta_selected );
-	
+
 	// ppom_pa($ppom_meta_selected); exit;
 	update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $ppom_meta_selected );
 
@@ -428,7 +428,7 @@ function ppom_admin_save_form_meta() {
 			return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] );
 		}
 	);
-	
+
 	// Updating PPOM Meta with ppom_id in each meta array
 	ppom_admin_update_ppom_meta_only( $ppom_id, $product_meta );
 
@@ -913,29 +913,48 @@ function ppom_admin_bar_menu() {
 function ppom_add_black_friday_data( $configs ) {
 	$config = $configs['default'];
 
-	// translators: %1$s - HTML tag, %2$s - discount, %3$s - HTML tag, %4$s - product name.
-	$message_template = __( 'Our biggest sale of the year: %1$sup to %2$s OFF%3$s on %4$s. Don\'t miss this limited-time offer.', 'woocommerce-product-addon' );
-	$product_label    = 'PPOM';
-	$discount         = '70%';
+	$message = __( 'Conditional fields, file uploads, pricing formulas. Let customers configure products the way they need. Exclusively for existing PPOM users.', 'woocommerce-product-addon' );
+	$cta_label = __( 'Get PPOM Pro', 'woocommerce-product-addon' );
 
 	$plan    = apply_filters( 'product_ppom_license_plan', 0 );
 	$license = apply_filters( 'product_ppom_license_key', false );
-	$is_pro  = 0 < $plan;
+	$status  = apply_filters( 'product_ppom_license_status', false );
+	$pro_product_slug = defined( 'PPOM_PRO_BASENAME' ) ? PPOM_PRO_BASENAME : '';
+
+	$is_pro  = 'valid' === $status;
+	$is_expired = 'expired' === $status || 'active-expired' === $status;
 
 	if ( $is_pro ) {
-		// translators: %1$s - HTML tag, %2$s - discount, %3$s - HTML tag, %4$s - product name.
-		$message_template = __( 'Get %1$sup to %2$s off%3$s when you upgrade your %4$s plan or renew early.', 'woocommerce-product-addon' );
-		$product_label    = 'PPOM Pro';
-		$discount         = '30%';
+		// translators: %s is the discount percentage.
+		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - up to %s off', 'woocommerce-product-addon' ), '30%' );
+		// translators: %1$s - discount, %2$s - discount.
+		$message = sprintf( __( 'Upgrade your PPOM Pro plan: %1$s off this week. Already on the plan you need? Renew early and save up to %2$s.', 'woocommerce-product-addon' ), '30%', '20%' );
+		$cta_label = __( 'See your options', 'woocommerce-product-addon' );
+	} elseif ( $is_expired ) {
+		// translators: %s is the discount percentage.
+		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - %s off', 'woocommerce-product-addon' ), '50%' );
+		$message = __( 'Your PPOM Pro features are still here, just locked. Renew at a reduced rate this week.', 'woocommerce-product-addon' );
+		$cta_label = __( 'Reactivate now', 'woocommerce-product-addon' );
+	} else {
+		// translators: %s is the discount percentage.
+		$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - %s off', 'woocommerce-product-addon' ), '60%' );
+		// translators: %s - discount.
+		$config['title'] = sprintf( __( 'PPOM Pro: %s off this week', 'woocommerce-product-addon' ), '60%' );
 	}
-	
-	$product_label = sprintf( '<strong>%s</strong>', $product_label );
+
 	$url_params    = array(
 		'utm_term' => $is_pro ? 'plan-' . $plan : 'free',
 		'lkey'     => ! empty( $license ) ? $license : false,
+		'expired'  => $is_expired ? '1' : false,
 	);
-	
-	$config['message']  = sprintf( $message_template, '<strong>', $discount, '</strong>', $product_label );
+
+	if ( ( $is_pro || $is_expired ) && ! empty( $pro_product_slug ) ) {
+		$config['plugin_meta_targets'] = array( $pro_product_slug );
+	}
+
+	$config['message']   = $message;
+	$config['cta_label'] = $cta_label;
+
 	$config['sale_url'] = add_query_arg(
 		$url_params,
 		tsdk_translate_link( tsdk_utmify( 'https://themeisle.link/ppom-bf', 'bfcm', 'ppom' ) )
@@ -945,4 +964,5 @@ function ppom_add_black_friday_data( $configs ) {
 
 	return $configs;
 }
+
 add_filter( 'themeisle_sdk_blackfriday_data', 'ppom_add_black_friday_data' );
