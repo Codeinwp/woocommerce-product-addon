@@ -84,7 +84,7 @@ Procedural utility code organized by concern:
 - `woocommerce.php` — WooCommerce integration hooks (cart, checkout, orders)
 - `prices.php` — price calculation logic
 - `files.php` — file upload handling
-- `rest.class.php` — REST API endpoints at `/wp-json/ppom/v1/`
+- `src/Rest/` — REST API (`Routes` facade, `ProductMetaController`, `OrderMetaController`, services) at `/wp-json/ppom/v1/`
 
 ### Two Runtime Modes
 

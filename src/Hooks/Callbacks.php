@@ -1,0 +1,1165 @@
+<?php
+/**
+ * PPOM filter/action callbacks.
+ *
+ * @package PPOM
+ */
+
+namespace PPOM\Hooks;
+
+use PPOM\Arrays\Settings;
+use PPOM\Files\Handler;
+use PPOM\Support\Helpers;
+use PPOM\WooCommerce\Product\ProductHandler;
+use PPOM_Meta;
+use WC_Order;
+use WC_Product;
+
+/**
+ * @internal
+ */
+final class Callbacks {
+
+	public static function save_cropped_image( $ppom_fields, $posted_data ) {
+
+		if ( ! isset( $posted_data['ppom_product_id'] ) ) {
+			return $ppom_fields;
+		}
+
+		$product_id = intval( $posted_data['ppom_product_id'] );
+
+		$cropped_fields = Helpers::has_field_by_type( $product_id, 'cropper' );
+		if ( empty( $cropped_fields ) ) {
+			return $ppom_fields;
+		}
+
+		$cropper_found = array();
+		foreach ( $cropped_fields as $cropper ) {
+
+			// Legacy view do not need this
+			if ( isset( $cropper['legacy_cropper'] ) && $cropper['legacy_cropper'] == 'on' ) {
+				continue;
+			}
+
+			if ( isset( $ppom_fields['fields'][ $cropper['data_name'] ] ) ) {
+
+				$cropper_found = $ppom_fields['fields'][ $cropper['data_name'] ];
+				foreach ( $cropper_found as $file_id => $values ) {
+
+					if ( empty( $values['cropped'] ) ) {
+						continue;
+					}
+
+					$image_data = $values['cropped'];
+					$file_name  = isset( $values['org'] ) ? $values['org'] : '';
+
+					// Verify uploaded file type.
+					$allowed_types = isset( $cropper['file_types'] ) && ! empty( $cropper['file_types'] ) ? sanitize_text_field( $cropper['file_types'] ) : 'jpg,png';
+					$allowed_types = explode( ',', $allowed_types );
+					$dir_path      = Handler::get_dir_path();
+					$file_type     = wp_check_filetype_and_ext( $dir_path . $file_name, $file_name );
+
+					if ( ! in_array( $file_type['ext'], $allowed_types, true ) ) {
+						continue;
+					}
+
+					$file_name = Handler::file_get_name( $file_name, $product_id );
+					Handler::save_data_url_to_image( $image_data, $file_name );
+				}
+				// Saving cropped data to image
+			}
+		}
+
+		// ppom_pa($cropper_found); exit;
+
+		return $ppom_fields;
+	}
+
+	// Pricing and order formatting hooks.
+
+	/**
+	 * Converts a PPOM option price through WOOCS when the currency filter is active.
+	 *
+	 * @param float|string $option_price Raw option price.
+	 *
+	 * @return mixed
+	 */
+	public static function convert_price( $option_price ) {
+		return apply_filters( 'woocs_exchange_value', $option_price );
+	}
+
+
+	/**
+	 * Converts PPOM prices back to the store currency before WooCommerce totals run.
+	 *
+	 * WOOCS converts cart totals later in the request, so PPOM reverses any earlier
+	 * option-price conversion to avoid double conversion in cart and checkout math.
+	 *
+	 * @param float|string $price Price already converted for display.
+	 *
+	 * @return mixed
+	 *
+	 * @see ppom_price_controller()
+	 */
+	public static function convert_price_back( $price ) {
+
+		if ( has_filter( 'woocs_exchange_value' ) ) {
+
+			global $WOOCS;
+
+			if ( isset( $WOOCS->current_currency ) && $WOOCS->current_currency != $WOOCS->default_currency && $WOOCS->is_multiple_allowed ) {
+				// if(1) {
+				// var_dump($WOOCS->is_multiple_allowed);
+
+				// ppom conver all prices into current currency, but woocommerce also
+				// converts cart prices to current, so have to get our currencies back to default rates
+				$set_currencies        = $WOOCS->get_currencies();
+				$current_currency_rate = $set_currencies[ $WOOCS->current_currency ]['rate'];
+				$price                 = $WOOCS->back_convert( $price, $current_currency_rate );
+			}
+		}
+
+
+		return $price;
+	}
+
+	/**
+	 * Formats JSON-encoded PPOM option data for order item display.
+	 *
+	 * @param string $display_value Order item meta display value.
+	 * @param object $meta          Order item meta object.
+	 * @param object $item          Order item.
+	 *
+	 * @return string
+	 *
+	 * @see ppom_generate_cart_meta()
+	 * @see ppom_woocommerce_order_value()
+	 */
+	public static function format_order_value( $display_value, $meta, $item ) {
+
+		$is_jsone = json_decode( $display_value, true );
+
+		if ( ! $is_jsone instanceof \stdClass && ! is_array( $is_jsone ) ) {
+			return $display_value;
+		}
+
+		// checking that is it same json created by PPOM
+		if ( ! isset( $is_jsone[0]['option'] ) ) {
+			return $display_value;
+		}
+
+		$option_display_values = array();
+		foreach ( $is_jsone as $option ) {
+
+			$price = isset( $option['price'] ) ? $option['price'] : '';
+
+			$options_display = $option['option'];
+
+			if ( $price != '' ) {
+				$options_display .= '(' . Helpers::price( $price ) . ')';
+			}
+
+			$option_display_values[] = $options_display;
+		}
+
+		$display_value = implode( ',', $option_display_values );
+
+		return $display_value;
+	}
+
+	// Input attribute and asset hooks.
+
+	/**
+	 * Builds HTML attributes used by frontend PPOM input templates.
+	 *
+	 * @param array  $field_meta Stored field definition.
+	 * @param string $type       Input type being rendered.
+	 *
+	 * @return array
+	 *
+	 * @see PPOM_Form::render_input_template()
+	 */
+	public static function set_attributes( $field_meta, $type ) {
+
+		$ppom_attribtues = array();
+
+		$ppom_attribtues['data-errormsg'] = isset( $field_meta['error_message'] ) ? Helpers::wpml_translate( $field_meta['error_message'], 'PPOM' ) : null;
+
+		switch ( $type ) {
+
+			case 'text':
+				$ppom_attribtues['maxlength'] = isset( $field_meta['maxlength'] ) ? $field_meta['maxlength'] : null;
+				$ppom_attribtues['minlength'] = isset( $field_meta['minlength'] ) ? $field_meta['minlength'] : null;
+				break;
+
+			case 'textarea':
+				$ppom_attribtues['maxlength'] = isset( $field_meta['max_length'] ) ? $field_meta['max_length'] : null;
+				break;
+
+
+			case 'number':
+				$ppom_attribtues['min']  = isset( $field_meta['min'] ) ? $field_meta['min'] : null;
+				$ppom_attribtues['max']  = isset( $field_meta['max'] ) ? $field_meta['max'] : null;
+				$ppom_attribtues['step'] = isset( $field_meta['step'] ) ? $field_meta['step'] : null;
+				break;
+
+		}
+
+		return $ppom_attribtues;
+	}
+
+	/**
+	 * Enqueues the legacy frontend assets required by a product's PPOM fields.
+	 *
+	 * Resolves the effective field set for the product, loads the matching script
+	 * and style handles, and localizes `ppom_input_vars` and `ppom_file_vars` for
+	 * pricing, conditions, validation, and uploads.
+	 *
+	 * @param WC_Product|int $product Product object or product ID.
+	 * @param int|null       $ppom_id Optional field-group ID override.
+	 *
+	 * @return string|void
+	 *
+	 * @see PPOM_Meta::__construct()
+	 * @see PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id()
+	 * @see ProductHandler::template_base_inputs_rendering()
+	 */
+	public static function load_input_scripts( $product, $ppom_id = null ) {
+
+		$product_id = Helpers::get_product_id( $product );
+		if ( ! $product instanceof WC_Product ) {
+			$resolved_product = wc_get_product( (int) $product_id );
+			if ( ! $resolved_product ) {
+				return '';
+			}
+			$product = $resolved_product;
+		}
+
+		$ppom               = new PPOM_Meta( $product_id );
+		$ppom_meta_settings = $ppom->ppom_settings;
+		$ppom_meta_fields   = $ppom->fields;
+
+		if ( ! empty( $ppom_id ) ) {
+			$ppom_meta_fields   = $ppom->get_fields_by_id( $ppom_id );
+			$ppom_meta_settings = $ppom->get_settings_by_id( $ppom_id );
+		}
+
+
+		if ( ! $ppom_meta_fields ) {
+			return '';
+		}
+
+		$ppom_inputs             = array();
+		$ppom_conditional_fields = array();
+		$croppie_options         = array();
+		$ppom_core_scripts       = array( 'jquery' );
+		$show_price_per_unit     = false;
+
+		// main css
+		wp_enqueue_style( 'ppom-main', PPOM_URL . '/css/ppom-style.css' );
+
+		wp_enqueue_style( 'ppom-sm-popup', PPOM_URL . '/css/ppom-simple-popup.css' );
+		wp_enqueue_script( 'PPOM-sm-popup', PPOM_URL . '/js/ppom-simple-popup.js', array( 'jquery' ), PPOM_VERSION, true );
+
+
+		if ( $ppom->inline_css != '' ) {
+			wp_add_inline_style( 'ppom-main', $ppom->inline_css );
+		}
+
+		// If Bootstrap is enabled
+		if ( Helpers::load_bootstrap_css() ) {
+
+			// Boostrap 4.0
+			$ppom_bs_css = PPOM_URL . '/css/bootstrap/bootstrap.css';
+
+			$ppom_bs_modal_css = PPOM_URL . '/css/bootstrap/bootstrap.modal.css';
+
+			// Description Tooltips JS File
+			wp_enqueue_script( 'ppom-tooltip', PPOM_URL . '/js/ppom-tooltip.js', array( 'jquery' ), PPOM_VERSION, true );
+
+			wp_enqueue_style( 'ppom-bootstrap', $ppom_bs_css );
+			wp_enqueue_style( 'ppom-bootstrap-modal', $ppom_bs_modal_css );
+
+		}
+
+		// Font-awesome
+		if ( Helpers::load_fontawesome() ) {
+			wp_enqueue_style( 'prefix-font-awesome', '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css' );
+		}
+
+		// Price display controller
+		$ppom_price_js = Helpers::get_price_table_calculation();
+		$dependencies  = Helpers::get_price_table_js_dependencies();
+		wp_enqueue_script(
+			'ppom-price',
+			PPOM_URL . "/js/price/{$ppom_price_js}",
+			$dependencies,
+			PPOM_VERSION,
+			true 
+		);
+
+		// Ajax validation
+		if ( $ppom->ajax_validation_enabled ) {
+			wp_enqueue_script( 'ppom-ajax-validation', PPOM_URL . '/js/ppom-validation.js', array( 'jquery' ), PPOM_VERSION, true );
+		}
+
+		$enable_file_rename = apply_filters( 'ppom_upload_file_rename', true, $ppom_meta_fields );
+
+		// ppom_pa($ppom_meta_fields);
+
+		$decimal_palces = wc_get_price_decimals();
+		if ( $ppom_meta_fields ) {
+			foreach ( $ppom_meta_fields as $field ) {
+
+
+				$type               = $field['type'];
+				$title              = ( isset( $field['title'] ) ? $field ['title'] : '' );
+				$data_name          = ( isset( $field['data_name'] ) ? $field ['data_name'] : $title );
+				$data_name          = sanitize_key( $data_name );
+				$field['data_name'] = $data_name;
+
+				// var_dump($field['options']);
+				if ( isset( $field['options'] ) && $type != 'bulkquantity' ) {
+					$field['options'] = Helpers::convert_options_to_key_val( $field['options'], $field, $product );
+				}
+
+
+				// Allow other types to be hooked
+				$type = apply_filters( 'ppom_load_input_script_type', $type, $field, $product );
+
+				switch ( $type ) {
+
+					case 'text':
+						if ( ! empty( $field['input_mask'] ) ) {
+							// Enqueue masking script
+							$ppom_mask_api = PPOM_URL . '/js/inputmask/jquery.inputmask.min.js';
+							wp_enqueue_script( 'ppom-inputmask', $ppom_mask_api, array( 'jquery' ), PPOM_VERSION, true );
+						}
+
+						break;
+
+					case 'date':
+						if ( isset( $field['jquery_dp'] ) && $field['jquery_dp'] == 'on' ) {
+							$ppom_core_scripts[] = 'jquery-ui-datepicker';
+							wp_enqueue_style( 'jqueryui', PPOM_URL . '/js/ui/css/smoothness/jquery-ui-1.10.3.custom.min.css' );
+							// wp_enqueue_script( 'ppom-datepciker-fr', 'https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/i18n/datepicker.fr-FR.min.js', array('jquery'), PPOM_VERSION, true);
+						}
+						break;
+
+					case 'color':
+						wp_enqueue_script(
+							'iris',
+							admin_url( 'js/iris.min.js' ),
+							array(
+								'jquery',
+								'jquery-ui-core',
+								'jquery-ui-draggable',
+								'jquery-ui-slider',
+							),
+							true,
+							1
+						);
+
+						break;
+
+					case 'image':
+						$ppom_tooltip = PPOM_URL . '/js/image-tooltip.js';
+						wp_enqueue_script( 'ppom-zoom', $ppom_tooltip, array( 'jquery' ), PPOM_VERSION, true );
+						break;
+
+					case 'pricematrix':
+						if ( isset( $field['show_slider'] ) && $field['show_slider'] == 'on' ) {
+							// Adding Bootstrap slider if slider is on
+							$ppom_bs_slider_js  = PPOM_URL . '/js/bs-slider/bootstrap-slider.min.js';
+							$ppom_bs_slider_css = PPOM_URL . '/js/bs-slider/bootstrap-slider.min.css';
+							wp_enqueue_script( 'ppom-bs-slider', $ppom_bs_slider_js, array( 'jquery' ), PPOM_VERSION, true );
+							wp_enqueue_style( 'ppom-bs-slider-css', $ppom_bs_slider_css );
+						}
+
+						if ( isset( $field['show_price_per_unit'] ) && $field['show_price_per_unit'] == 'on' ) {
+							$show_price_per_unit = true;
+						}
+						break;
+
+
+					case 'cropper':
+						$ppom_file_inputs[]      = $field;
+						$file_upload_pre_scripts = array( 'jquery', 'plupload', 'ppom-price' );
+
+						$ppom_croppie_api = PPOM_URL . '/js/croppie/node_modules/croppie/croppie.js';
+						$ppom_cropper     = PPOM_URL . '/js/croppie/ppom-crop.js';
+						$ppom_croppie_css = PPOM_URL . '/js/croppie/node_modules/croppie/croppie.css';
+
+						$ppom_exif = PPOM_URL . '/js/exif.js';
+						wp_enqueue_style( 'ppom-croppie-css', $ppom_croppie_css );
+
+						if ( isset( $field['legacy_cropper'] ) && $field['legacy_cropper'] == 'on' ) {
+							add_thickbox();
+							wp_enqueue_style( 'jcrop' );
+							$file_upload_pre_scripts[] = 'jcrop';
+						}
+
+						// Croppie options
+						$croppie_options[ $data_name ] = Handler::get_croppie_options( $field );
+
+						wp_enqueue_script( 'ppom-croppie', $ppom_croppie_api, '', PPOM_VERSION );
+						wp_enqueue_script( 'ppom-exif', $ppom_exif, '', PPOM_VERSION );
+
+
+						// wp_enqueue_script( 'ppom-croppie2', $ppom_cropper, array('jquery'), PPOM_VERSION);
+						wp_enqueue_script( 'ppom-file-upload', PPOM_URL . '/js/file-upload.js', $file_upload_pre_scripts, PPOM_VERSION, true );
+						$file_upload_nonce_action = 'ppom_uploading_file_action';
+						$file_delete_nonce_action = 'ppom_deleting_file_action';
+						$ppom_file_vars           = array(
+							'ajaxurl'                => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
+							'plugin_url'             => PPOM_URL,
+							'file_upload_path_thumb' => Handler::get_dir_url( true ),
+							'file_upload_path'       => Handler::get_dir_url(),
+							'mesage_max_files_limit' => __( ' files allowed only', 'woocommerce-product-addon' ),
+							'file_inputs'            => $ppom_file_inputs,
+							'delete_file_msg'        => __( 'Are you sure?', 'woocommerce-product-addon' ),
+							'plupload_runtime'       => ( Helpers::if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
+							'croppie_options'        => $croppie_options,
+							'ppom_file_upload_nonce' => wp_create_nonce( $file_upload_nonce_action ),
+							'ppom_file_delete_nonce' => wp_create_nonce( $file_delete_nonce_action ),
+							'enable_file_rename'     => $enable_file_rename,
+							'product_id'             => $product_id,
+						);
+						wp_localize_script( 'ppom-file-upload', 'ppom_file_vars', $ppom_file_vars );
+						break;
+
+					// 2- inc/hooks.php replace case 'file'
+					case 'file':
+						$ppom_file_inputs[] = $field;
+
+						$file_upload_pre_scripts = array( 'jquery', 'plupload', 'ppom-price' );
+
+						// ppom_pa($file_upload_pre_scripts);
+						wp_enqueue_script( 'ppom-file-upload', PPOM_URL . '/js/file-upload.js', $file_upload_pre_scripts, PPOM_VERSION, true );
+						$file_upload_nonce_action = 'ppom_uploading_file_action';
+						$file_delete_nonce_action = 'ppom_deleting_file_action';
+						$ppom_file_vars           = array(
+							'ajaxurl'                => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
+							'plugin_url'             => PPOM_URL,
+							'file_upload_path_thumb' => Handler::get_dir_url( true ),
+							'file_upload_path'       => Handler::get_dir_url(),
+							'mesage_max_files_limit' => __( ' files allowed only', 'woocommerce-product-addon' ),
+							'file_inputs'            => $ppom_file_inputs,
+							'delete_file_msg'        => __( 'Are you sure?', 'woocommerce-product-addon' ),
+							'aviary_api_key'         => '',
+							'plupload_runtime'       => ( Helpers::if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
+							'ppom_file_upload_nonce' => wp_create_nonce( $file_upload_nonce_action ),
+							'ppom_file_delete_nonce' => wp_create_nonce( $file_delete_nonce_action ),
+							'enable_file_rename'     => $enable_file_rename,
+							'product_id'             => $product_id,
+						);
+						wp_localize_script( 'ppom-file-upload', 'ppom_file_vars', $ppom_file_vars );
+
+						break;
+
+
+					case 'fixedprice':
+						// Fixed price addon has option to control decimnal places
+						if ( class_exists( 'NM_PPOM_FixedPrice' ) ) {
+							$decimal_palces = ! empty( $field['decimal_place'] ) ? $field['decimal_place'] : PPOM_FP()->default_decimal_places();
+						}
+						break;
+
+					case 'quantities':
+						add_filter( 'woocommerce_quantity_input_classes', 'ppom_hooks_hide_cart_quantity', 99, 2 );
+						break;
+				}
+
+				// Conditional fields
+				if ( isset( $field['logic'] ) && $field['logic'] == 'on' && ! empty( $field['conditions'] ) ) {
+
+					$field_conditions = $field['conditions'];
+
+					// WPML Translation
+					$condition_rules = $field_conditions['rules'];
+					$rule_index      = 0;
+					foreach ( $condition_rules as $rule ) {
+						// ppom_pa($rule);
+						if ( ! isset( $field_conditions['rules'][ $rule_index ]['element_values'] ) ) {
+							continue;
+						}
+						$field_conditions['rules'][ $rule_index ]['element_values'] = Helpers::wpml_translate( $rule['element_values'], 'PPOM' );
+						++$rule_index;
+					}
+
+					$ppom_conditional_fields[ $data_name ] = $field_conditions;
+				}
+
+				/**
+				 * creating action space to render hooks for more addons
+				 */
+				do_action( 'ppom_hooks_inputs', $field, $data_name );
+
+				// $ppom_inputs[] = $field;
+			}
+		}
+
+
+		// ppom_pa($ppom_conditional_fields);
+
+
+		wp_enqueue_script( 'ppom-inputs', PPOM_URL . '/js/ppom.inputs.js', $ppom_core_scripts, PPOM_DB_VERSION, true );
+		/*
+		$ppom_input_vars = array('ajaxurl' => admin_url( 'admin-ajax.php', (is_ssl() ? 'https' : 'http') ),
+							'ppom_inputs'       => $ppom_meta_fields,
+							'field_meta'        => $ppom_meta_fields);*/
+
+
+		$vars_args       = array(
+			'wc_no_decimal'       => $decimal_palces,
+			'show_price_per_unit' => $show_price_per_unit,
+		);
+		$ppom_input_vars = Settings::get_js_input_vars( $product, $vars_args );
+
+		wp_localize_script( 'ppom-inputs', 'ppom_input_vars', $ppom_input_vars );
+		wp_localize_script( 'ppom-price', 'ppom_input_vars', $ppom_input_vars );
+
+		// Conditional fields
+		if ( ! empty( $ppom_conditional_fields ) || apply_filters( 'ppom_enqueue_conditions_js', false ) ) {
+			$ppom_input_vars['conditions'] = $ppom_conditional_fields;
+
+			$ppom_conditions_script = Helpers::get_conditions_mode() === 'new' ? 'ppom-conditions-v2' : 'ppom-conditions';
+			$ppom_conditions_script = apply_filters( 'ppom_conditional_script_file', $ppom_conditions_script, $product );
+			wp_enqueue_script(
+				"ppom-{$ppom_conditions_script}",
+				PPOM_URL . "/js/{$ppom_conditions_script}.js",
+				array(
+					'jquery',
+					'ppom-inputs',
+				),
+				PPOM_VERSION,
+				true 
+			);
+			wp_localize_script( "ppom-{$ppom_conditions_script}", 'ppom_input_vars', $ppom_input_vars );
+		}
+	}
+
+	/**
+	 * Normalizes per-field input args before the field template renders.
+	 *
+	 * @param array      $field_setting Prepared input settings.
+	 * @param array      $field_meta    Stored field definition.
+	 * @param WC_Product $product       Product being rendered.
+	 *
+	 * @return array
+	 *
+	 * @see PPOM_Form::ppom_fields_render()
+	 */
+	public static function input_args( $field_setting, $field_meta, $product ) {
+
+		if ( $field_setting['type'] == 'date' && isset( $field_meta['jquery_dp'] ) && $field_meta['jquery_dp'] == 'on' ) {
+			$field_setting['type']        = 'text';
+			$field_setting['past_date']   = isset( $field_meta['past_date'] ) ? $field_meta['past_date'] : '';
+			$field_setting['no_weekends'] = isset( $field_meta['no_weekends'] ) ? $field_meta['no_weekends'] : '';
+		}
+
+		// Adding conditional field
+		if ( isset( $field_meta['logic'] ) && $field_meta['logic'] == 'on' ) {
+			$field_setting['conditions'] = $field_meta['conditions'];
+		}
+
+		// Adding min/max for number input
+		if ( $field_setting['type'] == 'number' ) {
+			$field_setting['min'] = ! empty( $field_meta['min'] ) ? $field_meta['min'] : '';
+			$field_setting['max'] = ! empty( $field_meta['max'] ) ? $field_meta['max'] : '';
+		}
+
+		$field_setting['product_id'] = Helpers::get_product_id( $product );
+
+		return $field_setting;
+	}
+
+	/**
+	 * Validates checkbox minimum and maximum selections.
+	 *
+	 * @param bool  $has_value     Current validation result.
+	 * @param array $posted_fields Normalized posted field values.
+	 * @param array $field         Stored field definition.
+	 *
+	 * @return bool
+	 *
+	 * @see ppom_check_validation()
+	 */
+	public static function checkbox_valided( $has_value, $posted_fields, $field ) {
+
+		if ( $field['type'] != 'checkbox' ) {
+			return $has_value;
+		}
+
+		if ( ( ! empty( $field['max_checked'] ) || ! empty( $field['min_checked'] ) ) && empty( $field['required'] ) ) {
+			$has_value = true;
+		}
+
+		if ( ! $has_value && empty( $field['required'] ) ) {
+			return $has_value;
+		}
+
+		$data_name   = $field['data_name'];
+		$max_checked = isset( $posted_fields[ $data_name ] ) ? count( $posted_fields[ $data_name ] ) : 0;
+
+
+		if ( ! empty( $field['max_checked'] ) && $max_checked > intval( $field['max_checked'] ) ) {
+			$has_value = false;
+		}
+
+		if ( ! empty( $field['min_checked'] ) && $max_checked < intval( $field['min_checked'] ) ) {
+			$has_value = false;
+		}
+
+
+		return $has_value;
+	}
+
+	public static function color_to_text_type( $attr_value, $attr, $args ) {
+
+		if ( $attr == 'type' && $attr_value == 'color' ) {
+			$attr_value = 'text';
+		}
+
+		return $attr_value;
+	}
+
+	public static function show_option_price_pricematrix( $show_price, $meta ) {
+
+		if ( $meta['type'] == 'pricematrix' ) {
+			$show_price = 'on';
+		}
+
+		return $show_price;
+	}
+
+	// Input metadata normalization hooks.
+
+	/**
+	 * Registers translatable strings and normalized option IDs for a field group.
+	 *
+	 * @param array $meta_data Field definitions being stored.
+	 * @param int   $ppom_id   Field-group ID being written.
+	 *
+	 * @return array
+	 *
+	 * @see ppom_admin_save_form_meta()
+	 * @see ppom_admin_update_form_meta()
+	 */
+	public static function register_wpml( $meta_data, $ppom_id ) {
+
+
+		foreach ( $meta_data as $index => $data ) {
+
+			// If Dataname is not provided then generate it.
+			$data['data_name'] = empty( $data['data_name'] ) ? sanitize_key( $data['title'] ) : $data['data_name'];
+
+			// title
+			if ( isset( $data['title'] ) ) {
+
+				nm_wpml_register( $data['title'], 'PPOM' );
+			}
+
+			// description
+			if ( isset( $data['description'] ) ) {
+
+				nm_wpml_register( $data['description'], 'PPOM' );
+			}
+
+			// error_message
+			if ( isset( $data['error_message'] ) ) {
+
+				nm_wpml_register( $data['error_message'], 'PPOM' );
+			}
+
+			// first_option
+			if ( isset( $data['first_option'] ) ) {
+
+				nm_wpml_register( $data['first_option'], 'PPOM' );
+			}
+
+			// html (HTML Input)
+			if ( isset( $data['html'] ) ) {
+
+				nm_wpml_register( $data['html'], 'PPOM' );
+			}
+
+			// images type options
+			if ( isset( $data['images'] ) && is_array( $data['images'] ) ) {
+
+				// Reseting the images options
+				// Version 24.9, May 18, 2021
+				$data['images'] = array_merge( $data['images'] );
+
+				$data['images'] = array_map(
+					function ( $option ) {
+
+						// registering for translation
+						nm_wpml_register( $option['title'], 'PPOM' );
+
+						return $option;
+					},
+					$data['images'] 
+				);
+			}
+
+			// options (select, radio, checkbox)
+			if ( isset( $data['options'] ) && is_array( $data['options'] ) ) {
+
+				// Reseting the options options
+				// Version 24.9, May 18, 2021
+				$data['options'] = array_merge( $data['options'] );
+
+				$data['options'] = array_map(
+					function ( $option ) {
+
+						// registering for translation
+						isset( $option['option'] ) && nm_wpml_register( $option['option'], 'PPOM' );
+						isset( $option['fontdisplay'] ) && nm_wpml_register( $option['fontdisplay'], 'PPOM' );
+
+						// if label key set e.g for palettes or price matrix
+						isset( $option['label'] ) && nm_wpml_register( $option['label'], 'PPOM' );
+
+						// If Option ID is not provided then generate it.
+						$option['id'] = Helpers::get_option_id( $option );
+
+						return $option;
+					},
+					$data['options']
+				);
+
+			}
+
+			// Reseting the conditions rules index
+			// Version 22.8, May 18, 2021
+			if ( isset( $data['conditions']['rules'] ) ) {
+				$data['conditions']['rules'] = array_merge( $data['conditions']['rules'] );
+			}
+
+			// Adding ppom_id in each ppom meta
+			$data['ppom_id']     = $ppom_id;
+			$meta_data[ $index ] = $data;
+		}
+
+		// ppom_pa($meta_data); exit;
+		return $meta_data;
+	}
+
+	// Conditional wrapper hooks.
+
+
+	/**
+	 * Adds conditional-visibility classes to the legacy field wrapper element.
+	 *
+	 * @param string $input_wrapper_class Existing wrapper classes.
+	 * @param array  $field_meta          Stored field definition.
+	 *
+	 * @return string
+	 */
+	public static function input_wrapper_class( $input_wrapper_class, $field_meta ) {
+
+		$input_wrapper_class .= ' ppom-input-' . $field_meta['id'];
+
+
+		if ( ! isset( $field_meta['logic'] ) ) {
+			$input_wrapper_class .= ' ppom-c-show';
+		}
+
+		if ( isset( $field_meta['logic'] ) && $field_meta['logic'] != 'on' ) {
+			return $input_wrapper_class;
+		}
+
+		$input_wrapper_class .= ' ppom-input-' . $field_meta['id'];
+
+		/**
+		 * If conditional field then add class
+		 * ppom-c-hide: if field need to be hidden with condition
+		 * ppom-c-show: if field need to be visilbe with condition
+		 * */
+		// ppom_pa($field_meta);
+		if ( isset( $field_meta['conditions'] ) ) {
+			if ( $field_meta['conditions']['visibility'] == 'Show' ) {
+				$input_wrapper_class .= ' ppom-c-hide';
+			} else {
+				$input_wrapper_class .= ' ppom-c-show';
+			}
+		}
+
+		return $input_wrapper_class;
+	}
+
+	/**
+	 * Adds stable wrapper classes for the newer conditional-logic renderer.
+	 *
+	 * @param string $input_wrapper_class Existing wrapper classes.
+	 * @param array  $field_meta          Stored field definition.
+	 *
+	 * @return string
+	 *
+	 * @see Helpers::get_conditions_mode()
+	 */
+	public static function input_wrapper_class_new( $input_wrapper_class, $field_meta ) {
+		// var_dump($input_wrapper_class);
+		$input_wrapper_class .= ' ppom-input-' . $field_meta['id'];
+
+		return $input_wrapper_class;
+	}
+
+	/**
+	 * Adds conditional-logic classes to the main field wrapper element.
+	 *
+	 * @param string $wrapper_class Existing wrapper classes.
+	 * @param array  $classes_array Wrapper class array passed by the caller.
+	 * @param array  $field_meta    Stored field definition.
+	 *
+	 * @return string
+	 */
+	public static function input_main_wrapper_class( $wrapper_class, $classes_array, $field_meta ) {
+
+		$logic      = ( isset( $field_meta['logic'] ) ? $field_meta['logic'] : '' );
+		$conditions = ( isset( $field_meta['conditions'] ) ? $field_meta['conditions'] : '' );
+
+		if ( $logic !== 'on' ) {
+			$wrapper_class .= ' ppom-c-show';
+		}
+
+		/**
+		 * If conditional field then add class
+		 * ppom-c-hide: if field need to be hidden with condition
+		 * ppom-c-show: if field need to be visilbe with condition
+		 * */
+		if ( isset( $field_meta['conditions'] ) && $logic === 'on' ) {
+			if ( $field_meta['conditions']['visibility'] == 'Show' ) {
+				$wrapper_class .= ' ppom-c-hide';
+			} else {
+				$wrapper_class .= ' ppom-c-show';
+			}
+
+			foreach ( $conditions['rules'] as $index => $rule ) {
+
+				$element        = isset( $rule['elements'] ) ? strtolower( $rule['elements'] ) : '';
+				$wrapper_class .= " ppom-cond-{$element}";
+				$wrapper_class .= " ppom-locked-{$element}";
+			}
+		}
+
+		return $wrapper_class;
+	}
+
+
+	public static function convert_option_json_to_string( $row, $order ) {
+
+		$new_row = array();
+		foreach ( $row as $key => $value ) {
+
+			// Scanning only key prefix products_
+			if ( strpos( $key, 'products_' ) !== false ) {
+
+				$row[ $key ] = $value;
+			}
+		}
+
+		return $row;
+	}
+
+	// Cart and order integration hooks.
+
+	/**
+	 * Adds PPOM option weights to the cart item's product object.
+	 *
+	 * @param array $ppom_field_prices Calculated PPOM pricing rows.
+	 * @param array $ppom_fields_post  Normalized posted PPOM field payload.
+	 * @param array $cart_items        WooCommerce cart item data.
+	 *
+	 * @return void
+	 *
+	 * @see ppom_get_field_prices()
+	 */
+	public static function update_cart_weight( $ppom_field_prices, $ppom_fields_post, $cart_items ) {
+
+		if ( Helpers::pro_is_installed() ) {
+			// ppom_pa($ppom_field_prices);
+			$option_weights = 0;
+			foreach ( $ppom_field_prices as $option ) {
+
+				if ( $option['apply'] != 'weight' ) {
+					continue;
+				}
+
+				$ppom_meta_ids = isset( $ppom_fields_post['id'] ) ? $ppom_fields_post['id'] : '';
+				// ppom_pa($cart_items);
+				if ( isset( $option['quantity'] ) && $option['quantity'] > 0 ) {
+					$option_weights += Helpers::get_field_option_weight_by_id( $option, $ppom_meta_ids ) * $option['quantity'];
+				} else {
+					$option_weights += Helpers::get_field_option_weight_by_id( $option, $ppom_meta_ids );
+
+				}
+			}
+
+			$wc_product = $cart_items['data'];
+			if ( $wc_product->has_weight() || $option_weights > 0 ) {
+				$product_weight = floatval( $wc_product->get_weight() );
+				$wc_product->set_weight( $option_weights + $product_weight );
+			}
+		}
+	}
+
+	public static function dom_option_id( $option_id, $args ) {
+
+		global $product;
+
+		if ( isset( $args['id'] ) ) {
+			$option_id = $args['id'] . '-' . $option_id;
+		}
+
+		if ( $product ) {
+			$option_id = $product->get_id() . '-' . $option_id;
+		}
+
+		return $option_id;
+	}
+
+	// Adding class in carty quantity field: ppom-qty-found to hide
+	public static function hide_cart_quantity( $classes, $product ) {
+
+		$classes[] = 'ppom-qty-found';
+
+		return $classes;
+	}
+
+	// adding weekly scheduale
+	public static function weekly_cron_schedule( $schedules ) {
+		$schedules['weekly'] = array(
+			'interval' => 60 * 60 * 24 * 7, // 604,800, seconds in a week
+			'display'  => __( 'Weekly', 'woocommerce-product-addon' ),
+		);
+
+		return $schedules;
+	}
+
+	// Set -ve operator if price is negative
+	public static function set_option_operator( $operator, $price, $meta ) {
+
+		if ( floatval( $price ) < 0 ) {
+			$operator = '';
+		}
+
+		return $operator;
+	}
+
+	// Shortcode and template override hooks.
+
+	/**
+	 * Renders PPOM fields inside the `[ppom]` shortcode form.
+	 *
+	 * Loads the same product-scoped assets used on the single-product template and
+	 * then renders either the legacy or template-based PPOM field output.
+	 *
+	 * @param array $attr Shortcode attributes.
+	 *
+	 * @return string|null
+	 *
+	 * @see PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id()
+	 * @see ProductHandler::show_fields_on_product()
+	 * @see ProductHandler::template_base_inputs_rendering()
+	 */
+	public static function render_shortcode( $attr ) {
+
+		$params = shortcode_atts(
+			array(
+				'product_id' => '',
+			),
+			$attr 
+		);
+
+		// return '';
+
+		global $post;
+		$page_id = ! is_null( $post ) ? $post->ID : '';
+
+		ob_start();
+
+		if ( $params['product_id'] ) {
+
+			$product = wc_get_product( $params['product_id'] );
+			if ( ! $product ) {
+				echo __( 'Product ID is not valid', 'woocommerce-product-addon' );
+
+				return ob_get_clean();
+			}
+
+			PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id( $params['product_id'], '', 'shortcode' );
+			?>
+		<form class="cart"
+				action="<?php echo esc_url( apply_filters( 'woocommerce_add_to_cart_form_action', $product->get_permalink() ) ); ?>"
+				method="post" enctype='multipart/form-data'>
+			<?php
+			$shortcode_product_id = (int) $params['product_id'];
+			if ( Helpers::is_legacy_mode() ) {
+				ProductHandler::show_fields_on_product( $shortcode_product_id );
+			} else {
+				ProductHandler::template_base_inputs_rendering( $shortcode_product_id );
+			}
+
+			if ( apply_filters( 'ppom_shortcode_show_quantity', true, $product ) ) {
+				woocommerce_quantity_input(
+					array(
+						'min_value'   => apply_filters( 'woocommerce_quantity_input_min', $product->get_min_purchase_quantity(), $product ),
+						'max_value'   => apply_filters( 'woocommerce_quantity_input_max', $product->get_max_purchase_quantity(), $product ),
+						'input_value' => isset( $_POST['quantity'] ) ? wc_stock_amount( wp_unslash( $_POST['quantity'] ) ) : $product->get_min_purchase_quantity(),
+						// WPCS: CSRF ok, input var ok.
+					),
+					$product
+				);
+			}
+
+			?>
+
+			<input type="hidden" name="ppom[ppom_shorcode_page_id]" value="<?php echo esc_attr( $page_id ); ?>">
+			<input type="hidden" name="ppom[ppom_shorcode_product_id]"
+					value="<?php echo esc_attr( $params['product_id'] ); ?>">
+
+			<button type="submit" name="add-to-cart" value="<?php echo esc_attr( $product->get_id() ); ?>"
+					class="single_add_to_cart_button button alt"><?php echo esc_html( $product->single_add_to_cart_text() ); ?></button>
+
+		</form>
+			<?php
+
+			return ob_get_clean();
+		}
+	}
+
+	/**
+	 * Redirects shortcode submissions to the cart after add-to-cart completes.
+	 *
+	 * @param string $url Default WooCommerce add-to-cart redirect URL.
+	 *
+	 * @return string
+	 */
+	public static function redirect_to_cart_if_shortcode( $url ) {
+		$url = isset( $_POST['ppom']['ppom_shorcode_product_id'] ) ? wc_get_cart_url() : $url;
+
+		return $url;
+	}
+
+	/**
+	 * Resolves theme-level template overrides for PPOM field templates.
+	 *
+	 * @param string     $full_path     Resolved plugin template path.
+	 * @param string     $template_path Relative template path within PPOM.
+	 * @param array|null $vars          Template vars available during resolution.
+	 *
+	 * @return string
+	 *
+	 * @see PPOM_Form::render_input_template()
+	 */
+	public static function check_theme_path( $full_path, $template_path, $vars ) {
+
+		// Extract variable from array
+		if ( $vars != null && is_array( $vars ) ) {
+			extract( $vars );
+		}
+
+		if ( isset( $addon_type ) ) {
+			$theme_path = get_stylesheet_directory() . "/ppom/addons/{$addon_type}.php";
+		} else {
+			$theme_path = get_stylesheet_directory() . "/ppom/{$template_path}";
+		}
+
+		if ( is_file( $theme_path ) ) {
+			$full_path = $theme_path;
+		}
+
+		return $full_path;
+	}
+
+	public static function remove_admin_notices() {
+
+		if ( isset( $_GET['page'] ) && $_GET['page'] == 'ppom' ) {
+			remove_all_actions( 'user_admin_notices' );
+			remove_all_actions( 'admin_notices' );
+		}
+	}
+
+	public static function update_converted_option_keys( $new_option, $option_key, $option, $meta, $product ) {
+		// ppom_pa($option);
+		if ( ! isset( $meta['type'] ) ) {
+			return $option;
+		}
+
+		switch ( $meta['type'] ) {
+			case 'cropper':
+			case 'fancycropper':
+				$new_option[ $option_key ]['width']  = isset( $option['width'] ) ? $option['width'] : '';
+				$new_option[ $option_key ]['height'] = isset( $option['height'] ) ? $option['height'] : '';
+				break;
+
+			case 'image':
+			case 'imageselect':
+				$new_option[ $option_key ]['link']        = isset( $option['link'] ) ? $option['link'] : '';
+				$new_option[ $option_key ]['url']         = isset( $option['url'] ) ? $option['url'] : '';
+				$new_option[ $option_key ]['image_id']    = isset( $option['id'] ) ? $option['id'] : '';
+				$new_option[ $option_key ]['description'] = isset( $option['description'] ) ? $option['description'] : '';
+				$new_option[ $option_key ]['stock']       = isset( $option['stock'] ) ? $option['stock'] : '';
+				$new_option[ $option_key ]['builder']     = isset( $option['builder'] ) ? $option['builder'] : '';
+				break;
+
+			case 'quantities':
+				$new_option[ $option_key ]['default'] = isset( $option['default'] ) ? $option['default'] : '';
+				$new_option[ $option_key ]['min']     = isset( $option['min'] ) ? $option['min'] : '';
+				$new_option[ $option_key ]['max']     = isset( $option['max'] ) ? $option['max'] : '';
+				$new_option[ $option_key ]['stock']   = isset( $option['stock'] ) ? $option['stock'] : '';
+				break;
+
+			case 'checkbox':
+				$new_option[ $option_key ]['discount']     = isset( $option['discount'] ) ? apply_filters( 'ppom_option_price', $option['discount'] ) : '';
+				$new_option[ $option_key ]['raw_discount'] = isset( $option['discount'] ) ? $option['discount'] : '';
+				$new_option[ $option_key ]['tooltip']      = isset( $option['tooltip'] ) ? $option['tooltip'] : '';
+				break;
+
+
+		}
+
+		return $new_option;
+	}
+
+	// search PPOM meta in order search
+	public static function search_in_order( $search_fields ) {
+
+		$orders = get_posts(
+			array(
+				'post_type'   => 'shop_order',
+				'post_status' => 'completed',
+				'numberposts' => 400,
+			) 
+		);
+
+
+		// echo count($orders);
+		foreach ( $orders as $order_post ) {
+			$order_id = $order_post->ID;
+			$order    = new WC_Order( $order_id );
+			$items    = $order->get_items();
+
+			$ppom_fields = array();
+			foreach ( $order->get_items() as $item_id => $item_values ) {
+				if ( version_compare( WC_VERSION, '3.0', '<' ) ) {
+					$product_id = $item_values['product_id'];
+				} else {
+					$product_id = $item_values->get_product_id();
+				}
+
+				$ppom_fields_post = wc_get_order_item_meta( $item_id, '_ppom_fields' );
+				if ( ! isset( $ppom_fields_post['fields'] ) ) {
+					continue;
+				}
+				$ppom_fields[] = $ppom_fields_post['fields'];
+				// array_merge($ppom_fields, $ppom_fields_post['fields']);
+				// ppom_pa($ppom_fields );
+			}
+			add_post_meta( $order_id, '_ppom_fields', $ppom_fields, true );
+		}
+
+		return array_merge( $search_fields, array( '_ppom_fields' ) );
+	}
+}
