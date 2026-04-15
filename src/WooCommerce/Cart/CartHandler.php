@@ -347,7 +347,11 @@ final class CartHandler {
 			return $cart;
 		}
 
-		WC()->cart->remove_cart_item( $_POST['ppom_cart_key'] );
+		$wc_cart = function_exists( 'WC' ) ? WC()->cart : null;
+
+		if ( ! empty( $_POST['ppom_cart_key'] ) && $wc_cart ) {
+			$wc_cart->remove_cart_item( sanitize_key( wp_unslash( $_POST['ppom_cart_key'] ) ) );
+		}
 
 		// ADDED WC BUNDLES COMPATIBILITY
 		if ( function_exists( 'wc_pb_is_bundled_cart_item' ) && wc_pb_is_bundled_cart_item( $cart ) ) {
