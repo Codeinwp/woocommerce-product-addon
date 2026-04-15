@@ -2,7 +2,11 @@
  * Textarea field type: grouped settings editor.
  */
 import { editorSectionIsConditions } from '../schemaTabs';
-import { SettingsConditionsTabs } from '../SettingsConditionsTabs';
+import {
+	SettingsConditionsTabs,
+	shouldShowConditionalRepeaterTab,
+} from '../SettingsConditionsTabs';
+import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { GroupedFieldSections } from './GroupedFieldSections';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
 
@@ -50,6 +54,7 @@ export function TextareaFieldEditor( {
 		editorSectionIsConditions( s )
 	);
 	const hasConditions = conditionsSections.length > 0;
+	const showRepeaterTab = shouldShowConditionalRepeaterTab( modalContext );
 
 	const shared = {
 		schema,
@@ -71,6 +76,15 @@ export function TextareaFieldEditor( {
 				<GroupedFieldSections
 					{ ...shared }
 					sections={ conditionsSections }
+				/>
+			}
+			hasRepeater={ showRepeaterTab }
+			repeater={
+				<ConditionalRepeaterSection
+					i18n={ i18n }
+					modalContext={ modalContext }
+					values={ values }
+					onChange={ onChange }
 				/>
 			}
 		/>

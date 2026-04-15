@@ -2,6 +2,7 @@
  * Section groupings for schema-driven (fallback) field editors — mirrors Text/Textarea/Select editors.
  */
 import { classifySettingTab } from './schemaTabs';
+import { isReactModalExcludedSchemaKey } from './schema/reactModalExcludedKeys';
 import type { I18nDict } from './types/fieldModal';
 
 /** Ordered section definitions; each setting key appears in at most one section (first match wins). */
@@ -145,6 +146,9 @@ export function buildFallbackGroupedSections(
 	/** Preserve schema key order for overflow. */
 	const fieldKeysOrdered: string[] = [];
 	Object.keys( settings ).forEach( ( key ) => {
+		if ( isReactModalExcludedSchemaKey( key ) ) {
+			return;
+		}
 		const meta = settings[ key ] as Record<string, unknown> | undefined;
 		if ( ! meta || typeof meta !== 'object' ) {
 			return;

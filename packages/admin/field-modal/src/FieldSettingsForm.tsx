@@ -6,9 +6,14 @@ import { Box, Text, Button, VStack, Alert, AlertIcon } from '@chakra-ui/react';
 import { classifySettingTab } from './schemaTabs';
 import { renderSettingRow, openLegacyFieldModal } from './schemaSettingControl';
 import { ResponsiveFieldGrid } from './ResponsiveFieldGrid';
-import { SettingsConditionsTabs } from './SettingsConditionsTabs';
+import {
+	SettingsConditionsTabs,
+	shouldShowConditionalRepeaterTab,
+} from './SettingsConditionsTabs';
 import { GroupedFieldSections } from './editors/GroupedFieldSections';
 import { buildFallbackGroupedSections } from './fieldSettingSectionBlueprint';
+import { isReactModalExcludedSchemaKey } from './schema/reactModalExcludedKeys';
+import { ConditionalRepeaterSection } from './components/ConditionalRepeaterSection';
 import type { FieldSettingsFormProps } from './types/fieldModal';
 
 export function FieldSettingsForm( {
@@ -18,7 +23,6 @@ export function FieldSettingsForm( {
 	fieldType,
 	i18n,
 	ppomFieldIndex,
-	isFallback = false,
 	modalContext = null,
 }: FieldSettingsFormProps ) {
 	const buckets = useMemo( () => {
@@ -35,6 +39,9 @@ export function FieldSettingsForm( {
 			meta: Record< string, unknown >;
 		} > = [];
 		Object.keys( settings ).forEach( ( key ) => {
+			if ( isReactModalExcludedSchemaKey( key ) ) {
+				return;
+			}
 			const meta = settings[ key ];
 			if ( ! meta || typeof meta !== 'object' ) {
 				return;
@@ -74,6 +81,7 @@ export function FieldSettingsForm( {
 	);
 	const hasConditions =
 		conditionControls.length > 0 || htmlConditions.length > 0;
+	const showRepeaterTab = shouldShowConditionalRepeaterTab( modalContext );
 
 	const unsupportedAlert =
 		buckets.unsupported.length > 0 ? (
@@ -143,25 +151,17 @@ export function FieldSettingsForm( {
 			hasConditions={ hasConditions }
 			settings={ settingsPanel }
 			conditions={ conditionsPanel }
+			hasRepeater={ showRepeaterTab }
+			repeater={
+				<ConditionalRepeaterSection
+					i18n={ i18n }
+					modalContext={ modalContext }
+					values={ values }
+					onChange={ onChange }
+				/>
+			}
 		/>
 	);
-
-	if ( isFallback ) {
-		return (
-			<Box pt={ 1 }>
-				<Text
-					fontWeight="semibold"
-					mb={ 3 }
-					fontSize="sm"
-					color="gray.600"
-				>
-					{ i18n.fallbackSettingsLayout ||
-						'Classic-style settings (full editor coming soon)' }
-				</Text>
-				{ body }
-			</Box>
-		);
-	}
 
 	return body;
 }

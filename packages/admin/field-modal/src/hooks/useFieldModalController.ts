@@ -266,6 +266,46 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		[ ctx?.catalog_groups ]
 	);
 
+	const fieldTypeLabel = useMemo( () => {
+		const raw = editDraft?.type;
+		if ( ! raw || typeof raw !== 'string' ) {
+			return '';
+		}
+		const slug = raw.toLowerCase();
+		const flat = ctx?.catalog;
+		if ( Array.isArray( flat ) ) {
+			for ( const c of flat ) {
+				if (
+					c &&
+					typeof c.slug === 'string' &&
+					c.slug.toLowerCase() === slug &&
+					typeof c.title === 'string' &&
+					c.title.trim() !== ''
+				) {
+					return c.title;
+				}
+			}
+		}
+		for ( const g of catalogGroups ) {
+			const groupFields = g.fields;
+			if ( ! Array.isArray( groupFields ) ) {
+				continue;
+			}
+			for ( const c of groupFields ) {
+				if (
+					c &&
+					typeof c.slug === 'string' &&
+					c.slug.toLowerCase() === slug &&
+					typeof c.title === 'string' &&
+					c.title.trim() !== ''
+				) {
+					return c.title;
+				}
+			}
+		}
+		return raw;
+	}, [ editDraft?.type, ctx?.catalog, catalogGroups ] );
+
 	const activeSchema =
 		editDraft && editDraft.type
 			? schemasCache[ String( editDraft.type ).toLowerCase() ] ?? null
@@ -275,8 +315,17 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		() => ( {
 			builderFields: fields,
 			conditionsProEnabled: ctx?.conditions_pro_enabled === true,
+			conditionalRepeaterUnlocked:
+				ctx?.conditional_repeater_unlocked === true,
+			conditionalRepeaterShowUpsell:
+				ctx?.conditional_repeater_show_upsell === true,
 		} ),
-		[ fields, ctx?.conditions_pro_enabled ]
+		[
+			fields,
+			ctx?.conditions_pro_enabled,
+			ctx?.conditional_repeater_unlocked,
+			ctx?.conditional_repeater_show_upsell,
+		]
 	);
 
 	const typedEditorSlug =
@@ -301,6 +350,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		i18n,
 		ppomFieldIndex,
 		catalogGroups,
+		fieldTypeLabel,
 		activeSchema,
 		modalContext,
 		TypedEditor,

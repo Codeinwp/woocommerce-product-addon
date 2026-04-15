@@ -1,11 +1,15 @@
 /**
- * Select field type: grouped settings; paired options use classic editor CTA.
+ * Select field type: grouped settings; paired options inline editor.
  */
-import { Box, Alert, AlertIcon, Text, Button, VStack } from '@chakra-ui/react';
+import { Box, Text, VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
-import { SettingsConditionsTabs } from '../SettingsConditionsTabs';
+import {
+	SettingsConditionsTabs,
+	shouldShowConditionalRepeaterTab,
+} from '../SettingsConditionsTabs';
+import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
+import { PairedOptionsEditor } from '../components/PairedOptionsEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
-import { openLegacyFieldModal } from '../schemaSettingControl';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
 
 export function SelectFieldEditor( {
@@ -59,6 +63,7 @@ export function SelectFieldEditor( {
 		editorSectionIsConditions( s )
 	);
 	const hasConditions = sectionsAfterConditions.length > 0;
+	const showRepeaterTab = shouldShowConditionalRepeaterTab( modalContext );
 
 	const shared = {
 		schema,
@@ -69,36 +74,22 @@ export function SelectFieldEditor( {
 		modalContext,
 	};
 
-	const legacyOptionsAlert = needsLegacyOptions ? (
-		<Alert
-			status="warning"
-			variant="subtle"
-			borderRadius="lg"
-			borderWidth="1px"
-			borderColor="orange.200"
-		>
-			<AlertIcon />
-			<Box>
-				<Text fontWeight="semibold" fontSize="sm" color="gray.800">
-					{ optionsMeta.title
-						? String( optionsMeta.title )
-						: i18n.selectOptionsTitle || 'Options' }
-				</Text>
-				<Text fontSize="sm" mt={ 2 } color="gray.600" lineHeight="1.5">
-					{ i18n.legacyEditorHint }
-				</Text>
-						<Button
-							size="sm"
-							mt={ 2 }
-							variant="outline"
-					colorScheme="blue"
-					borderColor="blue.300"
-					onClick={ () => openLegacyFieldModal( ppomFieldIndex ) }
-				>
-					{ i18n.openLegacyModal }
-				</Button>
-			</Box>
-		</Alert>
+	const optionsTitle = optionsMeta?.title
+		? String( optionsMeta.title )
+		: i18n.selectOptionsTitle || 'Options';
+
+	const pairedBlock = needsLegacyOptions ? (
+		<Box>
+			<PairedOptionsEditor
+				values={ values }
+				onChange={ onChange }
+				i18n={ i18n }
+				title={ optionsTitle }
+			/>
+			<Text fontSize="xs" color="gray.500" mt={ 2 } lineHeight="1.5">
+				{ i18n.legacyEditorHint }
+			</Text>
+		</Box>
 	) : null;
 
 	return (
@@ -111,7 +102,7 @@ export function SelectFieldEditor( {
 						{ ...shared }
 						sections={ sectionsBefore }
 					/>
-					{ legacyOptionsAlert }
+					{ pairedBlock }
 					<GroupedFieldSections
 						{ ...shared }
 						sections={ sectionsAfterSettings }
@@ -122,6 +113,15 @@ export function SelectFieldEditor( {
 				<GroupedFieldSections
 					{ ...shared }
 					sections={ sectionsAfterConditions }
+				/>
+			}
+			hasRepeater={ showRepeaterTab }
+			repeater={
+				<ConditionalRepeaterSection
+					i18n={ i18n }
+					modalContext={ modalContext }
+					values={ values }
+					onChange={ onChange }
 				/>
 			}
 		/>

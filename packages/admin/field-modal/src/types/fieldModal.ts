@@ -52,6 +52,8 @@ export interface FieldModalContextPayload {
 	catalog_groups?: CatalogGroup[];
 	group?: Record<string, unknown>;
 	conditions_pro_enabled?: boolean;
+	conditional_repeater_unlocked?: boolean;
+	conditional_repeater_show_upsell?: boolean;
 	upsell?: ModalUpsellPayload | null;
 	license?: LicensePayload | null;
 }
@@ -59,6 +61,8 @@ export interface FieldModalContextPayload {
 export interface ModalContextValue {
 	builderFields: FieldRow[];
 	conditionsProEnabled: boolean;
+	conditionalRepeaterUnlocked: boolean;
+	conditionalRepeaterShowUpsell: boolean;
 }
 
 export type SchemaObject = Record<string, unknown>;
@@ -72,7 +76,6 @@ export interface FieldEditorBaseProps {
 	ppomFieldIndex: number;
 	fieldType?: string;
 	modalContext?: ModalContextValue | null;
-	isFallback?: boolean;
 }
 
 export type FieldEditorComponent = ComponentType< FieldEditorBaseProps >;
@@ -92,6 +95,8 @@ export interface SettingRowContext {
 	ppomFieldIndex: number;
 	builderFields?: FieldRow[];
 	conditionsProEnabled?: boolean;
+	conditionalRepeaterUnlocked?: boolean;
+	conditionalRepeaterShowUpsell?: boolean;
 }
 
 export interface PpomFieldModalBoot {
@@ -109,12 +114,10 @@ export interface FieldModalBodyStatus {
 
 /** Picker step: passed through to `FieldPickerPanel`. */
 export interface FieldModalPickerStepProps {
-	modalEntry: 'picker' | 'manage';
 	i18n: I18nDict;
 	catalogGroups: CatalogGroup[];
 	pickerQuery: string;
 	onPickerQueryChange: ( q: string ) => void;
-	onBackOrCancel: () => void;
 	onPickType: ( slug: string ) => void;
 	upsell?: ModalUpsellPayload | null;
 	license?: LicensePayload | null;

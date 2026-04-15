@@ -177,7 +177,6 @@ function FieldManageEditorBridgeInner( {
 					i18n={ i18n }
 					ppomFieldIndex={ ppomFieldIndex }
 					modalContext={ modalContext }
-					isFallback
 				/>
 			) }
 			{ ! schemaLoading && ! activeSchema && editDraft.type && (

@@ -53,6 +53,15 @@ class Test_Field_Modal_Rest extends PPOM_Test_Case {
 		$this->assertArrayHasKey( 'upsell', $data );
 		$this->assertArrayHasKey( 'conditions_pro_enabled', $data );
 		$this->assertIsBool( $data['conditions_pro_enabled'] );
+		$this->assertArrayHasKey( 'conditional_repeater_unlocked', $data );
+		$this->assertIsBool( $data['conditional_repeater_unlocked'] );
+		$this->assertArrayHasKey( 'conditional_repeater_show_upsell', $data );
+		$this->assertIsBool( $data['conditional_repeater_show_upsell'] );
+		$this->assertSame(
+			! $data['conditional_repeater_unlocked'],
+			$data['conditional_repeater_show_upsell'],
+			'CFR upsell flag must mirror unlocked state.'
+		);
 		$this->assertNotEmpty( $data['catalog'], 'Flat catalog must list field types for the modal.' );
 
 		$first_group = $data['catalog_groups'][0];
@@ -83,6 +92,30 @@ class Test_Field_Modal_Rest extends PPOM_Test_Case {
 		$this->assertIsArray( $body );
 		$this->assertArrayHasKey( 'schema', $body );
 		$this->assertArrayHasKey( 'settings', $body['schema'] );
+	}
+
+	/**
+	 * Boot filter can force CFR unlocked for tests without PPOM Pro loaded.
+	 *
+	 * @return void
+	 */
+	public function test_conditional_repeater_unlocked_respects_boot_filter() {
+		$admin_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin_id );
+		$this->reset_rest_server();
+
+		add_filter( 'ppom_field_modal_conditional_repeater_unlocked', '__return_true' );
+
+		$request  = new WP_REST_Request( 'GET', '/ppom/v1/admin/field-groups/context' );
+		$request->set_query_params( array( 'productmeta_id' => 0 ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'ppom_field_modal_conditional_repeater_unlocked', '__return_true' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertTrue( $data['conditional_repeater_unlocked'] );
+		$this->assertFalse( $data['conditional_repeater_show_upsell'] );
 	}
 
 	/**

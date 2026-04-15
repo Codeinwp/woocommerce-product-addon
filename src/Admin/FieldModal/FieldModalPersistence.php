@@ -43,6 +43,8 @@ final class FieldModalPersistence {
 			if ( ! is_array( $row ) ) {
 				continue;
 			}
+			// Preserve keys the React modal does not render (e.g. Pro CFR / cond_field_repeater*).
+			// Client sends full field rows; unknown keys must survive until Pro filters and sanitize run.
 			// Filter: ppom_admin_field_modal_normalize_field — ( field row, index, productmeta_id ).
 			$row = apply_filters( 'ppom_admin_field_modal_normalize_field', $row, (int) $index, $productmeta_id );
 			if ( ! is_array( $row ) ) {
