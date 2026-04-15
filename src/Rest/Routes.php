@@ -173,7 +173,7 @@ final class Routes {
 			)
 		);
 
-		// get fresh nonces for file operations
+		// Get fresh nonces for file operations.
 		register_rest_route(
 			'ppom/v1',
 			'/nonces/file/',
@@ -191,11 +191,9 @@ final class Routes {
 	 * This endpoint allows JavaScript to fetch fresh nonces when needed,
 	 * solving the issue of stale nonces in cached pages or long-lived browser tabs.
 	 *
-	 * @param \WP_REST_Request $request REST request (no parameters required).
-	 *
 	 * @return \WP_REST_Response JSON response with fresh nonces.
 	 */
-	public function get_file_nonces( $request ) {
+	public function get_file_nonces() {
 
 		$response_info = array(
 			'status'                 => 'success',
