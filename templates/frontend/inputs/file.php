@@ -23,6 +23,7 @@ $file_cost     = $fm->get_meta_value( 'file_cost' );
 $btn_class     = $fm->get_meta_value( 'button_class' );
 $btn_label     = $fm->get_meta_value( 'button_label_select' );
 $input_classes = $fm->input_classes();
+$file_cost     = apply_filters( 'ppom_option_price', $file_cost );
 
 $field_label = ( $file_cost == '' ) ? $fm->field_label() : $fm->field_label() . ' - ' . wc_price( $file_cost );
 $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-addon' ) : $btn_label );

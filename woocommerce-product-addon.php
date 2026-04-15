@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'PPOM_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'PPOM_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
-define( 'PPOM_WP_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __DIR__ ) ) );
+define( 'PPOM_WP_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'PPOM_BASENAME', basename( PPOM_WP_PLUGIN_DIR ) );
 define( 'PPOM_PRODUCT_SLUG', PPOM_BASENAME );
 define( 'PPOM_VERSION', '33.0.18' );
@@ -70,16 +70,7 @@ function ppom_i18n_setup() {
 	load_plugin_textdomain( 'woocommerce-product-addon', false, basename( __DIR__ ) . '/languages' );
 }
 
-require_once PPOM_PATH . '/inc/functions.php';
-require_once PPOM_PATH . '/inc/validation.php';
-require_once PPOM_PATH . '/inc/deprecated.php';
-require_once PPOM_PATH . '/inc/arrays.php';
-require_once PPOM_PATH . '/inc/hooks.php';
-require_once PPOM_PATH . '/inc/woocommerce.php';
-require_once PPOM_PATH . '/inc/admin.php';
-require_once PPOM_PATH . '/inc/files.php';
-require_once PPOM_PATH . '/inc/nmInput.class.php';
-require_once PPOM_PATH . '/inc/prices.php';
+require_once PPOM_PATH . '/inc/compat/load.php';
 
 if ( is_admin() ) {
 	require_once PPOM_PATH . '/classes/freemium.class.php';
@@ -98,12 +89,14 @@ require_once PPOM_PATH . '/classes/input.class.php';
 require_once PPOM_PATH . '/classes/fields.class.php';
 // include_once PPOM_PATH . "/classes/field.class.php"; // Fronend PPOM Fields
 require_once PPOM_PATH . '/classes/ppom.class.php';
+require_once PPOM_PATH . '/classes/class-ppom-meta-repository.php';
+require_once PPOM_PATH . '/inc/ppom-meta-repository-functions.php';
 require_once PPOM_PATH . '/classes/plugin.class.php';
 require_once PPOM_PATH . '/classes/scripts.class.php';
 require_once PPOM_PATH . '/classes/frontend-scripts.class.php';
 require_once PPOM_PATH . '/backend/settings-panel.class.php';
 require_once PPOM_PATH . '/backend/options.php';
-require_once PPOM_PATH . '/inc/rest.class.php';
+new \PPOM\Rest\Routes();
 
 // New Files Inlcude
 require_once PPOM_PATH . '/classes/form.class.php';

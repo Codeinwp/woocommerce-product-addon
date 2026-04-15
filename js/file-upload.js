@@ -407,6 +407,9 @@ function ppom_show_cropped_preview(
 		.prop( 'disabled', false );
 	cropp_preview_container.find( '.ppom-cropping-size' ).show();
 
+	const container_width = jQuery(
+		'#ppom-file-container-' + file_name
+	).width();
 	const croppie_container = jQuery( '<div/>' )
 		.addClass( 'ppom-croppie-preview-' + image_id )
 		.attr( 'data-image_id', image_id )
@@ -460,6 +463,8 @@ function ppom_show_cropped_preview(
 	file_list_preview_containers[ file_name ].image_id = image_id;
 	file_list_preview_containers[ file_name ].image_url = image_url;
 
+	file_list_preview_containers[ file_name ].container_width =
+		container_width;
 	ppom_set_croppie_options( file_name, undefined, image_id );
 }
 
@@ -473,10 +478,19 @@ function ppom_set_croppie_options( file_name, viewport, image_id ) {
 				option.viewport = viewport;
 			}
 
+			const preview = file_list_preview_containers[ file_name ];
+			let applied = option;
+			if (
+				preview.container_width !== undefined &&
+				preview.container_width !== null
+			) {
+				applied = get_responsive_croppie_options(
+					option,
+					preview.container_width
+				);
+			}
 			// console.log($filelist_DIV[file_name]['croppie'][image_id]);
-			file_list_preview_containers[ file_name ].croppie[
-				image_id
-			].croppie( option );
+			preview.croppie[ image_id ].croppie( applied );
 		}
 	} );
 }
@@ -989,4 +1003,63 @@ function ppom_generate_cropper_data_for_cart( field_name ) {
 						.appendTo( file_list_preview_containers[ field_name ] );
 				} );
 		} );
+}
+
+/**
+ * Scale Croppie boundary/viewport when the field container is narrower than
+ * configured dimensions (responsive cropper).
+ *
+ * @param {Object} baseOptions Croppie options object for the field.
+ * @param {number} max_width  Container width in pixels.
+ * @return {Object} Options safe to pass to .croppie() without mutating globals.
+ */
+function get_responsive_croppie_options( baseOptions, max_width ) {
+	const boundary = baseOptions.boundary || {};
+
+	const boundaryWidthOriginal = Number( boundary.width );
+	const boundaryHeightOriginal = Number( boundary.height );
+	if (
+		! Number.isFinite( boundaryWidthOriginal ) ||
+		! Number.isFinite( boundaryHeightOriginal ) ||
+		boundaryWidthOriginal <= 0 ||
+		boundaryHeightOriginal <= 0
+	) {
+		return baseOptions;
+	}
+	if ( max_width >= boundaryWidthOriginal ) {
+		return baseOptions;
+	}
+	if ( ! Number.isFinite( max_width ) ) {
+		return baseOptions;
+	}
+	const aspectRatio = boundaryHeightOriginal / boundaryWidthOriginal || 1;
+	const boundaryWidth = Math.floor( max_width );
+	const boundaryHeight = Math.floor( boundaryWidth * aspectRatio );
+
+	const result = {
+		...baseOptions,
+		boundary: {
+			...baseOptions.boundary,
+			width: boundaryWidth,
+			height: boundaryHeight,
+		},
+	};
+
+	if (
+		baseOptions.viewport &&
+		baseOptions.viewport.width &&
+		baseOptions.viewport.height
+	) {
+		const scale = boundaryWidth / boundaryWidthOriginal;
+		const viewportWidth = Math.floor( baseOptions.viewport.width * scale );
+		const viewportHeight = Math.floor( baseOptions.viewport.height * scale );
+
+		result.viewport = {
+			...baseOptions.viewport,
+			width: Math.min( viewportWidth, boundaryWidth - 2 ),
+			height: Math.min( viewportHeight, boundaryHeight - 2 ),
+		};
+	}
+
+	return result;
 }

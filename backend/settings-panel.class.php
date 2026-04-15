@@ -28,58 +28,60 @@ class PPOM_SettingsFramework {
 	private static $ins = null;
 
 	/**
-	 * Return setting key.
+	 * Option name used to persist settings-panel values (`{id}-settings_panel`).
 	 *
 	 * @var string
 	 */
 	private static $save_key = '';
 
 	/**
-	 * Return saved settings.
+	 * Cached copy of saved settings (reserved / legacy; not actively populated).
 	 *
 	 * @var string
 	 */
 	private static $saved_settings = '';
 
 	/**
-	 * Return setting tabs.
+	 * Registered settings tabs and nested panel definitions.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	public $tabs = array();
 
 	/**
-	 * Return setting panels.
+	 * Flat list of all registered panel definitions.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	public $panels = array();
 
 	/**
-	 * Return panels setting.
+	 * All registered setting field definitions keyed by setting ID.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	public $settings_array = array();
 
 	/**
-	 * Return settings config array.
+	 * Merged framework configuration (IDs, menu placement, labels, etc.).
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	public $config = array();
 
 	/**
-	 * Return current settings panel assets URL.
+	 * Base URL for settings-panel CSS/JS assets under `backend/assets`.
 	 *
-	 * @var url
+	 * @var string
 	 */
 	private static $assets_url = '';
 
 	/**
-	 * Return main scripts framework class.
+	 * Optional reference to a scripts helper class (legacy; reserved for extensions).
+	 *
+	 * @var mixed|null
 	 */
-	var $scripts_class;
+	public $scripts_class;
 
 	/**
 	 * Registers the settings framework hooks and save endpoints.
@@ -123,7 +125,9 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Get class instace
+	 * Singleton accessor for the settings framework.
+	 *
+	 * @return self
 	 */
 	public static function get_instance() {
 
@@ -135,7 +139,9 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Register config options
+	 * Merges default menu and branding options into `$this->config`.
+	 *
+	 * @return void
 	 */
 	public function register_config() {
 
@@ -161,7 +167,11 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Get conifg option
+	 * Reads a value from the merged framework configuration.
+	 *
+	 * @param string $key Config key (e.g. `menu_slug`, `plugin_url`).
+	 *
+	 * @return mixed Empty string when the key is missing.
 	 */
 	public function get_config( $key ) {
 
@@ -175,7 +185,11 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Register WC settings tab slug
+	 * Adds the PPOM tab to the WooCommerce settings tabs list.
+	 *
+	 * @param array<string, string> $settings_tabs Tab slug => label pairs from WooCommerce.
+	 *
+	 * @return array<string, string>
 	 */
 	public function add_settings_tab( $settings_tabs ) {
 
@@ -205,7 +219,11 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Register tabs
+	 * Registers one or more top-level settings tabs (skips keys that already exist).
+	 *
+	 * @param array<string, mixed> $tabs Tab definitions keyed by tab ID.
+	 *
+	 * @return $this
 	 */
 	public function register_tabs( $tabs ) {
 
@@ -220,7 +238,12 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Register Panels
+	 * Attaches panel definitions to a tab and merges them into the flat `$this->panels` list.
+	 *
+	 * @param string               $tab_id Target tab ID.
+	 * @param array<string, mixed> $panels Panel definitions keyed by panel ID.
+	 *
+	 * @return $this
 	 */
 	public function register_panel( $tab_id, $panels ) {
 
@@ -239,10 +262,10 @@ class PPOM_SettingsFramework {
 	/**
 	 * Registers settings definitions under a panel.
 	 *
-	 * @param string $panel_id Panel ID that receives the settings.
-	 * @param array  $settings Settings definitions keyed by setting ID.
+	 * @param string               $panel_id Panel ID that receives the settings.
+	 * @param array<string, mixed> $settings Settings definitions keyed by setting ID.
 	 *
-	 * @return self
+	 * @return $this
 	 *
 	 * @see ppom_load_free_options()
 	 * @see ppom_load_pro_options()
@@ -272,7 +295,11 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Load inputs types
+	 * Includes the admin input partial for a settings field based on its `type`.
+	 *
+	 * @param array<string, mixed> $input_meta Field definition including `type` and `input_id`.
+	 *
+	 * @return void
 	 */
 	public function load_inputs( $input_meta ) {
 
@@ -289,7 +316,11 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Control the settings position from given array
+	 * Reorders settings entries that declare a `move_to` target key.
+	 *
+	 * @param array<string|int, mixed> $settings Associative settings array.
+	 *
+	 * @return array<string|int, mixed>
 	 */
 	public static function settings_position_controller( $settings ) {
 
@@ -309,7 +340,13 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Move the settings array from one to another position
+	 * Moves the element at key `$move` to immediately before key `$find`.
+	 *
+	 * @param array<string|int, mixed> $arr  Source array.
+	 * @param string|int               $find Key to insert before.
+	 * @param string|int               $move Key of the element to relocate.
+	 *
+	 * @return array<string|int, mixed> Unchanged `$arr` if keys are missing.
 	 */
 	public static function reposition_array_element( $arr, $find, $move ) {
 
@@ -436,7 +473,12 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Get settings meta by Type and ID
+	 * Resolves a tab, panel, or setting definition by key.
+	 *
+	 * @param string $type One of `tabs`, `panels`, or `settings`.
+	 * @param string $key  Identifier within that bucket.
+	 *
+	 * @return mixed|null
 	 */
 	public function _get( $type, $key ) {
 
@@ -461,7 +503,11 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Set name attribute for inputs
+	 * Builds the HTML `name` attribute for a saved settings field.
+	 *
+	 * @param string $id Setting / input ID.
+	 *
+	 * @return string Dot/bracket notation key under the panel option.
 	 */
 	public static function get_form_name( $id ) {
 
@@ -474,7 +520,12 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Get saved settings by ID
+	 * Returns a single value from the persisted settings-panel option.
+	 *
+	 * @param string     $key     Setting ID.
+	 * @param mixed|null $default Value when the key is absent or empty string.
+	 *
+	 * @return mixed|null
 	 */
 	public static function get_saved_settings( $key, $default = null ) {
 
@@ -546,7 +597,9 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Get border styles
+	 * CSS border-style choices for css_editor border mode.
+	 *
+	 * @return array<string, string> Value => translated label.
 	 */
 	public function border_style() {
 
@@ -567,8 +620,9 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Get css editor field options
-	 * Border | Padding | Margin
+	 * Side keys and labels/icons for css_editor margin, padding, and border fields.
+	 *
+	 * @return array<string, array{title: string, icon?: string}>
 	 */
 	public function css_editor_options() {
 
@@ -596,7 +650,9 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Get typography fields options
+	 * Typography sub-field keys and labels for typography settings rows.
+	 *
+	 * @return array<string, array{title: string}>
 	 */
 	public function typography_options() {
 
@@ -617,8 +673,12 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Generate CSS Editor CSS output
-	 * Border | Padding | Margin
+	 * Builds CSS rules for a `css_editor` field (border, margin, or padding).
+	 *
+	 * @param array<string, mixed>         $settings Field definition including `output` and `mode`.
+	 * @param array<string, string>|string $css_val  Per-side values; border mode uses nested width/style/color.
+	 *
+	 * @return string Concatenated CSS rule or empty string.
 	 */
 	public function generate_css_editor_output_css( $settings, $css_val ) {
 
@@ -655,6 +715,14 @@ class PPOM_SettingsFramework {
 	}
 
 
+	/**
+	 * Builds CSS rules for a `typography` settings field.
+	 *
+	 * @param array<string, mixed> $settings Field definition including string `output` selector.
+	 * @param array<string, mixed> $css_val  Values keyed by typography option (e.g. font-size).
+	 *
+	 * @return string Concatenated CSS rule or empty string.
+	 */
 	public function generate_typograpy_output_css( $settings, $css_val ) {
 
 		$css      = '';
@@ -680,13 +748,16 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Load settings panel templates
+	 * Loads a PHP template from `backend/` with optional extracted variables.
+	 *
+	 * @param string               $file_name Path relative to `backend/` (e.g. `/templates/admin-settings.php`).
+	 * @param array<string, mixed> $variables Variables to `extract()` into the template scope.
+	 *
+	 * @return void Terminates with `die()` when the file is missing.
 	 */
-	public static function load_template( $file_name, $variables = array( '' ) ) {
+	public static function load_template( $file_name, $variables = array() ) {
 
-		if ( is_array( $variables ) ) {
-			extract( $variables );
-		}
+		extract( $variables );
 
 		$file_path = PPOM_PATH . '/backend/' . $file_name;
 
@@ -699,7 +770,9 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Register plugin Settings page
+	 * Registers the admin menu entry or WooCommerce settings tab for this panel.
+	 *
+	 * @return void
 	 */
 	public function add_admin_menu() {
 
@@ -738,7 +811,9 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Register settings panel scripts
+	 * Script handles and metadata for the settings UI (filtered).
+	 *
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}>
 	 */
 	public function get_scripts() {
 
@@ -780,7 +855,9 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Register settings panel styles
+	 * Stylesheet handles and metadata for the settings UI (filtered).
+	 *
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}>
 	 */
 	public function get_styles() {
 
@@ -819,7 +896,7 @@ class PPOM_SettingsFramework {
 	/**
 	 * Loads the PPOM settings-page scripts, styles, and localized data.
 	 *
-	 * @return string|void
+	 * @return string|void Empty string when the current screen is not the PPOM settings page; otherwise void.
 	 */
 	public function load_scripts() {
 
@@ -901,7 +978,9 @@ class PPOM_SettingsFramework {
 
 
 	/**
-	 * Remove all admin notices
+	 * Strips default admin notices on the settings panel screen (hook currently unused).
+	 *
+	 * @return void
 	 */
 	public function remove_admin_notices() {
 
@@ -961,12 +1040,13 @@ class PPOM_SettingsFramework {
 	}
 }
 
+PPOMSETTINGS();
+
 /**
  * Returns the shared PPOM settings framework instance.
  *
  * @return PPOM_SettingsFramework
  */
-PPOMSETTINGS();
 function PPOMSETTINGS() {
 	return PPOM_SettingsFramework::get_instance();
 }

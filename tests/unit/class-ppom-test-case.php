@@ -422,10 +422,7 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	 * @return int
 	 */
 	protected function insert_ppom_meta( $fields, $product_id = 0, $overrides = array() ) {
-		global $wpdb;
-
-		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-		$row        = array_merge(
+		$row = array_merge(
 			array(
 				'productmeta_name'       => $product_id ? get_the_title( $product_id ) : 'PPOM Test Meta ' . wp_generate_password( 6, false ),
 				'productmeta_validation' => 'no',
@@ -441,10 +438,9 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 			$overrides
 		);
 
-		$inserted = $wpdb->insert( $ppom_table, $row );
-		$this->assertNotFalse( $inserted );
-
-		$meta_id = (int) $wpdb->insert_id;
+		$format  = array_fill( 0, count( $row ), '%s' );
+		$meta_id = ppom_meta_repository()->insert_group( $row, $format );
+		$this->assertGreaterThan( 0, $meta_id );
 
 		$fields = apply_filters( 'ppom_meta_data_saving', $fields, $meta_id );
 		ppom_admin_update_ppom_meta_only( $meta_id, $fields );
@@ -614,11 +610,8 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	 * @return int
 	 */
 	protected function ppom_meta_row_count() {
-		global $wpdb;
 
-		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$ppom_table}" );
+		return ppom_meta_repository()->count_rows();
 	}
 
 	/**
@@ -629,17 +622,9 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	 * @return array|null
 	 */
 	protected function get_ppom_meta_row( $meta_id ) {
-		global $wpdb;
+		$row = ppom_meta_repository()->get_row_by_id( (int) $meta_id );
 
-		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-
-		return $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT * FROM {$ppom_table} WHERE productmeta_id = %d",
-				$meta_id
-			),
-			ARRAY_A
-		);
+		return $row ? get_object_vars( $row ) : null;
 	}
 
 	/**

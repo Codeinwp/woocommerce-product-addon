@@ -1,10 +1,14 @@
 <?php
-/*
- * Followig class handling text input control and their
-* dependencies. Do not make changes in code
-* Create on: 9 November, 2013
-*/
+/**
+ * Divider field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * Visual divider / heading styles for separating groups of fields in the product form.
+ */
 class NM_Divider_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -17,6 +21,11 @@ class NM_Divider_wooproduct extends PPOM_Inputs {
 	*/
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata and loads the field settings schema.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -27,6 +36,11 @@ class NM_Divider_wooproduct extends PPOM_Inputs {
 		$this->settings = self::get_settings();
 	}
 
+	/**
+	 * Preset divider layout styles for the style selector.
+	 *
+	 * @return array<string, string>
+	 */
 	function ppom_divider_style() {
 
 		return array(
@@ -38,6 +52,11 @@ class NM_Divider_wooproduct extends PPOM_Inputs {
 		);
 	}
 
+	/**
+	 * CSS border styles for divider line configuration.
+	 *
+	 * @return array<string, string>
+	 */
 	function border_style() {
 
 		return array(
@@ -52,6 +71,11 @@ class NM_Divider_wooproduct extends PPOM_Inputs {
 		);
 	}
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 
 		$input_meta = array(

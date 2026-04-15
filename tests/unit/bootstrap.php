@@ -43,3 +43,5 @@ tests_add_filter( 'muplugins_loaded', '_register_module' );
 
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';
+
+require_once __DIR__ . '/class-ppom-test-case.php';
