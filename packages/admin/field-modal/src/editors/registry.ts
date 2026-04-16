@@ -7,6 +7,8 @@ import { SelectFieldEditor } from './SelectFieldEditor';
 import { ImageFieldEditor } from './ImageFieldEditor';
 import { ImageselectFieldEditor } from './ImageselectFieldEditor';
 import { AudioFieldEditor } from './AudioFieldEditor';
+import { CropperFieldEditor } from './CropperFieldEditor';
+import { QuantitiesFieldEditor } from './QuantitiesFieldEditor';
 import type { FieldEditorComponent } from '../types/fieldModal';
 
 const coreEditors: Record< string, FieldEditorComponent > = {
@@ -16,6 +18,8 @@ const coreEditors: Record< string, FieldEditorComponent > = {
 	image: ImageFieldEditor,
 	imageselect: ImageselectFieldEditor,
 	audio: AudioFieldEditor,
+	cropper: CropperFieldEditor,
+	quantities: QuantitiesFieldEditor,
 };
 
 export function getFieldEditor( slug: string ): FieldEditorComponent | null {

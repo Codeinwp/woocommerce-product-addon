@@ -14,6 +14,8 @@ import {
 } from '@chakra-ui/react';
 import { normalizeSelectOptions } from './schemaTabs';
 import { ConditionsEditor } from './ConditionsEditor';
+import { PairedCropperEditor } from './components/PairedCropperEditor';
+import { PairedQuantityEditor } from './components/PairedQuantityEditor';
 import type { SettingRowContext } from './types/fieldModal';
 
 const controlSurface = {
@@ -169,6 +171,34 @@ export function renderSettingRow(
 				i18n={ i18n }
 				builderFields={ builderFields }
 				conditionsProEnabled={ conditionsProEnabled }
+			/>
+		);
+	}
+
+	if ( type === 'paired-cropper' ) {
+		return (
+			<PairedCropperEditor
+				key={ key }
+				fieldKey={ key }
+				title={ title }
+				description={ desc }
+				values={ values }
+				onChange={ ctx.onChange }
+				i18n={ i18n }
+			/>
+		);
+	}
+
+	if ( type === 'paired-quantity' ) {
+		return (
+			<PairedQuantityEditor
+				key={ key }
+				fieldKey={ key }
+				title={ title }
+				description={ desc }
+				values={ values }
+				onChange={ ctx.onChange }
+				i18n={ i18n }
 			/>
 		);
 	}

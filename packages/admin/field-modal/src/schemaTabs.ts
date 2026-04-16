@@ -33,8 +33,6 @@ export function classifySettingTab(
 
 	const unsupportedTypes = new Set( [
 		'paired',
-		'paired-cropper',
-		'paired-quantity',
 		'paired-pricematrix',
 		'bulk-quantity',
 		'paired-palettes',

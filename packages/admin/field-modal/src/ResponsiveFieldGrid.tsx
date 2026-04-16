@@ -25,7 +25,9 @@ export function ResponsiveFieldGrid( { entries, ctx }: ResponsiveFieldGridProps 
 				const fullRow =
 					type === 'textarea' ||
 					type === 'html-conditions' ||
-					type === 'paired';
+					type === 'paired' ||
+					type === 'paired-cropper' ||
+					type === 'paired-quantity';
 				return (
 					<GridItem
 						key={ key }

@@ -81,6 +81,7 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 	{
 		labelKey: 'editorSectionMedia',
 		keys: [
+			'options',
 			'viewport_type',
 			'boundary',
 			'enforce_boundary',
