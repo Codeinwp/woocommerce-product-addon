@@ -1,5 +1,5 @@
 /**
- * Select field type: grouped settings; paired options inline editor.
+ * Select Option Quantity (Pro): paired options + option/qty labels + select-like layout.
  */
 import { Box, VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
@@ -12,7 +12,7 @@ import { PairedOptionsEditor } from '../components/PairedOptionsEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
 
-export function SelectFieldEditor( {
+export function SelectQtyFieldEditor( {
 	schema,
 	values,
 	onChange,
@@ -25,7 +25,7 @@ export function SelectFieldEditor( {
 			? ( schema.settings as Record< string, unknown > )
 			: {};
 	const optionsMeta = settings.options as Record< string, unknown > | undefined;
-	const needsLegacyOptions =
+	const needsPaired =
 		optionsMeta &&
 		optionsMeta.type &&
 		String( optionsMeta.type ) === 'paired';
@@ -40,15 +40,15 @@ export function SelectFieldEditor( {
 	const sectionsAfter = [
 		{
 			label: i18n.editorSectionDefaultPrice || 'Defaults',
-			keys: [ 'selected', 'first_option' ],
+			keys: [ 'selected', 'first_option', 'option_label', 'qty_label' ],
 		},
 		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
-			keys: [ 'class', 'width', 'visibility' ],
+			keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
 		},
 		{
 			label: i18n.editorSectionBehavior || 'Behavior',
-			keys: [ 'desc_tooltip', 'onetime', 'required' ],
+			keys: [ 'desc_tooltip', 'required', 'unlink_order_qty' ],
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -76,9 +76,9 @@ export function SelectFieldEditor( {
 
 	const optionsTitle = optionsMeta?.title
 		? String( optionsMeta.title )
-		: i18n.selectOptionsTitle || 'Options';
+		: i18n.selectQtyOptionsTitle || 'Add options';
 
-	const pairedBlock = needsLegacyOptions ? (
+	const pairedBlock = needsPaired ? (
 		<Box>
 			<PairedOptionsEditor
 				variant="select"

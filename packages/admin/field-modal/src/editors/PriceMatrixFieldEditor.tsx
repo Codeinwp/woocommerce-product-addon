@@ -1,5 +1,5 @@
 /**
- * Select field type: grouped settings; paired options inline editor.
+ * Price Matrix: heading + discount type + paired-pricematrix + qty step + display toggles + conditions.
  */
 import { Box, VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
@@ -8,11 +8,11 @@ import {
 	shouldShowConditionalRepeaterTab,
 } from '../SettingsConditionsTabs';
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
-import { PairedOptionsEditor } from '../components/PairedOptionsEditor';
+import { PairedMatrixOptionsEditor } from '../components/PairedMatrixOptionsEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
 
-export function SelectFieldEditor( {
+export function PriceMatrixFieldEditor( {
 	schema,
 	values,
 	onChange,
@@ -25,30 +25,38 @@ export function SelectFieldEditor( {
 			? ( schema.settings as Record< string, unknown > )
 			: {};
 	const optionsMeta = settings.options as Record< string, unknown > | undefined;
-	const needsLegacyOptions =
+	const needsMatrix =
 		optionsMeta &&
 		optionsMeta.type &&
-		String( optionsMeta.type ) === 'paired';
+		String( optionsMeta.type ) === 'paired-pricematrix';
 
 	const sectionsBefore = [
 		{
 			label: i18n.editorSectionBasic || 'Basic',
-			keys: [ 'title', 'data_name', 'description', 'error_message' ],
+			keys: [ 'title', 'data_name', 'description' ],
+		},
+		{
+			label: i18n.editorSectionDefaultPrice || 'Pricing',
+			keys: [ 'discount_type' ],
 		},
 	];
 
 	const sectionsAfter = [
 		{
-			label: i18n.editorSectionDefaultPrice || 'Defaults',
-			keys: [ 'selected', 'first_option' ],
-		},
-		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
-			keys: [ 'class', 'width', 'visibility' ],
+			keys: [
+				'qty_step',
+				'visibility',
+				'visibility_role',
+				'discount',
+				'show_slider',
+				'show_price_per_unit',
+				'hide_matrix_table',
+			],
 		},
 		{
 			label: i18n.editorSectionBehavior || 'Behavior',
-			keys: [ 'desc_tooltip', 'onetime', 'required' ],
+			keys: [ 'desc_tooltip' ],
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -76,12 +84,11 @@ export function SelectFieldEditor( {
 
 	const optionsTitle = optionsMeta?.title
 		? String( optionsMeta.title )
-		: i18n.selectOptionsTitle || 'Options';
+		: i18n.priceMatrixOptionsTitle || 'Price matrix';
 
-	const pairedBlock = needsLegacyOptions ? (
+	const matrixBlock = needsMatrix ? (
 		<Box>
-			<PairedOptionsEditor
-				variant="select"
+			<PairedMatrixOptionsEditor
 				values={ values }
 				onChange={ onChange }
 				i18n={ i18n }
@@ -100,7 +107,7 @@ export function SelectFieldEditor( {
 						{ ...shared }
 						sections={ sectionsBefore }
 					/>
-					{ pairedBlock }
+					{ matrixBlock }
 					<GroupedFieldSections
 						{ ...shared }
 						sections={ sectionsAfterSettings }

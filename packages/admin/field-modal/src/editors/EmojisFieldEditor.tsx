@@ -1,5 +1,5 @@
 /**
- * Select field type: grouped settings; paired options inline editor.
+ * Emojis (Pro): paired-palettes matrix + emoji picker settings.
  */
 import { Box, VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
@@ -8,11 +8,11 @@ import {
 	shouldShowConditionalRepeaterTab,
 } from '../SettingsConditionsTabs';
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
-import { PairedOptionsEditor } from '../components/PairedOptionsEditor';
+import { PairedMatrixOptionsEditor } from '../components/PairedMatrixOptionsEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
 
-export function SelectFieldEditor( {
+export function EmojisFieldEditor( {
 	schema,
 	values,
 	onChange,
@@ -25,10 +25,10 @@ export function SelectFieldEditor( {
 			? ( schema.settings as Record< string, unknown > )
 			: {};
 	const optionsMeta = settings.options as Record< string, unknown > | undefined;
-	const needsLegacyOptions =
+	const needsMatrix =
 		optionsMeta &&
 		optionsMeta.type &&
-		String( optionsMeta.type ) === 'paired';
+		String( optionsMeta.type ) === 'paired-palettes';
 
 	const sectionsBefore = [
 		{
@@ -39,16 +39,33 @@ export function SelectFieldEditor( {
 
 	const sectionsAfter = [
 		{
-			label: i18n.editorSectionDefaultPrice || 'Defaults',
-			keys: [ 'selected', 'first_option' ],
-		},
-		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
-			keys: [ 'class', 'width', 'visibility' ],
+			keys: [
+				'class',
+				'max_selected',
+				'width',
+				'emojis_display_type',
+				'search_placeholder',
+				'placeholder',
+				'filters_position',
+				'search_position',
+				'picker_position',
+				'tones_Style',
+				'recent_emojis',
+				'tones',
+				'search',
+				'visibility',
+				'visibility_role',
+			],
 		},
 		{
 			label: i18n.editorSectionBehavior || 'Behavior',
-			keys: [ 'desc_tooltip', 'onetime', 'required' ],
+			keys: [
+				'desc_tooltip',
+				'required',
+				'onetime',
+				'onetime_taxable',
+			],
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -76,12 +93,11 @@ export function SelectFieldEditor( {
 
 	const optionsTitle = optionsMeta?.title
 		? String( optionsMeta.title )
-		: i18n.selectOptionsTitle || 'Options';
+		: i18n.emojisOptionsTitle || 'Add colors';
 
-	const pairedBlock = needsLegacyOptions ? (
+	const matrixBlock = needsMatrix ? (
 		<Box>
-			<PairedOptionsEditor
-				variant="select"
+			<PairedMatrixOptionsEditor
 				values={ values }
 				onChange={ onChange }
 				i18n={ i18n }
@@ -100,7 +116,7 @@ export function SelectFieldEditor( {
 						{ ...shared }
 						sections={ sectionsBefore }
 					/>
-					{ pairedBlock }
+					{ matrixBlock }
 					<GroupedFieldSections
 						{ ...shared }
 						sections={ sectionsAfterSettings }

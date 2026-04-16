@@ -1,5 +1,5 @@
 /**
- * Select field type: grouped settings; paired options inline editor.
+ * Color Palettes: basic + paired-palettes matrix + display + behavior + conditions.
  */
 import { Box, VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
@@ -8,11 +8,11 @@ import {
 	shouldShowConditionalRepeaterTab,
 } from '../SettingsConditionsTabs';
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
-import { PairedOptionsEditor } from '../components/PairedOptionsEditor';
+import { PairedMatrixOptionsEditor } from '../components/PairedMatrixOptionsEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
 
-export function SelectFieldEditor( {
+export function PalettesFieldEditor( {
 	schema,
 	values,
 	onChange,
@@ -25,30 +25,50 @@ export function SelectFieldEditor( {
 			? ( schema.settings as Record< string, unknown > )
 			: {};
 	const optionsMeta = settings.options as Record< string, unknown > | undefined;
-	const needsLegacyOptions =
+	const needsMatrix =
 		optionsMeta &&
 		optionsMeta.type &&
-		String( optionsMeta.type ) === 'paired';
+		String( optionsMeta.type ) === 'paired-palettes';
 
 	const sectionsBefore = [
 		{
 			label: i18n.editorSectionBasic || 'Basic',
-			keys: [ 'title', 'data_name', 'description', 'error_message' ],
+			keys: [
+				'title',
+				'data_name',
+				'description',
+				'error_message',
+				'selected_palette_bcolor',
+			],
 		},
 	];
 
 	const sectionsAfter = [
 		{
 			label: i18n.editorSectionDefaultPrice || 'Defaults',
-			keys: [ 'selected', 'first_option' ],
+			keys: [ 'selected' ],
 		},
 		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
-			keys: [ 'class', 'width', 'visibility' ],
+			keys: [
+				'class',
+				'width',
+				'max_selected',
+				'color_width',
+				'color_height',
+				'visibility',
+				'visibility_role',
+			],
 		},
 		{
 			label: i18n.editorSectionBehavior || 'Behavior',
-			keys: [ 'desc_tooltip', 'onetime', 'required' ],
+			keys: [
+				'multiple_allowed',
+				'onetime',
+				'circle',
+				'desc_tooltip',
+				'required',
+			],
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -76,12 +96,11 @@ export function SelectFieldEditor( {
 
 	const optionsTitle = optionsMeta?.title
 		? String( optionsMeta.title )
-		: i18n.selectOptionsTitle || 'Options';
+		: i18n.palettesOptionsTitle || 'Add colors';
 
-	const pairedBlock = needsLegacyOptions ? (
+	const matrixBlock = needsMatrix ? (
 		<Box>
-			<PairedOptionsEditor
-				variant="select"
+			<PairedMatrixOptionsEditor
 				values={ values }
 				onChange={ onChange }
 				i18n={ i18n }
@@ -100,7 +119,7 @@ export function SelectFieldEditor( {
 						{ ...shared }
 						sections={ sectionsBefore }
 					/>
-					{ pairedBlock }
+					{ matrixBlock }
 					<GroupedFieldSections
 						{ ...shared }
 						sections={ sectionsAfterSettings }

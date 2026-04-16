@@ -1,5 +1,5 @@
 /**
- * Select field type: grouped settings; paired options inline editor.
+ * Fixed Price (Pro): quantity/price paired rows + view type + units + conditions.
  */
 import { Box, VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
@@ -8,11 +8,11 @@ import {
 	shouldShowConditionalRepeaterTab,
 } from '../SettingsConditionsTabs';
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
-import { PairedOptionsEditor } from '../components/PairedOptionsEditor';
+import { PairedFixedPriceEditor } from '../components/PairedFixedPriceEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
 
-export function SelectFieldEditor( {
+export function FixedPriceFieldEditor( {
 	schema,
 	values,
 	onChange,
@@ -25,30 +25,33 @@ export function SelectFieldEditor( {
 			? ( schema.settings as Record< string, unknown > )
 			: {};
 	const optionsMeta = settings.options as Record< string, unknown > | undefined;
-	const needsLegacyOptions =
+	const needsPaired =
 		optionsMeta &&
 		optionsMeta.type &&
 		String( optionsMeta.type ) === 'paired';
 
+	const placeholders = Array.isArray( optionsMeta?.placeholders )
+		? ( optionsMeta.placeholders as string[] )
+		: undefined;
+	const types = Array.isArray( optionsMeta?.types )
+		? ( optionsMeta.types as string[] )
+		: undefined;
+
 	const sectionsBefore = [
 		{
 			label: i18n.editorSectionBasic || 'Basic',
-			keys: [ 'title', 'data_name', 'description', 'error_message' ],
+			keys: [ 'title', 'data_name', 'description' ],
 		},
 	];
 
 	const sectionsAfter = [
 		{
 			label: i18n.editorSectionDefaultPrice || 'Defaults',
-			keys: [ 'selected', 'first_option' ],
+			keys: [ 'first_option', 'unit_plural', 'unit_single' ],
 		},
 		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
-			keys: [ 'class', 'width', 'visibility' ],
-		},
-		{
-			label: i18n.editorSectionBehavior || 'Behavior',
-			keys: [ 'desc_tooltip', 'onetime', 'required' ],
+			keys: [ 'view_type', 'decimal_place', 'class', 'width' ],
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -76,16 +79,17 @@ export function SelectFieldEditor( {
 
 	const optionsTitle = optionsMeta?.title
 		? String( optionsMeta.title )
-		: i18n.selectOptionsTitle || 'Options';
+		: i18n.fixedPriceOptionsTitle || 'Quantity';
 
-	const pairedBlock = needsLegacyOptions ? (
+	const pairedBlock = needsPaired ? (
 		<Box>
-			<PairedOptionsEditor
-				variant="select"
+			<PairedFixedPriceEditor
 				values={ values }
 				onChange={ onChange }
 				i18n={ i18n }
 				title={ optionsTitle }
+				placeholders={ placeholders }
+				types={ types }
 			/>
 		</Box>
 	) : null;

@@ -1,14 +1,22 @@
 /**
- * MVP editor for schema `options.type === 'paired'` (select, radio, etc.).
+ * Classic paired-palettes / paired-pricematrix rows: option, price, label, id, isfixed.
  */
-import { Box, Button, HStack, Input, Text, VStack } from '@chakra-ui/react';
+import {
+	Box,
+	Button,
+	Checkbox,
+	HStack,
+	Input,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
 
-export type PairedOptionRow = Record< string, unknown >;
+export type MatrixOptionRow = Record< string, unknown >;
 
-function normalizeOptionsArray( raw: unknown ): PairedOptionRow[] {
+function normalizeOptionsArray( raw: unknown ): MatrixOptionRow[] {
 	if ( Array.isArray( raw ) ) {
 		return raw.map( ( o ) =>
 			o && typeof o === 'object' && ! Array.isArray( o )
@@ -28,28 +36,27 @@ function normalizeOptionsArray( raw: unknown ): PairedOptionRow[] {
 	return [];
 }
 
-export type PairedOptionsVariant = 'select' | 'radio' | 'checkbox';
+function isFixedChecked( row: MatrixOptionRow ): boolean {
+	const v = row.isfixed;
+	return v === 'on' || v === true || v === '1' || v === 1;
+}
 
-export interface PairedOptionsEditorProps {
+export interface PairedMatrixOptionsEditorProps {
 	values: FieldRow;
 	onChange: Dispatch< SetStateAction< FieldRow | null > >;
 	i18n: I18nDict;
 	title: string;
-	/** `checkbox` adds discount + tooltip columns (classic paired UI). */
-	variant?: PairedOptionsVariant;
 }
 
-export function PairedOptionsEditor( {
+export function PairedMatrixOptionsEditor( {
 	values,
 	onChange,
 	i18n,
 	title,
-	variant = 'select',
-}: PairedOptionsEditorProps ) {
+}: PairedMatrixOptionsEditorProps ) {
 	const rows = normalizeOptionsArray( values.options );
-	const showCheckboxExtras = variant === 'checkbox';
 
-	const setRows = ( next: PairedOptionRow[] ) => {
+	const setRows = ( next: MatrixOptionRow[] ) => {
 		onChange( ( prev ) => {
 			if ( ! prev ) {
 				return prev;
@@ -58,7 +65,7 @@ export function PairedOptionsEditor( {
 		} );
 	};
 
-	const updateRow = ( index: number, patch: Partial< PairedOptionRow > ) => {
+	const updateRow = ( index: number, patch: Partial< MatrixOptionRow > ) => {
 		const next = rows.map( ( r, i ) =>
 			i === index ? { ...r, ...patch } : r
 		);
@@ -66,18 +73,16 @@ export function PairedOptionsEditor( {
 	};
 
 	const addRow = () => {
-		const base: PairedOptionRow = {
-			option: '',
-			price: '',
-			weight: '',
-			stock: '',
-			id: '',
-		};
-		if ( showCheckboxExtras ) {
-			base.discount = '';
-			base.tooltip = '';
-		}
-		setRows( [ ...rows, base ] );
+		setRows( [
+			...rows,
+			{
+				option: '',
+				price: '',
+				label: '',
+				id: '',
+				isfixed: '',
+			},
+		] );
 	};
 
 	const removeRow = ( index: number ) => {
@@ -94,6 +99,10 @@ export function PairedOptionsEditor( {
 		next[ index ] = next[ j ];
 		next[ j ] = t;
 		setRows( next );
+	};
+
+	const toggleFixed = ( index: number, checked: boolean ) => {
+		updateRow( index, { isfixed: checked ? 'on' : '' } );
 	};
 
 	return (
@@ -121,16 +130,16 @@ export function PairedOptionsEditor( {
 							spacing={ 2 }
 							w="full"
 							overflowX="auto"
+							flexWrap="wrap"
 						>
 							<Input
 								size="sm"
-								flex="1 1 0"
+								flex="1 1 120px"
 								minW={ 0 }
-								w="auto"
 								placeholder={
-									i18n.pairedOptionLabel || 'Option'
+									i18n.pairedMatrixOption || 'Option'
 								}
-								value={ String( row.option ?? row.title ?? '' ) }
+								value={ String( row.option ?? '' ) }
 								onChange={ ( e ) =>
 									updateRow( index, {
 										option: e.target.value,
@@ -139,96 +148,49 @@ export function PairedOptionsEditor( {
 							/>
 							<Input
 								size="sm"
-								flex="1 1 0"
+								flex="1 1 100px"
 								minW={ 0 }
-								w="auto"
 								placeholder={
-									i18n.pairedOptionPrice || 'Price'
+									i18n.pairedMatrixPrice || 'Price'
 								}
 								value={ String( row.price ?? '' ) }
 								onChange={ ( e ) =>
 									updateRow( index, { price: e.target.value } )
 								}
 							/>
-							{ showCheckboxExtras ? (
-								<>
-									<Input
-										size="sm"
-										flex="1 1 0"
-										minW={ 0 }
-										w="auto"
-										placeholder={
-											i18n.pairedOptionDiscount ||
-											'Discount'
-										}
-										value={ String( row.discount ?? '' ) }
-										onChange={ ( e ) =>
-											updateRow( index, {
-												discount: e.target.value,
-											} )
-										}
-									/>
-									<Input
-										size="sm"
-										flex="1 1 0"
-										minW={ 0 }
-										w="auto"
-										placeholder={
-											i18n.pairedOptionTooltip ||
-											'Tooltip'
-										}
-										value={ String( row.tooltip ?? '' ) }
-										onChange={ ( e ) =>
-											updateRow( index, {
-												tooltip: e.target.value,
-											} )
-										}
-									/>
-								</>
-							) : null }
 							<Input
 								size="sm"
-								flex="1 1 0"
+								flex="1 1 100px"
 								minW={ 0 }
-								w="auto"
 								placeholder={
-									i18n.pairedOptionWeight || 'Weight'
+									i18n.pairedMatrixLabel || 'Label'
 								}
-								value={ String( row.weight ?? '' ) }
+								value={ String( row.label ?? '' ) }
 								onChange={ ( e ) =>
-									updateRow( index, {
-										weight: e.target.value,
-									} )
+									updateRow( index, { label: e.target.value } )
 								}
 							/>
 							<Input
 								size="sm"
-								flex="1 1 0"
+								flex="1 1 100px"
 								minW={ 0 }
-								w="auto"
 								placeholder={
-									i18n.pairedOptionStock || 'Stock'
+									i18n.pairedMatrixOptionId || 'Option ID'
 								}
-								value={ String( row.stock ?? '' ) }
+								value={ String( row.id ?? '' ) }
 								onChange={ ( e ) =>
-									updateRow( index, { stock: e.target.value } )
+									updateRow( index, { id: e.target.value } )
 								}
 							/>
-							<Input
+							<Checkbox
 								size="sm"
-								flex="1 1 0"
-								minW={ 0 }
-								w="auto"
-								placeholder={
-									i18n.pairedOptionImageId || 'Image ID'
-								}
-								value={ String( row.id ?? row.images ?? '' ) }
+								isChecked={ isFixedChecked( row ) }
 								onChange={ ( e ) =>
-									updateRow( index, {
-										id: e.target.value,
-									} )
+									toggleFixed( index, e.target.checked )
 								}
-							/>
+							>
+								{ i18n.pairedMatrixFixed || 'Fixed' }
+							</Checkbox>
 							<HStack spacing={ 1 } flexShrink={ 0 }>
 								<Button
 									size="xs"

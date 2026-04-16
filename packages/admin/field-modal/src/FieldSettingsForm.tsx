@@ -2,7 +2,16 @@
  * Schema-driven field settings (fallback when no typed editor is registered).
  */
 import { useMemo } from '@wordpress/element';
-import { Box, Text, Button, VStack, Alert, AlertIcon } from '@chakra-ui/react';
+import {
+	Box,
+	Text,
+	Button,
+	VStack,
+	Alert,
+	AlertIcon,
+	List,
+	ListItem,
+} from '@chakra-ui/react';
 import { classifySettingTab } from './schemaTabs';
 import { renderSettingRow, openLegacyFieldModal } from './schemaSettingControl';
 import { ResponsiveFieldGrid } from './ResponsiveFieldGrid';
@@ -91,6 +100,22 @@ export function FieldSettingsForm( {
 					<Text fontSize="sm" lineHeight="1.5">
 						{ i18n.legacyEditorHint }
 					</Text>
+					<List fontSize="sm" mt={ 2 } spacing={ 1 } pl={ 4 } styleType="disc">
+						{ buckets.unsupported.map( ( { key, meta } ) => {
+							const t =
+								meta.title != null
+									? String( meta.title )
+									: key;
+							return (
+								<ListItem key={ key }>
+									{ t }{ ' ' }
+									<Text as="span" color="gray.500" fontSize="xs">
+										({ key })
+									</Text>
+								</ListItem>
+							);
+						} ) }
+					</List>
 					<Button
 						size="sm"
 						mt={ 2 }

@@ -1,12 +1,11 @@
 /**
- * MVP editor for schema `options.type === 'paired'` (select, radio, etc.).
+ * Fixed Price paired rows: quantity + fixed price (number inputs), classic input.fixedprice.php shape.
  */
 import { Box, Button, HStack, Input, Text, VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
-
-export type PairedOptionRow = Record< string, unknown >;
+import type { PairedOptionRow } from './PairedOptionsEditor';
 
 function normalizeOptionsArray( raw: unknown ): PairedOptionRow[] {
 	if ( Array.isArray( raw ) ) {
@@ -28,26 +27,30 @@ function normalizeOptionsArray( raw: unknown ): PairedOptionRow[] {
 	return [];
 }
 
-export type PairedOptionsVariant = 'select' | 'radio' | 'checkbox';
-
-export interface PairedOptionsEditorProps {
+export interface PairedFixedPriceEditorProps {
 	values: FieldRow;
 	onChange: Dispatch< SetStateAction< FieldRow | null > >;
 	i18n: I18nDict;
 	title: string;
-	/** `checkbox` adds discount + tooltip columns (classic paired UI). */
-	variant?: PairedOptionsVariant;
+	/** From schema `options.placeholders` (e.g. quantity label, price label). */
+	placeholders?: string[];
+	/** From schema `options.types` (e.g. `number`, `number`). */
+	types?: string[];
 }
 
-export function PairedOptionsEditor( {
+export function PairedFixedPriceEditor( {
 	values,
 	onChange,
 	i18n,
 	title,
-	variant = 'select',
-}: PairedOptionsEditorProps ) {
+	placeholders = [],
+	types = [ 'number', 'number' ],
+}: PairedFixedPriceEditorProps ) {
 	const rows = normalizeOptionsArray( values.options );
-	const showCheckboxExtras = variant === 'checkbox';
+	const p0 = placeholders[ 0 ] || i18n.fixedPriceQtyPlaceholder || 'Quantity';
+	const p1 = placeholders[ 1 ] || i18n.fixedPricePricePlaceholder || 'Fixed Price';
+	const t0 = types[ 0 ] === 'number' ? 'number' : 'text';
+	const t1 = types[ 1 ] === 'number' ? 'number' : 'text';
 
 	const setRows = ( next: PairedOptionRow[] ) => {
 		onChange( ( prev ) => {
@@ -66,18 +69,7 @@ export function PairedOptionsEditor( {
 	};
 
 	const addRow = () => {
-		const base: PairedOptionRow = {
-			option: '',
-			price: '',
-			weight: '',
-			stock: '',
-			id: '',
-		};
-		if ( showCheckboxExtras ) {
-			base.discount = '';
-			base.tooltip = '';
-		}
-		setRows( [ ...rows, base ] );
+		setRows( [ ...rows, { option: '', price: '', id: '' } ] );
 	};
 
 	const removeRow = ( index: number ) => {
@@ -90,9 +82,9 @@ export function PairedOptionsEditor( {
 			return;
 		}
 		const next = [ ...rows ];
-		const t = next[ index ];
+		const tmp = next[ index ];
 		next[ index ] = next[ j ];
-		next[ j ] = t;
+		next[ j ] = tmp;
 		setRows( next );
 	};
 
@@ -116,21 +108,14 @@ export function PairedOptionsEditor( {
 						borderRadius="md"
 						p={ 2 }
 					>
-						<HStack
-							align="center"
-							spacing={ 2 }
-							w="full"
-							overflowX="auto"
-						>
+						<HStack spacing={ 2 } flexWrap="wrap" align="center">
 							<Input
 								size="sm"
-								flex="1 1 0"
+								type={ t0 }
+								flex="1 1 120px"
 								minW={ 0 }
-								w="auto"
-								placeholder={
-									i18n.pairedOptionLabel || 'Option'
-								}
-								value={ String( row.option ?? row.title ?? '' ) }
+								placeholder={ p0 }
+								value={ String( row.option ?? '' ) }
 								onChange={ ( e ) =>
 									updateRow( index, {
 										option: e.target.value,
@@ -139,103 +124,31 @@ export function PairedOptionsEditor( {
 							/>
 							<Input
 								size="sm"
-								flex="1 1 0"
+								type={ t1 }
+								flex="1 1 120px"
 								minW={ 0 }
-								w="auto"
-								placeholder={
-									i18n.pairedOptionPrice || 'Price'
-								}
+								placeholder={ p1 }
 								value={ String( row.price ?? '' ) }
 								onChange={ ( e ) =>
 									updateRow( index, { price: e.target.value } )
 								}
 							/>
-							{ showCheckboxExtras ? (
-								<>
-									<Input
-										size="sm"
-										flex="1 1 0"
-										minW={ 0 }
-										w="auto"
-										placeholder={
-											i18n.pairedOptionDiscount ||
-											'Discount'
-										}
-										value={ String( row.discount ?? '' ) }
-										onChange={ ( e ) =>
-											updateRow( index, {
-												discount: e.target.value,
-											} )
-										}
-									/>
-									<Input
-										size="sm"
-										flex="1 1 0"
-										minW={ 0 }
-										w="auto"
-										placeholder={
-											i18n.pairedOptionTooltip ||
-											'Tooltip'
-										}
-										value={ String( row.tooltip ?? '' ) }
-										onChange={ ( e ) =>
-											updateRow( index, {
-												tooltip: e.target.value,
-											} )
-										}
-									/>
-								</>
-							) : null }
 							<Input
 								size="sm"
-								flex="1 1 0"
+								flex="1 1 100px"
 								minW={ 0 }
-								w="auto"
 								placeholder={
-									i18n.pairedOptionWeight || 'Weight'
+									i18n.pairedMatrixOptionId || 'Unique ID'
 								}
-								value={ String( row.weight ?? '' ) }
+								value={ String( row.id ?? '' ) }
 								onChange={ ( e ) =>
-									updateRow( index, {
-										weight: e.target.value,
-									} )
+									updateRow( index, { id: e.target.value } )
 								}
 							/>
-							<Input
-								size="sm"
-								flex="1 1 0"
-								minW={ 0 }
-								w="auto"
-								placeholder={
-									i18n.pairedOptionStock || 'Stock'
-								}
-								value={ String( row.stock ?? '' ) }
-								onChange={ ( e ) =>
-									updateRow( index, { stock: e.target.value } )
-								}
-							/>
-							<Input
-								size="sm"
-								flex="1 1 0"
-								minW={ 0 }
-								w="auto"
-								placeholder={
-									i18n.pairedOptionImageId || 'Image ID'
-								}
-								value={ String( row.id ?? row.images ?? '' ) }
-								onChange={ ( e ) =>
-									updateRow( index, {
-										id: e.target.value,
-									} )
-								}
-							/>
-							<HStack spacing={ 1 } flexShrink={ 0 }>
+							<HStack spacing={ 1 }>
 								<Button
 									size="xs"
 									variant="ghost"
-									aria-label={
-										i18n.pairedOptionsMoveUp || 'Up'
-									}
 									onClick={ () => move( index, -1 ) }
 									isDisabled={ index === 0 }
 								>
@@ -244,9 +157,6 @@ export function PairedOptionsEditor( {
 								<Button
 									size="xs"
 									variant="ghost"
-									aria-label={
-										i18n.pairedOptionsMoveDown || 'Down'
-									}
 									onClick={ () => move( index, 1 ) }
 									isDisabled={ index === rows.length - 1 }
 								>
