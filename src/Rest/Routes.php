@@ -87,6 +87,9 @@ final class Routes {
 		if ( ppom_is_api_enable() ) {
 			add_action( 'rest_api_init', array( $this, 'init_api' ) );
 		}
+
+		// Always register nonce refresh endpoint (doesn't need API enable setting).
+		add_action( 'rest_api_init', array( $this, 'init_nonce_api' ) );
 	}
 
 
@@ -172,7 +175,17 @@ final class Routes {
 				'permission_callback' => '__return_true',
 			)
 		);
+	}
 
+	/**
+	 * Registers the nonce refresh endpoint for file operations.
+	 *
+	 * This endpoint is always available and doesn't require the API to be enabled
+	 * in settings, as it only returns fresh nonces which are public values.
+	 *
+	 * @return void
+	 */
+	public function init_nonce_api() {
 		// Get fresh nonces for file operations.
 		register_rest_route(
 			'ppom/v1',

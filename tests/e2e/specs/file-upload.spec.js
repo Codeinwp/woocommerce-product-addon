@@ -50,6 +50,18 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		const fileField = page.locator( `[data-data_name="${ fieldId }"]` );
 		await expect( fileField ).toBeVisible();
 
+		// Wait for file upload JavaScript to be fully loaded
+		await page.waitForFunction(
+			() => {
+				return (
+					typeof window.ppom_file_vars !== 'undefined' &&
+					window.ppom_file_vars.rest_url &&
+					window.ppom_file_vars.ppom_file_upload_nonce
+				);
+			},
+			{ timeout: 10000 }
+		);
+
 		// Verify the REST endpoint URL is available
 		const restUrl = await page.evaluate( () => {
 			return window.ppom_file_vars?.rest_url;
@@ -99,6 +111,17 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		await page.waitForSelector( `[data-data_name="${ fieldId }"]`, {
 			timeout: 10000,
 		} );
+
+		// Wait for file upload JavaScript to be fully loaded
+		await page.waitForFunction(
+			() => {
+				return (
+					typeof window.ppom_file_vars !== 'undefined' &&
+					typeof window.ppom_refresh_file_nonces === 'function'
+				);
+			},
+			{ timeout: 10000 }
+		);
 
 		// Get the initial nonce
 		const initialNonce = await page.evaluate( () => {
@@ -163,6 +186,17 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		await page.waitForSelector( `[data-data_name="${ fieldId }"]`, {
 			timeout: 10000,
 		} );
+
+		// Wait for file upload JavaScript to be fully loaded
+		await page.waitForFunction(
+			() => {
+				return (
+					typeof window.ppom_file_vars !== 'undefined' &&
+					window.ppom_file_vars.rest_url
+				);
+			},
+			{ timeout: 10000 }
+		);
 
 		// Test the REST endpoint directly
 		const nonceResponse = await page.evaluate( async () => {
