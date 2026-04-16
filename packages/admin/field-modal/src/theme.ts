@@ -7,9 +7,13 @@ export const fieldModalTheme = extendTheme( {
 	config: {
 		cssVarPrefix: 'ppom-fm',
 	},
-	// Sit above wp-admin bar (99999), notices, and WP media modal (~160000).
+	/**
+	 * Must stay **below** the WordPress media modal (~160000 for `.media-modal` /
+	 * `.media-modal-backdrop`); otherwise `wp.media()` opened from inside this modal
+	 * is covered by our overlay. Still well above wp-admin bar (~99999) and typical UI.
+	 */
 	zIndices: {
-		modal: 200100,
+		modal: 159000,
 	},
 	fonts: {
 		body: 'inherit',
@@ -26,8 +30,8 @@ export const fieldModalTheme = extendTheme( {
 	components: {
 		Modal: {
 			baseStyle: {
-				overlay: { zIndex: 200100 },
-				dialogContainer: { zIndex: 200100 },
+				overlay: { zIndex: 159000 },
+				dialogContainer: { zIndex: 159000 },
 				dialog: { borderRadius: 'md' },
 			},
 			variants: {

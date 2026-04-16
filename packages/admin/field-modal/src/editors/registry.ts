@@ -4,12 +4,18 @@
 import { TextFieldEditor } from './TextFieldEditor';
 import { TextareaFieldEditor } from './TextareaFieldEditor';
 import { SelectFieldEditor } from './SelectFieldEditor';
+import { ImageFieldEditor } from './ImageFieldEditor';
+import { ImageselectFieldEditor } from './ImageselectFieldEditor';
+import { AudioFieldEditor } from './AudioFieldEditor';
 import type { FieldEditorComponent } from '../types/fieldModal';
 
 const coreEditors: Record< string, FieldEditorComponent > = {
 	text: TextFieldEditor,
 	textarea: TextareaFieldEditor,
 	select: SelectFieldEditor,
+	image: ImageFieldEditor,
+	imageselect: ImageselectFieldEditor,
+	audio: AudioFieldEditor,
 };
 
 export function getFieldEditor( slug: string ): FieldEditorComponent | null {

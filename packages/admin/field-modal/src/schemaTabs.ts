@@ -38,9 +38,7 @@ export function classifySettingTab(
 		'paired-pricematrix',
 		'bulk-quantity',
 		'paired-palettes',
-		'pre-images',
 		'pre-audios',
-		'imageselect',
 	] );
 	if ( unsupportedTypes.has( type ) ) {
 		return 'unsupported';
