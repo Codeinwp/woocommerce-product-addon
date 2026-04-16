@@ -1,8 +1,7 @@
 /**
  * Modal body: loading, errors, picker step, or manage step.
  */
-import { ModalBody } from '@chakra-ui/react';
-import { HStack, Text, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
+import { Dialog, Alert, HStack, Text, Spinner } from '@chakra-ui/react';
 import { FieldPickerPanel } from './FieldPickerPanel';
 import { FieldManagePanel } from './FieldManagePanel';
 import type { FieldModalBodyProps } from '../types/fieldModal';
@@ -16,31 +15,31 @@ export function FieldModalBody( {
 }: FieldModalBodyProps ) {
 	const { loading, error } = status;
 	return (
-		<ModalBody
+        <Dialog.Body
 			flex="1"
 			overflowY="auto"
 			minH={ 0 }
 			py={ 2 }
 			px={ { base: 3, md: 4 } }
 		>
-			{ loading && (
+            { loading && (
 				<HStack py={ 8 } justify="center">
 					<Spinner size="md" />
 					<Text>{ picker.i18n.loading || 'Loading…' }</Text>
 				</HStack>
 			) }
-			{ error && (
-				<Alert status="error" mb={ 3 } borderRadius="md">
-					<AlertIcon />
+            { error && (
+				<Alert.Root status="error" mb={ 3 } borderRadius="md">
+					<Alert.Indicator />
 					{ error }
-				</Alert>
+				</Alert.Root>
 			) }
-			{ ! loading && ctx && pickerOpen && (
+            { ! loading && ctx && pickerOpen && (
 				<FieldPickerPanel { ...picker } />
 			) }
-			{ ! loading && ctx && ! pickerOpen && (
+            { ! loading && ctx && ! pickerOpen && (
 				<FieldManagePanel { ...manage } />
 			) }
-		</ModalBody>
-	);
+        </Dialog.Body>
+    );
 }

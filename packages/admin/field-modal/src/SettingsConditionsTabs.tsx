@@ -2,13 +2,7 @@
  * Top-level Settings / Conditions / optional Conditional Repeater tabs for field modal editors.
  */
 import type { ReactNode } from 'react';
-import {
-	Tabs,
-	TabList,
-	TabPanels,
-	Tab,
-	TabPanel,
-} from '@chakra-ui/react';
+import { Box, Tabs } from '@chakra-ui/react';
 import type { I18nDict, ModalContextValue } from './types/fieldModal';
 
 /** Whether the Conditional Repeater tab should appear (Lite upsell or Plus mapping). */
@@ -55,38 +49,62 @@ export function SettingsConditionsTabs( {
 		return settings;
 	}
 
+	const settingsTabValue = 'settings';
+	const conditionsTabValue = 'conditions';
+	const repeaterTabValue = 'repeater';
+
 	return (
-		<Tabs variant="line" colorScheme="blue" isLazy>
-			<TabList borderBottomColor="gray.200" mb={ 3 } gap={ 1 }>
-				<Tab fontWeight="semibold" px={ 1 } py={ 1.5 }>
+		<Tabs.Root
+			variant="line"
+			colorPalette="blue"
+			lazyMount
+			defaultValue={ settingsTabValue }
+		>
+			<Tabs.List borderBottomColor="gray.200" mb={ 3 } gap={ 1 }>
+				<Tabs.Trigger
+					value={ settingsTabValue }
+					fontWeight="semibold"
+					px={ 1 }
+					py={ 1.5 }
+				>
 					{ settingsLabel }
-				</Tab>
+				</Tabs.Trigger>
 				{ hasConditions ? (
-					<Tab fontWeight="semibold" px={ 1 } py={ 1.5 }>
+					<Tabs.Trigger
+						value={ conditionsTabValue }
+						fontWeight="semibold"
+						px={ 1 }
+						py={ 1.5 }
+					>
 						{ conditionsLabel }
-					</Tab>
+					</Tabs.Trigger>
 				) : null }
 				{ showRepeater ? (
-					<Tab fontWeight="semibold" px={ 1 } py={ 1.5 }>
+					<Tabs.Trigger
+						value={ repeaterTabValue }
+						fontWeight="semibold"
+						px={ 1 }
+						py={ 1.5 }
+					>
 						{ repeaterLabel }
-					</Tab>
+					</Tabs.Trigger>
 				) : null }
-			</TabList>
-			<TabPanels>
-				<TabPanel px={ 0 } pt={ 0 }>
-					{ settings }
-				</TabPanel>
+			</Tabs.List>
+			<Tabs.ContentGroup>
+				<Tabs.Content value={ settingsTabValue } px={ 0 } pt={ 0 }>
+					<Box w="100%">{ settings }</Box>
+				</Tabs.Content>
 				{ hasConditions ? (
-					<TabPanel px={ 0 } pt={ 0 }>
-						{ conditions }
-					</TabPanel>
+					<Tabs.Content value={ conditionsTabValue } px={ 0 } pt={ 0 }>
+						<Box w="100%">{ conditions }</Box>
+					</Tabs.Content>
 				) : null }
 				{ showRepeater ? (
-					<TabPanel px={ 0 } pt={ 0 }>
-						{ repeater }
-					</TabPanel>
+					<Tabs.Content value={ repeaterTabValue } px={ 0 } pt={ 0 }>
+						<Box w="100%">{ repeater }</Box>
+					</Tabs.Content>
 				) : null }
-			</TabPanels>
-		</Tabs>
+			</Tabs.ContentGroup>
+		</Tabs.Root>
 	);
 }

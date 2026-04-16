@@ -25,7 +25,7 @@
  */
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from '@wordpress/element';
 import { useStore } from '@tanstack/react-form';
-import { Alert, AlertIcon, Skeleton, VStack } from '@chakra-ui/react';
+import { Steps, Alert, Skeleton, VStack } from '@chakra-ui/react';
 import { FieldSettingsForm } from '../FieldSettingsForm';
 import { usePpomAppForm } from '../form/ppomForm';
 import type { FieldRow } from '../types/fieldModal';
@@ -150,15 +150,15 @@ function FieldManageEditorBridgeInner( {
 	);
 
 	return (
-		<VStack align="stretch" spacing={ 3 }>
-			{ schemaLoading && ! activeSchema && (
-				<VStack spacing={ 2 } align="stretch">
+        <VStack align="stretch" gap={ 3 }>
+            { schemaLoading && ! activeSchema && (
+				<VStack gap={ 2 } align="stretch">
 					<Skeleton height="36px" />
 					<Skeleton height="36px" />
 					<Skeleton height="72px" />
 				</VStack>
 			) }
-			{ activeSchema && TypedEditor && (
+            { activeSchema && TypedEditor && (
 				<TypedEditor
 					schema={ activeSchema }
 					values={ values }
@@ -168,7 +168,7 @@ function FieldManageEditorBridgeInner( {
 					modalContext={ modalContext }
 				/>
 			) }
-			{ activeSchema && ! TypedEditor && (
+            { activeSchema && ! TypedEditor && (
 				<FieldSettingsForm
 					schema={ activeSchema }
 					values={ values }
@@ -179,12 +179,12 @@ function FieldManageEditorBridgeInner( {
 					modalContext={ modalContext }
 				/>
 			) }
-			{ ! schemaLoading && ! activeSchema && editDraft.type && (
-				<Alert status="info">
-					<AlertIcon />
+            { ! schemaLoading && ! activeSchema && editDraft.type && (
+				<Alert.Root status="info">
+					<Alert.Indicator />
 					{ i18n.unsupportedControl }
-				</Alert>
+				</Alert.Root>
 			) }
-		</VStack>
-	);
+        </VStack>
+    );
 }

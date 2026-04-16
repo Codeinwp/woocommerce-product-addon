@@ -1,11 +1,7 @@
 /**
  * PPOM text input bound to TanStack Form field context + Chakra v2.
  */
-import {
-	FormControl,
-	FormLabel,
-	Input,
-} from '@chakra-ui/react';
+import { Steps, Input, Field } from '@chakra-ui/react';
 import { useId } from '@wordpress/element';
 import { useFieldContext } from '../ppomFormContext';
 import { ppomControlSurface, ppomFieldLabelProps } from '../fieldStyles';
@@ -17,22 +13,23 @@ export interface PpomTextInputProps {
 export function PpomTextInput( { label }: PpomTextInputProps ) {
 	const field = useFieldContext<string>();
 	const v = field.state.value;
-	const inputId = useId();
+	// Use React.useId instead (available in React 18+)
+    const inputId = useId();
 	return (
-		<FormControl>
-			{ label ? (
-				<FormLabel htmlFor={ inputId } { ...ppomFieldLabelProps }>
+        <Field.Root>
+            { label ? (
+				<Field.Label htmlFor={ inputId } { ...ppomFieldLabelProps }>
 					{ label }
-				</FormLabel>
+				</Field.Label>
 			) : null }
-			<Input
+            <Input
 				id={ inputId }
 				size="sm"
 				value={ v ?? '' }
-				onChange={ ( e ) => field.handleChange( e.target.value ) }
+				onValueChange={ ( e ) => field.handleChange( e.target.value ) }
 				onBlur={ field.handleBlur }
 				{ ...ppomControlSurface }
 			/>
-		</FormControl>
-	);
+        </Field.Root>
+    );
 }

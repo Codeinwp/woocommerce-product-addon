@@ -2,7 +2,7 @@
  * Catches render errors in the field modal subtree so the admin page stays usable.
  */
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { Alert, AlertIcon, Button, Text, VStack } from '@chakra-ui/react';
+import { Steps, Alert, Button, Text, VStack } from '@chakra-ui/react';
 
 interface FieldModalErrorBoundaryProps {
 	children: ReactNode;
@@ -34,9 +34,9 @@ export class FieldModalErrorBoundary extends Component<
 	override render() {
 		if ( this.state.hasError ) {
 			return (
-				<Alert status="error" variant="subtle" borderRadius="md" my={ 4 }>
-					<AlertIcon />
-					<VStack align="stretch" spacing={ 2 }>
+                <Alert.Root status="error" variant="subtle" borderRadius="md" my={ 4 }>
+                    <Alert.Indicator />
+                    <VStack align="stretch" gap={ 2 }>
 						<Text fontSize="sm">
 							The field modal hit an unexpected error. Reload the page to try again.
 						</Text>
@@ -49,8 +49,8 @@ export class FieldModalErrorBoundary extends Component<
 							Reload page
 						</Button>
 					</VStack>
-				</Alert>
-			);
+                </Alert.Root>
+            );
 		}
 		return this.props.children;
 	}

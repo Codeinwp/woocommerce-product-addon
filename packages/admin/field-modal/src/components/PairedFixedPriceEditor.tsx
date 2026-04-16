@@ -1,7 +1,7 @@
 /**
  * Fixed Price paired rows: quantity + fixed price (number inputs), classic input.fixedprice.php shape.
  */
-import { Box, Button, HStack, Input, Text, VStack } from '@chakra-ui/react';
+import { Steps, Box, Button, HStack, Input, Text, VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
@@ -89,17 +89,17 @@ export function PairedFixedPriceEditor( {
 	};
 
 	return (
-		<Box
+        <Box
 			borderWidth="1px"
 			borderColor="gray.200"
 			borderRadius="md"
 			p={ 3 }
 			bg="white"
 		>
-			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
+            <Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
 				{ title }
 			</Text>
-			<VStack align="stretch" spacing={ 3 }>
+            <VStack align="stretch" gap={ 3 }>
 				{ rows.map( ( row, index ) => (
 					<Box
 						key={ index }
@@ -108,7 +108,7 @@ export function PairedFixedPriceEditor( {
 						borderRadius="md"
 						p={ 2 }
 					>
-						<HStack spacing={ 2 } flexWrap="wrap" align="center">
+						<HStack gap={ 2 } flexWrap="wrap" align="center">
 							<Input
 								size="sm"
 								type={ t0 }
@@ -116,7 +116,7 @@ export function PairedFixedPriceEditor( {
 								minW={ 0 }
 								placeholder={ p0 }
 								value={ String( row.option ?? '' ) }
-								onChange={ ( e ) =>
+								onValueChange={ ( e ) =>
 									updateRow( index, {
 										option: e.target.value,
 									} )
@@ -129,7 +129,7 @@ export function PairedFixedPriceEditor( {
 								minW={ 0 }
 								placeholder={ p1 }
 								value={ String( row.price ?? '' ) }
-								onChange={ ( e ) =>
+								onValueChange={ ( e ) =>
 									updateRow( index, { price: e.target.value } )
 								}
 							/>
@@ -141,16 +141,16 @@ export function PairedFixedPriceEditor( {
 									i18n.pairedMatrixOptionId || 'Unique ID'
 								}
 								value={ String( row.id ?? '' ) }
-								onChange={ ( e ) =>
+								onValueChange={ ( e ) =>
 									updateRow( index, { id: e.target.value } )
 								}
 							/>
-							<HStack spacing={ 1 }>
+							<HStack gap={ 1 }>
 								<Button
 									size="xs"
 									variant="ghost"
 									onClick={ () => move( index, -1 ) }
-									isDisabled={ index === 0 }
+									disabled={ index === 0 }
 								>
 									↑
 								</Button>
@@ -158,14 +158,14 @@ export function PairedFixedPriceEditor( {
 									size="xs"
 									variant="ghost"
 									onClick={ () => move( index, 1 ) }
-									isDisabled={ index === rows.length - 1 }
+									disabled={ index === rows.length - 1 }
 								>
 									↓
 								</Button>
 								<Button
 									size="xs"
 									variant="ghost"
-									colorScheme="red"
+									colorPalette="red"
 									onClick={ () => removeRow( index ) }
 								>
 									{ i18n.pairedOptionsRemove || 'Remove' }
@@ -178,6 +178,6 @@ export function PairedFixedPriceEditor( {
 					{ i18n.pairedOptionsAddRow || 'Add option' }
 				</Button>
 			</VStack>
-		</Box>
-	);
+        </Box>
+    );
 }

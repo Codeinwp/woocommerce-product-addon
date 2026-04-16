@@ -1,7 +1,7 @@
 /**
  * Inline editor for pre-uploaded audio/video (audio field type).
  */
-import { Box, Button, HStack, Input, Text, VStack } from '@chakra-ui/react';
+import { Steps, Box, Button, HStack, Input, Text, VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
 
@@ -172,34 +172,31 @@ export function AudiosSelectEditor( {
 		i18n.audioPricePlaceholder || 'Price (fix or %)';
 
 	return (
-		<Box
+        <Box
 			borderWidth="1px"
 			borderColor="gray.200"
 			borderRadius="md"
 			p={ 3 }
 			bg="white"
 		>
-			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
+            <Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
 				{ title }
 			</Text>
-
-			<Button
+            <Button
 				size="sm"
-				colorScheme="blue"
+				colorPalette="blue"
 				mb={ 3 }
 				onClick={ addFromMedia }
 			>
 				{ i18n.audioSelectUpload || 'Select Audio/Video' }
 			</Button>
-
-			{ rows.length === 0 && (
+            { rows.length === 0 && (
 				<Text fontSize="xs" color="gray.500">
 					{ i18n.audioEmptyState ||
 						'No audio or video selected. Use the button above to add files from the media library.' }
 				</Text>
 			) }
-
-			<VStack align="stretch" spacing={ 3 }>
+            <VStack align="stretch" gap={ 3 }>
 				{ rows.map( ( row, index ) => (
 					<Box
 						key={ index }
@@ -210,7 +207,7 @@ export function AudiosSelectEditor( {
 					>
 						<HStack
 							align="flex-start"
-							spacing={ 2 }
+							gap={ 2 }
 							w="full"
 							overflowX="auto"
 						>
@@ -232,8 +229,8 @@ export function AudiosSelectEditor( {
 								</Text>
 							</Box>
 
-							<VStack spacing={ 1.5 } flex="1" minW={ 0 }>
-								<HStack spacing={ 2 } w="full">
+							<VStack gap={ 1.5 } flex="1" minW={ 0 }>
+								<HStack gap={ 2 } w="full">
 									<Input
 										size="sm"
 										flex="1 1 0"
@@ -243,7 +240,7 @@ export function AudiosSelectEditor( {
 											'Title'
 										}
 										value={ row.title }
-										onChange={ ( e ) =>
+										onValueChange={ ( e ) =>
 											updateRow( index, {
 												title: e.target.value,
 											} )
@@ -255,7 +252,7 @@ export function AudiosSelectEditor( {
 										minW={ 0 }
 										placeholder={ pricePlaceholder }
 										value={ row.price }
-										onChange={ ( e ) =>
+										onValueChange={ ( e ) =>
 											updateRow( index, {
 												price: e.target.value,
 											} )
@@ -265,7 +262,7 @@ export function AudiosSelectEditor( {
 							</VStack>
 
 							<HStack
-								spacing={ 1 }
+								gap={ 1 }
 								flexShrink={ 0 }
 								alignSelf="center"
 							>
@@ -276,7 +273,7 @@ export function AudiosSelectEditor( {
 										i18n.audioMoveUp || 'Move up'
 									}
 									onClick={ () => move( index, -1 ) }
-									isDisabled={ index === 0 }
+									disabled={ index === 0 }
 								>
 									&#8593;
 								</Button>
@@ -287,14 +284,14 @@ export function AudiosSelectEditor( {
 										i18n.audioMoveDown || 'Move down'
 									}
 									onClick={ () => move( index, 1 ) }
-									isDisabled={ index === rows.length - 1 }
+									disabled={ index === rows.length - 1 }
 								>
 									&#8595;
 								</Button>
 								<Button
 									size="xs"
 									variant="ghost"
-									colorScheme="red"
+									colorPalette="red"
 									onClick={ () => removeRow( index ) }
 								>
 									{ i18n.audioRemove || 'Remove' }
@@ -304,6 +301,6 @@ export function AudiosSelectEditor( {
 					</Box>
 				) ) }
 			</VStack>
-		</Box>
-	);
+        </Box>
+    );
 }

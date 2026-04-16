@@ -3,18 +3,19 @@
  * Matches classic ppom-bulkquantity.js tableToJSON() shape.
  */
 import {
-	Box,
-	Button,
-	HStack,
-	Input,
-	Table,
-	Tbody,
-	Td,
-	Th,
-	Thead,
-	Tr,
-	Text,
-	VStack,
+    Steps,
+    Box,
+    Button,
+    HStack,
+    Input,
+    Table,
+    Tbody,
+    Td,
+    Th,
+    Thead,
+    Tr,
+    Text,
+    VStack,
 } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
@@ -160,18 +161,18 @@ export function BulkQuantityMatrixEditor( {
 	};
 
 	return (
-		<Box
+        <Box
 			borderWidth="1px"
 			borderColor="gray.200"
 			borderRadius="md"
 			p={ 3 }
 			bg="white"
 		>
-			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
+            <Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
 				{ title }
 			</Text>
-			<VStack align="stretch" spacing={ 3 }>
-				<HStack spacing={ 2 } flexWrap="wrap">
+            <VStack align="stretch" gap={ 3 }>
+				<HStack gap={ 2 } flexWrap="wrap">
 					<Button size="xs" onClick={ addRow }>
 						{ i18n.bulkQtyAddRow || 'Add quantity range' }
 					</Button>
@@ -180,18 +181,18 @@ export function BulkQuantityMatrixEditor( {
 					</Button>
 				</HStack>
 				<Box overflowX="auto">
-					<Table size="sm" variant="simple">
-						<Thead>
-							<Tr>
+					<Table.Root size="sm" variant="simple">
+						<Table.Header>
+							<Table.Row>
 								{ columns.map( ( col, ci ) => (
-									<Th key={ col } whiteSpace="nowrap">
+									<Table.ColumnHeader key={ col } whiteSpace="nowrap">
 										{ col }
 										{ ci >= 2 ? (
 											<Button
 												ml={ 1 }
 												size="xs"
 												variant="ghost"
-												colorScheme="red"
+												colorPalette="red"
 												onClick={ () =>
 													removeColumn( col, ci )
 												}
@@ -199,20 +200,20 @@ export function BulkQuantityMatrixEditor( {
 												×
 											</Button>
 										) : null }
-									</Th>
+									</Table.ColumnHeader>
 								) ) }
-								<Th>{ i18n.bulkQtyActions || '' }</Th>
-							</Tr>
-						</Thead>
-						<Tbody>
+								<Table.ColumnHeader>{ i18n.bulkQtyActions || '' }</Table.ColumnHeader>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
 							{ normalizedRows.map( ( row, ri ) => (
-								<Tr key={ ri }>
+								<Table.Row key={ ri }>
 									{ columns.map( ( col ) => (
-										<Td key={ col }>
+										<Table.Cell key={ col }>
 											<Input
 												size="sm"
 												value={ row[ col ] ?? '' }
-												onChange={ ( e ) =>
+												onValueChange={ ( e ) =>
 													updateCell(
 														ri,
 														col,
@@ -226,14 +227,14 @@ export function BulkQuantityMatrixEditor( {
 														: ''
 												}
 											/>
-										</Td>
+										</Table.Cell>
 									) ) }
-									<Td>
+									<Table.Cell>
 										<Button
 											size="xs"
 											variant="ghost"
-											colorScheme="red"
-											isDisabled={
+											colorPalette="red"
+											disabled={
 												normalizedRows.length < 2
 											}
 											onClick={ () => removeRow( ri ) }
@@ -241,17 +242,17 @@ export function BulkQuantityMatrixEditor( {
 											{ i18n.pairedOptionsRemove ||
 												'Remove' }
 										</Button>
-									</Td>
-								</Tr>
+									</Table.Cell>
+								</Table.Row>
 							) ) }
-						</Tbody>
-					</Table>
+						</Table.Body>
+					</Table.Root>
 				</Box>
 				<Text fontSize="xs" color="gray.600">
 					{ i18n.bulkQtyRangeHint ||
 						'Quantity range format: start-end (e.g. 1-10).' }
 				</Text>
 			</VStack>
-		</Box>
-	);
+        </Box>
+    );
 }

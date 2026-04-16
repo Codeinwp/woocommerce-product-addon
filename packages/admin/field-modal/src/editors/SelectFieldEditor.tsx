@@ -1,7 +1,7 @@
 /**
  * Select field type: grouped settings; paired options inline editor.
  */
-import { Box, VStack } from '@chakra-ui/react';
+import { Steps, Box, VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -91,11 +91,11 @@ export function SelectFieldEditor( {
 	) : null;
 
 	return (
-		<SettingsConditionsTabs
+        <SettingsConditionsTabs
 			i18n={ i18n }
 			hasConditions={ hasConditions }
 			settings={
-				<VStack align="stretch" spacing={ 3 }>
+				<VStack align="stretch" gap={ 3 }>
 					<GroupedFieldSections
 						{ ...shared }
 						sections={ sectionsBefore }
@@ -123,5 +123,5 @@ export function SelectFieldEditor( {
 				/>
 			}
 		/>
-	);
+    );
 }

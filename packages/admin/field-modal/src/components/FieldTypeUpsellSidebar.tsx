@@ -1,7 +1,7 @@
 /**
  * Pro upsell column beside the field type catalog.
  */
-import { Box, Button, Flex, HStack, Text, VStack } from '@chakra-ui/react';
+import { Box, Flex, HStack, Link, Text, VStack } from '@chakra-ui/react';
 import type { ModalUpsellPayload } from '../types/fieldModal';
 
 export interface FieldTypeUpsellSidebarProps {
@@ -10,7 +10,7 @@ export interface FieldTypeUpsellSidebarProps {
 
 export function FieldTypeUpsellSidebar( { upsell }: FieldTypeUpsellSidebarProps ) {
 	return (
-		<Box
+        <Box
 			flex="0 0 280px"
 			w={ { base: '100%', lg: '280px' } }
 			borderLeftWidth={ { base: 0, lg: '1px' } }
@@ -20,9 +20,9 @@ export function FieldTypeUpsellSidebar( { upsell }: FieldTypeUpsellSidebarProps 
 			pt={ { base: 4, lg: 0 } }
 			mt={ { base: 3, lg: 0 } }
 		>
-			<VStack
+            <VStack
 				align="center"
-				spacing={ 3 }
+				gap={ 3 }
 				p={ 3 }
 				bg="gray.50"
 				borderRadius="lg"
@@ -48,7 +48,7 @@ export function FieldTypeUpsellSidebar( { upsell }: FieldTypeUpsellSidebarProps 
 				<Text fontSize="sm" color="gray.700" textAlign="center">
 					{ upsell.intro }
 				</Text>
-				<VStack align="stretch" spacing={ 2 } w="full" fontSize="sm">
+				<VStack align="stretch" gap={ 2 } w="full" fontSize="sm">
 					{ ( upsell.features || [] ).map( ( line: string, i: number ) => (
 						<HStack key={ i } align="flex-start">
 							<Text color="green.500" fontWeight="bold">
@@ -58,19 +58,28 @@ export function FieldTypeUpsellSidebar( { upsell }: FieldTypeUpsellSidebarProps 
 						</HStack>
 					) ) }
 				</VStack>
-				<Button
-					as="a"
+				<Link
 					href={ upsell.cta_url }
 					target="_blank"
 					rel="noopener noreferrer"
+					display="inline-flex"
 					width="full"
-					colorScheme="green"
-					size="md"
+					justifyContent="center"
+					alignItems="center"
+					minH="40px"
+					px={ 4 }
+					py={ 2 }
 					borderRadius="md"
+					bg="green.500"
+					color="white"
+					fontWeight="semibold"
+					fontSize="sm"
+					textDecoration="none"
+					_hover={ { bg: 'green.600' } }
 				>
 					{ upsell.cta_label }
-				</Button>
+				</Link>
 			</VStack>
-		</Box>
-	);
+        </Box>
+    );
 }

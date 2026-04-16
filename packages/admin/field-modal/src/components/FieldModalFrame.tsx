@@ -2,13 +2,7 @@
  * Chakra modal shell: overlay, content sizing, header, close control.
  */
 import type { ReactNode } from 'react';
-import {
-	Modal,
-	ModalOverlay,
-	ModalContent,
-	ModalHeader,
-	ModalCloseButton,
-} from '@chakra-ui/react';
+import { Box, Dialog, Portal } from '@chakra-ui/react';
 
 export interface FieldModalFrameProps {
 	isOpen: boolean;
@@ -26,28 +20,48 @@ export function FieldModalFrame( {
 	children,
 }: FieldModalFrameProps ) {
 	return (
-		<Modal
-			isOpen={ isOpen }
-			onClose={ onClose }
+        <Dialog.Root
+			open={ isOpen }
 			variant="ppom"
 			scrollBehavior="inside"
-			closeOnOverlayClick={ ! saving }
-			closeOnEsc={ ! saving }
+			closeOnInteractOutside={ ! saving }
+			closeOnEscape={ ! saving }
 			motionPreset="slideInBottom"
+			onOpenChange={e => {
+                if (!e.open) {
+                    onClose();
+                }
+            }}
 		>
-			<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(2px)" />
-			<ModalContent
-				maxW={ { base: '96vw', md: 'min(92vw, 58rem)', lg: '62rem' } }
-				w="full"
-				maxH="min(90vh, 56rem)"
-				my={ 4 }
-				display="flex"
-				flexDirection="column"
-			>
-				<ModalHeader flexShrink={ 0 }>{ title }</ModalHeader>
-				<ModalCloseButton isDisabled={ saving } />
-				{ children }
-			</ModalContent>
-		</Modal>
-	);
+            <Portal>
+
+                <Dialog.Backdrop bg="blackAlpha.600" backdropFilter="blur(2px)" />
+				<Dialog.Positioner>
+					{/*
+					 * `Dialog.Content` is `forwardAsChild` in Chakra v3 — multiple direct
+					 * children (header + close + body) break the slot merge → React #130.
+					 */}
+					<Dialog.Content
+						maxW={ { base: '96vw', md: 'min(92vw, 58rem)', lg: '62rem' } }
+						w="full"
+						maxH="min(90vh, 56rem)"
+						my={ 4 }
+					>
+						<Box
+							display="flex"
+							flexDirection="column"
+							flex="1"
+							minH={ 0 }
+							w="full"
+						>
+							<Dialog.Header flexShrink={ 0 }>{ title }</Dialog.Header>
+							<Dialog.CloseTrigger disabled={ saving } />
+							{ children }
+						</Box>
+					</Dialog.Content>
+				</Dialog.Positioner>
+
+            </Portal>
+        </Dialog.Root>
+    );
 }

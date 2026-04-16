@@ -2,16 +2,7 @@
  * Schema-driven field settings (fallback when no typed editor is registered).
  */
 import { useMemo } from '@wordpress/element';
-import {
-	Box,
-	Text,
-	Button,
-	VStack,
-	Alert,
-	AlertIcon,
-	List,
-	ListItem,
-} from '@chakra-ui/react';
+import { Steps, Box, Text, Button, VStack, Alert, List } from '@chakra-ui/react';
 import { classifySettingTab } from './schemaTabs';
 import { renderSettingRow, openLegacyFieldModal } from './schemaSettingControl';
 import { ResponsiveFieldGrid } from './ResponsiveFieldGrid';
@@ -94,39 +85,39 @@ export function FieldSettingsForm( {
 
 	const unsupportedAlert =
 		buckets.unsupported.length > 0 ? (
-			<Alert status="warning" variant="subtle" borderRadius="md">
-				<AlertIcon />
+			<Alert.Root status="warning" variant="subtle" borderRadius="md">
+				<Alert.Indicator />
 				<Box>
 					<Text fontSize="sm" lineHeight="1.5">
 						{ i18n.legacyEditorHint }
 					</Text>
-					<List fontSize="sm" mt={ 2 } spacing={ 1 } pl={ 4 } styleType="disc">
+					<List.Root fontSize="sm" mt={ 2 } gap={ 1 } pl={ 4 } listStyleType="disc">
 						{ buckets.unsupported.map( ( { key, meta } ) => {
 							const t =
 								meta.title != null
 									? String( meta.title )
 									: key;
 							return (
-								<ListItem key={ key }>
-									{ t }{ ' ' }
-									<Text as="span" color="gray.500" fontSize="xs">
+                                <List.Item key={ key }>
+                                    { t }{ ' ' }
+                                    <Text as="span" color="gray.500" fontSize="xs">
 										({ key })
 									</Text>
-								</ListItem>
-							);
+                                </List.Item>
+                            );
 						} ) }
-					</List>
+					</List.Root>
 					<Button
 						size="sm"
 						mt={ 2 }
 						variant="outline"
-						colorScheme="blue"
+						colorPalette="blue"
 						onClick={ () => openLegacyFieldModal( ppomFieldIndex ) }
 					>
 						{ i18n.openLegacyModal }
 					</Button>
 				</Box>
-			</Alert>
+			</Alert.Root>
 		) : null;
 
 	const groupedEditorProps = {
@@ -139,7 +130,7 @@ export function FieldSettingsForm( {
 	};
 
 	const settingsPanel = (
-		<VStack align="stretch" spacing={ 3 }>
+		<VStack align="stretch" gap={ 3 }>
 			{ unsupportedAlert }
 			<GroupedFieldSections
 				{ ...groupedEditorProps }
@@ -158,7 +149,7 @@ export function FieldSettingsForm( {
 			py={ 3 }
 			boxShadow="0 1px 2px rgba(0, 0, 0, 0.04)"
 		>
-			<VStack align="stretch" spacing={ 3 }>
+			<VStack align="stretch" gap={ 3 }>
 				<ResponsiveFieldGrid
 					entries={ conditionControls }
 					ctx={ ctx }

@@ -5,17 +5,7 @@
  * @see ppom-pro/assets/conditional_field_repeater/admin/src/main.js
  */
 import { useMemo, useState } from '@wordpress/element';
-import {
-	Box,
-	Button,
-	FormControl,
-	FormLabel,
-	Select,
-	Switch,
-	Text,
-	VStack,
-	Link,
-} from '@chakra-ui/react';
+import { Box, Button, Field, Link, NativeSelect, Switch, Text, VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
@@ -151,80 +141,83 @@ export function ConditionalRepeaterMappingEditor( {
 	};
 
 	return (
-		<Box
+        <Box
 			borderWidth="1px"
 			borderColor="blue.100"
 			borderRadius="md"
 			p={ { base: 3, md: 4 } }
 			bg="blue.50"
 		>
-			<Text fontWeight="semibold" fontSize="sm" mb={ 3 } color="blue.900">
+            <Text fontWeight="semibold" fontSize="sm" mb={ 3 } color="blue.900">
 				{ i18n.cfrSectionTitle || 'Conditional Repeater' }
 			</Text>
-
-			<FormControl
+            <Field.Root
 				display="flex"
 				alignItems="flex-start"
 				gap={ 3 }
 				mb={ 4 }
 			>
-				<Switch
+				<Switch.Root
 					id="ppom-cfr-enable"
 					mt={ 1 }
-					colorScheme="blue"
-					isChecked={ Boolean( enabled ) }
-					onChange={ ( e ) => setEnabled( e.target.checked ) }
-				/>
+					colorPalette="blue"
+					checked={ Boolean( enabled ) }
+					onCheckedChange={ ( { checked: next } ) => setEnabled( next ) }
+				>
+					<Switch.HiddenInput />
+					<Switch.Control />
+				</Switch.Root>
 				<Box flex="1">
-					<FormLabel htmlFor="ppom-cfr-enable" mb={ 1 } fontWeight="semibold">
+					<Field.Label htmlFor="ppom-cfr-enable" mb={ 1 } fontWeight="semibold">
 						{ i18n.cfrEnableLabel || 'Enable Conditional Repeat' }
-					</FormLabel>
+					</Field.Label>
 					{ i18n.cfrDocsUrl ? (
 						<Link
-							href={ i18n.cfrDocsUrl }
-							isExternal
-							fontSize="xs"
-							color="blue.700"
-						>
+                            href={ i18n.cfrDocsUrl }
+                            fontSize="xs"
+                            color="blue.700"
+                            target='_blank'
+                            rel='noopener noreferrer'>
 							{ i18n.cfrLearnMore || 'Learn more' }
 						</Link>
 					) : null }
 				</Box>
-			</FormControl>
-
-			<Box
+			</Field.Root>
+            <Box
 				display={ enabled ? 'block' : 'none' }
 				opacity={ enabled ? 1 : 0 }
 				pointerEvents={ enabled ? 'auto' : 'none' }
 			>
-				<FormControl mb={ 4 }>
-					<FormLabel fontSize="sm">
+				<Field.Root mb={ 4 }>
+					<Field.Label fontSize="sm">
 						{ i18n.cfrOriginLabel || 'Origin' }
-					</FormLabel>
-					<Select
-						size="sm"
-						bg="white"
-						value={ origin }
-						placeholder={
-							i18n.cfrOriginPlaceholder ||
-							'Select origin field…'
-						}
-						onChange={ ( e ) => setOrigin( e.target.value ) }
-					>
-						<option value="">
-							{ i18n.cfrOriginNone || 'None' }
-						</option>
-						{ candidates.map( ( c ) => (
-							<option key={ c.value } value={ c.value }>
-								{ c.title } ({ c.value })
-							</option>
-						) ) }
-					</Select>
+					</Field.Label>
+					<NativeSelect.Root>
+                        <NativeSelect.Field
+                            size="sm"
+                            bg="white"
+                            value={ origin }
+                            placeholder={
+                                i18n.cfrOriginPlaceholder ||
+                                'Select origin field…'
+                            }
+                            onValueChange={ ( e ) => setOrigin( e.target.value ) }>
+                            <option value="">
+                                { i18n.cfrOriginNone || 'None' }
+                            </option>
+                            { candidates.map( ( c ) => (
+                                <option key={ c.value } value={ c.value }>
+                                    { c.title } ({ c.value })
+                                </option>
+                            ) ) }
+                        </NativeSelect.Field>
+                        <NativeSelect.Indicator />
+                    </NativeSelect.Root>
 					<Text fontSize="xs" color="gray.600" mt={ 1 } lineHeight="1.5">
 						{ i18n.cfrOriginHelp ||
 							'Only Number, Variation Quantity, and Quantity Pack fields can be the origin.' }
 					</Text>
-				</FormControl>
+				</Field.Root>
 
 				<Box
 					borderWidth="1px"
@@ -240,7 +233,7 @@ export function ConditionalRepeaterMappingEditor( {
 						{ i18n.cfrMagicTagsDescription ||
 							'Use these in the Field Title (Fields tab).' }
 					</Text>
-					<VStack align="stretch" spacing={ 2 }>
+					<VStack align="stretch" gap={ 2 }>
 						<Button
 							size="sm"
 							variant="outline"
@@ -265,6 +258,6 @@ export function ConditionalRepeaterMappingEditor( {
 					</VStack>
 				</Box>
 			</Box>
-		</Box>
-	);
+        </Box>
+    );
 }

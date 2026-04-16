@@ -1,15 +1,7 @@
 /**
  * Inline editor for pre-uploaded images (image + imageselect field types).
  */
-import {
-	Box,
-	Button,
-	HStack,
-	Input,
-	Text,
-	VStack,
-	Image as ChakraImage,
-} from '@chakra-ui/react';
+import { Steps, Box, Button, HStack, Input, Text, VStack, Image as ChakraImage } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
 
@@ -210,34 +202,31 @@ export function ImagesSelectEditor( {
 		: i18n.imagesPricePlaceholder || 'Price (fix or %)';
 
 	return (
-		<Box
+        <Box
 			borderWidth="1px"
 			borderColor="gray.200"
 			borderRadius="md"
 			p={ 3 }
 			bg="white"
 		>
-			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
+            <Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
 				{ title }
 			</Text>
-
-			<Button
+            <Button
 				size="sm"
-				colorScheme="blue"
+				colorPalette="blue"
 				mb={ 3 }
 				onClick={ addImagesFromMedia }
 			>
 				{ i18n.imagesSelectUpload || 'Select/Upload Image' }
 			</Button>
-
-			{ rows.length === 0 && (
+            { rows.length === 0 && (
 				<Text fontSize="xs" color="gray.500">
 					{ i18n.imagesEmptyState ||
 						'No images selected. Click the button above to add images.' }
 				</Text>
 			) }
-
-			<VStack align="stretch" spacing={ 3 }>
+            <VStack align="stretch" gap={ 3 }>
 				{ rows.map( ( row, index ) => (
 					<Box
 						key={ index }
@@ -248,7 +237,7 @@ export function ImagesSelectEditor( {
 					>
 						<HStack
 							align="flex-start"
-							spacing={ 2 }
+							gap={ 2 }
 							w="full"
 							overflowX="auto"
 						>
@@ -285,8 +274,8 @@ export function ImagesSelectEditor( {
 								) }
 							</Box>
 
-							<VStack spacing={ 1.5 } flex="1" minW={ 0 }>
-								<HStack spacing={ 2 } w="full">
+							<VStack gap={ 1.5 } flex="1" minW={ 0 }>
+								<HStack gap={ 2 } w="full">
 									<Input
 										size="sm"
 										flex="1 1 0"
@@ -295,7 +284,7 @@ export function ImagesSelectEditor( {
 											i18n.imagesTitle || 'Title'
 										}
 										value={ row.title }
-										onChange={ ( e ) =>
+										onValueChange={ ( e ) =>
 											updateRow( index, {
 												title: e.target.value,
 											} )
@@ -307,14 +296,14 @@ export function ImagesSelectEditor( {
 										minW={ 0 }
 										placeholder={ pricePlaceholder }
 										value={ row.price }
-										onChange={ ( e ) =>
+										onValueChange={ ( e ) =>
 											updateRow( index, {
 												price: e.target.value,
 											} )
 										}
 									/>
 								</HStack>
-								<HStack spacing={ 2 } w="full">
+								<HStack gap={ 2 } w="full">
 									<Input
 										size="sm"
 										flex="1 1 0"
@@ -323,7 +312,7 @@ export function ImagesSelectEditor( {
 											i18n.imagesStock || 'Stock'
 										}
 										value={ row.stock }
-										onChange={ ( e ) =>
+										onValueChange={ ( e ) =>
 											updateRow( index, {
 												stock: e.target.value,
 											} )
@@ -336,7 +325,7 @@ export function ImagesSelectEditor( {
 											minW={ 0 }
 											placeholder="Description"
 											value={ row.description || '' }
-											onChange={ ( e ) =>
+											onValueChange={ ( e ) =>
 												updateRow( index, {
 													description:
 														e.target.value,
@@ -352,7 +341,7 @@ export function ImagesSelectEditor( {
 												i18n.imagesUrl || 'URL'
 											}
 											value={ row.url || '' }
-											onChange={ ( e ) =>
+											onValueChange={ ( e ) =>
 												updateRow( index, {
 													url: e.target.value,
 												} )
@@ -363,7 +352,7 @@ export function ImagesSelectEditor( {
 							</VStack>
 
 							<HStack
-								spacing={ 1 }
+								gap={ 1 }
 								flexShrink={ 0 }
 								alignSelf="center"
 							>
@@ -374,7 +363,7 @@ export function ImagesSelectEditor( {
 										i18n.imagesMoveUp || 'Move up'
 									}
 									onClick={ () => move( index, -1 ) }
-									isDisabled={ index === 0 }
+									disabled={ index === 0 }
 								>
 									&#8593;
 								</Button>
@@ -385,14 +374,14 @@ export function ImagesSelectEditor( {
 										i18n.imagesMoveDown || 'Move down'
 									}
 									onClick={ () => move( index, 1 ) }
-									isDisabled={ index === rows.length - 1 }
+									disabled={ index === rows.length - 1 }
 								>
 									&#8595;
 								</Button>
 								<Button
 									size="xs"
 									variant="ghost"
-									colorScheme="red"
+									colorPalette="red"
 									onClick={ () => removeRow( index ) }
 								>
 									{ i18n.imagesRemove || 'Remove' }
@@ -402,6 +391,6 @@ export function ImagesSelectEditor( {
 					</Box>
 				) ) }
 			</VStack>
-		</Box>
-	);
+        </Box>
+    );
 }

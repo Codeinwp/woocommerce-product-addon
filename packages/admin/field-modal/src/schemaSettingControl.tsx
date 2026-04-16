@@ -1,17 +1,7 @@
 /**
  * Single setting row renderer shared by schema fallback and typed field editors.
  */
-import {
-	Box,
-	FormControl,
-	FormLabel,
-	Input,
-	Textarea,
-	Select,
-	Switch,
-	FormHelperText,
-	Text,
-} from '@chakra-ui/react';
+import { Box, Field, Input, NativeSelect, Switch, Text, Textarea } from '@chakra-ui/react';
 import { normalizeSelectOptions } from './schemaTabs';
 import { ConditionsEditor } from './ConditionsEditor';
 import { PairedCropperEditor } from './components/PairedCropperEditor';
@@ -81,54 +71,56 @@ export function renderSettingRow(
 
 	if ( type === 'textarea' ) {
 		return (
-			<FormControl key={ key }>
-				<FormLabel { ...labelProps }>{ title }</FormLabel>
-				<Textarea
+            <Field.Root key={ key }>
+                <Field.Label { ...labelProps }>{ title }</Field.Label>
+                <Textarea
 					size="sm"
 					rows={ 2 }
 					resize="vertical"
 					value={ String( value ) }
-					onChange={ ( e ) => setKey( key, e.target.value ) }
+					onValueChange={ ( e ) => setKey( key, e.target.value ) }
 					{ ...controlSurface }
 				/>
-				{ desc ? (
-					<FormHelperText
+                { desc ? (
+					<Field.HelperText
 						{ ...helperTextProps }
 						dangerouslySetInnerHTML={ { __html: desc } }
 					/>
 				) : null }
-			</FormControl>
-		);
+            </Field.Root>
+        );
 	}
 
 	if ( type === 'select' ) {
 		const opts = normalizeSelectOptions( meta.options );
 		return (
-			<FormControl key={ key }>
-				<FormLabel { ...labelProps }>{ title }</FormLabel>
-				<Select
-					size="sm"
-					value={ String( value ) }
-					onChange={ ( e ) => setKey( key, e.target.value ) }
-					{ ...controlSurface }
-				>
-					{ opts.map( ( o ) => (
-						<option key={ o.value } value={ o.value }>
-							{ o.label }
-						</option>
-					) ) }
-				</Select>
-				{ desc ? (
-					<FormHelperText { ...helperTextProps }>{ desc }</FormHelperText>
+            <Field.Root key={ key }>
+                <Field.Label { ...labelProps }>{ title }</Field.Label>
+                <NativeSelect.Root>
+                    <NativeSelect.Field
+                        size="sm"
+                        value={ String( value ) }
+                        onValueChange={ ( e ) => setKey( key, e.target.value ) }
+                        { ...controlSurface }>
+                        { opts.map( ( o ) => (
+                            <option key={ o.value } value={ o.value }>
+                                { o.label }
+                            </option>
+                        ) ) }
+                    </NativeSelect.Field>
+                    <NativeSelect.Indicator />
+                </NativeSelect.Root>
+                { desc ? (
+					<Field.HelperText { ...helperTextProps }>{ desc }</Field.HelperText>
 				) : null }
-			</FormControl>
-		);
+            </Field.Root>
+        );
 	}
 
 	if ( type === 'checkbox' ) {
 		const checked = value === 'on' || value === true || value === '1';
 		return (
-			<FormControl
+            <Field.Root
 				key={ key }
 				display="flex"
 				alignItems="flex-start"
@@ -139,24 +131,29 @@ export function renderSettingRow(
 				borderWidth="1px"
 				borderColor="gray.100"
 			>
-				<Switch
+                <Switch.Root
 					mt={ 0.5 }
-					colorScheme="blue"
-					isChecked={ checked }
-					onChange={ ( e ) => setKey( key, e.target.checked ? 'on' : 'off' ) }
-				/>
-				<Box flex="1" minW={ 0 }>
-					<FormLabel { ...labelProps } mb={ 0.5 }>
+					colorPalette="blue"
+					checked={ checked }
+					onCheckedChange={ ( { checked: next } ) =>
+						setKey( key, next ? 'on' : 'off' )
+					}
+				>
+					<Switch.HiddenInput />
+					<Switch.Control />
+				</Switch.Root>
+                <Box flex="1" minW={ 0 }>
+					<Field.Label { ...labelProps } mb={ 0.5 }>
 						{ title }
-					</FormLabel>
+					</Field.Label>
 					{ desc ? (
 						<Text fontSize="xs" color="gray.600" lineHeight="1.5">
 							{ desc }
 						</Text>
 					) : null }
 				</Box>
-			</FormControl>
-		);
+            </Field.Root>
+        );
 	}
 
 	if ( type === 'html-conditions' ) {
@@ -204,18 +201,18 @@ export function renderSettingRow(
 	}
 
 	return (
-		<FormControl key={ key }>
-			<FormLabel { ...labelProps }>{ title }</FormLabel>
-			<Input
+        <Field.Root key={ key }>
+            <Field.Label { ...labelProps }>{ title }</Field.Label>
+            <Input
 				size="sm"
 				value={ String( value ) }
-				onChange={ ( e ) => setKey( key, e.target.value ) }
+				onValueChange={ ( e ) => setKey( key, e.target.value ) }
 				{ ...controlSurface }
 			/>
-			{ desc ? (
-				<FormHelperText { ...helperTextProps }>{ desc }</FormHelperText>
+            { desc ? (
+				<Field.HelperText { ...helperTextProps }>{ desc }</Field.HelperText>
 			) : null }
-			{ meta.link ? (
+            { meta.link ? (
 				<Box
 					fontSize="xs"
 					mt={ 1 }
@@ -224,6 +221,6 @@ export function renderSettingRow(
 					dangerouslySetInnerHTML={ { __html: String( meta.link ) } }
 				/>
 			) : null }
-		</FormControl>
-	);
+        </Field.Root>
+    );
 }

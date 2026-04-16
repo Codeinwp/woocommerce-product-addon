@@ -2,13 +2,8 @@
  * Grid of field type tiles (free vs locked Pro) for the type picker.
  */
 import { Fragment, memo } from '@wordpress/element';
-import {
-	Box,
-	Button,
-	SimpleGrid,
-	Text,
-	Tooltip,
-} from '@chakra-ui/react';
+import { Box, Button, SimpleGrid, Text } from '@chakra-ui/react';
+import { Tooltip } from './ui/tooltip';
 import type { CatalogItem, I18nDict } from '../types/fieldModal';
 
 export interface FieldTypeGridProps {
@@ -25,11 +20,11 @@ function FieldTypeGridComponent( {
 	i18n,
 }: FieldTypeGridProps ) {
 	return (
-		<SimpleGrid
+        <SimpleGrid
 			columns={ { base: 2, sm: 3, md: 3 } }
-			spacing="15px"
+			gap="15px"
 		>
-			{ fields.map( ( f: CatalogItem ) => {
+            { fields.map( ( f: CatalogItem ) => {
 				const locked = Boolean( f.locked );
 				const iconClass = f.icon ? `fa ${ f.icon }` : 'fa fa-circle';
 				const desc = f.description ? String( f.description ).trim() : '';
@@ -86,7 +81,7 @@ function FieldTypeGridComponent( {
 							minW={ 0 }
 							fontWeight="semibold"
 							fontSize="xs"
-							noOfLines={ 2 }
+							lineClamp={ 2 }
 						>
 							{ f.title }
 						</Text>
@@ -101,25 +96,26 @@ function FieldTypeGridComponent( {
 								 * styles here (matches ppom-admin.css / classic modal chip).
 								 * Decorative badge only: the tile `Button` opens the upsell URL.
 								 */
-								sx={ {
-									position: 'absolute',
-									top: 0,
-									right: 0,
-									zIndex: 2,
-									background: '#28A745',
-									p: '2px 6px',
-									borderRadius: '3px',
-									lineHeight: 1.2,
-									display: 'inline-flex',
-									alignItems: 'center',
-									columnGap: '5px',
-									color: 'white',
-									fontSize: '12px',
-									'& .fa': {
+								css={ {
+                                    position: 'absolute',
+                                    top: 0,
+                                    right: 0,
+                                    zIndex: 2,
+                                    background: '#28A745',
+                                    p: '2px 6px',
+                                    borderRadius: '3px',
+                                    lineHeight: 1.2,
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    columnGap: '5px',
+                                    color: 'white',
+                                    fontSize: '12px',
+
+                                    '& & .fa': {
 										color: 'white',
 										fontSize: '12px',
-									},
-								} }
+									}
+                                } }
 							>
 								<i className="fa fa-lock" aria-hidden="true" />
 								{ i18n.proBadge }
@@ -129,24 +125,26 @@ function FieldTypeGridComponent( {
 				);
 
 				return (
-					<Fragment key={ f.slug }>
-						{ desc ? (
+                    <Fragment key={ f.slug }>
+                        { desc ? (
 							<Tooltip
-								label={ desc }
+								content={ desc }
 								openDelay={ 300 }
-								placement="top"
-								hasArrow
+								showArrow
+								positioning={{
+                                    placement: "top"
+                                }}
 							>
 								{ button }
 							</Tooltip>
 						) : (
 							button
 						) }
-					</Fragment>
-				);
+                    </Fragment>
+                );
 			} ) }
-		</SimpleGrid>
-	);
+        </SimpleGrid>
+    );
 }
 
 export const FieldTypeGrid = memo( FieldTypeGridComponent );

@@ -1,7 +1,7 @@
 /**
  * Renders schema-defined settings in labeled sections (for typed field editors).
  */
-import { Box, Text, VStack } from '@chakra-ui/react';
+import { Steps, Box, Text, VStack } from '@chakra-ui/react';
 import { ResponsiveFieldGrid } from '../ResponsiveFieldGrid';
 import type { GroupedFieldSectionsProps } from '../types/fieldModal';
 
@@ -29,8 +29,8 @@ export function GroupedFieldSections( {
 	};
 
 	return (
-		<VStack align="stretch" spacing={ 3 }>
-			{ sections.map( ( sec: { label: string; keys: string[] } ) => {
+        <VStack align="stretch" gap={ 3 }>
+            { sections.map( ( sec: { label: string; keys: string[] } ) => {
 				const entries = sec.keys
 					.filter( ( k: string ) => settings[ k ] && typeof settings[ k ] === 'object' )
 					.map( ( k: string ) => ( { key: k, meta: settings[ k ] } ) );
@@ -66,6 +66,6 @@ export function GroupedFieldSections( {
 					</Box>
 				);
 			} ) }
-		</VStack>
-	);
+        </VStack>
+    );
 }

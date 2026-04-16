@@ -4,7 +4,7 @@
 import { createRoot, StrictMode } from '@wordpress/element';
 import domReady from '@wordpress/dom-ready';
 import apiFetch from '@wordpress/api-fetch';
-import { ChakraProvider } from '@chakra-ui/react';
+import { Steps, ChakraProvider } from '@chakra-ui/react';
 import { App } from './App';
 import { FieldModalErrorBoundary } from './components/FieldModalErrorBoundary';
 import { fieldModalTheme } from './theme';
@@ -21,7 +21,7 @@ domReady( () => {
 	const root = createRoot( el );
 	root.render(
 		<StrictMode>
-			<ChakraProvider theme={ fieldModalTheme }>
+			<ChakraProvider value={ fieldModalTheme }>
 				<FieldModalErrorBoundary>
 					<App productmetaId={ boot.productmetaId } />
 				</FieldModalErrorBoundary>

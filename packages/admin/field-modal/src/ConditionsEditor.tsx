@@ -1,18 +1,7 @@
 /**
  * Conditional logic rules editor (parity with classes/fields.class.php html-conditions + ppom-admin.js).
  */
-import {
-	Box,
-	Button,
-	FormControl,
-	FormLabel,
-	HStack,
-	VStack,
-	Select,
-	Input,
-	Text,
-	Link,
-} from '@chakra-ui/react';
+import { Steps, Box, Button, HStack, VStack, NativeSelect, Input, Text, Link, Field } from '@chakra-ui/react';
 import {
 	COMPARISON_VALUE_CAN_USE_SELECT,
 	HIDE_COMPARISON_INPUT_FIELD,
@@ -334,64 +323,66 @@ export function ConditionsEditor( {
 	const upgradeCta = i18n.conditionUpgradeCta || 'Upgrade to unlock';
 
 	return (
-		<Box>
-			<Text fontWeight="semibold" fontSize="sm" color="gray.800">
+        <Box>
+            <Text fontWeight="semibold" fontSize="sm" color="gray.800">
 				{ title }
 			</Text>
-			{ desc ? (
+            { desc ? (
 				<Text fontSize="sm" color="gray.600" mt={ 1 } lineHeight="1.5">
 					{ desc }
 				</Text>
 			) : null }
-
-			{ ! logicOn ? (
+            { ! logicOn ? (
 				<Text mt={ 3 } fontSize="xs" color="gray.600" lineHeight="1.5">
 					{ i18n.condEnableLogicHint ||
 						'Turn on “Use conditional logic” above to apply these rules on the product page.' }
 				</Text>
 			) : null }
-
-			<VStack align="stretch" spacing={ 3 } mt={ 2 }>
+            <VStack align="stretch" gap={ 3 } mt={ 2 }>
 				<HStack
 					align="flex-end"
 					flexWrap="wrap"
-					spacing={ 2 }
+					gap={ 2 }
 					gap={ 2 }
 				>
-					<FormControl maxW="200px">
-						<FormLabel { ...labelProps }>{ i18n.condShowHide || 'Show / Hide' }</FormLabel>
-						<Select
-							size="sm"
-							value={ cond.visibility }
-							onChange={ ( e ) =>
-								setConditions( {
-									...cond,
-									visibility: e.target.value,
-								} )
-							}
-							{ ...controlSurface }
-						>
-							<option value="Show">{ i18n.condShow || 'Show' }</option>
-							<option value="Hide">{ i18n.condHide || 'Hide' }</option>
-						</Select>
-					</FormControl>
+					<Field.Root maxW="200px">
+						<Field.Label { ...labelProps }>{ i18n.condShowHide || 'Show / Hide' }</Field.Label>
+						<NativeSelect.Root>
+                            <NativeSelect.Field
+                                size="sm"
+                                value={ cond.visibility }
+                                onValueChange={ ( e ) =>
+                                    setConditions( {
+                                        ...cond,
+                                        visibility: e.target.value,
+                                    } )
+                                }
+                                { ...controlSurface }>
+                                <option value="Show">{ i18n.condShow || 'Show' }</option>
+                                <option value="Hide">{ i18n.condHide || 'Hide' }</option>
+                            </NativeSelect.Field>
+                            <NativeSelect.Indicator />
+                        </NativeSelect.Root>
+					</Field.Root>
 					<Text fontSize="sm" color="gray.600" pb={ 2 }>
 						{ i18n.condOnlyIf || 'only if' }
 					</Text>
-					<FormControl maxW="200px">
-						<FormLabel { ...labelProps }>{ i18n.condAllAny || 'All / Any' }</FormLabel>
-						<Select
-							size="sm"
-							value={ cond.bound }
-							onChange={ ( e ) =>
-								setConditions( { ...cond, bound: e.target.value } )
-							}
-							{ ...controlSurface }
-						>
-							<option value="All">{ i18n.condAll || 'All' }</option>
-							<option value="Any">{ i18n.condAny || 'Any' }</option>
-						</Select>
-					</FormControl>
+					<Field.Root maxW="200px">
+						<Field.Label { ...labelProps }>{ i18n.condAllAny || 'All / Any' }</Field.Label>
+						<NativeSelect.Root>
+                            <NativeSelect.Field
+                                size="sm"
+                                value={ cond.bound }
+                                onValueChange={ ( e ) =>
+                                    setConditions( { ...cond, bound: e.target.value } )
+                                }
+                                { ...controlSurface }>
+                                <option value="All">{ i18n.condAll || 'All' }</option>
+                                <option value="Any">{ i18n.condAny || 'Any' }</option>
+                            </NativeSelect.Field>
+                            <NativeSelect.Indicator />
+                        </NativeSelect.Root>
+					</Field.Root>
 					<Text fontSize="sm" color="gray.600" pb={ 2 }>
 						{ i18n.condFollowingMatches || 'of the following match' }
 					</Text>
@@ -452,7 +443,7 @@ export function ConditionsEditor( {
 					}
 
 					return (
-						<Box
+                        <Box
 							key={ ruleKey }
 							borderWidth="1px"
 							borderColor="gray.100"
@@ -460,7 +451,7 @@ export function ConditionsEditor( {
 							p={ 4 }
 							bg="gray.50"
 						>
-							<Text
+                            <Text
 								fontSize="xs"
 								fontWeight="700"
 								color="gray.500"
@@ -470,187 +461,193 @@ export function ConditionsEditor( {
 							>
 								{ ( i18n.condRule || 'Rule' ) + ' ' + ( idx + 1 ) }
 							</Text>
-							<VStack align="stretch" spacing={ 3 }>
-								<FormControl>
-									<FormLabel { ...labelProps }>
+                            <VStack align="stretch" gap={ 3 }>
+								<Field.Root>
+									<Field.Label { ...labelProps }>
 										{ i18n.condTargetField || 'Field' }
-									</FormLabel>
-									<Select
-										size="sm"
-										value={ String( rule.elements || '' ) }
-										onChange={ ( e ) => {
-											const elements = e.target.value;
-											const t = findFieldType(
-												builderFields,
-												elements
-											);
-											let operators = String(
-												rule.operators || 'is'
-											);
-											if (
-												! operatorAllowedForTarget(
-													operators,
-													t
-												)
-											) {
-												operators = 'any';
-											}
-											updateRule( ruleKey, {
-												elements,
-												operators,
-												element_values: '',
-												element_constant: '',
-												'cond-between-interval': {
-													from: '',
-													to: '',
-												},
-											} );
-										} }
-										{ ...controlSurface }
-									>
-										<option value="">
-											{ i18n.condSelectField ||
-												'Select a field…' }
-										</option>
-										{ targets.map( ( t ) => (
-											<option
-												key={ t.fieldId }
-												value={ t.fieldId }
-											>
-												{ t.fieldLabel } ({ t.fieldId })
-											</option>
-										) ) }
-									</Select>
-								</FormControl>
+									</Field.Label>
+									<NativeSelect.Root>
+                                        <NativeSelect.Field
+                                            size="sm"
+                                            value={ String( rule.elements || '' ) }
+                                            onValueChange={ ( e ) => {
+                                                const elements = e.target.value;
+                                                const t = findFieldType(
+                                                    builderFields,
+                                                    elements
+                                                );
+                                                let operators = String(
+                                                    rule.operators || 'is'
+                                                );
+                                                if (
+                                                    ! operatorAllowedForTarget(
+                                                        operators,
+                                                        t
+                                                    )
+                                                ) {
+                                                    operators = 'any';
+                                                }
+                                                updateRule( ruleKey, {
+                                                    elements,
+                                                    operators,
+                                                    element_values: '',
+                                                    element_constant: '',
+                                                    'cond-between-interval': {
+                                                        from: '',
+                                                        to: '',
+                                                    },
+                                                } );
+                                            } }
+                                            { ...controlSurface }>
+                                            <option value="">
+                                                { i18n.condSelectField ||
+                                                    'Select a field…' }
+                                            </option>
+                                            { targets.map( ( t ) => (
+                                                <option
+                                                    key={ t.fieldId }
+                                                    value={ t.fieldId }
+                                                >
+                                                    { t.fieldLabel } ({ t.fieldId })
+                                                </option>
+                                            ) ) }
+                                        </NativeSelect.Field>
+                                        <NativeSelect.Indicator />
+                                    </NativeSelect.Root>
+								</Field.Root>
 
-								<FormControl>
-									<FormLabel { ...labelProps }>
+								<Field.Root>
+									<Field.Label { ...labelProps }>
 										{ i18n.condOperator || 'Operator' }
-									</FormLabel>
-									<Select
-										size="sm"
-										value={ op }
-										onChange={ ( e ) => {
-											const operators = e.target.value;
-											const patch: Record< string, unknown > = {
-												operators,
-											};
-											if (
-												HIDE_COMPARISON_INPUT_FIELD.includes(
-													operators
-												) ||
-												operators === 'between'
-											) {
-												patch.element_values = '';
-												patch.element_constant = '';
-											}
-											if ( operators !== 'between' ) {
-												patch[ 'cond-between-interval' ] = {
-													from: '',
-													to: '',
-												};
-											}
-											updateRule( ruleKey, patch );
-										} }
-										{ ...controlSurface }
-									>
-										{ operatorGroups.map( ( grp ) => (
-											<optgroup
-												key={ grp.label }
-												label={ grp.label }
-											>
-												{ grp.options.map( ( o ) => {
-													const allowed =
-														! targetType ||
-														operatorAllowedForTarget(
-															o.value,
-															targetType
-														);
-													const isPro =
-														PRO_OPERATOR_VALUES.has(
-															o.value
-														);
-													const disabled =
-														! allowed ||
-														( isPro &&
-															! conditionsProEnabled );
-													let label = o.label;
-													if (
-														isPro &&
-														! conditionsProEnabled
-													) {
-														label =
-															label +
-															' (' +
-															( i18n.proBadge ||
-																'PRO' ) +
-															')';
-													}
-													return (
-														<option
-															key={ o.value }
-															value={ o.value }
-															disabled={
-																disabled
-															}
-														>
-															{ label }
-														</option>
-													);
-												} ) }
-											</optgroup>
-										) ) }
-									</Select>
-								</FormControl>
+									</Field.Label>
+									<NativeSelect.Root>
+                                        <NativeSelect.Field
+                                            size="sm"
+                                            value={ op }
+                                            onValueChange={ ( e ) => {
+                                                const operators = e.target.value;
+                                                const patch: Record< string, unknown > = {
+                                                    operators,
+                                                };
+                                                if (
+                                                    HIDE_COMPARISON_INPUT_FIELD.includes(
+                                                        operators
+                                                    ) ||
+                                                    operators === 'between'
+                                                ) {
+                                                    patch.element_values = '';
+                                                    patch.element_constant = '';
+                                                }
+                                                if ( operators !== 'between' ) {
+                                                    patch[ 'cond-between-interval' ] = {
+                                                        from: '',
+                                                        to: '',
+                                                    };
+                                                }
+                                                updateRule( ruleKey, patch );
+                                            } }
+                                            { ...controlSurface }>
+                                            { operatorGroups.map( ( grp ) => (
+                                                <optgroup
+                                                    key={ grp.label }
+                                                    label={ grp.label }
+                                                >
+                                                    { grp.options.map( ( o ) => {
+                                                        const allowed =
+                                                            ! targetType ||
+                                                            operatorAllowedForTarget(
+                                                                o.value,
+                                                                targetType
+                                                            );
+                                                        const isPro =
+                                                            PRO_OPERATOR_VALUES.has(
+                                                                o.value
+                                                            );
+                                                        const disabled =
+                                                            ! allowed ||
+                                                            ( isPro &&
+                                                                ! conditionsProEnabled );
+                                                        let label = o.label;
+                                                        if (
+                                                            isPro &&
+                                                            ! conditionsProEnabled
+                                                        ) {
+                                                            label =
+                                                                label +
+                                                                ' (' +
+                                                                ( i18n.proBadge ||
+                                                                    'PRO' ) +
+                                                                ')';
+                                                        }
+                                                        return (
+                                                            <option
+                                                                key={ o.value }
+                                                                value={ o.value }
+                                                                disabled={
+                                                                    disabled
+                                                                }
+                                                            >
+                                                                { label }
+                                                            </option>
+                                                        );
+                                                    } ) }
+                                                </optgroup>
+                                            ) ) }
+                                        </NativeSelect.Field>
+                                        <NativeSelect.Indicator />
+                                    </NativeSelect.Root>
+								</Field.Root>
 
 								{ proLocked && upgradeUrl ? (
 									<Link
-										href={ upgradeUrl }
-										isExternal
-										fontSize="sm"
-										color="blue.600"
-									>
+                                        href={ upgradeUrl }
+                                        fontSize="sm"
+                                        color="blue.600"
+                                        target='_blank'
+                                        rel='noopener noreferrer'>
 										{ upgradeCta }
 									</Link>
 								) : null }
 
 								{ showSelect ? (
-									<FormControl>
-										<FormLabel { ...labelProps }>
+									<Field.Root>
+										<Field.Label { ...labelProps }>
 											{ i18n.condValue || 'Value' }
-										</FormLabel>
-										<Select
-											size="sm"
-											value={ String(
-												rule.element_values || ''
-											) }
-											onChange={ ( e ) =>
-												updateRule( ruleKey, {
-													element_values:
-														e.target.value,
-													element_constant: '',
-												} )
-											}
-											{ ...controlSurface }
-										>
-											<option value="">
-												{ i18n.condSelectValue ||
-													'Select value…' }
-											</option>
-											{ optionValues.map( ( v ) => (
-												<option key={ v } value={ v }>
-													{ v }
-												</option>
-											) ) }
-										</Select>
-									</FormControl>
+										</Field.Label>
+										<NativeSelect.Root>
+                                            <NativeSelect.Field
+                                                size="sm"
+                                                value={ String(
+                                                    rule.element_values || ''
+                                                ) }
+                                                onValueChange={ ( e ) =>
+                                                    updateRule( ruleKey, {
+                                                        element_values:
+                                                            e.target.value,
+                                                        element_constant: '',
+                                                    } )
+                                                }
+                                                { ...controlSurface }>
+                                                <option value="">
+                                                    { i18n.condSelectValue ||
+                                                        'Select value…' }
+                                                </option>
+                                                { optionValues.map( ( v ) => (
+                                                    <option key={ v } value={ v }>
+                                                        { v }
+                                                    </option>
+                                                ) ) }
+                                            </NativeSelect.Field>
+                                            <NativeSelect.Indicator />
+                                        </NativeSelect.Root>
+									</Field.Root>
 								) : null }
 
 								{ showText ? (
-									<FormControl>
-										<FormLabel { ...labelProps }>
+									<Field.Root>
+										<Field.Label { ...labelProps }>
 											{ i18n.condValue || 'Value' }
-										</FormLabel>
+										</Field.Label>
 										<Input
 											size="sm"
 											value={ String(
@@ -662,7 +659,7 @@ export function ConditionsEditor( {
 													  rule.element_constant ||
 													  ''
 											) }
-											onChange={ ( e ) => {
+											onValueChange={ ( e ) => {
 												const v = e.target.value;
 												if ( usesConstantOnly ) {
 													updateRule( ruleKey, {
@@ -678,16 +675,16 @@ export function ConditionsEditor( {
 											} }
 											{ ...controlSurface }
 										/>
-									</FormControl>
+									</Field.Root>
 								) : null }
 
 								{ isBetween && ! proLocked ? (
-									<HStack spacing={ 2 } align="center">
+									<HStack gap={ 2 } align="center">
 										<Input
 											size="sm"
 											type="number"
 											value={ String( betweenIv?.from ?? '' ) }
-											onChange={ ( e ) =>
+											onValueChange={ ( e ) =>
 												updateRule( ruleKey, {
 													'cond-between-interval': {
 														from: e.target.value,
@@ -704,7 +701,7 @@ export function ConditionsEditor( {
 											size="sm"
 											type="number"
 											value={ String( betweenIv?.to ?? '' ) }
-											onChange={ ( e ) =>
+											onValueChange={ ( e ) =>
 												updateRule( ruleKey, {
 													'cond-between-interval': {
 														from: betweenIv?.from ?? '',
@@ -717,11 +714,11 @@ export function ConditionsEditor( {
 									</HStack>
 								) : null }
 
-								<HStack spacing={ 2 } justify="flex-end">
+								<HStack gap={ 2 } justify="flex-end">
 									{ ruleKey === lastKey ? (
 										<Button
 											size="sm"
-											colorScheme="green"
+											colorPalette="green"
 											variant="outline"
 											onClick={ addRule }
 										>
@@ -731,7 +728,7 @@ export function ConditionsEditor( {
 									{ ruleEntries.length > 1 ? (
 										<Button
 											size="sm"
-											colorScheme="red"
+											colorPalette="red"
 											variant="outline"
 											onClick={ () =>
 												removeRule( ruleKey )
@@ -743,10 +740,10 @@ export function ConditionsEditor( {
 									) : null }
 								</HStack>
 							</VStack>
-						</Box>
-					);
+                        </Box>
+                    );
 				} ) }
 			</VStack>
-		</Box>
-	);
+        </Box>
+    );
 }

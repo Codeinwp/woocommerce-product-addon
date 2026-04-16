@@ -1,7 +1,7 @@
 /**
  * Manage step: empty state or active field editor (typed, fallback, or unsupported).
  */
-import { Box, Button, VStack, Text } from '@chakra-ui/react';
+import { Steps, Box, Button, VStack, Text } from '@chakra-ui/react';
 import { FieldManageEditorBridge } from './FieldManageEditorBridge';
 import type { FieldModalManageStepProps } from '../types/fieldModal';
 
@@ -21,11 +21,11 @@ export function FieldManagePanel( {
 	onOpenPicker,
 }: FieldManagePanelProps ) {
 	return (
-		<Box minH="220px">
-			{ fields.length === 0 && (
+        <Box minH="220px">
+            { fields.length === 0 && (
 				<VStack
 					align="stretch"
-					spacing={ 4 }
+					gap={ 4 }
 					p={ { base: 2, md: 3 } }
 					pt={ 0 }
 				>
@@ -35,7 +35,7 @@ export function FieldManagePanel( {
 					</Text>
 					<Button
 						size="sm"
-						colorScheme="blue"
+						colorPalette="blue"
 						alignSelf="flex-start"
 						onClick={ onOpenPicker }
 					>
@@ -43,7 +43,7 @@ export function FieldManagePanel( {
 					</Button>
 				</VStack>
 			) }
-			{ fields.length > 0 && selectedId && editDraft && (
+            { fields.length > 0 && selectedId && editDraft && (
 				<FieldManageEditorBridge
 					i18n={ i18n }
 					fields={ fields }
@@ -58,6 +58,6 @@ export function FieldManagePanel( {
 					onOpenPicker={ onOpenPicker }
 				/>
 			) }
-		</Box>
-	);
+        </Box>
+    );
 }

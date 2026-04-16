@@ -2,19 +2,7 @@
  * Grouped field type picker with Pro locks and optional upsell sidebar.
  */
 import { useMemo } from '@wordpress/element';
-import {
-	Box,
-	Flex,
-	HStack,
-	Input,
-	Tabs,
-	TabList,
-	Tab,
-	TabPanels,
-	TabPanel,
-	Text,
-	VStack,
-} from '@chakra-ui/react';
+import { Box, Flex, HStack, Input, Tabs, Text, VStack } from '@chakra-ui/react';
 import { FieldTypeGrid } from './components/FieldTypeGrid';
 import { FieldTypeUpsellSidebar } from './components/FieldTypeUpsellSidebar';
 import { catalogGroupStableKey } from './utils/catalogGroupKeys';
@@ -24,6 +12,9 @@ import type {
 	LicensePayload,
 	ModalUpsellPayload,
 } from './types/fieldModal';
+
+/** Tab value for the combined "All groups" view (Chakra v3 `Tabs` uses string values). */
+const ALL_GROUPS_TAB_VALUE = '__ppom_all_groups__';
 
 export interface FieldTypePickerProps {
 	catalogGroups: CatalogGroup[];
@@ -70,10 +61,10 @@ export function FieldTypePicker( {
 	const upsellUrl = upsell && upsell.cta_url ? upsell.cta_url : '';
 
 	return (
-		<Flex align="flex-start" gap={ 0 } flexWrap={ { base: 'wrap', lg: 'nowrap' } }>
-			<Box flex="1" minW={ 0 } pr={ showUpsell ? { lg: 4 } : 0 }>
-				<VStack align="stretch" spacing={ 3 }>
-					<HStack flexWrap="wrap" spacing={ 3 }>
+        <Flex align="flex-start" gap={ 0 } flexWrap={ { base: 'wrap', lg: 'nowrap' } }>
+            <Box flex="1" minW={ 0 } pr={ showUpsell ? { lg: 4 } : 0 }>
+				<VStack align="stretch" gap={ 3 }>
+					<HStack flexWrap="wrap" gap={ 3 }>
 						<Text fontWeight="bold" fontSize="lg">
 							{ i18n.selectFieldType }
 						</Text>
@@ -83,50 +74,67 @@ export function FieldTypePicker( {
 							size="md"
 							placeholder={ i18n.searchFieldTypes }
 							value={ query }
-							onChange={ ( e ) => onQueryChange( e.target.value ) }
+							onChange={ ( e ) =>
+								onQueryChange( e.currentTarget.value )
+							}
 						/>
 					</HStack>
 
-					<Tabs variant="soft-rounded" colorScheme="blue" isLazy>
-						<TabList flexWrap="wrap" gap={ 1 } mb={ 3 }>
-							<Tab px={ 4 }>{ i18n.allTab }</Tab>
+					<Tabs.Root
+						variant="subtle"
+						colorPalette="blue"
+						lazyMount
+						defaultValue={ ALL_GROUPS_TAB_VALUE }
+					>
+						<Tabs.List flexWrap="wrap" gap={ 1 } mb={ 3 }>
+							<Tabs.Trigger value={ ALL_GROUPS_TAB_VALUE } px={ 4 }>
+								{ i18n.allTab }
+							</Tabs.Trigger>
 							{ ( catalogGroups || [] ).map( ( g, tabIdx ) => (
-								<Tab
+								<Tabs.Trigger
 									key={ catalogGroupStableKey( g, tabIdx ) }
+									value={ catalogGroupStableKey( g, tabIdx ) }
 									px={ 4 }
 								>
 									{ g.label }
-								</Tab>
+								</Tabs.Trigger>
 							) ) }
-						</TabList>
-						<TabPanels>
-							<TabPanel px={ 0 }>
-								{ filteredGroups.length === 0 && (
-									<Text color="gray.600">{ i18n.noTypesMatch }</Text>
-								) }
-								{ filteredGroups.map( ( group, fgIdx ) => (
-									<Box
-										key={ catalogGroupStableKey( group, fgIdx ) }
-										mb={ 6 }
-									>
-										<Text fontWeight="semibold" mb={ 2 } fontSize="md">
-											{ group.label }
-										</Text>
-										<FieldTypeGrid
-											fields={ group.fields }
-											onPick={ onPick }
-											upsellUrl={ upsellUrl }
-											i18n={ i18n }
-										/>
-									</Box>
-								) ) }
-							</TabPanel>
+						</Tabs.List>
+						<Tabs.ContentGroup>
+							<Tabs.Content value={ ALL_GROUPS_TAB_VALUE } px={ 0 }>
+								{/*
+								 * Single wrapper: `Tabs.Content` is forwardAsChild; multiple
+								 * siblings (empty-state + mapped groups) break slot merging.
+								 */}
+								<Box w="100%">
+									{ filteredGroups.length === 0 && (
+										<Text color="gray.600">{ i18n.noTypesMatch }</Text>
+									) }
+									{ filteredGroups.map( ( group, fgIdx ) => (
+										<Box
+											key={ catalogGroupStableKey( group, fgIdx ) }
+											mb={ 6 }
+										>
+											<Text fontWeight="semibold" mb={ 2 } fontSize="md">
+												{ group.label }
+											</Text>
+											<FieldTypeGrid
+												fields={ group.fields }
+												onPick={ onPick }
+												upsellUrl={ upsellUrl }
+												i18n={ i18n }
+											/>
+										</Box>
+									) ) }
+								</Box>
+							</Tabs.Content>
 							{ ( catalogGroups || [] ).map( ( group, panelIdx ) => {
 								const fg = filteredGroups.find( ( x ) => x.id === group.id );
 								const groupFields = fg ? fg.fields : [];
 								return (
-									<TabPanel
+									<Tabs.Content
 										key={ catalogGroupStableKey( group, panelIdx ) }
+										value={ catalogGroupStableKey( group, panelIdx ) }
 										px={ 0 }
 									>
 										{ groupFields.length === 0 ? (
@@ -139,17 +147,16 @@ export function FieldTypePicker( {
 												i18n={ i18n }
 											/>
 										) }
-									</TabPanel>
+									</Tabs.Content>
 								);
 							} ) }
-						</TabPanels>
-					</Tabs>
+						</Tabs.ContentGroup>
+					</Tabs.Root>
 				</VStack>
 			</Box>
-
-			{ showUpsell && upsell ? (
+            { showUpsell && upsell ? (
 				<FieldTypeUpsellSidebar upsell={ upsell } />
 			) : null }
-		</Flex>
-	);
+        </Flex>
+    );
 }

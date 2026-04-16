@@ -1,7 +1,7 @@
 /**
  * Conditional Field Repeater (Plus) — boot-gated; not driven by PHP schema tabs.
  */
-import { Alert, AlertIcon, Link, Text, VStack } from '@chakra-ui/react';
+import { Steps, Alert, Link, Text, VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import { ConditionalRepeaterMappingEditor } from './ConditionalRepeaterMappingEditor';
 import type { FieldRow } from '../types/fieldModal';
@@ -44,9 +44,9 @@ export function ConditionalRepeaterSection( {
 	}
 
 	return (
-		<Alert status="warning" variant="subtle" borderRadius="md">
-			<AlertIcon />
-			<VStack align="stretch" spacing={ 2 }>
+        <Alert.Root status="warning" variant="subtle" borderRadius="md">
+            <Alert.Indicator />
+            <VStack align="stretch" gap={ 2 }>
 				<Text fontWeight="semibold" fontSize="sm">
 					{ title } (PRO)
 				</Text>
@@ -55,16 +55,21 @@ export function ConditionalRepeaterSection( {
 						'Upgrade to PPOM Pro Plus or higher to enable Conditional Repeater.' }
 				</Text>
 				{ upgradeUrl ? (
-					<Link href={ upgradeUrl } isExternal color="blue.600" fontWeight="semibold">
+					<Link
+                        href={ upgradeUrl }
+                        color="blue.600"
+                        fontWeight="semibold"
+                        target='_blank'
+                        rel='noopener noreferrer'>
 						{ i18n.cfrUpgradeCta || 'Upgrade to Pro' }
 					</Link>
 				) : null }
 				{ demoUrl ? (
-					<Link href={ demoUrl } isExternal fontSize="sm">
+					<Link href={ demoUrl } fontSize="sm" target='_blank' rel='noopener noreferrer'>
 						{ i18n.cfrViewDemoLabel || 'View demo' }
 					</Link>
 				) : null }
 			</VStack>
-		</Alert>
-	);
+        </Alert.Root>
+    );
 }

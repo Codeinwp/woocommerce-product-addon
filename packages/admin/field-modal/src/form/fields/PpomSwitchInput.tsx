@@ -1,7 +1,7 @@
 /**
  * PPOM switch — stores PPOM-style 'on' | 'off' strings (see schemaSettingControl checkbox).
  */
-import { Box, FormControl, FormLabel, Switch, Text } from '@chakra-ui/react';
+import { Box, Field, Switch, Text } from '@chakra-ui/react';
 import { useId } from '@wordpress/element';
 import { useFieldContext } from '../ppomFormContext';
 import { ppomFieldLabelProps } from '../fieldStyles';
@@ -16,7 +16,8 @@ export function PpomSwitchInput( {
 	description,
 }: PpomSwitchInputProps ) {
 	const field = useFieldContext<unknown>();
-	const switchId = useId();
+	// Use React.useId instead (available in React 18+)
+    const switchId = useId();
 	const raw = field.state.value;
 	const checked =
 		raw === 'on' ||
@@ -25,7 +26,7 @@ export function PpomSwitchInput( {
 		raw === 1 ||
 		raw === 'true';
 	return (
-		<FormControl
+        <Field.Root
 			display="flex"
 			alignItems="flex-start"
 			gap={ 2 }
@@ -35,11 +36,11 @@ export function PpomSwitchInput( {
 			borderWidth="1px"
 			borderColor="gray.100"
 		>
-			<Switch
+            <Switch.Root
 				id={ switchId }
 				mt={ 0.5 }
-				colorScheme="blue"
-				isChecked={ Boolean( checked ) }
+				colorPalette="blue"
+				checked={ Boolean( checked ) }
 				aria-label={
 					label
 						? undefined
@@ -47,20 +48,23 @@ export function PpomSwitchInput( {
 						? description
 						: 'Toggle'
 				}
-				onChange={ ( e ) =>
-					field.handleChange( e.target.checked ? 'on' : 'off' )
+				onCheckedChange={ ( { checked: next } ) =>
+					field.handleChange( next ? 'on' : 'off' )
 				}
 				onBlur={ field.handleBlur }
-			/>
-			<Box flex="1" minW={ 0 }>
+			>
+				<Switch.HiddenInput />
+				<Switch.Control />
+			</Switch.Root>
+            <Box flex="1" minW={ 0 }>
 				{ label ? (
-					<FormLabel
+					<Field.Label
 						htmlFor={ switchId }
 						{ ...ppomFieldLabelProps }
 						mb={ 0.5 }
 					>
 						{ label }
-					</FormLabel>
+					</Field.Label>
 				) : null }
 				{ description ? (
 					<Text fontSize="xs" color="gray.600" lineHeight="1.5">
@@ -68,6 +72,6 @@ export function PpomSwitchInput( {
 					</Text>
 				) : null }
 			</Box>
-		</FormControl>
-	);
+        </Field.Root>
+    );
 }

@@ -6,7 +6,7 @@
  * ImagesSelectEditor and delegates all other settings to GroupedFieldSections
  * driven by the schema, using the fallback section blueprint.
  */
-import { Box, VStack, Text } from '@chakra-ui/react';
+import { Steps, Box, VStack, Text } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -55,11 +55,11 @@ export function ImageselectFieldEditor( {
 	};
 
 	return (
-		<SettingsConditionsTabs
+        <SettingsConditionsTabs
 			i18n={ i18n }
 			hasConditions={ hasConditions }
 			settings={
-				<VStack align="stretch" spacing={ 3 }>
+				<VStack align="stretch" gap={ 3 }>
 					<GroupedFieldSections
 						{ ...shared }
 						sections={ settingsSections }
@@ -100,5 +100,5 @@ export function ImageselectFieldEditor( {
 				/>
 			}
 		/>
-	);
+    );
 }

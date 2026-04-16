@@ -1,7 +1,7 @@
 /**
  * MVP editor for schema `options.type === 'paired'` (select, radio, etc.).
  */
-import { Box, Button, HStack, Input, Text, VStack } from '@chakra-ui/react';
+import { Steps, Box, Button, HStack, Input, Text, VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
@@ -97,17 +97,17 @@ export function PairedOptionsEditor( {
 	};
 
 	return (
-		<Box
+        <Box
 			borderWidth="1px"
 			borderColor="gray.200"
 			borderRadius="md"
 			p={ 3 }
 			bg="white"
 		>
-			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
+            <Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
 				{ title }
 			</Text>
-			<VStack align="stretch" spacing={ 3 }>
+            <VStack align="stretch" gap={ 3 }>
 				{ rows.map( ( row, index ) => (
 					<Box
 						key={ index }
@@ -118,7 +118,7 @@ export function PairedOptionsEditor( {
 					>
 						<HStack
 							align="center"
-							spacing={ 2 }
+							gap={ 2 }
 							w="full"
 							overflowX="auto"
 						>
@@ -131,7 +131,7 @@ export function PairedOptionsEditor( {
 									i18n.pairedOptionLabel || 'Option'
 								}
 								value={ String( row.option ?? row.title ?? '' ) }
-								onChange={ ( e ) =>
+								onValueChange={ ( e ) =>
 									updateRow( index, {
 										option: e.target.value,
 									} )
@@ -146,7 +146,7 @@ export function PairedOptionsEditor( {
 									i18n.pairedOptionPrice || 'Price'
 								}
 								value={ String( row.price ?? '' ) }
-								onChange={ ( e ) =>
+								onValueChange={ ( e ) =>
 									updateRow( index, { price: e.target.value } )
 								}
 							/>
@@ -162,7 +162,7 @@ export function PairedOptionsEditor( {
 											'Discount'
 										}
 										value={ String( row.discount ?? '' ) }
-										onChange={ ( e ) =>
+										onValueChange={ ( e ) =>
 											updateRow( index, {
 												discount: e.target.value,
 											} )
@@ -178,7 +178,7 @@ export function PairedOptionsEditor( {
 											'Tooltip'
 										}
 										value={ String( row.tooltip ?? '' ) }
-										onChange={ ( e ) =>
+										onValueChange={ ( e ) =>
 											updateRow( index, {
 												tooltip: e.target.value,
 											} )
@@ -195,7 +195,7 @@ export function PairedOptionsEditor( {
 									i18n.pairedOptionWeight || 'Weight'
 								}
 								value={ String( row.weight ?? '' ) }
-								onChange={ ( e ) =>
+								onValueChange={ ( e ) =>
 									updateRow( index, {
 										weight: e.target.value,
 									} )
@@ -210,7 +210,7 @@ export function PairedOptionsEditor( {
 									i18n.pairedOptionStock || 'Stock'
 								}
 								value={ String( row.stock ?? '' ) }
-								onChange={ ( e ) =>
+								onValueChange={ ( e ) =>
 									updateRow( index, { stock: e.target.value } )
 								}
 							/>
@@ -223,13 +223,13 @@ export function PairedOptionsEditor( {
 									i18n.pairedOptionImageId || 'Image ID'
 								}
 								value={ String( row.id ?? row.images ?? '' ) }
-								onChange={ ( e ) =>
+								onValueChange={ ( e ) =>
 									updateRow( index, {
 										id: e.target.value,
 									} )
 								}
 							/>
-							<HStack spacing={ 1 } flexShrink={ 0 }>
+							<HStack gap={ 1 } flexShrink={ 0 }>
 								<Button
 									size="xs"
 									variant="ghost"
@@ -237,7 +237,7 @@ export function PairedOptionsEditor( {
 										i18n.pairedOptionsMoveUp || 'Up'
 									}
 									onClick={ () => move( index, -1 ) }
-									isDisabled={ index === 0 }
+									disabled={ index === 0 }
 								>
 									↑
 								</Button>
@@ -248,14 +248,14 @@ export function PairedOptionsEditor( {
 										i18n.pairedOptionsMoveDown || 'Down'
 									}
 									onClick={ () => move( index, 1 ) }
-									isDisabled={ index === rows.length - 1 }
+									disabled={ index === rows.length - 1 }
 								>
 									↓
 								</Button>
 								<Button
 									size="xs"
 									variant="ghost"
-									colorScheme="red"
+									colorPalette="red"
 									onClick={ () => removeRow( index ) }
 								>
 									{ i18n.pairedOptionsRemove || 'Remove' }
@@ -268,6 +268,6 @@ export function PairedOptionsEditor( {
 					{ i18n.pairedOptionsAddRow || 'Add option' }
 				</Button>
 			</VStack>
-		</Box>
-	);
+        </Box>
+    );
 }

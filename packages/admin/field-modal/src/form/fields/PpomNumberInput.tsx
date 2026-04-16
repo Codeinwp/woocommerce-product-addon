@@ -1,11 +1,7 @@
 /**
  * Numeric input for PPOM fields (stores number or undefined when empty / invalid).
  */
-import {
-	FormControl,
-	FormLabel,
-	Input,
-} from '@chakra-ui/react';
+import { Steps, Input, Field } from '@chakra-ui/react';
 import { useEffect, useId, useState } from '@wordpress/element';
 import { useFieldContext } from '../ppomFormContext';
 import { ppomControlSurface, ppomFieldLabelProps } from '../fieldStyles';
@@ -32,7 +28,8 @@ export function PpomNumberInput( {
 }: PpomNumberInputProps ) {
 	const field = useFieldContext<number | undefined>();
 	const v = field.state.value;
-	const inputId = useId();
+	// Use React.useId instead (available in React 18+)
+    const inputId = useId();
 	const [ focused, setFocused ] = useState( false );
 	const [ draft, setDraft ] = useState( () => numToDisplay( v ) );
 
@@ -45,13 +42,13 @@ export function PpomNumberInput( {
 	const display = focused ? draft : numToDisplay( v );
 
 	return (
-		<FormControl>
-			{ label ? (
-				<FormLabel htmlFor={ inputId } { ...ppomFieldLabelProps }>
+        <Field.Root>
+            { label ? (
+				<Field.Label htmlFor={ inputId } { ...ppomFieldLabelProps }>
 					{ label }
-				</FormLabel>
+				</Field.Label>
 			) : null }
-			<Input
+            <Input
 				id={ inputId }
 				size="sm"
 				type="number"
@@ -59,7 +56,7 @@ export function PpomNumberInput( {
 				min={ min }
 				max={ max }
 				step={ step }
-				onChange={ ( e ) => {
+				onValueChange={ ( e ) => {
 					const next = e.target.value;
 					setDraft( next );
 					if ( next === '' ) {
@@ -99,6 +96,6 @@ export function PpomNumberInput( {
 				} }
 				{ ...ppomControlSurface }
 			/>
-		</FormControl>
-	);
+        </Field.Root>
+    );
 }

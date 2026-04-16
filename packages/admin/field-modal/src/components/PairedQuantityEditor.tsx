@@ -1,16 +1,7 @@
 /**
  * Variation quantity matrix rows (paired-quantity schema type).
  */
-import {
-	Box,
-	Button,
-	FormControl,
-	FormHelperText,
-	FormLabel,
-	HStack,
-	Input,
-	VStack,
-} from '@chakra-ui/react';
+import { Steps, Box, Button, HStack, Input, VStack, Field } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
 
@@ -215,22 +206,22 @@ export function PairedQuantityEditor( {
 	};
 
 	return (
-		<FormControl>
-			<FormLabel { ...labelProps }>{ title }</FormLabel>
-			<Box
+        <Field.Root>
+            <Field.Label { ...labelProps }>{ title }</Field.Label>
+            <Box
 				borderWidth="1px"
 				borderColor="gray.200"
 				borderRadius="md"
 				p={ 3 }
 				bg="white"
 			>
-				<Button size="sm" colorScheme="blue" mb={ 3 } onClick={ addRow }>
+				<Button size="sm" colorPalette="blue" mb={ 3 } onClick={ addRow }>
 					{ i18n.quantityPairedAddRow ||
 						i18n.pairedOptionsAddRow ||
 						'Add option' }
 				</Button>
 
-				<VStack align="stretch" spacing={ 3 }>
+				<VStack align="stretch" gap={ 3 }>
 					{ rows.map( ( row, index ) => (
 						<Box
 							key={ index }
@@ -241,7 +232,7 @@ export function PairedQuantityEditor( {
 						>
 							<HStack
 								align="flex-start"
-								spacing={ 2 }
+								gap={ 2 }
 								w="full"
 								flexWrap="wrap"
 							>
@@ -251,7 +242,7 @@ export function PairedQuantityEditor( {
 									minW={ 0 }
 									placeholder={ ph.option }
 									value={ row.option }
-									onChange={ ( e ) =>
+									onValueChange={ ( e ) =>
 										updateRow( index, {
 											option: e.target.value,
 										} )
@@ -264,7 +255,7 @@ export function PairedQuantityEditor( {
 									minW={ 0 }
 									placeholder={ ph.price }
 									value={ row.price }
-									onChange={ ( e ) =>
+									onValueChange={ ( e ) =>
 										updateRow( index, {
 											price: e.target.value,
 										} )
@@ -277,7 +268,7 @@ export function PairedQuantityEditor( {
 									minW={ 0 }
 									placeholder={ ph.weight }
 									value={ row.weight }
-									onChange={ ( e ) =>
+									onValueChange={ ( e ) =>
 										updateRow( index, {
 											weight: e.target.value,
 										} )
@@ -290,7 +281,7 @@ export function PairedQuantityEditor( {
 									minW={ 0 }
 									placeholder={ ph.defaultQty }
 									value={ row.defaultQty }
-									onChange={ ( e ) =>
+									onValueChange={ ( e ) =>
 										updateRow( index, {
 											defaultQty: e.target.value,
 										} )
@@ -303,7 +294,7 @@ export function PairedQuantityEditor( {
 									minW={ 0 }
 									placeholder={ ph.min }
 									value={ row.min }
-									onChange={ ( e ) =>
+									onValueChange={ ( e ) =>
 										updateRow( index, {
 											min: e.target.value,
 										} )
@@ -316,7 +307,7 @@ export function PairedQuantityEditor( {
 									minW={ 0 }
 									placeholder={ ph.max }
 									value={ row.max }
-									onChange={ ( e ) =>
+									onValueChange={ ( e ) =>
 										updateRow( index, {
 											max: e.target.value,
 										} )
@@ -329,14 +320,14 @@ export function PairedQuantityEditor( {
 									minW={ 0 }
 									placeholder={ ph.stock }
 									value={ row.stock }
-									onChange={ ( e ) =>
+									onValueChange={ ( e ) =>
 										updateRow( index, {
 											stock: e.target.value,
 										} )
 									}
 									{ ...controlSurface }
 								/>
-								<HStack spacing={ 1 } flexShrink={ 0 }>
+								<HStack gap={ 1 } flexShrink={ 0 }>
 									<Button
 										size="xs"
 										variant="ghost"
@@ -345,7 +336,7 @@ export function PairedQuantityEditor( {
 											'Move up'
 										}
 										onClick={ () => move( index, -1 ) }
-										isDisabled={ index === 0 }
+										disabled={ index === 0 }
 									>
 										&#8593;
 									</Button>
@@ -357,7 +348,7 @@ export function PairedQuantityEditor( {
 											'Move down'
 										}
 										onClick={ () => move( index, 1 ) }
-										isDisabled={
+										disabled={
 											index === rows.length - 1
 										}
 									>
@@ -366,7 +357,7 @@ export function PairedQuantityEditor( {
 									<Button
 										size="xs"
 										variant="ghost"
-										colorScheme="red"
+										colorPalette="red"
 										onClick={ () => removeRow( index ) }
 									>
 										{ i18n.pairedOptionsRemove ||
@@ -378,11 +369,11 @@ export function PairedQuantityEditor( {
 					) ) }
 				</VStack>
 			</Box>
-			{ description ? (
-				<FormHelperText { ...helperTextProps }>
+            { description ? (
+				<Field.HelperText { ...helperTextProps }>
 					{ description }
-				</FormHelperText>
+				</Field.HelperText>
 			) : null }
-		</FormControl>
-	);
+        </Field.Root>
+    );
 }

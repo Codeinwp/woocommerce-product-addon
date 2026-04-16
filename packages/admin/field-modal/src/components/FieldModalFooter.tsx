@@ -1,7 +1,7 @@
 /**
  * Modal footer: secondary actions (legacy, remove, back to types) + close/save.
  */
-import { ModalFooter, Button, HStack } from '@chakra-ui/react';
+import { Steps, Button, HStack, Dialog } from '@chakra-ui/react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
 
 export interface FieldModalFooterProps {
@@ -36,7 +36,7 @@ export function FieldModalFooter( {
 	onSave,
 }: FieldModalFooterProps ) {
 	return (
-		<ModalFooter
+        <Dialog.Footer
 			flexShrink={ 0 }
 			display="flex"
 			flexWrap="wrap"
@@ -44,26 +44,26 @@ export function FieldModalFooter( {
 			justifyContent="space-between"
 			alignItems="center"
 		>
-			<HStack flexWrap="wrap" spacing={ 3 } alignItems="center">
+            <HStack flexWrap="wrap" gap={ 3 } alignItems="center">
 				{ ! pickerOpen && selectedId && editDraft && (
 					<>
 						{ modalEntry === 'picker' && (
 							<Button
-								variant="link"
+								variant='plain'
 								size="sm"
-								colorScheme="blue"
+								colorPalette="blue"
 								onClick={ onBackToFieldTypes }
 							>
 								{ i18n.backToFieldTypes || 'Back to field types' }
 							</Button>
 						) }
-						<Button variant="link" size="sm" onClick={ onOpenLegacyEditor }>
+						<Button variant='plain' size="sm" onClick={ onOpenLegacyEditor }>
 							{ i18n.openLegacyModal }
 						</Button>
 						<Button
-							variant="link"
+							variant='plain'
 							size="sm"
-							colorScheme="red"
+							colorPalette="red"
 							onClick={ onRemoveSelected }
 						>
 							{ i18n.remove || 'Remove' }
@@ -71,21 +71,21 @@ export function FieldModalFooter( {
 					</>
 				) }
 			</HStack>
-			<HStack spacing={ 2 }>
+            <HStack gap={ 2 }>
 				{ ! pickerOpen && (
-					<Button variant="ghost" onClick={ onClose } isDisabled={ saving }>
+					<Button variant="ghost" onClick={ onClose } disabled={ saving }>
 						{ i18n.close || 'Close' }
 					</Button>
 				) }
 				<Button
-					colorScheme="blue"
+					colorPalette="blue"
 					onClick={ onSave }
-					isLoading={ saving }
-					isDisabled={ loading || ! hasCtx || pickerOpen }
+					loading={ saving }
+					disabled={ loading || ! hasCtx || pickerOpen }
 				>
 					{ i18n.save || 'Save' }
 				</Button>
 			</HStack>
-		</ModalFooter>
-	);
+        </Dialog.Footer>
+    );
 }

@@ -1,16 +1,7 @@
 /**
  * Viewport size rows for Image Cropper (paired-cropper schema type).
  */
-import {
-	Box,
-	Button,
-	FormControl,
-	FormHelperText,
-	FormLabel,
-	HStack,
-	Input,
-	VStack,
-} from '@chakra-ui/react';
+import { Steps, Box, Button, HStack, Input, VStack, Field } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
 
@@ -187,22 +178,22 @@ export function PairedCropperEditor( {
 		'Price (optional)';
 
 	return (
-		<FormControl>
-			<FormLabel { ...labelProps }>{ title }</FormLabel>
-			<Box
+        <Field.Root>
+            <Field.Label { ...labelProps }>{ title }</Field.Label>
+            <Box
 				borderWidth="1px"
 				borderColor="gray.200"
 				borderRadius="md"
 				p={ 3 }
 				bg="white"
 			>
-				<Button size="sm" colorScheme="blue" mb={ 3 } onClick={ addRow }>
+				<Button size="sm" colorPalette="blue" mb={ 3 } onClick={ addRow }>
 					{ i18n.cropperViewportAddRow ||
 						i18n.pairedOptionsAddRow ||
 						'Add viewport' }
 				</Button>
 
-				<VStack align="stretch" spacing={ 3 }>
+				<VStack align="stretch" gap={ 3 }>
 					{ rows.map( ( row, index ) => (
 						<Box
 							key={ index }
@@ -213,7 +204,7 @@ export function PairedCropperEditor( {
 						>
 							<HStack
 								align="flex-start"
-								spacing={ 2 }
+								gap={ 2 }
 								w="full"
 								flexWrap="wrap"
 							>
@@ -223,7 +214,7 @@ export function PairedCropperEditor( {
 									minW={ 0 }
 									placeholder={ lbl }
 									value={ row.option }
-									onChange={ ( e ) =>
+									onValueChange={ ( e ) =>
 										updateRow( index, {
 											option: e.target.value,
 										} )
@@ -236,7 +227,7 @@ export function PairedCropperEditor( {
 									minW={ 0 }
 									placeholder={ wPh }
 									value={ row.width }
-									onChange={ ( e ) =>
+									onValueChange={ ( e ) =>
 										updateRow( index, {
 											width: e.target.value,
 										} )
@@ -249,7 +240,7 @@ export function PairedCropperEditor( {
 									minW={ 0 }
 									placeholder={ hPh }
 									value={ row.height }
-									onChange={ ( e ) =>
+									onValueChange={ ( e ) =>
 										updateRow( index, {
 											height: e.target.value,
 										} )
@@ -262,14 +253,14 @@ export function PairedCropperEditor( {
 									minW={ 0 }
 									placeholder={ pricePh }
 									value={ row.price }
-									onChange={ ( e ) =>
+									onValueChange={ ( e ) =>
 										updateRow( index, {
 											price: e.target.value,
 										} )
 									}
 									{ ...controlSurface }
 								/>
-								<HStack spacing={ 1 } flexShrink={ 0 }>
+								<HStack gap={ 1 } flexShrink={ 0 }>
 									<Button
 										size="xs"
 										variant="ghost"
@@ -278,7 +269,7 @@ export function PairedCropperEditor( {
 											'Move up'
 										}
 										onClick={ () => move( index, -1 ) }
-										isDisabled={ index === 0 }
+										disabled={ index === 0 }
 									>
 										&#8593;
 									</Button>
@@ -290,7 +281,7 @@ export function PairedCropperEditor( {
 											'Move down'
 										}
 										onClick={ () => move( index, 1 ) }
-										isDisabled={
+										disabled={
 											index === rows.length - 1
 										}
 									>
@@ -299,7 +290,7 @@ export function PairedCropperEditor( {
 									<Button
 										size="xs"
 										variant="ghost"
-										colorScheme="red"
+										colorPalette="red"
 										onClick={ () => removeRow( index ) }
 									>
 										{ i18n.pairedOptionsRemove ||
@@ -311,11 +302,11 @@ export function PairedCropperEditor( {
 					) ) }
 				</VStack>
 			</Box>
-			{ description ? (
-				<FormHelperText { ...helperTextProps }>
+            { description ? (
+				<Field.HelperText { ...helperTextProps }>
 					{ description }
-				</FormHelperText>
+				</Field.HelperText>
 			) : null }
-		</FormControl>
-	);
+        </Field.Root>
+    );
 }

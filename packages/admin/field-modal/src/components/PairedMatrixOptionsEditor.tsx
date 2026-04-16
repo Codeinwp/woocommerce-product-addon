@@ -1,15 +1,7 @@
 /**
  * Classic paired-palettes / paired-pricematrix rows: option, price, label, id, isfixed.
  */
-import {
-	Box,
-	Button,
-	Checkbox,
-	HStack,
-	Input,
-	Text,
-	VStack,
-} from '@chakra-ui/react';
+import { Steps, Box, Button, Checkbox, HStack, Input, Text, VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
@@ -106,17 +98,17 @@ export function PairedMatrixOptionsEditor( {
 	};
 
 	return (
-		<Box
+        <Box
 			borderWidth="1px"
 			borderColor="gray.200"
 			borderRadius="md"
 			p={ 3 }
 			bg="white"
 		>
-			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
+            <Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
 				{ title }
 			</Text>
-			<VStack align="stretch" spacing={ 3 }>
+            <VStack align="stretch" gap={ 3 }>
 				{ rows.map( ( row, index ) => (
 					<Box
 						key={ index }
@@ -127,7 +119,7 @@ export function PairedMatrixOptionsEditor( {
 					>
 						<HStack
 							align="center"
-							spacing={ 2 }
+							gap={ 2 }
 							w="full"
 							overflowX="auto"
 							flexWrap="wrap"
@@ -140,7 +132,7 @@ export function PairedMatrixOptionsEditor( {
 									i18n.pairedMatrixOption || 'Option'
 								}
 								value={ String( row.option ?? '' ) }
-								onChange={ ( e ) =>
+								onValueChange={ ( e ) =>
 									updateRow( index, {
 										option: e.target.value,
 									} )
@@ -154,7 +146,7 @@ export function PairedMatrixOptionsEditor( {
 									i18n.pairedMatrixPrice || 'Price'
 								}
 								value={ String( row.price ?? '' ) }
-								onChange={ ( e ) =>
+								onValueChange={ ( e ) =>
 									updateRow( index, { price: e.target.value } )
 								}
 							/>
@@ -166,7 +158,7 @@ export function PairedMatrixOptionsEditor( {
 									i18n.pairedMatrixLabel || 'Label'
 								}
 								value={ String( row.label ?? '' ) }
-								onChange={ ( e ) =>
+								onValueChange={ ( e ) =>
 									updateRow( index, { label: e.target.value } )
 								}
 							/>
@@ -178,20 +170,20 @@ export function PairedMatrixOptionsEditor( {
 									i18n.pairedMatrixOptionId || 'Option ID'
 								}
 								value={ String( row.id ?? '' ) }
-								onChange={ ( e ) =>
+								onValueChange={ ( e ) =>
 									updateRow( index, { id: e.target.value } )
 								}
 							/>
-							<Checkbox
+							<Checkbox.Root
 								size="sm"
-								isChecked={ isFixedChecked( row ) }
-								onChange={ ( e ) =>
+								onCheckedChange={ ( e ) =>
 									toggleFixed( index, e.target.checked )
 								}
-							>
-								{ i18n.pairedMatrixFixed || 'Fixed' }
-							</Checkbox>
-							<HStack spacing={ 1 } flexShrink={ 0 }>
+								checked={ isFixedChecked( row ) }
+							><Checkbox.HiddenInput /><Checkbox.Control><Checkbox.Indicator /></Checkbox.Control><Checkbox.Label>
+                                { i18n.pairedMatrixFixed || 'Fixed' }
+                            </Checkbox.Label></Checkbox.Root>
+							<HStack gap={ 1 } flexShrink={ 0 }>
 								<Button
 									size="xs"
 									variant="ghost"
@@ -199,7 +191,7 @@ export function PairedMatrixOptionsEditor( {
 										i18n.pairedOptionsMoveUp || 'Up'
 									}
 									onClick={ () => move( index, -1 ) }
-									isDisabled={ index === 0 }
+									disabled={ index === 0 }
 								>
 									↑
 								</Button>
@@ -210,14 +202,14 @@ export function PairedMatrixOptionsEditor( {
 										i18n.pairedOptionsMoveDown || 'Down'
 									}
 									onClick={ () => move( index, 1 ) }
-									isDisabled={ index === rows.length - 1 }
+									disabled={ index === rows.length - 1 }
 								>
 									↓
 								</Button>
 								<Button
 									size="xs"
 									variant="ghost"
-									colorScheme="red"
+									colorPalette="red"
 									onClick={ () => removeRow( index ) }
 								>
 									{ i18n.pairedOptionsRemove || 'Remove' }
@@ -230,6 +222,6 @@ export function PairedMatrixOptionsEditor( {
 					{ i18n.pairedOptionsAddRow || 'Add option' }
 				</Button>
 			</VStack>
-		</Box>
-	);
+        </Box>
+    );
 }

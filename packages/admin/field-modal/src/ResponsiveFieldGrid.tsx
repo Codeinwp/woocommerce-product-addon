@@ -1,7 +1,7 @@
 /**
  * Two-column grid with full-width rows for textarea / block controls.
  */
-import { Grid, GridItem } from '@chakra-ui/react';
+import { Steps, Grid, GridItem } from '@chakra-ui/react';
 import { renderSettingRow } from './schemaSettingControl';
 import type { SettingRowContext } from './types/fieldModal';
 
