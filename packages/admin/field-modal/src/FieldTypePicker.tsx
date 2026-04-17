@@ -72,6 +72,7 @@ export function FieldTypePicker( {
 							flex="1"
 							minW="200px"
 							size="md"
+							bg="white"
 							placeholder={ i18n.searchFieldTypes }
 							value={ query }
 							onChange={ ( e ) =>

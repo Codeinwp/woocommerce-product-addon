@@ -1,7 +1,7 @@
 /**
  * PPOM switch — stores PPOM-style 'on' | 'off' strings (see schemaSettingControl checkbox).
  */
-import { Box, Field, Switch, Text } from '@chakra-ui/react';
+import { Field, Switch, Text } from '@chakra-ui/react';
 import { useId } from '@wordpress/element';
 import { useFieldContext } from '../ppomFormContext';
 import { ppomFieldLabelProps } from '../fieldStyles';
@@ -27,18 +27,21 @@ export function PpomSwitchInput( {
 		raw === 'true';
 	return (
         <Field.Root
-			display="flex"
-			alignItems="flex-start"
-			gap={ 2 }
-			p={ 2 }
-			bg="gray.50"
-			borderRadius="md"
-			borderWidth="1px"
-			borderColor="gray.100"
+			display="grid"
+			gridTemplateColumns="auto minmax(0, 1fr)"
+			columnGap={ 2 }
+			rowGap={ label && description ? 0.5 : 0 }
+			alignItems="start"
+			py={ 1.5 }
+			px={ 2 }
+			mb={ 0 }
 		>
             <Switch.Root
+				gridRow={ 1 }
+				gridColumn={ 1 }
 				id={ switchId }
-				mt={ 0.5 }
+				mt={ label ? 0.5 : 0 }
+				alignSelf="start"
 				colorPalette="blue"
 				checked={ Boolean( checked ) }
 				aria-label={
@@ -56,22 +59,28 @@ export function PpomSwitchInput( {
 				<Switch.HiddenInput />
 				<Switch.Control />
 			</Switch.Root>
-            <Box flex="1" minW={ 0 }>
-				{ label ? (
-					<Field.Label
-						htmlFor={ switchId }
-						{ ...ppomFieldLabelProps }
-						mb={ 0.5 }
-					>
-						{ label }
-					</Field.Label>
-				) : null }
-				{ description ? (
-					<Text fontSize="xs" color="gray.600" lineHeight="1.5">
-						{ description }
-					</Text>
-				) : null }
-			</Box>
+			{ label ? (
+				<Field.Label
+					gridRow={ 1 }
+					gridColumn={ 2 }
+					htmlFor={ switchId }
+					{ ...ppomFieldLabelProps }
+					mb={ 0 }
+				>
+					{ label }
+				</Field.Label>
+			) : null }
+			{ description ? (
+				<Text
+					gridRow={ label ? 2 : 1 }
+					gridColumn={ 2 }
+					fontSize="xs"
+					color="gray.600"
+					lineHeight="1.5"
+				>
+					{ description }
+				</Text>
+			) : null }
         </Field.Root>
     );
 }

@@ -5,7 +5,17 @@
  * @see ppom-pro/assets/conditional_field_repeater/admin/src/main.js
  */
 import { useMemo, useState } from '@wordpress/element';
-import { Box, Button, Field, Link, NativeSelect, Switch, Text, VStack } from '@chakra-ui/react';
+import {
+	Box,
+	Button,
+	Field,
+	HStack,
+	Link,
+	NativeSelect,
+	Switch,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
@@ -148,18 +158,16 @@ export function ConditionalRepeaterMappingEditor( {
 			p={ { base: 3, md: 4 } }
 			bg="blue.50"
 		>
-            <Text fontWeight="semibold" fontSize="sm" mb={ 3 } color="blue.900">
-				{ i18n.cfrSectionTitle || 'Conditional Repeater' }
-			</Text>
             <Field.Root
 				display="flex"
-				alignItems="flex-start"
+				flexDirection="row"
+				alignItems="center"
+				flexWrap="wrap"
 				gap={ 3 }
 				mb={ 4 }
 			>
 				<Switch.Root
 					id="ppom-cfr-enable"
-					mt={ 1 }
 					colorPalette="blue"
 					checked={ Boolean( enabled ) }
 					onCheckedChange={ ( { checked: next } ) => setEnabled( next ) }
@@ -167,21 +175,26 @@ export function ConditionalRepeaterMappingEditor( {
 					<Switch.HiddenInput />
 					<Switch.Control />
 				</Switch.Root>
-				<Box flex="1">
-					<Field.Label htmlFor="ppom-cfr-enable" mb={ 1 } fontWeight="semibold">
+				<HStack gap={ 2 } alignItems="center" flex="1" flexWrap="wrap">
+					<Field.Label
+						htmlFor="ppom-cfr-enable"
+						mb={ 0 }
+						fontWeight="semibold"
+					>
 						{ i18n.cfrEnableLabel || 'Enable Conditional Repeat' }
 					</Field.Label>
 					{ i18n.cfrDocsUrl ? (
 						<Link
-                            href={ i18n.cfrDocsUrl }
-                            fontSize="xs"
-                            color="blue.700"
-                            target='_blank'
-                            rel='noopener noreferrer'>
+							href={ i18n.cfrDocsUrl }
+							fontSize="xs"
+							color="blue.700"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
 							{ i18n.cfrLearnMore || 'Learn more' }
 						</Link>
 					) : null }
-				</Box>
+				</HStack>
 			</Field.Root>
             <Box
 				display={ enabled ? 'block' : 'none' }

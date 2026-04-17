@@ -206,17 +206,20 @@ export function renderSettingRow(
 		return (
             <Field.Root
 				key={ key }
-				display="flex"
-				alignItems="flex-start"
-				gap={ 2 }
-				p={ 2 }
-				bg="gray.50"
-				borderRadius="md"
-				borderWidth="1px"
-				borderColor="gray.100"
+				display="grid"
+				gridTemplateColumns="auto minmax(0, 1fr)"
+				columnGap={ 2 }
+				rowGap={ title && desc ? 0.5 : 0 }
+				alignItems="start"
+				py={ 1.5 }
+				px={ 2 }
+				mb={ 0 }
 			>
                 <Switch.Root
-					mt={ 0.5 }
+					gridRow={ 1 }
+					gridColumn={ 1 }
+					mt={ title ? 0.5 : 0 }
+					alignSelf="start"
 					colorPalette="blue"
 					checked={ checked }
 					onCheckedChange={ ( { checked: next } ) =>
@@ -226,16 +229,25 @@ export function renderSettingRow(
 					<Switch.HiddenInput />
 					<Switch.Control />
 				</Switch.Root>
-                <Box flex="1" minW={ 0 }>
-					<Field.Label { ...labelProps } mb={ 0.5 }>
-						{ title }
-					</Field.Label>
-					{ desc ? (
-						<Text fontSize="xs" color="gray.600" lineHeight="1.5">
-							{ desc }
-						</Text>
-					) : null }
-				</Box>
+				<Field.Label
+					{ ...labelProps }
+					gridRow={ 1 }
+					gridColumn={ 2 }
+					mb={ 0 }
+				>
+					{ title }
+				</Field.Label>
+				{ desc ? (
+					<Text
+						gridRow={ title ? 2 : 1 }
+						gridColumn={ 2 }
+						fontSize="xs"
+						color="gray.600"
+						lineHeight="1.5"
+					>
+						{ desc }
+					</Text>
+				) : null }
             </Field.Root>
         );
 	}

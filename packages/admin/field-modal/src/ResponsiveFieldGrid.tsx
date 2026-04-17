@@ -18,7 +18,7 @@ export function ResponsiveFieldGrid( { entries, ctx }: ResponsiveFieldGridProps 
 		<Grid
 			templateColumns={ { base: '1fr', md: 'repeat(2, minmax(0, 1fr))' } }
 			columnGap={ { base: 3, md: 4 } }
-			rowGap={ 3 }
+			rowGap={ 2 }
 		>
 			{ entries.map( ( { key, meta }: { key: string; meta: Record< string, unknown > } ) => {
 				const type = meta.type ? String( meta.type ) : 'text';
