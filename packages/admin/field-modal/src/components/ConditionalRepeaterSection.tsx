@@ -9,7 +9,6 @@ import type { I18nDict, ModalContextValue } from '../types/fieldModal';
 
 export interface ConditionalRepeaterSectionProps {
 	i18n: I18nDict;
-	ppomFieldIndex: number;
 	modalContext: ModalContextValue | null | undefined;
 	values?: FieldRow;
 	onChange?: Dispatch< SetStateAction< FieldRow | null > >;

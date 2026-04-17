@@ -6,7 +6,7 @@ import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
 	shouldShowConditionalRepeaterTab,
-} from '../SettingsConditionsTabs';
+} from '../panels/SettingsConditionsTabs';
 import { AudiosSelectEditor } from '../components/AudiosSelectEditor';
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { GroupedFieldSections } from './GroupedFieldSections';
@@ -103,7 +103,6 @@ export function AudioFieldEditor( {
 					modalContext={ modalContext }
 					values={ values }
 					onChange={ onChange }
-					ppomFieldIndex={ ppomFieldIndex }
 				/>
 			}
 		/>

@@ -6,7 +6,7 @@ import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
 	shouldShowConditionalRepeaterTab,
-} from '../SettingsConditionsTabs';
+} from '../panels/SettingsConditionsTabs';
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { ImagesSelectEditor } from '../components/ImagesSelectEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
@@ -139,7 +139,6 @@ export function ImageFieldEditor( {
 					modalContext={ modalContext }
 					values={ values }
 					onChange={ onChange }
-					ppomFieldIndex={ ppomFieldIndex }
 				/>
 			}
 		/>

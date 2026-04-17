@@ -5,7 +5,7 @@
  *
  * `useForm` calls `formApi.update(opts)` on every render. If `opts` includes `defaultValues` taken from
  * the parent `editDraft` prop, that object can lag the TanStack store by one React frame: after
- * `form.reset(next)` from a Chakra `onChange`, `useStore` re-renders this component before
+ * a bridge-level form sync, `useStore` re-renders this component before
  * `setEditDraft` from `listeners.onChange` has committed. `FormApi.update` may then treat parent
  * `defaultValues` as the source of truth and overwrite `values` (see `@tanstack/form-core` `FormApi.update`:
  * `shouldUpdateValues` when `!isTouched` — legacy inputs are not TanStack `Field`s, so the form often
@@ -25,17 +25,22 @@
  */
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from '@wordpress/element';
 import { useStore } from '@tanstack/react-form';
-import { Steps, Alert, Skeleton, VStack } from '@chakra-ui/react';
-import { FieldSettingsForm } from '../FieldSettingsForm';
+import { Alert, Skeleton, VStack } from '@chakra-ui/react';
 import { usePpomAppForm } from '../form/ppomForm';
+import { getFieldUiDefinition } from '../definitions/registry';
+import { resolveFieldModalRoute } from '../definitions/routing';
+import { mergeBuilderFieldsWithActive } from '../utils/mergedBuilderFields';
+import { UnknownSlugPanel } from '../panels/UnknownSlugPanel';
+import { DefinitionDrivenFieldEditor } from './DefinitionDrivenFieldEditor';
 import type { FieldRow } from '../types/fieldModal';
 import type { FieldModalManageStepProps } from '../types/fieldModal';
+import type { FieldFormApiLike } from '../types/fieldModal';
 
 export type FieldManageEditorBridgeProps = FieldModalManageStepProps;
 
 type FieldManageEditorBridgeInnerProps = Omit<
 	FieldModalManageStepProps,
-	'editDraft' | 'fields' | 'onOpenPicker'
+	'editDraft' | 'onOpenPicker'
 > & {
 	editDraft: FieldRow;
 };
@@ -66,11 +71,32 @@ function stableStringifyFieldRow( value: unknown ): string {
 	);
 }
 
+function applyFieldRowToForm(
+	form: FieldFormApiLike,
+	nextRow: FieldRow
+): void {
+	const currentRow = form.state.values as FieldRow;
+	const keys = new Set( [
+		...Object.keys( currentRow || {} ),
+		...Object.keys( nextRow || {} ),
+	] );
+
+	keys.forEach( ( key ) => {
+		const hasNext = Object.prototype.hasOwnProperty.call( nextRow, key );
+		const currentValue = currentRow[ key ];
+		const nextValue = hasNext ? nextRow[ key ] : undefined;
+		if ( Object.is( currentValue, nextValue ) ) {
+			return;
+		}
+		form.setFieldValue( key, nextValue );
+	} );
+}
+
 export function FieldManageEditorBridge( props: FieldManageEditorBridgeProps ) {
 	if ( ! props.editDraft ) {
 		return null;
 	}
-	const { fields: _fields, onOpenPicker: _onOpenPicker, ...rest } = props;
+	const { onOpenPicker: _onOpenPicker, ...rest } = props;
 	return (
 		<FieldManageEditorBridgeInner
 			key={ props.editDraft.clientId }
@@ -82,6 +108,7 @@ export function FieldManageEditorBridge( props: FieldManageEditorBridgeProps ) {
 
 function FieldManageEditorBridgeInner( {
 	i18n,
+	fields,
 	selectedId: _selectedId,
 	editDraft,
 	schemaLoading,
@@ -91,7 +118,6 @@ function FieldManageEditorBridgeInner( {
 	ppomFieldIndex,
 	modalContext,
 }: FieldManageEditorBridgeInnerProps ) {
-	/** See file docblock — must flip to false after mount so `usePpomAppForm` stops receiving `defaultValues: editDraft` every render. */
 	const [ includeDefaultValuesInOpts, setIncludeDefaultValuesInOpts ] =
 		useState( true );
 
@@ -108,7 +134,6 @@ function FieldManageEditorBridgeInner( {
 		[ onEditDraftChange ]
 	);
 
-	// After first paint, only pass `listeners` into `usePpomAppForm` (see file docblock).
 	useLayoutEffect( () => {
 		setIncludeDefaultValuesInOpts( false );
 	}, [] );
@@ -144,21 +169,48 @@ function FieldManageEditorBridgeInner( {
 			if ( next === null || next === undefined ) {
 				return;
 			}
-			form.reset( next );
+			applyFieldRowToForm( form, next );
 		},
 		[ form ]
 	);
 
+	const slug = editDraft.type ? String( editDraft.type ) : '';
+	const route = resolveFieldModalRoute( slug );
+	const uiDefinition = getFieldUiDefinition( slug );
+
+	const mergedBuilderFields = useMemo(
+		() =>
+			mergeBuilderFieldsWithActive(
+				fields,
+				editDraft.clientId,
+				values
+			),
+		[ fields, editDraft.clientId, values ]
+	);
+
 	return (
-        <VStack align="stretch" gap={ 3 }>
-            { schemaLoading && ! activeSchema && (
+		<VStack align="stretch" gap={ 3 }>
+			{ schemaLoading && ! activeSchema && (
 				<VStack gap={ 2 } align="stretch">
 					<Skeleton height="36px" />
 					<Skeleton height="36px" />
 					<Skeleton height="72px" />
 				</VStack>
 			) }
-            { activeSchema && TypedEditor && (
+			{ activeSchema && route.kind === 'definition' && uiDefinition && (
+				<DefinitionDrivenFieldEditor
+					definition={ uiDefinition }
+					mergedBuilderFields={ mergedBuilderFields }
+					schema={ activeSchema }
+					values={ values }
+					onChange={ bridgeOnChange }
+					i18n={ i18n }
+					ppomFieldIndex={ ppomFieldIndex }
+					form={ form }
+					modalContext={ modalContext }
+				/>
+			) }
+			{ activeSchema && route.kind === 'legacyReact' && TypedEditor && (
 				<TypedEditor
 					schema={ activeSchema }
 					values={ values }
@@ -168,23 +220,27 @@ function FieldManageEditorBridgeInner( {
 					modalContext={ modalContext }
 				/>
 			) }
-            { activeSchema && ! TypedEditor && (
-				<FieldSettingsForm
-					schema={ activeSchema }
-					values={ values }
-					onChange={ bridgeOnChange }
-					fieldType={ editDraft.type || '' }
-					i18n={ i18n }
-					ppomFieldIndex={ ppomFieldIndex }
-					modalContext={ modalContext }
-				/>
+			{ ! schemaLoading &&
+				editDraft.type &&
+				( route.kind === 'unknown' || route.kind === 'legacyPhp' ) && (
+					<UnknownSlugPanel
+						slug={ route.slug }
+						i18n={ i18n }
+						ppomFieldIndex={ ppomFieldIndex }
+					/>
+				) }
+			{ ! schemaLoading &&
+				! activeSchema &&
+				editDraft.type &&
+				route.kind !== 'unknown' &&
+				route.kind !== 'legacyPhp' && (
+				<>
+					<Alert.Root status="info">
+						<Alert.Indicator />
+						{ i18n.unsupportedControl }
+					</Alert.Root>
+				</>
 			) }
-            { ! schemaLoading && ! activeSchema && editDraft.type && (
-				<Alert.Root status="info">
-					<Alert.Indicator />
-					{ i18n.unsupportedControl }
-				</Alert.Root>
-			) }
-        </VStack>
-    );
+		</VStack>
+	);
 }

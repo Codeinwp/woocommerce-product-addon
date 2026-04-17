@@ -5,6 +5,8 @@ import { createRoot, StrictMode } from '@wordpress/element';
 import domReady from '@wordpress/dom-ready';
 import apiFetch from '@wordpress/api-fetch';
 import { Steps, ChakraProvider } from '@chakra-ui/react';
+import './widgets/registerDefaultFieldWidgets';
+import './definitions/registerAllFieldUiDefinitions';
 import { App } from './App';
 import { FieldModalErrorBoundary } from './components/FieldModalErrorBoundary';
 import { fieldModalTheme } from './theme';

@@ -1,9 +1,8 @@
-import type { PpomFieldModalBoot, PpomFieldModalEditorsMap } from './fieldModal';
+import type { PpomFieldModalBoot } from './fieldModal';
 
 declare global {
 	interface Window {
 		ppomFieldModalBoot?: PpomFieldModalBoot;
-		ppomFieldModalEditors?: PpomFieldModalEditorsMap;
 	}
 }
 

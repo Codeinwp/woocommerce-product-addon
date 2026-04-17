@@ -1,11 +1,19 @@
 /**
  * State, effects, and handlers for the PPOM React field modal.
  */
-import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
+import type { Dispatch, SetStateAction } from 'react';
+import { useCallback, useEffect, useMemo, useReducer } from '@wordpress/element';
+import { bindPpomReactFieldModalOpenButtons } from '../adapters/wpAdminFieldModalAdapter';
+import {
+	fetchFieldModalContext,
+	fetchFieldTypeSchema,
+	saveFieldGroup,
+} from '../services/fieldModalApi';
 import { getFieldEditor } from '../editors/registry';
+import { hasFieldUiDefinition } from '../definitions/registry';
 import { newClientId, withClientIds, stripClientIds } from '../utils/clientIds';
 import { readGroupFromForm } from '../utils/legacyGroupForm';
+import { createInitialModalState, modalReducer } from '../state/modalReducer';
 import type {
 	FieldModalContextPayload,
 	FieldRow,
@@ -21,153 +29,133 @@ function errorMessage( e: unknown ): string {
 }
 
 export function useFieldModalController( productmetaId: number | undefined ) {
-	const [ open, setOpen ] = useState( false );
-	const [ pickerOpen, setPickerOpen ] = useState( false );
-	const [ pickerQuery, setPickerQuery ] = useState( '' );
-	const [ loading, setLoading ] = useState( false );
-	const [ saving, setSaving ] = useState( false );
-	const [ error, setError ] = useState( '' );
-	const [ ctx, setCtx ] = useState< FieldModalContextPayload | null >( null );
-	const [ fields, setFields ] = useState< FieldRow[] >( [] );
-	const [ selectedId, setSelectedId ] = useState< string | null >( null );
-	const [ editDraft, setEditDraft ] = useState< FieldRow | null >( null );
-	const [ schemasCache, setSchemasCache ] = useState<
-		Record< string, Record< string, unknown > >
-	>( {} );
-	const [ schemaLoading, setSchemaLoading ] = useState( false );
-	/** `picker` when opened via Add New Field; `manage` when opened via Manage Fields. */
-	const [ modalEntry, setModalEntry ] = useState< 'picker' | 'manage' >( 'manage' );
+	const [ state, dispatch ] = useReducer( modalReducer, undefined, createInitialModalState );
 
 	const loadContext = useCallback(
 		async ( selectFieldIndex?: number ) => {
-			setLoading( true );
-			setError( '' );
-			setSchemasCache( {} );
+			dispatch( { type: 'LOAD_CONTEXT_START' } );
 			try {
-				const res = ( await apiFetch( {
-					path: `ppom/v1/admin/field-groups/context?productmeta_id=${ encodeURIComponent(
-						String( productmetaId )
-					) }`,
-				} ) ) as FieldModalContextPayload;
-				setCtx( res );
+				const res = await fetchFieldModalContext( productmetaId );
 				const rows = withClientIds( res.fields || [] );
-				setFields( rows );
+				let nextSelected: string | null = null;
 				if (
 					typeof selectFieldIndex === 'number' &&
 					! Number.isNaN( selectFieldIndex ) &&
 					selectFieldIndex >= 1
 				) {
 					const row = rows[ selectFieldIndex - 1 ];
-					setSelectedId( row ? row.clientId : null );
-				} else {
-					setSelectedId( null );
+					nextSelected = row ? row.clientId : null;
 				}
+				dispatch( {
+					type: 'LOAD_CONTEXT_SUCCESS',
+					ctx: res,
+					fields: rows,
+					selectedId: nextSelected,
+				} );
 			} catch ( e ) {
-				setError( errorMessage( e ) );
-			} finally {
-				setLoading( false );
+				dispatch( {
+					type: 'LOAD_CONTEXT_ERROR',
+					message: errorMessage( e ),
+				} );
 			}
 		},
 		[ productmetaId ]
 	);
+
+	useEffect( () => {
+		return bindPpomReactFieldModalOpenButtons( {
+			onOpen: ( entry ) => {
+				dispatch( { type: 'OPEN', entry } );
+				void loadContext();
+			},
+		} );
+	}, [ loadContext ] );
+
+	const editDraft = useMemo( () => {
+		if ( ! state.selectedId ) {
+			return null;
+		}
+		return (
+			state.fields.find( ( f ) => f.clientId === state.selectedId ) ?? null
+		);
+	}, [ state.fields, state.selectedId ] );
 
 	const fetchSchemaForType = useCallback( async ( type: string | undefined ) => {
 		if ( ! type ) {
 			return null;
 		}
 		const t = String( type ).toLowerCase();
-		setSchemaLoading( true );
+		dispatch( { type: 'SET_SCHEMA_LOADING', loading: true } );
 		try {
-			const res = ( await apiFetch( {
-				path: `ppom/v1/admin/field-groups/schema/${ encodeURIComponent( t ) }`,
-			} ) ) as { schema?: Record< string, unknown > };
-			const schema = res && res.schema ? res.schema : null;
+			const schema = await fetchFieldTypeSchema( t );
 			if ( schema ) {
-				setSchemasCache( ( prev ) => ( { ...prev, [ t ]: schema } ) );
+				dispatch( {
+					type: 'SET_SCHEMA_FOR_TYPE',
+					typeKey: t,
+					schema,
+				} );
 			}
 			return schema;
 		} catch ( e ) {
-			setError( errorMessage( e ) );
+			dispatch( {
+				type: 'LOAD_CONTEXT_ERROR',
+				message: errorMessage( e ),
+			} );
 			return null;
 		} finally {
-			setSchemaLoading( false );
+			dispatch( { type: 'SET_SCHEMA_LOADING', loading: false } );
 		}
 	}, [] );
 
 	useEffect( () => {
-		const buttons = document.querySelectorAll( '.ppom-react-field-modal-open' );
-		if ( ! buttons.length ) {
-			return undefined;
-		}
-		const handlers: Array< { btn: Element; onClick: () => void } > = [];
-		buttons.forEach( ( btn ) => {
-			const onClick = () => {
-				const mode = btn.getAttribute( 'data-ppom-react-mode' );
-				const fromPicker = mode === 'picker';
-				setModalEntry( fromPicker ? 'picker' : 'manage' );
-				setPickerOpen( fromPicker );
-				setPickerQuery( '' );
-				setOpen( true );
-				void loadContext();
-			};
-			btn.addEventListener( 'click', onClick );
-			handlers.push( { btn, onClick } );
-		} );
-		return () => {
-			handlers.forEach( ( { btn, onClick } ) =>
-				btn.removeEventListener( 'click', onClick )
-			);
-		};
-	}, [ loadContext ] );
-
-	useEffect( () => {
-		if ( ! open ) {
-			return;
-		}
-		const sel = fields.find( ( f ) => f.clientId === selectedId );
-		if ( sel ) {
-			setEditDraft( { ...sel } );
-		} else {
-			setEditDraft( null );
-		}
-	}, [ open, selectedId, fields ] );
-
-	useEffect( () => {
-		if ( ! open || ! editDraft?.type ) {
+		if ( ! state.open || ! editDraft?.type ) {
 			return;
 		}
 		const t = String( editDraft.type ).toLowerCase();
-		if ( schemasCache[ t ] ) {
+		if ( state.schemasCache[ t ] ) {
 			return;
 		}
 		void fetchSchemaForType( t );
-	}, [ open, editDraft?.type, schemasCache, fetchSchemaForType ] );
+	}, [
+		state.open,
+		editDraft?.type,
+		state.schemasCache,
+		fetchSchemaForType,
+	] );
 
-	/** Manage mode: no sidebar — keep a valid selection when the list changes. */
 	useEffect( () => {
-		if ( ! open || pickerOpen || loading ) {
+		if ( ! state.open || state.pickerOpen || state.loading ) {
 			return;
 		}
-		if ( fields.length === 0 ) {
-			if ( selectedId !== null ) {
-				setSelectedId( null );
+		if ( state.fields.length === 0 ) {
+			if ( state.selectedId !== null ) {
+				dispatch( { type: 'SET_SELECTED_ID', id: null } );
 			}
 			return;
 		}
 		const stillThere =
-			selectedId &&
-			fields.some( ( f ) => f.clientId === selectedId );
+			state.selectedId &&
+			state.fields.some( ( f ) => f.clientId === state.selectedId );
 		if ( stillThere ) {
 			return;
 		}
-		setSelectedId( fields[ 0 ].clientId );
-	}, [ open, pickerOpen, loading, fields, selectedId ] );
+		dispatch( { type: 'SET_SELECTED_ID', id: state.fields[ 0 ].clientId } );
+	}, [
+		state.open,
+		state.pickerOpen,
+		state.loading,
+		state.fields,
+		state.selectedId,
+	] );
 
+	const ctx = state.ctx;
 	const i18n = ctx?.i18n || {};
 
 	const ppomFieldIndex =
-		selectedId && fields.length
-			? fields.findIndex( ( f ) => f.clientId === selectedId ) + 1
+		state.selectedId && state.fields.length
+			? state.fields.findIndex(
+					( f ) => f.clientId === state.selectedId
+			  ) + 1
 			: 0;
 
 	const openLegacyEditor = useCallback( () => {
@@ -194,68 +182,45 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 				data_name: '',
 				status: 'on',
 			};
-			setFields( ( prev ) => [ ...prev, row ] );
-			setSelectedId( row.clientId );
-			setPickerOpen( false );
-			setPickerQuery( '' );
+			dispatch( { type: 'ADD_FIELD_ROW', row } );
 		},
 		[ ctx?.catalog ]
 	);
 
-	const removeField = useCallback(
-		( clientId: string ) => {
-			setFields( ( prev ) => prev.filter( ( f ) => f.clientId !== clientId ) );
-			if ( selectedId === clientId ) {
-				setSelectedId( null );
-			}
-		},
-		[ selectedId ]
-	);
+	const removeField = useCallback( ( clientId: string ) => {
+		dispatch( { type: 'REMOVE_FIELD_ROW', clientId } );
+	}, [] );
 
 	const handleSave = useCallback( async () => {
 		if ( ! ctx ) {
 			return;
 		}
-		const merged = fields.map( ( f ) =>
-			f.clientId === selectedId && editDraft ? { ...editDraft } : f
-		);
-		setSaving( true );
-		setError( '' );
+		dispatch( { type: 'SET_SAVING', saving: true } );
+		dispatch( { type: 'CLEAR_ERROR' } );
 		const group = readGroupFromForm( ctx.group || {} );
-		const payload = {
-			group,
-			fields: stripClientIds( merged ),
-		};
 		try {
-			let path: string;
-			if ( ( productmetaId ?? 0 ) > 0 ) {
-				path = `ppom/v1/admin/field-groups/${ productmetaId }`;
-				await apiFetch( { path, method: 'PUT', data: payload } );
-			} else {
-				path = 'ppom/v1/admin/field-groups';
-				const res = ( await apiFetch( {
-					path,
-					method: 'POST',
-					data: payload,
-				} ) ) as { redirect_to?: string };
-				if ( res.redirect_to ) {
-					window.location.assign( res.redirect_to );
-					return;
-				}
+			const res = await saveFieldGroup( {
+				productmetaId,
+				group,
+				fields: state.fields,
+			} );
+			if ( res && typeof res === 'object' && res.redirect_to ) {
+				window.location.assign( res.redirect_to );
+				return;
 			}
 			window.location.reload();
 		} catch ( e ) {
-			setError( errorMessage( e ) );
+			dispatch( {
+				type: 'LOAD_CONTEXT_ERROR',
+				message: errorMessage( e ),
+			} );
 		} finally {
-			setSaving( false );
+			dispatch( { type: 'SET_SAVING', saving: false } );
 		}
-	}, [ ctx, fields, selectedId, editDraft, productmetaId ] );
+	}, [ ctx, state.fields, productmetaId ] );
 
 	const closeModal = useCallback( () => {
-		setOpen( false );
-		setPickerOpen( false );
-		setPickerQuery( '' );
-		setModalEntry( 'manage' );
+		dispatch( { type: 'CLOSE' } );
 	}, [] );
 
 	const catalogGroups = useMemo(
@@ -308,12 +273,13 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 
 	const activeSchema =
 		editDraft && editDraft.type
-			? schemasCache[ String( editDraft.type ).toLowerCase() ] ?? null
+			? state.schemasCache[ String( editDraft.type ).toLowerCase() ] ??
+			  null
 			: null;
 
 	const modalContext: ModalContextValue = useMemo(
 		() => ( {
-			builderFields: fields,
+			builderFields: state.fields,
 			conditionsProEnabled: ctx?.conditions_pro_enabled === true,
 			conditionalRepeaterUnlocked:
 				ctx?.conditional_repeater_unlocked === true,
@@ -321,7 +287,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 				ctx?.conditional_repeater_show_upsell === true,
 		} ),
 		[
-			fields,
+			state.fields,
 			ctx?.conditions_pro_enabled,
 			ctx?.conditional_repeater_unlocked,
 			ctx?.conditional_repeater_show_upsell,
@@ -331,22 +297,48 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 	const typedEditorSlug =
 		editDraft && editDraft.type ? String( editDraft.type ) : '';
 	const TypedEditor: FieldEditorComponent | null =
-		typedEditorSlug ? getFieldEditor( typedEditorSlug ) : null;
+		typedEditorSlug && ! hasFieldUiDefinition( typedEditorSlug )
+			? getFieldEditor( typedEditorSlug )
+			: null;
+
+	const patchFieldRowFromForm: Dispatch<
+		SetStateAction< FieldRow | null >
+	> = useCallback(
+		( action ) => {
+			const current =
+				state.selectedId == null
+					? null
+					: state.fields.find(
+							( f ) => f.clientId === state.selectedId
+					  ) ?? null;
+			const row =
+				typeof action === 'function'
+					? ( action as ( p: FieldRow | null ) => FieldRow | null )(
+							current
+					  )
+					: action;
+			if ( ! row || typeof row !== 'object' || ! row.clientId ) {
+				return;
+			}
+			dispatch( { type: 'PATCH_FIELD_ROW_FROM_FORM', row } );
+		},
+		[ state.fields, state.selectedId ]
+	);
 
 	return {
-		open,
-		pickerOpen,
-		pickerQuery,
-		loading,
-		saving,
-		error,
+		open: state.open,
+		pickerOpen: state.pickerOpen,
+		pickerQuery: state.pickerQuery,
+		loading: state.loading,
+		saving: state.saving,
+		error: state.error,
 		ctx,
-		fields,
-		selectedId,
+		fields: state.fields,
+		selectedId: state.selectedId,
 		editDraft,
-		schemasCache,
-		schemaLoading,
-		modalEntry,
+		schemasCache: state.schemasCache,
+		schemaLoading: state.schemaLoading,
+		modalEntry: state.modalEntry,
 		i18n,
 		ppomFieldIndex,
 		catalogGroups,
@@ -354,10 +346,13 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		activeSchema,
 		modalContext,
 		TypedEditor,
-		setPickerOpen,
-		setPickerQuery,
-		setSelectedId,
-		setEditDraft,
+		setPickerOpen: ( open: boolean ) =>
+			dispatch( { type: 'SET_PICKER_OPEN', open } ),
+		setPickerQuery: ( query: string ) =>
+			dispatch( { type: 'SET_PICKER_QUERY', query } ),
+		setSelectedId: ( id: string | null ) =>
+			dispatch( { type: 'SET_SELECTED_ID', id } ),
+		setEditDraft: patchFieldRowFromForm,
 		loadContext,
 		fetchSchemaForType,
 		openLegacyEditor,

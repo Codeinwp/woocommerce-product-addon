@@ -9,7 +9,7 @@ import { ResponsiveFieldGrid } from './ResponsiveFieldGrid';
 import {
 	SettingsConditionsTabs,
 	shouldShowConditionalRepeaterTab,
-} from './SettingsConditionsTabs';
+} from './panels/SettingsConditionsTabs';
 import { GroupedFieldSections } from './editors/GroupedFieldSections';
 import { buildFallbackGroupedSections } from './fieldSettingSectionBlueprint';
 import { isReactModalExcludedSchemaKey } from './schema/reactModalExcludedKeys';
@@ -23,6 +23,7 @@ export function FieldSettingsForm( {
 	fieldType,
 	i18n,
 	ppomFieldIndex,
+	form,
 	modalContext = null,
 }: FieldSettingsFormProps ) {
 	const buckets = useMemo( () => {
@@ -68,6 +69,7 @@ export function FieldSettingsForm( {
 		onChange,
 		i18n,
 		ppomFieldIndex,
+		form,
 		...( modalContext && typeof modalContext === 'object'
 			? modalContext
 			: {} ),

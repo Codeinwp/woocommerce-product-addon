@@ -11,6 +11,7 @@ export function GroupedFieldSections( {
 	onChange,
 	i18n,
 	ppomFieldIndex,
+	form,
 	modalContext = null,
 	sections,
 }: GroupedFieldSectionsProps ) {
@@ -23,6 +24,7 @@ export function GroupedFieldSections( {
 		onChange,
 		i18n,
 		ppomFieldIndex,
+		form,
 		...( modalContext && typeof modalContext === 'object'
 			? modalContext
 			: {} ),

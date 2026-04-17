@@ -6,7 +6,7 @@ import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
 	shouldShowConditionalRepeaterTab,
-} from '../SettingsConditionsTabs';
+} from '../panels/SettingsConditionsTabs';
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { PairedQuantityEditor } from '../components/PairedQuantityEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
@@ -123,7 +123,6 @@ export function QuantitiesFieldEditor( {
 					modalContext={ modalContext }
 					values={ values }
 					onChange={ onChange }
-					ppomFieldIndex={ ppomFieldIndex }
 				/>
 			}
 		/>

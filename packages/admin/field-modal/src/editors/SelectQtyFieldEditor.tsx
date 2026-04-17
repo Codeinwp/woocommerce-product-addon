@@ -6,7 +6,7 @@ import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
 	shouldShowConditionalRepeaterTab,
-} from '../SettingsConditionsTabs';
+} from '../panels/SettingsConditionsTabs';
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { PairedOptionsEditor } from '../components/PairedOptionsEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';

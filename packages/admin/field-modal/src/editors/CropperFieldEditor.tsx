@@ -6,7 +6,7 @@ import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
 	shouldShowConditionalRepeaterTab,
-} from '../SettingsConditionsTabs';
+} from '../panels/SettingsConditionsTabs';
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { PairedCropperEditor } from '../components/PairedCropperEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
@@ -133,7 +133,6 @@ export function CropperFieldEditor( {
 					modalContext={ modalContext }
 					values={ values }
 					onChange={ onChange }
-					ppomFieldIndex={ ppomFieldIndex }
 				/>
 			}
 		/>

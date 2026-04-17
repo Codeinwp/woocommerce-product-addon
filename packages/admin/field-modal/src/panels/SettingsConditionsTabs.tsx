@@ -1,22 +1,11 @@
 /**
- * Top-level Settings / Conditions / optional Conditional Repeater tabs for field modal editors.
+ * Top-level Settings / Conditions / optional Conditional Repeater tabs for legacy field editors.
  */
 import type { ReactNode } from 'react';
 import { Box, Tabs } from '@chakra-ui/react';
-import type { I18nDict, ModalContextValue } from './types/fieldModal';
+import type { I18nDict } from '../types/fieldModal';
 
-/** Whether the Conditional Repeater tab should appear (Lite upsell or Plus mapping). */
-export function shouldShowConditionalRepeaterTab(
-	modalContext: ModalContextValue | null | undefined
-): boolean {
-	if ( ! modalContext ) {
-		return false;
-	}
-	return (
-		modalContext.conditionalRepeaterUnlocked === true ||
-		modalContext.conditionalRepeaterShowUpsell === true
-	);
-}
+export { shouldShowConditionalRepeaterTab } from './shouldShowConditionalRepeaterTab';
 
 export interface SettingsConditionsTabsProps {
 	i18n: I18nDict;

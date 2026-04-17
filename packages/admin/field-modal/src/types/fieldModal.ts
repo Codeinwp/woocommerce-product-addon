@@ -65,9 +65,22 @@ export interface ModalContextValue {
 	conditionalRepeaterShowUpsell: boolean;
 }
 
+export interface FieldFormApiLike {
+	AppField: ComponentType< any >;
+	setFieldValue: (
+		field: string,
+		updater: unknown,
+		opts?: { dontValidate?: boolean }
+	) => void;
+	state: {
+		values: FieldRow;
+	};
+	reset: ( values?: FieldRow ) => void;
+}
+
 export type SchemaObject = Record<string, unknown>;
 
-/** Props for typed field editors and schema fallback form. */
+/** Props for typed field editors. */
 export interface FieldEditorBaseProps {
 	schema?: SchemaObject | null;
 	values: FieldRow;
@@ -76,6 +89,7 @@ export interface FieldEditorBaseProps {
 	ppomFieldIndex: number;
 	fieldType?: string;
 	modalContext?: ModalContextValue | null;
+	form?: FieldFormApiLike;
 }
 
 export type FieldEditorComponent = ComponentType< FieldEditorBaseProps >;
@@ -93,6 +107,7 @@ export interface SettingRowContext {
 	onChange: Dispatch< SetStateAction< FieldRow | null > >;
 	i18n: I18nDict;
 	ppomFieldIndex: number;
+	form?: FieldFormApiLike;
 	builderFields?: FieldRow[];
 	conditionsProEnabled?: boolean;
 	conditionalRepeaterUnlocked?: boolean;
@@ -103,8 +118,6 @@ export interface PpomFieldModalBoot {
 	nonce: string;
 	productmetaId?: number;
 }
-
-export type PpomFieldModalEditorsMap = Record< string, FieldEditorComponent >;
 
 /** Loading / error surface for the modal body shell. */
 export interface FieldModalBodyStatus {
