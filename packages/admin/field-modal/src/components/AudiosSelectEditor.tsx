@@ -1,7 +1,17 @@
 /**
  * Inline editor for pre-uploaded audio/video (audio field type).
  */
-import { Steps, Box, Button, HStack, Input, Text, VStack } from '@chakra-ui/react';
+import {
+	Steps,
+	Box,
+	Button,
+	HStack,
+	Input,
+	Text,
+	VStack,
+	IconButton,
+} from '@chakra-ui/react';
+import { LuTrash2 } from 'react-icons/lu';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
 
@@ -288,14 +298,16 @@ export function AudiosSelectEditor( {
 								>
 									&#8595;
 								</Button>
-								<Button
+								<IconButton
 									size="xs"
 									variant="ghost"
 									colorPalette="red"
 									onClick={ () => removeRow( index ) }
+									aria-label={ i18n.audioRemove || 'Remove' }
+									title={ i18n.audioRemove || 'Remove' }
 								>
-									{ i18n.audioRemove || 'Remove' }
-								</Button>
+									<LuTrash2 />
+								</IconButton>
 							</HStack>
 						</HStack>
 					</Box>

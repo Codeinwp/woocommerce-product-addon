@@ -1,7 +1,18 @@
 /**
  * Inline editor for pre-uploaded images (image + imageselect field types).
  */
-import { Steps, Box, Button, HStack, Input, Text, VStack, Image as ChakraImage } from '@chakra-ui/react';
+import {
+	Steps,
+	Box,
+	Button,
+	HStack,
+	Input,
+	Text,
+	VStack,
+	Image as ChakraImage,
+	IconButton,
+} from '@chakra-ui/react';
+import { LuTrash2 } from 'react-icons/lu';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
 
@@ -378,14 +389,18 @@ export function ImagesSelectEditor( {
 								>
 									&#8595;
 								</Button>
-								<Button
+								<IconButton
 									size="xs"
 									variant="ghost"
 									colorPalette="red"
 									onClick={ () => removeRow( index ) }
+									aria-label={
+										i18n.imagesRemove || 'Remove'
+									}
+									title={ i18n.imagesRemove || 'Remove' }
 								>
-									{ i18n.imagesRemove || 'Remove' }
-								</Button>
+									<LuTrash2 />
+								</IconButton>
 							</HStack>
 						</HStack>
 					</Box>

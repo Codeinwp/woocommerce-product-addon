@@ -1,7 +1,7 @@
 /**
  * Bulk Quantity (Pro): matrix + label / display extras from input schema.
  */
-import { Steps, Box, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -79,14 +79,12 @@ export function BulkQuantityFieldEditor( {
 		: i18n.bulkQuantityOptionsTitle || 'Bulk quantity';
 
 	const matrixBlock = needsMatrix ? (
-		<Box>
-			<BulkQuantityMatrixEditor
-				values={ values }
-				onChange={ onChange }
-				i18n={ i18n }
-				title={ optionsTitle }
-			/>
-		</Box>
+		<BulkQuantityMatrixEditor
+			values={ values }
+			onChange={ onChange }
+			i18n={ i18n }
+			title={ optionsTitle }
+		/>
 	) : null;
 
 	return (

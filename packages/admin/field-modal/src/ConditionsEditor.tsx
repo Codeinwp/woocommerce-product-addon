@@ -323,7 +323,7 @@ export function ConditionsEditor( {
 	const upgradeCta = i18n.conditionUpgradeCta || 'Upgrade to unlock';
 
 	return (
-        <Box>
+        <VStack align="stretch" gap={ 0 }>
             <Text fontWeight="semibold" fontSize="sm" color="gray.800">
 				{ title }
 			</Text>
@@ -744,6 +744,6 @@ export function ConditionsEditor( {
                     );
 				} ) }
 			</VStack>
-        </Box>
+        </VStack>
     );
 }

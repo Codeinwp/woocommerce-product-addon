@@ -1,7 +1,7 @@
 /**
  * Variation Quantity: basic + paired options + layout/limits + display + behavior + conditions + CFR.
  */
-import { Steps, Box, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -96,16 +96,14 @@ export function QuantitiesFieldEditor( {
 			settings={
 				<VStack align="stretch" gap={ 3 }>
 					<GroupedFieldSections { ...shared } sections={ sectionsBefore } />
-					<Box>
-						<PairedQuantityEditor
-							fieldKey="options"
-							title={ optionsTitle }
-							description={ optionsDesc }
-							values={ values }
-							onChange={ onChange }
-							i18n={ i18n }
-						/>
-					</Box>
+					<PairedQuantityEditor
+						fieldKey="options"
+						title={ optionsTitle }
+						description={ optionsDesc }
+						values={ values }
+						onChange={ onChange }
+						i18n={ i18n }
+					/>
 					<GroupedFieldSections
 						{ ...shared }
 						sections={ sectionsAfterSettings }

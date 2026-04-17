@@ -1,7 +1,17 @@
 /**
  * Variation quantity matrix rows (paired-quantity schema type).
  */
-import { Steps, Box, Button, HStack, Input, VStack, Field } from '@chakra-ui/react';
+import {
+	Steps,
+	Box,
+	Button,
+	HStack,
+	Input,
+	VStack,
+	Field,
+	IconButton,
+} from '@chakra-ui/react';
+import { LuTrash2 } from 'react-icons/lu';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
 
@@ -354,15 +364,22 @@ export function PairedQuantityEditor( {
 									>
 										&#8595;
 									</Button>
-									<Button
+									<IconButton
 										size="xs"
 										variant="ghost"
 										colorPalette="red"
 										onClick={ () => removeRow( index ) }
+										aria-label={
+											i18n.pairedOptionsRemove ||
+											'Remove'
+										}
+										title={
+											i18n.pairedOptionsRemove ||
+											'Remove'
+										}
 									>
-										{ i18n.pairedOptionsRemove ||
-											'Remove' }
-									</Button>
+										<LuTrash2 />
+									</IconButton>
 								</HStack>
 							</HStack>
 						</Box>

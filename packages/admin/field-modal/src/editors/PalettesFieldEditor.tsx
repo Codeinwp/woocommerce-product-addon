@@ -1,7 +1,7 @@
 /**
  * Color Palettes: basic + paired-palettes matrix + display + behavior + conditions.
  */
-import { Steps, Box, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -99,14 +99,12 @@ export function PalettesFieldEditor( {
 		: i18n.palettesOptionsTitle || 'Add colors';
 
 	const matrixBlock = needsMatrix ? (
-		<Box>
-			<PairedMatrixOptionsEditor
-				values={ values }
-				onChange={ onChange }
-				i18n={ i18n }
-				title={ optionsTitle }
-			/>
-		</Box>
+		<PairedMatrixOptionsEditor
+			values={ values }
+			onChange={ onChange }
+			i18n={ i18n }
+			title={ optionsTitle }
+		/>
 	) : null;
 
 	return (

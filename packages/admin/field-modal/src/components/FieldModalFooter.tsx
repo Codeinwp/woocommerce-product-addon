@@ -1,5 +1,5 @@
 /**
- * Modal footer: secondary actions (legacy, remove, back to types) + close/save.
+ * Modal footer: back to field types (when applicable) + close/save.
  */
 import { Steps, Button, HStack, Dialog } from '@chakra-ui/react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
@@ -14,8 +14,6 @@ export interface FieldModalFooterProps {
 	editDraft: FieldRow | null;
 	modalEntry: 'picker' | 'manage';
 	onBackToFieldTypes: () => void;
-	onOpenLegacyEditor: () => void;
-	onRemoveSelected: () => void;
 	onClose: () => void;
 	onSave: () => void;
 }
@@ -30,8 +28,6 @@ export function FieldModalFooter( {
 	editDraft,
 	modalEntry,
 	onBackToFieldTypes,
-	onOpenLegacyEditor,
-	onRemoveSelected,
 	onClose,
 	onSave,
 }: FieldModalFooterProps ) {
@@ -57,17 +53,6 @@ export function FieldModalFooter( {
 								{ i18n.backToFieldTypes || 'Back to field types' }
 							</Button>
 						) }
-						<Button variant='plain' size="sm" onClick={ onOpenLegacyEditor }>
-							{ i18n.openLegacyModal }
-						</Button>
-						<Button
-							variant='plain'
-							size="sm"
-							colorPalette="red"
-							onClick={ onRemoveSelected }
-						>
-							{ i18n.remove || 'Remove' }
-						</Button>
 					</>
 				) }
 			</HStack>

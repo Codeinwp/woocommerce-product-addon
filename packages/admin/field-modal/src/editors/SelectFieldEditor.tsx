@@ -1,7 +1,7 @@
 /**
  * Select field type: grouped settings; paired options inline editor.
  */
-import { Steps, Box, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -79,15 +79,13 @@ export function SelectFieldEditor( {
 		: i18n.selectOptionsTitle || 'Options';
 
 	const pairedBlock = needsLegacyOptions ? (
-		<Box>
-			<PairedOptionsEditor
-				variant="select"
-				values={ values }
-				onChange={ onChange }
-				i18n={ i18n }
-				title={ optionsTitle }
-			/>
-		</Box>
+		<PairedOptionsEditor
+			variant="select"
+			values={ values }
+			onChange={ onChange }
+			i18n={ i18n }
+			title={ optionsTitle }
+		/>
 	) : null;
 
 	return (

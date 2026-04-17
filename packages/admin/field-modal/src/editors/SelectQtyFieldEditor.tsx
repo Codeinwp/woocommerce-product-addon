@@ -1,7 +1,7 @@
 /**
  * Select Option Quantity (Pro): paired options + option/qty labels + select-like layout.
  */
-import { Steps, Box, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -79,15 +79,13 @@ export function SelectQtyFieldEditor( {
 		: i18n.selectQtyOptionsTitle || 'Add options';
 
 	const pairedBlock = needsPaired ? (
-		<Box>
-			<PairedOptionsEditor
-				variant="select"
-				values={ values }
-				onChange={ onChange }
-				i18n={ i18n }
-				title={ optionsTitle }
-			/>
-		</Box>
+		<PairedOptionsEditor
+			variant="select"
+			values={ values }
+			onChange={ onChange }
+			i18n={ i18n }
+			title={ optionsTitle }
+		/>
 	) : null;
 
 	return (

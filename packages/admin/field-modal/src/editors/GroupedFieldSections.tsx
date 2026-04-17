@@ -1,7 +1,7 @@
 /**
  * Renders schema-defined settings in labeled sections (for typed field editors).
  */
-import { Steps, Box, Text, VStack } from '@chakra-ui/react';
+import { Text, VStack } from '@chakra-ui/react';
 import { ResponsiveFieldGrid } from '../ResponsiveFieldGrid';
 import type { GroupedFieldSectionsProps } from '../types/fieldModal';
 
@@ -38,15 +38,15 @@ export function GroupedFieldSections( {
 					return null;
 				}
 				return (
-					<Box
+					<VStack
 						key={ sec.label }
+						align="stretch"
+						gap={ 2 }
+						minW={ 0 }
 						bg="white"
-						borderWidth="1px"
-						borderColor="gray.200"
 						borderRadius="md"
-						px={ { base: 3, md: 4 } }
-						py={ 3 }
-						boxShadow="0 1px 2px rgba(0, 0, 0, 0.04)"
+						px={ { base: 2.5, md: 3 } }
+						py={ 2.5 }
 					>
 						<Text
 							as="h3"
@@ -55,15 +55,15 @@ export function GroupedFieldSections( {
 							color="gray.500"
 							textTransform="uppercase"
 							letterSpacing="0.08em"
-							mb={ 3 }
-							pb={ 1.5 }
+							mb={ 0 }
+							pb={ 1 }
 							borderBottomWidth="1px"
 							borderBottomColor="gray.100"
 						>
 							{ sec.label }
 						</Text>
 						<ResponsiveFieldGrid entries={ entries } ctx={ ctx } />
-					</Box>
+					</VStack>
 				);
 			} ) }
         </VStack>

@@ -2,7 +2,7 @@
  * Schema-driven field settings (fallback when no typed editor is registered).
  */
 import { useMemo } from '@wordpress/element';
-import { Steps, Box, Text, Button, VStack, Alert, List } from '@chakra-ui/react';
+import { Text, Button, VStack, Alert, List } from '@chakra-ui/react';
 import { classifySettingTab } from './schemaTabs';
 import { renderSettingRow, openLegacyFieldModal } from './schemaSettingControl';
 import { ResponsiveFieldGrid } from './ResponsiveFieldGrid';
@@ -87,11 +87,11 @@ export function FieldSettingsForm( {
 		buckets.unsupported.length > 0 ? (
 			<Alert.Root status="warning" variant="subtle" borderRadius="md">
 				<Alert.Indicator />
-				<Box>
+				<VStack align="stretch" gap={ 2 }>
 					<Text fontSize="sm" lineHeight="1.5">
 						{ i18n.legacyEditorHint }
 					</Text>
-					<List.Root fontSize="sm" mt={ 2 } gap={ 1 } pl={ 4 } listStyleType="disc">
+					<List.Root fontSize="sm" gap={ 1 } pl={ 4 } listStyleType="disc">
 						{ buckets.unsupported.map( ( { key, meta } ) => {
 							const t =
 								meta.title != null
@@ -109,14 +109,13 @@ export function FieldSettingsForm( {
 					</List.Root>
 					<Button
 						size="sm"
-						mt={ 2 }
 						variant="outline"
 						colorPalette="blue"
 						onClick={ () => openLegacyFieldModal( ppomFieldIndex ) }
 					>
 						{ i18n.openLegacyModal }
 					</Button>
-				</Box>
+				</VStack>
 			</Alert.Root>
 		) : null;
 
@@ -140,25 +139,22 @@ export function FieldSettingsForm( {
 	);
 
 	const conditionsPanel = (
-		<Box
+		<VStack
+			align="stretch"
+			gap={ 3 }
 			bg="white"
-			borderWidth="1px"
-			borderColor="gray.200"
 			borderRadius="md"
-			px={ { base: 3, md: 4 } }
-			py={ 3 }
-			boxShadow="0 1px 2px rgba(0, 0, 0, 0.04)"
+			px={ { base: 2.5, md: 3 } }
+			py={ 2.5 }
 		>
-			<VStack align="stretch" gap={ 3 }>
-				<ResponsiveFieldGrid
-					entries={ conditionControls }
-					ctx={ ctx }
-				/>
-				{ htmlConditions.map( ( { key, meta } ) =>
-					renderSettingRow( key, meta, ctx )
-				) }
-			</VStack>
-		</Box>
+			<ResponsiveFieldGrid
+				entries={ conditionControls }
+				ctx={ ctx }
+			/>
+			{ htmlConditions.map( ( { key, meta } ) =>
+				renderSettingRow( key, meta, ctx )
+			) }
+		</VStack>
 	);
 
 	const body = (

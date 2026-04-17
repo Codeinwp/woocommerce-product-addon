@@ -1,7 +1,7 @@
 /**
  * Image field type: grouped settings + ImagesSelectEditor for the "images" key.
  */
-import { Steps, Box, VStack, Text } from '@chakra-ui/react';
+import { VStack, Text } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -104,7 +104,7 @@ export function ImageFieldEditor( {
 						{ ...shared }
 						sections={ sectionsBefore }
 					/>
-					<Box>
+					<VStack align="stretch" gap={ 2 }>
 						<ImagesSelectEditor
 							values={ values }
 							onChange={ onChange }
@@ -115,12 +115,11 @@ export function ImageFieldEditor( {
 						<Text
 							fontSize="xs"
 							color="gray.500"
-							mt={ 2 }
 							lineHeight="1.5"
 						>
 							{ i18n.legacyEditorHint }
 						</Text>
-					</Box>
+					</VStack>
 					<GroupedFieldSections
 						{ ...shared }
 						sections={ sectionsAfterSettings }

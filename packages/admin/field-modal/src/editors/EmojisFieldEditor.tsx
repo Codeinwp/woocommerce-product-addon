@@ -1,7 +1,7 @@
 /**
  * Emojis (Pro): paired-palettes matrix + emoji picker settings.
  */
-import { Steps, Box, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -96,14 +96,12 @@ export function EmojisFieldEditor( {
 		: i18n.emojisOptionsTitle || 'Add colors';
 
 	const matrixBlock = needsMatrix ? (
-		<Box>
-			<PairedMatrixOptionsEditor
-				values={ values }
-				onChange={ onChange }
-				i18n={ i18n }
-				title={ optionsTitle }
-			/>
-		</Box>
+		<PairedMatrixOptionsEditor
+			values={ values }
+			onChange={ onChange }
+			i18n={ i18n }
+			title={ optionsTitle }
+		/>
 	) : null;
 
 	return (

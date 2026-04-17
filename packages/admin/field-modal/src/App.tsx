@@ -36,10 +36,8 @@ export function App( { productmetaId }: AppProps ) {
 		setPickerQuery,
 		setEditDraft,
 		addFieldOfType,
-		removeField,
 		handleSave,
 		closeModal,
-		openLegacyEditor,
 	} = useFieldModalController( productmetaId );
 
 	const onOpenPickerFromManage = () => {
@@ -113,12 +111,6 @@ export function App( { productmetaId }: AppProps ) {
 				editDraft={ editDraft }
 				modalEntry={ modalEntry }
 				onBackToFieldTypes={ onBackToFieldTypes }
-				onOpenLegacyEditor={ openLegacyEditor }
-				onRemoveSelected={ () => {
-					if ( selectedId ) {
-						removeField( selectedId );
-					}
-				} }
 				onClose={ closeModal }
 				onSave={ handleSave }
 			/>

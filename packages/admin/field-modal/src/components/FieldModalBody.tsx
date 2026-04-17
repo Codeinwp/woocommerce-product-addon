@@ -19,6 +19,7 @@ export function FieldModalBody( {
 			flex="1"
 			overflowY="auto"
 			minH={ 0 }
+			bg="gray.100"
 			py={ 2 }
 			px={ { base: 3, md: 4 } }
 		>

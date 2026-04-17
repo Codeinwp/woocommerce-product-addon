@@ -1,7 +1,7 @@
 /**
  * Image Cropper: basic + viewport rows + grouped settings + conditions + CFR.
  */
-import { Steps, Box, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -106,16 +106,14 @@ export function CropperFieldEditor( {
 			settings={
 				<VStack align="stretch" gap={ 3 }>
 					<GroupedFieldSections { ...shared } sections={ sectionsBefore } />
-					<Box>
-						<PairedCropperEditor
-							fieldKey="options"
-							title={ viewportTitle }
-							description={ viewportDesc }
-							values={ values }
-							onChange={ onChange }
-							i18n={ i18n }
-						/>
-					</Box>
+					<PairedCropperEditor
+						fieldKey="options"
+						title={ viewportTitle }
+						description={ viewportDesc }
+						values={ values }
+						onChange={ onChange }
+						i18n={ i18n }
+					/>
 					<GroupedFieldSections
 						{ ...shared }
 						sections={ sectionsAfterSettings }

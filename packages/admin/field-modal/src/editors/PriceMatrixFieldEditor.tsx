@@ -1,7 +1,7 @@
 /**
  * Price Matrix: heading + discount type + paired-pricematrix + qty step + display toggles + conditions.
  */
-import { Steps, Box, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -87,14 +87,12 @@ export function PriceMatrixFieldEditor( {
 		: i18n.priceMatrixOptionsTitle || 'Price matrix';
 
 	const matrixBlock = needsMatrix ? (
-		<Box>
-			<PairedMatrixOptionsEditor
-				values={ values }
-				onChange={ onChange }
-				i18n={ i18n }
-				title={ optionsTitle }
-			/>
-		</Box>
+		<PairedMatrixOptionsEditor
+			values={ values }
+			onChange={ onChange }
+			i18n={ i18n }
+			title={ optionsTitle }
+		/>
 	) : null;
 
 	return (

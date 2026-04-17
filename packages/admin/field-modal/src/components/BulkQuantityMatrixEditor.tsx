@@ -3,20 +3,22 @@
  * Matches classic ppom-bulkquantity.js tableToJSON() shape.
  */
 import {
-    Steps,
-    Box,
-    Button,
-    HStack,
-    Input,
-    Table,
-    Tbody,
-    Td,
-    Th,
-    Thead,
-    Tr,
-    Text,
-    VStack,
+	Steps,
+	Box,
+	Button,
+	HStack,
+	Input,
+	Table,
+	Tbody,
+	Td,
+	Th,
+	Thead,
+	Tr,
+	Text,
+	VStack,
+	IconButton,
 } from '@chakra-ui/react';
+import { LuTrash2 } from 'react-icons/lu';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
@@ -230,7 +232,7 @@ export function BulkQuantityMatrixEditor( {
 										</Table.Cell>
 									) ) }
 									<Table.Cell>
-										<Button
+										<IconButton
 											size="xs"
 											variant="ghost"
 											colorPalette="red"
@@ -238,10 +240,17 @@ export function BulkQuantityMatrixEditor( {
 												normalizedRows.length < 2
 											}
 											onClick={ () => removeRow( ri ) }
+											aria-label={
+												i18n.pairedOptionsRemove ||
+												'Remove'
+											}
+											title={
+												i18n.pairedOptionsRemove ||
+												'Remove'
+											}
 										>
-											{ i18n.pairedOptionsRemove ||
-												'Remove' }
-										</Button>
+											<LuTrash2 />
+										</IconButton>
 									</Table.Cell>
 								</Table.Row>
 							) ) }

@@ -1,7 +1,7 @@
 /**
  * Fixed Price (Pro): quantity/price paired rows + view type + units + conditions.
  */
-import { Steps, Box, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -82,16 +82,14 @@ export function FixedPriceFieldEditor( {
 		: i18n.fixedPriceOptionsTitle || 'Quantity';
 
 	const pairedBlock = needsPaired ? (
-		<Box>
-			<PairedFixedPriceEditor
-				values={ values }
-				onChange={ onChange }
-				i18n={ i18n }
-				title={ optionsTitle }
-				placeholders={ placeholders }
-				types={ types }
-			/>
-		</Box>
+		<PairedFixedPriceEditor
+			values={ values }
+			onChange={ onChange }
+			i18n={ i18n }
+			title={ optionsTitle }
+			placeholders={ placeholders }
+			types={ types }
+		/>
 	) : null;
 
 	return (

@@ -1,7 +1,7 @@
 /**
  * Radio field: basic + paired options + defaults + layout + behavior + conditions.
  */
-import { Steps, Box, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -79,15 +79,13 @@ export function RadioFieldEditor( {
 		: i18n.selectOptionsTitle || 'Add options';
 
 	const pairedBlock = needsPairedOptions ? (
-		<Box>
-			<PairedOptionsEditor
-				variant="radio"
-				values={ values }
-				onChange={ onChange }
-				i18n={ i18n }
-				title={ optionsTitle }
-			/>
-		</Box>
+		<PairedOptionsEditor
+			variant="radio"
+			values={ values }
+			onChange={ onChange }
+			i18n={ i18n }
+			title={ optionsTitle }
+		/>
 	) : null;
 
 	return (
