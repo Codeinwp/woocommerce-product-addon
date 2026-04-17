@@ -554,9 +554,9 @@ $fields_groups = array(
 								<?php } ?>
 							</div>
 						</div>
-						<?php
-						do_action( 'ppom_field_meta_general_tab', $ppom );
-						?>
+							<?php
+							do_action( 'ppom_field_meta_general_tab', $ppom );
+							?>
 					</div>
 
 					<!--Style Tab-->
@@ -769,7 +769,7 @@ $fields_groups = array(
 								</td>
 								<td>
 									<div class="onoffswitch">
-										<input <?php echo checked( $field_status, 'on' ); ?> type="checkbox"
+										<input <?php checked( $field_status, 'on' ); ?> type="checkbox"
 																							class="onoffswitch-checkbox"
 																							id="ppom-onoffswitch-<?php echo esc_attr( $f_index ); ?>"
 																							tabindex="0">

@@ -64,6 +64,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		// Getting products list
 		add_action( 'wp_ajax_ppom_get_products', array( $this, 'get_products' ) );
+		add_action( 'wp_ajax_ppom_search_products', array( $this, 'search_products' ) );
 		add_action( 'wp_ajax_ppom_attach_ppoms', array( $this, 'ppom_attach_ppoms' ) );
 
 		// Adding setting tab in WooCommerce
@@ -329,10 +330,11 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			->set_select(
 				array_merge(
 					array(
-						'label'    => __( 'Choose Products:', 'woocommerce-product-addon' ),
-						'name'     => 'ppom-attach-to-products[]',
-						'multiple' => true,
-						'is_used'  => true,
+						'label'               => __( 'Choose Products:', 'woocommerce-product-addon' ),
+						'name'                => 'ppom-attach-to-products[]',
+						'multiple'            => true,
+						'is_used'             => true,
+						'render_empty_option' => false,
 					),
 					$this->get_wc_products( $ppom_id )
 				)
@@ -418,6 +420,139 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 	/**
+	 * Returns paginated product matches for the attach modal Select2 control.
+	 *
+	 * @return void
+	 */
+	public function search_products() {
+		$nonce = isset( $_GET['ppom_attached_nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['ppom_attached_nonce'] ) ) : '';
+
+		if ( ! wp_verify_nonce( $nonce, 'ppom_attached_nonce_action' ) || ! ppom_security_role() ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'woocommerce-product-addon' ),
+				),
+				403
+			);
+		}
+
+		$search_term = '';
+		if ( isset( $_GET['q'] ) ) {
+			$search_term = sanitize_text_field( wp_unslash( $_GET['q'] ) );
+		} elseif ( isset( $_GET['term'] ) ) {
+			$search_term = sanitize_text_field( wp_unslash( $_GET['term'] ) );
+		}
+
+		$page       = isset( $_GET['page'] ) ? max( 1, absint( $_GET['page'] ) ) : 1;
+		$per_page   = 20;
+		$query_args = array(
+			'post_type'              => 'product',
+			'post_status'            => 'publish',
+			'posts_per_page'         => $per_page,
+			'paged'                  => $page,
+			'orderby'                => 'title',
+			'order'                  => 'ASC',
+			'fields'                 => 'ids',
+			'no_found_rows'          => false,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		);
+
+		if ( '' !== $search_term ) {
+			$query_args['s'] = $search_term;
+		}
+
+		$query   = new WP_Query( $query_args );
+		$results = array_map(
+			function ( $product_id ) {
+				$product_id = $product_id instanceof WP_Post ? (int) $product_id->ID : absint( $product_id );
+
+				return array(
+					'id'   => (string) $product_id,
+					'text' => get_the_title( $product_id ),
+				);
+			},
+			$query->posts
+		);
+
+		wp_send_json(
+			array(
+				'results'    => $results,
+				'pagination' => array(
+					'more' => $page < (int) $query->max_num_pages,
+				),
+			)
+		);
+	}
+
+	/**
+	 * Returns product IDs currently attached to a PPOM field group.
+	 *
+	 * Supports both the current serialized-array storage and the older scalar
+	 * storage used by {@see PPOM_PRODUCT_META_KEY}.
+	 *
+	 * @param int $ppom_id PPOM field-group ID.
+	 * @return int[]
+	 */
+	public static function get_attached_product_ids( $ppom_id ) {
+		$ppom_id = absint( $ppom_id );
+		if ( 0 === $ppom_id ) {
+			return array();
+		}
+
+		$ppom_id_string = (string) $ppom_id;
+		$product_ids    = get_posts(
+			array(
+				'post_type'              => 'product',
+				'post_status'            => 'publish',
+				// Intentionally load all matched attachments, not the full catalog.
+				// The modal must pre-render every currently attached product as a
+				// selected option so Select2 shows the existing state correctly.
+				'posts_per_page'         => -1,
+				'fields'                 => 'ids',
+				'orderby'                => 'title',
+				'order'                  => 'ASC',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Attachments are stored in post meta and this helper needs every selected product ID for modal preloading.
+				'meta_query'             => array(
+					'relation' => 'OR',
+					array(
+						'key'     => PPOM_PRODUCT_META_KEY,
+						'value'   => $ppom_id_string,
+						'compare' => '=',
+					),
+					array(
+						'key'     => PPOM_PRODUCT_META_KEY,
+						'value'   => sprintf( 'i:%d;', $ppom_id ),
+						'compare' => 'LIKE',
+					),
+					array(
+						'key'     => PPOM_PRODUCT_META_KEY,
+						'value'   => sprintf( 's:%d:"%s";', strlen( $ppom_id_string ), $ppom_id_string ),
+						'compare' => 'LIKE',
+					),
+				),
+			)
+		);
+
+		$verified = array();
+		foreach ( $product_ids as $candidate_id ) {
+			$candidate_id  = absint( $candidate_id );
+			$attached_meta = get_post_meta( $candidate_id, PPOM_PRODUCT_META_KEY, true );
+
+			if ( is_array( $attached_meta ) && in_array( $ppom_id, array_map( 'absint', $attached_meta ), true ) ) {
+				$verified[] = $candidate_id;
+			} elseif ( is_numeric( $attached_meta ) && absint( $attached_meta ) === $ppom_id ) {
+				$verified[] = $candidate_id;
+			}
+		}
+
+		return array_values( array_unique( $verified ) );
+	}
+
+	/**
 	 * Returns product selector options for the attach popup.
 	 *
 	 * Marks which products already reference the current PPOM ID through
@@ -433,52 +568,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			'is_used' => true,
 		);
 
-		if ( 'valid' === apply_filters( 'product_ppom_license_status', '' ) ) {
+		foreach ( self::get_attached_product_ids( $ppom_id ) as $product_id ) {
 			$result['options'][] = array(
-				'value'    => '-1',
-				'selected' => false,
-				'label'    => __( 'Select a product', 'woocommerce-product-addon' ),
-				'disabled' => true,
+				'value'    => (string) $product_id,
+				'selected' => true,
+				'label'    => get_the_title( $product_id ),
 			);
 		}
 
-		$query = new WP_Query(
-			array(
-				'post_type'      => 'product',
-				'posts_per_page' => -1, // Get all products
-				'post_status'    => 'publish',
-			)
-		);
-
-		if ( ! $query->have_posts() ) {
-			return $result;
-		}
-
-		while ( $query->have_posts() ) {
-			$query->the_post();
-
-			$is_used       = false;
-			$product_id    = get_the_ID();
-			$attached_meta = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
-
-			if ( is_array( $attached_meta ) ) {
-				$is_used = in_array( $ppom_id, $attached_meta );
-			} elseif ( is_numeric( $attached_meta ) ) {
-				$is_used = $product_id === $attached_meta; // Note: Legacy format.
-			}
-
-			if ( $is_used ) {
-				$result['is_used'] = true;
-			}
-
-			$result['options'][] = array(
-				'value'    => $product_id,
-				'selected' => $is_used,
-				'label'    => get_the_title(),
-			);
-		}
-
-		wp_reset_postdata();
 		return $result;
 	}
 
@@ -511,6 +608,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$used_categories = array();
 		if ( ! empty( $current_values['productmeta_categories'] ) ) {
 			$used_categories = preg_split( '/\r\n|\n/', $current_values['productmeta_categories'] );
+			if ( false === $used_categories ) {
+				$used_categories = array();
+			}
 		}
 
 		foreach ( $product_categories as $category ) {
@@ -615,8 +715,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @see ppom_admin_process_product_meta()
 	 */
 	public function ppom_attach_ppoms() {
-		if ( ! isset( $_POST['ppom_attached_nonce'] )
-			|| ! wp_verify_nonce( $_POST['ppom_attached_nonce'], 'ppom_attached_nonce_action' )
+		$attached_nonce = isset( $_POST['ppom_attached_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_attached_nonce'] ) ) : '';
+		if ( '' === $attached_nonce
+			|| ! wp_verify_nonce( $attached_nonce, 'ppom_attached_nonce_action' )
 			|| ! ppom_security_role()
 		) {
 			$response = array(
@@ -627,7 +728,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			wp_send_json( $response );
 		}
 
-		$ppom_id     = intval( $_POST['ppom_id'] );
+		$ppom_id     = isset( $_POST['ppom_id'] ) ? absint( $_POST['ppom_id'] ) : 0;
 		$is_pro_user = 'valid' === apply_filters( 'product_ppom_license_status', '' );
 
 		// +----- Attach Field to Product -----+
@@ -788,7 +889,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 */
 	public function ppom_setting_wpml( $value, $option, $raw_value ) {
 
-		if ( isset( $option['type'] ) && isset( $option['type'] ) == 'text' ) {
+		if ( isset( $option['type'] ) && 'text' === $option['type'] ) {
 			$value = ppom_wpml_translate( $value, 'PPOM' );
 		}
 
