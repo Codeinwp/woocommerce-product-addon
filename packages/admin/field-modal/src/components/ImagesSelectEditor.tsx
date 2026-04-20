@@ -22,6 +22,7 @@ export type ImageOptionRow = {
 	title: string;
 	price: string;
 	stock: string;
+	meta_id?: string;
 	url?: string;
 	description?: string;
 };
@@ -64,6 +65,9 @@ function normalizeImagesArray( raw: unknown ): ImageOptionRow[] {
 						stock: String(
 							( o as Record< string, unknown > ).stock ?? ''
 						),
+						meta_id: String(
+							( o as Record< string, unknown > ).meta_id ?? ''
+						),
 						url: String(
 							( o as Record< string, unknown > ).url ?? ''
 						),
@@ -77,6 +81,7 @@ function normalizeImagesArray( raw: unknown ): ImageOptionRow[] {
 						title: '',
 						price: '',
 						stock: '',
+						meta_id: '',
 						url: '',
 						description: '',
 				  }
@@ -93,6 +98,7 @@ function normalizeImagesArray( raw: unknown ): ImageOptionRow[] {
 					title: String( obj.title ?? '' ),
 					price: String( obj.price ?? '' ),
 					stock: String( obj.stock ?? '' ),
+					meta_id: String( obj.meta_id ?? '' ),
 					url: String( obj.url ?? '' ),
 					description: String( obj.description ?? '' ),
 				};
@@ -103,6 +109,7 @@ function normalizeImagesArray( raw: unknown ): ImageOptionRow[] {
 				title: '',
 				price: '',
 				stock: '',
+				meta_id: '',
 				url: '',
 				description: '',
 			};
@@ -116,7 +123,7 @@ export interface ImagesSelectEditorProps {
 	onChange: Dispatch< SetStateAction< FieldRow | null > >;
 	i18n: I18nDict;
 	title: string;
-	variant?: 'image' | 'imageselect';
+	variant?: 'image' | 'imageselect' | 'conditional-meta';
 }
 
 export function ImagesSelectEditor( {
@@ -179,6 +186,7 @@ export function ImagesSelectEditor( {
 						title: imageTitle,
 						price: '',
 						stock: '',
+						meta_id: '',
 						url: '',
 						description: '',
 					};
@@ -208,6 +216,7 @@ export function ImagesSelectEditor( {
 	};
 
 	const isImageselect = variant === 'imageselect';
+	const isConditionalMeta = variant === 'conditional-meta';
 	const pricePlaceholder = isImageselect
 		? i18n.imagesPrice || 'Price'
 		: i18n.imagesPricePlaceholder || 'Price (fix or %)';
@@ -301,49 +310,37 @@ export function ImagesSelectEditor( {
 											} )
 										}
 									/>
-									<Input
-										size="sm"
-										flex="1 1 0"
-										minW={ 0 }
-										placeholder={ pricePlaceholder }
-										value={ row.price }
-										onValueChange={ ( e ) =>
-											updateRow( index, {
-												price: e.target.value,
-											} )
-										}
-									/>
-								</HStack>
-								<HStack gap={ 2 } w="full">
-									<Input
-										size="sm"
-										flex="1 1 0"
-										minW={ 0 }
-										placeholder={
-											i18n.imagesStock || 'Stock'
-										}
-										value={ row.stock }
-										onValueChange={ ( e ) =>
-											updateRow( index, {
-												stock: e.target.value,
-											} )
-										}
-									/>
-									{ isImageselect ? (
+									{ isConditionalMeta ? (
 										<Input
 											size="sm"
 											flex="1 1 0"
 											minW={ 0 }
-											placeholder="Description"
-											value={ row.description || '' }
+											placeholder="Meta IDs"
+											value={ row.meta_id || '' }
 											onValueChange={ ( e ) =>
 												updateRow( index, {
-													description:
+													meta_id:
 														e.target.value,
 												} )
 											}
 										/>
 									) : (
+										<Input
+											size="sm"
+											flex="1 1 0"
+											minW={ 0 }
+											placeholder={ pricePlaceholder }
+											value={ row.price }
+											onValueChange={ ( e ) =>
+												updateRow( index, {
+													price: e.target.value,
+												} )
+											}
+										/>
+									) }
+								</HStack>
+								<HStack gap={ 2 } w="full">
+									{ isConditionalMeta ? (
 										<Input
 											size="sm"
 											flex="1 1 0"
@@ -358,7 +355,52 @@ export function ImagesSelectEditor( {
 												} )
 											}
 										/>
+									) : (
+										<Input
+											size="sm"
+											flex="1 1 0"
+											minW={ 0 }
+											placeholder={
+												i18n.imagesStock || 'Stock'
+											}
+											value={ row.stock }
+											onValueChange={ ( e ) =>
+												updateRow( index, {
+													stock: e.target.value,
+												} )
+											}
+										/>
 									) }
+									{ ! isConditionalMeta && isImageselect ? (
+										<Input
+											size="sm"
+											flex="1 1 0"
+											minW={ 0 }
+											placeholder="Description"
+											value={ row.description || '' }
+											onValueChange={ ( e ) =>
+												updateRow( index, {
+													description:
+														e.target.value,
+												} )
+											}
+										/>
+									) : ! isConditionalMeta ? (
+										<Input
+											size="sm"
+											flex="1 1 0"
+											minW={ 0 }
+											placeholder={
+												i18n.imagesUrl || 'URL'
+											}
+											value={ row.url || '' }
+											onValueChange={ ( e ) =>
+												updateRow( index, {
+													url: e.target.value,
+												} )
+											}
+										/>
+									) : null }
 								</HStack>
 							</VStack>
 

@@ -10,8 +10,8 @@ import {
 	saveFieldGroup,
 } from '../services/fieldModalApi';
 import { getFieldEditor } from '../editors/registry';
-import { hasFieldUiDefinition } from '../definitions/registry';
-import { newClientId, withClientIds, stripClientIds } from '../utils/clientIds';
+import { getFieldUiDefinition, hasFieldUiDefinition } from '../definitions/registry';
+import { newClientId, withClientIds } from '../utils/clientIds';
 import { readGroupFromForm } from '../utils/legacyGroupForm';
 import { createInitialModalState, modalReducer } from '../state/modalReducer';
 import type {
@@ -80,6 +80,23 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		);
 	}, [ state.fields, state.selectedId ] );
 
+	const localDefinitionSchema = useMemo( () => {
+		const slug =
+			editDraft && editDraft.type ? String( editDraft.type ).toLowerCase() : '';
+		if ( ! slug ) {
+			return null;
+		}
+		const definition = getFieldUiDefinition( slug );
+		if ( ! definition?.settings ) {
+			return null;
+		}
+		return {
+			type: slug,
+			settings: definition.settings,
+			tabs: definition.tabs,
+		};
+	}, [ editDraft?.type ] );
+
 	const fetchSchemaForType = useCallback( async ( type: string | undefined ) => {
 		if ( ! type ) {
 			return null;
@@ -108,7 +125,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 	}, [] );
 
 	useEffect( () => {
-		if ( ! state.open || ! editDraft?.type ) {
+		if ( ! state.open || ! editDraft?.type || localDefinitionSchema ) {
 			return;
 		}
 		const t = String( editDraft.type ).toLowerCase();
@@ -119,6 +136,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 	}, [
 		state.open,
 		editDraft?.type,
+		localDefinitionSchema,
 		state.schemasCache,
 		fetchSchemaForType,
 	] );
@@ -271,8 +289,9 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		return raw;
 	}, [ editDraft?.type, ctx?.catalog, catalogGroups ] );
 
-	const activeSchema =
-		editDraft && editDraft.type
+	const activeSchema = localDefinitionSchema
+		? localDefinitionSchema
+		: editDraft && editDraft.type
 			? state.schemasCache[ String( editDraft.type ).toLowerCase() ] ??
 			  null
 			: null;

@@ -29,7 +29,11 @@ function normalizeOptionsArray( raw: unknown ): PairedOptionRow[] {
 	return [];
 }
 
-export type PairedOptionsVariant = 'select' | 'radio' | 'checkbox';
+export type PairedOptionsVariant =
+	| 'select'
+	| 'radio'
+	| 'checkbox'
+	| 'switcher';
 
 export interface PairedOptionsEditorProps {
 	values: FieldRow;
@@ -49,6 +53,7 @@ export function PairedOptionsEditor( {
 }: PairedOptionsEditorProps ) {
 	const rows = normalizeOptionsArray( values.options );
 	const showCheckboxExtras = variant === 'checkbox';
+	const showSwitcherExtras = variant === 'switcher';
 
 	const setRows = ( next: PairedOptionRow[] ) => {
 		onChange( ( prev ) => {
@@ -77,6 +82,9 @@ export function PairedOptionsEditor( {
 		if ( showCheckboxExtras ) {
 			base.discount = '';
 			base.tooltip = '';
+		}
+		if ( showSwitcherExtras ) {
+			base.image = '';
 		}
 		setRows( [ ...rows, base ] );
 	};
@@ -221,7 +229,11 @@ export function PairedOptionsEditor( {
 								minW={ 0 }
 								w="auto"
 								placeholder={
-									i18n.pairedOptionImageId || 'Image ID'
+									showSwitcherExtras
+										? i18n.pairedOptionId ||
+										  'Option ID'
+										: i18n.pairedOptionImageId ||
+										  'Image ID'
 								}
 								value={ String( row.id ?? row.images ?? '' ) }
 								onValueChange={ ( e ) =>
@@ -230,6 +242,24 @@ export function PairedOptionsEditor( {
 									} )
 								}
 							/>
+							{ showSwitcherExtras ? (
+								<Input
+									size="sm"
+									flex="1 1 0"
+									minW={ 0 }
+									w="auto"
+									placeholder={
+										i18n.pairedOptionImageId ||
+										'Image ID'
+									}
+									value={ String( row.image ?? '' ) }
+									onValueChange={ ( e ) =>
+										updateRow( index, {
+											image: e.target.value,
+										} )
+									}
+								/>
+							) : null }
 							<HStack gap={ 1 } flexShrink={ 0 }>
 								<Button
 									size="xs"

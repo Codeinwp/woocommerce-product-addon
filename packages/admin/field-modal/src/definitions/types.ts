@@ -28,6 +28,45 @@ export type ExplicitExclusion = {
 	reason: string;
 };
 
+/**
+ * Recognized `type` discriminators for `SettingMeta`. Extend this list when a new
+ * setting-rendering type is introduced on the TS side. PHP-sourced schemas may still
+ * carry unknown types — that's why the field is typed as `SettingMetaType | string`.
+ */
+export type SettingMetaType =
+	| 'text'
+	| 'textarea'
+	| 'checkbox'
+	| 'select'
+	| 'color'
+	| 'html-conditions'
+	| 'paired'
+	| 'paired-switch'
+	| 'paired-quantity'
+	| 'chained_options'
+	| 'fonts_paired'
+	| 'conditional-images'
+	| 'vqmatrix-colunm'
+	| 'vqmatrix-row';
+
+/**
+ * One setting's metadata entry. `type` selects the renderer; the rest are UI hints.
+ * An index signature is kept so PHP-sourced schemas with extra fields pass through.
+ */
+export interface SettingMeta {
+	type: SettingMetaType | string;
+	title: string;
+	desc?: string;
+	default?: unknown;
+	options?: Record< string, string > | Record< number, string >;
+	col_classes?: string[];
+	link?: string;
+	hidden?: boolean;
+	[ key: string ]: unknown;
+}
+
+export type SettingSchema = Record< string, SettingMeta >;
+
 export type ValidatorFn = ( ctx: {
 	value: unknown;
 	activeClientId: string;
@@ -43,6 +82,7 @@ export interface FieldUiDefinition {
 		labelKey: string;
 	} >;
 	blocks: FieldUiBlock[];
+	settings?: SettingSchema;
 	exclusions?: ExplicitExclusion[];
 	clientValidators?: Record<
 		string,
