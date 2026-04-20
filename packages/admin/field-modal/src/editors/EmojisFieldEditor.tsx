@@ -10,7 +10,9 @@ import {
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { PairedMatrixOptionsEditor } from '../components/PairedMatrixOptionsEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
+import { LegacyAdvancedFieldStack } from './legacyAdvancedFieldStack';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
+import type { LegacySectionConfig } from './legacyAdvancedFieldStack';
 
 export function EmojisFieldEditor( {
 	schema,
@@ -30,14 +32,20 @@ export function EmojisFieldEditor( {
 		optionsMeta.type &&
 		String( optionsMeta.type ) === 'paired-palettes';
 
-	const sectionsBefore = [
+	const sectionsBefore: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionBasic || 'Basic',
-			keys: [ 'title', 'data_name', 'description', 'error_message' ],
+			keys: [ 'title', 'data_name', 'description' ],
+			advanced: false,
+		},
+		{
+			label: i18n.editorSectionValidation || 'Validation',
+			keys: [ 'error_message' ],
+			advanced: true,
 		},
 	];
 
-	const sectionsAfter = [
+	const sectionsAfter: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
 			keys: [
@@ -57,6 +65,7 @@ export function EmojisFieldEditor( {
 				'visibility',
 				'visibility_role',
 			],
+			advanced: true,
 		},
 		{
 			label: i18n.editorSectionBehavior || 'Behavior',
@@ -66,6 +75,7 @@ export function EmojisFieldEditor( {
 				'onetime',
 				'onetime_taxable',
 			],
+			advanced: true,
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -105,17 +115,17 @@ export function EmojisFieldEditor( {
 	) : null;
 
 	return (
-        <SettingsConditionsTabs
+		<SettingsConditionsTabs
 			i18n={ i18n }
 			hasConditions={ hasConditions }
 			settings={
 				<VStack align="stretch" gap={ 3 }>
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsBefore }
 					/>
 					{ matrixBlock }
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsAfterSettings }
 					/>
@@ -137,5 +147,5 @@ export function EmojisFieldEditor( {
 				/>
 			}
 		/>
-    );
+	);
 }

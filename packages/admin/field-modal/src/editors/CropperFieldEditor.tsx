@@ -10,7 +10,9 @@ import {
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { PairedCropperEditor } from '../components/PairedCropperEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
+import { LegacyAdvancedFieldStack } from './legacyAdvancedFieldStack';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
+import type { LegacySectionConfig } from './legacyAdvancedFieldStack';
 
 export function CropperFieldEditor( {
 	schema,
@@ -32,17 +34,24 @@ export function CropperFieldEditor( {
 	const viewportDesc =
 		optMeta && typeof optMeta.desc === 'string' ? optMeta.desc : '';
 
-	const sectionsBefore = [
+	const sectionsBefore: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionBasic || 'Basic',
-			keys: [ 'title', 'data_name', 'description', 'error_message' ],
+			keys: [ 'title', 'data_name', 'description' ],
+			advanced: false,
+		},
+		{
+			label: i18n.editorSectionValidation || 'Validation',
+			keys: [ 'error_message' ],
+			advanced: true,
 		},
 	];
 
-	const sectionsAfter = [
+	const sectionsAfter: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionDefaultPrice || 'Defaults',
 			keys: [ 'file_cost', 'selected', 'first_option' ],
+			advanced: true,
 		},
 		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
@@ -57,6 +66,7 @@ export function CropperFieldEditor( {
 				'visibility',
 				'visibility_role',
 			],
+			advanced: true,
 		},
 		{
 			label: i18n.editorSectionMedia || 'Media & layout',
@@ -70,10 +80,12 @@ export function CropperFieldEditor( {
 				'enable_exif',
 				'onetime_taxable',
 			],
+			advanced: true,
 		},
 		{
 			label: i18n.editorSectionBehavior || 'Behavior',
 			keys: [ 'desc_tooltip', 'required' ],
+			advanced: true,
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -100,12 +112,15 @@ export function CropperFieldEditor( {
 	};
 
 	return (
-        <SettingsConditionsTabs
+		<SettingsConditionsTabs
 			i18n={ i18n }
 			hasConditions={ hasConditions }
 			settings={
 				<VStack align="stretch" gap={ 3 }>
-					<GroupedFieldSections { ...shared } sections={ sectionsBefore } />
+					<LegacyAdvancedFieldStack
+						{ ...shared }
+						sections={ sectionsBefore }
+					/>
 					<PairedCropperEditor
 						fieldKey="options"
 						title={ viewportTitle }
@@ -114,7 +129,7 @@ export function CropperFieldEditor( {
 						onChange={ onChange }
 						i18n={ i18n }
 					/>
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsAfterSettings }
 					/>
@@ -136,5 +151,5 @@ export function CropperFieldEditor( {
 				/>
 			}
 		/>
-    );
+	);
 }

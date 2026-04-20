@@ -13,6 +13,8 @@ export type FieldUiBlock =
 			tab: FieldTabId;
 			labelKey: string;
 			keys: string[];
+			/** When true, rendered inside the shared “Advanced settings” disclosure (Settings tab only). */
+			advanced?: boolean;
 	  }
 	| {
 			kind: 'widget';

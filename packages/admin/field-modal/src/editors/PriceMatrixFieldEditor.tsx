@@ -10,7 +10,9 @@ import {
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { PairedMatrixOptionsEditor } from '../components/PairedMatrixOptionsEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
+import { LegacyAdvancedFieldStack } from './legacyAdvancedFieldStack';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
+import type { LegacySectionConfig } from './legacyAdvancedFieldStack';
 
 export function PriceMatrixFieldEditor( {
 	schema,
@@ -30,18 +32,20 @@ export function PriceMatrixFieldEditor( {
 		optionsMeta.type &&
 		String( optionsMeta.type ) === 'paired-pricematrix';
 
-	const sectionsBefore = [
+	const sectionsBefore: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionBasic || 'Basic',
 			keys: [ 'title', 'data_name', 'description' ],
+			advanced: false,
 		},
 		{
 			label: i18n.editorSectionDefaultPrice || 'Pricing',
 			keys: [ 'discount_type' ],
+			advanced: true,
 		},
 	];
 
-	const sectionsAfter = [
+	const sectionsAfter: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
 			keys: [
@@ -53,10 +57,12 @@ export function PriceMatrixFieldEditor( {
 				'show_price_per_unit',
 				'hide_matrix_table',
 			],
+			advanced: true,
 		},
 		{
 			label: i18n.editorSectionBehavior || 'Behavior',
 			keys: [ 'desc_tooltip' ],
+			advanced: true,
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -96,17 +102,17 @@ export function PriceMatrixFieldEditor( {
 	) : null;
 
 	return (
-        <SettingsConditionsTabs
+		<SettingsConditionsTabs
 			i18n={ i18n }
 			hasConditions={ hasConditions }
 			settings={
 				<VStack align="stretch" gap={ 3 }>
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsBefore }
 					/>
 					{ matrixBlock }
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsAfterSettings }
 					/>
@@ -128,5 +134,5 @@ export function PriceMatrixFieldEditor( {
 				/>
 			}
 		/>
-    );
+	);
 }

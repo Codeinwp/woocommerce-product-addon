@@ -10,7 +10,9 @@ import {
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { PairedOptionsEditor } from '../components/PairedOptionsEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
+import { LegacyAdvancedFieldStack } from './legacyAdvancedFieldStack';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
+import type { LegacySectionConfig } from './legacyAdvancedFieldStack';
 
 export function SelectQtyFieldEditor( {
 	schema,
@@ -30,25 +32,34 @@ export function SelectQtyFieldEditor( {
 		optionsMeta.type &&
 		String( optionsMeta.type ) === 'paired';
 
-	const sectionsBefore = [
+	const sectionsBefore: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionBasic || 'Basic',
-			keys: [ 'title', 'data_name', 'description', 'error_message' ],
+			keys: [ 'title', 'data_name', 'description' ],
+			advanced: false,
+		},
+		{
+			label: i18n.editorSectionValidation || 'Validation',
+			keys: [ 'error_message' ],
+			advanced: true,
 		},
 	];
 
-	const sectionsAfter = [
+	const sectionsAfter: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionDefaultPrice || 'Defaults',
 			keys: [ 'selected', 'first_option', 'option_label', 'qty_label' ],
+			advanced: true,
 		},
 		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
 			keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
+			advanced: true,
 		},
 		{
 			label: i18n.editorSectionBehavior || 'Behavior',
 			keys: [ 'desc_tooltip', 'required', 'unlink_order_qty' ],
+			advanced: true,
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -89,17 +100,17 @@ export function SelectQtyFieldEditor( {
 	) : null;
 
 	return (
-        <SettingsConditionsTabs
+		<SettingsConditionsTabs
 			i18n={ i18n }
 			hasConditions={ hasConditions }
 			settings={
 				<VStack align="stretch" gap={ 3 }>
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsBefore }
 					/>
 					{ pairedBlock }
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsAfterSettings }
 					/>
@@ -121,5 +132,5 @@ export function SelectQtyFieldEditor( {
 				/>
 			}
 		/>
-    );
+	);
 }

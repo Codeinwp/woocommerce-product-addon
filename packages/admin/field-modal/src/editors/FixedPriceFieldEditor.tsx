@@ -10,7 +10,9 @@ import {
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { PairedFixedPriceEditor } from '../components/PairedFixedPriceEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
+import { LegacyAdvancedFieldStack } from './legacyAdvancedFieldStack';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
+import type { LegacySectionConfig } from './legacyAdvancedFieldStack';
 
 export function FixedPriceFieldEditor( {
 	schema,
@@ -37,21 +39,24 @@ export function FixedPriceFieldEditor( {
 		? ( optionsMeta.types as string[] )
 		: undefined;
 
-	const sectionsBefore = [
+	const sectionsBefore: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionBasic || 'Basic',
 			keys: [ 'title', 'data_name', 'description' ],
+			advanced: false,
 		},
 	];
 
-	const sectionsAfter = [
+	const sectionsAfter: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionDefaultPrice || 'Defaults',
 			keys: [ 'first_option', 'unit_plural', 'unit_single' ],
+			advanced: true,
 		},
 		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
 			keys: [ 'view_type', 'decimal_place', 'class', 'width' ],
+			advanced: true,
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -93,17 +98,17 @@ export function FixedPriceFieldEditor( {
 	) : null;
 
 	return (
-        <SettingsConditionsTabs
+		<SettingsConditionsTabs
 			i18n={ i18n }
 			hasConditions={ hasConditions }
 			settings={
 				<VStack align="stretch" gap={ 3 }>
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsBefore }
 					/>
 					{ pairedBlock }
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsAfterSettings }
 					/>
@@ -125,5 +130,5 @@ export function FixedPriceFieldEditor( {
 				/>
 			}
 		/>
-    );
+	);
 }

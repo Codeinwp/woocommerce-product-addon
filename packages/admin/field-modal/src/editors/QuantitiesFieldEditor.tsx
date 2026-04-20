@@ -10,7 +10,9 @@ import {
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { PairedQuantityEditor } from '../components/PairedQuantityEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
+import { LegacyAdvancedFieldStack } from './legacyAdvancedFieldStack';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
+import type { LegacySectionConfig } from './legacyAdvancedFieldStack';
 
 export function QuantitiesFieldEditor( {
 	schema,
@@ -32,14 +34,20 @@ export function QuantitiesFieldEditor( {
 	const optionsDesc =
 		optMeta && typeof optMeta.desc === 'string' ? optMeta.desc : '';
 
-	const sectionsBefore = [
+	const sectionsBefore: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionBasic || 'Basic',
-			keys: [ 'title', 'data_name', 'description', 'error_message' ],
+			keys: [ 'title', 'data_name', 'description' ],
+			advanced: false,
+		},
+		{
+			label: i18n.editorSectionValidation || 'Validation',
+			keys: [ 'error_message' ],
+			advanced: true,
 		},
 	];
 
-	const sectionsAfter = [
+	const sectionsAfter: LegacySectionConfig[] = [
 		{
 			label:
 				i18n.editorSectionVariationLayout ||
@@ -50,10 +58,12 @@ export function QuantitiesFieldEditor( {
 				'min_qty',
 				'max_qty',
 			],
+			advanced: true,
 		},
 		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
 			keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
+			advanced: true,
 		},
 		{
 			label: i18n.editorSectionBehavior || 'Behavior',
@@ -64,6 +74,7 @@ export function QuantitiesFieldEditor( {
 				'unlink_order_qty',
 				'required',
 			],
+			advanced: true,
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -90,12 +101,15 @@ export function QuantitiesFieldEditor( {
 	};
 
 	return (
-        <SettingsConditionsTabs
+		<SettingsConditionsTabs
 			i18n={ i18n }
 			hasConditions={ hasConditions }
 			settings={
 				<VStack align="stretch" gap={ 3 }>
-					<GroupedFieldSections { ...shared } sections={ sectionsBefore } />
+					<LegacyAdvancedFieldStack
+						{ ...shared }
+						sections={ sectionsBefore }
+					/>
 					<PairedQuantityEditor
 						fieldKey="options"
 						title={ optionsTitle }
@@ -104,7 +118,7 @@ export function QuantitiesFieldEditor( {
 						onChange={ onChange }
 						i18n={ i18n }
 					/>
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsAfterSettings }
 					/>
@@ -126,5 +140,5 @@ export function QuantitiesFieldEditor( {
 				/>
 			}
 		/>
-    );
+	);
 }

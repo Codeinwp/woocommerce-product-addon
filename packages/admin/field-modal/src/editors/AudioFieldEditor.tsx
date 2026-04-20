@@ -1,7 +1,7 @@
 /**
  * Audio / Video field type: grouped settings + AudiosSelectEditor for the "audio" key.
  */
-import { Steps, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -10,7 +10,9 @@ import {
 import { AudiosSelectEditor } from '../components/AudiosSelectEditor';
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { GroupedFieldSections } from './GroupedFieldSections';
+import { LegacyAdvancedFieldStack } from './legacyAdvancedFieldStack';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
+import type { LegacySectionConfig } from './legacyAdvancedFieldStack';
 
 export function AudioFieldEditor( {
 	schema,
@@ -23,26 +25,29 @@ export function AudioFieldEditor( {
 	const audioSectionTitle =
 		i18n.addAudioVideoSectionTitle || 'Audio / Video';
 
-	const sectionsBefore = [
+	const sectionsBefore: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionBasic || 'Basic',
-			keys: [
-				'title',
-				'data_name',
-				'description',
-				'error_message',
-			],
+			keys: [ 'title', 'data_name', 'description' ],
+			advanced: false,
+		},
+		{
+			label: i18n.editorSectionValidation || 'Validation',
+			keys: [ 'error_message' ],
+			advanced: true,
 		},
 	];
 
-	const sectionsAfter = [
+	const sectionsAfter: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionDisplay || 'Display & layout',
 			keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
+			advanced: true,
 		},
 		{
 			label: i18n.editorSectionBehavior || 'Behavior',
 			keys: [ 'desc_tooltip', 'required', 'multiple_allowed' ],
+			advanced: true,
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -69,12 +74,12 @@ export function AudioFieldEditor( {
 	};
 
 	return (
-        <SettingsConditionsTabs
+		<SettingsConditionsTabs
 			i18n={ i18n }
 			hasConditions={ hasConditions }
 			settings={
 				<VStack align="stretch" gap={ 3 }>
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsBefore }
 					/>
@@ -84,7 +89,7 @@ export function AudioFieldEditor( {
 						i18n={ i18n }
 						title={ audioSectionTitle }
 					/>
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsAfterSettings }
 					/>
@@ -106,5 +111,5 @@ export function AudioFieldEditor( {
 				/>
 			}
 		/>
-    );
+	);
 }

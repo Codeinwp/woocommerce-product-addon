@@ -14,12 +14,22 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 			'data_name',
 			'description',
 			'placeholder',
-			'error_message',
+			'required',
 		],
+		advanced: false,
 	},
 	{
 		labelKey: 'editorSectionValidation',
-		keys: [ 'maxlength', 'minlength', 'max_length', 'max', 'min', 'step' ],
+		keys: [
+			'error_message',
+			'maxlength',
+			'minlength',
+			'max_length',
+			'max',
+			'min',
+			'step',
+		],
+		advanced: true,
 	},
 	{
 		labelKey: 'editorSectionDateCalendar',
@@ -40,6 +50,7 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 			'show_weeks',
 			'auto_apply',
 		],
+		advanced: true,
 	},
 	{
 		labelKey: 'editorSectionDefaultPrice',
@@ -55,6 +66,7 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 			'qty_step',
 			'discount',
 		],
+		advanced: true,
 	},
 	{
 		labelKey: 'editorSectionDisplay',
@@ -77,6 +89,7 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 			'file_types',
 			'file_size',
 		],
+		advanced: true,
 	},
 	{
 		labelKey: 'editorSectionMedia',
@@ -94,6 +107,7 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 			'show_slider',
 			'show_price_per_unit',
 		],
+		advanced: true,
 	},
 	{
 		labelKey: 'editorSectionBehavior',
@@ -105,13 +119,13 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 			'use_regex',
 			'rich_editor',
 			'desc_tooltip',
-			'required',
 			'multiple_allowed',
 			'circle',
 			'min_checked',
 			'max_checked',
 			'max_selected',
 		],
+		advanced: true,
 	},
 	{
 		labelKey: 'editorSectionImageDimensions',
@@ -123,6 +137,7 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 			'img_dimension_error',
 		],
 		imageTabOverride: true,
+		advanced: true,
 	},
 ];
 
@@ -138,7 +153,7 @@ export function buildFallbackGroupedSections(
 	schema: { settings?: Record<string, Record<string, unknown>> } | null | undefined,
 	fieldType: string,
 	i18n: I18nDict
-): Array< { label: string; keys: string[] } > {
+): Array< { label: string; keys: string[]; advanced?: boolean } > {
 	const settings =
 		schema && schema.settings && typeof schema.settings === 'object'
 			? schema.settings
@@ -162,7 +177,11 @@ export function buildFallbackGroupedSections(
 	const fieldKeySet = new Set( fieldKeysOrdered );
 	const assigned = new Set();
 
-	const sections: Array< { label: string; keys: string[] } > = [];
+	const sections: Array< {
+		label: string;
+		keys: string[];
+		advanced?: boolean;
+	} > = [];
 
 	for ( const block of FALLBACK_FIELD_SECTION_BLUEPRINT ) {
 		const keys: string[] = [];
@@ -198,14 +217,18 @@ export function buildFallbackGroupedSections(
 
 		const label =
 			( i18n && i18n[ block.labelKey ] ) || block.labelKey;
-		sections.push( { label, keys } );
+		const adv =
+			'advanced' in block && typeof block.advanced === 'boolean'
+				? block.advanced
+				: true;
+		sections.push( { label, keys, advanced: adv } );
 	}
 
 	const overflow = fieldKeysOrdered.filter( ( k ) => ! assigned.has( k ) );
 	if ( overflow.length > 0 ) {
 		const label =
 			( i18n && i18n.editorSectionMore ) || 'More options';
-		sections.push( { label, keys: overflow } );
+		sections.push( { label, keys: overflow, advanced: true } );
 	}
 
 	return sections;

@@ -301,6 +301,8 @@ final class FieldModalRestController {
 				'manageFieldsEmpty'                => __( 'No fields yet. Use Add field above (classic) or choose a field type below.', 'woocommerce-product-addon' ),
 				'manageFieldsEmptyRight'           => __( 'Choose a field type from the list on the left.', 'woocommerce-product-addon' ),
 				'openAddFieldType'                 => __( 'Choose field type', 'woocommerce-product-addon' ),
+				'showAdvancedSettings'             => __( 'Show advanced settings', 'woocommerce-product-addon' ),
+				'hideAdvancedSettings'             => __( 'Hide advanced settings', 'woocommerce-product-addon' ),
 				'editorSectionBasic'               => __( 'Basic', 'woocommerce-product-addon' ),
 				'editorSectionValidation'          => __( 'Validation', 'woocommerce-product-addon' ),
 				'editorSectionDefaultPrice'        => __( 'Default & pricing', 'woocommerce-product-addon' ),

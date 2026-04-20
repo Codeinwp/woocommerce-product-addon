@@ -10,7 +10,7 @@ import {
 	SettingsConditionsTabs,
 	shouldShowConditionalRepeaterTab,
 } from './panels/SettingsConditionsTabs';
-import { GroupedFieldSections } from './editors/GroupedFieldSections';
+import { LegacyAdvancedFieldStack } from './editors/legacyAdvancedFieldStack';
 import { buildFallbackGroupedSections } from './fieldSettingSectionBlueprint';
 import { isReactModalExcludedSchemaKey } from './schema/reactModalExcludedKeys';
 import { ConditionalRepeaterSection } from './components/ConditionalRepeaterSection';
@@ -128,12 +128,13 @@ export function FieldSettingsForm( {
 		i18n,
 		ppomFieldIndex,
 		modalContext,
+		form,
 	};
 
 	const settingsPanel = (
 		<VStack align="stretch" gap={ 3 }>
 			{ unsupportedAlert }
-			<GroupedFieldSections
+			<LegacyAdvancedFieldStack
 				{ ...groupedEditorProps }
 				sections={ fallbackSections }
 			/>

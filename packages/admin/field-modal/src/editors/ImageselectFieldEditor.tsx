@@ -6,6 +6,7 @@
  * ImagesSelectEditor and delegates all other settings to GroupedFieldSections
  * driven by the schema, using the fallback section blueprint.
  */
+import { useMemo } from '@wordpress/element';
 import { VStack, Text } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
@@ -15,8 +16,10 @@ import {
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { ImagesSelectEditor } from '../components/ImagesSelectEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
+import { LegacyAdvancedFieldStack } from './legacyAdvancedFieldStack';
 import { buildFallbackGroupedSections } from '../fieldSettingSectionBlueprint';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
+import type { LegacySectionConfig } from './legacyAdvancedFieldStack';
 
 export function ImageselectFieldEditor( {
 	schema,
@@ -30,18 +33,45 @@ export function ImageselectFieldEditor( {
 	const imagesTitle =
 		i18n.addImagesSectionTitle || 'Images';
 
-	const allSections = buildFallbackGroupedSections(
-		schema,
-		fieldType || 'imageselect',
-		i18n
+	const allSections = useMemo(
+		() =>
+			buildFallbackGroupedSections(
+				schema,
+				fieldType || 'imageselect',
+				i18n
+			),
+		[ schema, fieldType, i18n ]
 	);
 
-	const settingsSections = allSections.filter(
-		( s ) => ! editorSectionIsConditions( s )
+	const settingsSections = useMemo(
+		() =>
+			allSections.filter(
+				( s ) => ! editorSectionIsConditions( s )
+			),
+		[ allSections ]
 	);
-	const conditionsSections = allSections.filter( ( s ) =>
-		editorSectionIsConditions( s )
+	const conditionsSections = useMemo(
+		() =>
+			allSections.filter( ( s ) =>
+				editorSectionIsConditions( s )
+			),
+		[ allSections ]
 	);
+
+	const primarySettings = useMemo(
+		() =>
+			settingsSections
+				.filter( ( s ) => s.advanced !== true )
+				.map( ( { label, keys } ) => ( { label, keys } ) ),
+		[ settingsSections ]
+	);
+
+	const advancedSectionsOnly: LegacySectionConfig[] = useMemo(
+		() =>
+			settingsSections.filter( ( s ) => s.advanced === true ),
+		[ settingsSections ]
+	);
+
 	const hasConditions = conditionsSections.length > 0;
 	const showRepeaterTab = shouldShowConditionalRepeaterTab( modalContext );
 
@@ -55,15 +85,17 @@ export function ImageselectFieldEditor( {
 	};
 
 	return (
-        <SettingsConditionsTabs
+		<SettingsConditionsTabs
 			i18n={ i18n }
 			hasConditions={ hasConditions }
 			settings={
 				<VStack align="stretch" gap={ 3 }>
-					<GroupedFieldSections
-						{ ...shared }
-						sections={ settingsSections }
-					/>
+					{ primarySettings.length > 0 && (
+						<GroupedFieldSections
+							{ ...shared }
+							sections={ primarySettings }
+						/>
+					) }
 					<VStack align="stretch" gap={ 2 }>
 						<ImagesSelectEditor
 							values={ values }
@@ -80,12 +112,20 @@ export function ImageselectFieldEditor( {
 							{ i18n.legacyEditorHint }
 						</Text>
 					</VStack>
+					{ advancedSectionsOnly.length > 0 && (
+						<LegacyAdvancedFieldStack
+							{ ...shared }
+							sections={ advancedSectionsOnly }
+						/>
+					) }
 				</VStack>
 			}
 			conditions={
 				<GroupedFieldSections
 					{ ...shared }
-					sections={ conditionsSections }
+					sections={ conditionsSections.map(
+						( { label, keys } ) => ( { label, keys } )
+					) }
 				/>
 			}
 			hasRepeater={ showRepeaterTab }
@@ -98,5 +138,5 @@ export function ImageselectFieldEditor( {
 				/>
 			}
 		/>
-    );
+	);
 }

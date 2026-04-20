@@ -10,7 +10,9 @@ import {
 import { ConditionalRepeaterSection } from '../components/ConditionalRepeaterSection';
 import { BulkQuantityMatrixEditor } from '../components/BulkQuantityMatrixEditor';
 import { GroupedFieldSections } from './GroupedFieldSections';
+import { LegacyAdvancedFieldStack } from './legacyAdvancedFieldStack';
 import type { FieldEditorBaseProps } from '../types/fieldModal';
+import type { LegacySectionConfig } from './legacyAdvancedFieldStack';
 
 export function BulkQuantityFieldEditor( {
 	schema,
@@ -30,14 +32,15 @@ export function BulkQuantityFieldEditor( {
 		optionsMeta.type &&
 		String( optionsMeta.type ) === 'bulk-quantity';
 
-	const sectionsBefore = [
+	const sectionsBefore: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionBasic || 'Basic',
 			keys: [ 'title', 'data_name', 'description' ],
+			advanced: false,
 		},
 	];
 
-	const sectionsAfter = [
+	const sectionsAfter: LegacySectionConfig[] = [
 		{
 			label: i18n.editorSectionDisplay || 'Labels & display',
 			keys: [
@@ -49,6 +52,7 @@ export function BulkQuantityFieldEditor( {
 				'hide_baseprice',
 				'show_pricerange',
 			],
+			advanced: true,
 		},
 		{
 			label: i18n.conditionsTab || 'Conditions',
@@ -88,17 +92,17 @@ export function BulkQuantityFieldEditor( {
 	) : null;
 
 	return (
-        <SettingsConditionsTabs
+		<SettingsConditionsTabs
 			i18n={ i18n }
 			hasConditions={ hasConditions }
 			settings={
 				<VStack align="stretch" gap={ 3 }>
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsBefore }
 					/>
 					{ matrixBlock }
-					<GroupedFieldSections
+					<LegacyAdvancedFieldStack
 						{ ...shared }
 						sections={ sectionsAfterSettings }
 					/>
@@ -120,5 +124,5 @@ export function BulkQuantityFieldEditor( {
 				/>
 			}
 		/>
-    );
+	);
 }
