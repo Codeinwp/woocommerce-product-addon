@@ -1022,17 +1022,50 @@ function ppom_update_get_prices() {
 	const apply_as_discount = ppom_pricematrix_discount == 'on' ? true : false;
 
 	if ( ppom_pricematrix !== undefined ) {
-		jQuery.each( JSON.parse( ppom_pricematrix ), function ( range, meta ) {
+		const matrixData = JSON.parse(ppom_pricematrix);
+		const product_qty = parseInt(ppom_get_order_quantity(), 10);
+
+		// Pre-process keys ONCE (fix performance + ordering issue)
+		const parsedKeys = Object.keys(matrixData).map((range) => {
+			if (range.includes('-')) {
+				const [start, end] = range.split('-').map(Number);
+				return { type: 'range', start, end, key: range };
+			} else {
+				return { type: 'single', value: Number(range), key: range };
+			}
+		});
+
+		console.log(parsedKeys);
+		parsedKeys.sort((a, b) => {
+			const aVal = a.type === 'range' ? a.start : a.value;
+			const bVal = b.type === 'range' ? b.start : b.value;
+			return aVal - bVal;
+		});
+
+		const firstKey = parsedKeys[0]?.key;
+		const lastKey = parsedKeys[parsedKeys.length - 1]?.key;
+
+		jQuery.each(matrixData, function (range, meta) {
 			const option_price = {};
+			let isMatch = false;
 
-			const range_break = range.split( '-' );
-			const range_from = parseInt( range_break[ 0 ] );
-			const range_to = parseInt( range_break[ 1 ] );
-			const product_qty = ppom_get_order_quantity();
+			if (range.indexOf('-') !== -1) {
+				const [range_from, range_to] = range.split('-').map(Number);
 
-			// console.log(range, meta);
+				if (product_qty >= range_from && product_qty <= range_to) {
+					isMatch = true;
+				}
+			} else {
+				const value = Number(range);
 
-			if ( product_qty >= range_from && product_qty <= range_to ) {
+				if (range === firstKey && product_qty <= value) {
+					isMatch = true;
+				} else if (range === lastKey && product_qty >= value) {
+					isMatch = true;
+				}
+			}
+
+			if (isMatch) {
 				option_price.label = meta.label;
 				option_price.price = meta.price;
 				option_price.percent = meta.percent;
@@ -1041,11 +1074,13 @@ function ppom_update_get_prices() {
 					? 'matrix_discount'
 					: 'matrix';
 				option_price.data_name = ppom_pricematrix_id;
-				option_price.matrix_fixed =
-					meta.matrix_fixed == 'on' ? true : false;
-				options_price_added.push( option_price );
+				option_price.matrix_fixed = meta.matrix_fixed === 'on';
+
+				options_price_added.push(option_price);
+
+				return false;
 			}
-		} );
+		});
 	}
 
 	// Variation quantities

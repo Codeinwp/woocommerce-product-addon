@@ -1514,16 +1514,25 @@ final class Helpers {
 			return $matrix;
 		}
 
+		$quantity = intval( $quantity );
 		foreach ( $ranges as $range => $data ) {
 
-			$range_array = explode( '-', $range );
-			$range_start = $range_array[0];
-			$range_end   = $range_array[1];
+			if ( strpos( $range, '-' ) !== false ) {
+				list( $start, $end ) = array_map( 'intval', explode( '-', $range ) );
+				if ( $quantity >= $start && $quantity <= $end ) {
+					$matrix = $data;
+					break;
+				}
+			} else {
+				$value = intval( $range );
 
-			$quantity = intval( $quantity );
-			if ( $quantity >= $range_start && $quantity <= $range_end ) {
-				$matrix = $data;
-				break;
+				if ( $range === array_key_first( $ranges ) && $quantity <= $value ) {
+					$matrix = $data;
+					break;
+				} elseif ( $range === array_key_last( $ranges ) && $quantity >= $value ) {
+					$matrix = $data;
+					break;
+				}
 			}
 		}
 
