@@ -694,6 +694,109 @@ function radioSettings(): SettingSchema {
 	};
 }
 
+function switcherSettings(): SettingSchema {
+	return {
+		title: titleSetting(),
+		data_name: dataNameSetting(),
+		description: descriptionSetting(
+			__(
+				'Small description, it will be diplay near name title.',
+				'woocommerce-product-addon'
+			)
+		),
+		error_message: errorMessageSetting(),
+		options: setting(
+			'paired-switch',
+			__( 'Add options', 'woocommerce-product-addon' ),
+			__(
+				'Add options with label, price, weight, stock, option ID, and image URL or attachment ID for each choice.',
+				'woocommerce-product-addon'
+			)
+		),
+		selected: setting(
+			'text',
+			__( 'Selected option', 'woocommerce-product-addon' ),
+			__(
+				'Type option name given in (Add Options) tab if you want already selected.',
+				'woocommerce-product-addon'
+			)
+		),
+		marker_height: setting(
+			'text',
+			__( 'Marker height', 'woocommerce-product-addon' ),
+			__(
+				'Height of the switcher marker area (e.g. 80px).',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
+		),
+		font_size: setting(
+			'text',
+			__( 'Label font size', 'woocommerce-product-addon' ),
+			__(
+				'Font size for option labels (e.g. 14px).',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
+		),
+		switcher_color: setting(
+			'color',
+			__( 'Switcher color', 'woocommerce-product-addon' ),
+			__(
+				'Background color for the switcher track.',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
+		),
+		price_size: setting(
+			'text',
+			__( 'Price font size', 'woocommerce-product-addon' ),
+			__(
+				'Font size for option prices (e.g. 12px).',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
+		),
+		font_color: setting(
+			'color',
+			__( 'Font color', 'woocommerce-product-addon' ),
+			__( 'Text color for option labels.', 'woocommerce-product-addon' ),
+			{ col_classes: HALF_WIDTH }
+		),
+		marker_color: setting(
+			'color',
+			__( 'Marker color', 'woocommerce-product-addon' ),
+			__(
+				'Color of the active selection marker.',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
+		),
+		class: classSetting(),
+		width: widthSetting(
+			__( 'Select width column', 'woocommerce-product-addon' )
+		),
+		visibility: setting(
+			'select',
+			__( 'Visibility', 'woocommerce-product-addon' ),
+			__(
+				'Set field visibility based on user.',
+				'woocommerce-product-addon'
+			),
+			{
+				options: visibilityOptions(),
+				default: 'everyone',
+			}
+		),
+		visibility_role: visibilityRoleSetting(),
+		desc_tooltip: descTooltipSetting(),
+		onetime: fixedFeeSetting(),
+		required: requiredSetting(),
+		logic: logicSetting(),
+		conditions: conditionsSetting(),
+	};
+}
+
 function dateSettings(): SettingSchema {
 	return {
 		title: titleSetting(),
@@ -1018,6 +1121,7 @@ export const builtinFieldUiSchemas: Record< string, SettingSchema > = {
 	select: selectSettings(),
 	checkbox: checkboxSettings(),
 	radio: radioSettings(),
+	switcher: switcherSettings(),
 	date: dateSettings(),
 	timezone: timezoneSettings(),
 	color: colorSettings(),

@@ -1,7 +1,8 @@
 /**
- * Two-column grid with full-width rows for textarea / block controls.
+ * Two-column grid with full-width rows for most textarea / block controls.
+ * The `description` setting stays one column so it aligns with Title / Data name.
  */
-import { Steps, Grid, GridItem } from '@chakra-ui/react';
+import { Grid, GridItem } from '@chakra-ui/react';
 import { renderSettingRow } from './schemaSettingControl';
 import type { SettingRowContext } from './types/fieldModal';
 
@@ -23,7 +24,7 @@ export function ResponsiveFieldGrid( { entries, ctx }: ResponsiveFieldGridProps 
 			{ entries.map( ( { key, meta }: { key: string; meta: Record< string, unknown > } ) => {
 				const type = meta.type ? String( meta.type ) : 'text';
 				const fullRow =
-					type === 'textarea' ||
+					( type === 'textarea' && key !== 'description' ) ||
 					type === 'html-conditions' ||
 					type === 'paired' ||
 					type === 'paired-cropper' ||
