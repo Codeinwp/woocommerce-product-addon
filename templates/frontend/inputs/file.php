@@ -27,8 +27,6 @@ $file_cost     = apply_filters( 'ppom_option_price', $file_cost );
 
 $field_label = ( $file_cost == '' ) ? $fm->field_label() : $fm->field_label() . ' - ' . wc_price( $file_cost );
 $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-addon' ) : $btn_label );
-$file_types  = $fm->get_meta_value( 'file_types' );
-$file_size   = $fm->get_meta_value( 'file_size' );
 ?>
 
 
@@ -56,25 +54,7 @@ $file_size   = $fm->get_meta_value( 'file_size' );
 		</a>
 		<span class="ppom-dragdrop-text"><?php esc_html_e( 'Drag File Here', 'woocommerce-product-addon' ); ?></span>
 		<span class="ppom-field-notice">
-			<?php
-			$notice = '';
-			if ( $file_types ) {
-				$notice = sprintf(
-					// translators: $s is accepted file types.
-					__( 'Accepted formats: %s.', 'woocommerce-product-addon' ),
-					esc_html( strtoupper( $file_types ) )
-				); 
-			}
-			if ( $file_size ) {
-				$notice .= ' ' . sprintf(
-					// translators: $s is max file size.
-					__( 'Max size: %s', 'woocommerce-product-addon' ),
-					esc_html( strtoupper( $file_size ) )
-				);
-			}
-	
-			echo esc_html( $notice );
-			?>
+			<?php echo esc_html( \PPOM\Support\Helpers::get_file_uploader_notice( $fm ) ); ?>
 		</span>
 	</div> <!-- ppom-file-container -->
 

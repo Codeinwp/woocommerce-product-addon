@@ -31,8 +31,6 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $product );
 
 $input_classes = $fm->input_classes() . ' ppom-cropping-size';
-$file_types    = $fm->get_meta_value( 'file_types' );
-$file_size     = $fm->get_meta_value( 'file_size' );
 
 // ppom_pa($input_classes);
 ?>
@@ -58,25 +56,7 @@ $file_size     = $fm->get_meta_value( 'file_size' );
 		</a>
 		<span class="ppom-dragdrop-text"><?php esc_html_e( 'Drag file/directory here', 'woocommerce-product-addon' ); ?></span>
 		<span class="ppom-field-notice">
-			<?php
-			$notice = '';
-			if ( $file_types ) {
-				$notice = sprintf(
-					// translators: $s is accepted file types.
-					__( 'Accepted formats: %s.', 'woocommerce-product-addon' ),
-					esc_html( strtoupper( $file_types ) )
-				); 
-			}
-			if ( $file_size ) {
-				$notice .= ' ' . sprintf(
-					// translators: $s is max file size.
-					__( 'Max size: %s', 'woocommerce-product-addon' ),
-					esc_html( strtoupper( $file_size ) )
-				);
-			}
-	
-			echo esc_html( $notice );
-			?>
+			<?php echo esc_html( \PPOM\Support\Helpers::get_file_uploader_notice( $fm ) ); ?>
 		</span>
 	</div> <!-- ppom-file-container -->
 

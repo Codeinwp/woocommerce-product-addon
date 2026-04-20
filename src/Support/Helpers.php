@@ -2581,4 +2581,33 @@ final class Helpers {
 
 		return $updated_value;
 	}
+
+	/**
+	 * Get file uploader notice text based on field meta.
+	 *
+	 * @param \PPOM_InputManager $meta_field Meta field object.
+	 * @return string Notice text to display for file uploader field.
+	 */
+	public static function get_file_uploader_notice( $meta_field ) {
+		$file_types = $meta_field->get_meta_value( 'file_types' );
+		$file_size  = $meta_field->get_meta_value( 'file_size' );
+
+		$notice = '';
+		if ( $file_types ) {
+			$notice = sprintf(
+				// translators: %s is the accepted file types.
+				__( 'Accepted formats: %s.', 'woocommerce-product-addon' ),
+				esc_html( strtoupper( $file_types ) )
+			);
+		}
+		if ( $file_size ) {
+			$notice .= ' ' . sprintf(
+				// translators: %s is the maximum file size.
+				__( 'Max size: %s', 'woocommerce-product-addon' ),
+				esc_html( strtoupper( $file_size ) )
+			);
+		}
+
+		return $notice;
+	}
 }
