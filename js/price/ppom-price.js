@@ -1035,7 +1035,6 @@ function ppom_update_get_prices() {
 			}
 		});
 
-		console.log(parsedKeys);
 		parsedKeys.sort((a, b) => {
 			const aVal = a.type === 'range' ? a.start : a.value;
 			const bVal = b.type === 'range' ? b.start : b.value;
