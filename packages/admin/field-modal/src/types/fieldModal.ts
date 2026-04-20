@@ -98,10 +98,6 @@ export interface GroupedFieldSectionsProps extends FieldEditorBaseProps {
 	sections: Array< { label: string; keys: string[] } >;
 }
 
-export interface FieldSettingsFormProps extends FieldEditorBaseProps {
-	fieldType: string;
-}
-
 export interface SettingRowContext {
 	values: FieldRow;
 	onChange: Dispatch< SetStateAction< FieldRow | null > >;
@@ -143,6 +139,8 @@ export interface FieldModalManageStepProps {
 	selectedId: string | null;
 	editDraft: FieldRow | null;
 	schemaLoading: boolean;
+	/** Set when lazy `GET .../schema/{type}` fails or returns no schema. */
+	schemaFetchError?: string;
 	activeSchema: SchemaObject | null;
 	TypedEditor: FieldEditorComponent | null;
 	onEditDraftChange: Dispatch< SetStateAction< FieldRow | null > >;

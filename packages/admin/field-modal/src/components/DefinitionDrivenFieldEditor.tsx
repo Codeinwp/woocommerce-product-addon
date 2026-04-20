@@ -72,29 +72,35 @@ export function DefinitionDrivenFieldEditor( {
 		);
 	}
 
+	function renderWidgetBlock( block: Extract< FieldUiBlock, { kind: 'widget' } > ) {
+		const ctx: WidgetRenderContext = {
+			...widgetCtxBase,
+			widgetProps: block.props,
+		};
+		return (
+			<Fragment key={ block.id }>
+				{ renderFieldWidget( block.widget, ctx ) }
+			</Fragment>
+		);
+	}
+
+	function renderBlock( block: FieldUiBlock ) {
+		if ( block.kind === 'section' ) {
+			return renderSectionCard( block );
+		}
+		return renderWidgetBlock( block );
+	}
+
 	function renderSettingsTabContent( blocks: FieldUiBlock[] ) {
 		const primary: Array< JSX.Element > = [];
-		const advancedSections: Array< Extract< FieldUiBlock, { kind: 'section' } > > =
-			[];
+		const advanced: Array< JSX.Element > = [];
 
 		blocks.forEach( ( block ) => {
-			if ( block.kind === 'widget' ) {
-				const ctx: WidgetRenderContext = {
-					...widgetCtxBase,
-					widgetProps: block.props,
-				};
-				primary.push(
-					<Fragment key={ block.id }>
-						{ renderFieldWidget( block.widget, ctx ) }
-					</Fragment>
-				);
-				return;
-			}
 			if ( block.advanced ) {
-				advancedSections.push( block );
+				advanced.push( renderBlock( block ) );
 				return;
 			}
-			primary.push( renderSectionCard( block ) );
+			primary.push( renderBlock( block ) );
 		} );
 
 		const showAdvanced =
@@ -105,14 +111,12 @@ export function DefinitionDrivenFieldEditor( {
 		return (
 			<VStack align="stretch" gap={ 3 }>
 				{ primary }
-				{ advancedSections.length > 0 && (
+				{ advanced.length > 0 && (
 					<AdvancedSettingsPanel
 						showLabel={ showAdvanced }
 						hideLabel={ hideAdvanced }
 					>
-						{ advancedSections.map( ( block ) =>
-							renderSectionCard( block )
-						) }
+						{ advanced }
 					</AdvancedSettingsPanel>
 				) }
 			</VStack>
@@ -122,20 +126,7 @@ export function DefinitionDrivenFieldEditor( {
 	function renderPlainTabContent( blocks: FieldUiBlock[] ) {
 		return (
 			<VStack align="stretch" gap={ 3 }>
-				{ blocks.map( ( block ) => {
-					if ( block.kind === 'section' ) {
-						return renderSectionCard( block );
-					}
-					const ctx: WidgetRenderContext = {
-						...widgetCtxBase,
-						widgetProps: block.props,
-					};
-					return (
-						<Fragment key={ block.id }>
-							{ renderFieldWidget( block.widget, ctx ) }
-						</Fragment>
-					);
-				} ) }
+				{ blocks.map( ( block ) => renderBlock( block ) ) }
 			</VStack>
 		);
 	}

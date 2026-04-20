@@ -7,7 +7,7 @@
  * driven by the schema, using the fallback section blueprint.
  */
 import { useMemo } from '@wordpress/element';
-import { VStack, Text } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -96,22 +96,13 @@ export function ImageselectFieldEditor( {
 							sections={ primarySettings }
 						/>
 					) }
-					<VStack align="stretch" gap={ 2 }>
-						<ImagesSelectEditor
-							values={ values }
-							onChange={ onChange }
-							i18n={ i18n }
-							title={ imagesTitle }
-							variant="imageselect"
-						/>
-						<Text
-							fontSize="xs"
-							color="gray.500"
-							lineHeight="1.5"
-						>
-							{ i18n.legacyEditorHint }
-						</Text>
-					</VStack>
+					<ImagesSelectEditor
+						values={ values }
+						onChange={ onChange }
+						i18n={ i18n }
+						title={ imagesTitle }
+						variant="imageselect"
+					/>
 					{ advancedSectionsOnly.length > 0 && (
 						<LegacyAdvancedFieldStack
 							{ ...shared }

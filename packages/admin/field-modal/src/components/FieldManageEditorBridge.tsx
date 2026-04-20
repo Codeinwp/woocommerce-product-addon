@@ -112,8 +112,8 @@ function FieldManageEditorBridgeInner( {
 	selectedId: _selectedId,
 	editDraft,
 	schemaLoading,
+	schemaFetchError,
 	activeSchema,
-	TypedEditor,
 	onEditDraftChange,
 	ppomFieldIndex,
 	modalContext,
@@ -190,14 +190,23 @@ function FieldManageEditorBridgeInner( {
 
 	return (
 		<VStack align="stretch" gap={ 3 }>
-			{ schemaLoading && ! activeSchema && (
+			{ schemaFetchError && (
+				<Alert.Root status="error" borderRadius="md">
+					<Alert.Indicator />
+					{ schemaFetchError }
+				</Alert.Root>
+			) }
+			{ schemaLoading && ! activeSchema && ! schemaFetchError && (
 				<VStack gap={ 2 } align="stretch">
 					<Skeleton height="36px" />
 					<Skeleton height="36px" />
 					<Skeleton height="72px" />
 				</VStack>
 			) }
-			{ activeSchema && route.kind === 'definition' && uiDefinition && (
+			{ activeSchema &&
+				! schemaFetchError &&
+				route.kind === 'definition' &&
+				uiDefinition && (
 				<DefinitionDrivenFieldEditor
 					definition={ uiDefinition }
 					mergedBuilderFields={ mergedBuilderFields }
@@ -207,16 +216,6 @@ function FieldManageEditorBridgeInner( {
 					i18n={ i18n }
 					ppomFieldIndex={ ppomFieldIndex }
 					form={ form }
-					modalContext={ modalContext }
-				/>
-			) }
-			{ activeSchema && route.kind === 'legacyReact' && TypedEditor && (
-				<TypedEditor
-					schema={ activeSchema }
-					values={ values }
-					onChange={ bridgeOnChange }
-					i18n={ i18n }
-					ppomFieldIndex={ ppomFieldIndex }
 					modalContext={ modalContext }
 				/>
 			) }
@@ -230,14 +229,16 @@ function FieldManageEditorBridgeInner( {
 					/>
 				) }
 			{ ! schemaLoading &&
+				! schemaFetchError &&
 				! activeSchema &&
 				editDraft.type &&
-				route.kind !== 'unknown' &&
-				route.kind !== 'legacyPhp' && (
+				route.kind === 'definition' && (
 				<>
 					<Alert.Root status="info">
 						<Alert.Indicator />
-						{ i18n.unsupportedControl }
+						{ i18n.fieldModalEditorUnavailable ||
+							i18n.unsupportedControl ||
+							'Settings for this field could not be loaded in this editor.' }
 					</Alert.Root>
 				</>
 			) }

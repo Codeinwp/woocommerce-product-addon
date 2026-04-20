@@ -15,6 +15,8 @@ export interface ModalReducerState {
 	selectedId: string | null;
 	schemasCache: Record< string, Record< string, unknown > >;
 	schemaLoading: boolean;
+	/** Lazy REST schema fetch failed for the current field type (distinct from global `error`). */
+	schemaFetchError: string;
 	modalEntry: 'picker' | 'manage';
 }
 
@@ -32,6 +34,7 @@ export type ModalReducerAction =
 	  }
 	| { type: 'LOAD_CONTEXT_ERROR'; message: string }
 	| { type: 'CLEAR_ERROR' }
+	| { type: 'SET_SCHEMA_FETCH_ERROR'; message: string }
 	| {
 			type: 'SET_SCHEMA_FOR_TYPE';
 			typeKey: string;

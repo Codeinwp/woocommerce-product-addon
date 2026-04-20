@@ -114,6 +114,11 @@ export function EmojisFieldEditor( {
 		/>
 	) : null;
 
+	const settingsSections: LegacySectionConfig[] = [
+		...sectionsBefore,
+		...sectionsAfterSettings,
+	];
+
 	return (
 		<SettingsConditionsTabs
 			i18n={ i18n }
@@ -122,12 +127,13 @@ export function EmojisFieldEditor( {
 				<VStack align="stretch" gap={ 3 }>
 					<LegacyAdvancedFieldStack
 						{ ...shared }
-						sections={ sectionsBefore }
-					/>
-					{ matrixBlock }
-					<LegacyAdvancedFieldStack
-						{ ...shared }
-						sections={ sectionsAfterSettings }
+						sections={ settingsSections }
+						{ ...( matrixBlock
+							? {
+									advancedInsertionAfterIndex: 0,
+									advancedInsertion: matrixBlock,
+							  }
+							: {} ) }
 					/>
 				</VStack>
 			}

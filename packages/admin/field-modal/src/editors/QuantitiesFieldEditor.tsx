@@ -91,6 +91,11 @@ export function QuantitiesFieldEditor( {
 	const hasConditions = sectionsAfterConditions.length > 0;
 	const showRepeaterTab = shouldShowConditionalRepeaterTab( modalContext );
 
+	const settingsSections: LegacySectionConfig[] = [
+		...sectionsBefore,
+		...sectionsAfterSettings,
+	];
+
 	const shared = {
 		schema,
 		values,
@@ -108,19 +113,17 @@ export function QuantitiesFieldEditor( {
 				<VStack align="stretch" gap={ 3 }>
 					<LegacyAdvancedFieldStack
 						{ ...shared }
-						sections={ sectionsBefore }
-					/>
-					<PairedQuantityEditor
-						fieldKey="options"
-						title={ optionsTitle }
-						description={ optionsDesc }
-						values={ values }
-						onChange={ onChange }
-						i18n={ i18n }
-					/>
-					<LegacyAdvancedFieldStack
-						{ ...shared }
-						sections={ sectionsAfterSettings }
+						sections={ settingsSections }
+						betweenPrimaryAndAdvanced={
+							<PairedQuantityEditor
+								fieldKey="options"
+								title={ optionsTitle }
+								description={ optionsDesc }
+								values={ values }
+								onChange={ onChange }
+								i18n={ i18n }
+							/>
+						}
 					/>
 				</VStack>
 			}

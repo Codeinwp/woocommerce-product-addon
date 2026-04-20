@@ -1,6 +1,7 @@
 /**
- * Splits typed-editor section configs into primary vs advanced (collapsible), matching FieldSettingsForm.
+ * Splits typed-editor section configs into primary vs advanced (collapsible).
  */
+import type { ReactNode } from 'react';
 import { useMemo } from '@wordpress/element';
 import { VStack } from '@chakra-ui/react';
 import { AdvancedSettingsPanel } from '../components/AdvancedSettingsPanel';
@@ -18,6 +19,20 @@ export type LegacyAdvancedFieldStackProps = Omit<
 	'sections'
 > & {
 	sections: LegacySectionConfig[];
+	/**
+	 * Optional content rendered inside the advanced panel after the advanced section
+	 * at `advancedInsertionAfterIndex` (0 = after the first advanced section card).
+	 * Use to embed paired editors (e.g. matrices) between grouped schema sections
+	 * inside the same collapsible region — avoids a second toggle from a second stack.
+	 */
+	advancedInsertionAfterIndex?: number;
+	advancedInsertion?: ReactNode;
+	/**
+	 * Rendered after primary (non-advanced) sections and before the advanced toggle.
+	 * Use when a custom editor must stay visible even while advanced settings are collapsed
+	 * (e.g. cropper viewport, image/audio lists) — avoids hiding it inside the advanced panel.
+	 */
+	betweenPrimaryAndAdvanced?: ReactNode;
 };
 
 function splitSections(
@@ -38,6 +53,9 @@ function splitSections(
 /** Renders grouped settings: always-visible sections first, then “Show advanced settings” for the rest. */
 export function LegacyAdvancedFieldStack( {
 	sections,
+	advancedInsertionAfterIndex,
+	advancedInsertion,
+	betweenPrimaryAndAdvanced,
 	i18n,
 	...shared
 }: LegacyAdvancedFieldStackProps ) {
@@ -50,6 +68,48 @@ export function LegacyAdvancedFieldStack( {
 	const hideLabel =
 		i18n.hideAdvancedSettings || 'Hide advanced settings';
 
+	const insertionIdx =
+		advancedInsertion != null &&
+		typeof advancedInsertionAfterIndex === 'number' &&
+		advancedInsertionAfterIndex >= 0
+			? advancedInsertionAfterIndex
+			: null;
+
+	let advancedPanelBody: ReactNode = null;
+	if ( advanced.length > 0 ) {
+		if ( insertionIdx === null ) {
+			advancedPanelBody = (
+				<GroupedFieldSections
+					{ ...shared }
+					i18n={ i18n }
+					sections={ advanced }
+				/>
+			);
+		} else {
+			const before = advanced.slice( 0, insertionIdx + 1 );
+			const after = advanced.slice( insertionIdx + 1 );
+			advancedPanelBody = (
+				<>
+					{ before.length > 0 && (
+						<GroupedFieldSections
+							{ ...shared }
+							i18n={ i18n }
+							sections={ before }
+						/>
+					) }
+					{ advancedInsertion }
+					{ after.length > 0 && (
+						<GroupedFieldSections
+							{ ...shared }
+							i18n={ i18n }
+							sections={ after }
+						/>
+					) }
+				</>
+			);
+		}
+	}
+
 	return (
 		<VStack align="stretch" gap={ 3 }>
 			{ primary.length > 0 && (
@@ -59,16 +119,13 @@ export function LegacyAdvancedFieldStack( {
 					sections={ primary }
 				/>
 			) }
+			{ betweenPrimaryAndAdvanced }
 			{ advanced.length > 0 && (
 				<AdvancedSettingsPanel
 					showLabel={ showLabel }
 					hideLabel={ hideLabel }
 				>
-					<GroupedFieldSections
-						{ ...shared }
-						i18n={ i18n }
-						sections={ advanced }
-					/>
+					{ advancedPanelBody }
 				</AdvancedSettingsPanel>
 			) }
 		</VStack>

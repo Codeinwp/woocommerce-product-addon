@@ -9,15 +9,13 @@ import {
 	fetchFieldTypeSchema,
 	saveFieldGroup,
 } from '../services/fieldModalApi';
-import { getFieldEditor } from '../editors/registry';
-import { getFieldUiDefinition, hasFieldUiDefinition } from '../definitions/registry';
+import { getFieldUiDefinition } from '../definitions/registry';
 import { newClientId, withClientIds } from '../utils/clientIds';
 import { readGroupFromForm } from '../utils/legacyGroupForm';
 import { createInitialModalState, modalReducer } from '../state/modalReducer';
 import type {
 	FieldModalContextPayload,
 	FieldRow,
-	FieldEditorComponent,
 	ModalContextValue,
 } from '../types/fieldModal';
 
@@ -97,32 +95,47 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		};
 	}, [ editDraft?.type ] );
 
-	const fetchSchemaForType = useCallback( async ( type: string | undefined ) => {
-		if ( ! type ) {
-			return null;
-		}
-		const t = String( type ).toLowerCase();
-		dispatch( { type: 'SET_SCHEMA_LOADING', loading: true } );
-		try {
-			const schema = await fetchFieldTypeSchema( t );
-			if ( schema ) {
-				dispatch( {
-					type: 'SET_SCHEMA_FOR_TYPE',
-					typeKey: t,
-					schema,
-				} );
+	const ctx = state.ctx;
+	const i18n = ctx?.i18n || {};
+
+	const fetchSchemaForType = useCallback(
+		async ( type: string | undefined ) => {
+			if ( ! type ) {
+				return null;
 			}
-			return schema;
-		} catch ( e ) {
-			dispatch( {
-				type: 'LOAD_CONTEXT_ERROR',
-				message: errorMessage( e ),
-			} );
-			return null;
-		} finally {
-			dispatch( { type: 'SET_SCHEMA_LOADING', loading: false } );
-		}
-	}, [] );
+			const t = String( type ).toLowerCase();
+			dispatch( { type: 'SET_SCHEMA_FETCH_ERROR', message: '' } );
+			dispatch( { type: 'SET_SCHEMA_LOADING', loading: true } );
+			const emptyMsg =
+				i18n.schemaEmptyResponse ||
+				'The server did not return settings for this field type.';
+			try {
+				const schema = await fetchFieldTypeSchema( t );
+				if ( schema ) {
+					dispatch( {
+						type: 'SET_SCHEMA_FOR_TYPE',
+						typeKey: t,
+						schema,
+					} );
+					return schema;
+				}
+				dispatch( {
+					type: 'SET_SCHEMA_FETCH_ERROR',
+					message: emptyMsg,
+				} );
+				return null;
+			} catch ( e ) {
+				dispatch( {
+					type: 'SET_SCHEMA_FETCH_ERROR',
+					message: errorMessage( e ),
+				} );
+				return null;
+			} finally {
+				dispatch( { type: 'SET_SCHEMA_LOADING', loading: false } );
+			}
+		},
+		[ i18n.schemaEmptyResponse ]
+	);
 
 	useEffect( () => {
 		if ( ! state.open || ! editDraft?.type || localDefinitionSchema ) {
@@ -165,9 +178,6 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		state.fields,
 		state.selectedId,
 	] );
-
-	const ctx = state.ctx;
-	const i18n = ctx?.i18n || {};
 
 	const ppomFieldIndex =
 		state.selectedId && state.fields.length
@@ -313,13 +323,6 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		]
 	);
 
-	const typedEditorSlug =
-		editDraft && editDraft.type ? String( editDraft.type ) : '';
-	const TypedEditor: FieldEditorComponent | null =
-		typedEditorSlug && ! hasFieldUiDefinition( typedEditorSlug )
-			? getFieldEditor( typedEditorSlug )
-			: null;
-
 	const patchFieldRowFromForm: Dispatch<
 		SetStateAction< FieldRow | null >
 	> = useCallback(
@@ -357,6 +360,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		editDraft,
 		schemasCache: state.schemasCache,
 		schemaLoading: state.schemaLoading,
+		schemaFetchError: state.schemaFetchError,
 		modalEntry: state.modalEntry,
 		i18n,
 		ppomFieldIndex,
@@ -364,7 +368,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		fieldTypeLabel,
 		activeSchema,
 		modalContext,
-		TypedEditor,
+		TypedEditor: null,
 		setPickerOpen: ( open: boolean ) =>
 			dispatch( { type: 'SET_PICKER_OPEN', open } ),
 		setPickerQuery: ( query: string ) =>

@@ -99,6 +99,11 @@ export function SelectQtyFieldEditor( {
 		/>
 	) : null;
 
+	const settingsSections: LegacySectionConfig[] = [
+		...sectionsBefore,
+		...sectionsAfterSettings,
+	];
+
 	return (
 		<SettingsConditionsTabs
 			i18n={ i18n }
@@ -107,12 +112,10 @@ export function SelectQtyFieldEditor( {
 				<VStack align="stretch" gap={ 3 }>
 					<LegacyAdvancedFieldStack
 						{ ...shared }
-						sections={ sectionsBefore }
-					/>
-					{ pairedBlock }
-					<LegacyAdvancedFieldStack
-						{ ...shared }
-						sections={ sectionsAfterSettings }
+						sections={ settingsSections }
+						{ ...( pairedBlock
+							? { betweenPrimaryAndAdvanced: pairedBlock }
+							: {} ) }
 					/>
 				</VStack>
 			}

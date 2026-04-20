@@ -21,6 +21,23 @@ export function readControlDescription(
 	return meta.desc ? String( meta.desc ) : '';
 }
 
+/**
+ * Whether the setting should show Chakra `Field.RequiredIndicator` on its label.
+ * Honors `meta.required` when set; otherwise defaults for keys that must be filled to save.
+ */
+export function readControlLabelRequired(
+	meta: Record< string, unknown >,
+	settingKey: string
+): boolean {
+	if ( meta.required === true ) {
+		return true;
+	}
+	if ( meta.required === false ) {
+		return false;
+	}
+	return settingKey === 'title' || settingKey === 'data_name';
+}
+
 export function readControlValue(
 	settingKey: string,
 	ctx: SettingRowContext

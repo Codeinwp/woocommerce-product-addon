@@ -1,7 +1,7 @@
 /**
  * Image field type: grouped settings + ImagesSelectEditor for the "images" key.
  */
-import { VStack, Text } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { editorSectionIsConditions } from '../schemaTabs';
 import {
 	SettingsConditionsTabs,
@@ -92,6 +92,11 @@ export function ImageFieldEditor( {
 	const hasConditions = sectionsAfterConditions.length > 0;
 	const showRepeaterTab = shouldShowConditionalRepeaterTab( modalContext );
 
+	const settingsSections: LegacySectionConfig[] = [
+		...sectionsBefore,
+		...sectionsAfterSettings,
+	];
+
 	const shared = {
 		schema,
 		values,
@@ -109,27 +114,16 @@ export function ImageFieldEditor( {
 				<VStack align="stretch" gap={ 3 }>
 					<LegacyAdvancedFieldStack
 						{ ...shared }
-						sections={ sectionsBefore }
-					/>
-					<VStack align="stretch" gap={ 2 }>
-						<ImagesSelectEditor
-							values={ values }
-							onChange={ onChange }
-							i18n={ i18n }
-							title={ imagesTitle }
-							variant="image"
-						/>
-						<Text
-							fontSize="xs"
-							color="gray.500"
-							lineHeight="1.5"
-						>
-							{ i18n.legacyEditorHint }
-						</Text>
-					</VStack>
-					<LegacyAdvancedFieldStack
-						{ ...shared }
-						sections={ sectionsAfterSettings }
+						sections={ settingsSections }
+						betweenPrimaryAndAdvanced={
+							<ImagesSelectEditor
+								values={ values }
+								onChange={ onChange }
+								i18n={ i18n }
+								title={ imagesTitle }
+								variant="image"
+							/>
+						}
 					/>
 				</VStack>
 			}

@@ -1,15 +1,8 @@
 /**
- * Button toggle that reveals additional field sections (same card style as primary settings).
+ * Switch toggle that reveals additional field sections (switch first, label after).
  */
-import {
-	Box,
-	Button,
-	Collapsible,
-	Text,
-	VStack,
-	useCollapsibleContext,
-} from '@chakra-ui/react';
-import { LuChevronDown } from 'react-icons/lu';
+import { useId, useState } from '@wordpress/element';
+import { HStack, Switch, Text, VStack } from '@chakra-ui/react';
 
 export interface AdvancedSettingsPanelProps {
 	/** Label when the panel is collapsed (e.g. “Show advanced settings”). */
@@ -19,63 +12,49 @@ export interface AdvancedSettingsPanelProps {
 	children: React.ReactNode;
 }
 
-function ToggleButtonLabel( {
-	showLabel,
-	hideLabel,
-}: Pick< AdvancedSettingsPanelProps, 'showLabel' | 'hideLabel' > ) {
-	const ctx = useCollapsibleContext();
-	const open = ctx?.open ?? false;
-	return (
-		<Text as="span" fontWeight="medium" color="gray.700">
-			{ open ? hideLabel : showLabel }
-		</Text>
-	);
-}
-
 export function AdvancedSettingsPanel( {
 	showLabel,
 	hideLabel,
 	children,
 }: AdvancedSettingsPanelProps ) {
+	const [ open, setOpen ] = useState( false );
+	const switchId = useId();
+	const labelText = open ? hideLabel : showLabel;
+
 	return (
-		<Collapsible.Root defaultOpen={ false } lazyMount>
-			<VStack align="stretch" gap={ 0 } width="100%">
-				<Collapsible.Trigger asChild>
-					<Button
-						type="button"
-						variant="outline"
-						width="100%"
-						justifyContent="space-between"
-						size="sm"
-						px={ 3 }
-						py={ 2 }
-						fontWeight="normal"
-						borderColor="gray.200"
-						_hover={ { bg: 'gray.50' } }
-					>
-						<ToggleButtonLabel
-							showLabel={ showLabel }
-							hideLabel={ hideLabel }
-						/>
-						<Collapsible.Indicator
-							display="flex"
-							alignItems="center"
-							justifyContent="center"
-						>
-							<Box
-								as={ LuChevronDown }
-								boxSize="1.1rem"
-								color="gray.500"
-							/>
-						</Collapsible.Indicator>
-					</Button>
-				</Collapsible.Trigger>
-				<Collapsible.Content>
-					<VStack align="stretch" gap={ 3 } pt={ 3 } width="100%">
-						{ children }
-					</VStack>
-				</Collapsible.Content>
-			</VStack>
-		</Collapsible.Root>
+		<VStack align="stretch" gap={ 0 } width="100%">
+			<HStack align="center" gap={ 2.5 } width="100%" py={ 1 }>
+				<Switch.Root
+					colorPalette="blue"
+					checked={ open }
+					onCheckedChange={ ( { checked } ) =>
+						setOpen( Boolean( checked ) )
+					}
+					flexShrink={ 0 }
+				>
+					<Switch.HiddenInput id={ switchId } />
+					<Switch.Control />
+				</Switch.Root>
+				<Text
+					as="label"
+					htmlFor={ switchId }
+					flex="1"
+					minW={ 0 }
+					mb={ 0 }
+					fontWeight="medium"
+					fontSize="sm"
+					color="gray.700"
+					cursor="pointer"
+					lineHeight="1.4"
+				>
+					{ labelText }
+				</Text>
+			</HStack>
+			{ open ? (
+				<VStack align="stretch" gap={ 3 } pt={ 3 } width="100%">
+					{ children }
+				</VStack>
+			) : null }
+		</VStack>
 	);
 }

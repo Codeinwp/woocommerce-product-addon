@@ -22,6 +22,8 @@ export type FieldUiBlock =
 			tab: FieldTabId;
 			widget: string;
 			ownedKeys: string[];
+			/** When true, rendered inside the shared “Advanced settings” disclosure (Settings tab only). */
+			advanced?: boolean;
 			props?: Record< string, unknown >;
 	  };
 
@@ -40,14 +42,24 @@ export type SettingMetaType =
 	| 'textarea'
 	| 'checkbox'
 	| 'select'
+	| 'number'
+	| 'date'
+	| 'switch'
 	| 'color'
 	| 'html-conditions'
 	| 'paired'
+	| 'paired-cropper'
 	| 'paired-switch'
 	| 'paired-quantity'
+	| 'paired-palettes'
+	| 'paired-pricematrix'
+	| 'bulk-quantity'
 	| 'chained_options'
 	| 'fonts_paired'
 	| 'conditional-images'
+	| 'pre-audios'
+	| 'pre-images'
+	| 'imageselect'
 	| 'vqmatrix-colunm'
 	| 'vqmatrix-row';
 
@@ -64,6 +76,8 @@ export interface SettingMeta {
 	col_classes?: string[];
 	link?: string;
 	hidden?: boolean;
+	/** When true, show a required marker on the control label (Chakra `Field.RequiredIndicator`). */
+	required?: boolean;
 	[ key: string ]: unknown;
 }
 

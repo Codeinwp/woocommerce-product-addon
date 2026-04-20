@@ -9,13 +9,7 @@ import type { I18nDict } from './types/fieldModal';
 export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 	{
 		labelKey: 'editorSectionBasic',
-		keys: [
-			'title',
-			'data_name',
-			'description',
-			'placeholder',
-			'required',
-		],
+		keys: [ 'title', 'data_name', 'description', 'placeholder' ],
 		advanced: false,
 	},
 	{
@@ -112,6 +106,7 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 	{
 		labelKey: 'editorSectionBehavior',
 		keys: [
+			'required',
 			'jquery_dp',
 			'no_weekends',
 			'past_dates',

@@ -8,6 +8,7 @@ import {
 	labelProps,
 	type PrimitiveSettingControlProps,
 	readControlDescription,
+	readControlLabelRequired,
 	readControlTitle,
 	readControlValue,
 	renderHelperText,
@@ -22,6 +23,7 @@ export function ColorControl( {
 }: PrimitiveSettingControlProps ) {
 	const title = readControlTitle( settingKey, meta );
 	const description = readControlDescription( meta );
+	const labelRequired = readControlLabelRequired( meta, settingKey );
 	const AppField = ctx.form?.AppField;
 
 	if ( AppField ) {
@@ -30,8 +32,14 @@ export function ColorControl( {
 				{ ( field: any ) => {
 					const error = field.state.meta.errors?.[ 0 ];
 					return (
-						<Field.Root invalid={ Boolean( error ) }>
-							<Field.Label { ...labelProps }>{ title }</Field.Label>
+						<Field.Root
+							invalid={ Boolean( error ) }
+							required={ labelRequired }
+						>
+							<Field.Label { ...labelProps }>
+								{ title }
+								<Field.RequiredIndicator />
+							</Field.Label>
 							<ColorPicker.Root
 								value={ colorFromStoredValue( field.state.value ) }
 								onValueChange={ ( details ) =>
@@ -70,8 +78,11 @@ export function ColorControl( {
 	}
 
 	return (
-		<Field.Root>
-			<Field.Label { ...labelProps }>{ title }</Field.Label>
+		<Field.Root required={ labelRequired }>
+			<Field.Label { ...labelProps }>
+				{ title }
+				<Field.RequiredIndicator />
+			</Field.Label>
 			<ColorPicker.Root
 				value={ colorFromStoredValue( readControlValue( settingKey, ctx ) ) }
 				onValueChange={ ( details ) =>

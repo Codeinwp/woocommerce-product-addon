@@ -64,6 +64,11 @@ export function AudioFieldEditor( {
 	const hasConditions = sectionsAfterConditions.length > 0;
 	const showRepeaterTab = shouldShowConditionalRepeaterTab( modalContext );
 
+	const settingsSections: LegacySectionConfig[] = [
+		...sectionsBefore,
+		...sectionsAfterSettings,
+	];
+
 	const shared = {
 		schema,
 		values,
@@ -81,17 +86,15 @@ export function AudioFieldEditor( {
 				<VStack align="stretch" gap={ 3 }>
 					<LegacyAdvancedFieldStack
 						{ ...shared }
-						sections={ sectionsBefore }
-					/>
-					<AudiosSelectEditor
-						values={ values }
-						onChange={ onChange }
-						i18n={ i18n }
-						title={ audioSectionTitle }
-					/>
-					<LegacyAdvancedFieldStack
-						{ ...shared }
-						sections={ sectionsAfterSettings }
+						sections={ settingsSections }
+						betweenPrimaryAndAdvanced={
+							<AudiosSelectEditor
+								values={ values }
+								onChange={ onChange }
+								i18n={ i18n }
+								title={ audioSectionTitle }
+							/>
+						}
 					/>
 				</VStack>
 			}

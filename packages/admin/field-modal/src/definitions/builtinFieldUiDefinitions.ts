@@ -27,7 +27,7 @@ const TEXT_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'basic',
 		tab: 'settings',
 		labelKey: 'editorSectionBasic',
-		keys: [ 'title', 'data_name', 'description', 'placeholder', 'required' ],
+		keys: [ 'title', 'data_name', 'description', 'placeholder' ],
 	},
 	{
 		kind: 'section',
@@ -58,7 +58,7 @@ const TEXT_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'behavior',
 		tab: 'settings',
 		labelKey: 'editorSectionBehavior',
-		keys: [ 'onetime', 'use_regex', 'desc_tooltip' ],
+		keys: [ 'onetime', 'use_regex', 'desc_tooltip', 'required' ],
 		advanced: true,
 	},
 	{
@@ -80,7 +80,7 @@ const TEXTAREA_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'basic',
 		tab: 'settings',
 		labelKey: 'editorSectionBasic',
-		keys: [ 'title', 'data_name', 'description', 'placeholder', 'required' ],
+		keys: [ 'title', 'data_name', 'description', 'placeholder' ],
 	},
 	{
 		kind: 'section',
@@ -111,7 +111,7 @@ const TEXTAREA_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'behavior',
 		tab: 'settings',
 		labelKey: 'editorSectionBehavior',
-		keys: [ 'rich_editor', 'desc_tooltip' ],
+		keys: [ 'rich_editor', 'desc_tooltip', 'required' ],
 		advanced: true,
 	},
 	{
@@ -129,7 +129,7 @@ const EMAIL_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'basic',
 		tab: 'settings',
 		labelKey: 'editorSectionBasic',
-		keys: [ 'title', 'data_name', 'description', 'placeholder', 'required' ],
+		keys: [ 'title', 'data_name', 'description', 'placeholder' ],
 	},
 	{
 		kind: 'section',
@@ -152,7 +152,7 @@ const EMAIL_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'behavior',
 		tab: 'settings',
 		labelKey: 'editorSectionBehavior',
-		keys: [ 'desc_tooltip' ],
+		keys: [ 'desc_tooltip', 'required' ],
 		advanced: true,
 	},
 	{
@@ -170,7 +170,7 @@ const NUMBER_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'basic',
 		tab: 'settings',
 		labelKey: 'editorSectionBasic',
-		keys: [ 'title', 'data_name', 'description', 'placeholder', 'required' ],
+		keys: [ 'title', 'data_name', 'description', 'placeholder' ],
 	},
 	{
 		kind: 'section',
@@ -201,7 +201,7 @@ const NUMBER_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'behavior',
 		tab: 'settings',
 		labelKey: 'editorSectionBehavior',
-		keys: [ 'desc_tooltip' ],
+		keys: [ 'desc_tooltip', 'required' ],
 		advanced: true,
 	},
 	{
@@ -245,7 +245,7 @@ const SELECT_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'basic',
 		tab: 'settings',
 		labelKey: 'editorSectionBasic',
-		keys: [ 'title', 'data_name', 'description', 'required' ],
+		keys: [ 'title', 'data_name', 'description' ],
 	},
 	{
 		kind: 'widget',
@@ -284,7 +284,7 @@ const SELECT_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'behavior',
 		tab: 'settings',
 		labelKey: 'editorSectionBehavior',
-		keys: [ 'desc_tooltip', 'onetime' ],
+		keys: [ 'desc_tooltip', 'onetime', 'required' ],
 		advanced: true,
 	},
 	{
@@ -302,7 +302,7 @@ const CHECKBOX_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'basic',
 		tab: 'settings',
 		labelKey: 'editorSectionBasic',
-		keys: [ 'title', 'data_name', 'description', 'required' ],
+		keys: [ 'title', 'data_name', 'description' ],
 	},
 	{
 		kind: 'widget',
@@ -341,7 +341,7 @@ const CHECKBOX_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'behavior',
 		tab: 'settings',
 		labelKey: 'editorSectionBehavior',
-		keys: [ 'desc_tooltip', 'onetime' ],
+		keys: [ 'desc_tooltip', 'onetime', 'required' ],
 		advanced: true,
 	},
 	{
@@ -359,7 +359,7 @@ const RADIO_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'basic',
 		tab: 'settings',
 		labelKey: 'editorSectionBasic',
-		keys: [ 'title', 'data_name', 'description', 'required' ],
+		keys: [ 'title', 'data_name', 'description' ],
 	},
 	{
 		kind: 'widget',
@@ -398,7 +398,7 @@ const RADIO_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'behavior',
 		tab: 'settings',
 		labelKey: 'editorSectionBehavior',
-		keys: [ 'desc_tooltip', 'onetime' ],
+		keys: [ 'desc_tooltip', 'onetime', 'required' ],
 		advanced: true,
 	},
 	{
@@ -416,7 +416,7 @@ const DATE_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'basic',
 		tab: 'settings',
 		labelKey: 'editorSectionBasic',
-		keys: [ 'title', 'data_name', 'description', 'placeholder', 'required' ],
+		keys: [ 'title', 'data_name', 'description', 'placeholder' ],
 	},
 	{
 		kind: 'section',
@@ -447,7 +447,7 @@ const DATE_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'rules',
 		tab: 'settings',
 		labelKey: 'editorSectionBehavior',
-		keys: [ 'jquery_dp', 'no_weekends', 'past_dates', 'desc_tooltip' ],
+		keys: [ 'jquery_dp', 'no_weekends', 'past_dates', 'desc_tooltip', 'required' ],
 		advanced: true,
 	},
 	{
@@ -465,7 +465,7 @@ const TIMEZONE_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'basic',
 		tab: 'settings',
 		labelKey: 'editorSectionBasic',
-		keys: [ 'title', 'data_name', 'description', 'required' ],
+		keys: [ 'title', 'data_name', 'description' ],
 	},
 	{
 		kind: 'section',
@@ -496,7 +496,7 @@ const TIMEZONE_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'behavior',
 		tab: 'settings',
 		labelKey: 'editorSectionBehavior',
-		keys: [ 'show_time', 'desc_tooltip' ],
+		keys: [ 'show_time', 'desc_tooltip', 'required' ],
 		advanced: true,
 	},
 	{
@@ -514,7 +514,7 @@ const COLOR_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'basic',
 		tab: 'settings',
 		labelKey: 'editorSectionBasic',
-		keys: [ 'title', 'data_name', 'description', 'required' ],
+		keys: [ 'title', 'data_name', 'description' ],
 	},
 	{
 		kind: 'section',
@@ -545,7 +545,7 @@ const COLOR_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'behavior',
 		tab: 'settings',
 		labelKey: 'editorSectionBehavior',
-		keys: [ 'show_palettes', 'show_onload', 'desc_tooltip' ],
+		keys: [ 'show_palettes', 'show_onload', 'desc_tooltip', 'required' ],
 		advanced: true,
 	},
 	{
@@ -597,7 +597,8 @@ function widgetBlock(
 	tab: string,
 	widget: string,
 	ownedKeys: string[],
-	props?: Record< string, unknown >
+	props?: Record< string, unknown >,
+	advanced = false
 ): FieldUiDefinition[ 'blocks' ][ number ] {
 	return {
 		kind: 'widget',
@@ -606,6 +607,7 @@ function widgetBlock(
 		widget,
 		ownedKeys,
 		props,
+		...( advanced ? { advanced: true as const } : {} ),
 	};
 }
 
@@ -628,7 +630,7 @@ const FILE_BLOCKS = withConditions(
 		'basic',
 		'settings',
 		'editorSectionBasic',
-		[ 'title', 'data_name', 'description', 'required' ]
+		[ 'title', 'data_name', 'description' ]
 	),
 	sectionBlock(
 		'validation',
@@ -682,7 +684,7 @@ const FILE_BLOCKS = withConditions(
 		'behavior',
 		'settings',
 		'editorSectionBehavior',
-		[ 'desc_tooltip', 'onetime' ],
+		[ 'desc_tooltip', 'onetime', 'required' ],
 		true
 	)
 );
@@ -692,7 +694,7 @@ const DATERANGE_BLOCKS = withConditions(
 		'basic',
 		'settings',
 		'editorSectionBasic',
-		[ 'title', 'data_name', 'description', 'required' ]
+		[ 'title', 'data_name', 'description' ]
 	),
 	sectionBlock(
 		'validation',
@@ -735,6 +737,7 @@ const DATERANGE_BLOCKS = withConditions(
 			'show_weeks',
 			'auto_apply',
 			'desc_tooltip',
+			'required',
 		],
 		true
 	)
@@ -768,7 +771,7 @@ const MEASURE_BLOCKS = withConditions(
 		'basic',
 		'settings',
 		'editorSectionBasic',
-		[ 'title', 'data_name', 'description', 'required' ]
+		[ 'title', 'data_name', 'description' ]
 	),
 	sectionBlock(
 		'pricing',
@@ -795,7 +798,7 @@ const MEASURE_BLOCKS = withConditions(
 		'behavior',
 		'settings',
 		'editorSectionBehavior',
-		[ 'desc_tooltip' ],
+		[ 'desc_tooltip', 'required' ],
 		true
 	)
 );
@@ -810,7 +813,6 @@ const PHONE_BLOCKS = withConditions(
 			'data_name',
 			'description',
 			'placeholder',
-			'required',
 		]
 	),
 	sectionBlock(
@@ -842,6 +844,7 @@ const PHONE_BLOCKS = withConditions(
 			'enable_search',
 			'enable_material',
 			'desc_tooltip',
+			'required',
 		],
 		true
 	)
@@ -852,7 +855,7 @@ const SUPERLIST_BLOCKS = withConditions(
 		'basic',
 		'settings',
 		'editorSectionBasic',
-		[ 'title', 'data_name', 'description', 'required' ]
+		[ 'title', 'data_name', 'description' ]
 	),
 	sectionBlock(
 		'options',
@@ -879,7 +882,7 @@ const SUPERLIST_BLOCKS = withConditions(
 		'behavior',
 		'settings',
 		'editorSectionBehavior',
-		[ 'desc_tooltip' ],
+		[ 'desc_tooltip', 'required' ],
 		true
 	)
 );
@@ -925,7 +928,7 @@ const DOMAIN_BLOCKS = withConditions(
 		'basic',
 		'settings',
 		'editorSectionBasic',
-		[ 'title', 'data_name', 'description', 'placeholder', 'required' ]
+		[ 'title', 'data_name', 'description', 'placeholder' ]
 	),
 	sectionBlock(
 		'messages',
@@ -939,6 +942,13 @@ const DOMAIN_BLOCKS = withConditions(
 		'settings',
 		'editorSectionDisplay',
 		[ 'button_label', 'button_class', 'width' ],
+		true
+	),
+	sectionBlock(
+		'behavior',
+		'settings',
+		'editorSectionBehavior',
+		[ 'required' ],
 		true
 	)
 );
@@ -969,7 +979,6 @@ const QUANTITYOPTION_BLOCKS = withConditions(
 			'data_name',
 			'description',
 			'placeholder',
-			'required',
 		]
 	),
 	sectionBlock(
@@ -997,7 +1006,7 @@ const QUANTITYOPTION_BLOCKS = withConditions(
 		'behavior',
 		'settings',
 		'editorSectionBehavior',
-		[ 'desc_tooltip', 'onetime' ],
+		[ 'desc_tooltip', 'onetime', 'required' ],
 		true
 	)
 );
@@ -1044,7 +1053,7 @@ const SWITCHER_BLOCKS = withConditions(
 		'basic',
 		'settings',
 		'editorSectionBasic',
-		[ 'title', 'data_name', 'description', 'required' ]
+		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'options',
@@ -1091,7 +1100,7 @@ const SWITCHER_BLOCKS = withConditions(
 		'behavior',
 		'settings',
 		'editorSectionBehavior',
-		[ 'desc_tooltip', 'onetime' ],
+		[ 'desc_tooltip', 'onetime', 'required' ],
 		true
 	)
 );
@@ -1101,7 +1110,7 @@ const CHAINED_BLOCKS = withConditions(
 		'basic',
 		'settings',
 		'editorSectionBasic',
-		[ 'title', 'data_name', 'description', 'required' ]
+		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'options',
@@ -1134,7 +1143,7 @@ const CHAINED_BLOCKS = withConditions(
 		'behavior',
 		'settings',
 		'editorSectionBehavior',
-		[ 'desc_tooltip', 'onetime' ],
+		[ 'desc_tooltip', 'onetime', 'required' ],
 		true
 	)
 );
@@ -1144,7 +1153,7 @@ const CONDITIONAL_META_BLOCKS = withConditions(
 		'basic',
 		'settings',
 		'editorSectionBasic',
-		[ 'title', 'data_name', 'description', 'required' ]
+		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'images',
@@ -1177,7 +1186,7 @@ const CONDITIONAL_META_BLOCKS = withConditions(
 		'behavior',
 		'settings',
 		'editorSectionBehavior',
-		[ 'desc_tooltip' ],
+		[ 'desc_tooltip', 'required' ],
 		true
 	)
 );
@@ -1189,12 +1198,7 @@ const FONTS_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		'basic',
 		'settings',
 		'editorSectionBasic',
-		[
-			'title',
-			'data_name',
-			'description',
-			'required',
-		]
+		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'options',
@@ -1228,6 +1232,13 @@ const FONTS_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		'settings',
 		'editorSectionDisplay',
 		[ 'custom_fonts' ],
+		true
+	),
+	sectionBlock(
+		'behavior',
+		'settings',
+		'editorSectionBehavior',
+		[ 'required' ],
 		true
 	),
 	sectionBlock(
@@ -1272,7 +1283,7 @@ const VQMATRIX_BLOCKS = withConditions(
 		'basic',
 		'settings',
 		'editorSectionBasic',
-		[ 'title', 'data_name', 'description', 'required' ]
+		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'matrix',
@@ -1305,7 +1316,552 @@ const VQMATRIX_BLOCKS = withConditions(
 		'behavior',
 		'settings',
 		'editorSectionBehavior',
+		[ 'desc_tooltip', 'required' ],
+		true
+	)
+);
+
+const AUDIO_BLOCKS = withConditions(
+	sectionBlock(
+		'basic',
+		'settings',
+		'editorSectionBasic',
+		[ 'title', 'data_name', 'description' ]
+	),
+	widgetBlock(
+		'audio',
+		'settings',
+		'audio-media',
+		[ 'audio' ]
+	),
+	sectionBlock(
+		'validation',
+		'settings',
+		'editorSectionValidation',
+		[ 'error_message' ],
+		true
+	),
+	sectionBlock(
+		'display',
+		'settings',
+		'editorSectionDisplay',
+		[ 'class', 'width', 'visibility', 'visibility_role' ],
+		true
+	),
+	sectionBlock(
+		'behavior',
+		'settings',
+		'editorSectionBehavior',
+		[ 'desc_tooltip', 'required', 'multiple_allowed' ],
+		true
+	)
+);
+
+const BULKQUANTITY_BLOCKS = withConditions(
+	sectionBlock(
+		'basic',
+		'settings',
+		'editorSectionBasic',
+		[ 'title', 'data_name', 'description' ]
+	),
+	widgetBlock(
+		'bulk-quantity',
+		'settings',
+		'bulk-quantity',
+		[ 'options' ]
+	),
+	sectionBlock(
+		'display',
+		'settings',
+		'editorSectionDisplay',
+		[
+			'fixed_prices',
+			'label_quantity',
+			'label_baseprice',
+			'label_total',
+			'label_fixed',
+			'hide_baseprice',
+			'show_pricerange',
+		],
+		true
+	)
+);
+
+const CROPPER_BLOCKS = withConditions(
+	sectionBlock(
+		'basic',
+		'settings',
+		'editorSectionBasic',
+		[ 'title', 'data_name', 'description' ]
+	),
+	widgetBlock(
+		'viewport',
+		'settings',
+		'paired-cropper',
+		[ 'options' ],
+		{ fieldKey: 'options' }
+	),
+	sectionBlock(
+		'validation',
+		'settings',
+		'editorSectionValidation',
+		[ 'error_message' ],
+		true
+	),
+	sectionBlock(
+		'defaults',
+		'settings',
+		'editorSectionDefaultPrice',
+		[ 'file_cost', 'selected', 'first_option' ],
+		true
+	),
+	sectionBlock(
+		'display',
+		'settings',
+		'editorSectionDisplay',
+		[
+			'class',
+			'width',
+			'button_label_select',
+			'button_class',
+			'files_allowed',
+			'file_types',
+			'file_size',
+			'visibility',
+			'visibility_role',
+		],
+		true
+	),
+	sectionBlock(
+		'media',
+		'settings',
+		'editorSectionMedia',
+		[
+			'viewport_type',
+			'boundary',
+			'enforce_boundary',
+			'resize',
+			'enable_zoom',
+			'show_zoomer',
+			'enable_exif',
+			'onetime_taxable',
+		],
+		true
+	),
+	sectionBlock(
+		'behavior',
+		'settings',
+		'editorSectionBehavior',
+		[ 'desc_tooltip', 'required' ],
+		true
+	)
+);
+
+const EMOJIS_BLOCKS = withConditions(
+	sectionBlock(
+		'basic',
+		'settings',
+		'editorSectionBasic',
+		[ 'title', 'data_name', 'description' ]
+	),
+	sectionBlock(
+		'validation',
+		'settings',
+		'editorSectionValidation',
+		[ 'error_message' ],
+		true
+	),
+	widgetBlock(
+		'options',
+		'settings',
+		'paired-palettes',
+		[ 'options' ],
+		undefined,
+		true
+	),
+	sectionBlock(
+		'display',
+		'settings',
+		'editorSectionDisplay',
+		[
+			'class',
+			'max_selected',
+			'width',
+			'emojis_display_type',
+			'search_placeholder',
+			'placeholder',
+			'filters_position',
+			'search_position',
+			'picker_position',
+			'tones_Style',
+			'recent_emojis',
+			'tones',
+			'search',
+			'visibility',
+			'visibility_role',
+		],
+		true
+	),
+	sectionBlock(
+		'behavior',
+		'settings',
+		'editorSectionBehavior',
+		[
+			'desc_tooltip',
+			'required',
+			'onetime',
+			'onetime_taxable',
+		],
+		true
+	)
+);
+
+const FIXEDPRICE_BLOCKS = withConditions(
+	sectionBlock(
+		'basic',
+		'settings',
+		'editorSectionBasic',
+		[ 'title', 'data_name', 'description' ]
+	),
+	widgetBlock(
+		'options',
+		'settings',
+		'fixed-price-paired',
+		[ 'options' ]
+	),
+	sectionBlock(
+		'defaults',
+		'settings',
+		'editorSectionDefaultPrice',
+		[ 'first_option', 'unit_plural', 'unit_single' ],
+		true
+	),
+	sectionBlock(
+		'display',
+		'settings',
+		'editorSectionDisplay',
+		[ 'view_type', 'decimal_place', 'class', 'width' ],
+		true
+	)
+);
+
+const IMAGE_BLOCKS = withConditions(
+	sectionBlock(
+		'basic',
+		'settings',
+		'editorSectionBasic',
+		[ 'title', 'data_name', 'description' ]
+	),
+	widgetBlock(
+		'images',
+		'settings',
+		'image-media',
+		[ 'images' ]
+	),
+	sectionBlock(
+		'validation',
+		'settings',
+		'editorSectionValidation',
+		[ 'error_message' ],
+		true
+	),
+	sectionBlock(
+		'defaults',
+		'settings',
+		'editorSectionDefaultPrice',
+		[ 'selected' ],
+		true
+	),
+	sectionBlock(
+		'image-settings',
+		'settings',
+		'editorSectionImageSettings',
+		[ 'selected_img_bordercolor', 'image_width', 'image_height' ],
+		true
+	),
+	sectionBlock(
+		'display',
+		'settings',
+		'editorSectionDisplay',
+		[
+			'class',
+			'width',
+			'visibility',
+			'visibility_role',
+			'legacy_view',
+			'show_popup',
+		],
+		true
+	),
+	sectionBlock(
+		'behavior',
+		'settings',
+		'editorSectionBehavior',
+		[
+			'desc_tooltip',
+			'required',
+			'multiple_allowed',
+			'min_checked',
+			'max_checked',
+		],
+		true
+	)
+);
+
+const IMAGESELECT_BLOCKS = withConditions(
+	sectionBlock(
+		'basic',
+		'settings',
+		'editorSectionBasic',
+		[ 'title', 'data_name', 'description' ]
+	),
+	widgetBlock(
+		'images',
+		'settings',
+		'imageselect-media',
+		[ 'images' ]
+	),
+	sectionBlock(
+		'validation',
+		'settings',
+		'editorSectionValidation',
+		[ 'error_message' ],
+		true
+	),
+	sectionBlock(
+		'defaults',
+		'settings',
+		'editorSectionDefaultPrice',
+		[ 'first_option' ],
+		true
+	),
+	sectionBlock(
+		'display',
+		'settings',
+		'editorSectionDisplay',
+		[
+			'dropdown_height',
+			'image_width',
+			'image_height',
+			'bg_color',
+			'position',
+			'width',
+			'visibility',
+			'visibility_role',
+		],
+		true
+	),
+	sectionBlock(
+		'behavior',
+		'settings',
+		'editorSectionBehavior',
+		[ 'desc_tooltip', 'enable_gallery', 'image_replace', 'required' ],
+		true
+	)
+);
+
+const PALETTES_BLOCKS = withConditions(
+	sectionBlock(
+		'basic',
+		'settings',
+		'editorSectionBasic',
+		[ 'title', 'data_name', 'description' ]
+	),
+	sectionBlock(
+		'validation',
+		'settings',
+		'editorSectionValidation',
+		[ 'error_message' ],
+		true
+	),
+	sectionBlock(
+		'selected-border',
+		'settings',
+		'editorSectionDisplay',
+		[ 'selected_palette_bcolor' ],
+		true
+	),
+	widgetBlock(
+		'options',
+		'settings',
+		'paired-palettes',
+		[ 'options' ],
+		undefined,
+		true
+	),
+	sectionBlock(
+		'defaults',
+		'settings',
+		'editorSectionDefaultPrice',
+		[ 'selected' ],
+		true
+	),
+	sectionBlock(
+		'display',
+		'settings',
+		'editorSectionDisplay',
+		[
+			'class',
+			'width',
+			'max_selected',
+			'color_width',
+			'color_height',
+			'visibility',
+			'visibility_role',
+		],
+		true
+	),
+	sectionBlock(
+		'behavior',
+		'settings',
+		'editorSectionBehavior',
+		[
+			'multiple_allowed',
+			'onetime',
+			'circle',
+			'desc_tooltip',
+			'required',
+		],
+		true
+	)
+);
+
+const PRICEMATRIX_BLOCKS = withConditions(
+	sectionBlock(
+		'basic',
+		'settings',
+		'editorSectionBasic',
+		[ 'title', 'data_name', 'description' ]
+	),
+	sectionBlock(
+		'pricing',
+		'settings',
+		'editorSectionDefaultPrice',
+		[ 'discount_type' ],
+		true
+	),
+	widgetBlock(
+		'options',
+		'settings',
+		'paired-pricematrix',
+		[ 'options' ],
+		undefined,
+		true
+	),
+	sectionBlock(
+		'display',
+		'settings',
+		'editorSectionDisplay',
+		[
+			'qty_step',
+			'visibility',
+			'visibility_role',
+			'discount',
+			'show_slider',
+			'show_price_per_unit',
+			'hide_matrix_table',
+		],
+		true
+	),
+	sectionBlock(
+		'behavior',
+		'settings',
+		'editorSectionBehavior',
 		[ 'desc_tooltip' ],
+		true
+	)
+);
+
+const QUANTITIES_BLOCKS = withConditions(
+	sectionBlock(
+		'basic',
+		'settings',
+		'editorSectionBasic',
+		[ 'title', 'data_name', 'description' ]
+	),
+	widgetBlock(
+		'options',
+		'settings',
+		'paired-quantity',
+		[ 'options' ],
+		{ fieldKey: 'options' }
+	),
+	sectionBlock(
+		'validation',
+		'settings',
+		'editorSectionValidation',
+		[ 'error_message' ],
+		true
+	),
+	sectionBlock(
+		'variation-layout',
+		'settings',
+		'editorSectionVariationLayout',
+		[ 'view_control', 'default_price', 'min_qty', 'max_qty' ],
+		true
+	),
+	sectionBlock(
+		'display',
+		'settings',
+		'editorSectionDisplay',
+		[ 'class', 'width', 'visibility', 'visibility_role' ],
+		true
+	),
+	sectionBlock(
+		'behavior',
+		'settings',
+		'editorSectionBehavior',
+		[
+			'desc_tooltip',
+			'enable_plusminus',
+			'manage_stock',
+			'unlink_order_qty',
+			'required',
+		],
+		true
+	)
+);
+
+const SELECTQTY_BLOCKS = withConditions(
+	sectionBlock(
+		'basic',
+		'settings',
+		'editorSectionBasic',
+		[ 'title', 'data_name', 'description' ]
+	),
+	widgetBlock(
+		'options',
+		'settings',
+		'paired-options',
+		[ 'options' ],
+		{ variant: 'select' }
+	),
+	sectionBlock(
+		'validation',
+		'settings',
+		'editorSectionValidation',
+		[ 'error_message' ],
+		true
+	),
+	sectionBlock(
+		'defaults',
+		'settings',
+		'editorSectionDefaultPrice',
+		[ 'selected', 'first_option', 'option_label', 'qty_label' ],
+		true
+	),
+	sectionBlock(
+		'display',
+		'settings',
+		'editorSectionDisplay',
+		[ 'class', 'width', 'visibility', 'visibility_role' ],
+		true
+	),
+	sectionBlock(
+		'behavior',
+		'settings',
+		'editorSectionBehavior',
+		[ 'desc_tooltip', 'required', 'unlink_order_qty' ],
 		true
 	)
 );
@@ -1342,4 +1898,25 @@ export function registerBuiltinFieldUiDefinitions(): void {
 		definition( 'fonts', FONTS_BLOCKS, [ SETTINGS_TAB, PREVIEW_TAB, CONDITIONS_TAB ] )
 	);
 	registerFieldUiDefinition( definition( 'vqmatrix', VQMATRIX_BLOCKS ) );
+	registerFieldUiDefinition( definition( 'audio', AUDIO_BLOCKS ) );
+	registerFieldUiDefinition(
+		definition( 'bulkquantity', BULKQUANTITY_BLOCKS )
+	);
+	registerFieldUiDefinition( definition( 'cropper', CROPPER_BLOCKS ) );
+	registerFieldUiDefinition( definition( 'emojis', EMOJIS_BLOCKS ) );
+	registerFieldUiDefinition(
+		definition( 'fixedprice', FIXEDPRICE_BLOCKS )
+	);
+	registerFieldUiDefinition( definition( 'image', IMAGE_BLOCKS ) );
+	registerFieldUiDefinition(
+		definition( 'imageselect', IMAGESELECT_BLOCKS )
+	);
+	registerFieldUiDefinition( definition( 'palettes', PALETTES_BLOCKS ) );
+	registerFieldUiDefinition(
+		definition( 'pricematrix', PRICEMATRIX_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( 'quantities', QUANTITIES_BLOCKS )
+	);
+	registerFieldUiDefinition( definition( 'selectqty', SELECTQTY_BLOCKS ) );
 }

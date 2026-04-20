@@ -12,9 +12,14 @@
  */
 import { PairedOptionsEditor } from '../components/PairedOptionsEditor';
 import type { PairedOptionsVariant } from '../components/PairedOptionsEditor';
+import { AudiosSelectEditor } from '../components/AudiosSelectEditor';
+import { BulkQuantityMatrixEditor } from '../components/BulkQuantityMatrixEditor';
 import { ChainedOptionsEditor } from '../components/ChainedOptionsEditor';
 import { FontsPairedEditor } from '../components/FontsPairedEditor';
 import { ImagesSelectEditor } from '../components/ImagesSelectEditor';
+import { PairedCropperEditor } from '../components/PairedCropperEditor';
+import { PairedFixedPriceEditor } from '../components/PairedFixedPriceEditor';
+import { PairedMatrixOptionsEditor } from '../components/PairedMatrixOptionsEditor';
 import { PairedQuantityEditor } from '../components/PairedQuantityEditor';
 import { VqMatrixEditor } from '../components/VqMatrixEditor';
 import { readSettingMeta, readSettingTitle } from '../definitions/settingMeta';
@@ -50,6 +55,78 @@ registerFieldWidget( {
 } );
 
 registerMetaTypeWidget( {
+	id: 'audio-media',
+	ownedKeys: [ 'audio' ],
+	metaKey: 'audio',
+	metaType: 'pre-audios',
+	titleFallback: ( i18n ) =>
+		i18n.addAudioVideoSectionTitle || 'Audio / Video',
+	render: ( { ctx, title } ) => (
+		<AudiosSelectEditor
+			values={ ctx.field }
+			onChange={ ctx.updateField }
+			i18n={ ctx.i18n }
+			title={ title }
+		/>
+	),
+} );
+
+registerMetaTypeWidget( {
+	id: 'image-media',
+	ownedKeys: [ 'images' ],
+	metaKey: 'images',
+	metaType: 'pre-images',
+	titleFallback: ( i18n ) => i18n.addImagesSectionTitle || 'Images',
+	render: ( { ctx, title } ) => (
+		<ImagesSelectEditor
+			variant="image"
+			values={ ctx.field }
+			onChange={ ctx.updateField }
+			i18n={ ctx.i18n }
+			title={ title }
+		/>
+	),
+} );
+
+registerMetaTypeWidget( {
+	id: 'imageselect-media',
+	ownedKeys: [ 'images' ],
+	metaKey: 'images',
+	metaType: 'imageselect',
+	titleFallback: ( i18n ) => i18n.addImagesSectionTitle || 'Images',
+	render: ( { ctx, title } ) => (
+		<ImagesSelectEditor
+			variant="imageselect"
+			values={ ctx.field }
+			onChange={ ctx.updateField }
+			i18n={ ctx.i18n }
+			title={ title }
+		/>
+	),
+} );
+
+registerMetaTypeWidget( {
+	id: 'paired-cropper',
+	ownedKeys: [ 'options' ],
+	metaKey: ( ctx ) =>
+		typeof ctx.widgetProps?.fieldKey === 'string'
+			? String( ctx.widgetProps.fieldKey )
+			: 'options',
+	metaType: 'paired-cropper',
+	titleFallback: ( i18n ) => i18n.cropperViewportTitle || 'Viewport Size',
+	render: ( { ctx, title, description, metaKey } ) => (
+		<PairedCropperEditor
+			fieldKey={ metaKey }
+			title={ title }
+			description={ description }
+			values={ ctx.field }
+			onChange={ ctx.updateField }
+			i18n={ ctx.i18n }
+		/>
+	),
+} );
+
+registerMetaTypeWidget( {
 	id: 'paired-quantity',
 	ownedKeys: [ 'options' ],
 	metaKey: ( ctx ) =>
@@ -71,6 +148,32 @@ registerMetaTypeWidget( {
 } );
 
 registerMetaTypeWidget( {
+	id: 'fixed-price-paired',
+	ownedKeys: [ 'options' ],
+	metaKey: 'options',
+	metaType: 'paired',
+	titleFallback: ( i18n ) => i18n.fixedPriceOptionsTitle || 'Quantity',
+	render: ( { ctx, title, meta } ) => (
+		<PairedFixedPriceEditor
+			values={ ctx.field }
+			onChange={ ctx.updateField }
+			i18n={ ctx.i18n }
+			title={ title }
+			placeholders={
+				Array.isArray( meta.placeholders )
+					? ( meta.placeholders as string[] )
+					: undefined
+			}
+			types={
+				Array.isArray( meta.types )
+					? ( meta.types as string[] )
+					: undefined
+			}
+		/>
+	),
+} );
+
+registerMetaTypeWidget( {
 	id: 'paired-switch',
 	ownedKeys: [ 'options' ],
 	metaKey: 'options',
@@ -79,6 +182,56 @@ registerMetaTypeWidget( {
 	render: ( { ctx, title } ) => (
 		<PairedOptionsEditor
 			variant="switcher"
+			values={ ctx.field }
+			onChange={ ctx.updateField }
+			i18n={ ctx.i18n }
+			title={ title }
+		/>
+	),
+} );
+
+registerMetaTypeWidget( {
+	id: 'paired-palettes',
+	ownedKeys: [ 'options' ],
+	metaKey: 'options',
+	metaType: 'paired-palettes',
+	titleFallback: ( i18n ) => i18n.palettesOptionsTitle || 'Add colors',
+	render: ( { ctx, title } ) => (
+		<PairedMatrixOptionsEditor
+			values={ ctx.field }
+			onChange={ ctx.updateField }
+			i18n={ ctx.i18n }
+			title={ title }
+		/>
+	),
+} );
+
+registerMetaTypeWidget( {
+	id: 'paired-pricematrix',
+	ownedKeys: [ 'options' ],
+	metaKey: 'options',
+	metaType: 'paired-pricematrix',
+	titleFallback: ( i18n ) =>
+		i18n.priceMatrixOptionsTitle || 'Price matrix',
+	render: ( { ctx, title } ) => (
+		<PairedMatrixOptionsEditor
+			values={ ctx.field }
+			onChange={ ctx.updateField }
+			i18n={ ctx.i18n }
+			title={ title }
+		/>
+	),
+} );
+
+registerMetaTypeWidget( {
+	id: 'bulk-quantity',
+	ownedKeys: [ 'options' ],
+	metaKey: 'options',
+	metaType: 'bulk-quantity',
+	titleFallback: ( i18n ) =>
+		i18n.bulkQuantityOptionsTitle || 'Bulk quantity',
+	render: ( { ctx, title } ) => (
+		<BulkQuantityMatrixEditor
 			values={ ctx.field }
 			onChange={ ctx.updateField }
 			i18n={ ctx.i18n }

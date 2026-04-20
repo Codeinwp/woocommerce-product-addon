@@ -13,6 +13,7 @@ export function FieldManagePanel( {
 	selectedId,
 	editDraft,
 	schemaLoading,
+	schemaFetchError,
 	activeSchema,
 	TypedEditor,
 	onEditDraftChange,
@@ -31,7 +32,7 @@ export function FieldManagePanel( {
 				>
 					<Text fontSize="sm" color="gray.600" lineHeight="1.6">
 						{ i18n.manageFieldsEmpty ||
-							'No fields yet. Use Add field above (classic) or choose a type below.' }
+							'No fields yet. Use Add field above or choose a field type below.' }
 					</Text>
 					<Button
 						size="sm"
@@ -50,6 +51,7 @@ export function FieldManagePanel( {
 					selectedId={ selectedId }
 					editDraft={ editDraft }
 					schemaLoading={ schemaLoading }
+					schemaFetchError={ schemaFetchError }
 					activeSchema={ activeSchema }
 					TypedEditor={ TypedEditor }
 					onEditDraftChange={ onEditDraftChange }

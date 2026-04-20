@@ -16,6 +16,7 @@ export function createInitialModalState(): ModalReducerState {
 		selectedId: null,
 		schemasCache: {},
 		schemaLoading: false,
+		schemaFetchError: '',
 		modalEntry: 'manage',
 	};
 }
@@ -47,6 +48,7 @@ export function modalReducer(
 				loading: true,
 				error: '',
 				schemasCache: {},
+				schemaFetchError: '',
 			};
 		case 'LOAD_CONTEXT_SUCCESS':
 			return {
@@ -55,6 +57,7 @@ export function modalReducer(
 				ctx: action.ctx,
 				fields: action.fields,
 				selectedId: action.selectedId,
+				schemaFetchError: '',
 			};
 		case 'LOAD_CONTEXT_ERROR':
 			return {
@@ -64,6 +67,8 @@ export function modalReducer(
 			};
 		case 'CLEAR_ERROR':
 			return { ...state, error: '' };
+		case 'SET_SCHEMA_FETCH_ERROR':
+			return { ...state, schemaFetchError: action.message };
 		case 'SET_SCHEMA_FOR_TYPE': {
 			if ( ! action.schema ) {
 				return state;
@@ -72,6 +77,7 @@ export function modalReducer(
 			return {
 				...state,
 				schemasCache: { ...state.schemasCache, [ t ]: action.schema },
+				schemaFetchError: '',
 			};
 		}
 		case 'SET_SCHEMA_LOADING':
@@ -81,7 +87,11 @@ export function modalReducer(
 		case 'SET_FIELDS':
 			return { ...state, fields: action.fields };
 		case 'SET_SELECTED_ID':
-			return { ...state, selectedId: action.id };
+			return {
+				...state,
+				selectedId: action.id,
+				schemaFetchError: '',
+			};
 		case 'PATCH_FIELD_ROW_FROM_FORM': {
 			const id = action.row.clientId;
 			const nextFields = state.fields.map( ( f ) =>
