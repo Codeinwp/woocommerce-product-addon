@@ -2,11 +2,17 @@
  * Registers hand-authored `FieldUiDefinition` entries for built-in field types.
  */
 import { builtinFieldUiSchemas } from './builtinFieldUiSchemas';
+import {
+	BuiltinFieldType,
+	FieldTab,
+	SectionLabelKey,
+	WidgetKind,
+} from './builtinFieldTypes';
 import { registerFieldUiDefinition } from './registry';
 import type { FieldUiDefinition } from './types';
 
-const SETTINGS_TAB = { id: 'settings', labelKey: 'settingsTab' };
-const CONDITIONS_TAB = { id: 'conditions', labelKey: 'conditionsTab' };
+const SETTINGS_TAB = { id: FieldTab.Settings, labelKey: 'settingsTab' as const };
+const CONDITIONS_TAB = { id: FieldTab.Conditions, labelKey: 'conditionsTab' as const };
 
 function definition(
 	slug: string,
@@ -25,46 +31,52 @@ const TEXT_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
 		id: 'basic',
-		tab: 'settings',
-		labelKey: 'editorSectionBasic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name', 'description', 'placeholder' ],
 	},
 	{
 		kind: 'section',
-		id: 'defaults',
-		tab: 'settings',
-		labelKey: 'editorSectionDefaultPrice',
-		keys: [ 'default_value', 'price' ],
-		advanced: true,
+		id: 'field-settings',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.FieldSettings,
+		keys: [ 'required', 'default_value' ],
+	},
+	{
+		kind: 'section',
+		id: 'pricing',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.DefaultPrice,
+		keys: [ 'price', 'onetime' ],
 	},
 	{
 		kind: 'section',
 		id: 'validation',
-		tab: 'settings',
-		labelKey: 'editorSectionValidation',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Validation,
 		keys: [ 'error_message', 'maxlength', 'minlength' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'display',
-		tab: 'settings',
-		labelKey: 'editorSectionDisplay',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
 		keys: [ 'class', 'input_mask', 'width', 'visibility', 'visibility_role' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'behavior',
-		tab: 'settings',
-		labelKey: 'editorSectionBehavior',
-		keys: [ 'onetime', 'use_regex', 'desc_tooltip', 'required' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Behavior,
+		keys: [ 'use_regex', 'desc_tooltip' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'conditions',
-		tab: 'conditions',
+		tab: FieldTab.Conditions,
 		labelKey: 'conditionsTab',
 		keys: [ 'logic', 'conditions' ],
 	},
@@ -78,46 +90,52 @@ const TEXTAREA_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
 		id: 'basic',
-		tab: 'settings',
-		labelKey: 'editorSectionBasic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name', 'description', 'placeholder' ],
 	},
 	{
 		kind: 'section',
-		id: 'defaults',
-		tab: 'settings',
-		labelKey: 'editorSectionDefaultPrice',
+		id: 'field-settings',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.FieldSettings,
+		keys: [ 'required', 'default_value' ],
+	},
+	{
+		kind: 'section',
+		id: 'pricing',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.DefaultPrice,
 		keys: [ 'price' ],
-		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'validation',
-		tab: 'settings',
-		labelKey: 'editorSectionValidation',
-		keys: [ 'error_message', 'default_value', 'max_length' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Validation,
+		keys: [ 'error_message', 'max_length' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'display',
-		tab: 'settings',
-		labelKey: 'editorSectionDisplay',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
 		keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'behavior',
-		tab: 'settings',
-		labelKey: 'editorSectionBehavior',
-		keys: [ 'rich_editor', 'desc_tooltip', 'required' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Behavior,
+		keys: [ 'rich_editor', 'desc_tooltip' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'conditions',
-		tab: 'conditions',
+		tab: FieldTab.Conditions,
 		labelKey: 'conditionsTab',
 		keys: [ 'logic', 'conditions' ],
 	},
@@ -127,38 +145,45 @@ const EMAIL_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
 		id: 'basic',
-		tab: 'settings',
-		labelKey: 'editorSectionBasic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name', 'description', 'placeholder' ],
 	},
 	{
 		kind: 'section',
+		id: 'field-settings',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.FieldSettings,
+		keys: [ 'required' ],
+	},
+	{
+		kind: 'section',
 		id: 'validation',
-		tab: 'settings',
-		labelKey: 'editorSectionValidation',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Validation,
 		keys: [ 'error_message' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'display',
-		tab: 'settings',
-		labelKey: 'editorSectionDisplay',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
 		keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'behavior',
-		tab: 'settings',
-		labelKey: 'editorSectionBehavior',
-		keys: [ 'desc_tooltip', 'required' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Behavior,
+		keys: [ 'desc_tooltip' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'conditions',
-		tab: 'conditions',
+		tab: FieldTab.Conditions,
 		labelKey: 'conditionsTab',
 		keys: [ 'logic', 'conditions' ],
 	},
@@ -168,46 +193,52 @@ const NUMBER_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
 		id: 'basic',
-		tab: 'settings',
-		labelKey: 'editorSectionBasic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name', 'description', 'placeholder' ],
 	},
 	{
 		kind: 'section',
-		id: 'defaults',
-		tab: 'settings',
-		labelKey: 'editorSectionDefaultPrice',
-		keys: [ 'default_value' ],
-		advanced: true,
+		id: 'field-settings',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.FieldSettings,
+		keys: [ 'required', 'default_value' ],
+	},
+	{
+		kind: 'section',
+		id: 'constraints',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Constraints,
+		keys: [ 'min', 'max', 'step' ],
 	},
 	{
 		kind: 'section',
 		id: 'validation',
-		tab: 'settings',
-		labelKey: 'editorSectionValidation',
-		keys: [ 'error_message', 'max', 'min', 'step' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Validation,
+		keys: [ 'error_message' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'display',
-		tab: 'settings',
-		labelKey: 'editorSectionDisplay',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
 		keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'behavior',
-		tab: 'settings',
-		labelKey: 'editorSectionBehavior',
-		keys: [ 'desc_tooltip', 'required' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Behavior,
+		keys: [ 'desc_tooltip' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'conditions',
-		tab: 'conditions',
+		tab: FieldTab.Conditions,
 		labelKey: 'conditionsTab',
 		keys: [ 'logic', 'conditions' ],
 	},
@@ -217,23 +248,23 @@ const HIDDEN_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
 		id: 'basic',
-		tab: 'settings',
-		labelKey: 'editorSectionBasic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name', 'field_value' ],
 	},
 	{
 		kind: 'section',
 		id: 'display',
-		tab: 'settings',
-		labelKey: 'editorSectionDisplay',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
 		keys: [ 'visibility', 'visibility_role' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'behavior',
-		tab: 'settings',
-		labelKey: 'editorSectionBehavior',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Behavior,
 		keys: [ 'cart_display' ],
 		advanced: true,
 	},
@@ -243,54 +274,53 @@ const SELECT_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
 		id: 'basic',
-		tab: 'settings',
-		labelKey: 'editorSectionBasic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name', 'description' ],
 	},
 	{
 		kind: 'widget',
 		id: 'options',
-		tab: 'settings',
-		widget: 'paired-options',
+		tab: FieldTab.Settings,
+		widget: WidgetKind.PairedOptions,
 		ownedKeys: [ 'options' ],
 		props: { variant: 'select' },
 	},
 	{
 		kind: 'section',
-		id: 'defaults',
-		tab: 'settings',
-		labelKey: 'editorSectionDefaultPrice',
-		keys: [ 'selected', 'first_option' ],
-		advanced: true,
+		id: 'field-settings',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.FieldSettings,
+		keys: [ 'required', 'selected', 'first_option', 'onetime' ],
 	},
 	{
 		kind: 'section',
 		id: 'validation',
-		tab: 'settings',
-		labelKey: 'editorSectionValidation',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Validation,
 		keys: [ 'error_message' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'display',
-		tab: 'settings',
-		labelKey: 'editorSectionDisplay',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
 		keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'behavior',
-		tab: 'settings',
-		labelKey: 'editorSectionBehavior',
-		keys: [ 'desc_tooltip', 'onetime', 'required' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Behavior,
+		keys: [ 'desc_tooltip' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'conditions',
-		tab: 'conditions',
+		tab: FieldTab.Conditions,
 		labelKey: 'conditionsTab',
 		keys: [ 'logic', 'conditions' ],
 	},
@@ -300,54 +330,60 @@ const CHECKBOX_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
 		id: 'basic',
-		tab: 'settings',
-		labelKey: 'editorSectionBasic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name', 'description' ],
 	},
 	{
 		kind: 'widget',
 		id: 'options',
-		tab: 'settings',
-		widget: 'paired-options',
+		tab: FieldTab.Settings,
+		widget: WidgetKind.PairedOptions,
 		ownedKeys: [ 'options' ],
 		props: { variant: 'checkbox' },
 	},
 	{
 		kind: 'section',
-		id: 'defaults',
-		tab: 'settings',
-		labelKey: 'editorSectionDefaultPrice',
-		keys: [ 'checked', 'min_checked', 'max_checked' ],
-		advanced: true,
+		id: 'field-settings',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.FieldSettings,
+		keys: [ 'required', 'checked', 'onetime' ],
+	},
+	{
+		kind: 'section',
+		id: 'constraints',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Constraints,
+		keys: [ 'min_checked', 'max_checked' ],
 	},
 	{
 		kind: 'section',
 		id: 'validation',
-		tab: 'settings',
-		labelKey: 'editorSectionValidation',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Validation,
 		keys: [ 'error_message' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'display',
-		tab: 'settings',
-		labelKey: 'editorSectionDisplay',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
 		keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'behavior',
-		tab: 'settings',
-		labelKey: 'editorSectionBehavior',
-		keys: [ 'desc_tooltip', 'onetime', 'required' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Behavior,
+		keys: [ 'desc_tooltip' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'conditions',
-		tab: 'conditions',
+		tab: FieldTab.Conditions,
 		labelKey: 'conditionsTab',
 		keys: [ 'logic', 'conditions' ],
 	},
@@ -357,54 +393,53 @@ const RADIO_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
 		id: 'basic',
-		tab: 'settings',
-		labelKey: 'editorSectionBasic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name', 'description' ],
 	},
 	{
 		kind: 'widget',
 		id: 'options',
-		tab: 'settings',
-		widget: 'paired-options',
+		tab: FieldTab.Settings,
+		widget: WidgetKind.PairedOptions,
 		ownedKeys: [ 'options' ],
 		props: { variant: 'radio' },
 	},
 	{
 		kind: 'section',
-		id: 'defaults',
-		tab: 'settings',
-		labelKey: 'editorSectionDefaultPrice',
-		keys: [ 'selected' ],
-		advanced: true,
+		id: 'field-settings',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.FieldSettings,
+		keys: [ 'required', 'selected', 'onetime' ],
 	},
 	{
 		kind: 'section',
 		id: 'validation',
-		tab: 'settings',
-		labelKey: 'editorSectionValidation',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Validation,
 		keys: [ 'error_message' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'display',
-		tab: 'settings',
-		labelKey: 'editorSectionDisplay',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
 		keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'behavior',
-		tab: 'settings',
-		labelKey: 'editorSectionBehavior',
-		keys: [ 'desc_tooltip', 'onetime', 'required' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Behavior,
+		keys: [ 'desc_tooltip' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'conditions',
-		tab: 'conditions',
+		tab: FieldTab.Conditions,
 		labelKey: 'conditionsTab',
 		keys: [ 'logic', 'conditions' ],
 	},
@@ -414,46 +449,53 @@ const DATE_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
 		id: 'basic',
-		tab: 'settings',
-		labelKey: 'editorSectionBasic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name', 'description', 'placeholder' ],
 	},
 	{
 		kind: 'section',
+		id: 'field-settings',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.FieldSettings,
+		keys: [ 'required', 'date_formats', 'default_value' ],
+	},
+	{
+		kind: 'section',
 		id: 'validation',
-		tab: 'settings',
-		labelKey: 'editorSectionValidation',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Validation,
 		keys: [ 'error_message' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'date',
-		tab: 'settings',
-		labelKey: 'editorSectionDateCalendar',
-		keys: [ 'date_formats', 'default_value', 'min_date', 'max_date', 'year_range', 'first_day_of_week' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.DateCalendar,
+		keys: [ 'min_date', 'max_date', 'year_range', 'first_day_of_week' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'layout',
-		tab: 'settings',
-		labelKey: 'editorSectionDisplay',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
 		keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'rules',
-		tab: 'settings',
-		labelKey: 'editorSectionBehavior',
-		keys: [ 'jquery_dp', 'no_weekends', 'past_dates', 'desc_tooltip', 'required' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Behavior,
+		keys: [ 'jquery_dp', 'no_weekends', 'past_dates', 'desc_tooltip' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'conditions',
-		tab: 'conditions',
+		tab: FieldTab.Conditions,
 		labelKey: 'conditionsTab',
 		keys: [ 'logic', 'conditions' ],
 	},
@@ -463,46 +505,45 @@ const TIMEZONE_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
 		id: 'basic',
-		tab: 'settings',
-		labelKey: 'editorSectionBasic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name', 'description' ],
 	},
 	{
 		kind: 'section',
-		id: 'options',
-		tab: 'settings',
-		labelKey: 'editorSectionDefaultPrice',
-		keys: [ 'selected', 'first_option' ],
-		advanced: true,
+		id: 'field-settings',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.FieldSettings,
+		keys: [ 'required', 'selected', 'first_option' ],
 	},
 	{
 		kind: 'section',
 		id: 'regions',
-		tab: 'settings',
-		labelKey: 'editorSectionMore',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.More,
 		keys: [ 'regions', 'error_message' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'layout',
-		tab: 'settings',
-		labelKey: 'editorSectionDisplay',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
 		keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'behavior',
-		tab: 'settings',
-		labelKey: 'editorSectionBehavior',
-		keys: [ 'show_time', 'desc_tooltip', 'required' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Behavior,
+		keys: [ 'show_time', 'desc_tooltip' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'conditions',
-		tab: 'conditions',
+		tab: FieldTab.Conditions,
 		labelKey: 'conditionsTab',
 		keys: [ 'logic', 'conditions' ],
 	},
@@ -512,46 +553,53 @@ const COLOR_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
 		id: 'basic',
-		tab: 'settings',
-		labelKey: 'editorSectionBasic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name', 'description' ],
 	},
 	{
 		kind: 'section',
+		id: 'field-settings',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.FieldSettings,
+		keys: [ 'required', 'default_color' ],
+	},
+	{
+		kind: 'section',
 		id: 'validation',
-		tab: 'settings',
-		labelKey: 'editorSectionValidation',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Validation,
 		keys: [ 'error_message' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'palette',
-		tab: 'settings',
-		labelKey: 'editorSectionDefaultPrice',
-		keys: [ 'default_color', 'palettes_colors', 'palettes_width', 'palettes_mode' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.DefaultPrice,
+		keys: [ 'palettes_colors', 'palettes_width', 'palettes_mode' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'layout',
-		tab: 'settings',
-		labelKey: 'editorSectionDisplay',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
 		keys: [ 'width', 'visibility', 'visibility_role' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'behavior',
-		tab: 'settings',
-		labelKey: 'editorSectionBehavior',
-		keys: [ 'show_palettes', 'show_onload', 'desc_tooltip', 'required' ],
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Behavior,
+		keys: [ 'show_palettes', 'show_onload', 'desc_tooltip' ],
 		advanced: true,
 	},
 	{
 		kind: 'section',
 		id: 'conditions',
-		tab: 'conditions',
+		tab: FieldTab.Conditions,
 		labelKey: 'conditionsTab',
 		keys: [ 'logic', 'conditions' ],
 	},
@@ -561,15 +609,15 @@ const DIVIDER_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
 		id: 'basic',
-		tab: 'settings',
-		labelKey: 'editorSectionBasic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name' ],
 	},
 	{
 		kind: 'section',
 		id: 'style',
-		tab: 'settings',
-		labelKey: 'editorSectionDisplay',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
 		keys: [ 'divider_styles', 'style1_border', 'divider_height', 'divider_txtsize', 'divider_color', 'divider_txtclr' ],
 		advanced: true,
 	},
@@ -618,7 +666,7 @@ function withConditions(
 		...blocks,
 		sectionBlock(
 			'conditions',
-			'conditions',
+			FieldTab.Conditions,
 			'conditionsTab',
 			[ 'logic', 'conditions' ]
 		),
@@ -628,28 +676,33 @@ function withConditions(
 const FILE_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'file_cost', 'onetime' ]
+	),
+	sectionBlock(
+		'constraints',
+		FieldTab.Settings,
+		SectionLabelKey.Constraints,
+		[ 'files_allowed', 'file_types', 'file_size' ]
+	),
+	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
-		'pricing',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'file_cost' ],
-		true
-	),
-	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[
 			'class',
 			'width',
@@ -661,16 +714,9 @@ const FILE_BLOCKS = withConditions(
 		true
 	),
 	sectionBlock(
-		'media',
-		'settings',
-		'editorSectionMedia',
-		[ 'files_allowed', 'file_types', 'file_size' ],
-		true
-	),
-	sectionBlock(
 		'dimensions',
-		'settings',
-		'editorSectionImageDimensions',
+		FieldTab.Settings,
+		SectionLabelKey.ImageDimensions,
 		[
 			'min_img_h',
 			'max_img_h',
@@ -682,9 +728,9 @@ const FILE_BLOCKS = withConditions(
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'desc_tooltip', 'onetime', 'required' ],
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
+		[ 'desc_tooltip' ],
 		true
 	)
 );
@@ -692,24 +738,29 @@ const FILE_BLOCKS = withConditions(
 const DATERANGE_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'date_formats' ]
+	),
+	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
 		'date',
-		'settings',
-		'editorSectionDateCalendar',
+		FieldTab.Settings,
+		SectionLabelKey.DateCalendar,
 		[
 			'open_style',
-			'date_formats',
 			'tp_increment',
 			'start_date',
 			'end_date',
@@ -720,15 +771,15 @@ const DATERANGE_BLOCKS = withConditions(
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'class', 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
 		[
 			'time_picker',
 			'tp_24hours',
@@ -737,7 +788,6 @@ const DATERANGE_BLOCKS = withConditions(
 			'show_weeks',
 			'auto_apply',
 			'desc_tooltip',
-			'required',
 		],
 		true
 	)
@@ -746,21 +796,21 @@ const DATERANGE_BLOCKS = withConditions(
 const SECTION_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'data_name', 'description', 'html' ]
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
 		[ 'desc_tooltip', 'cart_display' ],
 		true
 	)
@@ -769,36 +819,47 @@ const SECTION_BLOCKS = withConditions(
 const MEASURE_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'default_value' ]
+	),
+	sectionBlock(
 		'pricing',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'default_value', 'price-multiplier', 'price' ],
-		true
+		FieldTab.Settings,
+		SectionLabelKey.DefaultPrice,
+		[ 'price', 'price-multiplier' ]
+	),
+	sectionBlock(
+		'constraints',
+		FieldTab.Settings,
+		SectionLabelKey.Constraints,
+		[ 'min', 'max', 'step' ]
 	),
 	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
-		[ 'error_message', 'max', 'min', 'step' ],
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
+		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'class', 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'desc_tooltip', 'required' ],
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
+		[ 'desc_tooltip' ],
 		true
 	)
 );
@@ -806,8 +867,8 @@ const MEASURE_BLOCKS = withConditions(
 const PHONE_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[
 			'title',
 			'data_name',
@@ -816,35 +877,33 @@ const PHONE_BLOCKS = withConditions(
 		]
 	),
 	sectionBlock(
-		'options',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'default_country' ],
-		true
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'default_country' ]
 	),
 	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'class', 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
 		[
 			'enable_search',
 			'enable_material',
 			'desc_tooltip',
-			'required',
 		],
 		true
 	)
@@ -853,36 +912,42 @@ const PHONE_BLOCKS = withConditions(
 const SUPERLIST_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'listoptions', 'selected' ]
+	),
+	sectionBlock(
 		'options',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'listoptions', 'option_exclude', 'selected' ],
+		FieldTab.Settings,
+		SectionLabelKey.DefaultPrice,
+		[ 'option_exclude' ],
 		true
 	),
 	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'desc_tooltip', 'required' ],
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
+		[ 'desc_tooltip' ],
 		true
 	)
 );
@@ -890,28 +955,28 @@ const SUPERLIST_BLOCKS = withConditions(
 const TEXTER_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description', 'post_id' ]
 	),
 	sectionBlock(
 		'button',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'button_title', 'btn_color', 'btn_bg_color', 'width' ],
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
 		[
 			'alignment',
 			'font_size',
@@ -926,29 +991,28 @@ const TEXTER_BLOCKS = withConditions(
 const DOMAIN_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description', 'placeholder' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required' ]
+	),
+	sectionBlock(
 		'messages',
-		'settings',
-		'editorSectionDefaultPrice',
+		FieldTab.Settings,
+		SectionLabelKey.DefaultPrice,
 		[ 'available_message', 'notavailable_message' ],
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'button_label', 'button_class', 'width' ],
-		true
-	),
-	sectionBlock(
-		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'required' ],
 		true
 	)
 );
@@ -956,14 +1020,14 @@ const DOMAIN_BLOCKS = withConditions(
 const COLLAPSE_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name' ]
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
 		[ 'collapse_type', 'default_open' ],
 		true
 	)
@@ -972,8 +1036,8 @@ const COLLAPSE_BLOCKS = withConditions(
 const QUANTITYOPTION_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[
 			'title',
 			'data_name',
@@ -982,31 +1046,42 @@ const QUANTITYOPTION_BLOCKS = withConditions(
 		]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'default_value' ]
+	),
+	sectionBlock(
 		'pricing',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'unit_price', 'default_value' ],
-		true
+		FieldTab.Settings,
+		SectionLabelKey.DefaultPrice,
+		[ 'unit_price', 'onetime' ]
+	),
+	sectionBlock(
+		'constraints',
+		FieldTab.Settings,
+		SectionLabelKey.Constraints,
+		[ 'min', 'max', 'step' ]
 	),
 	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
-		[ 'error_message', 'min', 'max', 'step' ],
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
+		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'class', 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'desc_tooltip', 'onetime', 'required' ],
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
+		[ 'desc_tooltip' ],
 		true
 	)
 );
@@ -1014,35 +1089,35 @@ const QUANTITYOPTION_BLOCKS = withConditions(
 const QTYPACK_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'options',
-		'settings',
-		'paired-quantity',
+		FieldTab.Settings,
+		WidgetKind.PairedQuantity,
 		[ 'options' ],
 		{ fieldKey: 'options' }
 	),
 	sectionBlock(
 		'pricing',
-		'settings',
-		'editorSectionDefaultPrice',
+		FieldTab.Settings,
+		SectionLabelKey.DefaultPrice,
 		[ 'default_price', 'pack_size', 'packsize_message' ],
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
 		[ 'desc_tooltip' ],
 		true
 	)
@@ -1051,34 +1126,33 @@ const QTYPACK_BLOCKS = withConditions(
 const SWITCHER_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'options',
-		'settings',
-		'paired-switch',
+		FieldTab.Settings,
+		WidgetKind.PairedSwitch,
 		[ 'options' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'selected', 'onetime' ]
+	),
+	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
-		'defaults',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'selected' ],
-		true
-	),
-	sectionBlock(
 		'appearance',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[
 			'marker_height',
 			'font_size',
@@ -1091,16 +1165,16 @@ const SWITCHER_BLOCKS = withConditions(
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'class', 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'desc_tooltip', 'onetime', 'required' ],
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
+		[ 'desc_tooltip' ],
 		true
 	)
 );
@@ -1108,42 +1182,41 @@ const SWITCHER_BLOCKS = withConditions(
 const CHAINED_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'options',
-		'settings',
-		'chained-options',
+		FieldTab.Settings,
+		WidgetKind.ChainedOptions,
 		[ 'options' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'selected', 'first_option', 'onetime' ]
+	),
+	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
-		'defaults',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'selected', 'first_option' ],
-		true
-	),
-	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'class', 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'desc_tooltip', 'onetime', 'required' ],
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
+		[ 'desc_tooltip' ],
 		true
 	)
 );
@@ -1151,99 +1224,97 @@ const CHAINED_BLOCKS = withConditions(
 const CONDITIONAL_META_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'images',
-		'settings',
-		'conditional-images',
+		FieldTab.Settings,
+		WidgetKind.ConditionalImages,
 		[ 'images' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required' ]
+	),
+	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
 		'appearance',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'class', 'selected_optionclr', 'width' ],
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'desc_tooltip', 'required' ],
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
+		[ 'desc_tooltip' ],
 		true
 	)
 );
 
-const PREVIEW_TAB = { id: 'preview', labelKey: 'Preview' };
+const PREVIEW_TAB = { id: FieldTab.Preview, labelKey: 'Preview' };
 
 const FONTS_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'options',
-		'settings',
-		'fonts-paired',
+		FieldTab.Settings,
+		WidgetKind.FontsPaired,
 		[ 'options' ]
 	),
 	sectionBlock(
-		'defaults',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'first_option' ],
-		true
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'first_option' ]
 	),
 	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
 		'layout',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'width', 'desc_tooltip' ],
 		true
 	),
 	sectionBlock(
 		'custom-fonts',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'custom_fonts' ],
 		true
 	),
 	sectionBlock(
-		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'required' ],
-		true
-	),
-	sectionBlock(
 		'preview-basic',
-		'preview',
+		FieldTab.Preview,
 		'Preview',
 		[
 			'label_placeholder',
@@ -1259,8 +1330,8 @@ const FONTS_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	),
 	sectionBlock(
 		'preview-colors',
-		'preview',
-		'editorSectionDisplay',
+		FieldTab.Preview,
+		SectionLabelKey.Display,
 		[
 			'preview_box_textcolor',
 			'preview_box_bgcolor',
@@ -1272,7 +1343,7 @@ const FONTS_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	),
 	sectionBlock(
 		'conditions',
-		'conditions',
+		FieldTab.Conditions,
 		'conditionsTab',
 		[ 'logic', 'conditions' ]
 	),
@@ -1281,25 +1352,33 @@ const FONTS_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 const VQMATRIX_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'matrix',
-		'settings',
-		'vqmatrix',
+		FieldTab.Settings,
+		WidgetKind.Vqmatrix,
 		[ 'options', 'row_options' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'vqmatrix_label', 'default_price' ]
+	),
+	sectionBlock(
+		'constraints',
+		FieldTab.Settings,
+		SectionLabelKey.Constraints,
+		[ 'min_qty', 'max_qty' ]
+	),
+	sectionBlock(
 		'pricing',
-		'settings',
-		'editorSectionDefaultPrice',
+		FieldTab.Settings,
+		SectionLabelKey.DefaultPrice,
 		[
-			'vqmatrix_label',
-			'default_price',
-			'min_qty',
-			'max_qty',
 			'price_view',
 			'enable_plusminus',
 		],
@@ -1307,16 +1386,16 @@ const VQMATRIX_BLOCKS = withConditions(
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'desc_tooltip', 'required' ],
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
+		[ 'desc_tooltip' ],
 		true
 	)
 );
@@ -1324,35 +1403,41 @@ const VQMATRIX_BLOCKS = withConditions(
 const AUDIO_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'audio',
-		'settings',
-		'audio-media',
+		FieldTab.Settings,
+		WidgetKind.AudioMedia,
 		[ 'audio' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required' ]
+	),
+	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'class', 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'desc_tooltip', 'required', 'multiple_allowed' ],
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
+		[ 'desc_tooltip', 'multiple_allowed' ],
 		true
 	)
 );
@@ -1360,20 +1445,20 @@ const AUDIO_BLOCKS = withConditions(
 const BULKQUANTITY_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'bulk-quantity',
-		'settings',
-		'bulk-quantity',
+		FieldTab.Settings,
+		WidgetKind.BulkQuantity,
 		[ 'options' ]
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[
 			'fixed_prices',
 			'label_quantity',
@@ -1390,43 +1475,51 @@ const BULKQUANTITY_BLOCKS = withConditions(
 const CROPPER_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'viewport',
-		'settings',
-		'paired-cropper',
+		FieldTab.Settings,
+		WidgetKind.PairedCropper,
 		[ 'options' ],
 		{ fieldKey: 'options' }
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'selected', 'first_option' ]
+	),
+	sectionBlock(
+		'pricing',
+		FieldTab.Settings,
+		SectionLabelKey.DefaultPrice,
+		[ 'file_cost' ]
+	),
+	sectionBlock(
+		'constraints',
+		FieldTab.Settings,
+		SectionLabelKey.Constraints,
+		[ 'files_allowed', 'file_types', 'file_size', 'viewport_type' ]
+	),
+	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
-		'defaults',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'file_cost', 'selected', 'first_option' ],
-		true
-	),
-	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[
 			'class',
 			'width',
 			'button_label_select',
 			'button_class',
-			'files_allowed',
-			'file_types',
-			'file_size',
 			'visibility',
 			'visibility_role',
 		],
@@ -1434,10 +1527,9 @@ const CROPPER_BLOCKS = withConditions(
 	),
 	sectionBlock(
 		'media',
-		'settings',
-		'editorSectionMedia',
+		FieldTab.Settings,
+		SectionLabelKey.Media,
 		[
-			'viewport_type',
 			'boundary',
 			'enforce_boundary',
 			'resize',
@@ -1450,9 +1542,9 @@ const CROPPER_BLOCKS = withConditions(
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'desc_tooltip', 'required' ],
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
+		[ 'desc_tooltip' ],
 		true
 	)
 );
@@ -1460,34 +1552,39 @@ const CROPPER_BLOCKS = withConditions(
 const EMOJIS_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'emojis_display_type', 'onetime' ]
+	),
+	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	widgetBlock(
 		'options',
-		'settings',
-		'paired-palettes',
+		FieldTab.Settings,
+		WidgetKind.PairedPalettes,
 		[ 'options' ],
 		undefined,
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[
 			'class',
 			'max_selected',
 			'width',
-			'emojis_display_type',
 			'search_placeholder',
 			'placeholder',
 			'filters_position',
@@ -1504,12 +1601,10 @@ const EMOJIS_BLOCKS = withConditions(
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
 		[
 			'desc_tooltip',
-			'required',
-			'onetime',
 			'onetime_taxable',
 		],
 		true
@@ -1519,28 +1614,27 @@ const EMOJIS_BLOCKS = withConditions(
 const FIXEDPRICE_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'options',
-		'settings',
-		'fixed-price-paired',
+		FieldTab.Settings,
+		WidgetKind.FixedPricePaired,
 		[ 'options' ]
 	),
 	sectionBlock(
-		'defaults',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'first_option', 'unit_plural', 'unit_single' ],
-		true
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'view_type', 'first_option', 'unit_plural', 'unit_single' ]
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
-		[ 'view_type', 'decimal_place', 'class', 'width' ],
+		FieldTab.Settings,
+		SectionLabelKey.Display,
+		[ 'decimal_place', 'class', 'width' ],
 		true
 	)
 );
@@ -1548,41 +1642,46 @@ const FIXEDPRICE_BLOCKS = withConditions(
 const IMAGE_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'images',
-		'settings',
-		'image-media',
+		FieldTab.Settings,
+		WidgetKind.ImageMedia,
 		[ 'images' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'selected', 'multiple_allowed' ]
+	),
+	sectionBlock(
+		'constraints',
+		FieldTab.Settings,
+		SectionLabelKey.Constraints,
+		[ 'min_checked', 'max_checked' ]
+	),
+	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
-		'defaults',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'selected' ],
-		true
-	),
-	sectionBlock(
 		'image-settings',
-		'settings',
-		'editorSectionImageSettings',
+		FieldTab.Settings,
+		SectionLabelKey.ImageSettings,
 		[ 'selected_img_bordercolor', 'image_width', 'image_height' ],
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[
 			'class',
 			'width',
@@ -1595,14 +1694,10 @@ const IMAGE_BLOCKS = withConditions(
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
 		[
 			'desc_tooltip',
-			'required',
-			'multiple_allowed',
-			'min_checked',
-			'max_checked',
 		],
 		true
 	)
@@ -1611,34 +1706,33 @@ const IMAGE_BLOCKS = withConditions(
 const IMAGESELECT_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'images',
-		'settings',
-		'imageselect-media',
+		FieldTab.Settings,
+		WidgetKind.ImageselectMedia,
 		[ 'images' ]
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'first_option', 'enable_gallery', 'image_replace' ]
+	),
+	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
-		'defaults',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'first_option' ],
-		true
-	),
-	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[
 			'dropdown_height',
 			'image_width',
@@ -1653,9 +1747,9 @@ const IMAGESELECT_BLOCKS = withConditions(
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'desc_tooltip', 'enable_gallery', 'image_replace', 'required' ],
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
+		[ 'desc_tooltip' ],
 		true
 	)
 );
@@ -1663,49 +1757,49 @@ const IMAGESELECT_BLOCKS = withConditions(
 const PALETTES_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
+	),
+	widgetBlock(
+		'options',
+		FieldTab.Settings,
+		WidgetKind.PairedPalettes,
+		[ 'options' ],
+		undefined,
+		false
+	),
+	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'selected', 'onetime', 'multiple_allowed' ]
 	),
 	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
 		'selected-border',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'selected_palette_bcolor' ],
-		true
-	),
-	widgetBlock(
-		'options',
-		'settings',
-		'paired-palettes',
-		[ 'options' ],
-		undefined,
-		true
-	),
-	sectionBlock(
-		'defaults',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'selected' ],
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[
 			'class',
 			'width',
 			'max_selected',
 			'color_width',
 			'color_height',
+			'circle',
 			'visibility',
 			'visibility_role',
 		],
@@ -1713,14 +1807,10 @@ const PALETTES_BLOCKS = withConditions(
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
 		[
-			'multiple_allowed',
-			'onetime',
-			'circle',
 			'desc_tooltip',
-			'required',
 		],
 		true
 	)
@@ -1729,29 +1819,28 @@ const PALETTES_BLOCKS = withConditions(
 const PRICEMATRIX_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	sectionBlock(
-		'pricing',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'discount_type' ],
-		true
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'discount_type' ]
 	),
 	widgetBlock(
 		'options',
-		'settings',
-		'paired-pricematrix',
+		FieldTab.Settings,
+		WidgetKind.PairedPricematrix,
 		[ 'options' ],
 		undefined,
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[
 			'qty_step',
 			'visibility',
@@ -1765,8 +1854,8 @@ const PRICEMATRIX_BLOCKS = withConditions(
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
 		[ 'desc_tooltip' ],
 		true
 	)
@@ -1775,48 +1864,52 @@ const PRICEMATRIX_BLOCKS = withConditions(
 const QUANTITIES_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'options',
-		'settings',
-		'paired-quantity',
+		FieldTab.Settings,
+		WidgetKind.PairedQuantity,
 		[ 'options' ],
 		{ fieldKey: 'options' }
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'view_control', 'default_price' ]
+	),
+	sectionBlock(
+		'constraints',
+		FieldTab.Settings,
+		SectionLabelKey.Constraints,
+		[ 'min_qty', 'max_qty' ]
+	),
+	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
-		'variation-layout',
-		'settings',
-		'editorSectionVariationLayout',
-		[ 'view_control', 'default_price', 'min_qty', 'max_qty' ],
-		true
-	),
-	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'class', 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
 		[
 			'desc_tooltip',
 			'enable_plusminus',
 			'manage_stock',
 			'unlink_order_qty',
-			'required',
 		],
 		true
 	)
@@ -1825,98 +1918,104 @@ const QUANTITIES_BLOCKS = withConditions(
 const SELECTQTY_BLOCKS = withConditions(
 	sectionBlock(
 		'basic',
-		'settings',
-		'editorSectionBasic',
+		FieldTab.Settings,
+		SectionLabelKey.Basic,
 		[ 'title', 'data_name', 'description' ]
 	),
 	widgetBlock(
 		'options',
-		'settings',
-		'paired-options',
+		FieldTab.Settings,
+		WidgetKind.PairedOptions,
 		[ 'options' ],
 		{ variant: 'select' }
 	),
 	sectionBlock(
+		'field-settings',
+		FieldTab.Settings,
+		SectionLabelKey.FieldSettings,
+		[ 'required', 'selected', 'first_option' ]
+	),
+	sectionBlock(
 		'validation',
-		'settings',
-		'editorSectionValidation',
+		FieldTab.Settings,
+		SectionLabelKey.Validation,
 		[ 'error_message' ],
 		true
 	),
 	sectionBlock(
 		'defaults',
-		'settings',
-		'editorSectionDefaultPrice',
-		[ 'selected', 'first_option', 'option_label', 'qty_label' ],
+		FieldTab.Settings,
+		SectionLabelKey.DefaultPrice,
+		[ 'option_label', 'qty_label' ],
 		true
 	),
 	sectionBlock(
 		'display',
-		'settings',
-		'editorSectionDisplay',
+		FieldTab.Settings,
+		SectionLabelKey.Display,
 		[ 'class', 'width', 'visibility', 'visibility_role' ],
 		true
 	),
 	sectionBlock(
 		'behavior',
-		'settings',
-		'editorSectionBehavior',
-		[ 'desc_tooltip', 'required', 'unlink_order_qty' ],
+		FieldTab.Settings,
+		SectionLabelKey.Behavior,
+		[ 'desc_tooltip', 'unlink_order_qty' ],
 		true
 	)
 );
 
 export function registerBuiltinFieldUiDefinitions(): void {
-	registerFieldUiDefinition( definition( 'text', TEXT_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'textcounter', TEXT_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'textarea', TEXTAREA_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'email', EMAIL_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'number', NUMBER_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'hidden', HIDDEN_BLOCKS, [ SETTINGS_TAB ] ) );
-	registerFieldUiDefinition( definition( 'date', DATE_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'timezone', TIMEZONE_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'color', COLOR_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'divider', DIVIDER_BLOCKS, [ SETTINGS_TAB ] ) );
-	registerFieldUiDefinition( definition( 'select', SELECT_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'checkbox', CHECKBOX_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'radio', RADIO_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'file', FILE_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'daterange', DATERANGE_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'section', SECTION_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'measure', MEASURE_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'phone', PHONE_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'superlist', SUPERLIST_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'texter', TEXTER_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'domain', DOMAIN_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'collapse', COLLAPSE_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'quantityoption', QUANTITYOPTION_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'qtypack', QTYPACK_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'switcher', SWITCHER_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'chained', CHAINED_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'conditional_meta', CONDITIONAL_META_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Text, TEXT_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Textcounter, TEXT_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Textarea, TEXTAREA_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Email, EMAIL_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Number, NUMBER_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Hidden, HIDDEN_BLOCKS, [ SETTINGS_TAB ] ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Date, DATE_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Timezone, TIMEZONE_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Color, COLOR_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Divider, DIVIDER_BLOCKS, [ SETTINGS_TAB ] ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Select, SELECT_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Checkbox, CHECKBOX_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Radio, RADIO_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.File, FILE_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Daterange, DATERANGE_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Section, SECTION_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Measure, MEASURE_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Phone, PHONE_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Superlist, SUPERLIST_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Texter, TEXTER_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Domain, DOMAIN_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Collapse, COLLAPSE_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Quantityoption, QUANTITYOPTION_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Qtypack, QTYPACK_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Switcher, SWITCHER_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Chained, CHAINED_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.ConditionalMeta, CONDITIONAL_META_BLOCKS ) );
 	registerFieldUiDefinition(
-		definition( 'fonts', FONTS_BLOCKS, [ SETTINGS_TAB, PREVIEW_TAB, CONDITIONS_TAB ] )
+		definition( BuiltinFieldType.Fonts, FONTS_BLOCKS, [ SETTINGS_TAB, PREVIEW_TAB, CONDITIONS_TAB ] )
 	);
-	registerFieldUiDefinition( definition( 'vqmatrix', VQMATRIX_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'audio', AUDIO_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Vqmatrix, VQMATRIX_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Audio, AUDIO_BLOCKS ) );
 	registerFieldUiDefinition(
-		definition( 'bulkquantity', BULKQUANTITY_BLOCKS )
+		definition( BuiltinFieldType.Bulkquantity, BULKQUANTITY_BLOCKS )
 	);
-	registerFieldUiDefinition( definition( 'cropper', CROPPER_BLOCKS ) );
-	registerFieldUiDefinition( definition( 'emojis', EMOJIS_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Cropper, CROPPER_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Emojis, EMOJIS_BLOCKS ) );
 	registerFieldUiDefinition(
-		definition( 'fixedprice', FIXEDPRICE_BLOCKS )
+		definition( BuiltinFieldType.Fixedprice, FIXEDPRICE_BLOCKS )
 	);
-	registerFieldUiDefinition( definition( 'image', IMAGE_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Image, IMAGE_BLOCKS ) );
 	registerFieldUiDefinition(
-		definition( 'imageselect', IMAGESELECT_BLOCKS )
+		definition( BuiltinFieldType.Imageselect, IMAGESELECT_BLOCKS )
 	);
-	registerFieldUiDefinition( definition( 'palettes', PALETTES_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Palettes, PALETTES_BLOCKS ) );
 	registerFieldUiDefinition(
-		definition( 'pricematrix', PRICEMATRIX_BLOCKS )
+		definition( BuiltinFieldType.Pricematrix, PRICEMATRIX_BLOCKS )
 	);
 	registerFieldUiDefinition(
-		definition( 'quantities', QUANTITIES_BLOCKS )
+		definition( BuiltinFieldType.Quantities, QUANTITIES_BLOCKS )
 	);
-	registerFieldUiDefinition( definition( 'selectqty', SELECTQTY_BLOCKS ) );
+	registerFieldUiDefinition( definition( BuiltinFieldType.Selectqty, SELECTQTY_BLOCKS ) );
 }

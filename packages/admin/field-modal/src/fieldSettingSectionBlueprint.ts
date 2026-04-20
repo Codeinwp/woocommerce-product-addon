@@ -1,6 +1,7 @@
 /**
  * Section groupings for schema-driven (fallback) field editors — mirrors Text/Textarea/Select editors.
  */
+import { SectionLabelKey } from './definitions/builtinFieldTypes';
 import { classifySettingTab } from './schemaTabs';
 import { isReactModalExcludedSchemaKey } from './schema/reactModalExcludedKeys';
 import type { I18nDict } from './types/fieldModal';
@@ -8,27 +9,71 @@ import type { I18nDict } from './types/fieldModal';
 /** Ordered section definitions; each setting key appears in at most one section (first match wins). */
 export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 	{
-		labelKey: 'editorSectionBasic',
+		labelKey: SectionLabelKey.Basic,
 		keys: [ 'title', 'data_name', 'description', 'placeholder' ],
 		advanced: false,
 	},
 	{
-		labelKey: 'editorSectionValidation',
+		labelKey: SectionLabelKey.FieldSettings,
+		keys: [
+			'required',
+			'default_value',
+			'selected',
+			'first_option',
+			'checked',
+			'default_color',
+			'date_formats',
+			'emojis_display_type',
+			'view_type',
+			'view_control',
+			'viewport_type',
+			'multiple_allowed',
+			'discount_type',
+		],
+		advanced: false,
+	},
+	{
+		labelKey: SectionLabelKey.DefaultPrice,
+		keys: [
+			'price',
+			'file_cost',
+			'unit_price',
+			'onetime',
+			'default_price',
+			'vqmatrix_label',
+		],
+		advanced: false,
+	},
+	{
+		labelKey: SectionLabelKey.Constraints,
+		keys: [
+			'min',
+			'max',
+			'step',
+			'min_checked',
+			'max_checked',
+			'min_qty',
+			'max_qty',
+			'max_selected',
+			'files_allowed',
+			'file_types',
+			'file_size',
+		],
+		advanced: false,
+	},
+	{
+		labelKey: SectionLabelKey.Validation,
 		keys: [
 			'error_message',
 			'maxlength',
 			'minlength',
 			'max_length',
-			'max',
-			'min',
-			'step',
 		],
 		advanced: true,
 	},
 	{
-		labelKey: 'editorSectionDateCalendar',
+		labelKey: SectionLabelKey.DateCalendar,
 		keys: [
-			'date_formats',
 			'min_date',
 			'max_date',
 			'year_range',
@@ -47,23 +92,7 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 		advanced: true,
 	},
 	{
-		labelKey: 'editorSectionDefaultPrice',
-		keys: [
-			'default_value',
-			'price',
-			'selected',
-			'first_option',
-			'checked',
-			'file_cost',
-			'default_color',
-			'discount_type',
-			'qty_step',
-			'discount',
-		],
-		advanced: true,
-	},
-	{
-		labelKey: 'editorSectionDisplay',
+		labelKey: SectionLabelKey.Display,
 		keys: [
 			'class',
 			'input_mask',
@@ -79,17 +108,13 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 			'color_height',
 			'show_palettes',
 			'show_onload',
-			'files_allowed',
-			'file_types',
-			'file_size',
 		],
 		advanced: true,
 	},
 	{
-		labelKey: 'editorSectionMedia',
+		labelKey: SectionLabelKey.Media,
 		keys: [
 			'options',
-			'viewport_type',
 			'boundary',
 			'enforce_boundary',
 			'resize',
@@ -104,26 +129,22 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 		advanced: true,
 	},
 	{
-		labelKey: 'editorSectionBehavior',
+		labelKey: SectionLabelKey.Behavior,
 		keys: [
-			'required',
 			'jquery_dp',
 			'no_weekends',
 			'past_dates',
-			'onetime',
 			'use_regex',
 			'rich_editor',
 			'desc_tooltip',
-			'multiple_allowed',
 			'circle',
-			'min_checked',
-			'max_checked',
-			'max_selected',
+			'qty_step',
+			'discount',
 		],
 		advanced: true,
 	},
 	{
-		labelKey: 'editorSectionImageDimensions',
+		labelKey: SectionLabelKey.ImageDimensions,
 		keys: [
 			'min_img_h',
 			'max_img_h',
@@ -222,7 +243,7 @@ export function buildFallbackGroupedSections(
 	const overflow = fieldKeysOrdered.filter( ( k ) => ! assigned.has( k ) );
 	if ( overflow.length > 0 ) {
 		const label =
-			( i18n && i18n.editorSectionMore ) || 'More options';
+			( i18n && i18n[ SectionLabelKey.More ] ) || 'More options';
 		sections.push( { label, keys: overflow, advanced: true } );
 	}
 
