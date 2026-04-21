@@ -52,7 +52,10 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 		>
 			<?php echo esc_html( $btn_label ); ?>
 		</a>
-		<span class="ppom-dragdrop-text"><?php echo _e( 'Drag File Here', 'woocommerce-product-addon' ); ?></span>
+		<span class="ppom-dragdrop-text"><?php esc_html_e( 'Drag File Here', 'woocommerce-product-addon' ); ?></span>
+		<span class="ppom-field-notice">
+			<?php echo esc_html( \PPOM\Support\Helpers::get_file_uploader_notice( $fm ) ); ?>
+		</span>
 	</div> <!-- ppom-file-container -->
 
 	<div id="filelist-<?php echo esc_attr( $fm->data_name() ); ?>"
