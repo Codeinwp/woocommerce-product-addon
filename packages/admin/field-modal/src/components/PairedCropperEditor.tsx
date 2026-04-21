@@ -1,91 +1,23 @@
 /**
  * Viewport size rows for Image Cropper (paired-cropper schema type).
  */
-import {
-	Steps,
-	Box,
-	Button,
-	HStack,
-	Input,
-	VStack,
-	Field,
-	IconButton,
-} from '@chakra-ui/react';
-import { LuTrash2 } from 'react-icons/lu';
+import { Box, Button, VStack, Field } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
+import { arrayMove } from '../utils/arrayMove';
+import {
+	type CropperViewportRow,
+	emptyCropperRow,
+	normalizePairedCropperOptions,
+	serializePairedCropperOptions,
+} from '../utils/pairedCropperData';
+import { CropperViewportRowItem } from './paired-cropper/CropperViewportRowItem';
 
-export type CropperViewportRow = {
-	option: string;
-	width: string;
-	height: string;
-	price: string;
-};
-
-function emptyRow(): CropperViewportRow {
-	return { option: '', width: '', height: '', price: '' };
-}
-
-function normalizeOneRow( item: unknown ): CropperViewportRow {
-	if ( ! item || typeof item !== 'object' || Array.isArray( item ) ) {
-		return emptyRow();
-	}
-	const o = item as Record< string, unknown >;
-	return {
-		option: String( o.option ?? '' ),
-		width: String( o.width ?? '' ),
-		height: String( o.height ?? '' ),
-		price: String( o.price ?? '' ),
-	};
-}
-
-/** Normalize stored options (associative object or array) into editable rows. */
-export function normalizePairedCropperOptions(
-	raw: unknown
-): CropperViewportRow[] {
-	if ( raw == null || raw === '' ) {
-		return [ emptyRow() ];
-	}
-	if ( Array.isArray( raw ) ) {
-		if ( raw.length === 0 ) {
-			return [ emptyRow() ];
-		}
-		return raw.map( ( item ) => normalizeOneRow( item ) );
-	}
-	if ( typeof raw === 'object' ) {
-		const rec = raw as Record< string, unknown >;
-		const keys = Object.keys( rec ).sort(
-			( a, b ) => Number( a ) - Number( b )
-		);
-		if ( keys.length === 0 ) {
-			return [ emptyRow() ];
-		}
-		return keys.map( ( k ) => normalizeOneRow( rec[ k ] ) );
-	}
-	return [ emptyRow() ];
-}
-
-/** Persist as a JSON array of row objects (matches PHP `array` options). */
-export function serializePairedCropperOptions(
-	rows: CropperViewportRow[]
-): unknown {
-	const filtered = rows.filter(
-		( r ) =>
-			r.option.trim() !== '' ||
-			r.width.trim() !== '' ||
-			r.height.trim() !== '' ||
-			r.price.trim() !== ''
-	);
-	if ( filtered.length === 0 ) {
-		return [];
-	}
-	return filtered.map( ( r ) => ( {
-		option: r.option,
-		width: r.width,
-		height: r.height,
-		price: r.price,
-	} ) );
-}
+export type { CropperViewportRow } from '../utils/pairedCropperData';
+export {
+	normalizePairedCropperOptions,
+	serializePairedCropperOptions,
+} from '../utils/pairedCropperData';
 
 const labelProps = {
 	fontSize: '13px',
@@ -99,17 +31,6 @@ const helperTextProps = {
 	fontSize: 'xs',
 	color: 'gray.600',
 	lineHeight: '1.45',
-};
-
-const controlSurface = {
-	bg: 'white',
-	borderColor: 'gray.200',
-	borderRadius: 'md',
-	_hover: { borderColor: 'gray.300' },
-	_focus: {
-		borderColor: 'blue.500',
-		boxShadow: '0 0 0 1px #2271b1',
-	},
 };
 
 export interface PairedCropperEditorProps {
@@ -148,49 +69,39 @@ export function PairedCropperEditor( {
 		index: number,
 		patch: Partial< CropperViewportRow >
 	) => {
-		const next = rows.map( ( r, i ) =>
-			i === index ? { ...r, ...patch } : r
+		setRows(
+			rows.map( ( r, i ) => ( i === index ? { ...r, ...patch } : r ) )
 		);
-		setRows( next );
 	};
 
 	const addRow = () => {
-		setRows( [ ...rows, emptyRow() ] );
+		setRows( [ ...rows, emptyCropperRow() ] );
 	};
 
 	const removeRow = ( index: number ) => {
 		if ( rows.length <= 1 ) {
-			setRows( [ emptyRow() ] );
+			setRows( [ emptyCropperRow() ] );
 			return;
 		}
 		setRows( rows.filter( ( _, i ) => i !== index ) );
 	};
 
-	const move = ( index: number, dir: -1 | 1 ) => {
-		const j = index + dir;
-		if ( j < 0 || j >= rows.length ) {
-			return;
-		}
-		const next = [ ...rows ];
-		const t = next[ index ];
-		next[ index ] = next[ j ];
-		next[ j ] = t;
-		setRows( next );
-	};
+	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
+	const moveDown = ( index: number ) => setRows( arrayMove( rows, index, 1 ) );
 
-	const lbl =
+	const labelPh =
 		i18n.cropperViewportLabel || i18n.pairedOptionLabel || 'Label';
-	const wPh = i18n.cropperViewportWidth || 'Width';
-	const hPh = i18n.cropperViewportHeight || 'Height';
+	const widthPh = i18n.cropperViewportWidth || 'Width';
+	const heightPh = i18n.cropperViewportHeight || 'Height';
 	const pricePh =
 		i18n.cropperViewportPrice ||
 		i18n.pairedOptionPrice ||
 		'Price (optional)';
 
 	return (
-        <Field.Root>
-            <Field.Label { ...labelProps }>{ title }</Field.Label>
-            <Box
+		<Field.Root>
+			<Field.Label { ...labelProps }>{ title }</Field.Label>
+			<Box
 				borderWidth="1px"
 				borderColor="gray.200"
 				borderRadius="md"
@@ -205,125 +116,30 @@ export function PairedCropperEditor( {
 
 				<VStack align="stretch" gap={ 3 }>
 					{ rows.map( ( row, index ) => (
-						<Box
+						<CropperViewportRowItem
 							key={ index }
-							borderWidth="1px"
-							borderColor="gray.100"
-							borderRadius="md"
-							p={ 2 }
-						>
-							<HStack
-								align="flex-start"
-								gap={ 2 }
-								w="full"
-								flexWrap="wrap"
-							>
-								<Input
-									size="sm"
-									flex="1 1 120px"
-									minW={ 0 }
-									placeholder={ lbl }
-									value={ row.option }
-									onValueChange={ ( e ) =>
-										updateRow( index, {
-											option: e.target.value,
-										} )
-									}
-									{ ...controlSurface }
-								/>
-								<Input
-									size="sm"
-									flex="1 1 72px"
-									minW={ 0 }
-									placeholder={ wPh }
-									value={ row.width }
-									onValueChange={ ( e ) =>
-										updateRow( index, {
-											width: e.target.value,
-										} )
-									}
-									{ ...controlSurface }
-								/>
-								<Input
-									size="sm"
-									flex="1 1 72px"
-									minW={ 0 }
-									placeholder={ hPh }
-									value={ row.height }
-									onValueChange={ ( e ) =>
-										updateRow( index, {
-											height: e.target.value,
-										} )
-									}
-									{ ...controlSurface }
-								/>
-								<Input
-									size="sm"
-									flex="1 1 96px"
-									minW={ 0 }
-									placeholder={ pricePh }
-									value={ row.price }
-									onValueChange={ ( e ) =>
-										updateRow( index, {
-											price: e.target.value,
-										} )
-									}
-									{ ...controlSurface }
-								/>
-								<HStack gap={ 1 } flexShrink={ 0 }>
-									<Button
-										size="xs"
-										variant="ghost"
-										aria-label={
-											i18n.pairedOptionsMoveUp ||
-											'Move up'
-										}
-										onClick={ () => move( index, -1 ) }
-										disabled={ index === 0 }
-									>
-										&#8593;
-									</Button>
-									<Button
-										size="xs"
-										variant="ghost"
-										aria-label={
-											i18n.pairedOptionsMoveDown ||
-											'Move down'
-										}
-										onClick={ () => move( index, 1 ) }
-										disabled={
-											index === rows.length - 1
-										}
-									>
-										&#8595;
-									</Button>
-									<IconButton
-										size="xs"
-										variant="ghost"
-										colorPalette="red"
-										onClick={ () => removeRow( index ) }
-										aria-label={
-											i18n.pairedOptionsRemove ||
-											'Remove'
-										}
-										title={
-											i18n.pairedOptionsRemove ||
-											'Remove'
-										}
-									>
-										<LuTrash2 />
-									</IconButton>
-								</HStack>
-							</HStack>
-						</Box>
+							row={ row }
+							index={ index }
+							isFirst={ index === 0 }
+							isLast={ index === rows.length - 1 }
+							i18n={ i18n }
+							labelPlaceholder={ labelPh }
+							widthPlaceholder={ widthPh }
+							heightPlaceholder={ heightPh }
+							pricePlaceholder={ pricePh }
+							onPatch={ updateRow }
+							onMoveUp={ moveUp }
+							onMoveDown={ moveDown }
+							onRemove={ removeRow }
+						/>
 					) ) }
 				</VStack>
 			</Box>
-            { description ? (
+			{ description ? (
 				<Field.HelperText { ...helperTextProps }>
 					{ description }
 				</Field.HelperText>
 			) : null }
-        </Field.Root>
-    );
+		</Field.Root>
+	);
 }

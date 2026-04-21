@@ -25,16 +25,22 @@
  */
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from '@wordpress/element';
 import { useStore } from '@tanstack/react-form';
-import { Alert, Skeleton, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import { usePpomAppForm } from '../form/ppomForm';
 import { getFieldUiDefinition } from '../definitions/registry';
 import { resolveFieldModalRoute } from '../definitions/routing';
 import { mergeBuilderFieldsWithActive } from '../utils/mergedBuilderFields';
 import { UnknownSlugPanel } from '../panels/UnknownSlugPanel';
 import { DefinitionDrivenFieldEditor } from './DefinitionDrivenFieldEditor';
+import { FieldEditorFetchError } from './manage/FieldEditorFetchError';
+import { SchemaLoadingSkeleton } from './manage/SchemaLoadingSkeleton';
+import { SchemaUnavailableAlert } from './manage/SchemaUnavailableAlert';
+import {
+	applyFieldRowToForm,
+	stableStringifyFieldRow,
+} from '../utils/fieldFormSync';
 import type { FieldRow } from '../types/fieldModal';
 import type { FieldModalManageStepProps } from '../types/fieldModal';
-import type { FieldFormApiLike } from '../types/fieldModal';
 
 export type FieldManageEditorBridgeProps = FieldModalManageStepProps;
 
@@ -44,53 +50,6 @@ type FieldManageEditorBridgeInnerProps = Omit<
 > & {
 	editDraft: FieldRow;
 };
-
-/** Stable JSON for comparing field rows regardless of key insertion order. */
-function stableStringifyFieldRow( value: unknown ): string {
-	if ( value === null || typeof value !== 'object' ) {
-		return JSON.stringify( value );
-	}
-	if ( Array.isArray( value ) ) {
-		return (
-			'[' +
-			value.map( ( item ) => stableStringifyFieldRow( item ) ).join( ',' ) +
-			']'
-		);
-	}
-	const obj = value as Record<string, unknown>;
-	const keys = Object.keys( obj ).sort();
-	return (
-		'{' +
-		keys
-			.map(
-				( k ) =>
-					JSON.stringify( k ) + ':' + stableStringifyFieldRow( obj[ k ] )
-			)
-			.join( ',' ) +
-		'}'
-	);
-}
-
-function applyFieldRowToForm(
-	form: FieldFormApiLike,
-	nextRow: FieldRow
-): void {
-	const currentRow = form.state.values as FieldRow;
-	const keys = new Set( [
-		...Object.keys( currentRow || {} ),
-		...Object.keys( nextRow || {} ),
-	] );
-
-	keys.forEach( ( key ) => {
-		const hasNext = Object.prototype.hasOwnProperty.call( nextRow, key );
-		const currentValue = currentRow[ key ];
-		const nextValue = hasNext ? nextRow[ key ] : undefined;
-		if ( Object.is( currentValue, nextValue ) ) {
-			return;
-		}
-		form.setFieldValue( key, nextValue );
-	} );
-}
 
 export function FieldManageEditorBridge( props: FieldManageEditorBridgeProps ) {
 	if ( ! props.editDraft ) {
@@ -191,34 +150,27 @@ function FieldManageEditorBridgeInner( {
 	return (
 		<VStack align="stretch" gap={ 3 }>
 			{ schemaFetchError && (
-				<Alert.Root status="error" borderRadius="md">
-					<Alert.Indicator />
-					{ schemaFetchError }
-				</Alert.Root>
+				<FieldEditorFetchError message={ schemaFetchError } />
 			) }
 			{ schemaLoading && ! activeSchema && ! schemaFetchError && (
-				<VStack gap={ 2 } align="stretch">
-					<Skeleton height="36px" />
-					<Skeleton height="36px" />
-					<Skeleton height="72px" />
-				</VStack>
+				<SchemaLoadingSkeleton />
 			) }
 			{ activeSchema &&
 				! schemaFetchError &&
 				route.kind === 'definition' &&
 				uiDefinition && (
-				<DefinitionDrivenFieldEditor
-					definition={ uiDefinition }
-					mergedBuilderFields={ mergedBuilderFields }
-					schema={ activeSchema }
-					values={ values }
-					onChange={ bridgeOnChange }
-					i18n={ i18n }
-					ppomFieldIndex={ ppomFieldIndex }
-					form={ form }
-					modalContext={ modalContext }
-				/>
-			) }
+					<DefinitionDrivenFieldEditor
+						definition={ uiDefinition }
+						mergedBuilderFields={ mergedBuilderFields }
+						schema={ activeSchema }
+						values={ values }
+						onChange={ bridgeOnChange }
+						i18n={ i18n }
+						ppomFieldIndex={ ppomFieldIndex }
+						form={ form }
+						modalContext={ modalContext }
+					/>
+				) }
 			{ ! schemaLoading &&
 				editDraft.type &&
 				( route.kind === 'unknown' || route.kind === 'legacyPhp' ) && (
@@ -233,15 +185,8 @@ function FieldManageEditorBridgeInner( {
 				! activeSchema &&
 				editDraft.type &&
 				route.kind === 'definition' && (
-				<>
-					<Alert.Root status="info">
-						<Alert.Indicator />
-						{ i18n.fieldModalEditorUnavailable ||
-							i18n.unsupportedControl ||
-							'Settings for this field could not be loaded in this editor.' }
-					</Alert.Root>
-				</>
-			) }
+					<SchemaUnavailableAlert i18n={ i18n } />
+				) }
 		</VStack>
 	);
 }

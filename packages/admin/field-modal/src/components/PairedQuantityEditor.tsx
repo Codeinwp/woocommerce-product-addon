@@ -1,111 +1,23 @@
 /**
  * Variation quantity matrix rows (paired-quantity schema type).
  */
-import {
-	Steps,
-	Box,
-	Button,
-	HStack,
-	Input,
-	VStack,
-	Field,
-	IconButton,
-} from '@chakra-ui/react';
-import { LuTrash2 } from 'react-icons/lu';
+import { Box, Button, VStack, Field } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
+import { arrayMove } from '../utils/arrayMove';
+import {
+	type QuantityOptionRow,
+	emptyQuantityRow,
+	normalizePairedQuantityOptions,
+	serializePairedQuantityOptions,
+} from '../utils/pairedQuantityData';
+import { QuantityRowItem } from './paired-quantity/QuantityRowItem';
 
-export type QuantityOptionRow = {
-	option: string;
-	price: string;
-	weight: string;
-	defaultQty: string;
-	min: string;
-	max: string;
-	stock: string;
-};
-
-function emptyRow(): QuantityOptionRow {
-	return {
-		option: '',
-		price: '',
-		weight: '',
-		defaultQty: '',
-		min: '',
-		max: '',
-		stock: '',
-	};
-}
-
-function normalizeOneRow( item: unknown ): QuantityOptionRow {
-	if ( ! item || typeof item !== 'object' || Array.isArray( item ) ) {
-		return emptyRow();
-	}
-	const o = item as Record< string, unknown >;
-	return {
-		option: String( o.option ?? '' ),
-		price: String( o.price ?? '' ),
-		weight: String( o.weight ?? '' ),
-		defaultQty: String( o.default ?? '' ),
-		min: String( o.min ?? '' ),
-		max: String( o.max ?? '' ),
-		stock: String( o.stock ?? '' ),
-	};
-}
-
-/** Normalize stored options (associative object or array) into editable rows. */
-export function normalizePairedQuantityOptions(
-	raw: unknown
-): QuantityOptionRow[] {
-	if ( raw == null || raw === '' ) {
-		return [ emptyRow() ];
-	}
-	if ( Array.isArray( raw ) ) {
-		if ( raw.length === 0 ) {
-			return [ emptyRow() ];
-		}
-		return raw.map( ( item ) => normalizeOneRow( item ) );
-	}
-	if ( typeof raw === 'object' ) {
-		const rec = raw as Record< string, unknown >;
-		const keys = Object.keys( rec ).sort(
-			( a, b ) => Number( a ) - Number( b )
-		);
-		if ( keys.length === 0 ) {
-			return [ emptyRow() ];
-		}
-		return keys.map( ( k ) => normalizeOneRow( rec[ k ] ) );
-	}
-	return [ emptyRow() ];
-}
-
-/** Persist with PHP key `default` for default quantity. */
-export function serializePairedQuantityOptions(
-	rows: QuantityOptionRow[]
-): unknown {
-	const filtered = rows.filter(
-		( r ) =>
-			r.option.trim() !== '' ||
-			r.price.trim() !== '' ||
-			r.weight.trim() !== '' ||
-			r.defaultQty.trim() !== '' ||
-			r.min.trim() !== '' ||
-			r.max.trim() !== '' ||
-			r.stock.trim() !== ''
-	);
-	if ( filtered.length === 0 ) {
-		return [];
-	}
-	return filtered.map( ( r ) => ( {
-		option: r.option,
-		price: r.price,
-		weight: r.weight,
-		default: r.defaultQty,
-		min: r.min,
-		max: r.max,
-		stock: r.stock,
-	} ) );
-}
+export type { QuantityOptionRow } from '../utils/pairedQuantityData';
+export {
+	normalizePairedQuantityOptions,
+	serializePairedQuantityOptions,
+} from '../utils/pairedQuantityData';
 
 const labelProps = {
 	fontSize: '13px',
@@ -119,17 +31,6 @@ const helperTextProps = {
 	fontSize: 'xs',
 	color: 'gray.600',
 	lineHeight: '1.45',
-};
-
-const controlSurface = {
-	bg: 'white',
-	borderColor: 'gray.200',
-	borderRadius: 'md',
-	_hover: { borderColor: 'gray.300' },
-	_focus: {
-		borderColor: 'blue.500',
-		boxShadow: '0 0 0 1px #2271b1',
-	},
 };
 
 export interface PairedQuantityEditorProps {
@@ -168,37 +69,27 @@ export function PairedQuantityEditor( {
 		index: number,
 		patch: Partial< QuantityOptionRow >
 	) => {
-		const next = rows.map( ( r, i ) =>
-			i === index ? { ...r, ...patch } : r
+		setRows(
+			rows.map( ( r, i ) => ( i === index ? { ...r, ...patch } : r ) )
 		);
-		setRows( next );
 	};
 
 	const addRow = () => {
-		setRows( [ ...rows, emptyRow() ] );
+		setRows( [ ...rows, emptyQuantityRow() ] );
 	};
 
 	const removeRow = ( index: number ) => {
 		if ( rows.length <= 1 ) {
-			setRows( [ emptyRow() ] );
+			setRows( [ emptyQuantityRow() ] );
 			return;
 		}
 		setRows( rows.filter( ( _, i ) => i !== index ) );
 	};
 
-	const move = ( index: number, dir: -1 | 1 ) => {
-		const j = index + dir;
-		if ( j < 0 || j >= rows.length ) {
-			return;
-		}
-		const next = [ ...rows ];
-		const t = next[ index ];
-		next[ index ] = next[ j ];
-		next[ j ] = t;
-		setRows( next );
-	};
+	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
+	const moveDown = ( index: number ) => setRows( arrayMove( rows, index, 1 ) );
 
-	const ph = {
+	const placeholders = {
 		option:
 			i18n.quantityPairedOptionPlaceholder ||
 			i18n.pairedOptionLabel ||
@@ -208,17 +99,16 @@ export function PairedQuantityEditor( {
 			i18n.pairedOptionPrice ||
 			'Price',
 		weight: i18n.quantityPairedWeightPlaceholder || 'Weight',
-		defaultQty:
-			i18n.quantityPairedDefaultPlaceholder || 'Default qty',
+		defaultQty: i18n.quantityPairedDefaultPlaceholder || 'Default qty',
 		min: i18n.quantityPairedMinPlaceholder || 'Min qty',
 		max: i18n.quantityPairedMaxPlaceholder || 'Max qty',
 		stock: i18n.quantityPairedStockPlaceholder || 'Stock',
 	};
 
 	return (
-        <Field.Root>
-            <Field.Label { ...labelProps }>{ title }</Field.Label>
-            <Box
+		<Field.Root>
+			<Field.Label { ...labelProps }>{ title }</Field.Label>
+			<Box
 				borderWidth="1px"
 				borderColor="gray.200"
 				borderRadius="md"
@@ -233,164 +123,27 @@ export function PairedQuantityEditor( {
 
 				<VStack align="stretch" gap={ 3 }>
 					{ rows.map( ( row, index ) => (
-						<Box
+						<QuantityRowItem
 							key={ index }
-							borderWidth="1px"
-							borderColor="gray.100"
-							borderRadius="md"
-							p={ 2 }
-						>
-							<HStack
-								align="flex-start"
-								gap={ 2 }
-								w="full"
-								flexWrap="wrap"
-							>
-								<Input
-									size="sm"
-									flex="1 1 72px"
-									minW={ 0 }
-									placeholder={ ph.option }
-									value={ row.option }
-									onValueChange={ ( e ) =>
-										updateRow( index, {
-											option: e.target.value,
-										} )
-									}
-									{ ...controlSurface }
-								/>
-								<Input
-									size="sm"
-									flex="1 1 72px"
-									minW={ 0 }
-									placeholder={ ph.price }
-									value={ row.price }
-									onValueChange={ ( e ) =>
-										updateRow( index, {
-											price: e.target.value,
-										} )
-									}
-									{ ...controlSurface }
-								/>
-								<Input
-									size="sm"
-									flex="1 1 72px"
-									minW={ 0 }
-									placeholder={ ph.weight }
-									value={ row.weight }
-									onValueChange={ ( e ) =>
-										updateRow( index, {
-											weight: e.target.value,
-										} )
-									}
-									{ ...controlSurface }
-								/>
-								<Input
-									size="sm"
-									flex="1 1 72px"
-									minW={ 0 }
-									placeholder={ ph.defaultQty }
-									value={ row.defaultQty }
-									onValueChange={ ( e ) =>
-										updateRow( index, {
-											defaultQty: e.target.value,
-										} )
-									}
-									{ ...controlSurface }
-								/>
-								<Input
-									size="sm"
-									flex="1 1 64px"
-									minW={ 0 }
-									placeholder={ ph.min }
-									value={ row.min }
-									onValueChange={ ( e ) =>
-										updateRow( index, {
-											min: e.target.value,
-										} )
-									}
-									{ ...controlSurface }
-								/>
-								<Input
-									size="sm"
-									flex="1 1 64px"
-									minW={ 0 }
-									placeholder={ ph.max }
-									value={ row.max }
-									onValueChange={ ( e ) =>
-										updateRow( index, {
-											max: e.target.value,
-										} )
-									}
-									{ ...controlSurface }
-								/>
-								<Input
-									size="sm"
-									flex="1 1 64px"
-									minW={ 0 }
-									placeholder={ ph.stock }
-									value={ row.stock }
-									onValueChange={ ( e ) =>
-										updateRow( index, {
-											stock: e.target.value,
-										} )
-									}
-									{ ...controlSurface }
-								/>
-								<HStack gap={ 1 } flexShrink={ 0 }>
-									<Button
-										size="xs"
-										variant="ghost"
-										aria-label={
-											i18n.pairedOptionsMoveUp ||
-											'Move up'
-										}
-										onClick={ () => move( index, -1 ) }
-										disabled={ index === 0 }
-									>
-										&#8593;
-									</Button>
-									<Button
-										size="xs"
-										variant="ghost"
-										aria-label={
-											i18n.pairedOptionsMoveDown ||
-											'Move down'
-										}
-										onClick={ () => move( index, 1 ) }
-										disabled={
-											index === rows.length - 1
-										}
-									>
-										&#8595;
-									</Button>
-									<IconButton
-										size="xs"
-										variant="ghost"
-										colorPalette="red"
-										onClick={ () => removeRow( index ) }
-										aria-label={
-											i18n.pairedOptionsRemove ||
-											'Remove'
-										}
-										title={
-											i18n.pairedOptionsRemove ||
-											'Remove'
-										}
-									>
-										<LuTrash2 />
-									</IconButton>
-								</HStack>
-							</HStack>
-						</Box>
+							row={ row }
+							index={ index }
+							isFirst={ index === 0 }
+							isLast={ index === rows.length - 1 }
+							i18n={ i18n }
+							placeholders={ placeholders }
+							onPatch={ updateRow }
+							onMoveUp={ moveUp }
+							onMoveDown={ moveDown }
+							onRemove={ removeRow }
+						/>
 					) ) }
 				</VStack>
 			</Box>
-            { description ? (
+			{ description ? (
 				<Field.HelperText { ...helperTextProps }>
 					{ description }
 				</Field.HelperText>
 			) : null }
-        </Field.Root>
-    );
+		</Field.Root>
+	);
 }

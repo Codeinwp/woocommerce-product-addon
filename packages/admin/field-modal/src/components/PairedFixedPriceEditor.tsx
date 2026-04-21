@@ -7,6 +7,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
 import type { PairedOptionRow } from './PairedOptionsEditor';
+import { arrayMove } from '../utils/arrayMove';
 
 function normalizeOptionsArray( raw: unknown ): PairedOptionRow[] {
 	if ( Array.isArray( raw ) ) {
@@ -78,15 +79,7 @@ export function PairedFixedPriceEditor( {
 	};
 
 	const move = ( index: number, dir: -1 | 1 ) => {
-		const j = index + dir;
-		if ( j < 0 || j >= rows.length ) {
-			return;
-		}
-		const next = [ ...rows ];
-		const tmp = next[ index ];
-		next[ index ] = next[ j ];
-		next[ j ] = tmp;
-		setRows( next );
+		setRows( arrayMove( rows, index, dir ) );
 	};
 
 	return (

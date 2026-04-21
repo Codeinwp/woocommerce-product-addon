@@ -13,18 +13,12 @@ import { getFieldUiDefinition } from '../definitions/registry';
 import { newClientId, withClientIds } from '../utils/clientIds';
 import { readGroupFromForm } from '../utils/legacyGroupForm';
 import { createInitialModalState, modalReducer } from '../state/modalReducer';
+import { errorMessage } from '../utils/errorMessage';
 import type {
 	FieldModalContextPayload,
 	FieldRow,
 	ModalContextValue,
 } from '../types/fieldModal';
-
-function errorMessage( e: unknown ): string {
-	if ( e instanceof Error ) {
-		return e.message;
-	}
-	return String( e );
-}
 
 export function useFieldModalController( productmetaId: number | undefined ) {
 	const [ state, dispatch ] = useReducer( modalReducer, undefined, createInitialModalState );
