@@ -1,7 +1,9 @@
 /**
- * Pro upsell column beside the field type catalog.
+ * Pro upsell card shown in the field type picker's right column. Stacked inside
+ * a shared sidebar container (see FieldTypePicker) so column sizing and dividers
+ * live on the parent, not here.
  */
-import { Box, Flex, HStack, Link, Text, VStack } from '@chakra-ui/react';
+import { Flex, HStack, Link, Text, VStack } from '@chakra-ui/react';
 import type { ModalUpsellPayload } from '../types/fieldModal';
 
 export interface FieldTypeUpsellSidebarProps {
@@ -10,16 +12,6 @@ export interface FieldTypeUpsellSidebarProps {
 
 export function FieldTypeUpsellSidebar( { upsell }: FieldTypeUpsellSidebarProps ) {
 	return (
-        <Box
-			flex="0 0 280px"
-			w={ { base: '100%', lg: '280px' } }
-			borderLeftWidth={ { base: 0, lg: '1px' } }
-			borderTopWidth={ { base: '1px', lg: 0 } }
-			borderColor="gray.200"
-			pl={ { base: 0, lg: 4 } }
-			pt={ { base: 4, lg: 0 } }
-			mt={ { base: 3, lg: 0 } }
-		>
             <VStack
 				align="center"
 				gap={ 3 }
@@ -80,6 +72,5 @@ export function FieldTypeUpsellSidebar( { upsell }: FieldTypeUpsellSidebarProps 
 					{ upsell.cta_label }
 				</Link>
 			</VStack>
-        </Box>
-    );
+	);
 }

@@ -387,9 +387,6 @@ $fields_groups = function_exists( 'ppom_get_admin_field_type_groups' ) ? ppom_ge
 								<button type="button" class="button ppom-react-field-modal-open" data-ppom-react-mode="picker" style="margin-left:8px;">
 									<?php esc_html_e( 'Add New Field', 'woocommerce-product-addon' ); ?>
 								</button>
-								<button type="button" class="button ppom-react-field-modal-open" data-ppom-react-mode="manage" style="margin-left:4px;">
-									<?php esc_html_e( 'Manage Fields', 'woocommerce-product-addon' ); ?>
-								</button>
 								<div id="ppom-field-modal-root"></div>
 							<?php endif; ?>
 							<button type="button"

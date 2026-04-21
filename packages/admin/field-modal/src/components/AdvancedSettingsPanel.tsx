@@ -32,12 +32,11 @@ export function AdvancedSettingsPanel( {
 					}
 					flexShrink={ 0 }
 				>
-					<Switch.HiddenInput id={ switchId } />
+					<Switch.HiddenInput />
 					<Switch.Control />
 				</Switch.Root>
 				<Text
 					as="label"
-					htmlFor={ switchId }
 					flex="1"
 					minW={ 0 }
 					mb={ 0 }
@@ -46,6 +45,7 @@ export function AdvancedSettingsPanel( {
 					color="gray.700"
 					cursor="pointer"
 					lineHeight="1.4"
+					onClick={ () => setOpen( ( prev ) => ! prev ) }
 				>
 					{ labelText }
 				</Text>

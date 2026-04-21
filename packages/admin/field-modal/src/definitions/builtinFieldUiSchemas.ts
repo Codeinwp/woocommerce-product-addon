@@ -181,7 +181,7 @@ function requiredSetting(): SettingMeta {
 
 function logicSetting(): SettingMeta {
 	return setting(
-		'checkbox',
+		'switch',
 		__( 'Enable Conditions', 'woocommerce-product-addon' ),
 		__(
 			'Tick it to turn conditional logic to work below',

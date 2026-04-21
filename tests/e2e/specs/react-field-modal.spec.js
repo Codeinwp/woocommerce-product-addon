@@ -28,7 +28,7 @@ test.describe( 'React field modal (opt-in)', () => {
 		).toBeVisible();
 	} );
 
-	test( 'manage entry opens sidebar without inner Add field CTA', async ( {
+	test( 'per-field edit button opens sidebar without inner Add field CTA', async ( {
 		page,
 		admin,
 	} ) => {
@@ -38,7 +38,7 @@ test.describe( 'React field modal (opt-in)', () => {
 			`admin.php?page=ppom&productmeta_id=${ ppomId }&do_meta=edit&ppom_react_modal=1`
 		);
 
-		await page.getByRole( 'button', { name: 'Manage Fields' } ).click();
+		await page.locator( '#ppom_sort_id_1 .ppom-edit-field' ).click();
 
 		const dialog = page.getByRole( 'dialog' ).first();
 		await expect( dialog ).toBeVisible();
@@ -47,7 +47,7 @@ test.describe( 'React field modal (opt-in)', () => {
 		).toHaveCount( 0 );
 	} );
 
-	test( 'manage entry shows Settings tab for definition-driven text field', async ( {
+	test( 'per-field edit button shows Settings tab for definition-driven text field', async ( {
 		page,
 		admin,
 	} ) => {
@@ -57,7 +57,7 @@ test.describe( 'React field modal (opt-in)', () => {
 			`admin.php?page=ppom&productmeta_id=${ ppomId }&do_meta=edit&ppom_react_modal=1`
 		);
 
-		await page.getByRole( 'button', { name: 'Manage Fields' } ).click();
+		await page.locator( '#ppom_sort_id_1 .ppom-edit-field' ).click();
 
 		const dialog = page.getByRole( 'dialog' ).first();
 		await expect( dialog ).toBeVisible();

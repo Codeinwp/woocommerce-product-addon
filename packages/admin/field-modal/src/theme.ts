@@ -41,6 +41,14 @@ export const fieldModalTheme = createSystem(
 					modal: {
 						value: PPOM_FIELD_MODAL_Z_INDEX,
 					},
+					/**
+					 * Chakra default tooltip z-index (1800) sits below our modal token
+					 * (159000), so tile tooltips inside the field modal render behind the
+					 * Dialog overlay. Bump above the modal so they portal on top.
+					 */
+					tooltip: {
+						value: PPOM_FIELD_MODAL_Z_INDEX + 10,
+					},
 				},
 
 				fonts: {

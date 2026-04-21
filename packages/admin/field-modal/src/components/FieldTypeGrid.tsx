@@ -4,6 +4,7 @@
 import { Fragment, memo } from '@wordpress/element';
 import { Box, Button, SimpleGrid, Text } from '@chakra-ui/react';
 import { Tooltip } from './ui/tooltip';
+import { firstSentence, getFieldGuide } from '../definitions/fieldGuides';
 import type { CatalogItem, I18nDict } from '../types/fieldModal';
 
 export interface FieldTypeGridProps {
@@ -11,6 +12,7 @@ export interface FieldTypeGridProps {
 	onPick: ( slug: string ) => void;
 	upsellUrl: string;
 	i18n: I18nDict;
+	onFieldHover?: ( field: CatalogItem | null ) => void;
 }
 
 function FieldTypeGridComponent( {
@@ -18,6 +20,7 @@ function FieldTypeGridComponent( {
 	onPick,
 	upsellUrl,
 	i18n,
+	onFieldHover,
 }: FieldTypeGridProps ) {
 	return (
         <SimpleGrid
@@ -27,9 +30,13 @@ function FieldTypeGridComponent( {
             { fields.map( ( f: CatalogItem ) => {
 				const locked = Boolean( f.locked );
 				const iconClass = f.icon ? `fa ${ f.icon }` : 'fa fa-circle';
-				const desc = f.description ? String( f.description ).trim() : '';
-				const ariaLabel = desc
-					? `${ f.title }. ${ desc }`
+				const phpDesc = f.description ? String( f.description ).trim() : '';
+				const guide = getFieldGuide( f.slug );
+				const tooltipText = guide
+					? firstSentence( guide.longDescription )
+					: phpDesc;
+				const ariaLabel = tooltipText
+					? `${ f.title }. ${ tooltipText }`
 					: String( f.title || f.slug );
 
 				const button = (
@@ -57,6 +64,10 @@ function FieldTypeGridComponent( {
 							bg: locked ? 'gray.50' : 'blue.600',
 						} }
 						aria-label={ ariaLabel }
+						onMouseEnter={ () => onFieldHover?.( f ) }
+						onMouseLeave={ () => onFieldHover?.( null ) }
+						onFocus={ () => onFieldHover?.( f ) }
+						onBlur={ () => onFieldHover?.( null ) }
 						onClick={ () => {
 							if ( locked && upsellUrl ) {
 								window.open( upsellUrl, '_blank', 'noopener,noreferrer' );
@@ -126,14 +137,12 @@ function FieldTypeGridComponent( {
 
 				return (
                     <Fragment key={ f.slug }>
-                        { desc ? (
+                        { tooltipText ? (
 							<Tooltip
-								content={ desc }
+								content={ tooltipText }
 								openDelay={ 300 }
 								showArrow
-								positioning={{
-                                    placement: "top"
-                                }}
+								positioning={ { placement: 'top' } }
 							>
 								{ button }
 							</Tooltip>

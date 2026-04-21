@@ -62,9 +62,9 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 
 	useEffect( () => {
 		return bindPpomReactFieldModalOpenButtons( {
-			onOpen: ( entry ) => {
+			onOpen: ( { entry, selectFieldIndex } ) => {
 				dispatch( { type: 'OPEN', entry } );
-				void loadContext();
+				void loadContext( selectFieldIndex );
 			},
 		} );
 	}, [ loadContext ] );
