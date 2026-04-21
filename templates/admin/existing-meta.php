@@ -75,7 +75,7 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 						<td class="ppom-meta-table-checkbox-mr ppom-checkboxe-style">
 							<label>
 								<input class="ppom_product_checkbox" type="checkbox" name="ppom_meta[]"
-										value="<?php echo esc_attr( $productmeta->productmeta_id ); ?>">
+										value="<?php echo esc_attr( $productmeta->productmeta_id ); ?>" data-name="<?php echo esc_attr( $productmeta->productmeta_name ); ?>">
 								<span></span>
 							</label>
 						</td>

@@ -37,11 +37,14 @@ jQuery( function ( $ ) {
 	 * Delete multiple saved PPOM groups after an explicit confirmation step.
 	 *
 	 * @param {number[]} checkedProducts_ids
+	 * @param {string} checkedProductsNames
 	 * @return {void}
 	 */
-	function deleteSelectedProducts( checkedProducts_ids ) {
+	function deleteSelectedProducts( checkedProducts_ids, checkedProductsNames = '' ) {
+		let title = window?.ppom_vars?.i18n.popup.confirmTitle;
+		title = checkedProductsNames ? title.replace( '%s', checkedProductsNames ) : title;
 		window?.ppomPopup?.open( {
-			title: window?.ppom_vars?.i18n.popup.confirmTitle,
+			title: title,
 			onConfirmation: () => {
 				$( '#ppom_delete_selected_products_btn' ).html( 'Deleting...' );
 
@@ -196,10 +199,18 @@ jQuery( function ( $ ) {
 			return;
 		}
 
+		const checkedProductsNames = $('.ppom_product_checkbox:checked')
+			.map(function () {
+				return this.dataset.name && this.dataset.name.trim() !== ''
+					? this.dataset.name
+					: this.value;
+			})
+			.get()
+			.join(', ');
 		// Only one action runs per selection. Resetting the select afterwards
 		// prevents DataTables redraws from accidentally replaying the last action.
 		if ( 'delete' === type ) {
-			deleteSelectedProducts( checkedProducts_ids );
+			deleteSelectedProducts( checkedProducts_ids, checkedProductsNames );
 		} else if ( 'export' === type ) {
 			$( '#ppom-groups-export-form' ).submit();
 		}
