@@ -210,8 +210,9 @@ class PPOM_Fields_Meta {
 				'freemiumCFRContent'     => \PPOM_Freemium::get_instance()->get_freemium_cfr_content(),
 				'freemiumCFRTab'         => \PPOM_Freemium::TAB_KEY_FREEMIUM_CFR,
 				'popup'                  => array(
+					'confirmTitle'    => __( 'Are you sure?', 'woocommerce-product-addon' ),
 					// translators: %s is the name of the field group being deleted.
-					'confirmTitle'    => __( 'Are you sure you want to delete the \'%s\' group? This action cannot be undone.', 'woocommerce-product-addon' ),
+					'deleteGroup'     => __( 'Are you sure you want to delete the \'%s\' group? This action cannot be undone.', 'woocommerce-product-addon' ),
 					'confirmationBtn' => __( 'Confirm', 'woocommerce-product-addon' ),
 					'cancelBtn'       => __( 'Cancel', 'woocommerce-product-addon' ),
 					'finishTitle'     => __( 'Done', 'woocommerce-product-addon' ),
