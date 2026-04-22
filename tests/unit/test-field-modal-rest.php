@@ -119,6 +119,87 @@ class Test_Field_Modal_Rest extends PPOM_Test_Case {
 	}
 
 	/**
+	 * The shared save pipeline should normalize a minimal image field without
+	 * depending on legacy global helper load order.
+	 *
+	 * @return void
+	 */
+	public function test_normalize_fields_allows_minimal_image_field_payload() {
+		$persistence = new \PPOM\Admin\FieldModal\FieldModalPersistence();
+		$result      = $persistence->normalize_fields(
+			array(
+				array(
+					'type'      => 'radio',
+					'title'     => 'sgdsfg',
+					'data_name' => 'sgdsfg',
+					'options'   => array(
+						array(
+							'option' => '',
+							'price'  => '',
+							'weight' => '',
+							'stock'  => '',
+							'id'     => '_',
+						),
+					),
+					'status'    => 'on',
+				),
+				array(
+					'type'      => 'textarea',
+					'title'     => 'Textarea Input',
+					'data_name' => 'textareainput',
+					'status'    => 'on',
+				),
+				array(
+					'type'      => 'text',
+					'title'     => 'Text Input',
+					'data_name' => 'textinput',
+					'status'    => 'on',
+				),
+				array(
+					'type'      => 'image',
+					'title'     => 'Images',
+					'data_name' => 'images',
+					'status'    => 'on',
+				),
+			),
+			'1'
+		);
+
+		$this->assertIsArray( $result );
+		$this->assertCount( 4, $result );
+		$this->assertSame( 'image', $result[3]['type'] );
+		$this->assertSame( 'images', $result[3]['data_name'] );
+	}
+
+	/**
+	 * React modal should keep classic editor behavior and reject blank data_name.
+	 *
+	 * @return void
+	 */
+	public function test_normalize_fields_rejects_blank_data_name() {
+		$persistence = new \PPOM\Admin\FieldModal\FieldModalPersistence();
+		$result      = $persistence->normalize_fields(
+			array(
+				array(
+					'type'      => 'image',
+					'title'     => 'Images',
+					'data_name' => '',
+					'status'    => 'on',
+				),
+			),
+			'1'
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'ppom_field_validation', $result->get_error_code() );
+		$this->assertSame( 'Field validation failed.', $result->get_error_message() );
+		$this->assertSame(
+			array( 'Data Name must be required' ),
+			$result->get_error_data()['errors']
+		);
+	}
+
+	/**
 	 * Reset REST server routes (FieldModal registers on rest_api_init).
 	 *
 	 * @return void

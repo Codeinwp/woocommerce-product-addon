@@ -2,7 +2,7 @@
  * Inline editor for pre-uploaded images (image + imageselect field types).
  */
 import { Box, Button, Text, VStack } from '@chakra-ui/react';
-import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
 import { arrayMove } from '../utils/arrayMove';
 import {
@@ -11,6 +11,7 @@ import {
 	emptyImageRow,
 	normalizeImagesArray,
 } from '../utils/imagesSelectData';
+import { lockMediaFrame, unlockMediaFrame } from '../utils/mediaLock';
 import { ImageRowItem } from './images-select/ImageRowItem';
 
 export type {
@@ -71,10 +72,36 @@ export function ImagesSelectEditor( {
 		);
 	};
 
+	// Release the lock if this editor unmounts while a media frame is open.
+	const holdingLockRef = useRef( false );
+	useEffect(
+		() => () => {
+			if ( holdingLockRef.current ) {
+				holdingLockRef.current = false;
+				unlockMediaFrame();
+			}
+		},
+		[]
+	);
+
 	const addImagesFromMedia = () => {
 		if ( ! window.wp?.media ) {
 			return;
 		}
+
+		const acquireLock = () => {
+			if ( ! holdingLockRef.current ) {
+				holdingLockRef.current = true;
+				lockMediaFrame();
+			}
+		};
+
+		const releaseLock = () => {
+			if ( holdingLockRef.current ) {
+				holdingLockRef.current = false;
+				unlockMediaFrame();
+			}
+		};
 
 		const frame = window.wp.media( {
 			title: i18n.imagesMediaTitle || 'Choose Images',
@@ -82,6 +109,9 @@ export function ImagesSelectEditor( {
 			button: { text: i18n.imagesMediaButton || 'Select' },
 			multiple: true,
 		} );
+
+		frame.on( 'open', acquireLock );
+		frame.on( 'close', releaseLock );
 
 		frame.on( 'select', () => {
 			const attachments = frame
@@ -107,7 +137,13 @@ export function ImagesSelectEditor( {
 			setRows( [ ...rows, ...newRows ] );
 		} );
 
-		frame.open();
+		try {
+			acquireLock();
+			frame.open();
+		} catch ( error ) {
+			releaseLock();
+			throw error;
+		}
 	};
 
 	const removeRow = ( index: number ) => {

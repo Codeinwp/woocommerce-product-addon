@@ -180,6 +180,20 @@ final class FieldModalRestController {
 	 */
 	public function get_context( WP_REST_Request $request ) {
 		$productmeta_id = (int) $request->get_param( 'productmeta_id' );
+		$cfr_upgrade_url = PPOM_UPGRADE_URL;
+		if ( function_exists( 'tsdk_translate_link' ) ) {
+			$cfr_upgrade_url = tsdk_translate_link( $cfr_upgrade_url );
+		}
+		if ( function_exists( 'tsdk_utmify' ) ) {
+			$cfr_upgrade_url = tsdk_utmify( $cfr_upgrade_url, 'react-field-modal', 'cfr' );
+		}
+		$condition_upgrade_url = PPOM_UPGRADE_URL;
+		if ( function_exists( 'tsdk_translate_link' ) ) {
+			$condition_upgrade_url = tsdk_translate_link( $condition_upgrade_url );
+		}
+		if ( function_exists( 'tsdk_utmify' ) ) {
+			$condition_upgrade_url = tsdk_utmify( $condition_upgrade_url, 'react-field-modal', 'condition' );
+		}
 
 		$catalog        = $this->schema_builder->get_catalog();
 		$catalog_groups = $this->schema_builder->get_catalog_groups_for_rest();
@@ -337,7 +351,7 @@ final class FieldModalRestController {
 				'cfrCopied'                        => __( 'Copied', 'woocommerce-product-addon' ),
 				'cfrCopyFallback'                  => __( 'Copy this value:', 'woocommerce-product-addon' ),
 				'cfrUpgradeCta'                    => __( 'Upgrade to Pro', 'woocommerce-product-addon' ),
-				'cfrUpgradeUrl'                    => esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'react-field-modal', 'cfr' ) ),
+				'cfrUpgradeUrl'                    => esc_url( $cfr_upgrade_url ),
 				'cfrViewDemoLabel'                 => __( 'View demo', 'woocommerce-product-addon' ),
 				'cfrViewDemoUrl'                   => 'https://demo-ppom-lite.vertisite.cloud/product/personalized-caps-using-conditional-repeater/',
 				'pairedOptionsAddRow'              => __( 'Add option', 'woocommerce-product-addon' ),
@@ -421,7 +435,7 @@ final class FieldModalRestController {
 				'condAllAny'                       => __( 'Match mode', 'woocommerce-product-addon' ),
 				'condEnableLogicHint'              => __( 'Turn on "Use conditional logic" above to apply these rules on the product page.', 'woocommerce-product-addon' ),
 				'conditionUpgradeCta'              => __( 'Upgrade to Unlock', 'woocommerce-product-addon' ),
-				'conditionUpgradeUrl'              => esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'react-field-modal', 'condition' ) ),
+				'conditionUpgradeUrl'              => esc_url( $condition_upgrade_url ),
 				'imagesSelectUpload'               => __( 'Select/Upload Image', 'woocommerce-product-addon' ),
 				'imagesMediaTitle'                 => __( 'Choose Images', 'woocommerce-product-addon' ),
 				'imagesMediaButton'                => __( 'Select', 'woocommerce-product-addon' ),

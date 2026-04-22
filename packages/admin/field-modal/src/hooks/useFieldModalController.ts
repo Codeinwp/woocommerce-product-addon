@@ -2,6 +2,7 @@
  * State, effects, and handlers for the PPOM React field modal.
  */
 import type { Dispatch, SetStateAction } from 'react';
+import { __ } from '@wordpress/i18n';
 import { useCallback, useEffect, useMemo, useReducer } from '@wordpress/element';
 import { bindPpomReactFieldModalOpenButtons } from '../adapters/wpAdminFieldModalAdapter';
 import {
@@ -19,6 +20,27 @@ import type {
 	FieldRow,
 	ModalContextValue,
 } from '../types/fieldModal';
+
+function getFieldSaveValidationError(
+	fields: FieldRow[],
+	i18n: FieldModalContextPayload[ 'i18n' ]
+): string {
+	const requiredMessage =
+		i18n?.dataNameRequired ||
+		__( 'Data Name must be required', 'woocommerce-product-addon' );
+
+	for ( const field of fields ) {
+		if ( ! Object.prototype.hasOwnProperty.call( field, 'data_name' ) ) {
+			continue;
+		}
+
+		if ( String( field.data_name || '' ).trim() === '' ) {
+			return requiredMessage;
+		}
+	}
+
+	return '';
+}
 
 export function useFieldModalController( productmetaId: number | undefined ) {
 	const [ state, dispatch ] = useReducer( modalReducer, undefined, createInitialModalState );
@@ -217,8 +239,20 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		if ( ! ctx ) {
 			return;
 		}
-		dispatch( { type: 'SET_SAVING', saving: true } );
 		dispatch( { type: 'CLEAR_ERROR' } );
+		const saveValidationError = getFieldSaveValidationError(
+			state.fields,
+			ctx.i18n
+		);
+		if ( saveValidationError ) {
+			dispatch( {
+				type: 'LOAD_CONTEXT_ERROR',
+				message: saveValidationError,
+			} );
+			return;
+		}
+
+		dispatch( { type: 'SET_SAVING', saving: true } );
 		const group = readGroupFromForm( ctx.group || {} );
 		try {
 			const res = await saveFieldGroup( {

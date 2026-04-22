@@ -24,6 +24,22 @@ use PPOM\Validation\Validator;
 final class FieldModalPersistence {
 
 	/**
+	 * Validates one field row against classic modal requirements.
+	 *
+	 * @param array<string, mixed> $row Field row payload.
+	 * @return array<int, string>
+	 */
+	private function validate_field_row( array $row ) {
+		$errors = array();
+
+		if ( array_key_exists( 'data_name', $row ) && '' === trim( (string) $row['data_name'] ) ) {
+			$errors[] = __( 'Data Name must be required', 'woocommerce-product-addon' );
+		}
+
+		return $errors;
+	}
+
+	/**
 	 * Normalizes, validates, and filters fields from REST JSON.
 	 *
 	 * @param mixed      $fields         Ordered field rows (array of field rows).
@@ -51,7 +67,7 @@ final class FieldModalPersistence {
 				continue;
 			}
 			// Filter: ppom_admin_field_modal_validate_field — ( errors, field row, index, productmeta_id ); return string[].
-			$errors = apply_filters( 'ppom_admin_field_modal_validate_field', array(), $row, (int) $index, $productmeta_id );
+			$errors = apply_filters( 'ppom_admin_field_modal_validate_field', $this->validate_field_row( $row ), $row, (int) $index, $productmeta_id );
 			if ( ! is_array( $errors ) ) {
 				$errors = array();
 			}

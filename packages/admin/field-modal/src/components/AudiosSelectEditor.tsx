@@ -2,13 +2,14 @@
  * Inline editor for pre-uploaded audio/video (audio field type).
  */
 import { Box, Button, Text, VStack } from '@chakra-ui/react';
-import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
 import { arrayMove } from '../utils/arrayMove';
 import {
 	type AudioOptionRow,
 	normalizeAudioArray,
 } from '../utils/audiosSelectData';
+import { lockMediaFrame, unlockMediaFrame } from '../utils/mediaLock';
 import { AudioRowItem } from './audios-select/AudioRowItem';
 
 export type { AudioOptionRow } from '../utils/audiosSelectData';
@@ -64,10 +65,36 @@ export function AudiosSelectEditor( {
 		);
 	};
 
+	// Release the lock if this editor unmounts while a media frame is open.
+	const holdingLockRef = useRef( false );
+	useEffect(
+		() => () => {
+			if ( holdingLockRef.current ) {
+				holdingLockRef.current = false;
+				unlockMediaFrame();
+			}
+		},
+		[]
+	);
+
 	const addFromMedia = () => {
 		if ( ! window.wp?.media ) {
 			return;
 		}
+
+		const acquireLock = () => {
+			if ( ! holdingLockRef.current ) {
+				holdingLockRef.current = true;
+				lockMediaFrame();
+			}
+		};
+
+		const releaseLock = () => {
+			if ( holdingLockRef.current ) {
+				holdingLockRef.current = false;
+				unlockMediaFrame();
+			}
+		};
 
 		const frame = window.wp.media( {
 			title: i18n.audioMediaTitle || 'Choose audio or video',
@@ -75,6 +102,9 @@ export function AudiosSelectEditor( {
 			button: { text: i18n.audioMediaButton || 'Select' },
 			multiple: true,
 		} );
+
+		frame.on( 'open', acquireLock );
+		frame.on( 'close', releaseLock );
 
 		frame.on( 'select', () => {
 			const attachments = frame
@@ -100,7 +130,13 @@ export function AudiosSelectEditor( {
 			setRows( [ ...rows, ...newRows ] );
 		} );
 
-		frame.open();
+		try {
+			acquireLock();
+			frame.open();
+		} catch ( error ) {
+			releaseLock();
+			throw error;
+		}
 	};
 
 	const removeRow = ( index: number ) => {

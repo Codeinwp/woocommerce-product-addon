@@ -3,6 +3,12 @@
  */
 import type { ReactNode } from 'react';
 import { Box, Dialog, Portal } from '@chakra-ui/react';
+import { useMediaFrameLocked } from '../utils/mediaLock';
+
+const mediaPersistentElements = [
+	() => document.querySelector< HTMLElement >( '.media-modal' ),
+	() => document.querySelector< HTMLElement >( '.media-modal-backdrop' ),
+];
 
 export interface FieldModalFrameProps {
 	isOpen: boolean;
@@ -19,13 +25,25 @@ export function FieldModalFrame( {
 	title,
 	children,
 }: FieldModalFrameProps ) {
+	// While a wp.media frame is open on top of us, disable outside-click and
+	// Esc dismissal entirely. We also have to drop out of "modal" mode, because
+	// Ark/Zag otherwise keeps the rest of the page inert (`body[data-inert]`),
+	// which leaves the wp.media frame visible but non-interactable.
+	const mediaLocked = useMediaFrameLocked();
+	const dismissible = ! saving && ! mediaLocked;
+	const modal = ! mediaLocked;
+
 	return (
         <Dialog.Root
 			open={ isOpen }
 			variant="ppom"
 			scrollBehavior="inside"
-			closeOnInteractOutside={ ! saving }
-			closeOnEscape={ ! saving }
+			modal={ modal }
+			trapFocus={ modal }
+			preventScroll={ modal }
+			persistentElements={ mediaPersistentElements }
+			closeOnInteractOutside={ dismissible }
+			closeOnEscape={ dismissible }
 			motionPreset="slideInBottom"
 			onOpenChange={e => {
                 if (!e.open) {

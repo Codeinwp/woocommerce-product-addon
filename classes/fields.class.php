@@ -98,7 +98,7 @@ class PPOM_Fields_Meta {
 						'invalid_pattern'                => esc_html__( 'Range format is invalid. (range: {range})', 'woocommerce-product-addon' ),
 					),
 				),
-			) 
+			)
 		);
 
 		wp_enqueue_script( 'ppom-inputmask', PPOM_URL . '/js/inputmask/jquery.inputmask.min.js', array( 'jquery' ), '5.0.6', true );
@@ -190,7 +190,7 @@ class PPOM_Fields_Meta {
 				'wp-color-picker',
 			),
 			PPOM_VERSION,
-			true 
+			true
 		);
 
 		wp_enqueue_media();
@@ -1473,7 +1473,7 @@ class PPOM_Fields_Meta {
 				$settings['min_img_w']['tabs_class']           = array( 'ppom_handle_image_dimension_tab', 'col-md-6' );
 				$settings['max_img_w']['tabs_class']           = array( 'ppom_handle_image_dimension_tab', 'col-md-6' );
 				$settings['img_dimension_error']['tabs_class'] = array( 'ppom_handle_image_dimension_tab', 'col-md-6' );
-			}       
+			}
 		}
 
 		// ppom_pa
