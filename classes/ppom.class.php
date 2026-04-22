@@ -577,9 +577,9 @@ class PPOM_Meta {
 
 			$type = isset( $field['type'] ) ? $field['type'] : '';
 
-			$allowed_types = array( 'pricematrix', 'collapse', 'section', 'divider' );
+			$skip_types = array( 'pricematrix', 'collapse', 'section', 'divider' );
 
-			if ( in_array( $type, $allowed_types, true ) ) {
+			if ( in_array( $type, $skip_types, true ) ) {
 				continue;
 			}
 
@@ -587,7 +587,7 @@ class PPOM_Meta {
 				continue;
 			}
 
-			$data_name = strtolower( trim( $field['data_name'] ) );
+			$data_name = sanitize_key( $field['data_name'] );
 			if ( in_array( $data_name, $datanames_array, true ) ) {
 
 				$has_unique = false;
