@@ -215,12 +215,24 @@ final class ProductHandler {
 			$passed = self::check_validation( $product_id, $_POST );
 		}
 
-		if ( Helpers::get_price_mode() == 'legacy' && isset( $_POST['ppom']['fields'] ) ) {
+		$fields     = isset( $_POST['ppom']['fields'] ) ? ppom_sanitize_array_data( $_POST['ppom']['fields'] ) : null; // phpcs:ignore WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$product_id = isset( $_POST['ppom_product_id'] ) ? intval( $_POST['ppom_product_id'] ) : $product_id; // phpcs:ignore WordPress.Security.NonceVerification
 
-			if ( Helpers::is_price_attached_with_fields( $_POST['ppom']['fields'] ) &&
-			empty( $_POST['ppom']['ppom_option_price'] )
-			) {
-				$error_message = __( 'Sorry, an error has occurred. Please enable JavaScript or contact site owner.', 'woocommerce-product-addon' );
+		if ( Helpers::get_price_mode() == 'legacy' && $fields ) {
+
+			if ( Helpers::is_price_attached_with_fields( $fields ) && empty( $_POST['ppom']['ppom_option_price'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+				// Price-matrix pricing is stored in ppom_pricematrix and handled independently.
+				if ( isset( $_POST['ppom']['ppom_pricematrix'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+					return $passed;
+				}
+
+				$computed = Helpers::compute_option_price_from_fields( $fields, $product_id );
+				if ( ! empty( $computed ) ) {
+					$_POST['ppom']['ppom_option_price'] = wp_json_encode( $computed );
+					return $passed;
+				}
+
+				$error_message = __( 'An error occurred while processing your order. Please refresh the page and try again, or contact the site owner.', 'woocommerce-product-addon' );
 				Helpers::wc_add_notice( $error_message );
 				$passed = false;
 
