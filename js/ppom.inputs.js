@@ -90,6 +90,13 @@ jQuery( function ( $ ) {
 	}
 
 	ppom_init_js_for_ppom_fields( ppom_input_vars.ppom_inputs );
+
+	// Re-init ppom fields.
+	jQuery(document).on('ppom_reinit', function() {
+		if (typeof ppom_input_vars !== 'undefined' && ppom_input_vars.ppom_inputs) {
+			ppom_init_js_for_ppom_fields(ppom_input_vars.ppom_inputs);
+		}
+	});
 } );
 
 /**
