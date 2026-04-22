@@ -39,6 +39,7 @@ export function App( { productmetaId }: AppProps ) {
 		addFieldOfType,
 		handleSave,
 		closeModal,
+		clearError,
 	} = useFieldModalController( productmetaId );
 
 	const onOpenPickerFromManage = () => {
@@ -47,6 +48,7 @@ export function App( { productmetaId }: AppProps ) {
 	};
 
 	const onBackToFieldTypes = () => {
+		clearError();
 		setPickerQuery( '' );
 		setPickerOpen( true );
 	};
@@ -77,6 +79,7 @@ export function App( { productmetaId }: AppProps ) {
 		>
 			<FieldModalBody
 				status={ { loading, error } }
+				onDismissError={ clearError }
 				ctx={ ctx }
 				pickerOpen={ pickerOpen }
 				picker={ {

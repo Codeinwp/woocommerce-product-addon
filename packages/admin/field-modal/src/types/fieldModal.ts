@@ -151,6 +151,7 @@ export interface FieldModalManageStepProps {
 
 export interface FieldModalBodyProps {
 	status: FieldModalBodyStatus;
+	onDismissError: () => void;
 	ctx: FieldModalContextPayload | null;
 	pickerOpen: boolean;
 	picker: FieldModalPickerStepProps;

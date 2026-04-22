@@ -279,6 +279,10 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		dispatch( { type: 'CLOSE' } );
 	}, [] );
 
+	const clearError = useCallback( () => {
+		dispatch( { type: 'CLEAR_ERROR' } );
+	}, [] );
+
 	const catalogGroups = useMemo(
 		() =>
 			ctx?.catalog_groups && ctx.catalog_groups.length > 0
@@ -411,5 +415,6 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		removeField,
 		handleSave,
 		closeModal,
+		clearError,
 	};
 }
