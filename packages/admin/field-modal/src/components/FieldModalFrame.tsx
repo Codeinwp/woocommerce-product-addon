@@ -2,7 +2,9 @@
  * Chakra modal shell: overlay, content sizing, header, close control.
  */
 import type { ReactNode } from 'react';
-import { Box, Dialog, Portal } from '@chakra-ui/react';
+import { useEffect } from '@wordpress/element';
+import { Box, Button, Dialog, HStack, Portal, Text } from '@chakra-ui/react';
+import { LuArrowLeft } from 'react-icons/lu';
 import { useMediaFrameLocked } from '../utils/mediaLock';
 
 const mediaPersistentElements = [
@@ -15,6 +17,8 @@ export interface FieldModalFrameProps {
 	onClose: () => void;
 	saving: boolean;
 	title: string;
+	onBack?: () => void;
+	backLabel?: string;
 	children: ReactNode;
 }
 
@@ -23,6 +27,8 @@ export function FieldModalFrame( {
 	onClose,
 	saving,
 	title,
+	onBack,
+	backLabel,
 	children,
 }: FieldModalFrameProps ) {
 	// While a wp.media frame is open on top of us, disable outside-click and
@@ -32,6 +38,28 @@ export function FieldModalFrame( {
 	const mediaLocked = useMediaFrameLocked();
 	const dismissible = ! saving && ! mediaLocked;
 	const modal = ! mediaLocked;
+
+	useEffect( () => {
+		if ( ! onBack ) return;
+		const handler = ( e: KeyboardEvent ) => {
+			if ( e.key !== 'Backspace' ) return;
+			const target = e.target as HTMLElement | null;
+			if ( ! target ) return;
+			const tag = target.tagName;
+			if (
+				tag === 'INPUT' ||
+				tag === 'TEXTAREA' ||
+				tag === 'SELECT' ||
+				target.isContentEditable
+			) {
+				return;
+			}
+			e.preventDefault();
+			onBack();
+		};
+		window.addEventListener( 'keydown', handler );
+		return () => window.removeEventListener( 'keydown', handler );
+	}, [ onBack ] );
 
 	return (
         <Dialog.Root
@@ -72,7 +100,27 @@ export function FieldModalFrame( {
 							minH={ 0 }
 							w="full"
 						>
-							<Dialog.Header flexShrink={ 0 }>{ title }</Dialog.Header>
+							<Dialog.Header flexShrink={ 0 }>
+								{ onBack ? (
+									<HStack w="full" justify="space-between" align="center" gap={ 4 }>
+										<Button
+											variant="ghost"
+											size="sm"
+											onClick={ onBack }
+											colorPalette="gray"
+											pl={ 0 }
+										>
+											<LuArrowLeft />
+											{ backLabel || 'Back' }
+										</Button>
+										<Text as="span" truncate>
+											{ title }
+										</Text>
+									</HStack>
+								) : (
+									title
+								) }
+							</Dialog.Header>
 							<Dialog.CloseTrigger disabled={ saving } />
 							{ children }
 						</Box>

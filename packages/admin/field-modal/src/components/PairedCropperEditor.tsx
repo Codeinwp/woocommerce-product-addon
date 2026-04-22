@@ -99,9 +99,10 @@ export function PairedCropperEditor( {
 		'Price (optional)';
 
 	return (
-		<Field.Root>
+		<Field.Root w="full">
 			<Field.Label { ...labelProps }>{ title }</Field.Label>
 			<Box
+				w="full"
 				borderWidth="1px"
 				borderColor="gray.200"
 				borderRadius="md"

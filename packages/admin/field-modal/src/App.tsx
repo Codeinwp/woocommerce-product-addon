@@ -70,12 +70,20 @@ export function App( { productmetaId }: AppProps ) {
 		i18n.fieldModalTitleWithType,
 	] );
 
+	const canGoBack =
+		! pickerOpen &&
+		Boolean( selectedId ) &&
+		Boolean( editDraft ) &&
+		modalEntry === 'picker';
+
 	return (
 		<FieldModalFrame
 			isOpen={ open }
 			onClose={ closeModal }
 			saving={ saving }
 			title={ modalTitle }
+			onBack={ canGoBack ? onBackToFieldTypes : undefined }
+			backLabel={ i18n.back || 'Back' }
 		>
 			<FieldModalBody
 				status={ { loading, error } }
@@ -112,10 +120,6 @@ export function App( { productmetaId }: AppProps ) {
 				loading={ loading }
 				saving={ saving }
 				hasCtx={ Boolean( ctx ) }
-				selectedId={ selectedId }
-				editDraft={ editDraft }
-				modalEntry={ modalEntry }
-				onBackToFieldTypes={ onBackToFieldTypes }
 				onClose={ closeModal }
 				onSave={ handleSave }
 			/>
