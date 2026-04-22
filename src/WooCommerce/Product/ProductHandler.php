@@ -215,8 +215,9 @@ final class ProductHandler {
 			$passed = self::check_validation( $product_id, $_POST );
 		}
 
-		$fields     = isset( $_POST['ppom']['fields'] ) ? ppom_sanitize_array_data( $_POST['ppom']['fields'] ) : null; // phpcs:ignore WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$product_id = isset( $_POST['ppom_product_id'] ) ? intval( $_POST['ppom_product_id'] ) : $product_id; // phpcs:ignore WordPress.Security.NonceVerification
+		$posted_fields = isset( $_POST['ppom']['fields'] ) ? wp_unslash( $_POST['ppom']['fields'] ) : null; // phpcs:ignore WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$fields        = is_array( $posted_fields ) ? ppom_sanitize_array_data( $posted_fields ) : null;
+		$product_id    = isset( $_POST['ppom_product_id'] ) ? intval( wp_unslash( $_POST['ppom_product_id'] ) ) : $product_id; // phpcs:ignore WordPress.Security.NonceVerification
 
 		if ( Helpers::get_price_mode() == 'legacy' && $fields ) {
 
