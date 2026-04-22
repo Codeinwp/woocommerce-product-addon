@@ -3,6 +3,7 @@
  */
 import { useMemo } from '@wordpress/element';
 import { useFieldModalController } from './hooks/useFieldModalController';
+import { useConfirmClose } from './hooks/useConfirmClose';
 import { FieldModalFrame } from './components/FieldModalFrame';
 import { FieldModalBody } from './components/FieldModalBody';
 import { FieldModalFooter } from './components/FieldModalFooter';
@@ -76,10 +77,16 @@ export function App( { productmetaId }: AppProps ) {
 		Boolean( editDraft ) &&
 		modalEntry === 'picker';
 
+	const isDirty = ! pickerOpen && Boolean( editDraft );
+	const { confirming: confirmingCancel, requestClose } = useConfirmClose( {
+		requireConfirm: isDirty,
+		onClose: closeModal,
+	} );
+
 	return (
 		<FieldModalFrame
 			isOpen={ open }
-			onClose={ closeModal }
+			onClose={ requestClose }
 			saving={ saving }
 			title={ modalTitle }
 			onBack={ canGoBack ? onBackToFieldTypes : undefined }
@@ -120,7 +127,8 @@ export function App( { productmetaId }: AppProps ) {
 				loading={ loading }
 				saving={ saving }
 				hasCtx={ Boolean( ctx ) }
-				onClose={ closeModal }
+				confirmingCancel={ confirmingCancel }
+				onClose={ requestClose }
 				onSave={ handleSave }
 			/>
 		</FieldModalFrame>
