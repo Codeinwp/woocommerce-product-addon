@@ -12,6 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class PPOM_Freemium {
 	const TAB_KEY_FREEMIUM_CFR = 'locked_conditional_field_repeater';
 
+	/**
+	 * Singleton instance.
+	 *
+	 * @var self|null
+	 */
 	public static $instance = null;
 
 	/**
@@ -27,7 +32,7 @@ class PPOM_Freemium {
 	/**
 	 * Get instance
 	 *
-	 * @return void
+	 * @return self
 	 */
 	public static function get_instance() {
 		if ( is_null( self::$instance ) ) {
@@ -40,8 +45,9 @@ class PPOM_Freemium {
 	/**
 	 * Add a tab to all PPOM field types as Conditional Repeater (PRO)
 	 *
-	 * @param  array $tabs Current tabs.
-	 * @return array
+	 * @param array<string, mixed> $tabs Current tabs.
+	 *
+	 * @return array<string, mixed>
 	 */
 	public function add_locked_cfr_tab( $tabs ) {
 		if ( ppom_pro_is_installed() && PPOM()->is_license_of_type( 'plus' ) ) {
@@ -83,8 +89,9 @@ class PPOM_Freemium {
 	/**
 	 * Adds admin setting fields to all input types.
 	 *
-	 * @param  array $inputs current input classes
-	 * @return array
+	 * @param array<int, object> $inputs Current input class instances.
+	 *
+	 * @return array<int, object>
 	 */
 	public function locked_cfr_register_form_elements( $inputs ) {
 		return array_map(
@@ -107,6 +114,11 @@ class PPOM_Freemium {
 		);
 	}
 
+	/**
+	 * Marketing list of Pro-only field types for the admin UI.
+	 *
+	 * @return list<array{title: string, icon: string}>
+	 */
 	public function get_pro_fields() {
 		return array(
 			array(

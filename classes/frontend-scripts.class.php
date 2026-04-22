@@ -24,9 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class PPOM_FRONTEND_SCRIPTS {
 
 	/**
-	 * Return scripts URL.
+	 * Base URL for plugin scripts and styles.
 	 *
-	 * @var URL
+	 * @var string
 	 */
 	private static $scripts_url = '';
 
@@ -39,7 +39,9 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
-	 * Return main scripts framework class.
+	 * Reserved reference to the script helper (legacy; unused in static API).
+	 *
+	 * @var mixed|null
 	 */
 	private static $scripts_class;
 
@@ -61,7 +63,7 @@ class PPOM_FRONTEND_SCRIPTS {
 	/**
 	 * Returns the script registry used by the modern frontend loader.
 	 *
-	 * @return array
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}>
 	 */
 	private static function get_scripts() {
 
@@ -158,7 +160,7 @@ class PPOM_FRONTEND_SCRIPTS {
 	/**
 	 * Returns the style registry used by the modern frontend loader.
 	 *
-	 * @return array
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}>
 	 */
 	private static function get_styles() {
 
@@ -593,6 +595,10 @@ class PPOM_FRONTEND_SCRIPTS {
 					'plupload_runtime'       => ( ppom_if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
 					'ppom_file_upload_nonce' => wp_create_nonce( 'ppom_uploading_file_action' ),
 					'ppom_file_delete_nonce' => wp_create_nonce( 'ppom_deleting_file_action' ),
+					'invalid_file_type'      => __( 'Invalid file type', 'woocommerce-product-addon' ),
+					// translators: %s is max file size.
+					'max_file_size'          => __( 'File size must be less than %s', 'woocommerce-product-addon' ),
+					'duplicate_file'         => __( 'You have already selected this file', 'woocommerce-product-addon' ),
 				);
 
 				break;

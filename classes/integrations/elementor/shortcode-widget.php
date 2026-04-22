@@ -11,6 +11,8 @@ class PPOM_Elementor_Shortcode_Widget extends \Elementor\Widget_Base {
 
 	/**
 	 * widget name
+	 *
+	 * @return string
 	 */
 	public function get_name() {
 		return 'ppom_shortcode';
@@ -19,6 +21,8 @@ class PPOM_Elementor_Shortcode_Widget extends \Elementor\Widget_Base {
 
 	/**
 	 * widget title
+	 *
+	 * @return string
 	 */
 	public function get_title() {
 		return __( 'PPOM Shortcode', 'woocommerce-product-addon' );
@@ -27,6 +31,8 @@ class PPOM_Elementor_Shortcode_Widget extends \Elementor\Widget_Base {
 
 	/**
 	 * widget icon
+	 *
+	 * @return string
 	 */
 	public function get_icon() {
 		return 'fa fa-list';
@@ -35,6 +41,8 @@ class PPOM_Elementor_Shortcode_Widget extends \Elementor\Widget_Base {
 
 	/**
 	 * Set this widget to category
+	 *
+	 * @return array<int, string>
 	 */
 	public function get_categories() {
 		return array( 'general' );
@@ -43,6 +51,8 @@ class PPOM_Elementor_Shortcode_Widget extends \Elementor\Widget_Base {
 
 	/**
 	 * Register widget controls/setings
+	 *
+	 * @return void
 	 */
 	protected function _register_controls() {
 
@@ -69,6 +79,8 @@ class PPOM_Elementor_Shortcode_Widget extends \Elementor\Widget_Base {
 
 	/**
 	 * Render widget output on the frontend
+	 *
+	 * @return void
 	 */
 	protected function render() {
 

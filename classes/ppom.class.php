@@ -10,6 +10,8 @@
  * Resolves product-level PPOM metadata for frontend and cart/order flows.
  *
  * @since version 15.0
+ *
+ * @phpstan-import-type PPOM_Meta_Group_Row from PPOM_Meta_Repository
  */
 class PPOM_Meta {
 
@@ -37,7 +39,11 @@ class PPOM_Meta {
 	/**
 	 * Runtime settings row selected from the resolved PPOM groups.
 	 *
-	 * @var object|array $ppom_settings
+	 * Empty `array()` before resolution; otherwise a DB row object (see {@see settings()}).
+	 *
+	 * @var object|array|null $ppom_settings
+	 *
+	 * @phpstan-var object|array|null $ppom_settings
 	 */
 	public $ppom_settings = array();
 
@@ -132,6 +138,7 @@ class PPOM_Meta {
 		$excluded_methods = array(
 			'__construct',
 			'get_settings_by_id',
+			'get_settings_by_ids',
 			'get_fields_by_id',
 			'settings',
 			'all_ppom_with_categories',
@@ -273,7 +280,17 @@ class PPOM_Meta {
 	/**
 	 * Loads the primary settings row for the resolved PPOM group.
 	 *
-	 * @return object|null
+	 * Returns a full `SELECT *` row from the PPOM meta table (same shape as
+	 * {@see PPOM_Meta_Repository::get_row_by_id()} and the repository’s
+	 * `PPOM_Meta_Group_Row` PHPStan alias),
+	 * or null when no group is resolved. Filtered with {@see 'ppom_meta_settings'}.
+	 *
+	 * Typed as generic `object` for static analysis so callers may mutate properties
+	 * (e.g. `productmeta_validation`) like a `stdClass` row.
+	 *
+	 * @return object|null Row object with PPOM meta columns, or null.
+	 *
+	 * @phpstan-return object|null
 	 */
 	public function settings() {
 
@@ -283,14 +300,13 @@ class PPOM_Meta {
 			return null;
 		}
 
-		global $wpdb;
-
-		if ( is_array( $meta_id ) ) {
-			$meta_id = implode( ',', $meta_id );
+		$id = absint( $meta_id );
+		if ( $id <= 0 ) {
+			return null;
 		}
 
-		$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id IN($meta_id)";
-		$meta_settings = $wpdb->get_results( $qry );
+		$row           = ppom_meta_repository()->get_row_by_id( $id );
+		$meta_settings = $row ? array( $row ) : array();
 		$filter_meta   = array_filter(
 			$meta_settings,
 			function ( $meta ) {
@@ -323,28 +339,27 @@ class PPOM_Meta {
 		}
 
 		$meta_fields = array();
-		global $wpdb;
+		$repo        = ppom_meta_repository();
+
 		if ( $this->has_multiple_meta() ) {
 
-			foreach ( $this->meta_id as $meta_id ) {
-				$qry    = 'SELECT the_meta FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
-				$fields = $wpdb->get_var( $qry );
-
-				if ( ! is_string( $fields ) || empty( $fields ) ) {
+			$rows = $repo->get_rows_by_ids( (array) $this->meta_id );
+			foreach ( $rows as $row ) {
+				if ( ! isset( $row->the_meta ) || ! is_string( $row->the_meta ) || '' === $row->the_meta ) {
 					continue;
 				}
 
-				$fields = json_decode( $fields, true );
+				$fields = json_decode( $row->the_meta, true );
 
 				if ( is_array( $fields ) ) {
 					$meta_fields = array_merge( $meta_fields, $fields );
 				}
 			}
 		} else {
-			$meta_id     = $this->meta_id;
-			$qry         = 'SELECT the_meta FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
-			$fields      = $wpdb->get_var( $qry );
-			$meta_fields = json_decode( $fields, true );
+			$meta_id     = absint( $this->meta_id );
+			$row         = $repo->get_row_by_id( $meta_id );
+			$raw         = ( $row && isset( $row->the_meta ) && is_string( $row->the_meta ) ) ? $row->the_meta : '';
+			$meta_fields = json_decode( $raw, true );
 		}
 
 		// Filter fields which are active only
@@ -364,14 +379,14 @@ class PPOM_Meta {
 	function get_fields_by_id( $ppom_id ) {
 
 		$meta_fields = array();
-		global $wpdb;
 
-		$ppom_ids = explode( ',', $ppom_id );
-		foreach ( $ppom_ids as $meta_id ) {
-
-			$table  = $wpdb->prefix . PPOM_TABLE_META;
-			$fields = $wpdb->get_var( $wpdb->prepare( "SELECT the_meta FROM $table WHERE productmeta_id = %d", $meta_id ) );
-			$fields = json_decode( $fields, true );
+		$ppom_ids = array_filter( array_map( 'absint', explode( ',', (string) $ppom_id ) ) );
+		$rows     = ppom_meta_repository()->get_rows_by_ids( $ppom_ids );
+		foreach ( $rows as $row ) {
+			if ( ! isset( $row->the_meta ) || ! is_string( $row->the_meta ) ) {
+				continue;
+			}
+			$fields = json_decode( $row->the_meta, true );
 			if ( is_array( $fields ) ) {
 				$meta_fields = array_merge( $meta_fields, $fields );
 			}
@@ -430,12 +445,7 @@ class PPOM_Meta {
 
 	function all_ppom_with_categories() {
 
-		global $wpdb;
-		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-
-		$qry = "SELECT productmeta_id, productmeta_categories, productmeta_tags FROM {$ppom_table} WHERE productmeta_categories != '' OR productmeta_tags != ''";
-
-		return $wpdb->get_results( $qry );
+		return ppom_meta_repository()->get_category_tag_summary_rows();
 	}
 
 	// check meta settings: ajax validation
@@ -598,14 +608,51 @@ class PPOM_Meta {
 	/* ============== Get settings by metaid  ================= */
 	function get_settings_by_id( $meta_id ) {
 
-		global $wpdb;
-
-		$qry           = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META . " WHERE productmeta_id = {$meta_id}";
-		$table         = $wpdb->prefix . PPOM_TABLE_META;
-		$meta_settings = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE productmeta_id = %d", $meta_id ) );
+		$meta_settings = ppom_meta_repository()->get_row_by_id( (int) $meta_id );
 
 		$meta_settings = empty( $meta_settings ) ? null : $meta_settings;
 
 		return apply_filters( 'ppom_get_settings_by_id', $meta_settings, $meta_id, $this );
+	}
+
+	/**
+	 * Loads settings rows for many meta ids in one repository round-trip (cache-friendly).
+	 *
+	 * @param array<int|string> $meta_ids PPOM group ids.
+	 * @return array<int, PPOM_Meta_Group_Row|null> Keyed by numeric id; values run through `ppom_get_settings_by_id`.
+	 *
+	 * @phpstan-return array<int, PPOM_Meta_Group_Row|null>
+	 */
+	public function get_settings_by_ids( array $meta_ids ) {
+		$ids = array_values(
+			array_unique(
+				array_filter(
+					array_map( 'absint', $meta_ids ),
+					static function ( $v ) {
+						return $v > 0;
+					}
+				)
+			)
+		);
+
+		if ( empty( $ids ) ) {
+			return array();
+		}
+
+		$rows  = ppom_meta_repository()->get_rows_by_ids( $ids );
+		$by_id = array();
+		foreach ( $rows as $row ) {
+			if ( isset( $row->productmeta_id ) ) {
+				$by_id[ (int) $row->productmeta_id ] = $row;
+			}
+		}
+
+		$out = array();
+		foreach ( $ids as $id ) {
+			$settings   = isset( $by_id[ $id ] ) ? $by_id[ $id ] : null;
+			$out[ $id ] = apply_filters( 'ppom_get_settings_by_id', $settings, $id, $this );
+		}
+
+		return $out;
 	}
 }

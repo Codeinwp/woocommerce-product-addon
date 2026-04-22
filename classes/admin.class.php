@@ -595,17 +595,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @return array
 	 */
 	public function get_db_field( $ppom_field_id ) {
-		global $wpdb;
-		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-		$rows       = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT productmeta_categories, productmeta_tags FROM $ppom_table WHERE productmeta_id = %d",
-				$ppom_field_id
-			),
-			ARRAY_A
-		);
+		$rows = ppom_meta_repository()->get_categories_and_tags_columns( (int) $ppom_field_id );
 
-		return 0 < count( $rows ) && ! empty( $rows[0] ) ? $rows[0] : array();
+		return ! empty( $rows ) ? $rows : array();
 	}
 
 	/**
@@ -724,25 +716,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @return void
 	 */
 	public static function save_categories_and_tags( $ppom_id, $categories, $tags ) {
-		global $wpdb;
-		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-
-		$data_to_update = array(
-			'productmeta_categories' => implode( "\r\n", $categories ), // NOTE: Keep the backward compatible format.
-		);
-
-		// false = caller chose not to change tags (e.g. E2E partial update); omit column from UPDATE.
-		if ( is_array( $tags ) ) {
-			$data_to_update['productmeta_tags'] = empty( $tags ) ? '' : serialize( $tags );
-		}
-
-		$wpdb->update(
-			$ppom_table,
-			$data_to_update,
-			array( 'productmeta_id' => $ppom_id ), // Where clause
-			array( '%s' ), // Data format
-			array( '%d' )  // Where format
-		);
+		ppom_meta_repository()->save_categories_and_tags( (int) $ppom_id, $categories, $tags );
 	}
 
 	// Legacy settings bridge and setup.
@@ -959,10 +933,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			return;
 		}
 
-		global $wpdb;
-		$ppom_meta_table = $wpdb->prefix . PPOM_TABLE_META;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$res = $wpdb->get_results( "SELECT * FROM `$ppom_meta_table` WHERE `productmeta_js` != '' OR `productmeta_style` != ''" );
+		$res = ppom_meta_repository()->get_rows_with_non_empty_style_or_js();
 		update_option( 'ppom_legacy_user', ! empty( $res ) ? 'yes' : 'no' );
 	}
 

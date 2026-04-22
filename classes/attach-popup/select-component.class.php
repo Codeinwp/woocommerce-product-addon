@@ -2,6 +2,9 @@
 
 namespace PPOM\Attach;
 
+/**
+ * Attach UI multi/single select rendered as a collapsible postbox.
+ */
 class SelectComponent extends ContainerView {
 	/**
 	 * The title of the component.
@@ -31,6 +34,11 @@ class SelectComponent extends ContainerView {
 	 */
 	protected $status = 'valid';
 
+	/**
+	 * Instantiates an empty select component; use setters to populate.
+	 *
+	 * @return void
+	 */
 	public function __construct() {}
 
 	/**

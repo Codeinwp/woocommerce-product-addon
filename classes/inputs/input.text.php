@@ -1,10 +1,14 @@
 <?php
-/*
- * Followig class handling text input control and their
-* dependencies. Do not make changes in code
-* Create on: 9 November, 2013
-*/
+/**
+ * Text input field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * Single-line text field with optional masking, length limits, add-on price, and conditional logic.
+ */
 class NM_Text_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -17,6 +21,11 @@ class NM_Text_wooproduct extends PPOM_Inputs {
 	*/
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata and loads the field settings schema.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -27,6 +36,11 @@ class NM_Text_wooproduct extends PPOM_Inputs {
 		$this->settings = self::get_settings();
 	}
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 
 		$regex_help_url = 'https://docs.themeisle.com/article/2060-input-masking-documentation-for-field-configuration';

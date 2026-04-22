@@ -262,13 +262,19 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 					'price_matrix',
 					array(
 						array(
-							'option' => '1-2',
+							'option' => '5',
 							'price'  => '12',
 							'label'  => 'Low quantity',
 							'id'     => 'low_qty',
 						),
 						array(
-							'option' => '3-5',
+							'option' => '5-10',
+							'price'  => '10',
+							'label'  => 'Range quantity',
+							'id'     => 'range_qty',
+						),
+						array(
+							'option' => '11',
 							'price'  => '8',
 							'label'  => 'High quantity',
 							'id'     => 'high_qty',
@@ -279,11 +285,13 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 			$product->get_id()
 		);
 
-		$initial = $this->restore_cart_item_from_session( wc_get_product( $product->get_id() ), array(), 1 );
-		$updated = $this->restore_cart_item_from_session( wc_get_product( $product->get_id() ), array(), 3 );
+		$low_quantity   = $this->restore_cart_item_from_session( wc_get_product( $product->get_id() ), array(), 3 );
+		$range_quantity = $this->restore_cart_item_from_session( wc_get_product( $product->get_id() ), array(), 7 );
+		$high_quantity  = $this->restore_cart_item_from_session( wc_get_product( $product->get_id() ), array(), 15 );
 
-		$this->assertSame( 12.0, (float) $initial['data']->get_price() );
-		$this->assertSame( 8.0, (float) $updated['data']->get_price() );
+		$this->assertSame( 12.0, (float) $low_quantity['data']->get_price() );
+		$this->assertSame( 10.0, (float) $range_quantity['data']->get_price() );
+		$this->assertSame( 8.0, (float) $high_quantity['data']->get_price() );
 	}
 
 	/**

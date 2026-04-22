@@ -19,7 +19,7 @@ class NM_PersonalizedProduct {
 	public const LICENSE_PLAN_1    = 1; // Essential.
 	public const LICENSE_PLAN_2    = 2; // Plus.
 	public const LICENSE_PLAN_3    = 3; // VIP.
-	static $tbl_productmeta        = 'nm_personalized';
+	static $tbl_productmeta        = PPOM_TABLE_META;
 
 
 	/**
@@ -472,7 +472,8 @@ class NM_PersonalizedProduct {
 	function nm_add_bulk_meta() {
 		global $post_type;
 
-		if ( $post_type == 'product' and $all_meta = $this->get_product_meta_all() ) {
+		$all_meta = $this->get_product_meta_list_for_ui();
+		if ( 'product' === $post_type && ! empty( $all_meta ) ) {
 			foreach ( $all_meta as $meta ) {
 				?>
 				<script type="text/javascript">
@@ -642,30 +643,29 @@ class NM_PersonalizedProduct {
 
 	function get_product_meta_all() {
 
-		global $wpdb;
+		return ppom_meta_repository()->get_all_rows();
+	}
 
-		$qry = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META;
-		$res = $wpdb->get_results( $qry );
+	/**
+	 * Field groups as id + name only (admin metabox, bulk actions, admin bar).
+	 *
+	 * @return list<stdClass> Rows with productmeta_id, productmeta_name.
+	 * @phpstan-return list<stdClass>
+	 */
+	public function get_product_meta_list_for_ui() {
 
-		return $res;
+		return ppom_meta_repository()->get_all_rows_list_ui();
 	}
 
 	/**
 	 * Get the count of all the created PPOM Group fields.
-	 * 
-	 * @param int $limit Optional limit on number of results to count
-	 * @return int - The number of group fields in the database.
+	 *
+	 * @param int|null $limit When set, returns at most this many (capped count for bounded metrics).
+	 * @return int Number of group rows, or capped count when `$limit` is provided.
 	 */
 	public static function get_product_meta_count( $limit = null ) {
-		global $wpdb;
 
-		$qry = 'SELECT COUNT(*) FROM ' . $wpdb->prefix . PPOM_TABLE_META;
-		if ( $limit !== null ) {
-			$qry .= ' LIMIT ' . intval( $limit );
-		}
-		$count = $wpdb->get_var( $qry );
-
-		return intval( $count );
+		return ppom_meta_repository()->count_rows( $limit );
 	}
 
 	function get_product_meta( $meta_id ) {
@@ -678,45 +678,12 @@ class NM_PersonalizedProduct {
 			return;
 		}
 
-		global $wpdb;
-
-		$table = $wpdb->prefix . PPOM_TABLE_META;
-		$res   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE productmeta_id = %d", $meta_id ) );
-
-		return $res;
+		return ppom_meta_repository()->get_row_by_id( (int) $meta_id );
 	}
 
 	public static function upgrade_database() {
-		global $wpdb;
 
-		/*
-		 * meta_for: this is to make this table to contact more then one metas for NM plugins in future in this plugin it will be populated with: forms
-		 */
-		$forms_table_name = $wpdb->prefix . PPOM_TABLE_META;
-
-		$charset_collate = $wpdb->get_charset_collate();
-
-		$sql = "CREATE TABLE $forms_table_name (
-		productmeta_id INT(5) NOT NULL AUTO_INCREMENT,
-		productmeta_name VARCHAR(50) NOT NULL,
-		productmeta_validation VARCHAR(3),
-        dynamic_price_display VARCHAR(10),
-        send_file_attachment VARCHAR(3) NOT NULL,
-        show_cart_thumb VARCHAR(3),
-		aviary_api_key VARCHAR(40),
-		productmeta_style MEDIUMTEXT,
-		productmeta_js MEDIUMTEXT,
-		productmeta_categories MEDIUMTEXT,
-		productmeta_tags LONGTEXT,
-		the_meta MEDIUMTEXT NOT NULL,
-		productmeta_created DATETIME NOT NULL,
-		PRIMARY KEY  (productmeta_id)
-		) $charset_collate;";
-
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		dbDelta( $sql );
-
-		update_option( 'personalizedproduct_db_version', PPOM_DB_VERSION );
+		PPOM_Meta_Repository::ensure_schema();
 	}
 
 	public static function activate_plugin() {
@@ -808,25 +775,10 @@ class NM_PersonalizedProduct {
 			return;
 		}
 
-		global $wpdb;
+		$new_id = ppom_meta_repository()->clone_group_from( (int) $meta_id );
 
-		$forms_table_name = $wpdb->prefix . PPOM_TABLE_META;
-
-		$sql = "INSERT INTO $forms_table_name
-		(productmeta_name, aviary_api_key, productmeta_style,productmeta_categories, the_meta, productmeta_created) 
-		SELECT CONCAT(productmeta_name, ' (clone)'), aviary_api_key, productmeta_style,productmeta_categories, the_meta, productmeta_created 
-		FROM $forms_table_name 
-		WHERE productmeta_id = %d;";
-
-		$result = $wpdb->query( $wpdb->prepare( $sql, array( $meta_id ) ) );
-
-		wp_safe_redirect( admin_url( 'admin.php?page=ppom&productmeta_id=' . intval( $wpdb->insert_id ) . '&do_meta=edit' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=ppom&productmeta_id=' . intval( $new_id ) . '&do_meta=edit' ) );
 		die();
-		/*
-		var_dump($result);
-		
-		$wpdb->show_errors();
-		$wpdb->print_error(); */
 	}
 
 	/*
@@ -885,7 +837,6 @@ class NM_PersonalizedProduct {
 			return;
 		}
 
-		global $wpdb;
 		// get the csv file
 		// ppom_pa($_FILES);
 		$demo_file = PPOM_PATH . '/assets/ppom-basic-meta.json';
@@ -916,40 +867,20 @@ class NM_PersonalizedProduct {
 			return;
 		}
 
-		$inserted = 0;
-
+		$repo = ppom_meta_repository();
 		foreach ( $ppom_meta as $meta ) {
-
-			$table  = $wpdb->prefix . PPOM_TABLE_META;
-			$data   = array();
-			$format = array();
-
-			foreach ( $meta as $key => $val ) {
-
-				if ( $key === 'productmeta_id' ) {
-					continue;
-				}
-
-				if ( $key === 'productmeta_name' ) {
-					$val = 'PPOM Demo Field';
-				}
-
-				$data[ $key ] = $val;
-				$format[]     = '%s';
+			$encoded = wp_json_encode( $meta );
+			if ( false === $encoded ) {
+				continue;
 			}
-
-			if ( ! empty( $data ) ) {
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-				$result = $wpdb->insert( $table, $data, $format );
-				if ( false !== $result ) {
-					++$inserted;
-				}
+			$row = json_decode( $encoded, true );
+			if ( ! is_array( $row ) ) {
+				continue;
 			}
+			$repo->insert_demo_row( $row );
 		}
 
-		if ( $inserted > 0 ) {
-			update_option( 'ppom_demo_meta_installed', 1 );
-		}
+		update_option( 'ppom_demo_meta_installed', 1 );
 	}
 
 
