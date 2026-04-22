@@ -1596,7 +1596,7 @@ final class Engine {
 			return $option_price;
 		}
 
-		if ( 'yes' != Helpers::get_option( 'ppom_taxable_option_price' ) ) {
+		if ( 'yes' != Helpers::get_option( 'ppom_taxable_option_price' ) && ! wc_tax_enabled() ) {
 			return $option_price;
 		}
 
