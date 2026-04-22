@@ -1514,16 +1514,25 @@ final class Helpers {
 			return $matrix;
 		}
 
+		$quantity = intval( $quantity );
 		foreach ( $ranges as $range => $data ) {
 
-			$range_array = explode( '-', $range );
-			$range_start = $range_array[0];
-			$range_end   = $range_array[1];
+			if ( strpos( $range, '-' ) !== false ) {
+				list( $start, $end ) = array_map( 'intval', explode( '-', $range ) );
+				if ( $quantity >= $start && $quantity <= $end ) {
+					$matrix = $data;
+					break;
+				}
+			} else {
+				$value = intval( $range );
 
-			$quantity = intval( $quantity );
-			if ( $quantity >= $range_start && $quantity <= $range_end ) {
-				$matrix = $data;
-				break;
+				if ( $range === array_key_first( $ranges ) && $quantity <= $value ) {
+					$matrix = $data;
+					break;
+				} elseif ( $range === array_key_last( $ranges ) && $quantity >= $value ) {
+					$matrix = $data;
+					break;
+				}
 			}
 		}
 
@@ -2571,5 +2580,34 @@ final class Helpers {
 		}
 
 		return $updated_value;
+	}
+
+	/**
+	 * Get file uploader notice text based on field meta.
+	 *
+	 * @param \PPOM_InputManager $meta_field Meta field object.
+	 * @return string Notice text to display for file uploader field.
+	 */
+	public static function get_file_uploader_notice( $meta_field ) {
+		$file_types = $meta_field->get_meta_value( 'file_types' );
+		$file_size  = $meta_field->get_meta_value( 'file_size' );
+
+		$notice = '';
+		if ( $file_types ) {
+			$notice = sprintf(
+				// translators: %s is the accepted file types.
+				__( 'Accepted formats: %s.', 'woocommerce-product-addon' ),
+				esc_html( strtoupper( $file_types ) )
+			);
+		}
+		if ( $file_size ) {
+			$notice .= ' ' . sprintf(
+				// translators: %s is the maximum file size.
+				__( 'Max size: %s', 'woocommerce-product-addon' ),
+				esc_html( strtoupper( $file_size ) )
+			);
+		}
+
+		return $notice;
 	}
 }
