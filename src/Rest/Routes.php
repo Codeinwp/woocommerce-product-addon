@@ -87,6 +87,9 @@ final class Routes {
 		if ( ppom_is_api_enable() ) {
 			add_action( 'rest_api_init', array( $this, 'init_api' ) );
 		}
+
+		// Always register nonce refresh endpoint (doesn't need API enable setting).
+		add_action( 'rest_api_init', array( $this, 'init_nonce_api' ) );
 	}
 
 
@@ -172,6 +175,46 @@ final class Routes {
 				'permission_callback' => '__return_true',
 			)
 		);
+	}
+
+	/**
+	 * Registers the nonce refresh endpoint for file operations.
+	 *
+	 * This endpoint is always available and doesn't require the API to be enabled
+	 * in settings, as it only returns fresh nonces which are public values.
+	 *
+	 * @return void
+	 */
+	public function init_nonce_api() {
+		// Get fresh nonces for file operations.
+		register_rest_route(
+			'ppom/v1',
+			'/nonces/file/',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'get_file_nonces' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+
+	/**
+	 * Returns fresh nonces for file upload and delete operations.
+	 *
+	 * This endpoint allows JavaScript to fetch fresh nonces when needed,
+	 * solving the issue of stale nonces in cached pages or long-lived browser tabs.
+	 *
+	 * @return \WP_REST_Response JSON response with fresh nonces.
+	 */
+	public function get_file_nonces() {
+
+		$response_info = array(
+			'status'                 => 'success',
+			'ppom_file_upload_nonce' => wp_create_nonce( 'ppom_uploading_file_action' ),
+			'ppom_file_delete_nonce' => wp_create_nonce( 'ppom_deleting_file_action' ),
+		);
+
+		return new \WP_REST_Response( $response_info );
 	}
 
 	// -------------------------------------------------------------------------
