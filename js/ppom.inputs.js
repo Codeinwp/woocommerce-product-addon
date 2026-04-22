@@ -63,7 +63,7 @@ jQuery( function ( $ ) {
 	const wc_cart_form = jQuery( 'form.cart' );
 
 	// Measure
-	$( '.ppom-measure' ).on( 'change', '.ppom-measure-unit', function ( e ) {
+	$( '.ppom-measure' ).off( 'change.ppom' ).on( 'change.ppom', '.ppom-measure-unit', function ( e ) {
 		e.preventDefault();
 		// console.log($(this).text());
 
@@ -77,7 +77,7 @@ jQuery( function ( $ ) {
 	wc_cart_button.removeClass( 'ajax_add_to_cart' );
 
 	// Range slider updated
-	$( document ).on( 'ppom_range_slider_updated', function ( e ) {
+	$( document ).off( 'ppom_range_slider_updated.ppom' ).on( 'ppom_range_slider_updated.ppom', function ( e ) {
 		// console.log(wc_product_qty);
 		$( 'form.cart' ).find( 'input[name="quantity"]' ).val( e.qty );
 		// wc_product_qty.val(e.qty);
@@ -92,11 +92,11 @@ jQuery( function ( $ ) {
 	ppom_init_js_for_ppom_fields( ppom_input_vars.ppom_inputs );
 
 	// Re-init ppom fields.
-	jQuery(document).on('ppom_reinit', function() {
-		if (typeof ppom_input_vars !== 'undefined' && ppom_input_vars.ppom_inputs) {
-			ppom_init_js_for_ppom_fields(ppom_input_vars.ppom_inputs);
+	$( document ).on( 'ppom_reinit', function ( e ) {
+		if ( typeof ppom_input_vars !== 'undefined' && ppom_input_vars.ppom_inputs ) {
+			ppom_init_js_for_ppom_fields( ppom_input_vars.ppom_inputs );
 		}
-	});
+	} );
 } );
 
 /**
@@ -118,6 +118,9 @@ function ppom_init_js_for_ppom_fields( ppom_fields ) {
 
 	jQuery.each( ppom_fields, function ( index, input ) {
 		const InputSelector = jQuery( '#' + input.data_name );
+		if ( InputSelector.data( 'ppom-initialized' ) === true ) {
+			return;
+		}
 
 		// Applying JS on inputs
 		switch ( input.type ) {
@@ -156,7 +159,7 @@ function ppom_init_js_for_ppom_fields( ppom_fields ) {
 					} else {
 						event.preventDefault();
 					}
-				} ).on( 'focus blur', function () {
+				} ).off( 'focus.ppom blur.ppom' ).on( 'focus.ppom blur.ppom', function () {
 					if ( typeof InputSelector.attr( 'max' ) !== 'undefined' ) {
 						if (
 							parseFloat( InputSelector.val() ) >
@@ -368,7 +371,7 @@ function ppom_init_js_for_ppom_fields( ppom_fields ) {
 
 				// Following script is added to close picker
 				// when color is picked
-				jQuery( document ).click( function ( e ) {
+				jQuery( document ).off( 'click.ppomColor' ).on( 'click.ppomColor', function ( e ) {
 					if (
 						! jQuery( e.target ).is(
 							'.ppom-input.color, .iris-picker, .iris-picker-inner'
@@ -379,7 +382,7 @@ function ppom_init_js_for_ppom_fields( ppom_fields ) {
 					}
 				} );
 
-				jQuery( '.ppom-input.color' ).click( function ( event ) {
+				jQuery( '.ppom-input.color' ).off( 'click.ppomColor' ).on( 'click.ppomColor', function ( event ) {
 					jQuery( '.ppom-input.color' ).iris( 'hide' );
 					jQuery( this ).iris( 'show' );
 					return event;
@@ -394,8 +397,11 @@ function ppom_init_js_for_ppom_fields( ppom_fields ) {
 					break;
 				}
 
-				jQuery( document ).on(
-					'click',
+				jQuery( document ).off(
+					'click.ppomPalettes' + input.data_name,
+					`.ppom-palettes-${ input.data_name } input.ppom-input`
+				).on(
+					'click.ppomPalettes' + input.data_name,
 					`.ppom-palettes-${ input.data_name } input.ppom-input`,
 					function ( e ) {
 						if (
@@ -456,7 +462,7 @@ function ppom_init_js_for_ppom_fields( ppom_fields ) {
 					} );
 				}
 
-				jQuery( '.ppom-range-bs-slider' ).on( 'change', function ( e ) {
+				jQuery( '.ppom-range-bs-slider' ).off( 'change.ppom' ).on( 'change.ppom', function ( e ) {
 					jQuery.event.trigger( {
 						type: 'ppom_range_slider_updated',
 						qty: jQuery( this ).val(),
@@ -472,6 +478,9 @@ function ppom_init_js_for_ppom_fields( ppom_fields ) {
 				}
 				break;
 		}
+
+		// Mark this field as initialized to prevent duplicate bindings
+		InputSelector.data( 'ppom-initialized', true );
 	} );
 }
 
