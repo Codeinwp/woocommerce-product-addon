@@ -10,17 +10,113 @@
  */
 jQuery( function ( $ ) {
 	/**
-	 * Initialize Select2 on the product search dropdowns in the "attach to products" modal.
+	 * Build a Select2 AJAX config for a taxonomy search endpoint.
+	 *
+	 * @param {string} action    The AJAX action name.
+	 * @param {string} nonce     The nonce value.
+	 * @return {Object} Select2 ajax config.
+	 */
+	function taxonomyAjaxConfig( action, nonce ) {
+		return {
+			url: ajaxurl,
+			dataType: 'json',
+			delay: 300,
+			cache: true,
+			data: function ( params ) {
+				return {
+					action: action,
+					ppom_attached_nonce: nonce,
+					q: params.term || '',
+					page: params.page || 1,
+				};
+			},
+			processResults: function ( data ) {
+				return {
+					results: Array.isArray( data?.results )
+						? data.results
+						: [],
+					pagination: {
+						more: Boolean( data?.pagination?.more ),
+					},
+				};
+			},
+		};
+	}
+
+	/**
+	 * Initialise a single Select2 search dropdown.
+	 *
+	 * @param {jQuery}           $el          Select element.
+	 * @param {string}           nonce        Attach nonce value.
+	 * @param {string}           placeholder  Placeholder text.
+	 * @param {string}           action       AJAX action name (or override key).
+	 * @param {string}           fallback     Default action when override is empty.
+	 * @param {jQuery|undefined} dropdownParent Optional parent for the dropdown.
+	 * @return {void}
+	 */
+	function initSelect2Search( $el, nonce, placeholder, action, fallback, dropdownParent ) {
+		const isLocked = $el.closest( '.ppom-fields-status-disabled' ).length > 0;
+
+		const config = {
+			width: '100%',
+			closeOnSelect: false,
+			minimumInputLength: 0,
+			placeholder,
+			ajax: taxonomyAjaxConfig( action || fallback, nonce ),
+		};
+
+		if ( dropdownParent ) {
+			config.dropdownParent = dropdownParent;
+		}
+
+		$el.select2( config );
+
+		if ( isLocked ) {
+			$el.prop( 'disabled', true ).trigger( 'change' );
+		}
+	}
+
+	/**
+	 * Initialize Select2 on the product, category, and tag search dropdowns
+	 * in the "attach to products" modal.
 	 *
 	 * @return {void}
 	 */
 	function initAttachSelects() {
-		const attachSelects = $( '.ppom-attach-container-item select' );
+		const productSelect = $( '#attach-to-products .ppom-attach' );
+		const categorySelect = $( '#attach-to-categories .ppom-attach' );
+		const tagSelect = $( '#attach-to-tags .ppom-attach' );
+		const attachNonce = $( '#ppom-product-form [name="ppom_attached_nonce"]' )
+			.val();
+		const parent = $( '#ppom-product-modal' );
+		const vars = window?.ppom_vars?.attach;
 
-		if ( typeof $.fn.select2 === 'function' ) {
-			attachSelects.select2();
+		if ( typeof $.fn.select2 !== 'function' ) {
+			return;
 		}
+
+		initSelect2Search( productSelect, attachNonce, vars?.productsPlaceholder, vars?.searchAction, 'ppom_search_products', parent );
+		initSelect2Search( categorySelect, attachNonce, vars?.categoriesPlaceholder, vars?.searchCategoriesAction, 'ppom_search_categories', parent );
+		initSelect2Search( tagSelect, attachNonce, vars?.tagsPlaceholder, vars?.searchTagsAction, 'ppom_search_tags', parent );
 	}
+
+	// Initialize Select2 on inline attach selects (field-group editor page).
+	( function initInlineAttachSelects() {
+		const $container = $( '.ppom-inline-attach-container' );
+		if ( ! $container.length || typeof $.fn.select2 !== 'function' ) {
+			return;
+		}
+
+		const attachNonce = $container.find( '[name="ppom_attached_nonce"]' ).val();
+		const productSelect = $container.find( '#attach-to-products .ppom-attach' );
+		const categorySelect = $container.find( '#attach-to-categories .ppom-attach' );
+		const tagSelect = $container.find( '#attach-to-tags .ppom-attach' );
+		const vars = window?.ppom_vars?.attach;
+
+		initSelect2Search( productSelect, attachNonce, vars?.productsPlaceholder, vars?.searchAction, 'ppom_search_products' );
+		initSelect2Search( categorySelect, attachNonce, vars?.categoriesPlaceholder, vars?.searchCategoriesAction, 'ppom_search_categories' );
+		initSelect2Search( tagSelect, attachNonce, vars?.tagsPlaceholder, vars?.searchTagsAction, 'ppom_search_tags' );
+	} )();
 
 	// DataTables provides the searchable/sortable shell, while PPOM injects its
 	// own action toolbar into the custom `ppom-toolbar` slot defined in `dom`.
@@ -132,8 +228,13 @@ jQuery( function ( $ ) {
 				initAttachSelects();
 				$( '#ppom_id' ).val( ppom_id );
 				$( 'body' ).append( append_overlay_modal );
-				$( '#' + model_id ).fadeIn();
-				$( '#attach-to-products input' ).focus();
+				$( '#' + model_id ).fadeIn( function () {
+					const productSelect = $( '#attach-to-products .ppom-attach' );
+
+					if ( productSelect.length ) {
+						productSelect.select2( 'open' );
+					}
+				} );
 			} );
 		}
 	);

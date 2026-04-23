@@ -163,12 +163,6 @@ parameters:
 			path: classes/admin.class.php
 
 		-
-			message: '#^Loose comparison using \=\= between true and ''text'' will always evaluate to true\.$#'
-			identifier: equal.alwaysTrue
-			count: 1
-			path: classes/admin.class.php
-
-		-
 			message: '#^Method NM_PersonalizedProduct_Admin\:\:add_settings_tab\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -289,19 +283,7 @@ parameters:
 			path: classes/admin.class.php
 
 		-
-			message: '#^Offset ''type'' on non\-empty\-array in isset\(\) always exists and is not nullable\.$#'
-			identifier: isset.offset
-			count: 1
-			path: classes/admin.class.php
-
-		-
 			message: '#^Parameter \#1 \$post_id of function delete_post_meta expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Parameter \#1 \$post_id of function get_post_meta expects int, int\|false given\.$#'
 			identifier: argument.type
 			count: 1
 			path: classes/admin.class.php

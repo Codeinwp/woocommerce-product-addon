@@ -544,19 +544,20 @@ $fields_groups = array(
 									</select>
 								</div>
 
-								<?php if ( $is_edit_screen && ! $is_new_group ) { ?>
-								<a class="btn btn-sm btn-secondary ppom-products-modal"
-									data-ppom_id="<?php echo esc_attr( $product_meta_id ); ?>"
-									data-formmodal-id="ppom-product-modal"
-								>
-									<?php _e( 'Attach to Products', 'woocommerce-product-addon' ); ?>
-								</a>
-								<?php } ?>
 							</div>
 						</div>
-						<?php
-						do_action( 'ppom_field_meta_general_tab', $ppom );
-						?>
+						<?php if ( $is_edit_screen && ! $is_new_group ) { ?>
+						<div class="row">
+							<div class="col-md-12 col-sm-12">
+								<?php
+								echo NM_PersonalizedProduct_Admin::render_inline_attach_selects( $product_meta_id );
+								?>
+							</div>
+						</div>
+						<?php } ?>
+							<?php
+							do_action( 'ppom_field_meta_general_tab', $ppom );
+							?>
 					</div>
 
 					<!--Style Tab-->
@@ -769,7 +770,7 @@ $fields_groups = array(
 								</td>
 								<td>
 									<div class="onoffswitch">
-										<input <?php echo checked( $field_status, 'on' ); ?> type="checkbox"
+										<input <?php checked( $field_status, 'on' ); ?> type="checkbox"
 																							class="onoffswitch-checkbox"
 																							id="ppom-onoffswitch-<?php echo esc_attr( $f_index ); ?>"
 																							tabindex="0">
@@ -847,7 +848,3 @@ $fields_groups = array(
 	<?php $form_meta->render_field_settings(); ?>
 </div>
 
-<?php
-
-ppom_load_template( 'admin/product-modal.php' );
-?>

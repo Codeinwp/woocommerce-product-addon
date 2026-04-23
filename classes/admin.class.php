@@ -64,6 +64,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		// Getting products list
 		add_action( 'wp_ajax_ppom_get_products', array( $this, 'get_products' ) );
+		add_action( 'wp_ajax_ppom_search_products', array( $this, 'search_products' ) );
+		add_action( 'wp_ajax_ppom_search_categories', array( $this, 'search_categories' ) );
+		add_action( 'wp_ajax_ppom_search_tags', array( $this, 'search_tags' ) );
 		add_action( 'wp_ajax_ppom_attach_ppoms', array( $this, 'ppom_attach_ppoms' ) );
 
 		// Adding setting tab in WooCommerce
@@ -329,10 +332,11 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			->set_select(
 				array_merge(
 					array(
-						'label'    => __( 'Choose Products:', 'woocommerce-product-addon' ),
-						'name'     => 'ppom-attach-to-products[]',
-						'multiple' => true,
-						'is_used'  => true,
+						'label'               => __( 'Choose Products:', 'woocommerce-product-addon' ),
+						'name'                => 'ppom-attach-to-products[]',
+						'multiple'            => true,
+						'is_used'             => true,
+						'render_empty_option' => false,
 					),
 					$this->get_wc_products( $ppom_id )
 				)
@@ -345,9 +349,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			->set_select(
 				array_merge(
 					array(
-						'label'    => __( 'Choose Categories:', 'woocommerce-product-addon' ),
-						'name'     => 'ppom-attach-to-categories[]',
-						'multiple' => true,
+						'label'               => __( 'Choose Categories:', 'woocommerce-product-addon' ),
+						'name'                => 'ppom-attach-to-categories[]',
+						'multiple'            => true,
+						'render_empty_option' => false,
 					),
 					$this->get_wc_categories( $current_saved_value )
 				)
@@ -359,29 +364,27 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			new \PPOM\Attach\ContainerItem( $attach_to_categories_component->get_id(), $attach_to_categories_component ),
 		);
 
-		$tags = $this->get_wc_tags( $current_saved_value );
-		if ( ! empty( $tags['options'] ) ) {
-			$attach_to_tags_component = ( new \PPOM\Attach\SelectComponent() )
-				->set_status( $license_status )
-				->set_id( 'attach-to-tags' )
-				->set_title( __( 'Display in Specific Product Tags', 'woocommerce-product-addon' ) )
-				->set_description( __( 'Select the product tags where you want these product fields to appear.', 'woocommerce-product-addon' ) )
-				->set_select(
-					array_merge(
-						array(
-							'label'    => __( 'Choose tags:', 'woocommerce-product-addon' ),
-							'name'     => 'ppom-attach-to-tags[]',
-							'multiple' => true,
-						),
-						$this->get_wc_tags( $current_saved_value )
-					)
-				);
-			if ( 'valid' !== $license_status ) {
-				$attach_to_tags_component = $attach_to_tags_component->set_status( 'invalid' );
-			}
-			$popup_components[] =
-				new \PPOM\Attach\ContainerItem( $attach_to_tags_component->get_id(), $attach_to_tags_component );
+		$attach_to_tags_component = ( new \PPOM\Attach\SelectComponent() )
+			->set_status( $license_status )
+			->set_id( 'attach-to-tags' )
+			->set_title( __( 'Display in Specific Product Tags', 'woocommerce-product-addon' ) )
+			->set_description( __( 'Select the product tags where you want these product fields to appear.', 'woocommerce-product-addon' ) )
+			->set_select(
+				array_merge(
+					array(
+						'label'               => __( 'Choose tags:', 'woocommerce-product-addon' ),
+						'name'                => 'ppom-attach-to-tags[]',
+						'multiple'            => true,
+						'render_empty_option' => false,
+					),
+					$this->get_wc_tags( $current_saved_value )
+				)
+			);
+		if ( 'valid' !== $license_status ) {
+			$attach_to_tags_component = $attach_to_tags_component->set_status( 'invalid' );
 		}
+		$popup_components[] =
+			new \PPOM\Attach\ContainerItem( $attach_to_tags_component->get_id(), $attach_to_tags_component );
 
 
 		$popup_components = apply_filters( 'pppom_popup_components', $popup_components, $ppom_id );
@@ -418,6 +421,139 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 	/**
+	 * Returns paginated product matches for the attach modal Select2 control.
+	 *
+	 * @return void
+	 */
+	public function search_products() {
+		$nonce = isset( $_GET['ppom_attached_nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['ppom_attached_nonce'] ) ) : '';
+
+		if ( ! wp_verify_nonce( $nonce, 'ppom_attached_nonce_action' ) || ! ppom_security_role() ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'woocommerce-product-addon' ),
+				),
+				403
+			);
+		}
+
+		$search_term = '';
+		if ( isset( $_GET['q'] ) ) {
+			$search_term = sanitize_text_field( wp_unslash( $_GET['q'] ) );
+		} elseif ( isset( $_GET['term'] ) ) {
+			$search_term = sanitize_text_field( wp_unslash( $_GET['term'] ) );
+		}
+
+		$page       = isset( $_GET['page'] ) ? max( 1, absint( $_GET['page'] ) ) : 1;
+		$per_page   = 20;
+		$query_args = array(
+			'post_type'              => 'product',
+			'post_status'            => 'publish',
+			'posts_per_page'         => $per_page,
+			'paged'                  => $page,
+			'orderby'                => 'title',
+			'order'                  => 'ASC',
+			'fields'                 => 'ids',
+			'no_found_rows'          => false,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		);
+
+		if ( '' !== $search_term ) {
+			$query_args['s'] = $search_term;
+		}
+
+		$query   = new WP_Query( $query_args );
+		$results = array_map(
+			function ( $product_id ) {
+				$product_id = $product_id instanceof WP_Post ? (int) $product_id->ID : absint( $product_id );
+
+				return array(
+					'id'   => (string) $product_id,
+					'text' => get_the_title( $product_id ),
+				);
+			},
+			$query->posts
+		);
+
+		wp_send_json(
+			array(
+				'results'    => $results,
+				'pagination' => array(
+					'more' => $page < (int) $query->max_num_pages,
+				),
+			)
+		);
+	}
+
+	/**
+	 * Returns product IDs currently attached to a PPOM field group.
+	 *
+	 * Supports both the current serialized-array storage and the older scalar
+	 * storage used by {@see PPOM_PRODUCT_META_KEY}.
+	 *
+	 * @param int $ppom_id PPOM field-group ID.
+	 * @return int[]
+	 */
+	public static function get_attached_product_ids( $ppom_id ) {
+		$ppom_id = absint( $ppom_id );
+		if ( 0 === $ppom_id ) {
+			return array();
+		}
+
+		$ppom_id_string = (string) $ppom_id;
+		$product_ids    = get_posts(
+			array(
+				'post_type'              => 'product',
+				'post_status'            => 'publish',
+				// Intentionally load all matched attachments, not the full catalog.
+				// The modal must pre-render every currently attached product as a
+				// selected option so Select2 shows the existing state correctly.
+				'posts_per_page'         => -1,
+				'fields'                 => 'ids',
+				'orderby'                => 'title',
+				'order'                  => 'ASC',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Attachments are stored in post meta and this helper needs every selected product ID for modal preloading.
+				'meta_query'             => array(
+					'relation' => 'OR',
+					array(
+						'key'     => PPOM_PRODUCT_META_KEY,
+						'value'   => $ppom_id_string,
+						'compare' => '=',
+					),
+					array(
+						'key'     => PPOM_PRODUCT_META_KEY,
+						'value'   => sprintf( 'i:%d;', $ppom_id ),
+						'compare' => 'LIKE',
+					),
+					array(
+						'key'     => PPOM_PRODUCT_META_KEY,
+						'value'   => sprintf( 's:%d:"%s";', strlen( $ppom_id_string ), $ppom_id_string ),
+						'compare' => 'LIKE',
+					),
+				),
+			)
+		);
+
+		$verified = array();
+		foreach ( $product_ids as $candidate_id ) {
+			$candidate_id  = absint( $candidate_id );
+			$attached_meta = get_post_meta( $candidate_id, PPOM_PRODUCT_META_KEY, true );
+
+			if ( is_array( $attached_meta ) && in_array( $ppom_id, array_map( 'absint', $attached_meta ), true ) ) {
+				$verified[] = $candidate_id;
+			} elseif ( is_numeric( $attached_meta ) && absint( $attached_meta ) === $ppom_id ) {
+				$verified[] = $candidate_id;
+			}
+		}
+
+		return array_values( array_unique( $verified ) );
+	}
+
+	/**
 	 * Returns product selector options for the attach popup.
 	 *
 	 * Marks which products already reference the current PPOM ID through
@@ -433,60 +569,115 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			'is_used' => true,
 		);
 
-		if ( 'valid' === apply_filters( 'product_ppom_license_status', '' ) ) {
+		foreach ( self::get_attached_product_ids( $ppom_id ) as $product_id ) {
 			$result['options'][] = array(
-				'value'    => '-1',
-				'selected' => false,
-				'label'    => __( 'Select a product', 'woocommerce-product-addon' ),
-				'disabled' => true,
+				'value'    => (string) $product_id,
+				'selected' => true,
+				'label'    => get_the_title( $product_id ),
 			);
 		}
 
-		$query = new WP_Query(
-			array(
-				'post_type'      => 'product',
-				'posts_per_page' => -1, // Get all products
-				'post_status'    => 'publish',
-			)
-		);
-
-		if ( ! $query->have_posts() ) {
-			return $result;
-		}
-
-		while ( $query->have_posts() ) {
-			$query->the_post();
-
-			$is_used       = false;
-			$product_id    = get_the_ID();
-			$attached_meta = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
-
-			if ( is_array( $attached_meta ) ) {
-				$is_used = in_array( $ppom_id, $attached_meta );
-			} elseif ( is_numeric( $attached_meta ) ) {
-				$is_used = $product_id === $attached_meta; // Note: Legacy format.
-			}
-
-			if ( $is_used ) {
-				$result['is_used'] = true;
-			}
-
-			$result['options'][] = array(
-				'value'    => $product_id,
-				'selected' => $is_used,
-				'label'    => get_the_title(),
-			);
-		}
-
-		wp_reset_postdata();
 		return $result;
 	}
 
 	/**
-	 * Retrieves WooCommerce product categories and checks if they are used in the current values.
+	 * Returns paginated category matches for the attach modal Select2 control.
+	 *
+	 * @return void
+	 */
+	public function search_categories() {
+		$this->search_taxonomy_terms( 'product_cat' );
+	}
+
+	/**
+	 * Returns paginated tag matches for the attach modal Select2 control.
+	 *
+	 * @return void
+	 */
+	public function search_tags() {
+		$this->search_taxonomy_terms( 'product_tag' );
+	}
+
+	/**
+	 * Shared AJAX handler for searching taxonomy terms with pagination.
+	 *
+	 * @param string $taxonomy The taxonomy to search.
+	 * @return void
+	 */
+	private function search_taxonomy_terms( $taxonomy ) {
+		$nonce = isset( $_GET['ppom_attached_nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['ppom_attached_nonce'] ) ) : '';
+
+		if ( ! wp_verify_nonce( $nonce, 'ppom_attached_nonce_action' ) || ! ppom_security_role() ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'woocommerce-product-addon' ),
+				),
+				403
+			);
+		}
+
+		$search_term = '';
+		if ( isset( $_GET['q'] ) ) {
+			$search_term = sanitize_text_field( wp_unslash( $_GET['q'] ) );
+		} elseif ( isset( $_GET['term'] ) ) {
+			$search_term = sanitize_text_field( wp_unslash( $_GET['term'] ) );
+		}
+
+		$page     = isset( $_GET['page'] ) ? max( 1, absint( $_GET['page'] ) ) : 1;
+		$per_page = 20;
+		$offset   = ( $page - 1 ) * $per_page;
+
+		$term_args = array(
+			'taxonomy'   => $taxonomy,
+			'orderby'    => 'name',
+			'order'      => 'ASC',
+			'hide_empty' => false,
+			'number'     => $per_page,
+			'offset'     => $offset,
+		);
+
+		if ( '' !== $search_term ) {
+			$term_args['search'] = $search_term;
+		}
+
+		$terms = get_terms( $term_args );
+
+		if ( is_wp_error( $terms ) ) {
+			$terms = array();
+		}
+
+		$results = array_map(
+			function ( $term ) {
+				return array(
+					'id'   => $term->slug,
+					'text' => $term->name,
+				);
+			},
+			$terms
+		);
+
+		// Check if there are more results beyond this page.
+		$count_args           = $term_args;
+		$count_args['fields'] = 'count';
+		unset( $count_args['number'], $count_args['offset'] );
+		$total_count = (int) get_terms( $count_args );
+		$has_more    = ( $offset + $per_page ) < $total_count;
+
+		wp_send_json(
+			array(
+				'results'    => $results,
+				'pagination' => array(
+					'more' => $has_more,
+				),
+			)
+		);
+	}
+
+	/**
+	 * Returns only the currently-attached categories for a PPOM field group.
 	 *
 	 * @param array $current_values The current values containing product meta categories.
-	 * @return array An array containing the options of product categories and a flag indicating if any category is used.
+	 * @return array An array containing the pre-selected category options.
 	 */
 	public function get_wc_categories( $current_values ) {
 		$result = array(
@@ -494,37 +685,39 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			'is_used' => false,
 		);
 
-		$product_categories = get_terms(
-			array(
-				'taxonomy'   => 'product_cat', // WooCommerce product categories
-				'orderby'    => 'name',
-				'order'      => 'ASC',
-				'hide_empty' => false, // Show all categories, even if empty
-			)
-		);
+		$used_slugs = array();
+		if ( ! empty( $current_values['productmeta_categories'] ) ) {
+			$used_slugs = preg_split( '/\r\n|\n/', $current_values['productmeta_categories'] );
+			if ( false === $used_slugs ) {
+				$used_slugs = array();
+			}
+			$used_slugs = array_filter( array_map( 'trim', $used_slugs ) );
+		}
 
-		// Check if there are categories
-		if ( empty( $product_categories ) || is_wp_error( $product_categories ) ) {
+		if ( empty( $used_slugs ) ) {
 			return $result;
 		}
 
-		$used_categories = array();
-		if ( ! empty( $current_values['productmeta_categories'] ) ) {
-			$used_categories = preg_split( '/\r\n|\n/', $current_values['productmeta_categories'] );
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'slug'       => $used_slugs,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+				'hide_empty' => false,
+			)
+		);
+
+		if ( empty( $terms ) || is_wp_error( $terms ) ) {
+			return $result;
 		}
 
-		foreach ( $product_categories as $category ) {
-			$category_slug = $category->slug;
-			$is_used       = in_array( $category_slug, $used_categories );
-
-			if ( $is_used ) {
-				$result['is_used'] = true;
-			}
-
+		$result['is_used'] = true;
+		foreach ( $terms as $term ) {
 			$result['options'][] = array(
-				'value'    => $category_slug,
-				'selected' => $is_used,
-				'label'    => $category->name,
+				'value'    => $term->slug,
+				'selected' => true,
+				'label'    => $term->name,
 			);
 		}
 
@@ -532,11 +725,11 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 	/**
-	 * Retrieves WooCommerce product tags and checks if they are used in the current values.
+	 * Returns only the currently-attached tags for a PPOM field group.
 	 *
 	 * @param array $current_values The current values to check against.
 	 *
-	 * @return array An array containing the options of product tags and a flag indicating if any category is used.
+	 * @return array An array containing the pre-selected tag options.
 	 */
 	public function get_wc_tags( $current_values ) {
 		$result = array(
@@ -544,41 +737,39 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			'is_used' => false,
 		);
 
-		$product_tags = get_terms(
-			array(
-				'taxonomy'   => 'product_tag',
-				'orderby'    => 'name',
-				'order'      => 'ASC',
-				'hide_empty' => false, // Show all tags, even if empty
-			)
-		);
+		$used_slugs = array();
+		if ( ! empty( $current_values['productmeta_tags'] ) ) {
+			$used_slugs = maybe_unserialize( $current_values['productmeta_tags'] );
+			if ( ! is_array( $used_slugs ) ) {
+				$used_slugs = array();
+			}
+			$used_slugs = array_filter( array_map( 'trim', $used_slugs ) );
+		}
 
-		// Check if there are tags
-		if ( empty( $product_tags ) || is_wp_error( $product_tags ) ) {
+		if ( empty( $used_slugs ) ) {
 			return $result;
 		}
 
-		$used_tags = array();
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'product_tag',
+				'slug'       => $used_slugs,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+				'hide_empty' => false,
+			)
+		);
 
-		if ( ! empty( $current_values['productmeta_tags'] ) ) {
-			$used_tags = maybe_unserialize( $current_values['productmeta_tags'] );
-			if ( ! is_array( $used_tags ) ) {
-				$used_tags = array();
-			}
+		if ( empty( $terms ) || is_wp_error( $terms ) ) {
+			return $result;
 		}
 
-		foreach ( $product_tags as $tag ) {
-			$tag_slug = $tag->slug;
-			$is_used  = in_array( $tag_slug, $used_tags );
-
-			if ( $is_used ) {
-				$result['is_used'] = true;
-			}
-
+		$result['is_used'] = true;
+		foreach ( $terms as $term ) {
 			$result['options'][] = array(
-				'value'    => $tag_slug,
-				'selected' => $is_used,
-				'label'    => $tag->name,
+				'value'    => $term->slug,
+				'selected' => true,
+				'label'    => $term->name,
 			);
 		}
 
@@ -601,6 +792,184 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 	/**
+	 * Renders the inline attach-to-products/categories/tags selects for the field group editor.
+	 *
+	 * Returns the same Select2 markup produced by get_products() but as a string
+	 * suitable for embedding directly in the editor form instead of a modal.
+	 *
+	 * @param int $ppom_id PPOM field-group ID.
+	 *
+	 * @return string HTML markup for the inline selects.
+	 *
+	 * @see get_products()
+	 */
+	public static function render_inline_attach_selects( $ppom_id ) {
+		$license_status      = apply_filters( 'product_ppom_license_status', '' );
+		$current_saved_value = self::get_db_field_static( $ppom_id );
+		$pro_multiple_fields = ! ppom_pro_is_installed() || 'valid' !== $license_status
+			? '</br><i style="font-size: 90%">' . sprintf(
+				// translators: %1$s: the link to the store with label 'upgrade'.
+				__( 'Your current plan supports adding one group of fields per product. To add multiple groups to the same product, please %1$s your plan!', 'woocommerce-product-addon' ),
+				sprintf(
+					'<a href="%1$s" target="_blank">%2$s</a>',
+					esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'multiple-fields' ) ),
+					__( 'Upgrade to the Pro', 'woocommerce-product-addon' )
+				)
+			) . '</i>'
+			: '';
+
+		$select_products_id_component = ( new \PPOM\Attach\SelectComponent() )
+			->set_inline()
+			->set_id( 'attach-to-products' )
+			->set_title( __( 'Display on Specific Products', 'woocommerce-product-addon' ) )
+			->set_description( __( 'Select the product(s) where you want these product fields to appear.', 'woocommerce-product-addon' ) . $pro_multiple_fields )
+			->set_select(
+				array_merge(
+					array(
+						'label'               => __( 'Choose Products:', 'woocommerce-product-addon' ),
+						'name'                => 'ppom-attach-to-products[]',
+						'multiple'            => true,
+						'is_used'             => true,
+						'render_empty_option' => false,
+					),
+					self::get_wc_products_static( $ppom_id )
+				)
+			);
+
+		$attach_to_categories_component = ( new \PPOM\Attach\SelectComponent() )
+			->set_inline()
+			->set_id( 'attach-to-categories' )
+			->set_title( __( 'Display in Specific Product Categories', 'woocommerce-product-addon' ) )
+			->set_description( __( 'Select the product categories where you want these product fields to appear.', 'woocommerce-product-addon' ) )
+			->set_select(
+				array_merge(
+					array(
+						'label'               => __( 'Choose Categories:', 'woocommerce-product-addon' ),
+						'name'                => 'ppom-attach-to-categories[]',
+						'multiple'            => true,
+						'render_empty_option' => false,
+					),
+					self::get_wc_categories_static( $current_saved_value )
+				)
+			);
+
+		$popup_components = array(
+			new \PPOM\Attach\ContainerItem( $select_products_id_component->get_id(), $select_products_id_component ),
+			new \PPOM\Attach\ContainerItem( $attach_to_categories_component->get_id(), $attach_to_categories_component ),
+		);
+
+		$attach_to_tags_component = ( new \PPOM\Attach\SelectComponent() )
+			->set_inline()
+			->set_status( $license_status )
+			->set_id( 'attach-to-tags' )
+			->set_title( __( 'Display in Specific Product Tags', 'woocommerce-product-addon' ) )
+			->set_description( __( 'Select the product tags where you want these product fields to appear.', 'woocommerce-product-addon' ) )
+			->set_select(
+				array_merge(
+					array(
+						'label'               => __( 'Choose tags:', 'woocommerce-product-addon' ),
+						'name'                => 'ppom-attach-to-tags[]',
+						'multiple'            => true,
+						'render_empty_option' => false,
+					),
+					self::get_wc_tags_static( $current_saved_value )
+				)
+			);
+		if ( 'valid' !== $license_status ) {
+			$attach_to_tags_component = $attach_to_tags_component->set_status( 'invalid' );
+		}
+		$popup_components[] =
+			new \PPOM\Attach\ContainerItem( $attach_to_tags_component->get_id(), $attach_to_tags_component );
+
+		$popup_components = apply_filters( 'pppom_popup_components', $popup_components, $ppom_id );
+
+		$rendered = array();
+		foreach ( $popup_components as $component ) {
+			if ( ! $component instanceof \PPOM\Attach\ContainerItem ) {
+				continue;
+			}
+			$rendered[] = $component->get_renderer()->render();
+		}
+
+		ob_start();
+		wp_nonce_field( 'ppom_attached_nonce_action', 'ppom_attached_nonce' );
+		$nonce_html = ob_get_clean();
+
+		$html = '<div class="ppom-inline-attach-container" data-ppom-id="' . esc_attr( $ppom_id ) . '">'
+			. $nonce_html;
+
+		$chunks = array_chunk( $rendered, 2 );
+		foreach ( $chunks as $pair ) {
+			$html .= '<div class="row">';
+			foreach ( $pair as $item ) {
+				$html .= '<div class="col-md-6 col-sm-12">' . $item . '</div>';
+			}
+			$html .= '</div>';
+		}
+
+		$html .= '<div class="ppom-inline-attach-notice" style="display:none; padding:6px 10px; margin-top:6px; border-left:4px solid #008c00; background:#f0f8f0;"></div>'
+			. '</div>';
+
+		return $html;
+	}
+
+	/**
+	 * Static wrapper for get_db_field() to use in static contexts.
+	 *
+	 * @param int $ppom_field_id The ID of the PPOM field.
+	 * @return array
+	 */
+	private static function get_db_field_static( $ppom_field_id ) {
+		$rows = ppom_meta_repository()->get_categories_and_tags_columns( (int) $ppom_field_id );
+		return ! empty( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * Static wrapper for get_wc_products() to use in static contexts.
+	 *
+	 * @param int $ppom_id PPOM field-group ID.
+	 * @return array
+	 */
+	private static function get_wc_products_static( $ppom_id ) {
+		$result = array(
+			'options' => array(),
+			'is_used' => true,
+		);
+
+		foreach ( self::get_attached_product_ids( $ppom_id ) as $product_id ) {
+			$result['options'][] = array(
+				'value'    => (string) $product_id,
+				'selected' => true,
+				'label'    => get_the_title( $product_id ),
+			);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Static wrapper for get_wc_categories() to use in static contexts.
+	 *
+	 * @param array $current_values The current saved values.
+	 * @return array
+	 */
+	private static function get_wc_categories_static( $current_values ) {
+		$admin = new self();
+		return $admin->get_wc_categories( $current_values );
+	}
+
+	/**
+	 * Static wrapper for get_wc_tags() to use in static contexts.
+	 *
+	 * @param array $current_values The current saved values.
+	 * @return array
+	 */
+	private static function get_wc_tags_static( $current_values ) {
+		$admin = new self();
+		return $admin->get_wc_tags( $current_values );
+	}
+
+	/**
 	 * AJAX handler for attaching products, categories, and tags to a PPOM field group.
 	 *
 	 * Reconciles the submitted attach selections against the stored
@@ -615,8 +984,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @see ppom_admin_process_product_meta()
 	 */
 	public function ppom_attach_ppoms() {
-		if ( ! isset( $_POST['ppom_attached_nonce'] )
-			|| ! wp_verify_nonce( $_POST['ppom_attached_nonce'], 'ppom_attached_nonce_action' )
+		$attached_nonce = isset( $_POST['ppom_attached_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_attached_nonce'] ) ) : '';
+		if ( '' === $attached_nonce
+			|| ! wp_verify_nonce( $attached_nonce, 'ppom_attached_nonce_action' )
 			|| ! ppom_security_role()
 		) {
 			$response = array(
@@ -627,7 +997,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			wp_send_json( $response );
 		}
 
-		$ppom_id     = intval( $_POST['ppom_id'] );
+		$ppom_id     = isset( $_POST['ppom_id'] ) ? absint( $_POST['ppom_id'] ) : 0;
 		$is_pro_user = 'valid' === apply_filters( 'product_ppom_license_status', '' );
 
 		// +----- Attach Field to Product -----+
@@ -788,7 +1158,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 */
 	public function ppom_setting_wpml( $value, $option, $raw_value ) {
 
-		if ( isset( $option['type'] ) && isset( $option['type'] ) == 'text' ) {
+		if ( isset( $option['type'] ) && 'text' === $option['type'] ) {
 			$value = ppom_wpml_translate( $value, 'PPOM' );
 		}
 
