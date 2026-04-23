@@ -10,10 +10,7 @@ import {
 import { LuTrash2 } from 'react-icons/lu';
 import type { I18nDict } from '../../types/fieldModal';
 import { arrayMove } from '../../utils/arrayMove';
-import {
-	type MatrixColumnRow,
-	emptyColumnRow,
-} from '../../utils/vqMatrixData';
+import { type MatrixColumnRow, emptyColumnRow } from '../../utils/vqMatrixData';
 
 export interface ColumnRowsSectionProps {
 	rows: MatrixColumnRow[];

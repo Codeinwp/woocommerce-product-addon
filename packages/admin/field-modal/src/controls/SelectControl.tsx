@@ -40,7 +40,11 @@ export function SelectControl( {
 							<NativeSelect.Root size="sm">
 								<NativeSelect.Field
 									required={ labelRequired }
-									value={ field.state.value == null ? '' : String( field.state.value ) }
+									value={
+										field.state.value == null
+											? ''
+											: String( field.state.value )
+									}
 									onChange={ ( e ) =>
 										field.handleChange( e.target.value )
 									}
@@ -48,7 +52,10 @@ export function SelectControl( {
 									{ ...controlSurface }
 								>
 									{ options.map( ( option ) => (
-										<option key={ option.value } value={ option.value }>
+										<option
+											key={ option.value }
+											value={ option.value }
+										>
 											{ option.label }
 										</option>
 									) ) }
@@ -57,7 +64,9 @@ export function SelectControl( {
 							</NativeSelect.Root>
 							{ renderHelperText( description ) }
 							{ error ? (
-								<Field.ErrorText>{ String( error ) }</Field.ErrorText>
+								<Field.ErrorText>
+									{ String( error ) }
+								</Field.ErrorText>
 							) : null }
 						</Field.Root>
 					);
@@ -75,9 +84,15 @@ export function SelectControl( {
 			<NativeSelect.Root size="sm">
 				<NativeSelect.Field
 					required={ labelRequired }
-					value={ String( readControlValue( settingKey, ctx ) ?? '' ) }
+					value={ String(
+						readControlValue( settingKey, ctx ) ?? ''
+					) }
 					onChange={ ( e ) =>
-						updateFallbackSettingValue( ctx, settingKey, e.target.value )
+						updateFallbackSettingValue(
+							ctx,
+							settingKey,
+							e.target.value
+						)
 					}
 					{ ...controlSurface }
 				>

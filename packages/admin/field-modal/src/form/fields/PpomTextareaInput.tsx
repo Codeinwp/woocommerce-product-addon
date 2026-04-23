@@ -15,18 +15,18 @@ export function PpomTextareaInput( {
 	label,
 	rows = 2,
 }: PpomTextareaInputProps ) {
-	const field = useFieldContext<string>();
+	const field = useFieldContext< string >();
 	const v = field.state.value;
 	// Use React.useId instead (available in React 18+)
-    const textareaId = useId();
+	const textareaId = useId();
 	return (
-        <Field.Root>
-            { label ? (
+		<Field.Root>
+			{ label ? (
 				<Field.Label htmlFor={ textareaId } { ...ppomFieldLabelProps }>
 					{ label }
 				</Field.Label>
 			) : null }
-            <Textarea
+			<Textarea
 				id={ textareaId }
 				size="sm"
 				rows={ rows }
@@ -36,6 +36,6 @@ export function PpomTextareaInput( {
 				onBlur={ field.handleBlur }
 				{ ...ppomControlSurface }
 			/>
-        </Field.Root>
-    );
+		</Field.Root>
+	);
 }

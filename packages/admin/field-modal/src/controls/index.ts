@@ -1,4 +1,8 @@
-export { controlSurface, helperTextProps, labelProps } from './chakraFieldStyles';
+export {
+	controlSurface,
+	helperTextProps,
+	labelProps,
+} from './chakraFieldStyles';
 export {
 	colorFromStoredValue,
 	normalizeStoredColorToHex6,

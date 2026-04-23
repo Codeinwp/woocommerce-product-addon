@@ -67,8 +67,7 @@ export function FontOptionRowItem( {
 					checked={ row.is_customfont === 'on' }
 					onCheckedChange={ ( details ) =>
 						onPatch( index, {
-							is_customfont:
-								details.checked === true ? 'on' : '',
+							is_customfont: details.checked === true ? 'on' : '',
 						} )
 					}
 				>

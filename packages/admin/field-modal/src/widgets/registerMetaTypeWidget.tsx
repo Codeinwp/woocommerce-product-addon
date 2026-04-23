@@ -52,8 +52,7 @@ export function registerMetaTypeWidget( spec: MetaTypeWidgetSpec ): void {
 				metaKey,
 				spec.titleFallback( ctx.i18n, ctx )
 			);
-			const description =
-				typeof meta.desc === 'string' ? meta.desc : '';
+			const description = typeof meta.desc === 'string' ? meta.desc : '';
 			return spec.render( { ctx, title, description, meta, metaKey } );
 		},
 	} );

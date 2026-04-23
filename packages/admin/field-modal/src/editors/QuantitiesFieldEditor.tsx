@@ -50,14 +50,8 @@ export function QuantitiesFieldEditor( {
 	const sectionsAfter: LegacySectionConfig[] = [
 		{
 			label:
-				i18n.editorSectionVariationLayout ||
-				'Layout & quantity limits',
-			keys: [
-				'view_control',
-				'default_price',
-				'min_qty',
-				'max_qty',
-			],
+				i18n.editorSectionVariationLayout || 'Layout & quantity limits',
+			keys: [ 'view_control', 'default_price', 'min_qty', 'max_qty' ],
 			advanced: true,
 		},
 		{

@@ -87,7 +87,8 @@ export function PairedCropperEditor( {
 	};
 
 	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
-	const moveDown = ( index: number ) => setRows( arrayMove( rows, index, 1 ) );
+	const moveDown = ( index: number ) =>
+		setRows( arrayMove( rows, index, 1 ) );
 
 	const labelPh =
 		i18n.cropperViewportLabel || i18n.pairedOptionLabel || 'Label';
@@ -109,7 +110,12 @@ export function PairedCropperEditor( {
 				p={ 3 }
 				bg="white"
 			>
-				<Button size="sm" colorPalette="blue" mb={ 3 } onClick={ addRow }>
+				<Button
+					size="sm"
+					colorPalette="blue"
+					mb={ 3 }
+					onClick={ addRow }
+				>
 					{ i18n.cropperViewportAddRow ||
 						i18n.pairedOptionsAddRow ||
 						'Add viewport' }

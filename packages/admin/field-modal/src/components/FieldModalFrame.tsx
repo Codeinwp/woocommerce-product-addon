@@ -62,7 +62,7 @@ export function FieldModalFrame( {
 	}, [ onBack ] );
 
 	return (
-        <Dialog.Root
+		<Dialog.Root
 			open={ isOpen }
 			variant="ppom"
 			scrollBehavior="inside"
@@ -73,22 +73,28 @@ export function FieldModalFrame( {
 			closeOnInteractOutside={ dismissible }
 			closeOnEscape={ dismissible }
 			motionPreset="slideInBottom"
-			onOpenChange={e => {
-                if (!e.open) {
-                    onClose();
-                }
-            }}
+			onOpenChange={ ( e ) => {
+				if ( ! e.open ) {
+					onClose();
+				}
+			} }
 		>
-            <Portal>
-
-                <Dialog.Backdrop bg="blackAlpha.600" backdropFilter="blur(2px)" />
+			<Portal>
+				<Dialog.Backdrop
+					bg="blackAlpha.600"
+					backdropFilter="blur(2px)"
+				/>
 				<Dialog.Positioner>
-					{/*
+					{ /*
 					 * `Dialog.Content` is `forwardAsChild` in Chakra v3 — multiple direct
 					 * children (header + close + body) break the slot merge → React #130.
-					 */}
+					 */ }
 					<Dialog.Content
-						maxW={ { base: '96vw', md: 'min(92vw, 58rem)', lg: '62rem' } }
+						maxW={ {
+							base: '96vw',
+							md: 'min(92vw, 58rem)',
+							lg: '62rem',
+						} }
 						w="full"
 						maxH="min(90vh, 56rem)"
 						my={ 4 }
@@ -102,7 +108,12 @@ export function FieldModalFrame( {
 						>
 							<Dialog.Header flexShrink={ 0 }>
 								{ onBack ? (
-									<HStack w="full" justify="space-between" align="center" gap={ 4 }>
+									<HStack
+										w="full"
+										justify="space-between"
+										align="center"
+										gap={ 4 }
+									>
 										<Button
 											variant="ghost"
 											size="sm"
@@ -126,8 +137,7 @@ export function FieldModalFrame( {
 						</Box>
 					</Dialog.Content>
 				</Dialog.Positioner>
-
-            </Portal>
-        </Dialog.Root>
-    );
+			</Portal>
+		</Dialog.Root>
+	);
 }

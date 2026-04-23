@@ -43,9 +43,9 @@ export function ConditionalRepeaterSection( {
 	}
 
 	return (
-        <Alert.Root status="warning" variant="subtle" borderRadius="md">
-            <Alert.Indicator />
-            <VStack align="stretch" gap={ 2 }>
+		<Alert.Root status="warning" variant="subtle" borderRadius="md">
+			<Alert.Indicator />
+			<VStack align="stretch" gap={ 2 }>
 				<Text fontWeight="semibold" fontSize="sm">
 					{ title } (PRO)
 				</Text>
@@ -55,20 +55,26 @@ export function ConditionalRepeaterSection( {
 				</Text>
 				{ upgradeUrl ? (
 					<Link
-                        href={ upgradeUrl }
-                        color="blue.600"
-                        fontWeight="semibold"
-                        target='_blank'
-                        rel='noopener noreferrer'>
+						href={ upgradeUrl }
+						color="blue.600"
+						fontWeight="semibold"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
 						{ i18n.cfrUpgradeCta || 'Upgrade to Pro' }
 					</Link>
 				) : null }
 				{ demoUrl ? (
-					<Link href={ demoUrl } fontSize="sm" target='_blank' rel='noopener noreferrer'>
+					<Link
+						href={ demoUrl }
+						fontSize="sm"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
 						{ i18n.cfrViewDemoLabel || 'View demo' }
 					</Link>
 				) : null }
 			</VStack>
-        </Alert.Root>
-    );
+		</Alert.Root>
+	);
 }

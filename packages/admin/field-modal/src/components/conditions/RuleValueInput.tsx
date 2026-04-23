@@ -1,4 +1,11 @@
-import { Field, HStack, Input, Link, NativeSelect, Text } from '@chakra-ui/react';
+import {
+	Field,
+	HStack,
+	Input,
+	Link,
+	NativeSelect,
+	Text,
+} from '@chakra-ui/react';
 import type { I18nDict } from '../../types/fieldModal';
 import type { ConditionRule } from '../../utils/conditionsLogic';
 import { controlSurface, labelProps } from './styles';
@@ -91,11 +98,11 @@ export function RuleValueInput( {
 						value={ String(
 							usesConstantOnly
 								? rule.element_constant ||
-									rule.element_values ||
-									''
+										rule.element_values ||
+										''
 								: rule.element_values ||
-									rule.element_constant ||
-									''
+										rule.element_constant ||
+										''
 						) }
 						onValueChange={ ( e ) => {
 							const v = e.target.value;

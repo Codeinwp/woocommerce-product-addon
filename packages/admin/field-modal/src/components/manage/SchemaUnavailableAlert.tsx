@@ -5,7 +5,9 @@ export interface SchemaUnavailableAlertProps {
 	i18n: I18nDict;
 }
 
-export function SchemaUnavailableAlert( { i18n }: SchemaUnavailableAlertProps ) {
+export function SchemaUnavailableAlert( {
+	i18n,
+}: SchemaUnavailableAlertProps ) {
 	return (
 		<Alert.Root status="info">
 			<Alert.Indicator />

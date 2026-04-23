@@ -15,9 +15,9 @@ export function PpomSwitchInput( {
 	label,
 	description,
 }: PpomSwitchInputProps ) {
-	const field = useFieldContext<unknown>();
+	const field = useFieldContext< unknown >();
 	// Use React.useId instead (available in React 18+)
-    const switchId = useId();
+	const switchId = useId();
 	const raw = field.state.value;
 	const checked =
 		raw === 'on' ||
@@ -26,7 +26,7 @@ export function PpomSwitchInput( {
 		raw === 1 ||
 		raw === 'true';
 	return (
-        <Field.Root
+		<Field.Root
 			display="grid"
 			gridTemplateColumns="auto minmax(0, 1fr)"
 			columnGap={ 2 }
@@ -36,7 +36,7 @@ export function PpomSwitchInput( {
 			px={ 2 }
 			mb={ 0 }
 		>
-            <Switch.Root
+			<Switch.Root
 				gridRow={ 1 }
 				gridColumn={ 1 }
 				id={ switchId }
@@ -45,11 +45,7 @@ export function PpomSwitchInput( {
 				colorPalette="blue"
 				checked={ Boolean( checked ) }
 				aria-label={
-					label
-						? undefined
-						: description
-						? description
-						: 'Toggle'
+					label ? undefined : description ? description : 'Toggle'
 				}
 				onCheckedChange={ ( { checked: next } ) =>
 					field.handleChange( next ? 'on' : 'off' )
@@ -81,6 +77,6 @@ export function PpomSwitchInput( {
 					{ description }
 				</Text>
 			) : null }
-        </Field.Root>
-    );
+		</Field.Root>
+	);
 }

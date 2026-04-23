@@ -2,14 +2,16 @@
 export const CONDITION_EDITOR_KEYS = new Set( [ 'logic', 'conditions' ] );
 
 /** True when a typed editor section belongs on the Conditions tab. */
-export function editorSectionIsConditions( section: { keys: string[] } ): boolean {
+export function editorSectionIsConditions( section: {
+	keys: string[];
+} ): boolean {
 	return section.keys.some( ( k ) => CONDITION_EDITOR_KEYS.has( k ) );
 }
 
 /** Map PPOM setting meta to editor tabs (mirrors admin CSS tab classes). */
 export function classifySettingTab(
 	key: string,
-	meta: Record<string, unknown> | null | undefined,
+	meta: Record< string, unknown > | null | undefined,
 	fieldType: string
 ): 'fields' | 'conditions' | 'unsupported' {
 	const type = meta && meta.type ? String( meta.type ) : '';
@@ -61,7 +63,9 @@ export function normalizeSelectOptions(
 			if ( item && typeof item === 'object' && 'value' in item ) {
 				return {
 					value: String( item.value ),
-					label: String( item.label != null ? item.label : item.value ),
+					label: String(
+						item.label != null ? item.label : item.value
+					),
 				};
 			}
 			return { value: String( item ), label: String( item ) };
@@ -70,7 +74,7 @@ export function normalizeSelectOptions(
 	if ( typeof raw === 'object' && raw !== null ) {
 		return Object.keys( raw ).map( ( k ) => ( {
 			value: String( k ),
-			label: String( ( raw as Record<string, unknown> )[ k ] ),
+			label: String( ( raw as Record< string, unknown > )[ k ] ),
 		} ) );
 	}
 	return [];

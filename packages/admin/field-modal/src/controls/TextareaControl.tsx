@@ -40,16 +40,24 @@ export function TextareaControl( {
 								rows={ 2 }
 								resize="vertical"
 								required={ labelRequired }
-								value={ field.state.value == null ? '' : String( field.state.value ) }
+								value={
+									field.state.value == null
+										? ''
+										: String( field.state.value )
+								}
 								onChange={ ( e ) =>
 									field.handleChange( e.target.value )
 								}
 								onBlur={ field.handleBlur }
 								{ ...controlSurface }
 							/>
-							{ renderHelperText( description, { allowHtml: true } ) }
+							{ renderHelperText( description, {
+								allowHtml: true,
+							} ) }
 							{ error ? (
-								<Field.ErrorText>{ String( error ) }</Field.ErrorText>
+								<Field.ErrorText>
+									{ String( error ) }
+								</Field.ErrorText>
 							) : null }
 						</Field.Root>
 					);
@@ -71,7 +79,11 @@ export function TextareaControl( {
 				required={ labelRequired }
 				value={ String( readControlValue( settingKey, ctx ) ?? '' ) }
 				onChange={ ( e ) =>
-					updateFallbackSettingValue( ctx, settingKey, e.target.value )
+					updateFallbackSettingValue(
+						ctx,
+						settingKey,
+						e.target.value
+					)
 				}
 				{ ...controlSurface }
 			/>

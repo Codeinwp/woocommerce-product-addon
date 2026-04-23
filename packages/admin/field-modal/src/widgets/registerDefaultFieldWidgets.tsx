@@ -211,8 +211,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'options' ],
 	metaKey: 'options',
 	metaType: 'paired-pricematrix',
-	titleFallback: ( i18n ) =>
-		i18n.priceMatrixOptionsTitle || 'Price matrix',
+	titleFallback: ( i18n ) => i18n.priceMatrixOptionsTitle || 'Price matrix',
 	render: ( { ctx, title } ) => (
 		<PairedMatrixOptionsEditor
 			values={ ctx.field }
@@ -228,8 +227,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'options' ],
 	metaKey: 'options',
 	metaType: 'bulk-quantity',
-	titleFallback: ( i18n ) =>
-		i18n.bulkQuantityOptionsTitle || 'Bulk quantity',
+	titleFallback: ( i18n ) => i18n.bulkQuantityOptionsTitle || 'Bulk quantity',
 	render: ( { ctx, title } ) => (
 		<BulkQuantityMatrixEditor
 			values={ ctx.field }

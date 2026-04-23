@@ -3,7 +3,12 @@
  */
 import type { Dispatch, SetStateAction } from 'react';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useEffect, useMemo, useReducer } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useReducer,
+} from '@wordpress/element';
 import { bindPpomReactFieldModalOpenButtons } from '../adapters/wpAdminFieldModalAdapter';
 import {
 	fetchFieldModalContext,
@@ -43,7 +48,11 @@ function getFieldSaveValidationError(
 }
 
 export function useFieldModalController( productmetaId: number | undefined ) {
-	const [ state, dispatch ] = useReducer( modalReducer, undefined, createInitialModalState );
+	const [ state, dispatch ] = useReducer(
+		modalReducer,
+		undefined,
+		createInitialModalState
+	);
 
 	const loadContext = useCallback(
 		async ( selectFieldIndex?: number ) => {
@@ -90,13 +99,16 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 			return null;
 		}
 		return (
-			state.fields.find( ( f ) => f.clientId === state.selectedId ) ?? null
+			state.fields.find( ( f ) => f.clientId === state.selectedId ) ??
+			null
 		);
 	}, [ state.fields, state.selectedId ] );
 
 	const localDefinitionSchema = useMemo( () => {
 		const slug =
-			editDraft && editDraft.type ? String( editDraft.type ).toLowerCase() : '';
+			editDraft && editDraft.type
+				? String( editDraft.type ).toLowerCase()
+				: '';
 		if ( ! slug ) {
 			return null;
 		}
@@ -334,9 +346,8 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 	const activeSchema = localDefinitionSchema
 		? localDefinitionSchema
 		: editDraft && editDraft.type
-			? state.schemasCache[ String( editDraft.type ).toLowerCase() ] ??
-			  null
-			: null;
+		? state.schemasCache[ String( editDraft.type ).toLowerCase() ] ?? null
+		: null;
 
 	const modalContext: ModalContextValue = useMemo(
 		() => ( {
@@ -355,29 +366,30 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		]
 	);
 
-	const patchFieldRowFromForm: Dispatch<
-		SetStateAction< FieldRow | null >
-	> = useCallback(
-		( action ) => {
-			const current =
-				state.selectedId == null
-					? null
-					: state.fields.find(
-							( f ) => f.clientId === state.selectedId
-					  ) ?? null;
-			const row =
-				typeof action === 'function'
-					? ( action as ( p: FieldRow | null ) => FieldRow | null )(
-							current
-					  )
-					: action;
-			if ( ! row || typeof row !== 'object' || ! row.clientId ) {
-				return;
-			}
-			dispatch( { type: 'PATCH_FIELD_ROW_FROM_FORM', row } );
-		},
-		[ state.fields, state.selectedId ]
-	);
+	const patchFieldRowFromForm: Dispatch< SetStateAction< FieldRow | null > > =
+		useCallback(
+			( action ) => {
+				const current =
+					state.selectedId == null
+						? null
+						: state.fields.find(
+								( f ) => f.clientId === state.selectedId
+						  ) ?? null;
+				const row =
+					typeof action === 'function'
+						? (
+								action as (
+									p: FieldRow | null
+								) => FieldRow | null
+						   )( current )
+						: action;
+				if ( ! row || typeof row !== 'object' || ! row.clientId ) {
+					return;
+				}
+				dispatch( { type: 'PATCH_FIELD_ROW_FROM_FORM', row } );
+			},
+			[ state.fields, state.selectedId ]
+		);
 
 	return {
 		open: state.open,

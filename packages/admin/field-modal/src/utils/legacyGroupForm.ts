@@ -1,8 +1,12 @@
 /**
  * Read group meta from the classic PPOM save form (same page as the React modal).
  */
-export function readGroupFromForm( baseGroup: Record<string, unknown> ): Record<string, unknown> {
-	const form = document.querySelector( 'form.ppom-save-fields-meta' ) as HTMLFormElement | null;
+export function readGroupFromForm(
+	baseGroup: Record< string, unknown >
+): Record< string, unknown > {
+	const form = document.querySelector(
+		'form.ppom-save-fields-meta'
+	) as HTMLFormElement | null;
 	const next = { ...baseGroup };
 	if ( ! form || ! form.elements ) {
 		return next;

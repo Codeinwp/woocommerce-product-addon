@@ -77,10 +77,7 @@ export function SwitchControl( {
 								</Text>
 							) : null }
 							{ error ? (
-								<Field.ErrorText
-									gridColumn="1 / -1"
-									mt={ 1 }
-								>
+								<Field.ErrorText gridColumn="1 / -1" mt={ 1 }>
 									{ String( error ) }
 								</Field.ErrorText>
 							) : null }

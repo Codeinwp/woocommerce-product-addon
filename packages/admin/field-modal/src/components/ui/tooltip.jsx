@@ -22,10 +22,10 @@ export const Tooltip = React.forwardRef( function Tooltip( props, ref ) {
 			<ChakraTooltip.Trigger asChild>{ children }</ChakraTooltip.Trigger>
 			<Portal disabled={ ! portalled } container={ portalRef }>
 				<ChakraTooltip.Positioner>
-					{/*
+					{ /*
 					 * Chakra v3 `Tooltip.Content` uses forwardAsChild; multiple direct children
 					 * break the slot merge and can trigger React #130 (invalid element type: object).
-					 */}
+					 */ }
 					<ChakraTooltip.Content ref={ ref } { ...contentProps }>
 						<Box as="span" display="block">
 							{ showArrow && (

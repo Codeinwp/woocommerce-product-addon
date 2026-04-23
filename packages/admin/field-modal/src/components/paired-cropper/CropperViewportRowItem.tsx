@@ -1,10 +1,4 @@
-import {
-	Box,
-	Button,
-	HStack,
-	IconButton,
-	Input,
-} from '@chakra-ui/react';
+import { Box, Button, HStack, IconButton, Input } from '@chakra-ui/react';
 import { LuTrash2 } from 'react-icons/lu';
 import type { I18nDict } from '../../types/fieldModal';
 import type { CropperViewportRow } from '../../utils/pairedCropperData';
@@ -53,12 +47,7 @@ export function CropperViewportRowItem( {
 }: CropperViewportRowItemProps ) {
 	return (
 		<Box borderWidth="1px" borderColor="gray.100" borderRadius="md" p={ 2 }>
-			<HStack
-				align="flex-start"
-				gap={ 2 }
-				w="full"
-				flexWrap="wrap"
-			>
+			<HStack align="flex-start" gap={ 2 } w="full" flexWrap="wrap">
 				<Input
 					size="sm"
 					flex="1 1 120px"

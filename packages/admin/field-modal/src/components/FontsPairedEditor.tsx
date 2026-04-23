@@ -58,7 +58,8 @@ export function FontsPairedEditor( {
 	};
 
 	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
-	const moveDown = ( index: number ) => setRows( arrayMove( rows, index, 1 ) );
+	const moveDown = ( index: number ) =>
+		setRows( arrayMove( rows, index, 1 ) );
 
 	return (
 		<Box

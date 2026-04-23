@@ -11,7 +11,10 @@ export interface ResponsiveFieldGridProps {
 	ctx: SettingRowContext;
 }
 
-export function ResponsiveFieldGrid( { entries, ctx }: ResponsiveFieldGridProps ) {
+export function ResponsiveFieldGrid( {
+	entries,
+	ctx,
+}: ResponsiveFieldGridProps ) {
 	if ( ! entries.length ) {
 		return null;
 	}
@@ -21,23 +24,31 @@ export function ResponsiveFieldGrid( { entries, ctx }: ResponsiveFieldGridProps 
 			columnGap={ { base: 3, md: 4 } }
 			rowGap={ 2 }
 		>
-			{ entries.map( ( { key, meta }: { key: string; meta: Record< string, unknown > } ) => {
-				const type = meta.type ? String( meta.type ) : 'text';
-				const fullRow =
-					( type === 'textarea' && key !== 'description' ) ||
-					type === 'html-conditions' ||
-					type === 'paired' ||
-					type === 'paired-cropper' ||
-					type === 'paired-quantity';
-				return (
-					<GridItem
-						key={ key }
-						colSpan={ { base: 1, md: fullRow ? 2 : 1 } }
-					>
-						{ renderSettingRow( key, meta, ctx ) }
-					</GridItem>
-				);
-			} ) }
+			{ entries.map(
+				( {
+					key,
+					meta,
+				}: {
+					key: string;
+					meta: Record< string, unknown >;
+				} ) => {
+					const type = meta.type ? String( meta.type ) : 'text';
+					const fullRow =
+						( type === 'textarea' && key !== 'description' ) ||
+						type === 'html-conditions' ||
+						type === 'paired' ||
+						type === 'paired-cropper' ||
+						type === 'paired-quantity';
+					return (
+						<GridItem
+							key={ key }
+							colSpan={ { base: 1, md: fullRow ? 2 : 1 } }
+						>
+							{ renderSettingRow( key, meta, ctx ) }
+						</GridItem>
+					);
+				}
+			) }
 		</Grid>
 	);
 }

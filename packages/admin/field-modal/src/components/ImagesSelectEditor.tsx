@@ -23,7 +23,10 @@ declare global {
 	interface Window {
 		wp?: {
 			media?: ( settings: Record< string, unknown > ) => {
-				on: ( event: string, cb: ( arg: unknown ) => void ) => {
+				on: (
+					event: string,
+					cb: ( arg: unknown ) => void
+				) => {
 					open: () => void;
 				};
 				state: () => {
@@ -63,10 +66,7 @@ export function ImagesSelectEditor( {
 		} );
 	};
 
-	const updateRow = (
-		index: number,
-		patch: Partial< ImageOptionRow >
-	) => {
+	const updateRow = ( index: number, patch: Partial< ImageOptionRow > ) => {
 		setRows(
 			rows.map( ( r, i ) => ( i === index ? { ...r, ...patch } : r ) )
 		);
@@ -151,7 +151,8 @@ export function ImagesSelectEditor( {
 	};
 
 	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
-	const moveDown = ( index: number ) => setRows( arrayMove( rows, index, 1 ) );
+	const moveDown = ( index: number ) =>
+		setRows( arrayMove( rows, index, 1 ) );
 
 	const isImageselect = variant === 'imageselect';
 	const pricePlaceholder = isImageselect

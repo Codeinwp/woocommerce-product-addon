@@ -35,7 +35,7 @@ export function MagicTagsBox( {
 					variant="outline"
 					onClick={ () => onCopy( '{repeatNumber}' ) }
 				>
-					{`{repeatNumber}`}
+					{ `{repeatNumber}` }
 				</Button>
 				{ showOptionTitleTag ? (
 					<Button
@@ -43,7 +43,7 @@ export function MagicTagsBox( {
 						variant="outline"
 						onClick={ () => onCopy( '{optionTitle}' ) }
 					>
-						{`{optionTitle}`}
+						{ `{optionTitle}` }
 					</Button>
 				) : null }
 				{ copiedHint ? (

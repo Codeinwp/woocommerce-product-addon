@@ -9,7 +9,12 @@ export const FIELD_COMPATIBLE_WITH_SELECT_OPTIONS = [
 	'image',
 	'conditional_meta',
 ];
-export const FIELDS_COMPATIBLE_WITH_TEXT = [ 'text', 'textarea', 'date', 'email' ];
+export const FIELDS_COMPATIBLE_WITH_TEXT = [
+	'text',
+	'textarea',
+	'date',
+	'email',
+];
 export const FIELDS_COMPATIBLE_WITH_NUMBERS = [
 	...FIELD_COMPATIBLE_WITH_SELECT_OPTIONS,
 	'number',

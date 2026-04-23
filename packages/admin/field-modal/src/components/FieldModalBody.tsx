@@ -25,7 +25,7 @@ export function FieldModalBody( {
 	const { loading, error } = status;
 	const dismissLabel = picker.i18n.dismiss || 'Dismiss';
 	return (
-        <Dialog.Body
+		<Dialog.Body
 			flex="1"
 			overflowY="auto"
 			minH={ 0 }
@@ -33,13 +33,13 @@ export function FieldModalBody( {
 			py={ 2 }
 			px={ { base: 3, md: 4 } }
 		>
-            { loading && (
+			{ loading && (
 				<HStack py={ 8 } justify="center">
 					<Spinner size="md" />
 					<Text>{ picker.i18n.loading || 'Loading…' }</Text>
 				</HStack>
 			) }
-            { error && (
+			{ error && (
 				<Alert.Root status="error" mb={ 3 } borderRadius="md">
 					<Alert.Indicator />
 					<Alert.Content flex="1">{ error }</Alert.Content>
@@ -53,12 +53,12 @@ export function FieldModalBody( {
 					</IconButton>
 				</Alert.Root>
 			) }
-            { ! loading && ctx && pickerOpen && (
+			{ ! loading && ctx && pickerOpen && (
 				<FieldPickerPanel { ...picker } />
 			) }
-            { ! loading && ctx && ! pickerOpen && (
+			{ ! loading && ctx && ! pickerOpen && (
 				<FieldManagePanel { ...manage } />
 			) }
-        </Dialog.Body>
-    );
+		</Dialog.Body>
+	);
 }

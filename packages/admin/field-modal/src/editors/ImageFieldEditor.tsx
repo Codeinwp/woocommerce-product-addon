@@ -22,8 +22,7 @@ export function ImageFieldEditor( {
 	ppomFieldIndex,
 	modalContext,
 }: FieldEditorBaseProps ) {
-	const imagesTitle =
-		i18n.addImagesSectionTitle || 'Images';
+	const imagesTitle = i18n.addImagesSectionTitle || 'Images';
 
 	const sectionsBefore: LegacySectionConfig[] = [
 		{
@@ -45,13 +44,8 @@ export function ImageFieldEditor( {
 			advanced: true,
 		},
 		{
-			label:
-				i18n.editorSectionImageSettings || 'Image Settings',
-			keys: [
-				'selected_img_bordercolor',
-				'image_width',
-				'image_height',
-			],
+			label: i18n.editorSectionImageSettings || 'Image Settings',
+			keys: [ 'selected_img_bordercolor', 'image_width', 'image_height' ],
 			advanced: true,
 		},
 		{

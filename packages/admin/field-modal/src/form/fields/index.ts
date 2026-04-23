@@ -3,10 +3,7 @@ export type { PpomTextInputProps } from './PpomTextInput';
 export { PpomTextareaInput } from './PpomTextareaInput';
 export type { PpomTextareaInputProps } from './PpomTextareaInput';
 export { PpomSelectInput } from './PpomSelectInput';
-export type {
-	PpomSelectInputProps,
-	PpomSelectOption,
-} from './PpomSelectInput';
+export type { PpomSelectInputProps, PpomSelectOption } from './PpomSelectInput';
 export { PpomSwitchInput } from './PpomSwitchInput';
 export type { PpomSwitchInputProps } from './PpomSwitchInput';
 export { PpomNumberInput } from './PpomNumberInput';

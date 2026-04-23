@@ -52,17 +52,23 @@ export function FieldTypePicker( {
 					const t = String( f.title || '' ).toLowerCase();
 					const s = String( f.slug || '' ).toLowerCase();
 					const d = String( f.description || '' ).toLowerCase();
-					return t.includes( q ) || s.includes( q ) || d.includes( q );
+					return (
+						t.includes( q ) || s.includes( q ) || d.includes( q )
+					);
 				} );
 				return { ...group, fields };
 			} )
 			.filter( ( g ) => g.fields.length > 0 );
 	}, [ catalogGroups, q ] );
 
-	const showUpsell = Boolean( license && license.show_upsell && upsell && upsell.cta_url );
+	const showUpsell = Boolean(
+		license && license.show_upsell && upsell && upsell.cta_url
+	);
 	const upsellUrl = upsell && upsell.cta_url ? upsell.cta_url : '';
 
-	const [ hoveredField, setHoveredField ] = useState< CatalogItem | null >( null );
+	const [ hoveredField, setHoveredField ] = useState< CatalogItem | null >(
+		null
+	);
 
 	useEffect( () => {
 		if ( ! hoveredField ) {
@@ -77,8 +83,12 @@ export function FieldTypePicker( {
 	}, [ filteredGroups, hoveredField ] );
 
 	return (
-        <Flex align="flex-start" gap={ 0 } flexWrap={ { base: 'wrap', lg: 'nowrap' } }>
-            <Box flex="1" minW={ 0 } pr={ { lg: 4 } }>
+		<Flex
+			align="flex-start"
+			gap={ 0 }
+			flexWrap={ { base: 'wrap', lg: 'nowrap' } }
+		>
+			<Box flex="1" minW={ 0 } pr={ { lg: 4 } }>
 				<VStack align="stretch" gap={ 3 }>
 					<HStack flexWrap="wrap" gap={ 3 }>
 						<Text fontWeight="bold" fontSize="lg">
@@ -103,8 +113,11 @@ export function FieldTypePicker( {
 						lazyMount
 						defaultValue={ ALL_GROUPS_TAB_VALUE }
 					>
-						<Tabs.List flexWrap="wrap" gap={ 1 } mb={ 3 }>
-							<Tabs.Trigger value={ ALL_GROUPS_TAB_VALUE } px={ 4 }>
+						<Tabs.List flexWrap="wrap" gap={ 1 } mb={ 0 }>
+							<Tabs.Trigger
+								value={ ALL_GROUPS_TAB_VALUE }
+								px={ 4 }
+							>
 								{ i18n.allTab }
 							</Tabs.Trigger>
 							{ ( catalogGroups || [] ).map( ( g, tabIdx ) => (
@@ -118,21 +131,34 @@ export function FieldTypePicker( {
 							) ) }
 						</Tabs.List>
 						<Tabs.ContentGroup>
-							<Tabs.Content value={ ALL_GROUPS_TAB_VALUE } px={ 0 }>
-								{/*
+							<Tabs.Content
+								value={ ALL_GROUPS_TAB_VALUE }
+                px={0}
+                pt={0}
+							>
+								{ /*
 								 * Single wrapper: `Tabs.Content` is forwardAsChild; multiple
 								 * siblings (empty-state + mapped groups) break slot merging.
-								 */}
+								 */ }
 								<Box w="100%">
 									{ filteredGroups.length === 0 && (
-										<Text color="gray.600">{ i18n.noTypesMatch }</Text>
+										<Text color="gray.600">
+											{ i18n.noTypesMatch }
+										</Text>
 									) }
 									{ filteredGroups.map( ( group, fgIdx ) => (
 										<Box
-											key={ catalogGroupStableKey( group, fgIdx ) }
+											key={ catalogGroupStableKey(
+												group,
+												fgIdx
+											) }
 											mb={ 6 }
 										>
-											<Text fontWeight="semibold" mb={ 2 } fontSize="md">
+											<Text
+												fontWeight="semibold"
+												mb={ 2 }
+												fontSize="md"
+											>
 												{ group.label }
 											</Text>
 											<FieldTypeGrid
@@ -146,34 +172,48 @@ export function FieldTypePicker( {
 									) ) }
 								</Box>
 							</Tabs.Content>
-							{ ( catalogGroups || [] ).map( ( group, panelIdx ) => {
-								const fg = filteredGroups.find( ( x ) => x.id === group.id );
-								const groupFields = fg ? fg.fields : [];
-								return (
-									<Tabs.Content
-										key={ catalogGroupStableKey( group, panelIdx ) }
-										value={ catalogGroupStableKey( group, panelIdx ) }
-										px={ 0 }
-									>
-										{ groupFields.length === 0 ? (
-											<Text color="gray.600">{ i18n.noTypesMatch }</Text>
-										) : (
-											<FieldTypeGrid
-												fields={ groupFields }
-												onPick={ onPick }
-												upsellUrl={ upsellUrl }
-												i18n={ i18n }
-												onFieldHover={ setHoveredField }
-											/>
-										) }
-									</Tabs.Content>
-								);
-							} ) }
+							{ ( catalogGroups || [] ).map(
+								( group, panelIdx ) => {
+									const fg = filteredGroups.find(
+										( x ) => x.id === group.id
+									);
+									const groupFields = fg ? fg.fields : [];
+									return (
+										<Tabs.Content
+											key={ catalogGroupStableKey(
+												group,
+												panelIdx
+											) }
+											value={ catalogGroupStableKey(
+												group,
+												panelIdx
+											) }
+											px={ 0 }
+										>
+											{ groupFields.length === 0 ? (
+												<Text color="gray.600">
+													{ i18n.noTypesMatch }
+												</Text>
+											) : (
+												<FieldTypeGrid
+													fields={ groupFields }
+													onPick={ onPick }
+													upsellUrl={ upsellUrl }
+													i18n={ i18n }
+													onFieldHover={
+														setHoveredField
+													}
+												/>
+											) }
+										</Tabs.Content>
+									);
+								}
+							) }
 						</Tabs.ContentGroup>
 					</Tabs.Root>
 				</VStack>
 			</Box>
-            <VStack
+			<VStack
 				flex="0 0 280px"
 				w={ { base: '100%', lg: '280px' } }
 				align="stretch"
@@ -183,7 +223,7 @@ export function FieldTypePicker( {
 				borderColor="gray.200"
 				pl={ { base: 0, lg: 3 } }
 				pt={ { base: 2, lg: 0 } }
-				mt={ { base: 2, lg: 0 } }
+				mt={ { base: 0, lg: 0 } }
 				position={ { base: 'static', lg: 'sticky' } }
 				top={ { lg: 2 } }
 				alignSelf={ { lg: 'flex-start' } }
@@ -193,6 +233,6 @@ export function FieldTypePicker( {
 					<FieldTypeUpsellSidebar upsell={ upsell } />
 				) : null }
 			</VStack>
-        </Flex>
-    );
+		</Flex>
+	);
 }

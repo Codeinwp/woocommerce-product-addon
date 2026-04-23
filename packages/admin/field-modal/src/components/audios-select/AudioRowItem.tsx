@@ -38,12 +38,7 @@ export function AudioRowItem( {
 }: AudioRowItemProps ) {
 	return (
 		<Box borderWidth="1px" borderColor="gray.100" borderRadius="md" p={ 2 }>
-			<HStack
-				align="flex-start"
-				gap={ 2 }
-				w="full"
-				overflowX="auto"
-			>
+			<HStack align="flex-start" gap={ 2 } w="full" overflowX="auto">
 				<AudioIconBox />
 
 				<VStack gap={ 1.5 } flex="1" minW={ 0 }>
@@ -52,7 +47,9 @@ export function AudioRowItem( {
 							size="sm"
 							flex="1 1 0"
 							minW={ 0 }
-							placeholder={ i18n.audioTitlePlaceholder || 'Title' }
+							placeholder={
+								i18n.audioTitlePlaceholder || 'Title'
+							}
 							value={ row.title }
 							onValueChange={ ( e ) =>
 								onPatch( index, { title: e.target.value } )

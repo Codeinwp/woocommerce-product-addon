@@ -1,7 +1,16 @@
 /**
  * Fixed Price paired rows: quantity + fixed price (number inputs), classic input.fixedprice.php shape.
  */
-import { Steps, Box, Button, HStack, Input, Text, VStack, IconButton } from '@chakra-ui/react';
+import {
+	Steps,
+	Box,
+	Button,
+	HStack,
+	Input,
+	Text,
+	VStack,
+	IconButton,
+} from '@chakra-ui/react';
 import { LuTrash2 } from 'react-icons/lu';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
@@ -50,7 +59,8 @@ export function PairedFixedPriceEditor( {
 }: PairedFixedPriceEditorProps ) {
 	const rows = normalizeOptionsArray( values.options );
 	const p0 = placeholders[ 0 ] || i18n.fixedPriceQtyPlaceholder || 'Quantity';
-	const p1 = placeholders[ 1 ] || i18n.fixedPricePricePlaceholder || 'Fixed Price';
+	const p1 =
+		placeholders[ 1 ] || i18n.fixedPricePricePlaceholder || 'Fixed Price';
 	const t0 = types[ 0 ] === 'number' ? 'number' : 'text';
 	const t1 = types[ 1 ] === 'number' ? 'number' : 'text';
 
@@ -83,17 +93,17 @@ export function PairedFixedPriceEditor( {
 	};
 
 	return (
-        <Box
+		<Box
 			borderWidth="1px"
 			borderColor="gray.200"
 			borderRadius="md"
 			p={ 3 }
 			bg="white"
 		>
-            <Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
+			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
 				{ title }
 			</Text>
-            <VStack align="stretch" gap={ 3 }>
+			<VStack align="stretch" gap={ 3 }>
 				{ rows.map( ( row, index ) => (
 					<Box
 						key={ index }
@@ -124,7 +134,9 @@ export function PairedFixedPriceEditor( {
 								placeholder={ p1 }
 								value={ String( row.price ?? '' ) }
 								onValueChange={ ( e ) =>
-									updateRow( index, { price: e.target.value } )
+									updateRow( index, {
+										price: e.target.value,
+									} )
 								}
 							/>
 							<Input
@@ -178,6 +190,6 @@ export function PairedFixedPriceEditor( {
 					{ i18n.pairedOptionsAddRow || 'Add option' }
 				</Button>
 			</VStack>
-        </Box>
-    );
+		</Box>
+	);
 }

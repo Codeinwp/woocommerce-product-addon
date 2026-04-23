@@ -43,9 +43,7 @@ export function bindPpomReactFieldModalOpenButtons(
 		if ( ! target || typeof target.closest !== 'function' ) {
 			return;
 		}
-		const btn = target.closest(
-			'.ppom-edit-field'
-		) as HTMLElement | null;
+		const btn = target.closest( '.ppom-edit-field' ) as HTMLElement | null;
 		if ( ! btn || btn.classList.contains( 'ppom-is-pro-field' ) ) {
 			return;
 		}
@@ -65,10 +63,6 @@ export function bindPpomReactFieldModalOpenButtons(
 		headerHandlers.forEach( ( { btn, onClick } ) =>
 			btn.removeEventListener( 'click', onClick )
 		);
-		document.removeEventListener(
-			'click',
-			onEditFieldClickCapture,
-			true
-		);
+		document.removeEventListener( 'click', onEditFieldClickCapture, true );
 	};
 }

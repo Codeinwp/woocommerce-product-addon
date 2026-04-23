@@ -23,7 +23,13 @@
  * the incoming prop differs from the form store. User edits stay in sync because the listener updates
  * the parent before the serialized snapshot diverges.
  */
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { useStore } from '@tanstack/react-form';
 import { VStack } from '@chakra-ui/react';
 import { usePpomAppForm } from '../form/ppomForm';
@@ -139,11 +145,7 @@ function FieldManageEditorBridgeInner( {
 
 	const mergedBuilderFields = useMemo(
 		() =>
-			mergeBuilderFieldsWithActive(
-				fields,
-				editDraft.clientId,
-				values
-			),
+			mergeBuilderFieldsWithActive( fields, editDraft.clientId, values ),
 		[ fields, editDraft.clientId, values ]
 	);
 

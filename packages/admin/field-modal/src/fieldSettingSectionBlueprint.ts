@@ -63,12 +63,7 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 	},
 	{
 		labelKey: SectionLabelKey.Validation,
-		keys: [
-			'error_message',
-			'maxlength',
-			'minlength',
-			'max_length',
-		],
+		keys: [ 'error_message', 'maxlength', 'minlength', 'max_length' ],
 		advanced: true,
 	},
 	{
@@ -157,7 +152,9 @@ export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
 	},
 ];
 
-function tabsClassHasImageDimensions( meta: Record<string, unknown> | undefined ): boolean {
+function tabsClassHasImageDimensions(
+	meta: Record< string, unknown > | undefined
+): boolean {
 	const tc =
 		meta && Array.isArray( meta.tabs_class )
 			? ( meta.tabs_class as string[] )
@@ -166,7 +163,10 @@ function tabsClassHasImageDimensions( meta: Record<string, unknown> | undefined 
 }
 
 export function buildFallbackGroupedSections(
-	schema: { settings?: Record<string, Record<string, unknown>> } | null | undefined,
+	schema:
+		| { settings?: Record< string, Record< string, unknown > > }
+		| null
+		| undefined,
 	fieldType: string,
 	i18n: I18nDict
 ): Array< { label: string; keys: string[]; advanced?: boolean } > {
@@ -181,7 +181,7 @@ export function buildFallbackGroupedSections(
 		if ( isReactModalExcludedSchemaKey( key ) ) {
 			return;
 		}
-		const meta = settings[ key ] as Record<string, unknown> | undefined;
+		const meta = settings[ key ] as Record< string, unknown > | undefined;
 		if ( ! meta || typeof meta !== 'object' ) {
 			return;
 		}
@@ -231,8 +231,7 @@ export function buildFallbackGroupedSections(
 			continue;
 		}
 
-		const label =
-			( i18n && i18n[ block.labelKey ] ) || block.labelKey;
+		const label = ( i18n && i18n[ block.labelKey ] ) || block.labelKey;
 		const adv =
 			'advanced' in block && typeof block.advanced === 'boolean'
 				? block.advanced

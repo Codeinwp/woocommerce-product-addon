@@ -30,8 +30,7 @@ export function ImageselectFieldEditor( {
 	modalContext,
 	fieldType,
 }: FieldEditorBaseProps ) {
-	const imagesTitle =
-		i18n.addImagesSectionTitle || 'Images';
+	const imagesTitle = i18n.addImagesSectionTitle || 'Images';
 
 	const allSections = useMemo(
 		() =>
@@ -44,17 +43,11 @@ export function ImageselectFieldEditor( {
 	);
 
 	const settingsSections = useMemo(
-		() =>
-			allSections.filter(
-				( s ) => ! editorSectionIsConditions( s )
-			),
+		() => allSections.filter( ( s ) => ! editorSectionIsConditions( s ) ),
 		[ allSections ]
 	);
 	const conditionsSections = useMemo(
-		() =>
-			allSections.filter( ( s ) =>
-				editorSectionIsConditions( s )
-			),
+		() => allSections.filter( ( s ) => editorSectionIsConditions( s ) ),
 		[ allSections ]
 	);
 
@@ -67,8 +60,7 @@ export function ImageselectFieldEditor( {
 	);
 
 	const advancedSectionsOnly: LegacySectionConfig[] = useMemo(
-		() =>
-			settingsSections.filter( ( s ) => s.advanced === true ),
+		() => settingsSections.filter( ( s ) => s.advanced === true ),
 		[ settingsSections ]
 	);
 

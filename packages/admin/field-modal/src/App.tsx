@@ -61,7 +61,9 @@ export function App( { productmetaId }: AppProps ) {
 		}
 		const tpl = i18n.fieldModalTitleWithType;
 		if ( tpl && tpl.includes( '%1$s' ) ) {
-			return tpl.replace( '%1$s', base ).replace( '%2$s', fieldTypeLabel );
+			return tpl
+				.replace( '%1$s', base )
+				.replace( '%2$s', fieldTypeLabel );
 		}
 		return `${ base } · ${ fieldTypeLabel }`;
 	}, [

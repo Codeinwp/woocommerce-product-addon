@@ -1,9 +1,6 @@
 import { ColorPicker, Field, HStack } from '@chakra-ui/react';
 import { controlSurface } from './chakraFieldStyles';
-import {
-	colorFromStoredValue,
-	persistColorValueAsHex,
-} from './colorHelpers';
+import { colorFromStoredValue, persistColorValueAsHex } from './colorHelpers';
 import {
 	labelProps,
 	type PrimitiveSettingControlProps,
@@ -41,7 +38,9 @@ export function ColorControl( {
 								<Field.RequiredIndicator />
 							</Field.Label>
 							<ColorPicker.Root
-								value={ colorFromStoredValue( field.state.value ) }
+								value={ colorFromStoredValue(
+									field.state.value
+								) }
 								onValueChange={ ( details ) =>
 									field.handleChange(
 										persistColorValueAsHex( details.value )
@@ -59,7 +58,10 @@ export function ColorControl( {
 									<ColorPicker.Content>
 										<ColorPicker.Area />
 										<HStack>
-											<ColorPicker.EyeDropper size="xs" variant="outline" />
+											<ColorPicker.EyeDropper
+												size="xs"
+												variant="outline"
+											/>
 											<ColorPicker.Sliders />
 										</HStack>
 									</ColorPicker.Content>
@@ -68,7 +70,9 @@ export function ColorControl( {
 							{ renderHelperText( description ) }
 							{ renderMetaLink( meta.link ) }
 							{ error ? (
-								<Field.ErrorText>{ String( error ) }</Field.ErrorText>
+								<Field.ErrorText>
+									{ String( error ) }
+								</Field.ErrorText>
 							) : null }
 						</Field.Root>
 					);
@@ -84,7 +88,9 @@ export function ColorControl( {
 				<Field.RequiredIndicator />
 			</Field.Label>
 			<ColorPicker.Root
-				value={ colorFromStoredValue( readControlValue( settingKey, ctx ) ) }
+				value={ colorFromStoredValue(
+					readControlValue( settingKey, ctx )
+				) }
 				onValueChange={ ( details ) =>
 					updateFallbackSettingValue(
 						ctx,
@@ -104,7 +110,10 @@ export function ColorControl( {
 					<ColorPicker.Content>
 						<ColorPicker.Area />
 						<HStack>
-							<ColorPicker.EyeDropper size="xs" variant="outline" />
+							<ColorPicker.EyeDropper
+								size="xs"
+								variant="outline"
+							/>
 							<ColorPicker.Sliders />
 						</HStack>
 					</ColorPicker.Content>

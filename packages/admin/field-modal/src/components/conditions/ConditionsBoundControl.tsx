@@ -53,7 +53,9 @@ export function ConditionsBoundControl( {
 					<NativeSelect.Field
 						size="sm"
 						value={ bound }
-						onValueChange={ ( e ) => onBoundChange( e.target.value ) }
+						onValueChange={ ( e ) =>
+							onBoundChange( e.target.value )
+						}
 						{ ...controlSurface }
 					>
 						<option value="All">{ i18n.condAll || 'All' }</option>

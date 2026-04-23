@@ -1,10 +1,4 @@
-import {
-	Box,
-	Button,
-	HStack,
-	IconButton,
-	Input,
-} from '@chakra-ui/react';
+import { Box, Button, HStack, IconButton, Input } from '@chakra-ui/react';
 import { LuTrash2 } from 'react-icons/lu';
 import type { I18nDict } from '../../types/fieldModal';
 import type {
@@ -44,12 +38,7 @@ export function PairedOptionRowItem( {
 
 	return (
 		<Box borderWidth="1px" borderColor="gray.100" borderRadius="md" p={ 2 }>
-			<HStack
-				align="center"
-				gap={ 2 }
-				w="full"
-				overflowX="auto"
-			>
+			<HStack align="center" gap={ 2 } w="full" overflowX="auto">
 				<Input
 					size="sm"
 					flex="1 1 0"

@@ -26,7 +26,9 @@ export function EmojisFieldEditor( {
 		schema && schema.settings && typeof schema.settings === 'object'
 			? ( schema.settings as Record< string, unknown > )
 			: {};
-	const optionsMeta = settings.options as Record< string, unknown > | undefined;
+	const optionsMeta = settings.options as
+		| Record< string, unknown >
+		| undefined;
 	const needsMatrix =
 		optionsMeta &&
 		optionsMeta.type &&
@@ -69,12 +71,7 @@ export function EmojisFieldEditor( {
 		},
 		{
 			label: i18n.editorSectionBehavior || 'Behavior',
-			keys: [
-				'desc_tooltip',
-				'required',
-				'onetime',
-				'onetime_taxable',
-			],
+			keys: [ 'desc_tooltip', 'required', 'onetime', 'onetime_taxable' ],
 			advanced: true,
 		},
 		{

@@ -3,15 +3,9 @@
  */
 export type PairedOptionRow = Record< string, unknown >;
 
-export type PairedOptionsVariant =
-	| 'select'
-	| 'radio'
-	| 'checkbox'
-	| 'switcher';
+export type PairedOptionsVariant = 'select' | 'radio' | 'checkbox' | 'switcher';
 
-export function normalizePairedOptionsArray(
-	raw: unknown
-): PairedOptionRow[] {
+export function normalizePairedOptionsArray( raw: unknown ): PairedOptionRow[] {
 	if ( Array.isArray( raw ) ) {
 		return raw.map( ( o ) =>
 			o && typeof o === 'object' && ! Array.isArray( o )

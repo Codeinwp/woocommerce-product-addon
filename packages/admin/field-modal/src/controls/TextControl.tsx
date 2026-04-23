@@ -45,7 +45,11 @@ export function TextControl( {
 								size="sm"
 								type={ inputType }
 								required={ labelRequired }
-								value={ field.state.value == null ? '' : String( field.state.value ) }
+								value={
+									field.state.value == null
+										? ''
+										: String( field.state.value )
+								}
 								onChange={ ( e ) =>
 									field.handleChange( e.target.value )
 								}
@@ -55,7 +59,9 @@ export function TextControl( {
 							{ renderHelperText( description ) }
 							{ renderMetaLink( meta.link ) }
 							{ error ? (
-								<Field.ErrorText>{ String( error ) }</Field.ErrorText>
+								<Field.ErrorText>
+									{ String( error ) }
+								</Field.ErrorText>
 							) : null }
 						</Field.Root>
 					);
@@ -76,7 +82,11 @@ export function TextControl( {
 				required={ labelRequired }
 				value={ String( readControlValue( settingKey, ctx ) ?? '' ) }
 				onChange={ ( e ) =>
-					updateFallbackSettingValue( ctx, settingKey, e.target.value )
+					updateFallbackSettingValue(
+						ctx,
+						settingKey,
+						e.target.value
+					)
 				}
 				{ ...controlSurface }
 			/>

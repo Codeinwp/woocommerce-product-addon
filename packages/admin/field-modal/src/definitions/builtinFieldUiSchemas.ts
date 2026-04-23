@@ -28,10 +28,7 @@ function titleSetting( desc?: string ): SettingMeta {
 		'text',
 		__( 'Title', 'woocommerce-product-addon' ),
 		desc ||
-			__(
-				'It will be shown as field label',
-				'woocommerce-product-addon'
-			)
+			__( 'It will be shown as field label', 'woocommerce-product-addon' )
 	);
 }
 
@@ -111,8 +108,7 @@ function widthSetting( desc?: string ): SettingMeta {
 	return setting(
 		'select',
 		__( 'Width', 'woocommerce-product-addon' ),
-		desc ||
-			__( 'Select width column.', 'woocommerce-product-addon' ),
+		desc || __( 'Select width column.', 'woocommerce-product-addon' ),
 		{
 			options: widthOptions(),
 			default: 12,
@@ -330,7 +326,10 @@ function textSettings(): SettingSchema {
 		onetime: setting(
 			'checkbox',
 			__( 'One Time Fee/Charge', 'woocommerce-product-addon' ),
-			__( 'Will not multiply with quantity', 'woocommerce-product-addon' ),
+			__(
+				'Will not multiply with quantity',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		use_regex: setting(
@@ -365,7 +364,10 @@ function textareaSettings(): SettingSchema {
 		default_value: setting(
 			'text',
 			__( 'Post ID', 'woocommerce-product-addon' ),
-			__( 'It will pull content from post. e.g: 22', 'woocommerce-product-addon' )
+			__(
+				'It will pull content from post. e.g: 22',
+				'woocommerce-product-addon'
+			)
 		),
 		max_length: setting(
 			'text',
@@ -462,19 +464,28 @@ function numberSettings(): SettingSchema {
 		max: setting(
 			'text',
 			__( 'Max. values', 'woocommerce-product-addon' ),
-			__( 'Max. values allowed, leave blank for default', 'woocommerce-product-addon' ),
+			__(
+				'Max. values allowed, leave blank for default',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		min: setting(
 			'text',
 			__( 'Min. values', 'woocommerce-product-addon' ),
-			__( 'Min. values allowed, leave blank for default', 'woocommerce-product-addon' ),
+			__(
+				'Min. values allowed, leave blank for default',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		step: setting(
 			'text',
 			__( 'Steps', 'woocommerce-product-addon' ),
-			__( 'specified legal number intervals', 'woocommerce-product-addon' ),
+			__(
+				'specified legal number intervals',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		default_value: setting(
@@ -569,7 +580,10 @@ function selectSettings(): SettingSchema {
 		first_option: setting(
 			'text',
 			__( 'First option', 'woocommerce-product-addon' ),
-			__( 'Just for info e.g: Select your option.', 'woocommerce-product-addon' ),
+			__(
+				'Just for info e.g: Select your option.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
@@ -595,7 +609,10 @@ function checkboxSettings(): SettingSchema {
 		options: setting(
 			'paired',
 			__( 'Add options', 'woocommerce-product-addon' ),
-			__( 'Type option with price (optionally)', 'woocommerce-product-addon' )
+			__(
+				'Type option with price (optionally)',
+				'woocommerce-product-addon'
+			)
 		),
 		class: classSetting(),
 		width: widthSetting(
@@ -653,13 +670,19 @@ function radioSettings(): SettingSchema {
 		title: titleSetting(),
 		data_name: dataNameSetting(),
 		description: descriptionSetting(
-			__( 'Small description, it will be diplay near name title.', 'woocommerce-product-addon' )
+			__(
+				'Small description, it will be diplay near name title.',
+				'woocommerce-product-addon'
+			)
 		),
 		error_message: errorMessageSetting(),
 		options: setting(
 			'paired',
 			__( 'Add options', 'woocommerce-product-addon' ),
-			__( 'Type option with price (optionally)', 'woocommerce-product-addon' )
+			__(
+				'Type option with price (optionally)',
+				'woocommerce-product-addon'
+			)
 		),
 		selected: setting(
 			'text',
@@ -959,7 +982,10 @@ function timezoneSettings(): SettingSchema {
 		first_option: setting(
 			'text',
 			__( 'First option', 'woocommerce-product-addon' ),
-			__( 'Just for info e.g: Select your option.', 'woocommerce-product-addon' ),
+			__(
+				'Just for info e.g: Select your option.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		regions: setting(
@@ -980,7 +1006,10 @@ function timezoneSettings(): SettingSchema {
 		show_time: setting(
 			'checkbox',
 			__( 'Show Local Time', 'woocommerce-product-addon' ),
-			__( 'It will show current local time.', 'woocommerce-product-addon' ),
+			__(
+				'It will show current local time.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		desc_tooltip: descTooltipSetting(),
@@ -999,7 +1028,10 @@ function colorSettings(): SettingSchema {
 		default_color: setting(
 			'color',
 			__( 'Default color', 'woocommerce-product-addon' ),
-			__( 'Define default color e.g: #effeff', 'woocommerce-product-addon' ),
+			__(
+				'Define default color e.g: #effeff',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		palettes_colors: setting(
@@ -1087,13 +1119,19 @@ function dividerSettings(): SettingSchema {
 		divider_height: setting(
 			'text',
 			__( 'Divider height', 'woocommerce-product-addon' ),
-			__( 'Provide the divider height e.g: 3px.', 'woocommerce-product-addon' ),
+			__(
+				'Provide the divider height e.g: 3px.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		divider_txtsize: setting(
 			'text',
 			__( 'Font size', 'woocommerce-product-addon' ),
-			__( 'Provide divider text font size e.g: 18px', 'woocommerce-product-addon' ),
+			__(
+				'Provide divider text font size e.g: 18px',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		divider_color: setting(
@@ -1151,7 +1189,10 @@ function fileSettings(): SettingSchema {
 		button_label_select: setting(
 			'text',
 			__( 'Button label (select files)', 'woocommerce-product-addon' ),
-			__( 'Type button label e.g: Select Files', 'woocommerce-product-addon' ),
+			__(
+				'Type button label e.g: Select Files',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		button_class: setting(
@@ -1195,13 +1236,19 @@ function fileSettings(): SettingSchema {
 		min_img_h: setting(
 			'text',
 			__( 'Min. image height', 'woocommerce-product-addon' ),
-			__( 'Minimum image height in pixels.', 'woocommerce-product-addon' ),
+			__(
+				'Minimum image height in pixels.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		max_img_h: setting(
 			'text',
 			__( 'Max. image height', 'woocommerce-product-addon' ),
-			__( 'Maximum image height in pixels.', 'woocommerce-product-addon' ),
+			__(
+				'Maximum image height in pixels.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		min_img_w: setting(
@@ -1241,31 +1288,46 @@ function daterangeSettings(): SettingSchema {
 		open_style: setting(
 			'text',
 			__( 'Open style', 'woocommerce-product-addon' ),
-			__( 'Type the date picker open style.', 'woocommerce-product-addon' ),
+			__(
+				'Type the date picker open style.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		date_formats: setting(
 			'select',
 			__( 'Date format', 'woocommerce-product-addon' ),
-			__( 'Select your preferred date format.', 'woocommerce-product-addon' ),
+			__(
+				'Select your preferred date format.',
+				'woocommerce-product-addon'
+			),
 			{ options: dateFormatOptions(), col_classes: HALF_WIDTH }
 		),
 		tp_increment: setting(
 			'text',
 			__( 'Time increment', 'woocommerce-product-addon' ),
-			__( 'Minutes step for the time picker.', 'woocommerce-product-addon' ),
+			__(
+				'Minutes step for the time picker.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		start_date: setting(
 			'text',
 			__( 'Start date', 'woocommerce-product-addon' ),
-			__( 'Default start date for the range.', 'woocommerce-product-addon' ),
+			__(
+				'Default start date for the range.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		end_date: setting(
 			'text',
 			__( 'End date', 'woocommerce-product-addon' ),
-			__( 'Default end date for the range.', 'woocommerce-product-addon' ),
+			__(
+				'Default end date for the range.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		min_date: setting(
@@ -1287,7 +1349,10 @@ function daterangeSettings(): SettingSchema {
 		time_picker: setting(
 			'checkbox',
 			__( 'Enable time picker', 'woocommerce-product-addon' ),
-			__( 'Show time controls for the date range.', 'woocommerce-product-addon' ),
+			__(
+				'Show time controls for the date range.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		tp_24hours: setting(
@@ -1317,7 +1382,10 @@ function daterangeSettings(): SettingSchema {
 		auto_apply: setting(
 			'checkbox',
 			__( 'Auto apply', 'woocommerce-product-addon' ),
-			__( 'Apply the selected range automatically.', 'woocommerce-product-addon' ),
+			__(
+				'Apply the selected range automatically.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		desc_tooltip: descTooltipSetting(),
@@ -1333,7 +1401,10 @@ function sectionSettings(): SettingSchema {
 		html: setting(
 			'textarea',
 			__( 'HTML content', 'woocommerce-product-addon' ),
-			__( 'Custom HTML displayed for this section.', 'woocommerce-product-addon' )
+			__(
+				'Custom HTML displayed for this section.',
+				'woocommerce-product-addon'
+			)
 		),
 		width: widthSetting(),
 		visibility: visibilitySetting(),
@@ -1342,7 +1413,10 @@ function sectionSettings(): SettingSchema {
 		cart_display: setting(
 			'checkbox',
 			__( 'Show in Cart', 'woocommerce-product-addon' ),
-			__( 'Display the section content in cart.', 'woocommerce-product-addon' ),
+			__(
+				'Display the section content in cart.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		logic: logicSetting(),
@@ -1365,13 +1439,19 @@ function measureSettings(): SettingSchema {
 		'price-multiplier': setting(
 			'text',
 			__( 'Price multiplier', 'woocommerce-product-addon' ),
-			__( 'Multiply the price by the entered amount.', 'woocommerce-product-addon' ),
+			__(
+				'Multiply the price by the entered amount.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		price: setting(
 			'text',
 			__( 'Add-on Price', 'woocommerce-product-addon' ),
-			__( 'Base price added for this measurement field.', 'woocommerce-product-addon' ),
+			__(
+				'Base price added for this measurement field.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		error_message: errorMessageSetting(),
@@ -1390,7 +1470,10 @@ function measureSettings(): SettingSchema {
 		step: setting(
 			'text',
 			__( 'Steps', 'woocommerce-product-addon' ),
-			__( 'Specified legal number intervals.', 'woocommerce-product-addon' ),
+			__(
+				'Specified legal number intervals.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
@@ -1413,7 +1496,10 @@ function phoneSettings(): SettingSchema {
 		default_country: setting(
 			'text',
 			__( 'Default country', 'woocommerce-product-addon' ),
-			__( 'Country code used when the field first loads.', 'woocommerce-product-addon' ),
+			__(
+				'Country code used when the field first loads.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		error_message: errorMessageSetting(),
@@ -1424,13 +1510,19 @@ function phoneSettings(): SettingSchema {
 		enable_search: setting(
 			'checkbox',
 			__( 'Enable search', 'woocommerce-product-addon' ),
-			__( 'Allow searching in the country picker.', 'woocommerce-product-addon' ),
+			__(
+				'Allow searching in the country picker.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		enable_material: setting(
 			'checkbox',
 			__( 'Enable material style', 'woocommerce-product-addon' ),
-			__( 'Use the material theme for the phone field.', 'woocommerce-product-addon' ),
+			__(
+				'Use the material theme for the phone field.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		desc_tooltip: descTooltipSetting(),
@@ -1448,12 +1540,18 @@ function superlistSettings(): SettingSchema {
 		listoptions: setting(
 			'textarea',
 			__( 'List options', 'woocommerce-product-addon' ),
-			__( 'One option per line or CSV entry.', 'woocommerce-product-addon' )
+			__(
+				'One option per line or CSV entry.',
+				'woocommerce-product-addon'
+			)
 		),
 		option_exclude: setting(
 			'textarea',
 			__( 'Exclude options', 'woocommerce-product-addon' ),
-			__( 'Options that should be hidden from the list.', 'woocommerce-product-addon' )
+			__(
+				'Options that should be hidden from the list.',
+				'woocommerce-product-addon'
+			)
 		),
 		selected: setting(
 			'text',
@@ -1478,12 +1576,18 @@ function texterSettings(): SettingSchema {
 		post_id: setting(
 			'text',
 			__( 'Post ID', 'woocommerce-product-addon' ),
-			__( 'It will pull preview content from a post.', 'woocommerce-product-addon' )
+			__(
+				'It will pull preview content from a post.',
+				'woocommerce-product-addon'
+			)
 		),
 		button_title: setting(
 			'text',
 			__( 'Button label', 'woocommerce-product-addon' ),
-			__( 'Text displayed on the preview button.', 'woocommerce-product-addon' ),
+			__(
+				'Text displayed on the preview button.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		btn_color: setting(
@@ -1495,7 +1599,10 @@ function texterSettings(): SettingSchema {
 		btn_bg_color: setting(
 			'color',
 			__( 'Button background color', 'woocommerce-product-addon' ),
-			__( 'Choose the button background color.', 'woocommerce-product-addon' ),
+			__(
+				'Choose the button background color.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		width: widthSetting(),
@@ -1504,7 +1611,10 @@ function texterSettings(): SettingSchema {
 		alignment: setting(
 			'select',
 			__( 'Alignment', 'woocommerce-product-addon' ),
-			__( 'Default text alignment for the preview.', 'woocommerce-product-addon' ),
+			__(
+				'Default text alignment for the preview.',
+				'woocommerce-product-addon'
+			),
 			{
 				options: {
 					left: __( 'Left', 'woocommerce-product-addon' ),
@@ -1523,13 +1633,19 @@ function texterSettings(): SettingSchema {
 		font_family: setting(
 			'text',
 			__( 'Font family', 'woocommerce-product-addon' ),
-			__( 'Default font family for the preview text.', 'woocommerce-product-addon' ),
+			__(
+				'Default font family for the preview text.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		font_color: setting(
 			'color',
 			__( 'Font color', 'woocommerce-product-addon' ),
-			__( 'Default font color for the preview text.', 'woocommerce-product-addon' ),
+			__(
+				'Default font color for the preview text.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		desc_tooltip: descTooltipSetting(),
@@ -1548,23 +1664,35 @@ function domainSettings(): SettingSchema {
 		available_message: setting(
 			'text',
 			__( 'Available message', 'woocommerce-product-addon' ),
-			__( 'Message shown when the domain is available.', 'woocommerce-product-addon' )
+			__(
+				'Message shown when the domain is available.',
+				'woocommerce-product-addon'
+			)
 		),
 		notavailable_message: setting(
 			'text',
 			__( 'Unavailable message', 'woocommerce-product-addon' ),
-			__( 'Message shown when the domain is unavailable.', 'woocommerce-product-addon' )
+			__(
+				'Message shown when the domain is unavailable.',
+				'woocommerce-product-addon'
+			)
 		),
 		button_label: setting(
 			'text',
 			__( 'Button label', 'woocommerce-product-addon' ),
-			__( 'Label used for the availability check button.', 'woocommerce-product-addon' ),
+			__(
+				'Label used for the availability check button.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		button_class: setting(
 			'text',
 			__( 'Button class', 'woocommerce-product-addon' ),
-			__( 'Additional classes for the check button.', 'woocommerce-product-addon' ),
+			__(
+				'Additional classes for the check button.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		width: widthSetting(),
@@ -1580,13 +1708,19 @@ function collapseSettings(): SettingSchema {
 		collapse_type: setting(
 			'text',
 			__( 'Collapse type', 'woocommerce-product-addon' ),
-			__( 'Style or type identifier for the collapsible section.', 'woocommerce-product-addon' ),
+			__(
+				'Style or type identifier for the collapsible section.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		default_open: setting(
 			'checkbox',
 			__( 'Open by default', 'woocommerce-product-addon' ),
-			__( 'Expand the section when the page first loads.', 'woocommerce-product-addon' ),
+			__(
+				'Expand the section when the page first loads.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		logic: logicSetting(),
@@ -1604,13 +1738,19 @@ function quantityOptionSettings(): SettingSchema {
 		unit_price: setting(
 			'text',
 			__( 'Unit price', 'woocommerce-product-addon' ),
-			__( 'Price applied per quantity step.', 'woocommerce-product-addon' ),
+			__(
+				'Price applied per quantity step.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		default_value: setting(
 			'text',
 			__( 'Default value', 'woocommerce-product-addon' ),
-			__( 'Predefined quantity for the field.', 'woocommerce-product-addon' ),
+			__(
+				'Predefined quantity for the field.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		error_message: errorMessageSetting(),
@@ -1629,7 +1769,10 @@ function quantityOptionSettings(): SettingSchema {
 		step: setting(
 			'text',
 			__( 'Step', 'woocommerce-product-addon' ),
-			__( 'Step interval for the quantity input.', 'woocommerce-product-addon' ),
+			__(
+				'Step interval for the quantity input.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
@@ -1651,24 +1794,36 @@ function qtyPackSettings(): SettingSchema {
 		options: setting(
 			'paired-quantity',
 			__( 'Add options', 'woocommerce-product-addon' ),
-			__( 'Type option with quantity and price information.', 'woocommerce-product-addon' )
+			__(
+				'Type option with quantity and price information.',
+				'woocommerce-product-addon'
+			)
 		),
 		default_price: setting(
 			'text',
 			__( 'Default price', 'woocommerce-product-addon' ),
-			__( 'Fallback price when an option has no explicit value.', 'woocommerce-product-addon' ),
+			__(
+				'Fallback price when an option has no explicit value.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		pack_size: setting(
 			'text',
 			__( 'Pack size', 'woocommerce-product-addon' ),
-			__( 'Default quantity size for the pack.', 'woocommerce-product-addon' ),
+			__(
+				'Default quantity size for the pack.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		packsize_message: setting(
 			'text',
 			__( 'Pack size message', 'woocommerce-product-addon' ),
-			__( 'Helper text shown next to the pack size control.', 'woocommerce-product-addon' )
+			__(
+				'Helper text shown next to the pack size control.',
+				'woocommerce-product-addon'
+			)
 		),
 		width: widthSetting(),
 		visibility: visibilitySetting(),
@@ -1704,7 +1859,10 @@ function chainedSettings(): SettingSchema {
 		first_option: setting(
 			'text',
 			__( 'First option', 'woocommerce-product-addon' ),
-			__( 'Just for info e.g: Select your option.', 'woocommerce-product-addon' ),
+			__(
+				'Just for info e.g: Select your option.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
@@ -1729,7 +1887,10 @@ function audioSettings(): SettingSchema {
 		audio: setting(
 			'pre-audios',
 			__( 'Select Audio/Video', 'woocommerce-product-addon' ),
-			__( 'Select audio or video from media library.', 'woocommerce-product-addon' )
+			__(
+				'Select audio or video from media library.',
+				'woocommerce-product-addon'
+			)
 		),
 		error_message: errorMessageSetting(),
 		class: classSetting(),
@@ -1741,7 +1902,10 @@ function audioSettings(): SettingSchema {
 		multiple_allowed: setting(
 			'checkbox',
 			__( 'Multiple selection?', 'woocommerce-product-addon' ),
-			__( 'Allow users to select more than one audio or video item.', 'woocommerce-product-addon' ),
+			__(
+				'Allow users to select more than one audio or video item.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		logic: logicSetting(),
@@ -1762,27 +1926,42 @@ function bulkQuantitySettings(): SettingSchema {
 		fixed_prices: setting(
 			'textarea',
 			__( 'Fixed Prices', 'woocommerce-product-addon' ),
-			__( 'Variation name with price e.g: color | 50', 'woocommerce-product-addon' )
+			__(
+				'Variation name with price e.g: color | 50',
+				'woocommerce-product-addon'
+			)
 		),
 		label_quantity: setting(
 			'text',
 			__( 'Quantity Label', 'woocommerce-product-addon' ),
-			__( 'Label used for quantity. Default: Quantity', 'woocommerce-product-addon' )
+			__(
+				'Label used for quantity. Default: Quantity',
+				'woocommerce-product-addon'
+			)
 		),
 		label_baseprice: setting(
 			'text',
 			__( 'Base Price Label', 'woocommerce-product-addon' ),
-			__( 'Label used for base price. Default: Base Price', 'woocommerce-product-addon' )
+			__(
+				'Label used for base price. Default: Base Price',
+				'woocommerce-product-addon'
+			)
 		),
 		label_total: setting(
 			'text',
 			__( 'Total Price Label', 'woocommerce-product-addon' ),
-			__( 'Label used for total price. Default: Total', 'woocommerce-product-addon' )
+			__(
+				'Label used for total price. Default: Total',
+				'woocommerce-product-addon'
+			)
 		),
 		label_fixed: setting(
 			'text',
 			__( 'Fixed Price Label', 'woocommerce-product-addon' ),
-			__( 'Label used for fixed price. Default: Fixed', 'woocommerce-product-addon' )
+			__(
+				'Label used for fixed price. Default: Fixed',
+				'woocommerce-product-addon'
+			)
 		),
 		hide_baseprice: setting(
 			'checkbox',
@@ -1793,7 +1972,10 @@ function bulkQuantitySettings(): SettingSchema {
 		show_pricerange: setting(
 			'checkbox',
 			__( 'Show price range', 'woocommerce-product-addon' ),
-			__( 'Show the calculated price range as the product price.', 'woocommerce-product-addon' ),
+			__(
+				'Show the calculated price range as the product price.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		logic: logicSetting(),
@@ -1821,13 +2003,19 @@ function cropperSettings(): SettingSchema {
 		selected: setting(
 			'text',
 			__( 'Selected option', 'woocommerce-product-addon' ),
-			__( 'Type option name if you want it selected by default.', 'woocommerce-product-addon' ),
+			__(
+				'Type option name if you want it selected by default.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		first_option: setting(
 			'text',
 			__( 'First option', 'woocommerce-product-addon' ),
-			__( 'Just for info e.g: Select your option.', 'woocommerce-product-addon' ),
+			__(
+				'Just for info e.g: Select your option.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
@@ -1835,31 +2023,46 @@ function cropperSettings(): SettingSchema {
 		button_label_select: setting(
 			'text',
 			__( 'Button label (select files)', 'woocommerce-product-addon' ),
-			__( 'Type button label e.g: Select Photos', 'woocommerce-product-addon' ),
+			__(
+				'Type button label e.g: Select Photos',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		button_class: setting(
 			'text',
 			__( 'Button class', 'woocommerce-product-addon' ),
-			__( 'Type class for both select and upload buttons.', 'woocommerce-product-addon' ),
+			__(
+				'Type class for both select and upload buttons.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		files_allowed: setting(
 			'text',
 			__( 'Files allowed', 'woocommerce-product-addon' ),
-			__( 'Type number of files allowed per upload by user, e.g: 3', 'woocommerce-product-addon' ),
+			__(
+				'Type number of files allowed per upload by user, e.g: 3',
+				'woocommerce-product-addon'
+			),
 			{ default: 1, col_classes: HALF_WIDTH }
 		),
 		file_types: setting(
 			'text',
 			__( 'Image types', 'woocommerce-product-addon' ),
-			__( 'Image types allowed separated by comma, e.g: jpg,png', 'woocommerce-product-addon' ),
+			__(
+				'Image types allowed separated by comma, e.g: jpg,png',
+				'woocommerce-product-addon'
+			),
 			{ default: 'jpg,png', col_classes: HALF_WIDTH }
 		),
 		file_size: setting(
 			'text',
 			__( 'Image size', 'woocommerce-product-addon' ),
-			__( 'Type size with units in kb|mb per uploaded file, e.g: 3mb', 'woocommerce-product-addon' ),
+			__(
+				'Type size with units in kb|mb per uploaded file, e.g: 3mb',
+				'woocommerce-product-addon'
+			),
 			{ default: '1mb', col_classes: HALF_WIDTH }
 		),
 		visibility: visibilitySetting(),
@@ -1879,13 +2082,19 @@ function cropperSettings(): SettingSchema {
 		boundary: setting(
 			'text',
 			__( 'Boundary height,width', 'woocommerce-product-addon' ),
-			__( 'Separated by comma h,w e.g: 200,200', 'woocommerce-product-addon' ),
+			__(
+				'Separated by comma h,w e.g: 200,200',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		enforce_boundary: setting(
 			'checkbox',
 			__( 'Enforce Boundary', 'woocommerce-product-addon' ),
-			__( 'Restrict zoom so the image cannot be smaller than the viewport.', 'woocommerce-product-addon' ),
+			__(
+				'Restrict zoom so the image cannot be smaller than the viewport.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		resize: setting(
@@ -1909,13 +2118,19 @@ function cropperSettings(): SettingSchema {
 		enable_exif: setting(
 			'checkbox',
 			__( 'Enable Exif', 'woocommerce-product-addon' ),
-			__( 'Read EXIF orientation data from the uploaded image.', 'woocommerce-product-addon' ),
+			__(
+				'Read EXIF orientation data from the uploaded image.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		onetime_taxable: setting(
 			'checkbox',
 			__( 'Fee Taxable?', 'woocommerce-product-addon' ),
-			__( 'Calculate tax for the fixed fee.', 'woocommerce-product-addon' ),
+			__(
+				'Calculate tax for the fixed fee.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		desc_tooltip: descTooltipSetting(),
@@ -1934,13 +2149,19 @@ function emojisSettings(): SettingSchema {
 		options: setting(
 			'paired-palettes',
 			__( 'Add colors', 'woocommerce-product-addon' ),
-			__( 'Type color code with price. To write a label, use #colorcode - White.', 'woocommerce-product-addon' )
+			__(
+				'Type color code with price. To write a label, use #colorcode - White.',
+				'woocommerce-product-addon'
+			)
 		),
 		class: classSetting(),
 		max_selected: setting(
 			'number',
 			__( 'Max selected', 'woocommerce-product-addon' ),
-			__( 'Max. selected, leave blank for default.', 'woocommerce-product-addon' ),
+			__(
+				'Max. selected, leave blank for default.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		width: widthSetting(),
@@ -1963,7 +2184,9 @@ function emojisSettings(): SettingSchema {
 			__( 'Set search placeholder.', 'woocommerce-product-addon' ),
 			{ col_classes: HALF_WIDTH }
 		),
-		placeholder: placeholderSetting( __( 'Set placeholder.', 'woocommerce-product-addon' ) ),
+		placeholder: placeholderSetting(
+			__( 'Set placeholder.', 'woocommerce-product-addon' )
+		),
 		filters_position: setting(
 			'select',
 			__( 'Filters Position', 'woocommerce-product-addon' ),
@@ -2060,13 +2283,19 @@ function fixedPriceSettings(): SettingSchema {
 		unit_plural: setting(
 			'text',
 			__( 'Unit plural', 'woocommerce-product-addon' ),
-			__( 'Enter the plural unit label, e.g: pieces.', 'woocommerce-product-addon' ),
+			__(
+				'Enter the plural unit label, e.g: pieces.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		unit_single: setting(
 			'text',
 			__( 'Unit single', 'woocommerce-product-addon' ),
-			__( 'Enter the singular unit label, e.g: piece.', 'woocommerce-product-addon' ),
+			__(
+				'Enter the singular unit label, e.g: piece.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		view_type: setting(
@@ -2084,7 +2313,10 @@ function fixedPriceSettings(): SettingSchema {
 		decimal_place: setting(
 			'text',
 			__( 'Decimal Places', 'woocommerce-product-addon' ),
-			__( 'Use larger decimal precision for very small prices.', 'woocommerce-product-addon' ),
+			__(
+				'Use larger decimal precision for very small prices.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
@@ -2102,31 +2334,46 @@ function imageSettings(): SettingSchema {
 		images: setting(
 			'pre-images',
 			__( 'Select images', 'woocommerce-product-addon' ),
-			__( 'Select images from media library.', 'woocommerce-product-addon' )
+			__(
+				'Select images from media library.',
+				'woocommerce-product-addon'
+			)
 		),
 		error_message: errorMessageSetting(),
 		selected: setting(
 			'text',
 			__( 'Selected image', 'woocommerce-product-addon' ),
-			__( 'Type option title if you want it already selected.', 'woocommerce-product-addon' ),
+			__(
+				'Type option title if you want it already selected.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		selected_img_bordercolor: setting(
 			'color',
 			__( 'Selected Image Border Color', 'woocommerce-product-addon' ),
-			__( 'Change selected images border color, e.g: #fff', 'woocommerce-product-addon' ),
+			__(
+				'Change selected images border color, e.g: #fff',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		image_width: setting(
 			'text',
 			__( 'Image Width', 'woocommerce-product-addon' ),
-			__( 'Change image width e.g: 50px or 50%.', 'woocommerce-product-addon' ),
+			__(
+				'Change image width e.g: 50px or 50%.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		image_height: setting(
 			'text',
 			__( 'Image Height', 'woocommerce-product-addon' ),
-			__( 'Change image height e.g: 50px or 50%.', 'woocommerce-product-addon' ),
+			__(
+				'Change image height e.g: 50px or 50%.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
@@ -2136,7 +2383,10 @@ function imageSettings(): SettingSchema {
 		legacy_view: setting(
 			'checkbox',
 			__( 'Enable legacy view', 'woocommerce-product-addon' ),
-			__( 'Turn on the old boxes view for images.', 'woocommerce-product-addon' ),
+			__(
+				'Turn on the old boxes view for images.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		show_popup: setting(
@@ -2150,19 +2400,28 @@ function imageSettings(): SettingSchema {
 		multiple_allowed: setting(
 			'checkbox',
 			__( 'Multiple selections?', 'woocommerce-product-addon' ),
-			__( 'Allow users to select more than one image.', 'woocommerce-product-addon' ),
+			__(
+				'Allow users to select more than one image.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		min_checked: setting(
 			'text',
 			__( 'Min. Image Select', 'woocommerce-product-addon' ),
-			__( 'How many images can be checked by user, e.g: 2.', 'woocommerce-product-addon' ),
+			__(
+				'How many images can be checked by user, e.g: 2.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		max_checked: setting(
 			'text',
 			__( 'Max. Image Select', 'woocommerce-product-addon' ),
-			__( 'How many images can be checked by user, e.g: 3.', 'woocommerce-product-addon' ),
+			__(
+				'How many images can be checked by user, e.g: 3.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		logic: logicSetting(),
@@ -2181,31 +2440,46 @@ function imageselectSettings(): SettingSchema {
 		description: setting(
 			'textarea',
 			__( 'Description', 'woocommerce-product-addon' ),
-			__( 'Type description, it will display under the section heading.', 'woocommerce-product-addon' )
+			__(
+				'Type description, it will display under the section heading.',
+				'woocommerce-product-addon'
+			)
 		),
 		required: requiredSetting(),
 		images: setting(
 			'imageselect',
 			__( 'Select images', 'woocommerce-product-addon' ),
-			__( 'Select images from media library.', 'woocommerce-product-addon' )
+			__(
+				'Select images from media library.',
+				'woocommerce-product-addon'
+			)
 		),
 		error_message: errorMessageSetting(),
 		dropdown_height: setting(
 			'text',
 			__( 'DropDown Height', 'woocommerce-product-addon' ),
-			__( 'Set the dropdown height e.g: 300px.', 'woocommerce-product-addon' ),
+			__(
+				'Set the dropdown height e.g: 300px.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		image_width: setting(
 			'text',
 			__( 'Images Width', 'woocommerce-product-addon' ),
-			__( 'Change the images width in px or %, e.g: 50% or 50px.', 'woocommerce-product-addon' ),
+			__(
+				'Change the images width in px or %, e.g: 50% or 50px.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		image_height: setting(
 			'text',
 			__( 'Images Height', 'woocommerce-product-addon' ),
-			__( 'Change the images height in px, e.g: 50px.', 'woocommerce-product-addon' ),
+			__(
+				'Change the images height in px, e.g: 50px.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		bg_color: setting(
@@ -2217,8 +2491,15 @@ function imageselectSettings(): SettingSchema {
 		position: setting(
 			'select',
 			__( 'Images Position', 'woocommerce-product-addon' ),
-			__( 'Select images position left or right.', 'woocommerce-product-addon' ),
-			{ options: leftRightOptions(), default: 'left', col_classes: HALF_WIDTH }
+			__(
+				'Select images position left or right.',
+				'woocommerce-product-addon'
+			),
+			{
+				options: leftRightOptions(),
+				default: 'left',
+				col_classes: HALF_WIDTH,
+			}
 		),
 		width: widthSetting(),
 		visibility: visibilitySetting(),
@@ -2233,13 +2514,19 @@ function imageselectSettings(): SettingSchema {
 		enable_gallery: setting(
 			'checkbox',
 			__( 'Enable Gallery', 'woocommerce-product-addon' ),
-			__( 'All selected images show in gallery.', 'woocommerce-product-addon' ),
+			__(
+				'All selected images show in gallery.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		image_replace: setting(
 			'checkbox',
 			__( 'Enable Image Replace', 'woocommerce-product-addon' ),
-			__( 'Selected image replaces the main product image.', 'woocommerce-product-addon' ),
+			__(
+				'Selected image replaces the main product image.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		logic: logicSetting(),
@@ -2256,18 +2543,27 @@ function palettesSettings(): SettingSchema {
 		selected_palette_bcolor: setting(
 			'color',
 			__( 'Selected Border Color', 'woocommerce-product-addon' ),
-			__( 'Change selected palette border color, e.g: #fff', 'woocommerce-product-addon' ),
+			__(
+				'Change selected palette border color, e.g: #fff',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		options: setting(
 			'paired-palettes',
 			__( 'Add colors', 'woocommerce-product-addon' ),
-			__( 'Type color code with price. To write label, use #colorcode - White', 'woocommerce-product-addon' )
+			__(
+				'Type color code with price. To write label, use #colorcode - White',
+				'woocommerce-product-addon'
+			)
 		),
 		selected: setting(
 			'text',
 			__( 'Selected color', 'woocommerce-product-addon' ),
-			__( 'Type color code if you want one already selected.', 'woocommerce-product-addon' ),
+			__(
+				'Type color code if you want one already selected.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
@@ -2275,7 +2571,10 @@ function palettesSettings(): SettingSchema {
 		max_selected: setting(
 			'number',
 			__( 'Max selected', 'woocommerce-product-addon' ),
-			__( 'Max. selected, leave blank for default.', 'woocommerce-product-addon' ),
+			__(
+				'Max. selected, leave blank for default.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		color_width: setting(
@@ -2295,14 +2594,20 @@ function palettesSettings(): SettingSchema {
 		multiple_allowed: setting(
 			'checkbox',
 			__( 'Multiple selections?', 'woocommerce-product-addon' ),
-			__( 'Allow users to select more than one palette.', 'woocommerce-product-addon' ),
+			__(
+				'Allow users to select more than one palette.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		onetime: fixedFeeSetting(),
 		circle: setting(
 			'checkbox',
 			__( 'Show as Circle', 'woocommerce-product-addon' ),
-			__( 'Display color palettes as circles.', 'woocommerce-product-addon' ),
+			__(
+				'Display color palettes as circles.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		desc_tooltip: descTooltipSetting(),
@@ -2345,19 +2650,28 @@ function priceMatrixSettings(): SettingSchema {
 		discount: setting(
 			'checkbox',
 			__( 'Apply as discount', 'woocommerce-product-addon' ),
-			__( 'Apply the matrix result as a discount.', 'woocommerce-product-addon' ),
+			__(
+				'Apply the matrix result as a discount.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		show_slider: setting(
 			'checkbox',
 			__( 'Enable Quantity Slider', 'woocommerce-product-addon' ),
-			__( 'Display a range slider for quantity under matrix.', 'woocommerce-product-addon' ),
+			__(
+				'Display a range slider for quantity under matrix.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		show_price_per_unit: setting(
 			'checkbox',
 			__( 'Show price per unit?', 'woocommerce-product-addon' ),
-			__( 'Calculate price against per unit and show along total.', 'woocommerce-product-addon' ),
+			__(
+				'Calculate price against per unit and show along total.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		hide_matrix_table: setting(
@@ -2380,14 +2694,20 @@ function quantitiesSettings(): SettingSchema {
 		options: setting(
 			'paired-quantity',
 			__( 'Add options', 'woocommerce-product-addon' ),
-			__( 'Type option with price (optionally).', 'woocommerce-product-addon' )
+			__(
+				'Type option with price (optionally).',
+				'woocommerce-product-addon'
+			)
 		),
 		required: requiredSetting(),
 		error_message: errorMessageSetting(),
 		view_control: setting(
 			'select',
 			__( 'Variation Layout', 'woocommerce-product-addon' ),
-			__( 'Select variation layout design.', 'woocommerce-product-addon' ),
+			__(
+				'Select variation layout design.',
+				'woocommerce-product-addon'
+			),
 			{
 				options: variationLayoutOptions(),
 				default: 'simple_view',
@@ -2397,7 +2717,10 @@ function quantitiesSettings(): SettingSchema {
 		default_price: setting(
 			'text',
 			__( 'Default Price', 'woocommerce-product-addon' ),
-			__( 'Default option price if no prices are given in options.', 'woocommerce-product-addon' ),
+			__(
+				'Default option price if no prices are given in options.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		min_qty: setting(
@@ -2426,13 +2749,19 @@ function quantitiesSettings(): SettingSchema {
 		manage_stock: setting(
 			'checkbox',
 			__( 'Manage Stock', 'woocommerce-product-addon' ),
-			__( 'Check and update stock against each variation.', 'woocommerce-product-addon' ),
+			__(
+				'Check and update stock against each variation.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		unlink_order_qty: setting(
 			'checkbox',
 			__( 'Unlink Order Quantity', 'woocommerce-product-addon' ),
-			__( 'Order quantity will not be controlled by this field.', 'woocommerce-product-addon' ),
+			__(
+				'Order quantity will not be controlled by this field.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		logic: logicSetting(),
@@ -2448,13 +2777,19 @@ function selectQtySettings(): SettingSchema {
 		options: setting(
 			'paired',
 			__( 'Add options', 'woocommerce-product-addon' ),
-			__( 'Type option with price and quantity data.', 'woocommerce-product-addon' )
+			__(
+				'Type option with price and quantity data.',
+				'woocommerce-product-addon'
+			)
 		),
 		error_message: errorMessageSetting(),
 		selected: setting(
 			'text',
 			__( 'Selected option', 'woocommerce-product-addon' ),
-			__( 'Type option name if you want it already selected.', 'woocommerce-product-addon' ),
+			__(
+				'Type option name if you want it already selected.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		first_option: setting(
@@ -2466,13 +2801,19 @@ function selectQtySettings(): SettingSchema {
 		option_label: setting(
 			'text',
 			__( 'Option label', 'woocommerce-product-addon' ),
-			__( 'Label used for the option column.', 'woocommerce-product-addon' ),
+			__(
+				'Label used for the option column.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		qty_label: setting(
 			'text',
 			__( 'Quantity label', 'woocommerce-product-addon' ),
-			__( 'Label used for the quantity column.', 'woocommerce-product-addon' ),
+			__(
+				'Label used for the quantity column.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
@@ -2484,7 +2825,10 @@ function selectQtySettings(): SettingSchema {
 		unlink_order_qty: setting(
 			'checkbox',
 			__( 'Unlink Order Quantity', 'woocommerce-product-addon' ),
-			__( 'Order quantity will not be controlled by this field.', 'woocommerce-product-addon' ),
+			__(
+				'Order quantity will not be controlled by this field.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		logic: logicSetting(),
@@ -2501,14 +2845,20 @@ function conditionalMetaSettings(): SettingSchema {
 		images: setting(
 			'conditional-images',
 			__( 'Select images', 'woocommerce-product-addon' ),
-			__( 'Select images from media library.', 'woocommerce-product-addon' )
+			__(
+				'Select images from media library.',
+				'woocommerce-product-addon'
+			)
 		),
 		error_message: errorMessageSetting(),
 		class: classSetting(),
 		selected_optionclr: setting(
 			'color',
 			__( 'Selected option color', 'woocommerce-product-addon' ),
-			__( 'Color used for the selected conditional option.', 'woocommerce-product-addon' ),
+			__(
+				'Color used for the selected conditional option.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		width: widthSetting(),
@@ -2543,17 +2893,26 @@ function fontsSettings(): SettingSchema {
 		custom_fonts: setting(
 			'textarea',
 			__( 'Custom fonts', 'woocommerce-product-addon' ),
-			__( 'Additional custom fonts available in the picker.', 'woocommerce-product-addon' )
+			__(
+				'Additional custom fonts available in the picker.',
+				'woocommerce-product-addon'
+			)
 		),
 		label_placeholder: setting(
 			'text',
 			__( 'Label placeholder', 'woocommerce-product-addon' ),
-			__( 'Placeholder shown in the preview input.', 'woocommerce-product-addon' )
+			__(
+				'Placeholder shown in the preview input.',
+				'woocommerce-product-addon'
+			)
 		),
 		label_preview: setting(
 			'text',
 			__( 'Preview label', 'woocommerce-product-addon' ),
-			__( 'Label displayed above the preview area.', 'woocommerce-product-addon' )
+			__(
+				'Label displayed above the preview area.',
+				'woocommerce-product-addon'
+			)
 		),
 		maxlength: setting(
 			'text',
@@ -2570,65 +2929,98 @@ function fontsSettings(): SettingSchema {
 		default_font: setting(
 			'text',
 			__( 'Default font', 'woocommerce-product-addon' ),
-			__( 'Default font family for the preview.', 'woocommerce-product-addon' ),
+			__(
+				'Default font family for the preview.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		preview_hide: setting(
 			'checkbox',
 			__( 'Hide preview', 'woocommerce-product-addon' ),
-			__( 'Hide the preview area by default.', 'woocommerce-product-addon' ),
+			__(
+				'Hide the preview area by default.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		preview_data_id: setting(
 			'text',
 			__( 'Preview data ID', 'woocommerce-product-addon' ),
-			__( 'Data attribute or selector for the preview source.', 'woocommerce-product-addon' ),
+			__(
+				'Data attribute or selector for the preview source.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		preview_class: setting(
 			'text',
 			__( 'Preview class', 'woocommerce-product-addon' ),
-			__( 'Additional classes for the preview wrapper.', 'woocommerce-product-addon' ),
+			__(
+				'Additional classes for the preview wrapper.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		preview_addtocart: setting(
 			'checkbox',
 			__( 'Preview on add to cart', 'woocommerce-product-addon' ),
-			__( 'Include the preview text in add to cart actions.', 'woocommerce-product-addon' ),
+			__(
+				'Include the preview text in add to cart actions.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		preview_box_textcolor: setting(
 			'color',
 			__( 'Preview text color', 'woocommerce-product-addon' ),
-			__( 'Text color used inside the preview box.', 'woocommerce-product-addon' ),
+			__(
+				'Text color used inside the preview box.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		preview_box_bgcolor: setting(
 			'color',
 			__( 'Preview background color', 'woocommerce-product-addon' ),
-			__( 'Background color used inside the preview box.', 'woocommerce-product-addon' ),
+			__(
+				'Background color used inside the preview box.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		preview_box_bgcolor_datasource: setting(
 			'text',
 			__( 'Preview background datasource', 'woocommerce-product-addon' ),
-			__( 'Field or attribute used to drive the preview background color.', 'woocommerce-product-addon' )
+			__(
+				'Field or attribute used to drive the preview background color.',
+				'woocommerce-product-addon'
+			)
 		),
 		preview_box_textcolor_datasource: setting(
 			'text',
 			__( 'Preview text datasource', 'woocommerce-product-addon' ),
-			__( 'Field or attribute used to drive the preview text color.', 'woocommerce-product-addon' )
+			__(
+				'Field or attribute used to drive the preview text color.',
+				'woocommerce-product-addon'
+			)
 		),
 		disable_defaultfonts: setting(
 			'checkbox',
 			__( 'Disable default fonts', 'woocommerce-product-addon' ),
-			__( 'Hide the built-in font library.', 'woocommerce-product-addon' ),
+			__(
+				'Hide the built-in font library.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		disable_fontselect: setting(
 			'checkbox',
 			__( 'Disable font select', 'woocommerce-product-addon' ),
-			__( 'Prevent changing the font from the preview UI.', 'woocommerce-product-addon' ),
+			__(
+				'Prevent changing the font from the preview UI.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		logic: logicSetting(),
@@ -2655,12 +3047,18 @@ function vqmatrixSettings(): SettingSchema {
 		vqmatrix_label: setting(
 			'text',
 			__( 'Matrix label', 'woocommerce-product-addon' ),
-			__( 'Heading shown above the variation matrix.', 'woocommerce-product-addon' )
+			__(
+				'Heading shown above the variation matrix.',
+				'woocommerce-product-addon'
+			)
 		),
 		default_price: setting(
 			'text',
 			__( 'Default price', 'woocommerce-product-addon' ),
-			__( 'Fallback price when no matrix cell has a value.', 'woocommerce-product-addon' ),
+			__(
+				'Fallback price when no matrix cell has a value.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		min_qty: setting(
@@ -2678,7 +3076,10 @@ function vqmatrixSettings(): SettingSchema {
 		price_view: setting(
 			'text',
 			__( 'Price view', 'woocommerce-product-addon' ),
-			__( 'Display mode for matrix pricing.', 'woocommerce-product-addon' ),
+			__(
+				'Display mode for matrix pricing.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		enable_plusminus: setting(

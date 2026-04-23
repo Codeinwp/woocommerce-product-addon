@@ -11,18 +11,18 @@ export interface PpomTextInputProps {
 }
 
 export function PpomTextInput( { label }: PpomTextInputProps ) {
-	const field = useFieldContext<string>();
+	const field = useFieldContext< string >();
 	const v = field.state.value;
 	// Use React.useId instead (available in React 18+)
-    const inputId = useId();
+	const inputId = useId();
 	return (
-        <Field.Root>
-            { label ? (
+		<Field.Root>
+			{ label ? (
 				<Field.Label htmlFor={ inputId } { ...ppomFieldLabelProps }>
 					{ label }
 				</Field.Label>
 			) : null }
-            <Input
+			<Input
 				id={ inputId }
 				size="sm"
 				value={ v ?? '' }
@@ -30,6 +30,6 @@ export function PpomTextInput( { label }: PpomTextInputProps ) {
 				onBlur={ field.handleBlur }
 				{ ...ppomControlSurface }
 			/>
-        </Field.Root>
-    );
+		</Field.Root>
+	);
 }

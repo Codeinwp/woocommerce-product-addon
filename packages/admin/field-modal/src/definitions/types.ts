@@ -2,7 +2,12 @@
  * Field UI definition contracts (layout + ownership). PHP schema supplies metadata only.
  */
 import type { Dispatch, SetStateAction } from 'react';
-import type { FieldRow, I18nDict, ModalContextValue, SchemaObject } from '../types/fieldModal';
+import type {
+	FieldRow,
+	I18nDict,
+	ModalContextValue,
+	SchemaObject,
+} from '../types/fieldModal';
 
 export type FieldTabId = string;
 

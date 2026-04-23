@@ -31,14 +31,14 @@ export function FieldModalFooter( {
 		: i18n.cancel || 'Cancel';
 
 	return (
-        <Dialog.Footer
+		<Dialog.Footer
 			flexShrink={ 0 }
 			display="flex"
 			gap={ 2 }
 			justifyContent="flex-end"
 			alignItems="center"
 		>
-            <HStack gap={ 2 }>
+			<HStack gap={ 2 }>
 				<Button
 					variant={ confirmingCancel ? 'solid' : 'ghost' }
 					colorPalette={ confirmingCancel ? 'red' : undefined }
@@ -61,6 +61,6 @@ export function FieldModalFooter( {
 					</Button>
 				) }
 			</HStack>
-        </Dialog.Footer>
-    );
+		</Dialog.Footer>
+	);
 }

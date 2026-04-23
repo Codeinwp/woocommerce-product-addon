@@ -26,10 +26,10 @@ export function PpomNumberInput( {
 	max,
 	step,
 }: PpomNumberInputProps ) {
-	const field = useFieldContext<number | undefined>();
+	const field = useFieldContext< number | undefined >();
 	const v = field.state.value;
 	// Use React.useId instead (available in React 18+)
-    const inputId = useId();
+	const inputId = useId();
 	const [ focused, setFocused ] = useState( false );
 	const [ draft, setDraft ] = useState( () => numToDisplay( v ) );
 
@@ -42,13 +42,13 @@ export function PpomNumberInput( {
 	const display = focused ? draft : numToDisplay( v );
 
 	return (
-        <Field.Root>
-            { label ? (
+		<Field.Root>
+			{ label ? (
 				<Field.Label htmlFor={ inputId } { ...ppomFieldLabelProps }>
 					{ label }
 				</Field.Label>
 			) : null }
-            <Input
+			<Input
 				id={ inputId }
 				size="sm"
 				type="number"
@@ -96,6 +96,6 @@ export function PpomNumberInput( {
 				} }
 				{ ...ppomControlSurface }
 			/>
-        </Field.Root>
-    );
+		</Field.Root>
+	);
 }

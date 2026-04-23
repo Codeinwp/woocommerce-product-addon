@@ -28,10 +28,7 @@ export function BulkQuantityTable( {
 				<Table.Header>
 					<Table.Row>
 						{ columns.map( ( col, ci ) => (
-							<Table.ColumnHeader
-								key={ col }
-								whiteSpace="nowrap"
-							>
+							<Table.ColumnHeader key={ col } whiteSpace="nowrap">
 								{ col }
 								{ ci >= 2 ? (
 									<Button

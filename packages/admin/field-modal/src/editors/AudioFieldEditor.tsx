@@ -22,8 +22,7 @@ export function AudioFieldEditor( {
 	ppomFieldIndex,
 	modalContext,
 }: FieldEditorBaseProps ) {
-	const audioSectionTitle =
-		i18n.addAudioVideoSectionTitle || 'Audio / Video';
+	const audioSectionTitle = i18n.addAudioVideoSectionTitle || 'Audio / Video';
 
 	const sectionsBefore: LegacySectionConfig[] = [
 		{

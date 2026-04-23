@@ -1,10 +1,7 @@
 /**
  * Bridge helpers for syncing FieldRow values into a TanStack Form store.
  */
-import type {
-	FieldFormApiLike,
-	FieldRow,
-} from '../types/fieldModal';
+import type { FieldFormApiLike, FieldRow } from '../types/fieldModal';
 
 /** Stable JSON for comparing field rows regardless of key insertion order. */
 export function stableStringifyFieldRow( value: unknown ): string {

@@ -35,9 +35,7 @@ export type LegacyAdvancedFieldStackProps = Omit<
 	betweenPrimaryAndAdvanced?: ReactNode;
 };
 
-function splitSections(
-	sections: LegacySectionConfig[]
-): {
+function splitSections( sections: LegacySectionConfig[] ): {
 	primary: Array< { label: string; keys: string[] } >;
 	advanced: Array< { label: string; keys: string[] } >;
 } {
@@ -63,10 +61,8 @@ export function LegacyAdvancedFieldStack( {
 		() => splitSections( sections ),
 		[ sections ]
 	);
-	const showLabel =
-		i18n.showAdvancedSettings || 'Show advanced settings';
-	const hideLabel =
-		i18n.hideAdvancedSettings || 'Hide advanced settings';
+	const showLabel = i18n.showAdvancedSettings || 'Show advanced settings';
+	const hideLabel = i18n.hideAdvancedSettings || 'Hide advanced settings';
 
 	const insertionIdx =
 		advancedInsertion != null &&

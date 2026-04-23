@@ -15,10 +15,11 @@ export function GroupedFieldSections( {
 	modalContext = null,
 	sections,
 }: GroupedFieldSectionsProps ) {
-	const settings: Record< string, Record< string, unknown > > =
-		schema && schema.settings && typeof schema.settings === 'object'
-			? ( schema.settings as Record< string, Record< string, unknown > > )
-			: {};
+	const settings: Record< string, Record< string, unknown > > = schema &&
+	schema.settings &&
+	typeof schema.settings === 'object'
+		? ( schema.settings as Record< string, Record< string, unknown > > )
+		: {};
 	const ctx = {
 		values,
 		onChange,
@@ -31,11 +32,17 @@ export function GroupedFieldSections( {
 	};
 
 	return (
-        <VStack align="stretch" gap={ 3 }>
-            { sections.map( ( sec: { label: string; keys: string[] } ) => {
+		<VStack align="stretch" gap={ 3 }>
+			{ sections.map( ( sec: { label: string; keys: string[] } ) => {
 				const entries = sec.keys
-					.filter( ( k: string ) => settings[ k ] && typeof settings[ k ] === 'object' )
-					.map( ( k: string ) => ( { key: k, meta: settings[ k ] } ) );
+					.filter(
+						( k: string ) =>
+							settings[ k ] && typeof settings[ k ] === 'object'
+					)
+					.map( ( k: string ) => ( {
+						key: k,
+						meta: settings[ k ],
+					} ) );
 				if ( entries.length === 0 ) {
 					return null;
 				}
@@ -68,6 +75,6 @@ export function GroupedFieldSections( {
 					</VStack>
 				);
 			} ) }
-        </VStack>
-    );
+		</VStack>
+	);
 }

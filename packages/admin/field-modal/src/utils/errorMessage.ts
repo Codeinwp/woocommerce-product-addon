@@ -1,7 +1,6 @@
 export function errorMessage( e: unknown ): string {
 	if ( e && typeof e === 'object' ) {
-		const data =
-			'data' in e ? ( e as { data?: unknown } ).data : null;
+		const data = 'data' in e ? ( e as { data?: unknown } ).data : null;
 		if (
 			data &&
 			typeof data === 'object' &&

@@ -1,4 +1,12 @@
-import { Box, Button, Field, HStack, NativeSelect, Text, VStack } from '@chakra-ui/react';
+import {
+	Box,
+	Button,
+	Field,
+	HStack,
+	NativeSelect,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
 import {
 	COMPARISON_VALUE_CAN_USE_SELECT,
 	HIDE_COMPARISON_INPUT_FIELD,
@@ -64,8 +72,7 @@ export function RuleRow( {
 	const op = String( rule.operators || 'is' );
 	const hideValue = HIDE_COMPARISON_INPUT_FIELD.includes( op );
 	const isBetween = op === 'between';
-	const proLocked =
-		PRO_OPERATOR_VALUES.has( op ) && ! conditionsProEnabled;
+	const proLocked = PRO_OPERATOR_VALUES.has( op ) && ! conditionsProEnabled;
 	const usesConstantOnly =
 		op === 'contains' ||
 		op === 'not-contains' ||
@@ -78,9 +85,7 @@ export function RuleRow( {
 		const canSelect =
 			COMPARISON_VALUE_CAN_USE_SELECT.includes( op ) &&
 			targetType &&
-			OPERATOR_COMPARISON_VALUE_FIELD_TYPE.select.includes(
-				targetType
-			);
+			OPERATOR_COMPARISON_VALUE_FIELD_TYPE.select.includes( targetType );
 		if ( canSelect && optionValues.length > 0 ) {
 			showSelect = true;
 		} else {
@@ -143,14 +148,10 @@ export function RuleRow( {
 							{ ...controlSurface }
 						>
 							<option value="">
-								{ i18n.condSelectField ||
-									'Select a field…' }
+								{ i18n.condSelectField || 'Select a field…' }
 							</option>
 							{ targets.map( ( t ) => (
-								<option
-									key={ t.fieldId }
-									value={ t.fieldId }
-								>
+								<option key={ t.fieldId } value={ t.fieldId }>
 									{ t.fieldLabel } ({ t.fieldId })
 								</option>
 							) ) }
@@ -192,10 +193,7 @@ export function RuleRow( {
 							{ ...controlSurface }
 						>
 							{ operatorGroups.map( ( grp ) => (
-								<optgroup
-									key={ grp.label }
-									label={ grp.label }
-								>
+								<optgroup key={ grp.label } label={ grp.label }>
 									{ grp.options.map( ( o ) => {
 										const allowed =
 											! targetType ||
@@ -203,8 +201,9 @@ export function RuleRow( {
 												o.value,
 												targetType
 											);
-										const isPro =
-											PRO_OPERATOR_VALUES.has( o.value );
+										const isPro = PRO_OPERATOR_VALUES.has(
+											o.value
+										);
 										const disabled =
 											! allowed ||
 											( isPro && ! conditionsProEnabled );

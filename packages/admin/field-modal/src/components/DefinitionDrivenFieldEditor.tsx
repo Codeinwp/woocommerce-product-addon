@@ -61,7 +61,9 @@ export function DefinitionDrivenFieldEditor( {
 		modalContext,
 	};
 
-	function renderSectionCard( block: Extract< FieldUiBlock, { kind: 'section' } > ) {
+	function renderSectionCard(
+		block: Extract< FieldUiBlock, { kind: 'section' } >
+	) {
 		const secLabel = i18n[ block.labelKey ] || block.labelKey;
 		return (
 			<GroupedFieldSections
@@ -72,7 +74,9 @@ export function DefinitionDrivenFieldEditor( {
 		);
 	}
 
-	function renderWidgetBlock( block: Extract< FieldUiBlock, { kind: 'widget' } > ) {
+	function renderWidgetBlock(
+		block: Extract< FieldUiBlock, { kind: 'widget' } >
+	) {
 		const ctx: WidgetRenderContext = {
 			...widgetCtxBase,
 			widgetProps: block.props,

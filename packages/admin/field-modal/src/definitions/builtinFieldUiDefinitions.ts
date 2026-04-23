@@ -11,8 +11,14 @@ import {
 import { registerFieldUiDefinition } from './registry';
 import type { FieldUiDefinition } from './types';
 
-const SETTINGS_TAB = { id: FieldTab.Settings, labelKey: 'settingsTab' as const };
-const CONDITIONS_TAB = { id: FieldTab.Conditions, labelKey: 'conditionsTab' as const };
+const SETTINGS_TAB = {
+	id: FieldTab.Settings,
+	labelKey: 'settingsTab' as const,
+};
+const CONDITIONS_TAB = {
+	id: FieldTab.Conditions,
+	labelKey: 'conditionsTab' as const,
+};
 
 function definition(
 	slug: string,
@@ -62,7 +68,13 @@ const TEXT_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'display',
 		tab: FieldTab.Settings,
 		labelKey: SectionLabelKey.Display,
-		keys: [ 'class', 'input_mask', 'width', 'visibility', 'visibility_role' ],
+		keys: [
+			'class',
+			'input_mask',
+			'width',
+			'visibility',
+			'visibility_role',
+		],
 		advanced: true,
 	},
 	{
@@ -618,7 +630,14 @@ const DIVIDER_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'style',
 		tab: FieldTab.Settings,
 		labelKey: SectionLabelKey.Display,
-		keys: [ 'divider_styles', 'style1_border', 'divider_height', 'divider_txtsize', 'divider_color', 'divider_txtclr' ],
+		keys: [
+			'divider_styles',
+			'style1_border',
+			'divider_height',
+			'divider_txtsize',
+			'divider_color',
+			'divider_txtclr',
+		],
 		advanced: true,
 	},
 ];
@@ -664,22 +683,19 @@ function withConditions(
 ): FieldUiDefinition[ 'blocks' ] {
 	return [
 		...blocks,
-		sectionBlock(
+		sectionBlock( 'conditions', FieldTab.Conditions, 'conditionsTab', [
+			'logic',
 			'conditions',
-			FieldTab.Conditions,
-			'conditionsTab',
-			[ 'logic', 'conditions' ]
-		),
+		] ),
 	];
 }
 
 const FILE_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -736,12 +752,11 @@ const FILE_BLOCKS = withConditions(
 );
 
 const DATERANGE_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -794,12 +809,11 @@ const DATERANGE_BLOCKS = withConditions(
 );
 
 const SECTION_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'data_name', 'description', 'html' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'data_name',
+		'description',
+		'html',
+	] ),
 	sectionBlock(
 		'display',
 		FieldTab.Settings,
@@ -817,24 +831,21 @@ const SECTION_BLOCKS = withConditions(
 );
 
 const MEASURE_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
 		SectionLabelKey.FieldSettings,
 		[ 'required', 'default_value' ]
 	),
-	sectionBlock(
-		'pricing',
-		FieldTab.Settings,
-		SectionLabelKey.DefaultPrice,
-		[ 'price', 'price-multiplier' ]
-	),
+	sectionBlock( 'pricing', FieldTab.Settings, SectionLabelKey.DefaultPrice, [
+		'price',
+		'price-multiplier',
+	] ),
 	sectionBlock(
 		'constraints',
 		FieldTab.Settings,
@@ -865,17 +876,12 @@ const MEASURE_BLOCKS = withConditions(
 );
 
 const PHONE_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[
-			'title',
-			'data_name',
-			'description',
-			'placeholder',
-		]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+		'placeholder',
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -900,22 +906,17 @@ const PHONE_BLOCKS = withConditions(
 		'behavior',
 		FieldTab.Settings,
 		SectionLabelKey.Behavior,
-		[
-			'enable_search',
-			'enable_material',
-			'desc_tooltip',
-		],
+		[ 'enable_search', 'enable_material', 'desc_tooltip' ],
 		true
 	)
 );
 
 const SUPERLIST_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -953,12 +954,12 @@ const SUPERLIST_BLOCKS = withConditions(
 );
 
 const TEXTER_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description', 'post_id' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+		'post_id',
+	] ),
 	sectionBlock(
 		'button',
 		FieldTab.Settings,
@@ -989,12 +990,12 @@ const TEXTER_BLOCKS = withConditions(
 );
 
 const DOMAIN_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description', 'placeholder' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+		'placeholder',
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -1018,12 +1019,10 @@ const DOMAIN_BLOCKS = withConditions(
 );
 
 const COLLAPSE_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+	] ),
 	sectionBlock(
 		'behavior',
 		FieldTab.Settings,
@@ -1034,29 +1033,22 @@ const COLLAPSE_BLOCKS = withConditions(
 );
 
 const QUANTITYOPTION_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[
-			'title',
-			'data_name',
-			'description',
-			'placeholder',
-		]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+		'placeholder',
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
 		SectionLabelKey.FieldSettings,
 		[ 'required', 'default_value' ]
 	),
-	sectionBlock(
-		'pricing',
-		FieldTab.Settings,
-		SectionLabelKey.DefaultPrice,
-		[ 'unit_price', 'onetime' ]
-	),
+	sectionBlock( 'pricing', FieldTab.Settings, SectionLabelKey.DefaultPrice, [
+		'unit_price',
+		'onetime',
+	] ),
 	sectionBlock(
 		'constraints',
 		FieldTab.Settings,
@@ -1087,12 +1079,11 @@ const QUANTITYOPTION_BLOCKS = withConditions(
 );
 
 const QTYPACK_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
 	widgetBlock(
 		'options',
 		FieldTab.Settings,
@@ -1124,18 +1115,14 @@ const QTYPACK_BLOCKS = withConditions(
 );
 
 const SWITCHER_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
-	widgetBlock(
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
+	widgetBlock( 'options', FieldTab.Settings, WidgetKind.PairedSwitch, [
 		'options',
-		FieldTab.Settings,
-		WidgetKind.PairedSwitch,
-		[ 'options' ]
-	),
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -1180,18 +1167,14 @@ const SWITCHER_BLOCKS = withConditions(
 );
 
 const CHAINED_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
-	widgetBlock(
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
+	widgetBlock( 'options', FieldTab.Settings, WidgetKind.ChainedOptions, [
 		'options',
-		FieldTab.Settings,
-		WidgetKind.ChainedOptions,
-		[ 'options' ]
-	),
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -1222,18 +1205,14 @@ const CHAINED_BLOCKS = withConditions(
 );
 
 const CONDITIONAL_META_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
-	widgetBlock(
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
+	widgetBlock( 'images', FieldTab.Settings, WidgetKind.ConditionalImages, [
 		'images',
-		FieldTab.Settings,
-		WidgetKind.ConditionalImages,
-		[ 'images' ]
-	),
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -1273,18 +1252,14 @@ const CONDITIONAL_META_BLOCKS = withConditions(
 const PREVIEW_TAB = { id: FieldTab.Preview, labelKey: 'Preview' };
 
 const FONTS_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
-	widgetBlock(
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
+	widgetBlock( 'options', FieldTab.Settings, WidgetKind.FontsPaired, [
 		'options',
-		FieldTab.Settings,
-		WidgetKind.FontsPaired,
-		[ 'options' ]
-	),
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -1312,56 +1287,41 @@ const FONTS_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		[ 'custom_fonts' ],
 		true
 	),
-	sectionBlock(
-		'preview-basic',
-		FieldTab.Preview,
-		'Preview',
-		[
-			'label_placeholder',
-			'label_preview',
-			'maxlength',
-			'minlength',
-			'default_font',
-			'preview_hide',
-			'preview_data_id',
-			'preview_class',
-			'preview_addtocart',
-		]
-	),
-	sectionBlock(
-		'preview-colors',
-		FieldTab.Preview,
-		SectionLabelKey.Display,
-		[
-			'preview_box_textcolor',
-			'preview_box_bgcolor',
-			'preview_box_bgcolor_datasource',
-			'preview_box_textcolor_datasource',
-			'disable_defaultfonts',
-			'disable_fontselect',
-		]
-	),
-	sectionBlock(
+	sectionBlock( 'preview-basic', FieldTab.Preview, 'Preview', [
+		'label_placeholder',
+		'label_preview',
+		'maxlength',
+		'minlength',
+		'default_font',
+		'preview_hide',
+		'preview_data_id',
+		'preview_class',
+		'preview_addtocart',
+	] ),
+	sectionBlock( 'preview-colors', FieldTab.Preview, SectionLabelKey.Display, [
+		'preview_box_textcolor',
+		'preview_box_bgcolor',
+		'preview_box_bgcolor_datasource',
+		'preview_box_textcolor_datasource',
+		'disable_defaultfonts',
+		'disable_fontselect',
+	] ),
+	sectionBlock( 'conditions', FieldTab.Conditions, 'conditionsTab', [
+		'logic',
 		'conditions',
-		FieldTab.Conditions,
-		'conditionsTab',
-		[ 'logic', 'conditions' ]
-	),
+	] ),
 ];
 
 const VQMATRIX_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
-	widgetBlock(
-		'matrix',
-		FieldTab.Settings,
-		WidgetKind.Vqmatrix,
-		[ 'options', 'row_options' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
+	widgetBlock( 'matrix', FieldTab.Settings, WidgetKind.Vqmatrix, [
+		'options',
+		'row_options',
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -1378,10 +1338,7 @@ const VQMATRIX_BLOCKS = withConditions(
 		'pricing',
 		FieldTab.Settings,
 		SectionLabelKey.DefaultPrice,
-		[
-			'price_view',
-			'enable_plusminus',
-		],
+		[ 'price_view', 'enable_plusminus' ],
 		true
 	),
 	sectionBlock(
@@ -1401,18 +1358,14 @@ const VQMATRIX_BLOCKS = withConditions(
 );
 
 const AUDIO_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
-	widgetBlock(
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
+	widgetBlock( 'audio', FieldTab.Settings, WidgetKind.AudioMedia, [
 		'audio',
-		FieldTab.Settings,
-		WidgetKind.AudioMedia,
-		[ 'audio' ]
-	),
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -1443,18 +1396,14 @@ const AUDIO_BLOCKS = withConditions(
 );
 
 const BULKQUANTITY_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
-	widgetBlock(
-		'bulk-quantity',
-		FieldTab.Settings,
-		WidgetKind.BulkQuantity,
-		[ 'options' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
+	widgetBlock( 'bulk-quantity', FieldTab.Settings, WidgetKind.BulkQuantity, [
+		'options',
+	] ),
 	sectionBlock(
 		'display',
 		FieldTab.Settings,
@@ -1473,12 +1422,11 @@ const BULKQUANTITY_BLOCKS = withConditions(
 );
 
 const CROPPER_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
 	widgetBlock(
 		'viewport',
 		FieldTab.Settings,
@@ -1492,12 +1440,9 @@ const CROPPER_BLOCKS = withConditions(
 		SectionLabelKey.FieldSettings,
 		[ 'required', 'selected', 'first_option' ]
 	),
-	sectionBlock(
-		'pricing',
-		FieldTab.Settings,
-		SectionLabelKey.DefaultPrice,
-		[ 'file_cost' ]
-	),
+	sectionBlock( 'pricing', FieldTab.Settings, SectionLabelKey.DefaultPrice, [
+		'file_cost',
+	] ),
 	sectionBlock(
 		'constraints',
 		FieldTab.Settings,
@@ -1550,12 +1495,11 @@ const CROPPER_BLOCKS = withConditions(
 );
 
 const EMOJIS_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -1603,27 +1547,20 @@ const EMOJIS_BLOCKS = withConditions(
 		'behavior',
 		FieldTab.Settings,
 		SectionLabelKey.Behavior,
-		[
-			'desc_tooltip',
-			'onetime_taxable',
-		],
+		[ 'desc_tooltip', 'onetime_taxable' ],
 		true
 	)
 );
 
 const FIXEDPRICE_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
-	widgetBlock(
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
+	widgetBlock( 'options', FieldTab.Settings, WidgetKind.FixedPricePaired, [
 		'options',
-		FieldTab.Settings,
-		WidgetKind.FixedPricePaired,
-		[ 'options' ]
-	),
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -1640,18 +1577,14 @@ const FIXEDPRICE_BLOCKS = withConditions(
 );
 
 const IMAGE_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
-	widgetBlock(
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
+	widgetBlock( 'images', FieldTab.Settings, WidgetKind.ImageMedia, [
 		'images',
-		FieldTab.Settings,
-		WidgetKind.ImageMedia,
-		[ 'images' ]
-	),
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -1696,26 +1629,20 @@ const IMAGE_BLOCKS = withConditions(
 		'behavior',
 		FieldTab.Settings,
 		SectionLabelKey.Behavior,
-		[
-			'desc_tooltip',
-		],
+		[ 'desc_tooltip' ],
 		true
 	)
 );
 
 const IMAGESELECT_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
-	widgetBlock(
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
+	widgetBlock( 'images', FieldTab.Settings, WidgetKind.ImageselectMedia, [
 		'images',
-		FieldTab.Settings,
-		WidgetKind.ImageselectMedia,
-		[ 'images' ]
-	),
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -1755,12 +1682,11 @@ const IMAGESELECT_BLOCKS = withConditions(
 );
 
 const PALETTES_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
 	widgetBlock(
 		'options',
 		FieldTab.Settings,
@@ -1809,20 +1735,17 @@ const PALETTES_BLOCKS = withConditions(
 		'behavior',
 		FieldTab.Settings,
 		SectionLabelKey.Behavior,
-		[
-			'desc_tooltip',
-		],
+		[ 'desc_tooltip' ],
 		true
 	)
 );
 
 const PRICEMATRIX_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
 	sectionBlock(
 		'field-settings',
 		FieldTab.Settings,
@@ -1862,12 +1785,11 @@ const PRICEMATRIX_BLOCKS = withConditions(
 );
 
 const QUANTITIES_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
 	widgetBlock(
 		'options',
 		FieldTab.Settings,
@@ -1916,12 +1838,11 @@ const QUANTITIES_BLOCKS = withConditions(
 );
 
 const SELECTQTY_BLOCKS = withConditions(
-	sectionBlock(
-		'basic',
-		FieldTab.Settings,
-		SectionLabelKey.Basic,
-		[ 'title', 'data_name', 'description' ]
-	),
+	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
+		'title',
+		'data_name',
+		'description',
+	] ),
 	widgetBlock(
 		'options',
 		FieldTab.Settings,
@@ -1966,56 +1887,128 @@ const SELECTQTY_BLOCKS = withConditions(
 );
 
 export function registerBuiltinFieldUiDefinitions(): void {
-	registerFieldUiDefinition( definition( BuiltinFieldType.Text, TEXT_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Textcounter, TEXT_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Textarea, TEXTAREA_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Email, EMAIL_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Number, NUMBER_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Hidden, HIDDEN_BLOCKS, [ SETTINGS_TAB ] ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Date, DATE_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Timezone, TIMEZONE_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Color, COLOR_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Divider, DIVIDER_BLOCKS, [ SETTINGS_TAB ] ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Select, SELECT_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Checkbox, CHECKBOX_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Radio, RADIO_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.File, FILE_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Daterange, DATERANGE_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Section, SECTION_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Measure, MEASURE_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Phone, PHONE_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Superlist, SUPERLIST_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Texter, TEXTER_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Domain, DOMAIN_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Collapse, COLLAPSE_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Quantityoption, QUANTITYOPTION_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Qtypack, QTYPACK_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Switcher, SWITCHER_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Chained, CHAINED_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.ConditionalMeta, CONDITIONAL_META_BLOCKS ) );
 	registerFieldUiDefinition(
-		definition( BuiltinFieldType.Fonts, FONTS_BLOCKS, [ SETTINGS_TAB, PREVIEW_TAB, CONDITIONS_TAB ] )
+		definition( BuiltinFieldType.Text, TEXT_BLOCKS )
 	);
-	registerFieldUiDefinition( definition( BuiltinFieldType.Vqmatrix, VQMATRIX_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Audio, AUDIO_BLOCKS ) );
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Textcounter, TEXT_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Textarea, TEXTAREA_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Email, EMAIL_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Number, NUMBER_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Hidden, HIDDEN_BLOCKS, [ SETTINGS_TAB ] )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Date, DATE_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Timezone, TIMEZONE_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Color, COLOR_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Divider, DIVIDER_BLOCKS, [ SETTINGS_TAB ] )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Select, SELECT_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Checkbox, CHECKBOX_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Radio, RADIO_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.File, FILE_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Daterange, DATERANGE_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Section, SECTION_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Measure, MEASURE_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Phone, PHONE_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Superlist, SUPERLIST_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Texter, TEXTER_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Domain, DOMAIN_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Collapse, COLLAPSE_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Quantityoption, QUANTITYOPTION_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Qtypack, QTYPACK_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Switcher, SWITCHER_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Chained, CHAINED_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.ConditionalMeta, CONDITIONAL_META_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Fonts, FONTS_BLOCKS, [
+			SETTINGS_TAB,
+			PREVIEW_TAB,
+			CONDITIONS_TAB,
+		] )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Vqmatrix, VQMATRIX_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Audio, AUDIO_BLOCKS )
+	);
 	registerFieldUiDefinition(
 		definition( BuiltinFieldType.Bulkquantity, BULKQUANTITY_BLOCKS )
 	);
-	registerFieldUiDefinition( definition( BuiltinFieldType.Cropper, CROPPER_BLOCKS ) );
-	registerFieldUiDefinition( definition( BuiltinFieldType.Emojis, EMOJIS_BLOCKS ) );
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Cropper, CROPPER_BLOCKS )
+	);
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Emojis, EMOJIS_BLOCKS )
+	);
 	registerFieldUiDefinition(
 		definition( BuiltinFieldType.Fixedprice, FIXEDPRICE_BLOCKS )
 	);
-	registerFieldUiDefinition( definition( BuiltinFieldType.Image, IMAGE_BLOCKS ) );
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Image, IMAGE_BLOCKS )
+	);
 	registerFieldUiDefinition(
 		definition( BuiltinFieldType.Imageselect, IMAGESELECT_BLOCKS )
 	);
-	registerFieldUiDefinition( definition( BuiltinFieldType.Palettes, PALETTES_BLOCKS ) );
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Palettes, PALETTES_BLOCKS )
+	);
 	registerFieldUiDefinition(
 		definition( BuiltinFieldType.Pricematrix, PRICEMATRIX_BLOCKS )
 	);
 	registerFieldUiDefinition(
 		definition( BuiltinFieldType.Quantities, QUANTITIES_BLOCKS )
 	);
-	registerFieldUiDefinition( definition( BuiltinFieldType.Selectqty, SELECTQTY_BLOCKS ) );
+	registerFieldUiDefinition(
+		definition( BuiltinFieldType.Selectqty, SELECTQTY_BLOCKS )
+	);
 }

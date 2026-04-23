@@ -86,8 +86,7 @@ export const FieldTab = {
 	Preview: 'preview',
 } as const;
 
-export type FieldTabValue =
-	( typeof FieldTab )[ keyof typeof FieldTab ];
+export type FieldTabValue = ( typeof FieldTab )[ keyof typeof FieldTab ];
 
 // ---------------------------------------------------------------------------
 // Widget kinds
@@ -111,5 +110,4 @@ export const WidgetKind = {
 	ImageselectMedia: 'imageselect-media',
 } as const;
 
-export type WidgetKindValue =
-	( typeof WidgetKind )[ keyof typeof WidgetKind ];
+export type WidgetKindValue = ( typeof WidgetKind )[ keyof typeof WidgetKind ];

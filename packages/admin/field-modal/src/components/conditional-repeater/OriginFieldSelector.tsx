@@ -26,14 +26,11 @@ export function OriginFieldSelector( {
 					bg="white"
 					value={ origin }
 					placeholder={
-						i18n.cfrOriginPlaceholder ||
-						'Select origin field…'
+						i18n.cfrOriginPlaceholder || 'Select origin field…'
 					}
 					onValueChange={ ( e ) => onChange( e.target.value ) }
 				>
-					<option value="">
-						{ i18n.cfrOriginNone || 'None' }
-					</option>
+					<option value="">{ i18n.cfrOriginNone || 'None' }</option>
 					{ candidates.map( ( c ) => (
 						<option key={ c.value } value={ c.value }>
 							{ c.title } ({ c.value })

@@ -79,9 +79,7 @@ export function FieldPreviewPanel( { field, i18n }: FieldPreviewPanelProps ) {
 				color="gray.800"
 				css={ { '& > p': { margin: 0, lineHeight: 1.5 } } }
 			>
-				{ longDescription ? (
-					<Text>{ longDescription }</Text>
-				) : null }
+				{ longDescription ? <Text>{ longDescription }</Text> : null }
 				{ guide?.examples ? (
 					<Text>
 						<Text as="span" fontWeight="bold">

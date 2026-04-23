@@ -46,12 +46,7 @@ export function ImageRowItem( {
 
 	return (
 		<Box borderWidth="1px" borderColor="gray.100" borderRadius="md" p={ 2 }>
-			<HStack
-				align="flex-start"
-				gap={ 2 }
-				w="full"
-				overflowX="auto"
-			>
+			<HStack align="flex-start" gap={ 2 } w="full" overflowX="auto">
 				<ImagePreview src={ row.link } alt={ row.title } />
 
 				<VStack gap={ 1.5 } flex="1" minW={ 0 }>

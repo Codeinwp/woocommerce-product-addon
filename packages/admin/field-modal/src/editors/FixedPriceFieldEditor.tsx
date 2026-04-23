@@ -26,7 +26,9 @@ export function FixedPriceFieldEditor( {
 		schema && schema.settings && typeof schema.settings === 'object'
 			? ( schema.settings as Record< string, unknown > )
 			: {};
-	const optionsMeta = settings.options as Record< string, unknown > | undefined;
+	const optionsMeta = settings.options as
+		| Record< string, unknown >
+		| undefined;
 	const needsPaired =
 		optionsMeta &&
 		optionsMeta.type &&

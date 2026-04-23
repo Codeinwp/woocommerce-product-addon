@@ -22,8 +22,8 @@ export function FieldManagePanel( {
 	onOpenPicker,
 }: FieldManagePanelProps ) {
 	return (
-        <Box minH="220px">
-            { fields.length === 0 && (
+		<Box minH="220px">
+			{ fields.length === 0 && (
 				<VStack
 					align="stretch"
 					gap={ 4 }
@@ -44,7 +44,7 @@ export function FieldManagePanel( {
 					</Button>
 				</VStack>
 			) }
-            { fields.length > 0 && selectedId && editDraft && (
+			{ fields.length > 0 && selectedId && editDraft && (
 				<FieldManageEditorBridge
 					i18n={ i18n }
 					fields={ fields }
@@ -60,6 +60,6 @@ export function FieldManagePanel( {
 					onOpenPicker={ onOpenPicker }
 				/>
 			) }
-        </Box>
-    );
+		</Box>
+	);
 }

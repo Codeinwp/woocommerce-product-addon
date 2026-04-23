@@ -18,7 +18,10 @@ declare global {
 	interface Window {
 		wp?: {
 			media?: ( settings: Record< string, unknown > ) => {
-				on: ( event: string, cb: ( arg: unknown ) => void ) => {
+				on: (
+					event: string,
+					cb: ( arg: unknown ) => void
+				) => {
 					open: () => void;
 				};
 				state: () => {
@@ -56,10 +59,7 @@ export function AudiosSelectEditor( {
 		} );
 	};
 
-	const updateRow = (
-		index: number,
-		patch: Partial< AudioOptionRow >
-	) => {
+	const updateRow = ( index: number, patch: Partial< AudioOptionRow > ) => {
 		setRows(
 			rows.map( ( r, i ) => ( i === index ? { ...r, ...patch } : r ) )
 		);
@@ -144,10 +144,10 @@ export function AudiosSelectEditor( {
 	};
 
 	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
-	const moveDown = ( index: number ) => setRows( arrayMove( rows, index, 1 ) );
+	const moveDown = ( index: number ) =>
+		setRows( arrayMove( rows, index, 1 ) );
 
-	const pricePlaceholder =
-		i18n.audioPricePlaceholder || 'Price (fix or %)';
+	const pricePlaceholder = i18n.audioPricePlaceholder || 'Price (fix or %)';
 
 	return (
 		<Box

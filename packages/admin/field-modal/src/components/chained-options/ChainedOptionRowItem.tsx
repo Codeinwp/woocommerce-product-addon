@@ -1,10 +1,4 @@
-import {
-	Box,
-	Button,
-	HStack,
-	IconButton,
-	Input,
-} from '@chakra-ui/react';
+import { Box, Button, HStack, IconButton, Input } from '@chakra-ui/react';
 import { LuTrash2 } from 'react-icons/lu';
 import type { I18nDict } from '../../types/fieldModal';
 import type { ChainedOptionRow } from '../../utils/chainedOptionsData';

@@ -17,33 +17,36 @@ export interface PpomSelectInputProps {
 }
 
 export function PpomSelectInput( { label, options }: PpomSelectInputProps ) {
-	const field = useFieldContext<string>();
+	const field = useFieldContext< string >();
 	const v = field.state.value;
 	// Use React.useId instead (available in React 18+)
-    const selectId = useId();
+	const selectId = useId();
 	return (
-        <Field.Root>
-            { label ? (
+		<Field.Root>
+			{ label ? (
 				<Field.Label htmlFor={ selectId } { ...ppomFieldLabelProps }>
 					{ label }
 				</Field.Label>
 			) : null }
-            <NativeSelect.Root>
-                <NativeSelect.Field
-                    id={ selectId }
-                    size="sm"
-                    value={ v ?? '' }
-                    onValueChange={ ( e ) => field.handleChange( e.target.value ) }
-                    onBlur={ field.handleBlur }
-                    { ...ppomControlSurface }>
-                    { options.map( ( o, i ) => (
-                        <option key={ `${ i }:${ o.value }` } value={ o.value }>
-                            { o.label }
-                        </option>
-                    ) ) }
-                </NativeSelect.Field>
-                <NativeSelect.Indicator />
-            </NativeSelect.Root>
-        </Field.Root>
-    );
+			<NativeSelect.Root>
+				<NativeSelect.Field
+					id={ selectId }
+					size="sm"
+					value={ v ?? '' }
+					onValueChange={ ( e ) =>
+						field.handleChange( e.target.value )
+					}
+					onBlur={ field.handleBlur }
+					{ ...ppomControlSurface }
+				>
+					{ options.map( ( o, i ) => (
+						<option key={ `${ i }:${ o.value }` } value={ o.value }>
+							{ o.label }
+						</option>
+					) ) }
+				</NativeSelect.Field>
+				<NativeSelect.Indicator />
+			</NativeSelect.Root>
+		</Field.Root>
+	);
 }

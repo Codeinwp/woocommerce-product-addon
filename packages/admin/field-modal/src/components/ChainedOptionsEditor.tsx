@@ -40,10 +40,7 @@ export function ChainedOptionsEditor( {
 		} );
 	};
 
-	const updateRow = (
-		index: number,
-		patch: Partial< ChainedOptionRow >
-	) => {
+	const updateRow = ( index: number, patch: Partial< ChainedOptionRow > ) => {
 		setRows(
 			rows.map( ( row, rowIndex ) =>
 				rowIndex === index ? { ...row, ...patch } : row
@@ -61,7 +58,8 @@ export function ChainedOptionsEditor( {
 	};
 
 	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
-	const moveDown = ( index: number ) => setRows( arrayMove( rows, index, 1 ) );
+	const moveDown = ( index: number ) =>
+		setRows( arrayMove( rows, index, 1 ) );
 
 	return (
 		<Box

@@ -68,12 +68,14 @@ export function renderHelperText(
 			/>
 		);
 	}
-	return <Field.HelperText { ...helperTextProps }>{ description }</Field.HelperText>;
+	return (
+		<Field.HelperText { ...helperTextProps }>
+			{ description }
+		</Field.HelperText>
+	);
 }
 
-export function renderMetaLink(
-	link: unknown
-): JSX.Element | null {
+export function renderMetaLink( link: unknown ): JSX.Element | null {
 	if ( link == null || link === '' ) {
 		return null;
 	}

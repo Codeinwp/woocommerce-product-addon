@@ -4,10 +4,10 @@
 import type { ComponentType, Dispatch, SetStateAction } from 'react';
 
 /** UI strings from REST `i18n` payload. */
-export type I18nDict = Record<string, string>;
+export type I18nDict = Record< string, string >;
 
 /** One field row in the modal; server may omit `clientId` until `withClientIds` runs. */
-export type FieldRow = Record<string, unknown> & {
+export type FieldRow = Record< string, unknown > & {
 	clientId: string;
 	type?: string;
 	title?: string;
@@ -21,7 +21,7 @@ export interface CatalogItem {
 	locked?: boolean;
 	description?: string;
 	icon?: string;
-	[key: string]: unknown;
+	[ key: string ]: unknown;
 }
 
 export interface CatalogGroup {
@@ -50,7 +50,7 @@ export interface FieldModalContextPayload {
 	fields?: FieldRow[];
 	catalog?: CatalogItem[];
 	catalog_groups?: CatalogGroup[];
-	group?: Record<string, unknown>;
+	group?: Record< string, unknown >;
 	conditions_pro_enabled?: boolean;
 	conditional_repeater_unlocked?: boolean;
 	conditional_repeater_show_upsell?: boolean;
@@ -78,7 +78,7 @@ export interface FieldFormApiLike {
 	reset: ( values?: FieldRow ) => void;
 }
 
-export type SchemaObject = Record<string, unknown>;
+export type SchemaObject = Record< string, unknown >;
 
 /** Props for typed field editors. */
 export interface FieldEditorBaseProps {

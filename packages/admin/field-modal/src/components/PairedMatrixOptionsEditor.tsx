@@ -39,10 +39,7 @@ export function PairedMatrixOptionsEditor( {
 		} );
 	};
 
-	const updateRow = (
-		index: number,
-		patch: Partial< MatrixOptionRow >
-	) => {
+	const updateRow = ( index: number, patch: Partial< MatrixOptionRow > ) => {
 		setRows(
 			rows.map( ( r, i ) => ( i === index ? { ...r, ...patch } : r ) )
 		);
@@ -57,7 +54,8 @@ export function PairedMatrixOptionsEditor( {
 	};
 
 	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
-	const moveDown = ( index: number ) => setRows( arrayMove( rows, index, 1 ) );
+	const moveDown = ( index: number ) =>
+		setRows( arrayMove( rows, index, 1 ) );
 
 	const toggleFixed = ( index: number, checked: boolean ) => {
 		updateRow( index, { isfixed: checked ? 'on' : '' } );

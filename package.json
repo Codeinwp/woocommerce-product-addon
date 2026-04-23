@@ -52,8 +52,8 @@
     "test:unit:php:setup:debug": "wp-env start --xdebug",
     "test:unit:php": "wp-env run --env-cwd='wp-content/plugins/woocommerce-product-addon' tests-wordpress vendor/bin/phpunit -c phpunit.xml --verbose",
     "lint": "wp-scripts lint-js ./js/",
-    "lint:fix": "wp-scripts lint-js --fix ./js",
-    "format": "wp-scripts format ./js"
+    "lint:fix": "wp-scripts lint-js --fix ./js ./packages",
+    "format": "wp-scripts format ./js ./packages"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.34.0",

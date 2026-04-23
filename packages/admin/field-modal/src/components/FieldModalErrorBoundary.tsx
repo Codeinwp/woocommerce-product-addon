@@ -34,11 +34,17 @@ export class FieldModalErrorBoundary extends Component<
 	override render() {
 		if ( this.state.hasError ) {
 			return (
-                <Alert.Root status="error" variant="subtle" borderRadius="md" my={ 4 }>
-                    <Alert.Indicator />
-                    <VStack align="stretch" gap={ 2 }>
+				<Alert.Root
+					status="error"
+					variant="subtle"
+					borderRadius="md"
+					my={ 4 }
+				>
+					<Alert.Indicator />
+					<VStack align="stretch" gap={ 2 }>
 						<Text fontSize="sm">
-							The field modal hit an unexpected error. Reload the page to try again.
+							The field modal hit an unexpected error. Reload the
+							page to try again.
 						</Text>
 						<Button
 							size="sm"
@@ -49,8 +55,8 @@ export class FieldModalErrorBoundary extends Component<
 							Reload page
 						</Button>
 					</VStack>
-                </Alert.Root>
-            );
+				</Alert.Root>
+			);
 		}
 		return this.props.children;
 	}

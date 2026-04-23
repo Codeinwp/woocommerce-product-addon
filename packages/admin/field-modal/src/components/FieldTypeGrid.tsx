@@ -23,14 +23,13 @@ function FieldTypeGridComponent( {
 	onFieldHover,
 }: FieldTypeGridProps ) {
 	return (
-        <SimpleGrid
-			columns={ { base: 2, sm: 3, md: 3 } }
-			gap="15px"
-		>
-            { fields.map( ( f: CatalogItem ) => {
+		<SimpleGrid columns={ { base: 2, sm: 3, md: 3 } } gap="15px">
+			{ fields.map( ( f: CatalogItem ) => {
 				const locked = Boolean( f.locked );
 				const iconClass = f.icon ? `fa ${ f.icon }` : 'fa fa-circle';
-				const phpDesc = f.description ? String( f.description ).trim() : '';
+				const phpDesc = f.description
+					? String( f.description ).trim()
+					: '';
 				const guide = getFieldGuide( f.slug );
 				const tooltipText = guide
 					? firstSentence( guide.longDescription )
@@ -70,7 +69,11 @@ function FieldTypeGridComponent( {
 						onBlur={ () => onFieldHover?.( null ) }
 						onClick={ () => {
 							if ( locked && upsellUrl ) {
-								window.open( upsellUrl, '_blank', 'noopener,noreferrer' );
+								window.open(
+									upsellUrl,
+									'_blank',
+									'noopener,noreferrer'
+								);
 								return;
 							}
 							if ( ! locked ) {
@@ -108,25 +111,25 @@ function FieldTypeGridComponent( {
 								 * Decorative badge only: the tile `Button` opens the upsell URL.
 								 */
 								css={ {
-                                    position: 'absolute',
-                                    top: 0,
-                                    right: 0,
-                                    zIndex: 2,
-                                    background: '#28A745',
-                                    p: '2px 6px',
-                                    borderRadius: '3px',
-                                    lineHeight: 1.2,
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    columnGap: '5px',
-                                    color: 'white',
-                                    fontSize: '12px',
+									position: 'absolute',
+									top: 0,
+									right: 0,
+									zIndex: 2,
+									background: '#28A745',
+									p: '2px 6px',
+									borderRadius: '3px',
+									lineHeight: 1.2,
+									display: 'inline-flex',
+									alignItems: 'center',
+									columnGap: '5px',
+									color: 'white',
+									fontSize: '12px',
 
-                                    '& & .fa': {
+									'& & .fa': {
 										color: 'white',
 										fontSize: '12px',
-									}
-                                } }
+									},
+								} }
 							>
 								<i className="fa fa-lock" aria-hidden="true" />
 								{ i18n.proBadge }
@@ -136,8 +139,8 @@ function FieldTypeGridComponent( {
 				);
 
 				return (
-                    <Fragment key={ f.slug }>
-                        { tooltipText ? (
+					<Fragment key={ f.slug }>
+						{ tooltipText ? (
 							<Tooltip
 								content={ tooltipText }
 								openDelay={ 300 }
@@ -149,11 +152,11 @@ function FieldTypeGridComponent( {
 						) : (
 							button
 						) }
-                    </Fragment>
-                );
+					</Fragment>
+				);
 			} ) }
-        </SimpleGrid>
-    );
+		</SimpleGrid>
+	);
 }
 
 export const FieldTypeGrid = memo( FieldTypeGridComponent );

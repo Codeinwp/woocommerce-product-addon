@@ -17,7 +17,8 @@ export function UnknownSlugPanel( {
 	ppomFieldIndex,
 }: UnknownSlugPanelProps ) {
 	const title =
-		i18n.unknownFieldTypeTitle || 'This field type is not supported here yet.';
+		i18n.unknownFieldTypeTitle ||
+		'This field type is not supported here yet.';
 	const hint =
 		i18n.unknownFieldTypeHint ||
 		'Use the classic PPOM editor for this field, or contact the extension author.';

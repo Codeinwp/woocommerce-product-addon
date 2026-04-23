@@ -84,7 +84,11 @@ export function SettingsConditionsTabs( {
 					<Box w="100%">{ settings }</Box>
 				</Tabs.Content>
 				{ hasConditions ? (
-					<Tabs.Content value={ conditionsTabValue } px={ 0 } pt={ 0 }>
+					<Tabs.Content
+						value={ conditionsTabValue }
+						px={ 0 }
+						pt={ 0 }
+					>
 						<Box w="100%">{ conditions }</Box>
 					</Tabs.Content>
 				) : null }

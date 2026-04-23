@@ -18,8 +18,8 @@ function FieldPickerPanelComponent( {
 	license,
 }: FieldPickerPanelProps ) {
 	return (
-        <VStack align="stretch" gap={ 2 }>
-            { catalogGroups.length > 0 ? (
+		<VStack align="stretch" gap={ 2 }>
+			{ catalogGroups.length > 0 ? (
 				<FieldTypePicker
 					catalogGroups={ catalogGroups }
 					query={ pickerQuery }
@@ -35,8 +35,8 @@ function FieldPickerPanelComponent( {
 					{ i18n.noFieldTypes || 'No field types are available.' }
 				</Alert.Root>
 			) }
-        </VStack>
-    );
+		</VStack>
+	);
 }
 
 export const FieldPickerPanel = memo( FieldPickerPanelComponent );
