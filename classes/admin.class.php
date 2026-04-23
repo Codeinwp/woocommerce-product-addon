@@ -657,7 +657,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		);
 
 		// Check if there are more results beyond this page.
-		$count_args          = $term_args;
+		$count_args           = $term_args;
 		$count_args['fields'] = 'count';
 		unset( $count_args['number'], $count_args['offset'] );
 		$total_count = (int) get_terms( $count_args );

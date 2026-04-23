@@ -200,12 +200,12 @@ class PPOM_Fields_Meta {
 			'loader'            => PPOM_URL . '/images/loading.gif',
 			'ppomProActivated'  => ppom_pro_is_installed() && PPOM()->is_license_of_type( 'pro' ) ? 'yes' : 'no',
 			'attach'            => array(
-				'searchAction'            => 'ppom_search_products',
-				'productsPlaceholder'     => __( 'Search products...', 'woocommerce-product-addon' ),
-				'searchCategoriesAction'  => 'ppom_search_categories',
-				'categoriesPlaceholder'   => __( 'Search categories...', 'woocommerce-product-addon' ),
-				'searchTagsAction'        => 'ppom_search_tags',
-				'tagsPlaceholder'         => __( 'Search tags...', 'woocommerce-product-addon' ),
+				'searchAction'           => 'ppom_search_products',
+				'productsPlaceholder'    => __( 'Search products...', 'woocommerce-product-addon' ),
+				'searchCategoriesAction' => 'ppom_search_categories',
+				'categoriesPlaceholder'  => __( 'Search categories...', 'woocommerce-product-addon' ),
+				'searchTagsAction'       => 'ppom_search_tags',
+				'tagsPlaceholder'        => __( 'Search tags...', 'woocommerce-product-addon' ),
 			),
 			'i18n'              => array(
 				'addGroupUrl'            => esc_url( add_query_arg( array( 'action' => 'new' ) ) ),
