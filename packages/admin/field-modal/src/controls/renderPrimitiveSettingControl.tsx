@@ -2,6 +2,7 @@ import { CheckboxControl } from './CheckboxControl';
 import { ColorControl } from './ColorControl';
 import { DateControl } from './DateControl';
 import { NumberControl } from './NumberControl';
+import { OptionsDropdownControl } from './OptionsDropdownControl';
 import { SelectControl } from './SelectControl';
 import { SwitchControl } from './SwitchControl';
 import { TextControl } from './TextControl';
@@ -18,6 +19,8 @@ export function renderPrimitiveSettingControl(
 			return <TextareaControl { ...props } />;
 		case 'select':
 			return <SelectControl { ...props } />;
+		case 'options-dropdown':
+			return <OptionsDropdownControl { ...props } />;
 		case 'checkbox':
 			return <CheckboxControl { ...props } />;
 		case 'switch':

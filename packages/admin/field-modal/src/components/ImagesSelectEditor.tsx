@@ -1,10 +1,11 @@
 /**
  * Inline editor for pre-uploaded images (image + imageselect field types).
+ * Mini media-manager: empty-state dropzone, 2-row image cards, drag-to-reorder.
  */
-import { Box, Button, Text, VStack } from '@chakra-ui/react';
-import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
+import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import { LuImagePlus, LuLibrary, LuPlus } from 'react-icons/lu';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
-import { arrayMove } from '../utils/arrayMove';
 import {
 	type ImageOptionRow,
 	type ImagesSelectVariant,
@@ -48,6 +49,28 @@ export interface ImagesSelectEditorProps {
 	variant?: ImagesSelectVariant;
 }
 
+type MediaFrame = ReturnType< NonNullable< NonNullable< Window[ 'wp' ] >[ 'media' ] > >;
+
+type AttachmentLike = {
+	url?: unknown;
+	id?: unknown;
+	title?: unknown;
+	filename?: unknown;
+};
+
+function toImageRowFromAttachment( attachment: AttachmentLike ): ImageOptionRow {
+	const url = String( attachment.url ?? '' );
+	const imageTitle = String(
+		attachment.title ?? attachment.filename ?? ''
+	);
+	return {
+		...emptyImageRow(),
+		link: url,
+		id: String( attachment.id ?? '' ),
+		title: imageTitle,
+	};
+}
+
 export function ImagesSelectEditor( {
 	values,
 	onChange,
@@ -72,6 +95,46 @@ export function ImagesSelectEditor( {
 		);
 	};
 
+	const removeRow = ( index: number ) => {
+		setRows( rows.filter( ( _, i ) => i !== index ) );
+	};
+
+	const moveUp = ( index: number ) => {
+		if ( index <= 0 ) return;
+		const next = [ ...rows ];
+		[ next[ index - 1 ], next[ index ] ] = [
+			next[ index ],
+			next[ index - 1 ],
+		];
+		setRows( next );
+	};
+
+	const moveDown = ( index: number ) => {
+		if ( index >= rows.length - 1 ) return;
+		const next = [ ...rows ];
+		[ next[ index + 1 ], next[ index ] ] = [
+			next[ index ],
+			next[ index + 1 ],
+		];
+		setRows( next );
+	};
+
+	/**
+	 * Move `from` to `slot`, where slot is the insertion index in [0, rows.length].
+	 * slot=0 → before first, slot=rows.length → after last.
+	 */
+	const reorder = ( from: number, slot: number ) => {
+		if ( from < 0 || from >= rows.length ) return;
+		if ( slot < 0 || slot > rows.length ) return;
+		// After removing `from`, slots to its right collapse by one.
+		const adjusted = slot > from ? slot - 1 : slot;
+		if ( adjusted === from ) return;
+		const next = [ ...rows ];
+		const [ moved ] = next.splice( from, 1 );
+		next.splice( adjusted, 0, moved );
+		setRows( next );
+	};
+
 	// Release the lock if this editor unmounts while a media frame is open.
 	const holdingLockRef = useRef( false );
 	useEffect(
@@ -84,7 +147,12 @@ export function ImagesSelectEditor( {
 		[]
 	);
 
-	const addImagesFromMedia = () => {
+	const openMediaFrame = ( options: {
+		multiple: boolean;
+		frameTitle?: string;
+		buttonText?: string;
+		onSelect: ( attachments: AttachmentLike[] ) => void;
+	} ) => {
 		if ( ! window.wp?.media ) {
 			return;
 		}
@@ -103,11 +171,19 @@ export function ImagesSelectEditor( {
 			}
 		};
 
-		const frame = window.wp.media( {
-			title: i18n.imagesMediaTitle || 'Choose Images',
+		const frame: MediaFrame = window.wp.media( {
+			title:
+				options.frameTitle ||
+				i18n.imagesMediaTitle ||
+				'Choose Images',
 			library: { type: 'image' },
-			button: { text: i18n.imagesMediaButton || 'Select' },
-			multiple: true,
+			button: {
+				text:
+					options.buttonText ||
+					i18n.imagesMediaButton ||
+					'Select',
+			},
+			multiple: options.multiple,
 		} );
 
 		frame.on( 'open', acquireLock );
@@ -117,24 +193,8 @@ export function ImagesSelectEditor( {
 			const attachments = frame
 				.state()
 				.get( 'selection' )
-				.toJSON() as Array< Record< string, unknown > >;
-
-			const newRows: ImageOptionRow[] = attachments.map(
-				( attachment ) => {
-					const url = String( attachment.url ?? '' );
-					const imageTitle = String(
-						attachment.title ?? attachment.filename ?? ''
-					);
-					return {
-						...emptyImageRow(),
-						link: url,
-						id: String( attachment.id ?? '' ),
-						title: imageTitle,
-					};
-				}
-			);
-
-			setRows( [ ...rows, ...newRows ] );
+				.toJSON() as AttachmentLike[];
+			options.onSelect( attachments );
 		} );
 
 		try {
@@ -146,61 +206,212 @@ export function ImagesSelectEditor( {
 		}
 	};
 
-	const removeRow = ( index: number ) => {
-		setRows( rows.filter( ( _, i ) => i !== index ) );
+	const addImagesFromMedia = () => {
+		openMediaFrame( {
+			multiple: true,
+			onSelect: ( attachments ) => {
+				setRows( [
+					...rows,
+					...attachments.map( toImageRowFromAttachment ),
+				] );
+			},
+		} );
 	};
 
-	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
-	const moveDown = ( index: number ) =>
-		setRows( arrayMove( rows, index, 1 ) );
+	const replaceImageAt = ( index: number ) => {
+		openMediaFrame( {
+			multiple: false,
+			frameTitle: i18n.imagesReplaceTitle || 'Replace image',
+			buttonText: i18n.imagesReplaceButton || 'Replace',
+			onSelect: ( attachments ) => {
+				const next = attachments[ 0 ];
+				if ( ! next ) return;
+				updateRow( index, {
+					link: String( next.url ?? '' ),
+					id: String( next.id ?? '' ),
+				} );
+			},
+		} );
+	};
 
-	const isImageselect = variant === 'imageselect';
-	const pricePlaceholder = isImageselect
-		? i18n.imagesPrice || 'Price'
-		: i18n.imagesPricePlaceholder || 'Price (fix or %)';
+	// Drag-and-drop reorder state. `dragIndexRef` mirrors state so handleDrop
+	// can read the source index synchronously even if React hasn't committed
+	// the re-render from `setDragIndex` before the drop event fires.
+	const [ dragIndex, setDragIndex ] = useState< number | null >( null );
+	const dragIndexRef = useRef< number | null >( null );
+
+	const handleDragStart = ( idx: number ) => {
+		dragIndexRef.current = idx;
+		setDragIndex( idx );
+	};
+	const handleDragEnd = () => {
+		dragIndexRef.current = null;
+		setDragIndex( null );
+	};
+	const handleDrop = ( slot: number ) => {
+		const from = dragIndexRef.current;
+		if ( from !== null ) {
+			reorder( from, slot );
+		}
+		dragIndexRef.current = null;
+		setDragIndex( null );
+	};
+
+	const isEmpty = rows.length === 0;
+	const sectionHelper =
+		i18n.imagesSectionHelper ||
+		'Upload or choose the images that can be shown for this field.';
 
 	return (
 		<Box
-			borderWidth="1px"
-			borderColor="gray.200"
-			borderRadius="md"
-			p={ 3 }
 			bg="white"
+			borderRadius="md"
+			px={ { base: 2.5, md: 3 } }
+			py={ 2.5 }
+			minW={ 0 }
 		>
-			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
-				{ title }
-			</Text>
-			<Button
-				size="sm"
-				colorPalette="blue"
-				mb={ 3 }
-				onClick={ addImagesFromMedia }
+			<HStack
+				justify="space-between"
+				align="center"
+				gap={ 3 }
+				pb={ 1 }
+				mb={ 2 }
+				borderBottomWidth="1px"
+				borderBottomColor="gray.100"
 			>
-				{ i18n.imagesSelectUpload || 'Select/Upload Image' }
-			</Button>
-			{ rows.length === 0 && (
-				<Text fontSize="xs" color="gray.500">
-					{ i18n.imagesEmptyState ||
-						'No images selected. Click the button above to add images.' }
-				</Text>
+				<VStack align="start" gap={ 0 } flex="1" minW={ 0 }>
+					<Text
+						as="h3"
+						fontSize="11px"
+						fontWeight="700"
+						color="gray.500"
+						textTransform="uppercase"
+						letterSpacing="0.08em"
+					>
+						{ title }
+					</Text>
+					<Text fontSize="xs" color="gray.500" mt={ 0.5 }>
+						{ sectionHelper }
+					</Text>
+				</VStack>
+				{ ! isEmpty ? (
+					<Button
+						size="sm"
+						variant="ghost"
+						color="blue.600"
+						_hover={ { bg: 'blue.50' } }
+						onClick={ addImagesFromMedia }
+					>
+						<LuPlus />
+						{ i18n.imagesAddMore || 'Add image' }
+					</Button>
+				) : null }
+			</HStack>
+
+			{ isEmpty ? (
+				<EmptyState
+					i18n={ i18n }
+					onUpload={ addImagesFromMedia }
+					onBrowse={ addImagesFromMedia }
+				/>
+			) : (
+				<Box mt={ 2 }>
+					{ rows.map( ( row, index ) => (
+						<Box
+							key={ index }
+							borderBottomWidth={
+								index === rows.length - 1 ? 0 : '1px'
+							}
+							borderBottomColor="gray.100"
+						>
+							<ImageRowItem
+								row={ row }
+								index={ index }
+								isFirst={ index === 0 }
+								isLast={ index === rows.length - 1 }
+								variant={ variant }
+								i18n={ i18n }
+								onPatch={ updateRow }
+								onMoveUp={ moveUp }
+								onMoveDown={ moveDown }
+								onRemove={ removeRow }
+								onReplace={ replaceImageAt }
+								dragIndex={ dragIndex }
+								onDragStart={ handleDragStart }
+								onDragEnd={ handleDragEnd }
+								onDrop={ handleDrop }
+							/>
+						</Box>
+					) ) }
+					<Text fontSize="11px" color="gray.400" mt={ 2 }>
+						{ rows.length === 1
+							? i18n.imagesFooterSingular || '1 image'
+							: (
+									i18n.imagesFooterPlural ||
+									'{count} images'
+								).replace( '{count}', String( rows.length ) ) }
+					</Text>
+				</Box>
 			) }
-			<VStack align="stretch" gap={ 3 }>
-				{ rows.map( ( row, index ) => (
-					<ImageRowItem
-						key={ index }
-						row={ row }
-						index={ index }
-						isFirst={ index === 0 }
-						isLast={ index === rows.length - 1 }
-						variant={ variant }
-						i18n={ i18n }
-						pricePlaceholder={ pricePlaceholder }
-						onPatch={ updateRow }
-						onMoveUp={ moveUp }
-						onMoveDown={ moveDown }
-						onRemove={ removeRow }
-					/>
-				) ) }
+		</Box>
+	);
+}
+
+interface EmptyStateProps {
+	i18n: I18nDict;
+	onUpload: () => void;
+	onBrowse: () => void;
+}
+
+function EmptyState( { i18n, onUpload, onBrowse }: EmptyStateProps ) {
+	return (
+		<Box
+			mt={ 3 }
+			borderWidth="1.5px"
+			borderStyle="dashed"
+			borderColor="gray.300"
+			borderRadius="lg"
+			bg="gray.50"
+			px={ 6 }
+			py={ 8 }
+		>
+			<VStack gap={ 3 } textAlign="center">
+				<Box color="gray.400">
+					<LuImagePlus size={ 32 } />
+				</Box>
+				<VStack gap={ 1 }>
+					<Text fontWeight="semibold" fontSize="sm" color="gray.700">
+						{ i18n.imagesEmptyTitle ||
+							'Add images to this field' }
+					</Text>
+					<Text fontSize="xs" color="gray.500" maxW="380px">
+						{ i18n.imagesEmptyDescription ||
+							'Upload from your device or pick from the media library.' }
+					</Text>
+				</VStack>
+				<HStack gap={ 2 }>
+					<Button
+						size="sm"
+						colorPalette="blue"
+						onClick={ onUpload }
+					>
+						<LuImagePlus />
+						{ i18n.imagesUploadButton || 'Upload images' }
+					</Button>
+					<Button
+						size="sm"
+						variant="outline"
+						onClick={ onBrowse }
+					>
+						<LuLibrary />
+						{ i18n.imagesLibraryButton ||
+							'Choose from library' }
+					</Button>
+				</HStack>
+				<Text fontSize="xs" color="gray.400">
+					{ i18n.imagesEmptySupport ||
+						'JPG, PNG, WebP or SVG · 800×800 recommended' }
+				</Text>
 			</VStack>
 		</Box>
 	);

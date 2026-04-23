@@ -46,7 +46,7 @@ export function PairedOptionRowItem( {
 					w="auto"
 					placeholder={ i18n.pairedOptionLabel || 'Option' }
 					value={ String( row.option ?? row.title ?? '' ) }
-					onValueChange={ ( e ) =>
+					onChange={ ( e ) =>
 						onPatch( index, { option: e.target.value } )
 					}
 				/>
@@ -57,7 +57,7 @@ export function PairedOptionRowItem( {
 					w="auto"
 					placeholder={ i18n.pairedOptionPrice || 'Price' }
 					value={ String( row.price ?? '' ) }
-					onValueChange={ ( e ) =>
+					onChange={ ( e ) =>
 						onPatch( index, { price: e.target.value } )
 					}
 				/>
@@ -76,7 +76,7 @@ export function PairedOptionRowItem( {
 					w="auto"
 					placeholder={ i18n.pairedOptionWeight || 'Weight' }
 					value={ String( row.weight ?? '' ) }
-					onValueChange={ ( e ) =>
+					onChange={ ( e ) =>
 						onPatch( index, { weight: e.target.value } )
 					}
 				/>
@@ -87,7 +87,7 @@ export function PairedOptionRowItem( {
 					w="auto"
 					placeholder={ i18n.pairedOptionStock || 'Stock' }
 					value={ String( row.stock ?? '' ) }
-					onValueChange={ ( e ) =>
+					onChange={ ( e ) =>
 						onPatch( index, { stock: e.target.value } )
 					}
 				/>
@@ -102,7 +102,7 @@ export function PairedOptionRowItem( {
 							: i18n.pairedOptionImageId || 'Image ID'
 					}
 					value={ String( row.id ?? row.images ?? '' ) }
-					onValueChange={ ( e ) =>
+					onChange={ ( e ) =>
 						onPatch( index, { id: e.target.value } )
 					}
 				/>

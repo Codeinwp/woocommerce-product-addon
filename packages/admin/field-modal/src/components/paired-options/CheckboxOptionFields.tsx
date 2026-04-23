@@ -24,7 +24,7 @@ export function CheckboxOptionFields( {
 				w="auto"
 				placeholder={ i18n.pairedOptionDiscount || 'Discount' }
 				value={ String( row.discount ?? '' ) }
-				onValueChange={ ( e ) =>
+				onChange={ ( e ) =>
 					onPatch( index, { discount: e.target.value } )
 				}
 			/>
@@ -35,7 +35,7 @@ export function CheckboxOptionFields( {
 				w="auto"
 				placeholder={ i18n.pairedOptionTooltip || 'Tooltip' }
 				value={ String( row.tooltip ?? '' ) }
-				onValueChange={ ( e ) =>
+				onChange={ ( e ) =>
 					onPatch( index, { tooltip: e.target.value } )
 				}
 			/>

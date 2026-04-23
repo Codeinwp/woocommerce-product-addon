@@ -570,10 +570,10 @@ function selectSettings(): SettingSchema {
 			)
 		),
 		selected: setting(
-			'text',
+			'options-dropdown',
 			__( 'Selected option', 'woocommerce-product-addon' ),
 			__(
-				'Type option name given in (Add Options) tab if you want already selected.',
+				'Pick which option is pre-selected by default.',
 				'woocommerce-product-addon'
 			)
 		),
@@ -685,10 +685,10 @@ function radioSettings(): SettingSchema {
 			)
 		),
 		selected: setting(
-			'text',
+			'options-dropdown',
 			__( 'Selected option', 'woocommerce-product-addon' ),
 			__(
-				'Type option name given in (Add Options) tab if you want already selected.',
+				'Pick which option is pre-selected by default.',
 				'woocommerce-product-addon'
 			)
 		),
@@ -737,10 +737,10 @@ function switcherSettings(): SettingSchema {
 			)
 		),
 		selected: setting(
-			'text',
+			'options-dropdown',
 			__( 'Selected option', 'woocommerce-product-addon' ),
 			__(
-				'Type option name given in (Add Options) tab if you want already selected.',
+				'Pick which option is pre-selected by default.',
 				'woocommerce-product-addon'
 			)
 		),

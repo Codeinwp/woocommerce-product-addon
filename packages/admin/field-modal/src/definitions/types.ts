@@ -47,6 +47,7 @@ export type SettingMetaType =
 	| 'textarea'
 	| 'checkbox'
 	| 'select'
+	| 'options-dropdown'
 	| 'number'
 	| 'date'
 	| 'switch'
