@@ -16,17 +16,26 @@ class PPOM_ELEMENTOR {
 
 	/**
 	 * Class Instance var
+	 *
+	 * @var self|null
 	 */
 	private static $_instance = null;
 
 
+	/**
+	 * Hooks Elementor integration after plugins load.
+	 *
+	 * @return void
+	 */
 	public function __construct() {
-		add_action( 'plugins_loaded', [ $this, 'load' ] );
+		add_action( 'plugins_loaded', array( $this, 'load' ) );
 	}
 
 
 	/**
-	 * An instance of the class.
+	 * Singleton accessor.
+	 *
+	 * @return self
 	 */
 	public static function instance() {
 
@@ -40,17 +49,21 @@ class PPOM_ELEMENTOR {
 
 	/**
 	 * Checks if Elementor has installed & loaded
+	 *
+	 * @return void
 	 */
 	public function load() {
 
 		if ( $this->is_compatible() ) {
-			add_action( 'elementor/init', [ $this, 'init' ] );
+			add_action( 'elementor/init', array( $this, 'init' ) );
 		}
 	}
 
 
 	/**
 	 * Compatibility Checks
+	 *
+	 * @return bool
 	 */
 	public function is_compatible() {
 
@@ -65,19 +78,21 @@ class PPOM_ELEMENTOR {
 
 	/**
 	 * Initialize the Class
+	 *
+	 * @return void
 	 */
 	public function init() {
 
 		// $frontend = \Elementor\Plugin::$instance->frontend->has_elementor_in_page();
 
 		// Register New Weidget
-		add_action( 'elementor/widgets/widgets_registered', [ $this, 'init_widgets' ] );
+		add_action( 'elementor/widgets/widgets_registered', array( $this, 'init_widgets' ) );
 
 		// Register New Controls
 		// add_action( 'elementor/controls/controls_registered', [ $this, 'init_controls' ] );
 
 		// Register Widget Styles
-		add_action( 'elementor/frontend/after_enqueue_styles', [ $this, 'widget_styles' ] );
+		add_action( 'elementor/frontend/after_enqueue_styles', array( $this, 'widget_styles' ) );
 	}
 
 
@@ -85,6 +100,8 @@ class PPOM_ELEMENTOR {
 	 * Init Widgets
 	 *
 	 * Include widgets files and register them
+	 *
+	 * @return void
 	 */
 	public function init_widgets() {
 
@@ -98,6 +115,8 @@ class PPOM_ELEMENTOR {
 
 	/**
 	 * Load Widgets Styles
+	 *
+	 * @return void
 	 */
 	public function widget_styles() {
 		wp_enqueue_style( 'ppom-main' );

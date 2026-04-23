@@ -1,41 +1,41 @@
 <?php
 /**
- * Changleog Handler
+ * Parses Themeisle-style changelog markdown into structured release data.
  *
- * Handles parsing for Changelog files.
- *
+ * @package PPOM
+ * @subpackage Backend
  */
 
 /**
- * Class PPOM_Changelog_Handler
+ * Markdown changelog parser for in-admin release notes.
  */
 class PPOM_Changelog_Handler {
 	/**
-	 * Get the parsed changelog.
+	 * Reads and parses a changelog file into release buckets (fixes, features, tweaks).
 	 *
-	 * @param string $changelog_path the changelog path.
+	 * @param string $changelog_path Absolute filesystem path to the changelog file.
 	 *
-	 * @return array
+	 * @return list<array<string, mixed>>
 	 */
 	public function get_changelog( $changelog_path ) {
 
 		if ( ! is_file( $changelog_path ) ) {
-			return [];
+			return array();
 		}
 
 		if ( ! WP_Filesystem() ) {
-			return [];
+			return array();
 		}
 
 		return $this->parse_changelog( $changelog_path );
 	}
 
 	/**
-	 * Return the releases changes array.
+	 * Parses changelog lines into ordered release entries.
 	 *
-	 * @param string $changelog_path the changelog path.
+	 * @param string $changelog_path Absolute path to the changelog file.
 	 *
-	 * @return array $releases - changelog.
+	 * @return list<array<string, mixed>>
 	 */
 	private function parse_changelog( $changelog_path ) {
 		WP_Filesystem();
@@ -45,7 +45,7 @@ class PPOM_Changelog_Handler {
 			$changelog = '';
 		}
 		$changelog     = explode( PHP_EOL, $changelog );
-		$releases      = [];
+		$releases      = array();
 		$release_count = 0;
 
 		foreach ( $changelog as $changelog_line ) {
@@ -53,7 +53,7 @@ class PPOM_Changelog_Handler {
 				continue;
 			}
 			if ( substr( ltrim( $changelog_line ), 0, 4 ) === '####' ) {
-				$release_count ++;
+				++$release_count;
 
 				preg_match( '/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/', $changelog_line, $found_v );
 				preg_match( '/[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/', $changelog_line, $found_d );
@@ -91,11 +91,11 @@ class PPOM_Changelog_Handler {
 	}
 
 	/**
-	 * Parse markdown links and cleanup string.
+	 * Normalizes a changelog line and converts markdown links to HTML anchors.
 	 *
-	 * @param string $string changelog line.
+	 * @param string $string Raw line content.
 	 *
-	 * @return string
+	 * @return string HTML-safe text with inline markdown links converted to anchor tags.
 	 */
 	private function parse_md_and_clean( $string ) {
 		// Drop spaces, starting lines | asterisks.

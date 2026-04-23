@@ -10,13 +10,14 @@
     "textdomain": "woocommerce-product-addon"
   },
   "devDependencies": {
-    "@playwright/test": "^1.48.0",
+    "@playwright/test": "^1.58.2",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@wordpress/e2e-test-utils-playwright": "^1.9.0",
-    "@wordpress/env": "^10.9.0",
-    "@wordpress/scripts": "27.9.0",
+    "@wordpress/env": "^11.2.0",
+    "@wordpress/eslint-plugin": "^24.4.0",
+    "@wordpress/scripts": "31.7.0",
     "conventional-changelog-simple-preset": "^1.0.20",
     "grunt": "^1.5.3",
     "grunt-version": "^3.0.0",
@@ -36,11 +37,13 @@
     "build:grunt": "grunt build",
     "grunt": "grunt",
     "wp-env": "wp-env",
-    "env:after:setup": "bash ./bin/e2e-after-setup.sh",
     "test:e2e": "wp-scripts test-playwright --config tests/e2e/playwright.config.js",
     "test:e2e:debug": "wp-scripts test-playwright --config tests/e2e/playwright.config.js --ui",
-    "test:unit:php:setup": "wp-env start",
+    "env:setup": "wp-env start",
     "test:unit:php:setup:debug": "wp-env start --xdebug",
-    "test:unit:php": "wp-env run --env-cwd='wp-content/plugins/woocommerce-product-addon' tests-wordpress vendor/bin/phpunit -c phpunit.xml --verbose"
+    "test:unit:php": "wp-env run --env-cwd='wp-content/plugins/woocommerce-product-addon' tests-wordpress vendor/bin/phpunit -c phpunit.xml --verbose",
+    "lint": "wp-scripts lint-js ./js/",
+    "lint:fix": "wp-scripts lint-js --fix ./js",
+    "format": "wp-scripts format ./js"
   }
 }

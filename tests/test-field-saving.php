@@ -11,9 +11,6 @@ class Test_Field_Saving extends WP_UnitTestCase {
      * Test if the saved categories are in a backward compatible format and tags in a serialized format.
      */
     public function test_saving_categories_compatibilities() {
-        global $wpdb;
-        
-        $table_name = $wpdb->prefix . PPOM_TABLE_META;
         $data = array(
             'productmeta_name' => 'Test Multiple Categories',
             'productmeta_validation' => '',
@@ -29,15 +26,13 @@ class Test_Field_Saving extends WP_UnitTestCase {
             'productmeta_tags' => 'a:1:{i:0;s:8:"test-tag";}'
         );
 
-        // Insert data into the table
-        $result = $wpdb->insert($table_name, $data);
-        $this->assertNotFalse( $result );
-        
-        $field_id = $wpdb->insert_id;
+        $format   = array_fill( 0, count( $data ), '%s' );
+        $field_id = ppom_meta_repository()->insert_group( $data, $format );
+        $this->assertGreaterThan( 0, $field_id );
 
         NM_PersonalizedProduct_Admin::save_categories_and_tags( $field_id, ['accessories', 'clothing', 'test-cat'], false );
         
-        $saved_data = $wpdb->get_row( $wpdb->prepare( "SELECT productmeta_categories, productmeta_tags FROM $table_name WHERE productmeta_id = %d", $field_id ), ARRAY_A );
+        $saved_data = ppom_meta_repository()->get_categories_and_tags_columns( $field_id );
        
         $expected_categories = "accessories\r\nclothing\r\ntest-cat";
         $this->assertEquals( $expected_categories, $saved_data['productmeta_categories'] );

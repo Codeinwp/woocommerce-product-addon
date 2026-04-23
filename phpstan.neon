@@ -1,8 +1,16 @@
 parameters:
-	level: 6
+	level: 8
+	bootstrapFiles:
+		- %currentWorkingDirectory%/phpstan-bootstrap-ppom.php
 	dynamicConstantNames:
 		- WC_VERSION
+		- PPOM_PATH
+		- PPOM_URL
+		- PPOM_WP_PLUGIN_DIR
+		- PPOM_UPLOAD_DIR_NAME
+		- PPOM_PRODUCT_SLUG
 	paths:
+		- %currentWorkingDirectory%/src
 		- %currentWorkingDirectory%/inc
 		- %currentWorkingDirectory%/classes
 		- %currentWorkingDirectory%/backend

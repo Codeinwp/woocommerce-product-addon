@@ -1,10 +1,14 @@
 <?php
-/*
- * Following class handling date input control and their
-* dependencies. Do not make changes in code
-* Create on: 9 November, 2013
-*/
+/**
+ * Date field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * Date picker (HTML5 or jQuery UI) with format, min/max, weekends/past rules, and conditional logic.
+ */
 class NM_Date_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -17,6 +21,11 @@ class NM_Date_wooproduct extends PPOM_Inputs {
 	*/
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata and loads the field settings schema.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -25,9 +34,13 @@ class NM_Date_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'regular date input', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-calendar" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 
 		$input_meta = array(
@@ -103,7 +116,7 @@ class NM_Date_wooproduct extends PPOM_Inputs {
 				'title'       => __( 'Year Range', 'woocommerce-product-addon' ),
 				'desc'        => sprintf(
 					// translators: %1%s: the current year date, %2%s the next yar date.
-					esc_html__( '[ This feature requires jQuery datePicker ] Years to allow date selections. Example: c-10:c+10. TIP: The letter "c" indicates the current year so "c+1" will indicate next year.  Thus c:c+1 will be %1$s:%2$s', 'woocommerce-product-addon'),
+					esc_html__( '[ This feature requires jQuery datePicker ] Years to allow date selections. Example: c-10:c+10. TIP: The letter "c" indicates the current year so "c+1" will indicate next year.  Thus c:c+1 will be %1$s:%2$s', 'woocommerce-product-addon' ),
 					date( 'Y' ),
 					date( 'Y', strtotime( '+1 year' ) )
 				),

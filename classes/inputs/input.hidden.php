@@ -1,10 +1,14 @@
 <?php
-/*
- * Followig class handling hidden input control and their
-* dependencies. Do not make changes in code
-* Create on: 9 November, 2013
-*/
+/**
+ * Hidden field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * Hidden value submitted with the product; optional cart display and role-based visibility.
+ */
 class NM_Hidden_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -17,6 +21,11 @@ class NM_Hidden_wooproduct extends PPOM_Inputs {
 	*/
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata and loads the field settings schema.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -25,10 +34,14 @@ class NM_Hidden_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'regular hidden input', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-hashtag" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 
 		$input_meta = array(
