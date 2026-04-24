@@ -14,10 +14,16 @@ export function FieldTypeUpsellSidebar( {
 	upsell,
 }: FieldTypeUpsellSidebarProps ) {
 	return (
-		<VStack align="center" gap={ 3 } p={ 3 } bg="gray.50" borderRadius="lg">
+		<VStack
+			align="center"
+			gap={ 2 }
+			p={ 2.5 }
+			bg="gray.50"
+			borderRadius="lg"
+		>
 			<Flex
-				w={ 14 }
-				h={ 14 }
+				w={ 11 }
+				h={ 11 }
 				borderRadius="full"
 				bg="blue.500"
 				align="center"
@@ -26,24 +32,38 @@ export function FieldTypeUpsellSidebar( {
 			>
 				<span
 					className="dashicons dashicons-lock"
-					style={ { fontSize: 28, width: 28, height: 28 } }
+					style={ { fontSize: 22, width: 22, height: 22 } }
 					aria-hidden
 				/>
 			</Flex>
-			<Text fontWeight="bold" fontSize="lg" textAlign="center">
+			<Text
+				fontWeight="bold"
+				fontSize="md"
+				lineHeight="1.25"
+				m={ 0 }
+				textAlign="center"
+			>
 				{ upsell.title }
 			</Text>
-			<Text fontSize="sm" color="gray.700" textAlign="center">
+			<Text
+				fontSize="sm"
+				color="gray.700"
+				lineHeight="1.4"
+				m={ 0 }
+				textAlign="center"
+			>
 				{ upsell.intro }
 			</Text>
-			<VStack align="stretch" gap={ 2 } w="full" fontSize="sm">
+			<VStack align="stretch" gap={ 1.5 } w="full" fontSize="sm">
 				{ ( upsell.features || [] ).map(
 					( line: string, i: number ) => (
-						<HStack key={ i } align="flex-start">
-							<Text color="green.500" fontWeight="bold">
+						<HStack key={ i } align="flex-start" gap={ 2 }>
+							<Text color="green.500" fontWeight="bold" m={ 0 }>
 								✓
 							</Text>
-							<Text>{ line }</Text>
+							<Text lineHeight="1.35" m={ 0 }>
+								{ line }
+							</Text>
 						</HStack>
 					)
 				) }
@@ -56,9 +76,9 @@ export function FieldTypeUpsellSidebar( {
 				width="full"
 				justifyContent="center"
 				alignItems="center"
-				minH="40px"
+				minH="36px"
 				px={ 4 }
-				py={ 2 }
+				py={ 1.5 }
 				borderRadius="md"
 				bg="green.500"
 				color="white"
