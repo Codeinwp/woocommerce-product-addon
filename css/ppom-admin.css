@@ -1360,7 +1360,7 @@ a.ppom-attach-upsell-upgrade {
 }
 
 .ppom-popup-title {
-    font-size: 2.5em;
+    font-size: 1.5em;
     margin: 0;
     line-height: 1.3;
 
@@ -1398,6 +1398,14 @@ a.ppom-attach-upsell-upgrade {
 
 .ppom-popup-actions .ppom-btn-cancel {
     background-color: #6c757d;
+}
+
+.ppom-popup-actions .ppom-btn-confirm {
+    background-color: #ff0f0f;
+}
+
+.ppom-popup-actions .ppom-btn-confirm:hover {
+    background-color: #ef6060;
 }
 
 .ppom-popup.ppom-error .ppom-popup-title {
