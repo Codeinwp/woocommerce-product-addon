@@ -4,7 +4,7 @@
 export type BulkQuantityRow = Record< string, string >;
 
 export function parseOptionsRaw( raw: unknown ): BulkQuantityRow[] {
-	if ( raw == null || raw === '' ) {
+	if ( raw === null || raw === undefined || raw === '' ) {
 		return [];
 	}
 	if ( typeof raw === 'string' ) {
@@ -19,13 +19,13 @@ export function parseOptionsRaw( raw: unknown ): BulkQuantityRow[] {
 		return raw.map( ( row ) => {
 			if ( ! row || typeof row !== 'object' || Array.isArray( row ) ) {
 				return {};
-			}
-			const o: BulkQuantityRow = {};
-			for ( const [ k, v ] of Object.entries( row ) ) {
-				o[ k ] = v == null ? '' : String( v );
-			}
-			return o;
-		} );
+				}
+				const o: BulkQuantityRow = {};
+				for ( const [ k, v ] of Object.entries( row ) ) {
+					o[ k ] = v === null || v === undefined ? '' : String( v );
+				}
+				return o;
+			} );
 	}
 	return [];
 }

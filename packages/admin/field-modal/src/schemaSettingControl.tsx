@@ -46,6 +46,7 @@ export function renderSettingRow(
 				i18n={ i18n }
 				builderFields={ builderFields }
 				conditionsProEnabled={ conditionsProEnabled }
+				links={ ctx.links || {} }
 			/>
 		);
 	}

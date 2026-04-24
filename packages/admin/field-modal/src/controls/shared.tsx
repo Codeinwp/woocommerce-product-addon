@@ -76,7 +76,7 @@ export function renderHelperText(
 }
 
 export function renderMetaLink( link: unknown ): JSX.Element | null {
-	if ( link == null || link === '' ) {
+	if ( link === null || link === undefined || link === '' ) {
 		return null;
 	}
 	return (

@@ -23,6 +23,7 @@
     "@wordpress/element": "^6.43.0",
     "@wordpress/env": "^11.2.0",
     "@wordpress/eslint-plugin": "^24.4.0",
+    "@wordpress/i18n": "^6.16.0",
     "@wordpress/scripts": "31.7.0",
     "conventional-changelog-simple-preset": "^1.0.20",
     "grunt": "^1.5.3",
@@ -51,7 +52,8 @@
     "env:setup": "wp-env start",
     "test:unit:php:setup:debug": "wp-env start --xdebug",
     "test:unit:php": "wp-env run --env-cwd='wp-content/plugins/woocommerce-product-addon' tests-wordpress vendor/bin/phpunit -c phpunit.xml --verbose",
-    "lint": "wp-scripts lint-js ./js/",
+    "lint": "wp-scripts lint-js ./js ./packages",
+    "lint:modal": "wp-scripts lint-js ./packages/admin/field-modal/src",
     "lint:fix": "wp-scripts lint-js --fix ./js ./packages",
     "format": "wp-scripts format ./js ./packages"
   },

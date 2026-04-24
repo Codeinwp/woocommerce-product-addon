@@ -43,7 +43,7 @@ function coerceQuantityRow( item: unknown ): QuantityOptionRow {
 export function normalizePairedQuantityOptions(
 	raw: unknown
 ): QuantityOptionRow[] {
-	if ( raw == null || raw === '' ) {
+	if ( raw === null || raw === undefined || raw === '' ) {
 		return [];
 	}
 	if ( Array.isArray( raw ) ) {

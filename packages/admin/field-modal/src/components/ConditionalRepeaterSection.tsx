@@ -22,10 +22,11 @@ export function ConditionalRepeaterSection( {
 }: ConditionalRepeaterSectionProps ) {
 	const unlocked = modalContext?.conditionalRepeaterUnlocked === true;
 	const showUpsell = modalContext?.conditionalRepeaterShowUpsell === true;
+	const links = modalContext?.links || {};
 
 	const title = i18n.cfrSectionTitle || 'Conditional Repeater';
-	const upgradeUrl = i18n.cfrUpgradeUrl || '';
-	const demoUrl = i18n.cfrViewDemoUrl || '';
+	const upgradeUrl = links.cfrUpgradeUrl || '';
+	const demoUrl = links.cfrViewDemoUrl || '';
 
 	if ( unlocked && values && onChange ) {
 		return (

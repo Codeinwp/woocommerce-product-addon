@@ -109,6 +109,7 @@ export function ConditionalRepeaterMappingEditor( {
 			<EnableSwitch
 				enabled={ enabled }
 				i18n={ i18n }
+				docsUrl={ modalContext?.links.cfrDocsUrl || '' }
 				onToggle={ setEnabled }
 			/>
 			<Box

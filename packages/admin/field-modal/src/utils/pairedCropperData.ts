@@ -29,7 +29,7 @@ function coerceCropperRow( item: unknown ): CropperViewportRow {
 export function normalizePairedCropperOptions(
 	raw: unknown
 ): CropperViewportRow[] {
-	if ( raw == null || raw === '' ) {
+	if ( raw === null || raw === undefined || raw === '' ) {
 		return [];
 	}
 	if ( Array.isArray( raw ) ) {

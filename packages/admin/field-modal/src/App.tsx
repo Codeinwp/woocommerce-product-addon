@@ -2,6 +2,7 @@
  * Field modal: grouped picker, typed or schema fallback editor, save via admin REST.
  */
 import { useMemo } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { useFieldModalController } from './hooks/useFieldModalController';
 import { useConfirmClose } from './hooks/useConfirmClose';
 import { FieldModalFrame } from './components/FieldModalFrame';
@@ -57,23 +58,15 @@ export function App( { productmetaId }: AppProps ) {
 	};
 
 	const modalTitle = useMemo( () => {
-		const base = i18n.newFieldModal || 'PPOM fields';
+		const base = __( 'PPOM fields', 'woocommerce-product-addon' );
 		if ( pickerOpen || ! fieldTypeLabel ) {
 			return base;
 		}
-		const tpl = i18n.fieldModalTitleWithType;
-		if ( tpl && tpl.includes( '%1$s' ) ) {
-			return tpl
-				.replace( '%1$s', base )
-				.replace( '%2$s', fieldTypeLabel );
-		}
-		return `${ base } · ${ fieldTypeLabel }`;
-	}, [
-		pickerOpen,
-		fieldTypeLabel,
-		i18n.newFieldModal,
-		i18n.fieldModalTitleWithType,
-	] );
+		const tpl =
+			/* translators: 1: modal title, 2: selected field type label. */
+			__( '%1$s · %2$s', 'woocommerce-product-addon' );
+		return sprintf( tpl, base, fieldTypeLabel );
+	}, [ pickerOpen, fieldTypeLabel ] );
 
 	const canGoBack =
 		! pickerOpen &&
@@ -102,7 +95,7 @@ export function App( { productmetaId }: AppProps ) {
 				) : undefined
 			}
 			onBack={ canGoBack ? onBackToFieldTypes : undefined }
-			backLabel={ i18n.back || 'Back' }
+			backLabel={ __( 'Back', 'woocommerce-product-addon' ) }
 		>
 			<FieldModalBody
 				status={ { loading, error } }

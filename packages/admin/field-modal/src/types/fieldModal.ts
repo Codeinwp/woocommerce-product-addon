@@ -3,7 +3,7 @@
  */
 import type { ComponentType, Dispatch, SetStateAction } from 'react';
 
-/** UI strings from REST `i18n` payload. */
+/** Static UI strings owned by the React modal. */
 export type I18nDict = Record< string, string >;
 
 /** One field row in the modal; server may omit `clientId` until `withClientIds` runs. */
@@ -44,9 +44,16 @@ export interface ModalUpsellPayload {
 
 export type LicensePayload = Record< string, unknown >;
 
+/** Runtime URLs supplied by PHP because they may be filtered or license-aware. */
+export interface FieldModalLinks {
+	cfrDocsUrl?: string;
+	cfrUpgradeUrl?: string;
+	cfrViewDemoUrl?: string;
+	conditionUpgradeUrl?: string;
+}
+
 /** `GET ppom/v1/admin/field-groups/context` response. */
 export interface FieldModalContextPayload {
-	i18n?: I18nDict;
 	fields?: FieldRow[];
 	catalog?: CatalogItem[];
 	catalog_groups?: CatalogGroup[];
@@ -56,6 +63,7 @@ export interface FieldModalContextPayload {
 	conditional_repeater_show_upsell?: boolean;
 	upsell?: ModalUpsellPayload | null;
 	license?: LicensePayload | null;
+	links?: FieldModalLinks;
 }
 
 export interface ModalContextValue {
@@ -63,6 +71,7 @@ export interface ModalContextValue {
 	conditionsProEnabled: boolean;
 	conditionalRepeaterUnlocked: boolean;
 	conditionalRepeaterShowUpsell: boolean;
+	links: FieldModalLinks;
 }
 
 export interface FieldFormApiLike {
@@ -108,6 +117,7 @@ export interface SettingRowContext {
 	conditionsProEnabled?: boolean;
 	conditionalRepeaterUnlocked?: boolean;
 	conditionalRepeaterShowUpsell?: boolean;
+	links?: FieldModalLinks;
 }
 
 export interface PpomFieldModalBoot {

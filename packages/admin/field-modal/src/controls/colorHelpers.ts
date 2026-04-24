@@ -58,7 +58,9 @@ export function normalizeStoredColorToHex6( raw: string ): string {
 }
 
 export function colorFromStoredValue( raw: unknown ) {
-	const hex = normalizeStoredColorToHex6( raw == null ? '' : String( raw ) );
+	const hex = normalizeStoredColorToHex6(
+		raw === null || raw === undefined ? '' : String( raw )
+	);
 	return parseColor( hex );
 }
 

@@ -3,7 +3,7 @@
  */
 import { VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
-import type { FieldRow, I18nDict } from './types/fieldModal';
+import type { FieldModalLinks, FieldRow, I18nDict } from './types/fieldModal';
 import {
 	buildConditionsTargets,
 	emptyRule,
@@ -23,6 +23,7 @@ export interface ConditionsEditorProps {
 	i18n: I18nDict;
 	builderFields?: FieldRow[];
 	conditionsProEnabled?: boolean;
+	links?: FieldModalLinks;
 }
 
 export function ConditionsEditor( {
@@ -32,6 +33,7 @@ export function ConditionsEditor( {
 	i18n,
 	builderFields = [],
 	conditionsProEnabled = false,
+	links = {},
 }: ConditionsEditorProps ) {
 	const title = meta.title ? String( meta.title ) : 'Conditions';
 	const desc = meta.desc ? String( meta.desc ) : '';
@@ -45,7 +47,7 @@ export function ConditionsEditor( {
 		String( values.data_name || '' )
 	);
 	const operatorGroups = buildOperatorGroups( i18n );
-	const upgradeUrl = i18n.conditionUpgradeUrl || '';
+	const upgradeUrl = links.conditionUpgradeUrl || '';
 	const upgradeCta = i18n.conditionUpgradeCta || 'Upgrade to unlock';
 
 	const setConditions = ( nextCond: unknown ) => {

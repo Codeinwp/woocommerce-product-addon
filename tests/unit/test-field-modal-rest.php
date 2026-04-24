@@ -51,6 +51,13 @@ class Test_Field_Modal_Rest extends PPOM_Test_Case {
 		$this->assertNotEmpty( $data['catalog_groups'], 'catalog_groups must mirror admin field picker groups.' );
 		$this->assertArrayHasKey( 'license', $data );
 		$this->assertArrayHasKey( 'upsell', $data );
+		$this->assertArrayHasKey( 'links', $data );
+		$this->assertIsArray( $data['links'] );
+		$this->assertArrayHasKey( 'cfrDocsUrl', $data['links'] );
+		$this->assertArrayHasKey( 'cfrUpgradeUrl', $data['links'] );
+		$this->assertArrayHasKey( 'cfrViewDemoUrl', $data['links'] );
+		$this->assertArrayHasKey( 'conditionUpgradeUrl', $data['links'] );
+		$this->assertArrayNotHasKey( 'i18n', $data, 'Static React modal copy should not be shipped in REST context.' );
 		$this->assertArrayHasKey( 'conditions_pro_enabled', $data );
 		$this->assertIsBool( $data['conditions_pro_enabled'] );
 		$this->assertArrayHasKey( 'conditional_repeater_unlocked', $data );
@@ -67,6 +74,8 @@ class Test_Field_Modal_Rest extends PPOM_Test_Case {
 		$first_group = $data['catalog_groups'][0];
 		$this->assertArrayHasKey( 'id', $first_group );
 		$this->assertArrayHasKey( 'label', $first_group );
+		$this->assertIsString( $first_group['label'] );
+		$this->assertNotSame( '', $first_group['label'], 'Field group labels must remain PHP/provider-owned.' );
 		$this->assertArrayHasKey( 'fields', $first_group );
 		$this->assertNotEmpty( $first_group['fields'] );
 		$field0 = $first_group['fields'][0];

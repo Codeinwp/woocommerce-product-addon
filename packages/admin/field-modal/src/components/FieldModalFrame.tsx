@@ -3,6 +3,7 @@
  */
 import type { ReactNode } from 'react';
 import { useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { Box, Button, Dialog, HStack, Portal, Text } from '@chakra-ui/react';
 import { LuArrowLeft } from 'react-icons/lu';
 import { useMediaFrameLocked } from '../utils/mediaLock';
@@ -125,7 +126,11 @@ export function FieldModalFrame( {
 											pl={ 0 }
 										>
 											<LuArrowLeft />
-											{ backLabel || 'Back' }
+											{ backLabel ||
+												__(
+													'Back',
+													'woocommerce-product-addon'
+												) }
 										</Button>
 										<Text as="span" truncate>
 											{ title }

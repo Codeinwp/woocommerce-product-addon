@@ -65,7 +65,8 @@ export function LegacyAdvancedFieldStack( {
 	const hideLabel = i18n.hideAdvancedSettings || 'Hide advanced settings';
 
 	const insertionIdx =
-		advancedInsertion != null &&
+		advancedInsertion !== null &&
+		advancedInsertion !== undefined &&
 		typeof advancedInsertionAfterIndex === 'number' &&
 		advancedInsertionAfterIndex >= 0
 			? advancedInsertionAfterIndex

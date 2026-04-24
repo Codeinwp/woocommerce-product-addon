@@ -2,6 +2,7 @@
  * Grouped field type picker with Pro locks and optional upsell sidebar.
  */
 import { useMemo, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { Box, Flex, Tabs, Text, VStack } from '@chakra-ui/react';
 import { FieldTypeGrid } from './components/FieldTypeGrid';
 import { FieldTypeUpsellSidebar } from './components/FieldTypeUpsellSidebar';
@@ -89,7 +90,7 @@ export function FieldTypePicker( {
 								value={ ALL_GROUPS_TAB_VALUE }
 								px={ 4 }
 							>
-								{ i18n.allTab }
+								{ __( 'All', 'woocommerce-product-addon' ) }
 							</Tabs.Trigger>
 							{ ( catalogGroups || [] ).map( ( g, tabIdx ) => (
 								<Tabs.Trigger
@@ -114,7 +115,10 @@ export function FieldTypePicker( {
 								<Box w="100%">
 									{ filteredGroups.length === 0 && (
 										<Text color="gray.600">
-											{ i18n.noTypesMatch }
+											{ __(
+												'No types match your search.',
+												'woocommerce-product-addon'
+											) }
 										</Text>
 									) }
 									{ filteredGroups.map( ( group, fgIdx ) => (
@@ -163,7 +167,10 @@ export function FieldTypePicker( {
 										>
 											{ groupFields.length === 0 ? (
 												<Text color="gray.600">
-													{ i18n.noTypesMatch }
+													{ __(
+														'No types match your search.',
+														'woocommerce-product-addon'
+													) }
 												</Text>
 											) : (
 												<FieldTypeGrid

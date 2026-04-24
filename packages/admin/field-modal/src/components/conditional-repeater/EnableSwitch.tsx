@@ -4,10 +4,16 @@ import type { I18nDict } from '../../types/fieldModal';
 export interface EnableSwitchProps {
 	enabled: boolean;
 	i18n: I18nDict;
+	docsUrl: string;
 	onToggle: ( on: boolean ) => void;
 }
 
-export function EnableSwitch( { enabled, i18n, onToggle }: EnableSwitchProps ) {
+export function EnableSwitch( {
+	enabled,
+	i18n,
+	docsUrl,
+	onToggle,
+}: EnableSwitchProps ) {
 	return (
 		<Field.Root
 			display="flex"
@@ -34,9 +40,9 @@ export function EnableSwitch( { enabled, i18n, onToggle }: EnableSwitchProps ) {
 				>
 					{ i18n.cfrEnableLabel || 'Enable Conditional Repeat' }
 				</Field.Label>
-				{ i18n.cfrDocsUrl ? (
+				{ docsUrl ? (
 					<Link
-						href={ i18n.cfrDocsUrl }
+						href={ docsUrl }
 						fontSize="xs"
 						color="blue.700"
 						target="_blank"

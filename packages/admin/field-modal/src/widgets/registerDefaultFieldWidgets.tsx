@@ -40,7 +40,7 @@ registerFieldWidget( {
 		const title = readSettingTitle(
 			ctx.schema,
 			'options',
-			ctx.i18n.selectOptionsTitle || 'Options'
+			ctx.i18n.selectOptionsTitle
 		);
 		return (
 			<PairedOptionsEditor
@@ -59,8 +59,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'audio' ],
 	metaKey: 'audio',
 	metaType: 'pre-audios',
-	titleFallback: ( i18n ) =>
-		i18n.addAudioVideoSectionTitle || 'Audio / Video',
+	titleFallback: ( i18n ) => i18n.addAudioVideoSectionTitle,
 	render: ( { ctx, title } ) => (
 		<AudiosSelectEditor
 			values={ ctx.field }
@@ -76,7 +75,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'images' ],
 	metaKey: 'images',
 	metaType: 'pre-images',
-	titleFallback: ( i18n ) => i18n.addImagesSectionTitle || 'Images',
+	titleFallback: ( i18n ) => i18n.addImagesSectionTitle,
 	render: ( { ctx, title } ) => (
 		<ImagesSelectEditor
 			variant="image"
@@ -93,7 +92,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'images' ],
 	metaKey: 'images',
 	metaType: 'imageselect',
-	titleFallback: ( i18n ) => i18n.addImagesSectionTitle || 'Images',
+	titleFallback: ( i18n ) => i18n.addImagesSectionTitle,
 	render: ( { ctx, title } ) => (
 		<ImagesSelectEditor
 			variant="imageselect"
@@ -113,7 +112,7 @@ registerMetaTypeWidget( {
 			? String( ctx.widgetProps.fieldKey )
 			: 'options',
 	metaType: 'paired-cropper',
-	titleFallback: ( i18n ) => i18n.cropperViewportTitle || 'Viewport Size',
+	titleFallback: ( i18n ) => i18n.cropperViewportTitle,
 	render: ( { ctx, title, description, metaKey } ) => (
 		<PairedCropperEditor
 			fieldKey={ metaKey }
@@ -134,7 +133,7 @@ registerMetaTypeWidget( {
 			? String( ctx.widgetProps.fieldKey )
 			: 'options',
 	metaType: 'paired-quantity',
-	titleFallback: ( i18n ) => i18n.quantityOptionsTitle || 'Options',
+	titleFallback: ( i18n ) => i18n.quantityOptionsTitle,
 	render: ( { ctx, title, description, metaKey } ) => (
 		<PairedQuantityEditor
 			fieldKey={ metaKey }
@@ -152,7 +151,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'options' ],
 	metaKey: 'options',
 	metaType: 'paired',
-	titleFallback: ( i18n ) => i18n.fixedPriceOptionsTitle || 'Quantity',
+	titleFallback: ( i18n ) => i18n.fixedPriceOptionsTitle,
 	render: ( { ctx, title, meta } ) => (
 		<PairedFixedPriceEditor
 			values={ ctx.field }
@@ -178,7 +177,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'options' ],
 	metaKey: 'options',
 	metaType: 'paired-switch',
-	titleFallback: ( i18n ) => i18n.selectOptionsTitle || 'Options',
+	titleFallback: ( i18n ) => i18n.selectOptionsTitle,
 	render: ( { ctx, title } ) => (
 		<PairedOptionsEditor
 			variant="switcher"
@@ -195,7 +194,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'options' ],
 	metaKey: 'options',
 	metaType: 'paired-palettes',
-	titleFallback: ( i18n ) => i18n.palettesOptionsTitle || 'Add colors',
+	titleFallback: ( i18n ) => i18n.palettesOptionsTitle,
 	render: ( { ctx, title } ) => (
 		<PairedMatrixOptionsEditor
 			values={ ctx.field }
@@ -211,7 +210,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'options' ],
 	metaKey: 'options',
 	metaType: 'paired-pricematrix',
-	titleFallback: ( i18n ) => i18n.priceMatrixOptionsTitle || 'Price matrix',
+	titleFallback: ( i18n ) => i18n.priceMatrixOptionsTitle,
 	render: ( { ctx, title } ) => (
 		<PairedMatrixOptionsEditor
 			values={ ctx.field }
@@ -227,7 +226,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'options' ],
 	metaKey: 'options',
 	metaType: 'bulk-quantity',
-	titleFallback: ( i18n ) => i18n.bulkQuantityOptionsTitle || 'Bulk quantity',
+	titleFallback: ( i18n ) => i18n.bulkQuantityOptionsTitle,
 	render: ( { ctx, title } ) => (
 		<BulkQuantityMatrixEditor
 			values={ ctx.field }
@@ -243,7 +242,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'options' ],
 	metaKey: 'options',
 	metaType: 'fonts_paired',
-	titleFallback: ( i18n ) => i18n.fontsOptionsTitle || 'Font Families',
+	titleFallback: ( i18n ) => i18n.fontsOptionsTitle,
 	render: ( { ctx, title } ) => (
 		<FontsPairedEditor
 			values={ ctx.field }
@@ -259,7 +258,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'options' ],
 	metaKey: 'options',
 	metaType: 'chained_options',
-	titleFallback: ( i18n ) => i18n.selectOptionsTitle || 'Options',
+	titleFallback: ( i18n ) => i18n.selectOptionsTitle,
 	render: ( { ctx, title } ) => (
 		<ChainedOptionsEditor
 			values={ ctx.field }
@@ -275,7 +274,7 @@ registerMetaTypeWidget( {
 	ownedKeys: [ 'images' ],
 	metaKey: 'images',
 	metaType: 'conditional-images',
-	titleFallback: ( i18n ) => i18n.imagesMediaTitle || 'Select images',
+	titleFallback: ( i18n ) => i18n.imagesMediaTitle,
 	render: ( { ctx, title } ) => (
 		<ImagesSelectEditor
 			variant="conditional-meta"
@@ -294,7 +293,7 @@ registerMetaTypeWidget( {
 	metaType: 'vqmatrix-colunm',
 	extraGuard: ( ctx ) =>
 		readSettingMeta( ctx.schema, 'row_options' )?.type === 'vqmatrix-row',
-	titleFallback: ( i18n ) => i18n.priceMatrixOptionsTitle || 'Matrix options',
+	titleFallback: ( i18n ) => i18n.priceMatrixOptionsTitle,
 	render: ( { ctx, title } ) => (
 		<VqMatrixEditor
 			values={ ctx.field }

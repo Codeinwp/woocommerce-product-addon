@@ -2,6 +2,7 @@
  * Header controls for the field type picker step.
  */
 import { Box, HStack, Input, Text } from '@chakra-ui/react';
+import { __ } from '@wordpress/i18n';
 import { LuSearch } from 'react-icons/lu';
 import type { I18nDict } from '../types/fieldModal';
 
@@ -25,7 +26,7 @@ export function FieldPickerHeader( {
 				lineHeight="1.2"
 				whiteSpace="nowrap"
 			>
-				{ i18n.selectFieldType }
+				{ __( 'Select field type', 'woocommerce-product-addon' ) }
 			</Text>
 			<Box position="relative" w="300px" maxW="100%">
 				<Box
@@ -46,7 +47,10 @@ export function FieldPickerHeader( {
 					bg="white"
 					fontWeight="400"
 					ps={ 9 }
-					placeholder={ i18n.searchFieldTypes }
+					placeholder={ __(
+						'Search field types…',
+						'woocommerce-product-addon'
+					) }
 					value={ query }
 					onChange={ ( e ) => onQueryChange( e.currentTarget.value ) }
 				/>

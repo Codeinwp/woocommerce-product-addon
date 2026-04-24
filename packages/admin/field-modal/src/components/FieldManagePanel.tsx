@@ -2,6 +2,7 @@
  * Manage step: empty state or active field editor (typed, fallback, or unsupported).
  */
 import { Steps, Box, Button, VStack, Text } from '@chakra-ui/react';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { FieldManageEditorBridge } from './FieldManageEditorBridge';
 import type { FieldModalManageStepProps } from '../types/fieldModal';
 
@@ -21,8 +22,19 @@ export function FieldManagePanel( {
 	modalContext,
 	onOpenPicker,
 }: FieldManagePanelProps ) {
+	const fieldCountLabel = sprintf(
+		/* translators: %d: number of fields in the current field group. */
+		_n(
+			'%d field',
+			'%d fields',
+			fields.length,
+			'woocommerce-product-addon'
+		),
+		fields.length
+	);
+
 	return (
-		<Box minH="220px">
+		<Box minH="220px" role="region" aria-label={ fieldCountLabel }>
 			{ fields.length === 0 && (
 				<VStack
 					align="stretch"
@@ -31,8 +43,10 @@ export function FieldManagePanel( {
 					pt={ 0 }
 				>
 					<Text fontSize="sm" color="gray.600" lineHeight="1.6">
-						{ i18n.manageFieldsEmpty ||
-							'No fields yet. Use Add field above or choose a field type below.' }
+						{ __(
+							'No fields yet. Use Add field above or choose a field type below.',
+							'woocommerce-product-addon'
+						) }
 					</Text>
 					<Button
 						size="sm"
@@ -40,7 +54,10 @@ export function FieldManagePanel( {
 						alignSelf="flex-start"
 						onClick={ onOpenPicker }
 					>
-						{ i18n.openAddFieldType || 'Choose field type' }
+						{ __(
+							'Choose field type',
+							'woocommerce-product-addon'
+						) }
 					</Button>
 				</VStack>
 			) }

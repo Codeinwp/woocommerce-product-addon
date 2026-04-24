@@ -2,7 +2,6 @@
  * State, effects, and handlers for the PPOM React field modal.
  */
 import type { Dispatch, SetStateAction } from 'react';
-import { __ } from '@wordpress/i18n';
 import {
 	useCallback,
 	useEffect,
@@ -21,27 +20,25 @@ import { readGroupFromForm } from '../utils/legacyGroupForm';
 import { createInitialModalState, modalReducer } from '../state/modalReducer';
 import { errorMessage } from '../utils/errorMessage';
 import { stableStringifyFieldRow } from '../utils/fieldFormSync';
+import { fieldModalI18n } from '../i18n';
 import type {
 	FieldModalContextPayload,
 	FieldRow,
+	I18nDict,
 	ModalContextValue,
 } from '../types/fieldModal';
 
 function getFieldSaveValidationError(
 	fields: FieldRow[],
-	i18n: FieldModalContextPayload[ 'i18n' ]
+	i18n: I18nDict
 ): string {
-	const requiredMessage =
-		i18n?.dataNameRequired ||
-		__( 'Data Name must be required', 'woocommerce-product-addon' );
-
 	for ( const field of fields ) {
 		if ( ! Object.prototype.hasOwnProperty.call( field, 'data_name' ) ) {
 			continue;
 		}
 
 		if ( String( field.data_name || '' ).trim() === '' ) {
-			return requiredMessage;
+			return i18n.dataNameRequired;
 		}
 	}
 
@@ -146,7 +143,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 	}, [ editDraft?.type ] );
 
 	const ctx = state.ctx;
-	const i18n = ctx?.i18n || {};
+	const i18n = fieldModalI18n;
 	const isDirty = useMemo( () => {
 		return (
 			state.dirtyClientIds.length > 0 ||
@@ -162,9 +159,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 			const t = String( type ).toLowerCase();
 			dispatch( { type: 'SET_SCHEMA_FETCH_ERROR', message: '' } );
 			dispatch( { type: 'SET_SCHEMA_LOADING', loading: true } );
-			const emptyMsg =
-				i18n.schemaEmptyResponse ||
-				'The server did not return settings for this field type.';
+			const emptyMsg = i18n.schemaEmptyResponse;
 			try {
 				const schema = await fetchFieldTypeSchema( t );
 				if ( schema ) {
@@ -286,7 +281,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		dispatch( { type: 'CLEAR_ERROR' } );
 		const saveValidationError = getFieldSaveValidationError(
 			state.fields,
-			ctx.i18n
+			i18n
 		);
 		if ( saveValidationError ) {
 			dispatch( {
@@ -317,7 +312,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		} finally {
 			dispatch( { type: 'SET_SAVING', saving: false } );
 		}
-	}, [ ctx, state.fields, productmetaId ] );
+	}, [ ctx, state.fields, productmetaId, i18n ] );
 
 	const closeModal = useCallback( () => {
 		dispatch( { type: 'CLOSE' } );
@@ -389,12 +384,14 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 				ctx?.conditional_repeater_unlocked === true,
 			conditionalRepeaterShowUpsell:
 				ctx?.conditional_repeater_show_upsell === true,
+			links: ctx?.links || {},
 		} ),
 		[
 			state.fields,
 			ctx?.conditions_pro_enabled,
 			ctx?.conditional_repeater_unlocked,
 			ctx?.conditional_repeater_show_upsell,
+			ctx?.links,
 		]
 	);
 
@@ -402,7 +399,8 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		useCallback(
 			( action ) => {
 				const current =
-					state.selectedId == null
+					state.selectedId === null ||
+					state.selectedId === undefined
 						? null
 						: state.fields.find(
 								( f ) => f.clientId === state.selectedId

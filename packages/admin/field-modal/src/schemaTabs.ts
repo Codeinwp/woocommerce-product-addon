@@ -61,12 +61,14 @@ export function normalizeSelectOptions(
 	if ( Array.isArray( raw ) ) {
 		return raw.map( ( item, i ) => {
 			if ( item && typeof item === 'object' && 'value' in item ) {
-				return {
-					value: String( item.value ),
-					label: String(
-						item.label != null ? item.label : item.value
-					),
-				};
+					return {
+						value: String( item.value ),
+						label: String(
+							item.label !== null && item.label !== undefined
+								? item.label
+								: item.value
+						),
+					};
 			}
 			return { value: String( item ), label: String( item ) };
 		} );

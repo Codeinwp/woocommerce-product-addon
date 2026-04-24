@@ -2,6 +2,7 @@
  * Modal footer: cancel + save actions.
  */
 import { Button, HStack, Dialog } from '@chakra-ui/react';
+import { __ } from '@wordpress/i18n';
 import { LuCheck, LuTriangleAlert, LuX } from 'react-icons/lu';
 import type { I18nDict } from '../types/fieldModal';
 
@@ -27,8 +28,8 @@ export function FieldModalFooter( {
 	onSave,
 }: FieldModalFooterProps ) {
 	const cancelLabel = confirmingCancel
-		? i18n.cancelConfirm || 'Confirm'
-		: i18n.cancel || 'Cancel';
+		? __( 'Confirm', 'woocommerce-product-addon' )
+		: __( 'Cancel', 'woocommerce-product-addon' );
 
 	return (
 		<Dialog.Footer
@@ -57,7 +58,7 @@ export function FieldModalFooter( {
 						disabled={ loading || ! hasCtx }
 					>
 						<LuCheck />
-						{ i18n.save || 'Save' }
+						{ __( 'Save', 'woocommerce-product-addon' ) }
 					</Button>
 				) }
 			</HStack>

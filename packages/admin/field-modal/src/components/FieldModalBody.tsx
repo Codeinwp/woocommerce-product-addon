@@ -9,6 +9,7 @@ import {
 	Text,
 	Spinner,
 } from '@chakra-ui/react';
+import { __ } from '@wordpress/i18n';
 import { LuX } from 'react-icons/lu';
 import { FieldPickerPanel } from './FieldPickerPanel';
 import { FieldManagePanel } from './FieldManagePanel';
@@ -23,7 +24,7 @@ export function FieldModalBody( {
 	manage,
 }: FieldModalBodyProps ) {
 	const { loading, error } = status;
-	const dismissLabel = picker.i18n.dismiss || 'Dismiss';
+	const dismissLabel = __( 'Dismiss', 'woocommerce-product-addon' );
 	return (
 		<Dialog.Body
 			flex="1"
@@ -36,7 +37,9 @@ export function FieldModalBody( {
 			{ loading && (
 				<HStack py={ 8 } justify="center">
 					<Spinner size="md" />
-					<Text>{ picker.i18n.loading || 'Loading…' }</Text>
+					<Text>
+						{ __( 'Loading…', 'woocommerce-product-addon' ) }
+					</Text>
 				</HStack>
 			) }
 			{ error && (
