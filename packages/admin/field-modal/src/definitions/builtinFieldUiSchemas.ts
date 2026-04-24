@@ -1574,12 +1574,18 @@ function texterSettings(): SettingSchema {
 		data_name: dataNameSetting(),
 		description: descriptionSetting(),
 		post_id: setting(
-			'text',
-			__( 'Post ID', 'woocommerce-product-addon' ),
+			'select',
+			__( 'Personalization preview', 'woocommerce-product-addon' ),
 			__(
-				'It will pull preview content from a post.',
+				'Select the name of Personalization preview that you want your users to use.',
 				'woocommerce-product-addon'
-			)
+			),
+			{
+				options: {
+					'': __( 'Select image', 'woocommerce-product-addon' ),
+				},
+				link: '<a href="post-new.php?post_type=nm_ppom_texter" target="_blank">Add new one</a>',
+			}
 		),
 		button_title: setting(
 			'text',

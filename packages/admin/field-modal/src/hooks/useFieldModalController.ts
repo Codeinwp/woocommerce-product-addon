@@ -56,6 +56,10 @@ function serializePersistedField( field: FieldRow ): string {
 	return serializePersistedFields( [ field ] );
 }
 
+function definitionNeedsServerSchema( slug: string ): boolean {
+	return slug === 'texter';
+}
+
 export function useFieldModalController( productmetaId: number | undefined ) {
 	const [ state, dispatch ] = useReducer(
 		modalReducer,
@@ -129,6 +133,9 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		}
 		const definition = getFieldUiDefinition( slug );
 		if ( ! definition?.settings ) {
+			return null;
+		}
+		if ( definitionNeedsServerSchema( slug ) ) {
 			return null;
 		}
 		return {

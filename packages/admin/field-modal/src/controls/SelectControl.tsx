@@ -9,6 +9,7 @@ import {
 	readControlTitle,
 	readControlValue,
 	renderHelperText,
+	renderMetaLink,
 	updateFallbackSettingValue,
 } from './shared';
 
@@ -63,6 +64,7 @@ export function SelectControl( {
 								<NativeSelect.Indicator />
 							</NativeSelect.Root>
 							{ renderHelperText( description ) }
+							{ renderMetaLink( meta.link ) }
 							{ error ? (
 								<Field.ErrorText>
 									{ String( error ) }
@@ -105,6 +107,7 @@ export function SelectControl( {
 				<NativeSelect.Indicator />
 			</NativeSelect.Root>
 			{ renderHelperText( description ) }
+			{ renderMetaLink( meta.link ) }
 		</Field.Root>
 	);
 }
