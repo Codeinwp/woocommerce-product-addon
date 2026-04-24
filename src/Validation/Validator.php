@@ -308,6 +308,11 @@ final class Validator {
 				$first_range  = reset( $ranges );
 				$qty_ranges   = explode( '-', $first_range['raw'] );
 				$min_quantity = $qty_ranges[0];
+
+				// If first options is not in range format, set min quantity to 1.
+				if ( ! isset( $qty_ranges[1] ) ) {
+					$min_quantity = 1;
+				}
 			}
 		}
 
@@ -329,7 +334,7 @@ final class Validator {
 
 				$last_range   = end( $ranges );
 				$qty_ranges   = explode( '-', $last_range['raw'] );
-				$max_quantity = $qty_ranges[1];
+				$max_quantity = isset( $qty_ranges[1] ) ? $qty_ranges[1] : -1;
 			}
 		}
 

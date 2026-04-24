@@ -492,8 +492,8 @@ function ppom_setup_file_upload_input( file_input ) {
 		max_file_size: file_input.file_size,
 		max_file_count: parseInt( file_input.files_allowed ),
 		unique_names: ppom_file_vars.enable_file_rename,
-		chunk_size: '2mb',
 		unique_names: false,
+		chunk_size: '2mb',
 
 		filters: {
 			mime_types: [
@@ -868,8 +868,15 @@ function ppom_setup_file_upload_input( file_input ) {
 			},
 
 			Error( up, err ) {
-				//document.getElementById('console').innerHTML += "\nError #" + err.code + ": " + err.message;
-				alert( '\nError #' + err.code + ': ' + err.message );
+				if ( -600 === err.code && file_input.file_size ) {
+					alert( ppom_file_vars.max_file_size.replace( '%s', file_input.file_size.toUpperCase() )  );
+				} else if ( -601 === err.code && file_input.file_types ) {
+					alert( ppom_file_vars.invalid_file_type);
+				} else if ( -602 === err.code ) {
+					alert( ppom_file_vars.duplicate_file );
+				} else {
+					alert( 'Error #' + err.code + ': ' + err.message );
+				}
 			},
 		},
 	} );
