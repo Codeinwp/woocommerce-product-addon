@@ -27,8 +27,7 @@ function buildOptions(
 	const fromRows: DropdownOption[] = [];
 
 	for ( const row of rows ) {
-		const label =
-			typeof row.option === 'string' ? row.option.trim() : '';
+		const label = typeof row.option === 'string' ? row.option.trim() : '';
 		if ( ! label || seen.has( label ) ) {
 			continue;
 		}

@@ -358,6 +358,7 @@ final class FieldModalRestController {
 				'pairedOptionsRemove'              => __( 'Remove', 'woocommerce-product-addon' ),
 				'pairedOptionsMoveUp'              => __( 'Move up', 'woocommerce-product-addon' ),
 				'pairedOptionsMoveDown'            => __( 'Move down', 'woocommerce-product-addon' ),
+				'pairedOptionsDragHandle'          => __( 'Drag to reorder', 'woocommerce-product-addon' ),
 				'pairedOptionLabel'                => __( 'Option', 'woocommerce-product-addon' ),
 				'pairedOptionPrice'                => __( 'Price', 'woocommerce-product-addon' ),
 				'pairedOptionWeight'               => __( 'Weight', 'woocommerce-product-addon' ),

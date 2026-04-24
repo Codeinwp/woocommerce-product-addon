@@ -23,9 +23,7 @@ export function SwitcherOptionFields( {
 			w="auto"
 			placeholder={ i18n.pairedOptionImageId || 'Image ID' }
 			value={ String( row.image ?? '' ) }
-			onChange={ ( e ) =>
-				onPatch( index, { image: e.target.value } )
-			}
+			onChange={ ( e ) => onPatch( index, { image: e.target.value } ) }
 		/>
 	);
 }

@@ -133,8 +133,8 @@ export function FieldTypePicker( {
 						<Tabs.ContentGroup>
 							<Tabs.Content
 								value={ ALL_GROUPS_TAB_VALUE }
-                px={0}
-                pt={0}
+								px={ 0 }
+								pt={ 0 }
 							>
 								{ /*
 								 * Single wrapper: `Tabs.Content` is forwardAsChild; multiple

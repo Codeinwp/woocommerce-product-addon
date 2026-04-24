@@ -2,11 +2,12 @@
  * MVP editor for schema `options.type === 'paired'` (select, radio, etc.).
  */
 import { Box, Button, Icon, Text, VStack } from '@chakra-ui/react';
-import type { Dispatch, SetStateAction } from 'react';
+import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { LuListChecks, LuPlus } from 'react-icons/lu';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
 import { arrayMove } from '../utils/arrayMove';
+import { arrayReorder } from '../utils/arrayReorder';
 import {
 	type PairedOptionRow,
 	type PairedOptionsVariant,
@@ -66,12 +67,33 @@ export function PairedOptionsEditor( {
 	const moveDown = ( index: number ) =>
 		setRows( arrayMove( rows, index, 1 ) );
 
+	// Drag-and-drop reorder state. `dragIndexRef` mirrors state so handleDrop
+	// can read the source index synchronously even if React hasn't committed
+	// the re-render from `setDragIndex` before the drop event fires.
+	const [ dragIndex, setDragIndex ] = useState< number | null >( null );
+	const dragIndexRef = useRef< number | null >( null );
+
+	const handleDragStart = ( idx: number ) => {
+		dragIndexRef.current = idx;
+		setDragIndex( idx );
+	};
+	const handleDragEnd = () => {
+		dragIndexRef.current = null;
+		setDragIndex( null );
+	};
+	const handleDrop = ( slot: number ) => {
+		const from = dragIndexRef.current;
+		if ( from !== null ) {
+			setRows( arrayReorder( rows, from, slot ) );
+		}
+		dragIndexRef.current = null;
+		setDragIndex( null );
+	};
+
 	const helperText =
-		i18n.pairedOptionsHelper ||
-		'Add the choices customers can select.';
+		i18n.pairedOptionsHelper || 'Add the choices customers can select.';
 	const addLabel = i18n.pairedOptionsAddRow || 'Add option';
-	const addFirstLabel =
-		i18n.pairedOptionsAddFirst || 'Add your first option';
+	const addFirstLabel = i18n.pairedOptionsAddFirst || 'Add your first option';
 	const emptyTitle = i18n.pairedOptionsEmptyTitle || 'No options yet';
 	const emptyDescription =
 		i18n.pairedOptionsEmptyDescription ||
@@ -151,14 +173,16 @@ export function PairedOptionsEditor( {
 							key={ index }
 							row={ row }
 							index={ index }
-							isFirst={ index === 0 }
-							isLast={ index === rows.length - 1 }
 							variant={ variant }
 							i18n={ i18n }
 							onPatch={ updateRow }
 							onMoveUp={ moveUp }
 							onMoveDown={ moveDown }
 							onRemove={ removeRow }
+							dragIndex={ dragIndex }
+							onDragStart={ handleDragStart }
+							onDragEnd={ handleDragEnd }
+							onDrop={ handleDrop }
 						/>
 					) ) }
 					<Button

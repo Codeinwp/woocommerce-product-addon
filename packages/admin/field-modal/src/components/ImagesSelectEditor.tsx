@@ -3,9 +3,16 @@
  * Mini media-manager: empty-state dropzone, 2-row image cards, drag-to-reorder.
  */
 import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import {
+	useEffect,
+	useRef,
+	useState,
+	type Dispatch,
+	type SetStateAction,
+} from 'react';
 import { LuImagePlus, LuLibrary, LuPlus } from 'react-icons/lu';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
+import { arrayReorder } from '../utils/arrayReorder';
 import {
 	type ImageOptionRow,
 	type ImagesSelectVariant,
@@ -49,7 +56,9 @@ export interface ImagesSelectEditorProps {
 	variant?: ImagesSelectVariant;
 }
 
-type MediaFrame = ReturnType< NonNullable< NonNullable< Window[ 'wp' ] >[ 'media' ] > >;
+type MediaFrame = ReturnType<
+	NonNullable< NonNullable< Window[ 'wp' ] >[ 'media' ] >
+>;
 
 type AttachmentLike = {
 	url?: unknown;
@@ -58,11 +67,11 @@ type AttachmentLike = {
 	filename?: unknown;
 };
 
-function toImageRowFromAttachment( attachment: AttachmentLike ): ImageOptionRow {
+function toImageRowFromAttachment(
+	attachment: AttachmentLike
+): ImageOptionRow {
 	const url = String( attachment.url ?? '' );
-	const imageTitle = String(
-		attachment.title ?? attachment.filename ?? ''
-	);
+	const imageTitle = String( attachment.title ?? attachment.filename ?? '' );
 	return {
 		...emptyImageRow(),
 		link: url,
@@ -119,21 +128,8 @@ export function ImagesSelectEditor( {
 		setRows( next );
 	};
 
-	/**
-	 * Move `from` to `slot`, where slot is the insertion index in [0, rows.length].
-	 * slot=0 → before first, slot=rows.length → after last.
-	 */
-	const reorder = ( from: number, slot: number ) => {
-		if ( from < 0 || from >= rows.length ) return;
-		if ( slot < 0 || slot > rows.length ) return;
-		// After removing `from`, slots to its right collapse by one.
-		const adjusted = slot > from ? slot - 1 : slot;
-		if ( adjusted === from ) return;
-		const next = [ ...rows ];
-		const [ moved ] = next.splice( from, 1 );
-		next.splice( adjusted, 0, moved );
-		setRows( next );
-	};
+	const reorder = ( from: number, slot: number ) =>
+		setRows( arrayReorder( rows, from, slot ) );
 
 	// Release the lock if this editor unmounts while a media frame is open.
 	const holdingLockRef = useRef( false );
@@ -173,15 +169,10 @@ export function ImagesSelectEditor( {
 
 		const frame: MediaFrame = window.wp.media( {
 			title:
-				options.frameTitle ||
-				i18n.imagesMediaTitle ||
-				'Choose Images',
+				options.frameTitle || i18n.imagesMediaTitle || 'Choose Images',
 			library: { type: 'image' },
 			button: {
-				text:
-					options.buttonText ||
-					i18n.imagesMediaButton ||
-					'Select',
+				text: options.buttonText || i18n.imagesMediaButton || 'Select',
 			},
 			multiple: options.multiple,
 		} );
@@ -347,9 +338,8 @@ export function ImagesSelectEditor( {
 						{ rows.length === 1
 							? i18n.imagesFooterSingular || '1 image'
 							: (
-									i18n.imagesFooterPlural ||
-									'{count} images'
-								).replace( '{count}', String( rows.length ) ) }
+									i18n.imagesFooterPlural || '{count} images'
+							  ).replace( '{count}', String( rows.length ) ) }
 					</Text>
 				</Box>
 			) }
@@ -381,8 +371,7 @@ function EmptyState( { i18n, onUpload, onBrowse }: EmptyStateProps ) {
 				</Box>
 				<VStack gap={ 1 }>
 					<Text fontWeight="semibold" fontSize="sm" color="gray.700">
-						{ i18n.imagesEmptyTitle ||
-							'Add images to this field' }
+						{ i18n.imagesEmptyTitle || 'Add images to this field' }
 					</Text>
 					<Text fontSize="xs" color="gray.500" maxW="380px">
 						{ i18n.imagesEmptyDescription ||
@@ -390,22 +379,13 @@ function EmptyState( { i18n, onUpload, onBrowse }: EmptyStateProps ) {
 					</Text>
 				</VStack>
 				<HStack gap={ 2 }>
-					<Button
-						size="sm"
-						colorPalette="blue"
-						onClick={ onUpload }
-					>
+					<Button size="sm" colorPalette="blue" onClick={ onUpload }>
 						<LuImagePlus />
 						{ i18n.imagesUploadButton || 'Upload images' }
 					</Button>
-					<Button
-						size="sm"
-						variant="outline"
-						onClick={ onBrowse }
-					>
+					<Button size="sm" variant="outline" onClick={ onBrowse }>
 						<LuLibrary />
-						{ i18n.imagesLibraryButton ||
-							'Choose from library' }
+						{ i18n.imagesLibraryButton || 'Choose from library' }
 					</Button>
 				</HStack>
 				<Text fontSize="xs" color="gray.400">

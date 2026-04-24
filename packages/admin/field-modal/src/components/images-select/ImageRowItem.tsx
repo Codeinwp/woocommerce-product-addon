@@ -142,14 +142,13 @@ export function ImageRowItem( {
 	const patchPriceType = ( nextType: PriceType ) =>
 		onPatch( index, { price: formatPrice( priceAmount, nextType ) } );
 
-	const showDropEdge =
-		isDragActive && ! isBeingDragged && dropEdge !== null;
+	const showDropEdge = isDragActive && ! isBeingDragged && dropEdge !== null;
 	const indicatorShadow =
 		showDropEdge && dropEdge === 'above'
 			? 'inset 0 2px 0 0 var(--chakra-colors-blue-500)'
 			: showDropEdge && dropEdge === 'below'
-				? 'inset 0 -2px 0 0 var(--chakra-colors-blue-500)'
-				: undefined;
+			? 'inset 0 -2px 0 0 var(--chakra-colors-blue-500)'
+			: undefined;
 
 	const rowStyle: CSSProperties = {
 		opacity: isBeingDragged ? 0.4 : 1,
@@ -174,10 +173,9 @@ export function ImageRowItem( {
 			onDragEnd={ handleDragEnd }
 			style={ rowStyle }
 			css={ {
-				'&:hover [data-row-reveal], &:focus-within [data-row-reveal]':
-					{
-						opacity: 1,
-					},
+				'&:hover [data-row-reveal], &:focus-within [data-row-reveal]': {
+					opacity: 1,
+				},
 			} }
 		>
 			<HStack align="center" gap={ 3 }>
@@ -198,9 +196,7 @@ export function ImageRowItem( {
 						onPointerDown={ () => setDraggable( true ) }
 						onPointerUp={ () => setDraggable( false ) }
 						onKeyDown={ handleKeyDown }
-						title={
-							i18n.imagesDragHandle || 'Drag to reorder'
-						}
+						title={ i18n.imagesDragHandle || 'Drag to reorder' }
 					>
 						<LuGripVertical />
 					</IconButton>
@@ -265,12 +261,7 @@ export function ImageRowItem( {
 				</HStack>
 			</HStack>
 
-			<HStack
-				gap={ 3 }
-				mt={ 2 }
-				pl="72px"
-				align="flex-end"
-			>
+			<HStack gap={ 3 } mt={ 2 } pl="72px" align="flex-end">
 				{ isConditionalMeta ? (
 					<>
 						<LabeledField
@@ -360,12 +351,10 @@ export function ImageRowItem( {
 									}
 								>
 									<option value="fixed">
-										{ i18n.imagesPriceTypeFixed ||
-											'Fixed' }
+										{ i18n.imagesPriceTypeFixed || 'Fixed' }
 									</option>
 									<option value="percent">
-										{ i18n.imagesPriceTypePercent ||
-											'%' }
+										{ i18n.imagesPriceTypePercent || '%' }
 									</option>
 								</NativeSelect.Field>
 								<NativeSelect.Indicator />
@@ -374,8 +363,7 @@ export function ImageRowItem( {
 						{ isImageselect ? (
 							<LabeledField
 								label={
-									i18n.imagesDescription ||
-									'Description'
+									i18n.imagesDescription || 'Description'
 								}
 								flex="1"
 								minW={ 0 }
@@ -384,8 +372,7 @@ export function ImageRowItem( {
 									variant="outline"
 									size="sm"
 									placeholder={
-										i18n.imagesDescription ||
-										'Description'
+										i18n.imagesDescription || 'Description'
 									}
 									value={ row.description || '' }
 									onChange={ ( e ) =>
@@ -429,13 +416,7 @@ interface LabeledFieldProps {
 	minW?: number | string;
 }
 
-function LabeledField( {
-	label,
-	children,
-	w,
-	flex,
-	minW,
-}: LabeledFieldProps ) {
+function LabeledField( { label, children, w, flex, minW }: LabeledFieldProps ) {
 	return (
 		<VStack align="stretch" gap={ 1 } w={ w } flex={ flex } minW={ minW }>
 			<Text
@@ -450,4 +431,3 @@ function LabeledField( {
 		</VStack>
 	);
 }
-
