@@ -100,6 +100,7 @@ export const fieldModalTheme = createSystem(
 									borderRadius: '8px',
 									borderWidth: '1px',
 									borderColor: 'rgba(0, 0, 0, 0.1)',
+									overflow: 'hidden',
 									boxShadow:
 										'0 4px 16px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08)',
 								},
@@ -118,6 +119,7 @@ export const fieldModalTheme = createSystem(
 									bg: '#FAFAFA',
 									borderTopWidth: '1px',
 									borderTopColor: '#EFEFEF',
+									borderBottomRadius: '8px',
 									/* Match .ppom-modal-box footer padding. */
 									px: '1em',
 									py: '1em',
