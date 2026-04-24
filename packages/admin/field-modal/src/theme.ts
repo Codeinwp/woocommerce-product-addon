@@ -110,10 +110,9 @@ export const fieldModalTheme = createSystem(
 									fontWeight: '600',
 									fontSize: '1.05rem',
 									color: '#1d2327',
-									/* Match .ppom-modal-box header (ppom-admin.css). */
-									pt: '1.25em',
-									pb: '1.25em',
-									px: '1.5em',
+									pt: '0.75em',
+									pb: '0.75em',
+									px: '1em',
 								},
 								footer: {
 									bg: '#FAFAFA',

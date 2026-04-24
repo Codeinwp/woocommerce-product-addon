@@ -381,16 +381,19 @@ $fields_groups = function_exists( 'ppom_get_admin_field_type_groups' ) ? ppom_ge
 					<thead>
 					<tr>
 						<th colspan="6">
-							<button type="button" class="btn btn-primary"
-									data-modal-id="ppom_fields_model_id"><?php _e( 'Add field', 'woocommerce-product-addon' ); ?></button>
 							<?php if ( function_exists( 'ppom_use_react_field_modal' ) && ppom_use_react_field_modal() ) : ?>
-								<button type="button" class="button ppom-react-field-modal-open" data-ppom-react-mode="picker" style="margin-left:8px;">
-									<?php esc_html_e( 'Add New Field', 'woocommerce-product-addon' ); ?>
+								<button type="button" class="btn btn-primary ppom-react-field-modal-open" data-ppom-react-mode="picker">
+									<?php esc_html_e( 'Add field', 'woocommerce-product-addon' ); ?>
 								</button>
-								<div id="ppom-field-modal-root"></div>
+							<?php else : ?>
+								<button type="button" class="btn btn-primary"
+										data-modal-id="ppom_fields_model_id"><?php _e( 'Add field', 'woocommerce-product-addon' ); ?></button>
 							<?php endif; ?>
 							<button type="button"
 									class="btn btn-danger ppom_remove_field"><?php _e( 'Remove', 'woocommerce-product-addon' ); ?></button>
+							<?php if ( function_exists( 'ppom_use_react_field_modal' ) && ppom_use_react_field_modal() ) : ?>
+								<div id="ppom-field-modal-root"></div>
+							<?php endif; ?>
 						</th>
 					</tr>
 					<tr class="ppom-thead-bg">

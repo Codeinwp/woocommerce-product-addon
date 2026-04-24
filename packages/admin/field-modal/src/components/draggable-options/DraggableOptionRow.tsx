@@ -1,9 +1,4 @@
-import {
-	Box,
-	HStack,
-	IconButton,
-	type StackProps,
-} from '@chakra-ui/react';
+import { Box, HStack, IconButton, type StackProps } from '@chakra-ui/react';
 import {
 	useRef,
 	useState,
@@ -57,8 +52,7 @@ export function useDraggableRows< T >(
 		onDragEnd,
 		onDrop,
 		onMoveUp: ( index: number ) => setRows( arrayMove( rows, index, -1 ) ),
-		onMoveDown: ( index: number ) =>
-			setRows( arrayMove( rows, index, 1 ) ),
+		onMoveDown: ( index: number ) => setRows( arrayMove( rows, index, 1 ) ),
 	};
 }
 

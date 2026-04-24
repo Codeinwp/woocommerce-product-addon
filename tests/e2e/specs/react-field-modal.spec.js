@@ -5,8 +5,7 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 import { buildPalettesField } from '../fixtures/fields.js';
 import { setPpomLicenseFixture } from '../fixtures/license.js';
-import { createPpomGroup } from '../fixtures/ppom.js';
-import { createSimpleGroupField } from '../utils';
+import { createPpomGroup, createSimpleTextGroup } from '../fixtures/ppom.js';
 
 async function visitReactModalGroup( admin, ppomId ) {
 	await admin.visitAdminPage(
@@ -35,15 +34,27 @@ async function optionValues( dialog ) {
 }
 
 test.describe( 'React field modal (opt-in)', () => {
-	test( 'picker entry opens FieldTypePicker (Add New Field)', async ( {
+	test( 'picker entry opens FieldTypePicker (Add field)', async ( {
 		page,
 		admin,
+		requestUtils,
 	} ) => {
-		const { ppomId } = await createSimpleGroupField( admin, page, 1 );
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
 
 		await visitReactModalGroup( admin, ppomId );
 
-		await page.getByRole( 'button', { name: 'Add New Field' } ).click();
+		await expect(
+			page.locator( 'button[data-modal-id="ppom_fields_model_id"]' )
+		).toHaveCount( 0 );
+
+		const addFieldButton = page.getByRole( 'button', {
+			name: 'Add field',
+			exact: true,
+		} );
+		await expect( addFieldButton ).toHaveClass( /btn-primary/ );
+		await addFieldButton.click();
 
 		const dialog = page.getByRole( 'dialog' ).first();
 		await expect( dialog ).toBeVisible();
@@ -58,8 +69,11 @@ test.describe( 'React field modal (opt-in)', () => {
 	test( 'per-field edit button opens sidebar without inner Add field CTA', async ( {
 		page,
 		admin,
+		requestUtils,
 	} ) => {
-		const { ppomId } = await createSimpleGroupField( admin, page, 1 );
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
 
 		await visitReactModalGroup( admin, ppomId );
 
@@ -72,8 +86,11 @@ test.describe( 'React field modal (opt-in)', () => {
 	test( 'per-field edit button shows Settings tab for definition-driven text field', async ( {
 		page,
 		admin,
+		requestUtils,
 	} ) => {
-		const { ppomId } = await createSimpleGroupField( admin, page, 1 );
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
 
 		await visitReactModalGroup( admin, ppomId );
 
@@ -86,8 +103,11 @@ test.describe( 'React field modal (opt-in)', () => {
 	test( 'opening an existing field can close without confirmation when unchanged', async ( {
 		page,
 		admin,
+		requestUtils,
 	} ) => {
-		const { ppomId } = await createSimpleGroupField( admin, page, 1 );
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
 
 		await visitReactModalGroup( admin, ppomId );
 
@@ -100,8 +120,11 @@ test.describe( 'React field modal (opt-in)', () => {
 	test( 'editing an existing field requires close confirmation', async ( {
 		page,
 		admin,
+		requestUtils,
 	} ) => {
-		const { ppomId } = await createSimpleGroupField( admin, page, 1 );
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
 
 		await visitReactModalGroup( admin, ppomId );
 
@@ -118,12 +141,15 @@ test.describe( 'React field modal (opt-in)', () => {
 	test( 'selecting a new field type can close without confirmation when unchanged', async ( {
 		page,
 		admin,
+		requestUtils,
 	} ) => {
-		const { ppomId } = await createSimpleGroupField( admin, page, 1 );
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
 
 		await visitReactModalGroup( admin, ppomId );
 
-		await page.getByRole( 'button', { name: 'Add New Field' } ).click();
+		await page.getByRole( 'button', { name: 'Add field', exact: true } ).click();
 		const dialog = page.getByRole( 'dialog' ).first();
 		await expect( dialog ).toBeVisible();
 
@@ -140,12 +166,15 @@ test.describe( 'React field modal (opt-in)', () => {
 	test( 'editing a newly selected field requires close confirmation', async ( {
 		page,
 		admin,
+		requestUtils,
 	} ) => {
-		const { ppomId } = await createSimpleGroupField( admin, page, 1 );
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
 
 		await visitReactModalGroup( admin, ppomId );
 
-		await page.getByRole( 'button', { name: 'Add New Field' } ).click();
+		await page.getByRole( 'button', { name: 'Add field', exact: true } ).click();
 		const dialog = page.getByRole( 'dialog' ).first();
 		await expect( dialog ).toBeVisible();
 
