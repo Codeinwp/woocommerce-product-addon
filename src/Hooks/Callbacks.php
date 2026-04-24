@@ -636,6 +636,42 @@ final class Callbacks {
 	// Input metadata normalization hooks.
 
 	/**
+	 * Registers a translatable field string without depending on legacy helper load order.
+	 *
+	 * @param mixed  $field_value String value entered by the merchant.
+	 * @param string $domain      Translation domain/group.
+	 *
+	 * @return void
+	 */
+	private static function maybe_register_wpml_string( $field_value, $domain ) {
+		if ( ! is_scalar( $field_value ) ) {
+			return;
+		}
+
+		$field_value = (string) $field_value;
+		if ( '' === $field_value ) {
+			return;
+		}
+
+		if ( \function_exists( 'nm_wpml_register' ) ) {
+			\nm_wpml_register( $field_value, $domain );
+			return;
+		}
+
+		if ( ! \function_exists( 'icl_register_string' ) ) {
+			return;
+		}
+
+		$field_name = $domain . ' - ' . sanitize_key( $field_value );
+
+		do_action( 'wpml_register_single_string', $domain, $field_name, $field_value );
+
+		if ( \function_exists( 'pll_register_string' ) ) {
+			pll_register_string( $field_name, $field_value );
+		}
+	}
+
+	/**
 	 * Registers translatable strings and normalized option IDs for a field group.
 	 *
 	 * @param array $meta_data Field definitions being stored.
@@ -657,31 +693,31 @@ final class Callbacks {
 			// title
 			if ( isset( $data['title'] ) ) {
 
-				nm_wpml_register( $data['title'], 'PPOM' );
+				self::maybe_register_wpml_string( $data['title'], 'PPOM' );
 			}
 
 			// description
 			if ( isset( $data['description'] ) ) {
 
-				nm_wpml_register( $data['description'], 'PPOM' );
+				self::maybe_register_wpml_string( $data['description'], 'PPOM' );
 			}
 
 			// error_message
 			if ( isset( $data['error_message'] ) ) {
 
-				nm_wpml_register( $data['error_message'], 'PPOM' );
+				self::maybe_register_wpml_string( $data['error_message'], 'PPOM' );
 			}
 
 			// first_option
 			if ( isset( $data['first_option'] ) ) {
 
-				nm_wpml_register( $data['first_option'], 'PPOM' );
+				self::maybe_register_wpml_string( $data['first_option'], 'PPOM' );
 			}
 
 			// html (HTML Input)
 			if ( isset( $data['html'] ) ) {
 
-				nm_wpml_register( $data['html'], 'PPOM' );
+				self::maybe_register_wpml_string( $data['html'], 'PPOM' );
 			}
 
 			// images type options
@@ -695,7 +731,7 @@ final class Callbacks {
 					function ( $option ) {
 
 						// registering for translation
-						nm_wpml_register( $option['title'], 'PPOM' );
+						self::maybe_register_wpml_string( $option['title'], 'PPOM' );
 
 						return $option;
 					},
@@ -714,11 +750,11 @@ final class Callbacks {
 					function ( $option ) {
 
 						// registering for translation
-						isset( $option['option'] ) && nm_wpml_register( $option['option'], 'PPOM' );
-						isset( $option['fontdisplay'] ) && nm_wpml_register( $option['fontdisplay'], 'PPOM' );
+						isset( $option['option'] ) && self::maybe_register_wpml_string( $option['option'], 'PPOM' );
+						isset( $option['fontdisplay'] ) && self::maybe_register_wpml_string( $option['fontdisplay'], 'PPOM' );
 
 						// if label key set e.g for palettes or price matrix
-						isset( $option['label'] ) && nm_wpml_register( $option['label'], 'PPOM' );
+						isset( $option['label'] ) && self::maybe_register_wpml_string( $option['label'], 'PPOM' );
 
 						// If Option ID is not provided then generate it.
 						$option['id'] = Helpers::get_option_id( $option );

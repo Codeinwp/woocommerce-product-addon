@@ -65,7 +65,7 @@ class NM_Color_wooproduct extends PPOM_Inputs {
 				'desc'  => __( 'Insert the error message for validation.', 'woocommerce-product-addon' ),
 			),
 			'default_color'   => array(
-				'type'        => 'text',
+				'type'        => 'color',
 				'title'       => __( 'Default color', 'woocommerce-product-addon' ),
 				'desc'        => __( 'Define default color e.g: #effeff', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),

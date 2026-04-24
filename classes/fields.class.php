@@ -98,7 +98,7 @@ class PPOM_Fields_Meta {
 						'invalid_pattern'                => esc_html__( 'Range format is invalid. (range: {range})', 'woocommerce-product-addon' ),
 					),
 				),
-			) 
+			)
 		);
 
 		wp_enqueue_script( 'ppom-inputmask', PPOM_URL . '/js/inputmask/jquery.inputmask.min.js', array( 'jquery' ), '5.0.6', true );
@@ -190,7 +190,7 @@ class PPOM_Fields_Meta {
 				'wp-color-picker',
 			),
 			PPOM_VERSION,
-			true 
+			true
 		);
 
 		wp_enqueue_media();
@@ -236,6 +236,35 @@ class PPOM_Fields_Meta {
 		// localize ppom_vars
 		wp_localize_script( 'ppom-field', 'ppom_vars', $ppom_admin_meta );
 		wp_localize_script( 'ppom-meta-table', 'ppom_vars', $ppom_admin_meta );
+
+		$is_field_editor_screen = ( isset( $_GET['do_meta'] ) && 'edit' === $_GET['do_meta'] )
+			|| ( isset( $_GET['action'] ) && 'new' === $_GET['action'] );
+		if ( $is_field_editor_screen && function_exists( 'ppom_use_react_field_modal' ) && ppom_use_react_field_modal() ) {
+			$field_modal_asset = PPOM_PATH . '/packages/admin/field-modal/build/index.asset.php';
+			if ( file_exists( $field_modal_asset ) ) {
+				$field_modal = require $field_modal_asset;
+				wp_enqueue_script(
+					'ppom-admin-field-modal',
+					PPOM_URL . '/packages/admin/field-modal/build/index.js',
+					$field_modal['dependencies'],
+					$field_modal['version'],
+					true
+				);
+					wp_set_script_translations(
+						'ppom-admin-field-modal',
+						'woocommerce-product-addon'
+					);
+				$productmeta_id = isset( $_GET['productmeta_id'] ) ? absint( $_GET['productmeta_id'] ) : 0;
+				wp_localize_script(
+					'ppom-admin-field-modal',
+					'ppomFieldModalBoot',
+					array(
+						'productmetaId' => $productmeta_id,
+						'nonce'         => wp_create_nonce( 'wp_rest' ),
+					)
+				);
+			}
+		}
 
 		$action    = isset( $_GET['action'] ) ? sanitize_text_field( $_GET['action'] ) : '';
 		$page_slug = 'fields';
@@ -1448,7 +1477,7 @@ class PPOM_Fields_Meta {
 				$settings['min_img_w']['tabs_class']           = array( 'ppom_handle_image_dimension_tab', 'col-md-6' );
 				$settings['max_img_w']['tabs_class']           = array( 'ppom_handle_image_dimension_tab', 'col-md-6' );
 				$settings['img_dimension_error']['tabs_class'] = array( 'ppom_handle_image_dimension_tab', 'col-md-6' );
-			}       
+			}
 		}
 
 		// ppom_pa

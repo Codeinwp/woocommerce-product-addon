@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce integration: loads PPOM lifecycle by phase (product → catalog → cart → order).
+ * WooCommerce integration: loads PPOM lifecycle by phase (product -> catalog -> cart -> order).
  *
  * @package PPOM
  * @subpackage WooCommerce

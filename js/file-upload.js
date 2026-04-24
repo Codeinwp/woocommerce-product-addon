@@ -117,9 +117,8 @@ jQuery( function ( $ ) {
 			cropp_preview_container
 				.find( '.croppie-container' )
 				.each( function ( i, croppie_dom ) {
-					const image_id = jQuery( croppie_dom ).attr(
-						'data-image_id'
-					);
+					const image_id =
+						jQuery( croppie_dom ).attr( 'data-image_id' );
 					const croppie_container = jQuery(
 						'.ppom-croppie-preview-' + image_id
 					);
@@ -132,8 +131,10 @@ jQuery( function ( $ ) {
 					file_list_preview_containers[ data_name ].croppie[
 						image_id
 					] = croppie_container;
-					file_list_preview_containers[ data_name ].image_id = image_id;
-					file_list_preview_containers[ data_name ].image_url = image_url;
+					file_list_preview_containers[ data_name ].image_id =
+						image_id;
+					file_list_preview_containers[ data_name ].image_url =
+						image_url;
 
 					ppom_set_croppie_options( data_name, viewport, image_id );
 				} );
@@ -391,8 +392,7 @@ function ppom_show_cropped_preview(
 	file_list_preview_containers[ file_name ].image_id = image_id;
 	file_list_preview_containers[ file_name ].image_url = image_url;
 
-	file_list_preview_containers[ file_name ].container_width =
-		container_width;
+	file_list_preview_containers[ file_name ].container_width = container_width;
 	ppom_set_croppie_options( file_name, undefined, image_id );
 }
 
@@ -453,7 +453,12 @@ function ppom_setup_file_upload_input( file_input ) {
 		return;
 	}
 
-	if ( ! Object.prototype.hasOwnProperty.call( field_file_count, file_data_name ) ) {
+	if (
+		! Object.prototype.hasOwnProperty.call(
+			field_file_count,
+			file_data_name
+		)
+	) {
 		field_file_count[ file_data_name ] = 0;
 	}
 	file_list_preview_containers[ file_data_name ] = jQuery(
@@ -487,8 +492,8 @@ function ppom_setup_file_upload_input( file_input ) {
 		max_file_size: file_input.file_size,
 		max_file_count: parseInt( file_input.files_allowed ),
 		unique_names: ppom_file_vars.enable_file_rename,
-		chunk_size: '2mb',
 		unique_names: false,
+		chunk_size: '2mb',
 
 		filters: {
 			mime_types: [
@@ -591,7 +596,9 @@ function ppom_setup_file_upload_input( file_input ) {
 							.hide( 500 )
 							.remove();
 						jQuery( `.btn.${ file_id }` ).hide( 500 ).remove();
-						jQuery( '#u_i_c_' + file_id ).hide( 500 ).remove();
+						jQuery( '#u_i_c_' + file_id )
+							.hide( 500 )
+							.remove();
 						jQuery(
 							`input[name="ppom[fields][${ file_data_name }][${ file_data_name }][cropped]"]`
 						)
@@ -967,7 +974,9 @@ function get_responsive_croppie_options( baseOptions, max_width ) {
 	) {
 		const scale = boundaryWidth / boundaryWidthOriginal;
 		const viewportWidth = Math.floor( baseOptions.viewport.width * scale );
-		const viewportHeight = Math.floor( baseOptions.viewport.height * scale );
+		const viewportHeight = Math.floor(
+			baseOptions.viewport.height * scale
+		);
 
 		result.viewport = {
 			...baseOptions.viewport,

@@ -14,9 +14,16 @@
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@wordpress/api-fetch": "^7.43.0",
+    "@wordpress/data": "^10.43.0",
+    "@wordpress/dom-ready": "^4.43.0",
     "@wordpress/e2e-test-utils-playwright": "^1.9.0",
+    "@wordpress/element": "^6.43.0",
     "@wordpress/env": "^11.2.0",
     "@wordpress/eslint-plugin": "^24.4.0",
+    "@wordpress/i18n": "^6.16.0",
     "@wordpress/scripts": "31.7.0",
     "conventional-changelog-simple-preset": "^1.0.20",
     "grunt": "^1.5.3",
@@ -27,7 +34,8 @@
     "npm-run-all": "^4.1.5",
     "replace-in-file": "^6.3.5",
     "semantic-release": "^19.0.3",
-    "semantic-release-slack-bot": "^3.5.3"
+    "semantic-release-slack-bot": "^3.5.3",
+    "typescript": "^6.0.2"
   },
   "scripts": {
     "build": "npm-run-all build:*",
@@ -35,6 +43,8 @@
     "release": "npx semantic-release",
     "build:makepot": "bash ./bin/makepot.sh",
     "build:grunt": "grunt build",
+    "build:admin-field-modal": "wp-scripts build ./packages/admin/field-modal/src/index.tsx --output-path=./packages/admin/field-modal/build --config ./packages/admin/field-modal/webpack.config.cjs",
+    "watch:admin-field-modal": "wp-scripts start ./packages/admin/field-modal/src/index.tsx --output-path=./packages/admin/field-modal/build --config ./packages/admin/field-modal/webpack.config.cjs",
     "grunt": "grunt",
     "wp-env": "wp-env",
     "test:e2e": "wp-scripts test-playwright --config tests/e2e/playwright.config.js",
@@ -42,8 +52,18 @@
     "env:setup": "wp-env start",
     "test:unit:php:setup:debug": "wp-env start --xdebug",
     "test:unit:php": "wp-env run --env-cwd='wp-content/plugins/woocommerce-product-addon' tests-wordpress vendor/bin/phpunit -c phpunit.xml --verbose",
-    "lint": "wp-scripts lint-js ./js/",
-    "lint:fix": "wp-scripts lint-js --fix ./js",
-    "format": "wp-scripts format ./js"
+    "lint": "wp-scripts lint-js ./js ./packages",
+    "lint:modal": "wp-scripts lint-js ./packages/admin/field-modal/src",
+    "lint:fix": "wp-scripts lint-js --fix ./js ./packages",
+    "format": "wp-scripts format ./js ./packages"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^3.34.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@tanstack/react-form": "^1.29.0",
+    "framer-motion": "^12.38.0",
+    "next-themes": "^0.4.6",
+    "react-icons": "^5.6.0"
   }
 }

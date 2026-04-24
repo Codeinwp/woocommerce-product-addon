@@ -34,19 +34,20 @@ if ( ! defined( 'PPOM_E2E_LICENSE_FILTER_PRIORITY' ) ) {
 /**
  * Default license fixture: valid Essential plan (wp-env has no store key).
  *
- * @return array{status:string,plan:int}
+ * @return array{status:string,plan:int,pro_installed:bool}
  */
 function ppom_e2e_default_license_fixture() {
 	return array(
-		'status' => 'valid',
-		'plan'   => 1,
+		'status'        => 'valid',
+		'plan'          => 1,
+		'pro_installed' => false,
 	);
 }
 
 /**
  * Resolved license fixture for filters and AJAX responses.
  *
- * @return array{status:string,plan:int}
+ * @return array{status:string,plan:int,pro_installed:bool}
  */
 function ppom_e2e_get_license_fixture() {
 	$defaults = ppom_e2e_default_license_fixture();
@@ -56,13 +57,23 @@ function ppom_e2e_get_license_fixture() {
 		return $defaults;
 	}
 
-	$status = isset( $stored['status'] ) && 'invalid' === $stored['status'] ? 'invalid' : 'valid';
-	$plan   = isset( $stored['plan'] ) ? max( 1, min( 3, absint( $stored['plan'] ) ) ) : $defaults['plan'];
+	$status        = isset( $stored['status'] ) && 'invalid' === $stored['status'] ? 'invalid' : 'valid';
+	$plan          = isset( $stored['plan'] ) ? max( 1, min( 3, absint( $stored['plan'] ) ) ) : $defaults['plan'];
+	$pro_installed = isset( $stored['pro_installed'] ) ? (bool) $stored['pro_installed'] : $defaults['pro_installed'];
 
 	return array(
-		'status' => $status,
-		'plan'   => $plan,
+		'status'        => $status,
+		'plan'          => $plan,
+		'pro_installed' => $pro_installed,
 	);
+}
+
+if ( ppom_e2e_get_license_fixture()['pro_installed'] && ! class_exists( 'PPOM_PRO', false ) ) {
+	/**
+	 * Minimal test double so wp-env can exercise premium-field admin UI gates
+	 * without loading the separate PPOM Pro add-on.
+	 */
+	class PPOM_PRO {}
 }
 
 /**
@@ -1104,13 +1115,15 @@ function ppom_e2e_set_license_fixture() {
 
 	$status_raw = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
 	$plan_raw   = isset( $_POST['plan'] ) ? absint( wp_unslash( $_POST['plan'] ) ) : 0;
+	$pro_raw    = isset( $_POST['pro_installed'] ) ? sanitize_text_field( wp_unslash( $_POST['pro_installed'] ) ) : '';
 
 	$status = ( 'invalid' === $status_raw ) ? 'invalid' : 'valid';
 	$plan   = max( 1, min( 3, $plan_raw > 0 ? $plan_raw : 1 ) );
 
 	$stored = array(
-		'status' => $status,
-		'plan'   => $plan,
+		'status'        => $status,
+		'plan'          => $plan,
+		'pro_installed' => in_array( $pro_raw, array( '1', 'true', 'yes' ), true ),
 	);
 
 	update_option( PPOM_E2E_LICENSE_FIXTURE_OPTION, $stored, false );

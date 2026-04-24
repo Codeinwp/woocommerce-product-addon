@@ -595,9 +595,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @return array
 	 */
 	public function get_db_field( $ppom_field_id ) {
-		$rows = ppom_meta_repository()->get_categories_and_tags_columns( (int) $ppom_field_id );
-
-		return ! empty( $rows ) ? $rows : array();
+		return \PPOM\Data\FieldGroupRepository::instance()->get_categories_tags_columns_by_id( absint( $ppom_field_id ) );
 	}
 
 	/**
@@ -716,7 +714,24 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @return void
 	 */
 	public static function save_categories_and_tags( $ppom_id, $categories, $tags ) {
-		ppom_meta_repository()->save_categories_and_tags( (int) $ppom_id, $categories, $tags );
+		$data_to_update = array(
+			'productmeta_categories' => implode( "\r\n", $categories ), // NOTE: Keep the backward compatible format.
+		);
+
+		$format = array( '%s' );
+
+		// false = caller chose not to change tags (e.g. E2E partial update); omit column from UPDATE.
+		if ( is_array( $tags ) ) {
+			$data_to_update['productmeta_tags'] = empty( $tags ) ? '' : serialize( $tags );
+			$format[]                           = '%s';
+		}
+
+		\PPOM\Data\FieldGroupRepository::instance()->update_row(
+			$data_to_update,
+			array( 'productmeta_id' => $ppom_id ),
+			$format,
+			array( '%d' )
+		);
 	}
 
 	// Legacy settings bridge and setup.
@@ -933,7 +948,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			return;
 		}
 
-		$res = ppom_meta_repository()->get_rows_with_non_empty_style_or_js();
+		$res = \PPOM\Data\FieldGroupRepository::instance()->find_rows_with_inline_js_or_style();
 		update_option( 'ppom_legacy_user', ! empty( $res ) ? 'yes' : 'no' );
 	}
 
