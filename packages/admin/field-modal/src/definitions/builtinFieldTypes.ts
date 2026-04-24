@@ -1,8 +1,9 @@
 /**
- * Centralised string constants for built-in field types, section label keys,
- * tab IDs, and widget kinds.  Every consumer imports from here instead of
- * repeating raw string literals.
+ * Centralised string constants for built-in field types, section labels, tab IDs,
+ * and widget kinds. Every consumer imports from here instead of repeating raw
+ * string literals.
  */
+import { __ } from '@wordpress/i18n';
 
 // ---------------------------------------------------------------------------
 // Field type slugs
@@ -55,22 +56,22 @@ export type BuiltinFieldTypeValue =
 	( typeof BuiltinFieldType )[ keyof typeof BuiltinFieldType ];
 
 // ---------------------------------------------------------------------------
-// Section label keys (i18n dictionary lookups)
+// Section labels
 // ---------------------------------------------------------------------------
 
 export const SectionLabelKey = {
-	Basic: 'editorSectionBasic',
-	FieldSettings: 'editorSectionFieldSettings',
-	DefaultPrice: 'editorSectionDefaultPrice',
-	Validation: 'editorSectionValidation',
-	Display: 'editorSectionDisplay',
-	Behavior: 'editorSectionBehavior',
-	Constraints: 'editorSectionConstraints',
-	DateCalendar: 'editorSectionDateCalendar',
-	ImageDimensions: 'editorSectionImageDimensions',
-	ImageSettings: 'editorSectionImageSettings',
-	Media: 'editorSectionMedia',
-	More: 'editorSectionMore',
+	Basic: __( 'Basic', 'woocommerce-product-addon' ),
+	FieldSettings: __( 'Field Settings', 'woocommerce-product-addon' ),
+	DefaultPrice: __( 'Pricing', 'woocommerce-product-addon' ),
+	Validation: __( 'Validation', 'woocommerce-product-addon' ),
+	Display: __( 'Display & layout', 'woocommerce-product-addon' ),
+	Behavior: __( 'Behavior', 'woocommerce-product-addon' ),
+	Constraints: __( 'Constraints', 'woocommerce-product-addon' ),
+	DateCalendar: __( 'Date & calendar', 'woocommerce-product-addon' ),
+	ImageDimensions: __( 'Image dimensions', 'woocommerce-product-addon' ),
+	ImageSettings: __( 'Image Settings', 'woocommerce-product-addon' ),
+	Media: __( 'Media & layout', 'woocommerce-product-addon' ),
+	More: __( 'More options', 'woocommerce-product-addon' ),
 } as const;
 
 export type SectionLabelKeyValue =

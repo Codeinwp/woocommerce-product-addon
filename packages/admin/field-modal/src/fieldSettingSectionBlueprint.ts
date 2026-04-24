@@ -4,7 +4,6 @@
 import { SectionLabelKey } from './definitions/builtinFieldTypes';
 import { classifySettingTab } from './schemaTabs';
 import { isReactModalExcludedSchemaKey } from './schema/reactModalExcludedKeys';
-import type { I18nDict } from './types/fieldModal';
 
 /** Ordered section definitions; each setting key appears in at most one section (first match wins). */
 export const FALLBACK_FIELD_SECTION_BLUEPRINT = [
@@ -167,8 +166,7 @@ export function buildFallbackGroupedSections(
 		| { settings?: Record< string, Record< string, unknown > > }
 		| null
 		| undefined,
-	fieldType: string,
-	i18n: I18nDict
+	fieldType: string
 ): Array< { label: string; keys: string[]; advanced?: boolean } > {
 	const settings =
 		schema && schema.settings && typeof schema.settings === 'object'
@@ -231,7 +229,7 @@ export function buildFallbackGroupedSections(
 			continue;
 		}
 
-		const label = ( i18n && i18n[ block.labelKey ] ) || block.labelKey;
+		const label = block.labelKey;
 		const adv =
 			'advanced' in block && typeof block.advanced === 'boolean'
 				? block.advanced
@@ -241,9 +239,11 @@ export function buildFallbackGroupedSections(
 
 	const overflow = fieldKeysOrdered.filter( ( k ) => ! assigned.has( k ) );
 	if ( overflow.length > 0 ) {
-		const label =
-			( i18n && i18n[ SectionLabelKey.More ] ) || 'More options';
-		sections.push( { label, keys: overflow, advanced: true } );
+		sections.push( {
+			label: SectionLabelKey.More,
+			keys: overflow,
+			advanced: true,
+		} );
 	}
 
 	return sections;

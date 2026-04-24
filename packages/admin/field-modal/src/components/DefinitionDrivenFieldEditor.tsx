@@ -64,7 +64,7 @@ export function DefinitionDrivenFieldEditor( {
 	function renderSectionCard(
 		block: Extract< FieldUiBlock, { kind: 'section' } >
 	) {
-		const secLabel = i18n[ block.labelKey ] || block.labelKey;
+		const secLabel = block.labelKey;
 		return (
 			<GroupedFieldSections
 				key={ block.id }
