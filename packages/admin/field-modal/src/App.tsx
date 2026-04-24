@@ -28,6 +28,7 @@ export function App( { productmetaId }: AppProps ) {
 		schemaLoading,
 		schemaFetchError,
 		modalEntry,
+		isDirty,
 		i18n,
 		ppomFieldIndex,
 		catalogGroups,
@@ -80,7 +81,6 @@ export function App( { productmetaId }: AppProps ) {
 		Boolean( editDraft ) &&
 		modalEntry === 'picker';
 
-	const isDirty = ! pickerOpen && Boolean( editDraft );
 	const { confirming: confirmingCancel, requestClose } = useConfirmClose( {
 		requireConfirm: isDirty,
 		onClose: closeModal,

@@ -16,10 +16,11 @@ import {
 	saveFieldGroup,
 } from '../services/fieldModalApi';
 import { getFieldUiDefinition } from '../definitions/registry';
-import { newClientId, withClientIds } from '../utils/clientIds';
+import { newClientId, stripClientIds, withClientIds } from '../utils/clientIds';
 import { readGroupFromForm } from '../utils/legacyGroupForm';
 import { createInitialModalState, modalReducer } from '../state/modalReducer';
 import { errorMessage } from '../utils/errorMessage';
+import { stableStringifyFieldRow } from '../utils/fieldFormSync';
 import type {
 	FieldModalContextPayload,
 	FieldRow,
@@ -45,6 +46,14 @@ function getFieldSaveValidationError(
 	}
 
 	return '';
+}
+
+function serializePersistedFields( fields: FieldRow[] ): string {
+	return stableStringifyFieldRow( stripClientIds( fields ) );
+}
+
+function serializePersistedField( field: FieldRow ): string {
+	return serializePersistedFields( [ field ] );
 }
 
 export function useFieldModalController( productmetaId: number | undefined ) {
@@ -73,6 +82,12 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 					type: 'LOAD_CONTEXT_SUCCESS',
 					ctx: res,
 					fields: rows,
+					cleanFieldSnapshots: Object.fromEntries(
+						rows.map( ( row ) => [
+							row.clientId,
+							serializePersistedField( row ),
+						] )
+					),
 					selectedId: nextSelected,
 				} );
 			} catch ( e ) {
@@ -125,6 +140,12 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 
 	const ctx = state.ctx;
 	const i18n = ctx?.i18n || {};
+	const isDirty = useMemo( () => {
+		return (
+			state.dirtyClientIds.length > 0 ||
+			state.removedPersistedClientIds.length > 0
+		);
+	}, [ state.dirtyClientIds, state.removedPersistedClientIds ] );
 
 	const fetchSchemaForType = useCallback(
 		async ( type: string | undefined ) => {
@@ -238,7 +259,11 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 				data_name: '',
 				status: 'on',
 			};
-			dispatch( { type: 'ADD_FIELD_ROW', row } );
+			dispatch( {
+				type: 'ADD_FIELD_ROW',
+				row,
+				snapshot: serializePersistedField( row ),
+			} );
 		},
 		[ ctx?.catalog ]
 	);
@@ -386,7 +411,11 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 				if ( ! row || typeof row !== 'object' || ! row.clientId ) {
 					return;
 				}
-				dispatch( { type: 'PATCH_FIELD_ROW_FROM_FORM', row } );
+				dispatch( {
+					type: 'PATCH_FIELD_ROW_FROM_FORM',
+					row,
+					snapshot: serializePersistedField( row ),
+				} );
 			},
 			[ state.fields, state.selectedId ]
 		);
@@ -406,6 +435,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		schemaLoading: state.schemaLoading,
 		schemaFetchError: state.schemaFetchError,
 		modalEntry: state.modalEntry,
+		isDirty,
 		i18n,
 		ppomFieldIndex,
 		catalogGroups,

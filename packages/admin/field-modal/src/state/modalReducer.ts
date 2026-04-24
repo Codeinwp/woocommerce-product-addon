@@ -13,6 +13,10 @@ export function createInitialModalState(): ModalReducerState {
 		error: '',
 		ctx: null,
 		fields: [],
+		cleanFieldSnapshots: {},
+		persistedClientIds: [],
+		dirtyClientIds: [],
+		removedPersistedClientIds: [],
 		selectedId: null,
 		schemasCache: {},
 		schemaLoading: false,
@@ -56,6 +60,12 @@ export function modalReducer(
 				loading: false,
 				ctx: action.ctx,
 				fields: action.fields,
+				cleanFieldSnapshots: action.cleanFieldSnapshots,
+				persistedClientIds: action.fields.map(
+					( field ) => field.clientId
+				),
+				dirtyClientIds: [],
+				removedPersistedClientIds: [],
 				selectedId: action.selectedId,
 				schemaFetchError: '',
 			};
@@ -97,15 +107,27 @@ export function modalReducer(
 			const nextFields = state.fields.map( ( f ) =>
 				f.clientId === id ? { ...action.row } : f
 			);
+			const cleanSnapshot = state.cleanFieldSnapshots[ id ];
+			const dirtyClientIds =
+				cleanSnapshot !== undefined && cleanSnapshot === action.snapshot
+					? state.dirtyClientIds.filter(
+							( clientId ) => clientId !== id
+					  )
+					: Array.from( new Set( [ ...state.dirtyClientIds, id ] ) );
 			return {
 				...state,
 				fields: nextFields,
+				dirtyClientIds,
 			};
 		}
 		case 'ADD_FIELD_ROW':
 			return {
 				...state,
 				fields: [ ...state.fields, action.row ],
+				cleanFieldSnapshots: {
+					...state.cleanFieldSnapshots,
+					[ action.row.clientId ]: action.snapshot,
+				},
 				selectedId: action.row.clientId,
 				pickerOpen: false,
 				pickerQuery: '',
@@ -116,7 +138,28 @@ export function modalReducer(
 			);
 			const sel =
 				state.selectedId === action.clientId ? null : state.selectedId;
-			return { ...state, fields: next, selectedId: sel };
+			const { [ action.clientId ]: _removedSnapshot, ...snapshots } =
+				state.cleanFieldSnapshots;
+			const removedPersistedClientIds = state.persistedClientIds.includes(
+				action.clientId
+			)
+				? Array.from(
+						new Set( [
+							...state.removedPersistedClientIds,
+							action.clientId,
+						] )
+				  )
+				: state.removedPersistedClientIds;
+			return {
+				...state,
+				fields: next,
+				cleanFieldSnapshots: snapshots,
+				dirtyClientIds: state.dirtyClientIds.filter(
+					( clientId ) => clientId !== action.clientId
+				),
+				removedPersistedClientIds,
+				selectedId: sel,
+			};
 		}
 		case 'SET_SAVING':
 			return { ...state, saving: action.saving };
