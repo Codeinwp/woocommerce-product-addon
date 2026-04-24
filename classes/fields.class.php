@@ -250,6 +250,10 @@ class PPOM_Fields_Meta {
 					$field_modal['version'],
 					true
 				);
+					wp_set_script_translations(
+						'ppom-admin-field-modal',
+						'woocommerce-product-addon'
+					);
 				$productmeta_id = isset( $_GET['productmeta_id'] ) ? absint( $_GET['productmeta_id'] ) : 0;
 				wp_localize_script(
 					'ppom-admin-field-modal',
