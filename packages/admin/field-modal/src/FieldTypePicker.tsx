@@ -1,7 +1,7 @@
 /**
  * Grouped field type picker with Pro locks and optional upsell sidebar.
  */
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { Box, Flex, Tabs, Text, VStack } from '@chakra-ui/react';
 import { FieldTypeGrid } from './components/FieldTypeGrid';
 import { FieldTypeUpsellSidebar } from './components/FieldTypeUpsellSidebar';
@@ -68,25 +68,15 @@ export function FieldTypePicker( {
 		null
 	);
 
-	useEffect( () => {
-		if ( ! hoveredField ) {
-			return;
-		}
-		const stillVisible = filteredGroups.some( ( g ) =>
-			( g.fields || [] ).some( ( f ) => f.slug === hoveredField.slug )
-		);
-		if ( ! stillVisible ) {
-			setHoveredField( null );
-		}
-	}, [ filteredGroups, hoveredField ] );
-
 	return (
 		<Flex
-			align="flex-start"
+			align={ { base: 'flex-start', lg: 'stretch' } }
 			gap={ 0 }
 			flexWrap={ { base: 'wrap', lg: 'nowrap' } }
+			h="full"
+			minH={ 0 }
 		>
-			<Box flex="1" minW={ 0 } pr={ { lg: 4 } }>
+			<Box flex="1" minW={ 0 } minH={ 0 } pr={ { lg: 4 } }>
 				<VStack align="stretch" gap={ 3 }>
 					<Tabs.Root
 						variant="subtle"
@@ -197,6 +187,9 @@ export function FieldTypePicker( {
 			<VStack
 				flex="0 0 280px"
 				w={ { base: '100%', lg: '280px' } }
+				minW={ { base: 0, lg: '280px' } }
+				maxW={ { base: '100%', lg: '280px' } }
+				flexShrink={ 0 }
 				align="stretch"
 				gap={ 1 }
 				borderLeftWidth={ { base: 0, lg: '1px' } }
@@ -207,11 +200,20 @@ export function FieldTypePicker( {
 				mt={ { base: 0, lg: 0 } }
 				position={ { base: 'static', lg: 'sticky' } }
 				top={ { lg: 2 } }
-				alignSelf={ { lg: 'flex-start' } }
+				alignSelf={ { lg: 'stretch' } }
+				overflow="hidden"
+				css={ {
+					overflowWrap: 'anywhere',
+					wordBreak: 'break-word',
+				} }
 			>
-				<FieldPreviewPanel field={ hoveredField } i18n={ i18n } />
+				<Box flex={ { lg: '1 1 auto' } } minH={ 0 } overflowY="auto">
+					<FieldPreviewPanel field={ hoveredField } i18n={ i18n } />
+				</Box>
 				{ showUpsell && upsell ? (
-					<FieldTypeUpsellSidebar upsell={ upsell } />
+					<Box flexShrink={ 0 } mt={ { lg: 'auto' } }>
+						<FieldTypeUpsellSidebar upsell={ upsell } />
+					</Box>
 				) : null }
 			</VStack>
 		</Flex>

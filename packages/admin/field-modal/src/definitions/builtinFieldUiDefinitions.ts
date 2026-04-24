@@ -1752,14 +1752,9 @@ const PRICEMATRIX_BLOCKS = withConditions(
 		SectionLabelKey.FieldSettings,
 		[ 'discount_type' ]
 	),
-	widgetBlock(
+	widgetBlock( 'options', FieldTab.Settings, WidgetKind.PairedPricematrix, [
 		'options',
-		FieldTab.Settings,
-		WidgetKind.PairedPricematrix,
-		[ 'options' ],
-		undefined,
-		true
-	),
+	] ),
 	sectionBlock(
 		'display',
 		FieldTab.Settings,

@@ -1,16 +1,17 @@
 /**
  * Inline editor for chained option rows.
  */
-import { Box, Button, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Icon, Text, VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
+import { LuPlus } from 'react-icons/lu';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
-import { arrayMove } from '../utils/arrayMove';
 import {
 	type ChainedOptionRow,
 	emptyChainedRow,
 	normalizeChainedRows,
 	serializeChainedRows,
 } from '../utils/chainedOptionsData';
+import { useDraggableRows } from './draggable-options/DraggableOptionRow';
 import { ChainedOptionRowItem } from './chained-options/ChainedOptionRowItem';
 
 export interface ChainedOptionsEditorProps {
@@ -57,9 +58,7 @@ export function ChainedOptionsEditor( {
 		setRows( next.length > 0 ? next : [ emptyChainedRow() ] );
 	};
 
-	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
-	const moveDown = ( index: number ) =>
-		setRows( arrayMove( rows, index, 1 ) );
+	const dragHandlers = useDraggableRows( rows, setRows );
 
 	return (
 		<Box
@@ -72,22 +71,33 @@ export function ChainedOptionsEditor( {
 			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
 				{ title }
 			</Text>
-			<VStack align="stretch" gap={ 3 }>
+			<VStack align="stretch" gap={ 2 }>
 				{ rows.map( ( row, index ) => (
 					<ChainedOptionRowItem
 						key={ index }
 						row={ row }
 						index={ index }
-						isFirst={ index === 0 }
-						isLast={ index === rows.length - 1 }
 						i18n={ i18n }
 						onPatch={ updateRow }
-						onMoveUp={ moveUp }
-						onMoveDown={ moveDown }
+						onMoveUp={ dragHandlers.onMoveUp }
+						onMoveDown={ dragHandlers.onMoveDown }
 						onRemove={ removeRow }
+						dragIndex={ dragHandlers.dragIndex }
+						onDragStart={ dragHandlers.onDragStart }
+						onDragEnd={ dragHandlers.onDragEnd }
+						onDrop={ dragHandlers.onDrop }
 					/>
 				) ) }
-				<Button size="sm" alignSelf="flex-start" onClick={ addRow }>
+				<Button
+					size="sm"
+					variant="outline"
+					borderStyle="dashed"
+					color="gray.600"
+					width="full"
+					mt={ 1 }
+					onClick={ addRow }
+				>
+					<Icon as={ LuPlus } boxSize={ 3.5 } mr={ 1 } />
 					{ i18n.pairedOptionsAddRow || 'Add option' }
 				</Button>
 			</VStack>

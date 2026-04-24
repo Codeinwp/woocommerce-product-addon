@@ -1,16 +1,17 @@
 /**
  * Variation quantity matrix rows (paired-quantity schema type).
  */
-import { Box, Button, VStack, Field } from '@chakra-ui/react';
+import { Box, Button, VStack, Field, Icon, Text } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
+import { LuListChecks, LuPlus } from 'react-icons/lu';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
-import { arrayMove } from '../utils/arrayMove';
 import {
 	type QuantityOptionRow,
 	emptyQuantityRow,
 	normalizePairedQuantityOptions,
 	serializePairedQuantityOptions,
 } from '../utils/pairedQuantityData';
+import { useDraggableRows } from './draggable-options/DraggableOptionRow';
 import { QuantityRowItem } from './paired-quantity/QuantityRowItem';
 
 export type { QuantityOptionRow } from '../utils/pairedQuantityData';
@@ -79,16 +80,8 @@ export function PairedQuantityEditor( {
 	};
 
 	const removeRow = ( index: number ) => {
-		if ( rows.length <= 1 ) {
-			setRows( [ emptyQuantityRow() ] );
-			return;
-		}
 		setRows( rows.filter( ( _, i ) => i !== index ) );
 	};
-
-	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
-	const moveDown = ( index: number ) =>
-		setRows( arrayMove( rows, index, 1 ) );
 
 	const placeholders = {
 		option:
@@ -105,44 +98,93 @@ export function PairedQuantityEditor( {
 		max: i18n.quantityPairedMaxPlaceholder || 'Max qty',
 		stock: i18n.quantityPairedStockPlaceholder || 'Stock',
 	};
+	const dragHandlers = useDraggableRows( rows, setRows );
+	const isEmpty = rows.length === 0;
 
 	return (
-		<Field.Root>
+		<Field.Root w="full">
 			<Field.Label { ...labelProps }>{ title }</Field.Label>
 			<Box
+				w="full"
 				borderWidth="1px"
 				borderColor="gray.200"
 				borderRadius="md"
 				p={ 3 }
 				bg="white"
 			>
-				<Button
-					size="sm"
-					colorPalette="blue"
-					mb={ 3 }
-					onClick={ addRow }
-				>
-					{ i18n.quantityPairedAddRow ||
-						i18n.pairedOptionsAddRow ||
-						'Add option' }
-				</Button>
-
-				<VStack align="stretch" gap={ 3 }>
-					{ rows.map( ( row, index ) => (
-						<QuantityRowItem
-							key={ index }
-							row={ row }
-							index={ index }
-							isFirst={ index === 0 }
-							isLast={ index === rows.length - 1 }
-							i18n={ i18n }
-							placeholders={ placeholders }
-							onPatch={ updateRow }
-							onMoveUp={ moveUp }
-							onMoveDown={ moveDown }
-							onRemove={ removeRow }
-						/>
-					) ) }
+				<VStack align="stretch" gap={ 2 } w="full">
+					{ isEmpty ? (
+						<VStack
+							align="center"
+							w="full"
+							gap={ 1.5 }
+							py={ 4 }
+							px={ 4 }
+							borderWidth="1px"
+							borderStyle="dashed"
+							borderColor="gray.300"
+							borderRadius="md"
+							bg="gray.50"
+						>
+							<Icon
+								as={ LuListChecks }
+								boxSize={ 5 }
+								color="gray.400"
+								aria-hidden
+							/>
+							<Text
+								fontWeight="semibold"
+								fontSize="sm"
+								color="gray.700"
+								m={ 0 }
+							>
+								{ i18n.pairedOptionsEmptyTitle ||
+									'No options yet' }
+							</Text>
+							<Text
+								fontSize="xs"
+								color="gray.500"
+								textAlign="center"
+								maxW="xs"
+								m={ 0 }
+							>
+								{ i18n.pairedOptionsEmptyDescription ||
+									'Options are the choices your customer picks from.' }
+							</Text>
+						</VStack>
+					) : (
+						rows.map( ( row, index ) => (
+							<QuantityRowItem
+								key={ index }
+								row={ row }
+								index={ index }
+								i18n={ i18n }
+								placeholders={ placeholders }
+								onPatch={ updateRow }
+								onMoveUp={ dragHandlers.onMoveUp }
+								onMoveDown={ dragHandlers.onMoveDown }
+								onRemove={ removeRow }
+								dragIndex={ dragHandlers.dragIndex }
+								onDragStart={ dragHandlers.onDragStart }
+								onDragEnd={ dragHandlers.onDragEnd }
+								onDrop={ dragHandlers.onDrop }
+							/>
+						) )
+					) }
+					<Button
+						size="sm"
+						variant="outline"
+						borderStyle="dashed"
+						color="gray.600"
+						width="full"
+						mt={ 1 }
+						onClick={ addRow }
+					>
+						<Icon as={ LuPlus } boxSize={ 3.5 } mr={ 1 } />
+						{ i18n.quantityPairedAddRow ||
+							i18n.pairedOptionsAddRow ||
+							'Add option' }
+					</Button>
 				</VStack>
 			</Box>
 			{ description ? (

@@ -1,14 +1,15 @@
 /**
  * Inline editor for pre-uploaded audio/video (audio field type).
  */
-import { Box, Button, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Icon, Text, VStack } from '@chakra-ui/react';
 import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
+import { LuPlus } from 'react-icons/lu';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
-import { arrayMove } from '../utils/arrayMove';
 import {
 	type AudioOptionRow,
 	normalizeAudioArray,
 } from '../utils/audiosSelectData';
+import { useDraggableRows } from './draggable-options/DraggableOptionRow';
 import { lockMediaFrame, unlockMediaFrame } from '../utils/mediaLock';
 import { AudioRowItem } from './audios-select/AudioRowItem';
 
@@ -143,11 +144,8 @@ export function AudiosSelectEditor( {
 		setRows( rows.filter( ( _, i ) => i !== index ) );
 	};
 
-	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
-	const moveDown = ( index: number ) =>
-		setRows( arrayMove( rows, index, 1 ) );
-
 	const pricePlaceholder = i18n.audioPricePlaceholder || 'Price (fix or %)';
+	const dragHandlers = useDraggableRows( rows, setRows );
 
 	return (
 		<Box
@@ -162,10 +160,14 @@ export function AudiosSelectEditor( {
 			</Text>
 			<Button
 				size="sm"
-				colorPalette="blue"
+				variant="outline"
+				borderStyle="dashed"
+				color="gray.600"
+				width="full"
 				mb={ 3 }
 				onClick={ addFromMedia }
 			>
+				<Icon as={ LuPlus } boxSize={ 3.5 } mr={ 1 } />
 				{ i18n.audioSelectUpload || 'Select Audio/Video' }
 			</Button>
 			{ rows.length === 0 && (
@@ -174,20 +176,22 @@ export function AudiosSelectEditor( {
 						'No audio or video selected. Use the button above to add files from the media library.' }
 				</Text>
 			) }
-			<VStack align="stretch" gap={ 3 }>
+			<VStack align="stretch" gap={ 2 }>
 				{ rows.map( ( row, index ) => (
 					<AudioRowItem
 						key={ index }
 						row={ row }
 						index={ index }
-						isFirst={ index === 0 }
-						isLast={ index === rows.length - 1 }
 						i18n={ i18n }
 						pricePlaceholder={ pricePlaceholder }
 						onPatch={ updateRow }
-						onMoveUp={ moveUp }
-						onMoveDown={ moveDown }
+						onMoveUp={ dragHandlers.onMoveUp }
+						onMoveDown={ dragHandlers.onMoveDown }
 						onRemove={ removeRow }
+						dragIndex={ dragHandlers.dragIndex }
+						onDragStart={ dragHandlers.onDragStart }
+						onDragEnd={ dragHandlers.onDragEnd }
+						onDrop={ dragHandlers.onDrop }
 					/>
 				) ) }
 			</VStack>

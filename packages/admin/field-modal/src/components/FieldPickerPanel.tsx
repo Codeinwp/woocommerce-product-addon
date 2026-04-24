@@ -2,7 +2,7 @@
  * Field type catalog step: picker or empty warning.
  */
 import { memo } from '@wordpress/element';
-import { Steps, VStack, Alert } from '@chakra-ui/react';
+import { VStack, Alert } from '@chakra-ui/react';
 import { FieldTypePicker } from '../FieldTypePicker';
 import type { FieldModalPickerStepProps } from '../types/fieldModal';
 
@@ -17,7 +17,7 @@ function FieldPickerPanelComponent( {
 	license,
 }: FieldPickerPanelProps ) {
 	return (
-		<VStack align="stretch" gap={ 2 }>
+		<VStack align="stretch" gap={ 2 } h="full" minH={ 0 }>
 			{ catalogGroups.length > 0 ? (
 				<FieldTypePicker
 					catalogGroups={ catalogGroups }

@@ -89,24 +89,9 @@ export function normalizeRowRows( raw: unknown ): MatrixRowRow[] {
 export function serializeColumnRows(
 	rows: MatrixColumnRow[]
 ): MatrixColumnRow[] {
-	const filtered = rows.filter(
-		( row ) =>
-			row.option.trim() !== '' ||
-			row.img_id.trim() !== '' ||
-			row.price.trim() !== '' ||
-			row.min.trim() !== '' ||
-			row.max.trim() !== '' ||
-			row.option_id.trim() !== ''
-	);
-	return filtered.length > 0 ? filtered : [];
+	return rows.length > 0 ? rows : [];
 }
 
 export function serializeRowRows( rows: MatrixRowRow[] ): MatrixRowRow[] {
-	const filtered = rows.filter(
-		( row ) =>
-			row.option.trim() !== '' ||
-			row.img_id.trim() !== '' ||
-			row.option_id.trim() !== ''
-	);
-	return filtered.length > 0 ? filtered : [];
+	return rows.length > 0 ? rows : [];
 }

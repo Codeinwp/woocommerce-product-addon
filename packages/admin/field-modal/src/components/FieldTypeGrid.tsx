@@ -65,9 +65,7 @@ function FieldTypeGridComponent( {
 						} }
 						aria-label={ ariaLabel }
 						onMouseEnter={ () => onFieldHover?.( f ) }
-						onMouseLeave={ () => onFieldHover?.( null ) }
 						onFocus={ () => onFieldHover?.( f ) }
-						onBlur={ () => onFieldHover?.( null ) }
 						onClick={ () => {
 							if ( locked && upsellUrl ) {
 								window.open(

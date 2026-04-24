@@ -98,6 +98,7 @@ export function FieldModalFrame( {
 							lg: 'min(92vw, 1100px)',
 						} }
 						w="full"
+						h="min(90vh, 56rem)"
 						maxH="min(90vh, 56rem)"
 						my={ 4 }
 					>

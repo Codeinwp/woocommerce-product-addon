@@ -44,11 +44,11 @@ export function normalizePairedQuantityOptions(
 	raw: unknown
 ): QuantityOptionRow[] {
 	if ( raw == null || raw === '' ) {
-		return [ emptyQuantityRow() ];
+		return [];
 	}
 	if ( Array.isArray( raw ) ) {
 		if ( raw.length === 0 ) {
-			return [ emptyQuantityRow() ];
+			return [];
 		}
 		return raw.map( coerceQuantityRow );
 	}
@@ -58,31 +58,21 @@ export function normalizePairedQuantityOptions(
 			( a, b ) => Number( a ) - Number( b )
 		);
 		if ( keys.length === 0 ) {
-			return [ emptyQuantityRow() ];
+			return [];
 		}
 		return keys.map( ( k ) => coerceQuantityRow( rec[ k ] ) );
 	}
-	return [ emptyQuantityRow() ];
+	return [];
 }
 
 /** Persist with PHP key `default` for default quantity. */
 export function serializePairedQuantityOptions(
 	rows: QuantityOptionRow[]
 ): unknown {
-	const filtered = rows.filter(
-		( r ) =>
-			r.option.trim() !== '' ||
-			r.price.trim() !== '' ||
-			r.weight.trim() !== '' ||
-			r.defaultQty.trim() !== '' ||
-			r.min.trim() !== '' ||
-			r.max.trim() !== '' ||
-			r.stock.trim() !== ''
-	);
-	if ( filtered.length === 0 ) {
+	if ( rows.length === 0 ) {
 		return [];
 	}
-	return filtered.map( ( r ) => ( {
+	return rows.map( ( r ) => ( {
 		option: r.option,
 		price: r.price,
 		weight: r.weight,

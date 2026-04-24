@@ -1,16 +1,17 @@
 /**
  * Classic paired-palettes / paired-pricematrix rows: option, price, label, id, isfixed.
  */
-import { Box, Button, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Icon, Text, VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
+import { LuPlus } from 'react-icons/lu';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
-import { arrayMove } from '../utils/arrayMove';
 import {
 	type MatrixOptionRow,
 	emptyMatrixRow,
 	normalizeMatrixOptions,
 } from '../utils/pairedMatrixData';
+import { useDraggableRows } from './draggable-options/DraggableOptionRow';
 import { MatrixOptionRowItem } from './paired-matrix/MatrixOptionRowItem';
 
 export type { MatrixOptionRow } from '../utils/pairedMatrixData';
@@ -53,13 +54,11 @@ export function PairedMatrixOptionsEditor( {
 		setRows( rows.filter( ( _, i ) => i !== index ) );
 	};
 
-	const moveUp = ( index: number ) => setRows( arrayMove( rows, index, -1 ) );
-	const moveDown = ( index: number ) =>
-		setRows( arrayMove( rows, index, 1 ) );
-
 	const toggleFixed = ( index: number, checked: boolean ) => {
 		updateRow( index, { isfixed: checked ? 'on' : '' } );
 	};
+
+	const dragHandlers = useDraggableRows( rows, setRows );
 
 	return (
 		<Box
@@ -72,23 +71,34 @@ export function PairedMatrixOptionsEditor( {
 			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
 				{ title }
 			</Text>
-			<VStack align="stretch" gap={ 3 }>
+			<VStack align="stretch" gap={ 2 }>
 				{ rows.map( ( row, index ) => (
 					<MatrixOptionRowItem
 						key={ index }
 						row={ row }
 						index={ index }
-						isFirst={ index === 0 }
-						isLast={ index === rows.length - 1 }
 						i18n={ i18n }
 						onPatch={ updateRow }
-						onMoveUp={ moveUp }
-						onMoveDown={ moveDown }
+						onMoveUp={ dragHandlers.onMoveUp }
+						onMoveDown={ dragHandlers.onMoveDown }
 						onRemove={ removeRow }
 						onToggleFixed={ toggleFixed }
+						dragIndex={ dragHandlers.dragIndex }
+						onDragStart={ dragHandlers.onDragStart }
+						onDragEnd={ dragHandlers.onDragEnd }
+						onDrop={ dragHandlers.onDrop }
 					/>
 				) ) }
-				<Button size="sm" alignSelf="flex-start" onClick={ addRow }>
+				<Button
+					size="sm"
+					variant="outline"
+					borderStyle="dashed"
+					color="gray.600"
+					width="full"
+					mt={ 1 }
+					onClick={ addRow }
+				>
+					<Icon as={ LuPlus } boxSize={ 3.5 } mr={ 1 } />
 					{ i18n.pairedOptionsAddRow || 'Add option' }
 				</Button>
 			</VStack>

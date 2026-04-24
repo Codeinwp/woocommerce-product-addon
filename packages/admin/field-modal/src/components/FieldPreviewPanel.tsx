@@ -33,7 +33,7 @@ export function FieldPreviewPanel( { field, i18n }: FieldPreviewPanelProps ) {
 						color="blue.500"
 						fontSize="md"
 					/>
-					<Text fontWeight="bold" fontSize="md">
+					<Text fontWeight="bold" fontSize="md" minW={ 0 } m={ 0 }>
 						{ i18n.fieldGuideEmptyTitle }
 					</Text>
 				</HStack>
@@ -68,7 +68,7 @@ export function FieldPreviewPanel( { field, i18n }: FieldPreviewPanelProps ) {
 					color="blue.500"
 					fontSize="lg"
 				/>
-				<Text fontWeight="bold" fontSize="md">
+				<Text fontWeight="bold" fontSize="md" minW={ 0 } m={ 0 }>
 					{ title }
 				</Text>
 			</HStack>

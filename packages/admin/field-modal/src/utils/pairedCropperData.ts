@@ -30,11 +30,11 @@ export function normalizePairedCropperOptions(
 	raw: unknown
 ): CropperViewportRow[] {
 	if ( raw == null || raw === '' ) {
-		return [ emptyCropperRow() ];
+		return [];
 	}
 	if ( Array.isArray( raw ) ) {
 		if ( raw.length === 0 ) {
-			return [ emptyCropperRow() ];
+			return [];
 		}
 		return raw.map( coerceCropperRow );
 	}
@@ -44,28 +44,21 @@ export function normalizePairedCropperOptions(
 			( a, b ) => Number( a ) - Number( b )
 		);
 		if ( keys.length === 0 ) {
-			return [ emptyCropperRow() ];
+			return [];
 		}
 		return keys.map( ( k ) => coerceCropperRow( rec[ k ] ) );
 	}
-	return [ emptyCropperRow() ];
+	return [];
 }
 
 /** Persist as a JSON array of row objects (matches PHP `array` options). */
 export function serializePairedCropperOptions(
 	rows: CropperViewportRow[]
 ): unknown {
-	const filtered = rows.filter(
-		( r ) =>
-			r.option.trim() !== '' ||
-			r.width.trim() !== '' ||
-			r.height.trim() !== '' ||
-			r.price.trim() !== ''
-	);
-	if ( filtered.length === 0 ) {
+	if ( rows.length === 0 ) {
 		return [];
 	}
-	return filtered.map( ( r ) => ( {
+	return rows.map( ( r ) => ( {
 		option: r.option,
 		width: r.width,
 		height: r.height,

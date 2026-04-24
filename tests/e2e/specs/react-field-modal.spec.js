@@ -3,6 +3,9 @@
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
+import { buildPalettesField } from '../fixtures/fields.js';
+import { setPpomLicenseFixture } from '../fixtures/license.js';
+import { createPpomGroup } from '../fixtures/ppom.js';
 import { createSimpleGroupField } from '../utils';
 
 async function visitReactModalGroup( admin, ppomId ) {
@@ -16,6 +19,19 @@ async function openFirstFieldReactModal( page ) {
 	const dialog = page.getByRole( 'dialog' ).first();
 	await expect( dialog ).toBeVisible();
 	return dialog;
+}
+
+async function openAdvancedSettings( dialog ) {
+	const toggle = dialog.getByText( /Show advanced settings/i );
+	if ( ( await toggle.count() ) > 0 ) {
+		await toggle.click();
+	}
+}
+
+async function optionValues( dialog ) {
+	return dialog.locator( 'input[placeholder="Option"]' ).evaluateAll(
+		( inputs ) => inputs.map( ( input ) => input.value )
+	);
 }
 
 test.describe( 'React field modal (opt-in)', () => {
@@ -145,5 +161,77 @@ test.describe( 'React field modal (opt-in)', () => {
 		await expect(
 			dialog.getByRole( 'button', { name: 'Confirm' } )
 		).toBeVisible();
+	} );
+
+	test( 'matrix-style options reorder, add, and remove', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		await setPpomLicenseFixture( requestUtils, {
+			valid: true,
+			plan: 3,
+			proInstalled: true,
+		} );
+
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'React modal matrix options',
+			fields: [
+				buildPalettesField( {
+					title: 'Palette Options',
+					dataName: 'palette_options',
+					options: [
+						{
+							option: 'Small',
+							price: '10',
+							label: 'Small label',
+							id: 'small',
+						},
+						{
+							option: 'Large',
+							price: '20',
+							label: 'Large label',
+							id: 'large',
+						},
+					],
+				} ),
+			],
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		let dialog = await openFirstFieldReactModal( page );
+		await openAdvancedSettings( dialog );
+
+		await expect(
+			dialog.locator( 'input[placeholder="Option"]' )
+		).toHaveCount( 2 );
+		expect( await optionValues( dialog ) ).toEqual( [ 'Small', 'Large' ] );
+
+		const dragHandles = dialog.getByRole( 'button', {
+			name: 'Drag to reorder',
+		} );
+		await dragHandles.nth( 1 ).focus();
+		await page.keyboard.press( 'ArrowUp' );
+		expect( await optionValues( dialog ) ).toEqual( [ 'Large', 'Small' ] );
+
+		await dialog.getByRole( 'button', { name: 'Add option' } ).click();
+		await expect(
+			dialog.locator( 'input[placeholder="Option"]' )
+		).toHaveCount( 3 );
+		await dialog
+			.locator( 'input[placeholder="Option"]' )
+			.nth( 2 )
+			.click();
+		await page.keyboard.type( 'Medium' );
+		await expect(
+			dialog.locator( 'input[placeholder="Option"]' ).nth( 2 )
+		).toHaveValue( 'Medium' );
+
+		await dialog
+			.getByRole( 'button', { name: 'Remove' } )
+			.first()
+			.click();
+		expect( await optionValues( dialog ) ).toEqual( [ 'Small', 'Medium' ] );
 	} );
 } );
