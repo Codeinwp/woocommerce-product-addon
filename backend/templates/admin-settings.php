@@ -9,6 +9,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+/** @var PPOM_SettingsFramework $class_ins */
 
 $admin_url   = admin_url( 'admin-post.php' );
 $migrate_url = add_query_arg(
@@ -120,6 +121,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 													if ( ! empty( $params ) ) {
 														foreach ( $params as $id => $input_meta ) {
 
+															$id                     = (string) $id;
 															$type                   = isset( $input_meta['type'] ) ? $input_meta['type'] : '';
 															$title                  = isset( $input_meta['title'] ) ? $input_meta['title'] : '';
 															$desc                   = isset( $input_meta['desc'] ) ? $input_meta['desc'] : '';
@@ -132,6 +134,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 															$ref_link               = isset( $reference['ref_link'] ) ? $reference['ref_link'] : '';
 															$video_title            = isset( $reference['ref_video_title'] ) ? $reference['ref_video_title'] : '';
 															$video_link             = isset( $reference['ref_video_link'] ) ? $reference['ref_video_link'] : '';
+															$is_readonly            = isset( $input_meta['readonly'] ) ? $input_meta['readonly'] : false;
 															$input_meta['input_id'] = $id;
 															$condition_class        = '';
 															$is_input_available     = isset( $input_meta['is_available'] ) ? $input_meta['is_available'] : $is_available;
@@ -168,83 +171,127 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																				</p>
 																			</div>
 																		<?php endif; ?>
-																		<h3>
+																		<?php
+																		$ppom_section_icons = array(
+																			'ppom_integrations_rest' => 'dashicons-networking',
+																			'ppom_integrations_wcfm' => 'dashicons-store',
+																		);
+																		?>
+																		<h3 class="ppom-section-heading" data-section-id="<?php echo esc_attr( $id ); ?>">
+																			<?php if ( isset( $ppom_section_icons[ $id ] ) ) : ?>
+																				<span class="ppom-section-icon dashicons <?php echo esc_attr( $ppom_section_icons[ $id ] ); ?>"></span>
+																			<?php endif; ?>
 																			<?php echo esc_html( $title ); ?>
 																			<?php if ( ! empty( $desc ) ) { ?>
-																				<span class="nmsf-field-desc"><?php echo $desc; ?></span>
+																				<span class="nmsf-field-desc"><?php echo esc_html( $desc ); ?></span>
 																			<?php } ?>
+																			<?php
+																			$ppom_badge_map = array(
+																				'ppom_integrations_rest' => 'ppom_api_enable',
+																				'ppom_integrations_wcfm' => 'ppom_wcfm_allow_vendors',
+																			);
+																			if ( isset( $ppom_badge_map[ $id ] ) ) {
+																				$badge_field_id = $ppom_badge_map[ $id ];
+																				$badge_enabled  = $class_ins::get_saved_settings( $badge_field_id );
+																				$badge_active   = ( $badge_enabled === 'on' || $badge_enabled === '1' || $badge_enabled === 'yes' );
+																				$badge_class    = $badge_active ? 'ppom-status-badge ppom-badge-active' : 'ppom-status-badge ppom-badge-inactive';
+																				$badge_text     = $badge_active ? __( 'Active', 'woocommerce-product-addon' ) : __( 'Inactive', 'woocommerce-product-addon' );
+																				?>
+																				<span class="<?php echo esc_attr( $badge_class ); ?>"
+																					data-field-id="<?php echo esc_attr( $badge_field_id ); ?>"><?php echo esc_html( $badge_text ); ?></span>
+																				<?php
+																			}
+																			?>
 																		</h3>
 																	</td>
 																</tr>
 															<?php } else { ?>
+																<?php
+																if ( 'ppom_available_endpoints' === $id ) {
+																	$class_ins::load_template( 'templates/available-endpoints.php', $input_meta );
+																	continue;
+																}
+																?>
 																<tr
-																		data-conditions="<?php echo esc_attr( json_encode( $conditions ) ); ?>"
-																		class="<?php echo $condition_class; ?>"
+																		data-conditions="<?php echo esc_attr( wp_json_encode( $conditions ) ); ?>"
+																		class="<?php echo esc_attr( $condition_class ); ?>"
 																>
 																	<th>
-																		<label for=""><?php echo $title; ?></label>
+																		<label for=""><?php echo esc_html( $title ); ?></label>
 
 																		<?php if ( $tooltip ) { ?>
 																			<span class="nmsf-tooltip"
-																					title="<?php echo $desc; ?>">
-																			<i class="dashicons dashicons-editor-help"></i>
-																		</span>
+																					title="<?php echo esc_attr( $desc ); ?>">
+																				<i class="dashicons dashicons-editor-help"></i>
+																			</span>
 
 																			<!--Tips Area-->
 																			<?php if ( ! empty( $reference ) ) { ?>
 																				<span class="nmsf-ref-area">
-																				<?php if ( $ref_link != '' ) { ?>
-																				<a href="<?php echo esc_url( $ref_link ); ?>"
-																					target="_blank">
-																					<span class="dashicons dashicons-admin-links"></span>
-																					<?php echo $ref_title; ?>
-																				</a>
-																			<?php } ?>
+																					<?php if ( $ref_link != '' ) { ?>
+																						<a href="<?php echo esc_url( $ref_link ); ?>"
+																							target="_blank">
+																							<span class="dashicons dashicons-admin-links"></span>
+																							<?php echo esc_html( $ref_title ); ?>
+																						</a>
+																					<?php } ?>
 
 																					<?php if ( $video_link != '' ) { ?>
 																						<a class="nmsf-ref-video-popup"
 																							video-url="<?php echo esc_url( $video_link ); ?>">
-																					<span class="dashicons dashicons-video-alt2"></span>
-																						<?php echo $video_title; ?>
-																				</a>
+																							<span class="dashicons dashicons-video-alt2"></span>
+																							<?php echo esc_html( $video_title ); ?>
+																						</a>
 																					<?php } ?>
-																		</span>
+																				</span>
 																			<?php } ?>
 
 																		<?php } else { ?>
-																			<span class="nmsf-field-desc"><?php echo $desc; ?></span>
+																			<span class="nmsf-field-desc"><?php echo esc_html( $desc ); ?></span>
 
 																			<?php if ( ! empty( $reference ) ) { ?>
 																				<span class="nmsf-ref-area">
-																				<?php if ( $ref_link != '' ) { ?>
-																				<a href="<?php echo esc_url( $ref_link ); ?>"
-																					target="_blank">
-																					<span class="dashicons dashicons-admin-links"></span>
-																					<?php echo $ref_title; ?>
-																				</a>
-																			<?php } ?>
+																					<?php if ( $ref_link != '' ) { ?>
+																						<a href="<?php echo esc_url( $ref_link ); ?>"
+																							target="_blank">
+																							<span class="dashicons dashicons-admin-links"></span>
+																							<?php echo esc_html( $ref_title ); ?>
+																						</a>
+																					<?php } ?>
 
 																					<?php if ( $video_link != '' ) { ?>
 																						<a class="nmsf-ref-video-popup"
 																							video-url="<?php echo esc_url( $video_link ); ?>">
-																					<span class="dashicons dashicons-video-alt2"></span>
-																						<?php echo $video_title; ?>
-																				</a>
+																							<span class="dashicons dashicons-video-alt2"></span>
+																							<?php echo esc_html( $video_title ); ?>
+																						</a>
 																					<?php } ?>
-																		</span>
+																				</span>
 																				<?php
 																			}
 																		}
 																		?>
 																	</th>
 																	<td>
-																		<?php $class_ins->load_inputs( $input_meta ); ?>
-
-																		<?php if ( $hint != '' ) { ?>
-																			<span class="nmsf-hint-area">
-																			<span><?php echo _e( 'Hint: ', 'woocommerce-product-addon' ); ?></span>
-																			<?php echo esc_html( $hint ); ?>
-																		</span>
+																		<?php if ( $is_readonly ) { ?>
+																			<div class="ppom-rest-url-block">
+																				<?php $class_ins->load_inputs( $input_meta ); ?>
+																				<button type="button" class="ppom-copy-btn button button-small"
+																					data-target="ppom_rest_base_url"
+																					title="<?php esc_attr_e( 'Copy URL', 'woocommerce-product-addon' ); ?>">
+																					<?php esc_html_e( 'Copy', 'woocommerce-product-addon' ); ?>
+																				</button>
+																			</div>
+																			<?php
+																		} else {
+																			$class_ins->load_inputs( $input_meta );
+																			if ( $hint != '' ) {
+																				?>
+																				<span class="nmsf-hint-area">
+																				<span><?php esc_html_e( 'Hint: ', 'woocommerce-product-addon' ); ?></span>
+																				<?php echo esc_html( $hint ); ?>
+																			</span>
+																			<?php } ?>
 																		<?php } ?>
 																	</td>
 																</tr>

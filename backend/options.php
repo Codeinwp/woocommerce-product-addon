@@ -733,19 +733,30 @@ function ppom_load_pro_options() {
 
 	$integration_settings = array();
 
-	$integration_settings['ppom_integrations_rest'] = array(
+	$integration_settings['ppom_integrations_rest']   = array(
 		'type'  => 'section',
 		'title' => __( 'REST API', 'woocommerce-product-addon' ),
 	);
-	$integration_settings['ppom_api_enable']        = array(
+	$integration_settings['ppom_api_enable']          = array(
 		'type'  => 'checkbox',
 		'title' => __( 'PPOM REST API', 'woocommerce-product-addon' ),
 		'desc'  => __( 'Check this option to enable PPOM REST API.', 'woocommerce-product-addon' ),
 	);
-	$integration_settings['ppom_rest_secret_key']   = array(
-		'type'  => 'text',
+	$integration_settings['ppom_rest_base_url']       = array(
+		'type'     => 'text',
+		'title'    => __( 'Base URL', 'woocommerce-product-addon' ),
+		'readonly' => true,
+		'default'  => rest_url( 'ppom/v1' ),
+		'class'    => 'ppom-rest-url-input',
+	);
+	$integration_settings['ppom_rest_secret_key']     = array(
+		'type'  => 'password',
 		'title' => __( 'Secret Key', 'woocommerce-product-addon' ),
 		'desc'  => __( 'Enter any characters to create a secret key. This key must be provided when making API requests.', 'woocommerce-product-addon' ),
+	);
+	$integration_settings['ppom_available_endpoints'] = array(
+		'type'  => 'textarea',
+		'title' => __( 'Available Endpoints', 'woocommerce-product-addon' ),
 	);
 
 	$integration_settings['ppom_integrations_wcfm']  = array(

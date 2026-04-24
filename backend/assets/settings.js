@@ -152,4 +152,68 @@ jQuery(function($) {
             }
         });
     });
+
+    $(document).on('click', '.ppom-eye-toggle', function () {
+        var targetId = $(this).data('target');
+        var $input   = $('#' + targetId);
+        var reveal   = $input.attr('type') === 'password';
+        $input.attr('type', reveal ? 'text' : 'password');
+        $(this).find('.dashicons')
+            .toggleClass('dashicons-visibility', !reveal)
+            .toggleClass('dashicons-hidden',     reveal);
+    });
+
+    function ppomCopyFeedback($btn) {
+        var $icon = $btn.find('.dashicons');
+        if ($icon.length) {
+            $icon.removeClass('dashicons-clipboard').addClass('dashicons-yes');
+            $btn.addClass('ppom-copied');
+            setTimeout(function () {
+                $icon.removeClass('dashicons-yes').addClass('dashicons-clipboard');
+                $btn.removeClass('ppom-copied');
+            }, 2000);
+        } else {
+            var orig = $btn.text();
+            $btn.addClass('ppom-copied').text(nmsf_vars.copied);
+            setTimeout(function () { $btn.removeClass('ppom-copied').text(orig); }, 2000);
+        }
+    }
+
+    function ppomExecCopy(text) {
+        var $tmp = $('<textarea>').css({ position: 'fixed', top: 0, left: '-9999px', opacity: 0 }).val(text);
+        $('body').append($tmp);
+        $tmp[0].focus();
+        $tmp[0].select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) {}
+        $tmp.remove();
+        return ok;
+    }
+
+    $(document).on('click', '.ppom-copy-btn', function () {
+        var $btn     = $(this);
+        var targetId = $btn.data('target');
+        var $target  = $('#' + targetId);
+        var text     = ($target.is('input') ? $target.val() : $target.text()).trim();
+        if (!text) { return; }
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text)
+                .then(function () { ppomCopyFeedback($btn); })
+                .catch(function () { if (ppomExecCopy(text)) { ppomCopyFeedback($btn); } });
+        } else if (ppomExecCopy(text)) {
+            ppomCopyFeedback($btn);
+        }
+    });
+
+    $(document).on('change', 'input[type="checkbox"][data-rule-id]', function () {
+        var fieldId = $(this).data('rule-id');
+        var $badge  = $('.ppom-status-badge[data-field-id="' + fieldId + '"]');
+        if (!$badge.length) { return; }
+        var active = $(this).is(':checked');
+        $badge
+            .removeClass('ppom-badge-active ppom-badge-inactive')
+            .addClass(active ? 'ppom-badge-active' : 'ppom-badge-inactive')
+            .html(active ? nmsf_vars.active : nmsf_vars.inactive);
+    });
 });
