@@ -12,7 +12,6 @@ function FieldPickerPanelComponent( {
 	i18n,
 	catalogGroups,
 	pickerQuery,
-	onPickerQueryChange,
 	onPickType,
 	upsell,
 	license,
@@ -23,7 +22,6 @@ function FieldPickerPanelComponent( {
 				<FieldTypePicker
 					catalogGroups={ catalogGroups }
 					query={ pickerQuery }
-					onQueryChange={ onPickerQueryChange }
 					onPick={ onPickType }
 					upsell={ upsell }
 					license={ license }

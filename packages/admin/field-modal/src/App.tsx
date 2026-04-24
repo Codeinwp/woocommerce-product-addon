@@ -7,6 +7,7 @@ import { useConfirmClose } from './hooks/useConfirmClose';
 import { FieldModalFrame } from './components/FieldModalFrame';
 import { FieldModalBody } from './components/FieldModalBody';
 import { FieldModalFooter } from './components/FieldModalFooter';
+import { FieldPickerHeader } from './components/FieldPickerHeader';
 
 export interface AppProps {
 	productmetaId?: number;
@@ -91,6 +92,15 @@ export function App( { productmetaId }: AppProps ) {
 			onClose={ requestClose }
 			saving={ saving }
 			title={ modalTitle }
+			headerContent={
+				pickerOpen ? (
+					<FieldPickerHeader
+						i18n={ i18n }
+						query={ pickerQuery }
+						onQueryChange={ setPickerQuery }
+					/>
+				) : undefined
+			}
 			onBack={ canGoBack ? onBackToFieldTypes : undefined }
 			backLabel={ i18n.back || 'Back' }
 		>

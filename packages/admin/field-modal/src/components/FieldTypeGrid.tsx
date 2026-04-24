@@ -2,8 +2,9 @@
  * Grid of field type tiles (free vs locked Pro) for the type picker.
  */
 import { Fragment, memo } from '@wordpress/element';
-import { Box, Button, SimpleGrid, Text } from '@chakra-ui/react';
+import { Button, SimpleGrid, Text } from '@chakra-ui/react';
 import { Tooltip } from './ui/tooltip';
+import { FieldTypeProBadge } from './FieldTypeProBadge';
 import { firstSentence, getFieldGuide } from '../definitions/fieldGuides';
 import type { CatalogItem, I18nDict } from '../types/fieldModal';
 
@@ -44,7 +45,7 @@ function FieldTypeGridComponent( {
 						height="auto"
 						minH="unset"
 						p={ 2 }
-						pr={ locked ? 10 : 2 }
+						pr={ locked ? 11 : 2 }
 						position={ locked ? 'relative' : undefined }
 						overflow={ locked ? 'visible' : undefined }
 						flexDir="row"
@@ -93,47 +94,16 @@ function FieldTypeGridComponent( {
 							as="span"
 							flex="1"
 							minW={ 0 }
-							fontWeight="semibold"
+							fontWeight={ locked ? '400' : 'semibold' }
 							fontSize="xs"
-							lineClamp={ 2 }
+							whiteSpace="nowrap"
+							overflow="hidden"
+							textOverflow="ellipsis"
 						>
 							{ f.title }
 						</Text>
 						{ locked ? (
-							<Box
-								as="span"
-								className="upsell-btn-wrapper"
-								aria-hidden
-								/**
-								 * Modal content is portaled outside `#ppom-field-modal-root`, so
-								 * theme global `.upsell-btn-wrapper` rules do not apply — keep
-								 * styles here (matches ppom-admin.css / classic modal chip).
-								 * Decorative badge only: the tile `Button` opens the upsell URL.
-								 */
-								css={ {
-									position: 'absolute',
-									top: 0,
-									right: 0,
-									zIndex: 2,
-									background: '#28A745',
-									p: '2px 6px',
-									borderRadius: '3px',
-									lineHeight: 1.2,
-									display: 'inline-flex',
-									alignItems: 'center',
-									columnGap: '5px',
-									color: 'white',
-									fontSize: '12px',
-
-									'& & .fa': {
-										color: 'white',
-										fontSize: '12px',
-									},
-								} }
-							>
-								<i className="fa fa-lock" aria-hidden="true" />
-								{ i18n.proBadge }
-							</Box>
+							<FieldTypeProBadge label={ i18n.proBadge } />
 						) : null }
 					</Button>
 				);

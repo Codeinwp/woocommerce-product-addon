@@ -17,6 +17,7 @@ export interface FieldModalFrameProps {
 	onClose: () => void;
 	saving: boolean;
 	title: string;
+	headerContent?: ReactNode;
 	onBack?: () => void;
 	backLabel?: string;
 	children: ReactNode;
@@ -27,6 +28,7 @@ export function FieldModalFrame( {
 	onClose,
 	saving,
 	title,
+	headerContent,
 	onBack,
 	backLabel,
 	children,
@@ -93,7 +95,7 @@ export function FieldModalFrame( {
 						maxW={ {
 							base: '96vw',
 							md: 'min(92vw, 58rem)',
-							lg: '62rem',
+							lg: 'min(92vw, 1100px)',
 						} }
 						w="full"
 						maxH="min(90vh, 56rem)"
@@ -128,6 +130,8 @@ export function FieldModalFrame( {
 											{ title }
 										</Text>
 									</HStack>
+								) : headerContent ? (
+									headerContent
 								) : (
 									title
 								) }

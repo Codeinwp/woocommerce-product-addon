@@ -2,7 +2,7 @@
  * Grouped field type picker with Pro locks and optional upsell sidebar.
  */
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { Box, Flex, HStack, Input, Tabs, Text, VStack } from '@chakra-ui/react';
+import { Box, Flex, Tabs, Text, VStack } from '@chakra-ui/react';
 import { FieldTypeGrid } from './components/FieldTypeGrid';
 import { FieldTypeUpsellSidebar } from './components/FieldTypeUpsellSidebar';
 import { FieldPreviewPanel } from './components/FieldPreviewPanel';
@@ -21,7 +21,6 @@ const ALL_GROUPS_TAB_VALUE = '__ppom_all_groups__';
 export interface FieldTypePickerProps {
 	catalogGroups: CatalogGroup[];
 	query: string;
-	onQueryChange: ( q: string ) => void;
 	onPick: ( slug: string ) => void;
 	upsell?: ModalUpsellPayload | null;
 	license?: LicensePayload | null;
@@ -31,7 +30,6 @@ export interface FieldTypePickerProps {
 export function FieldTypePicker( {
 	catalogGroups,
 	query,
-	onQueryChange,
 	onPick,
 	upsell,
 	license,
@@ -90,23 +88,6 @@ export function FieldTypePicker( {
 		>
 			<Box flex="1" minW={ 0 } pr={ { lg: 4 } }>
 				<VStack align="stretch" gap={ 3 }>
-					<HStack flexWrap="wrap" gap={ 3 }>
-						<Text fontWeight="bold" fontSize="lg">
-							{ i18n.selectFieldType }
-						</Text>
-						<Input
-							flex="1"
-							minW="200px"
-							size="md"
-							bg="white"
-							placeholder={ i18n.searchFieldTypes }
-							value={ query }
-							onChange={ ( e ) =>
-								onQueryChange( e.currentTarget.value )
-							}
-						/>
-					</HStack>
-
 					<Tabs.Root
 						variant="subtle"
 						colorPalette="blue"
