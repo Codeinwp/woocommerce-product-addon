@@ -149,7 +149,7 @@ final class Routes {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $o, 'get_ppom_meta_info_order' ),
-				'permission_callback' => array( $this, 'check_read_permission' ),
+				'permission_callback' => array( $this, 'check_write_permission' ),
 			)
 		);
 
