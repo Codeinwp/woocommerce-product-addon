@@ -647,3 +647,185 @@ div.nmsf-panels-area .nmsf-panels-content p {
 .ppom-is-locked-field select,
 .ppom-is-locked-panel select{   cursor: not-allowed;
     pointer-events: none; }
+
+h3.ppom-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-left: 4px solid #6576ff;
+    background: #f6f7ff;
+    padding: 8px 14px;
+    margin: 0.8em 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 1em;
+    color: #1d2327;
+}
+
+.ppom-status-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72em;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 12px;
+    margin-left: 8px;
+    vertical-align: middle;
+    line-height: 1.6;
+    white-space: nowrap;
+}
+
+.ppom-badge-active {
+    background: #e6f9ed;
+    color: #1a7a40;
+    border: 1px solid #b4e8c5;
+}
+
+.ppom-badge-inactive {
+    background: #f2f2f2;
+    color: #888;
+    border: 1px solid #d0d0d0;
+}
+
+.ppom-section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #6576ff;
+    color: #fff;
+    font-size: 15px;
+    flex-shrink: 0;
+    margin-right: 4px;
+}
+
+.ppom-rest-url-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0 6px;
+    flex-wrap: wrap;
+}
+
+.ppom-rest-url-input {
+    flex: 1;
+    min-width: 200px;
+    background: #f0f0f1 !important;
+    border: 1px solid #ddd !important;
+    color: #3c434a !important;
+    font-family: monospace;
+    font-size: 0.85em !important;
+    cursor: default;
+}
+
+.ppom-available-endpoints-section td{
+    float: right;
+}
+
+.ppom-available-endpoint-list th {
+    padding-top: 0px;
+}
+
+.ppom-api-guide-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.82em;
+    color: #6576ff;
+    text-decoration: none;
+}
+
+.ppom-api-guide-link:hover {
+    color: #4a5be0;
+    text-decoration: underline;
+}
+
+.ppom-endpoint-group {
+    border-top: 1px solid #f0f0f1;
+}
+
+.ppom-endpoint-group-label {
+    display: block;
+    font-weight: 700;
+    color: #8c8f94;
+    margin-bottom: 4px;
+}
+
+.ppom-endpoint-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.ppom-method-badge {
+    display: inline-block;
+    font-size: 0.75em;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    min-width: 36px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.ppom-method-get {
+    background: #e6f9ed;
+    color: #1a7a40;
+    border: 1px solid #b4e8c5;
+}
+
+.ppom-method-post {
+    background: #fff3e0;
+    color: #b85d00;
+    border: 1px solid #ffd699;
+}
+
+.ppom-endpoint-path {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 12px;
+    color: #3c434a;
+    font-family: monospace;
+}
+
+.ppom-endpoint-desc {
+    color: #6c757d;
+    font-size: 12px;
+}
+
+.ppom-endpoint-auth {
+    font-size: 13px !important;
+    width: 13px !important;
+    height: 13px !important;
+    color: #8c8f94;
+    flex-shrink: 0;
+}
+
+.ppom-password-field-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ppom-password-field-wrap input[type="password"],
+.ppom-password-field-wrap input[type="text"] {
+    flex: 1;
+    min-width: 0;
+}
+
+.ppom-eye-toggle .dashicons,
+.ppom-copy-btn .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+
+.ppom-copy-btn.ppom-copied {
+    color: #1a7a40;
+}
