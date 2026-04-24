@@ -29,6 +29,20 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	protected $original_wc_customer;
 
 	/**
+	 * Test user with edit_products capability for REST read routes.
+	 *
+	 * @var int|null
+	 */
+	protected $ppom_test_read_user;
+
+	/**
+	 * Test user with manage_woocommerce capability for REST write routes.
+	 *
+	 * @var int|null
+	 */
+	protected $ppom_test_write_user;
+
+	/**
 	 * Whether test license filters are registered.
 	 *
 	 * @var bool
@@ -86,6 +100,7 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		}
 
 		$this->remove_ppom_license_filters();
+		wp_set_current_user( 0 );
 
 		parent::tearDown();
 	}
@@ -705,6 +720,23 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Create a test user with shop_manager role.
+	 *
+	 * @return int User ID.
+	 */
+	protected function create_shop_manager_user() {
+		if ( null === $this->ppom_test_read_user ) {
+			$this->ppom_test_read_user = $this->factory->user->create(
+				array(
+					'role' => 'shop_manager',
+				)
+			);
+		}
+
+		return $this->ppom_test_read_user;
+	}
+
+	/**
 	 * Register the PPOM REST routes for the current test.
 	 *
 	 * @param string $secret_key REST secret key.
@@ -726,15 +758,20 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	/**
 	 * Dispatch a PPOM REST request through the registered route table.
 	 *
-	 * @param string $method     HTTP method.
-	 * @param string $route      Route path.
-	 * @param array  $params     Request params.
-	 * @param string $secret_key Expected secret key.
+	 * @param string $method          HTTP method.
+	 * @param string $route           Route path.
+	 * @param array  $params          Request params.
+	 * @param string $secret_key      Expected secret key.
+	 * @param bool   $authenticate    Whether to authenticate as appropriate user (default true).
 	 *
 	 * @return WP_REST_Response
 	 */
-	protected function dispatch_ppom_rest_request( $method, $route, $params = array(), $secret_key = 'secret-key' ) {
+	protected function dispatch_ppom_rest_request( $method, $route, $params = array(), $secret_key = 'secret-key', $authenticate = true ) {
 		$this->register_ppom_rest_routes( $secret_key );
+
+		if ( $authenticate ) {
+			wp_set_current_user( $this->create_shop_manager_user() );
+		}
 
 		$response = $this->dispatch_rest_request_to_route( $method, $route, $params );
 		$data     = $response->get_data();
