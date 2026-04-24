@@ -214,6 +214,6 @@ jQuery(function($) {
         $badge
             .removeClass('ppom-badge-active ppom-badge-inactive')
             .addClass(active ? 'ppom-badge-active' : 'ppom-badge-inactive')
-            .html(active ? nmsf_vars.active : nmsf_vars.inactive);
+            .text(active ? nmsf_vars.active : nmsf_vars.inactive);
     });
 });

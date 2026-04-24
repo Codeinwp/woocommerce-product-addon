@@ -9,7 +9,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/** @var PPOM_SettingsFramework $class_ins */
+/**
+ * PPOM_SettingsFramework class instance
+ *
+ * @var PPOM_SettingsFramework $class_ins
+ */
 
 $input_id = isset( $input_meta['input_id'] ) ? $input_meta['input_id'] : '';
 $default  = isset( $input_meta['default'] ) ? $input_meta['default'] : '';

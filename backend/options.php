@@ -745,7 +745,7 @@ function ppom_load_pro_options() {
 	$integration_settings['ppom_rest_base_url']       = array(
 		'type'     => 'text',
 		'title'    => __( 'Base URL', 'woocommerce-product-addon' ),
-		'readonly' => true,
+		'disabled' => true,
 		'default'  => rest_url( 'ppom/v1' ),
 		'class'    => 'ppom-rest-url-input',
 	);

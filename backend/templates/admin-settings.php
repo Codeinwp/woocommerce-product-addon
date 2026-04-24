@@ -9,7 +9,11 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-/** @var PPOM_SettingsFramework $class_ins */
+/**
+ * PPOM_SettingsFramework class instance
+ *
+ * @var PPOM_SettingsFramework $class_ins
+ */
 
 $admin_url   = admin_url( 'admin-post.php' );
 $migrate_url = add_query_arg(
@@ -54,7 +58,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 					<div class="nmsf-panels-area">
 						<p class="submit">
 							<input type="submit" class="woocommerce-save-button components-button is-primary"
-									value="<?php _e( 'Save changes', 'woocommerce-product-addon' ); ?>"/>
+									value="<?php esc_attr_e( 'Save changes', 'woocommerce-product-addon' ); ?>"/>
 						</p>
 						<?php
 						foreach ( $tabs as $tab_id => $tab_meta ) {
@@ -121,21 +125,20 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 													if ( ! empty( $params ) ) {
 														foreach ( $params as $id => $input_meta ) {
 
-															$id                     = (string) $id;
-															$type                   = isset( $input_meta['type'] ) ? $input_meta['type'] : '';
-															$title                  = isset( $input_meta['title'] ) ? $input_meta['title'] : '';
+															$_id                    = (string) $id;
+															$_type                  = isset( $input_meta['type'] ) ? $input_meta['type'] : '';
+															$_title                 = isset( $input_meta['title'] ) ? $input_meta['title'] : '';
 															$desc                   = isset( $input_meta['desc'] ) ? $input_meta['desc'] : '';
 															$tooltip                = isset( $input_meta['tooltip'] ) ? $input_meta['tooltip'] : false;
 															$hint                   = isset( $input_meta['hint'] ) ? $input_meta['hint'] : '';
-															$type                   = isset( $input_meta['type'] ) ? $input_meta['type'] : '';
 															$conditions             = isset( $input_meta['conditions'] ) ? $input_meta['conditions'] : array();
 															$reference              = isset( $input_meta['reference'] ) ? $input_meta['reference'] : array();
 															$ref_title              = isset( $reference['ref_title'] ) ? $reference['ref_title'] : '';
 															$ref_link               = isset( $reference['ref_link'] ) ? $reference['ref_link'] : '';
 															$video_title            = isset( $reference['ref_video_title'] ) ? $reference['ref_video_title'] : '';
 															$video_link             = isset( $reference['ref_video_link'] ) ? $reference['ref_video_link'] : '';
-															$is_readonly            = isset( $input_meta['readonly'] ) ? $input_meta['readonly'] : false;
-															$input_meta['input_id'] = $id;
+															$is_disabled            = isset( $input_meta['disabled'] ) ? $input_meta['disabled'] : false;
+															$input_meta['input_id'] = $_id;
 															$condition_class        = '';
 															$is_input_available     = isset( $input_meta['is_available'] ) ? $input_meta['is_available'] : $is_available;
 															if ( ! $is_input_available ) {
@@ -148,10 +151,10 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 
 															?>
 
-															<?php if ( $type == 'section' ) { ?>
+															<?php if ( $_type == 'section' ) { ?>
 																<tr
-																		data-conditions="<?php echo esc_attr( json_encode( $conditions ) ); ?>"
-																		class="<?php echo $condition_class; ?>"
+																		data-conditions="<?php echo esc_attr( wp_json_encode( $conditions ) ); ?>"
+																		class="<?php echo esc_attr( $condition_class ); ?>"
 																>
 																	<td class="nmsf-section-type" colspan="2">
 																		<?php if ( $is_available && ! $is_input_available ) : ?>
@@ -159,12 +162,12 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																					<?php
 																					printf(
 																						// translators: %1$s: the name of plugin feature, %2$s: opening anchor tag.
-																						__( '%1$s customization is not available on your current plan. %2$s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ),
-																						esc_html( $title ),
+																						esc_html__( '%1$s customization is not available on your current plan. %2$s plan to unlock the ability to fully enable and customize this functionality.', 'woocommerce-product-addon' ),
+																						esc_html( $_title ),
 																						sprintf(
 																							'<a href="%s" target="_blank">%s</a>',
-																							esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, $id ) ) ),
-																							__( 'Upgrade to the Pro', 'woocommerce-product-addon' )
+																							esc_url( tsdk_translate_link( tsdk_utmify( PPOM_UPGRADE_URL, $_id ) ) ),
+																							esc_html__( 'Upgrade to the Pro', 'woocommerce-product-addon' )
 																						)
 																					);
 																					?>
@@ -177,11 +180,11 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																			'ppom_integrations_wcfm' => 'dashicons-store',
 																		);
 																		?>
-																		<h3 class="ppom-section-heading" data-section-id="<?php echo esc_attr( $id ); ?>">
-																			<?php if ( isset( $ppom_section_icons[ $id ] ) ) : ?>
-																				<span class="ppom-section-icon dashicons <?php echo esc_attr( $ppom_section_icons[ $id ] ); ?>"></span>
+																		<h3 class="ppom-section-heading" data-section-id="<?php echo esc_attr( $_id ); ?>">
+																			<?php if ( isset( $ppom_section_icons[ $_id ] ) ) : ?>
+																				<span class="ppom-section-icon dashicons <?php echo esc_attr( $ppom_section_icons[ $_id ] ); ?>"></span>
 																			<?php endif; ?>
-																			<?php echo esc_html( $title ); ?>
+																			<?php echo esc_html( $_title ); ?>
 																			<?php if ( ! empty( $desc ) ) { ?>
 																				<span class="nmsf-field-desc"><?php echo esc_html( $desc ); ?></span>
 																			<?php } ?>
@@ -190,8 +193,8 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																				'ppom_integrations_rest' => 'ppom_api_enable',
 																				'ppom_integrations_wcfm' => 'ppom_wcfm_allow_vendors',
 																			);
-																			if ( isset( $ppom_badge_map[ $id ] ) ) {
-																				$badge_field_id = $ppom_badge_map[ $id ];
+																			if ( isset( $ppom_badge_map[ $_id ] ) ) {
+																				$badge_field_id = $ppom_badge_map[ $_id ];
 																				$badge_enabled  = $class_ins::get_saved_settings( $badge_field_id );
 																				$badge_active   = ( $badge_enabled === 'on' || $badge_enabled === '1' || $badge_enabled === 'yes' );
 																				$badge_class    = $badge_active ? 'ppom-status-badge ppom-badge-active' : 'ppom-status-badge ppom-badge-inactive';
@@ -207,7 +210,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																</tr>
 															<?php } else { ?>
 																<?php
-																if ( 'ppom_available_endpoints' === $id ) {
+																if ( 'ppom_available_endpoints' === $_id ) {
 																	$class_ins::load_template( 'templates/available-endpoints.php', $input_meta );
 																	continue;
 																}
@@ -217,7 +220,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																		class="<?php echo esc_attr( $condition_class ); ?>"
 																>
 																	<th>
-																		<label for=""><?php echo esc_html( $title ); ?></label>
+																		<label for=""><?php echo esc_html( $_title ); ?></label>
 
 																		<?php if ( $tooltip ) { ?>
 																			<span class="nmsf-tooltip"
@@ -273,11 +276,12 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																		?>
 																	</th>
 																	<td>
-																		<?php if ( $is_readonly ) { ?>
+																		<?php if ( $is_disabled ) { ?>
+																			<?php $copy_target = ! empty( $input_meta['input_id'] ) ? $input_meta['input_id'] : $_id; ?>
 																			<div class="ppom-rest-url-block">
 																				<?php $class_ins->load_inputs( $input_meta ); ?>
 																				<button type="button" class="ppom-copy-btn button button-small"
-																					data-target="ppom_rest_base_url"
+																					data-target="<?php echo esc_attr( $copy_target ); ?>"
 																					title="<?php esc_attr_e( 'Copy URL', 'woocommerce-product-addon' ); ?>">
 																					<?php esc_html_e( 'Copy', 'woocommerce-product-addon' ); ?>
 																				</button>
@@ -343,7 +347,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 						?>
 						<p class="submit">
 							<input type="submit" class="woocommerce-save-button components-button is-primary"
-									value="<?php _e( 'Save changes', 'woocommerce-product-addon' ); ?>"/>
+									value="<?php esc_attr_e( 'Save changes', 'woocommerce-product-addon' ); ?>"/>
 						</p>
 					</div>
 				</div>
