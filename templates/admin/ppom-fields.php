@@ -506,8 +506,8 @@ $fields_groups = array(
 			wp_nonce_field( 'ppom_form_nonce_action', 'ppom_form_nonce' );
 			?>
 
-			<input type="hidden" name="productmeta_id" value="<?php echo esc_attr( $product_meta_id ); ?>">
-			<input type="hidden" name="product_id" value="<?php echo esc_attr( $product_id ); ?>">
+			<input type="hidden" name="productmeta_id" value="<?php echo esc_attr( (string) $product_meta_id ); ?>">
+			<input type="hidden" name="product_id" value="<?php echo esc_attr( (string) $product_id ); ?>">
 
 
 			<div class="ppom-basic-setting-section">
@@ -847,4 +847,3 @@ $fields_groups = array(
 <div class="checker">
 	<?php $form_meta->render_field_settings(); ?>
 </div>
-

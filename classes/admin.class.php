@@ -18,6 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Registers the PPOM menu pages, AJAX attach handlers, legacy WooCommerce
  * settings tab, and admin initialization hooks that prepare the PPOM schema.
+ *
+ * @phpstan-import-type PPOM_Meta_Group_Categories_Tags_Columns from PPOM_Meta_Repository
+ * @phpstan-type PPOM_Attach_Select_Option array{value: string, selected: bool, label: string, disabled?: bool}
+ * @phpstan-type PPOM_Attach_Select_Data array{options: list<PPOM_Attach_Select_Option>, is_used: bool}
  */
 class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
@@ -660,8 +664,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$count_args           = $term_args;
 		$count_args['fields'] = 'count';
 		unset( $count_args['number'], $count_args['offset'] );
-		$total_count = (int) get_terms( $count_args );
-		$has_more    = ( $offset + $per_page ) < $total_count;
+		$total_count_result = get_terms( $count_args );
+		$total_count        = is_wp_error( $total_count_result ) ? 0 : (int) $total_count_result;
+		$has_more           = ( $offset + $per_page ) < $total_count;
 
 		wp_send_json(
 			array(
@@ -678,6 +683,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 *
 	 * @param array $current_values The current values containing product meta categories.
 	 * @return array An array containing the pre-selected category options.
+	 * @phpstan-param PPOM_Meta_Group_Categories_Tags_Columns $current_values
+	 * @phpstan-return PPOM_Attach_Select_Data
 	 */
 	public function get_wc_categories( $current_values ) {
 		$result = array(
@@ -730,6 +737,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @param array $current_values The current values to check against.
 	 *
 	 * @return array An array containing the pre-selected tag options.
+	 * @phpstan-param PPOM_Meta_Group_Categories_Tags_Columns $current_values
+	 * @phpstan-return PPOM_Attach_Select_Data
 	 */
 	public function get_wc_tags( $current_values ) {
 		$result = array(
@@ -784,6 +793,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 *
 	 * @param int $ppom_field_id The ID of the PPOM field to retrieve data for.
 	 * @return array
+	 * @phpstan-return PPOM_Meta_Group_Categories_Tags_Columns
 	 */
 	public function get_db_field( $ppom_field_id ) {
 		$rows = ppom_meta_repository()->get_categories_and_tags_columns( (int) $ppom_field_id );
@@ -895,7 +905,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		wp_nonce_field( 'ppom_attached_nonce_action', 'ppom_attached_nonce' );
 		$nonce_html = ob_get_clean();
 
-		$html = '<div class="ppom-inline-attach-container" data-ppom-id="' . esc_attr( $ppom_id ) . '">'
+		$html = '<div class="ppom-inline-attach-container" data-ppom-id="' . esc_attr( (string) $ppom_id ) . '">'
 			. $nonce_html;
 
 		$chunks = array_chunk( $rendered, 2 );
@@ -918,6 +928,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 *
 	 * @param int $ppom_field_id The ID of the PPOM field.
 	 * @return array
+	 * @phpstan-return PPOM_Meta_Group_Categories_Tags_Columns
 	 */
 	private static function get_db_field_static( $ppom_field_id ) {
 		$rows = ppom_meta_repository()->get_categories_and_tags_columns( (int) $ppom_field_id );
@@ -929,6 +940,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 *
 	 * @param int $ppom_id PPOM field-group ID.
 	 * @return array
+	 * @phpstan-return PPOM_Attach_Select_Data
 	 */
 	private static function get_wc_products_static( $ppom_id ) {
 		$result = array(
@@ -952,6 +964,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 *
 	 * @param array $current_values The current saved values.
 	 * @return array
+	 * @phpstan-param PPOM_Meta_Group_Categories_Tags_Columns $current_values
+	 * @phpstan-return PPOM_Attach_Select_Data
 	 */
 	private static function get_wc_categories_static( $current_values ) {
 		$admin = new self();
@@ -963,6 +977,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 *
 	 * @param array $current_values The current saved values.
 	 * @return array
+	 * @phpstan-param PPOM_Meta_Group_Categories_Tags_Columns $current_values
+	 * @phpstan-return PPOM_Attach_Select_Data
 	 */
 	private static function get_wc_tags_static( $current_values ) {
 		$admin = new self();

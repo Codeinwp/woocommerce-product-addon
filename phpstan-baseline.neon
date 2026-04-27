@@ -175,37 +175,7 @@ parameters:
 			path: classes/admin.class.php
 
 		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:get_db_field\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:get_wc_categories\(\) has parameter \$current_values with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:get_wc_categories\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/admin.class.php
-
-		-
 			message: '#^Method NM_PersonalizedProduct_Admin\:\:get_wc_products\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:get_wc_tags\(\) has parameter \$current_values with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: classes/admin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct_Admin\:\:get_wc_tags\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: classes/admin.class.php
@@ -307,12 +277,6 @@ parameters:
 			path: classes/admin.class.php
 
 		-
-			message: '#^Parameter \#2 \$haystack of function in_array expects array, list\<string\>\|false given\.$#'
-			identifier: argument.type
-			count: 1
-			path: classes/admin.class.php
-
-		-
 			message: '#^Parameter \#3 \$tags of method PPOM_Meta_Repository\:\:save_categories_and_tags\(\) expects list\<string\>\|false, array\|false given\.$#'
 			identifier: argument.type
 			count: 1
@@ -369,12 +333,6 @@ parameters:
 		-
 			message: '#^Method PPOM\\Attach\\SelectComponent\:\:get_select\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: classes/attach-popup/select-component.class.php
-
-		-
-			message: '#^Method PPOM\\Attach\\SelectComponent\:\:render\(\) should return string but returns string\|false\.$#'
-			identifier: return.type
 			count: 1
 			path: classes/attach-popup/select-component.class.php
 
@@ -7429,21 +7387,9 @@ parameters:
 			path: templates/admin/ppom-fields.php
 
 		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
-			identifier: argument.type
-			count: 2
-			path: templates/admin/ppom-fields.php
-
-		-
 			message: '#^Parameter \#1 \$text of function esc_attr expects string, int\<1, max\> given\.$#'
 			identifier: argument.type
 			count: 13
-			path: templates/admin/ppom-fields.php
-
-		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, int\|string given\.$#'
-			identifier: argument.type
-			count: 1
 			path: templates/admin/ppom-fields.php
 
 		-
