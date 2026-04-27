@@ -447,6 +447,62 @@ ul.ppom-options-container li {
 */
 
 
+/* Field Groups list-table toolbar: turn the top tablenav strip into a flex row
+   so our toolbar can stretch and "Add Group" can sit at the right end. */
+.ppom-existing-meta-wrapper .tablenav.top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* WP's `.tablenav .tablenav-pages` ships with `margin: 0 0 9px` and
+   `float: right`. We keep its 9px bottom margin (preserves WP's intended
+   gap above the table) but match it on the toolbar divs so all flex
+   children share the same baseline under cross-axis centering. */
+.ppom-existing-meta-wrapper .tablenav.top > .alignleft {
+    float: none;
+    margin-bottom: 9px;
+}
+
+.ppom-existing-meta-wrapper .tablenav.top .tablenav-pages {
+    float: none;
+}
+
+.ppom-listtable-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.ppom-listtable-actions .button,
+.ppom-listtable-actions .button:hover,
+.ppom-listtable-actions .button:focus {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+}
+
+.ppom-listtable-actions .button-primary {
+    margin-left: auto;
+}
+
+.ppom-listtable-actions .button .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+}
+
+/* "Attach to Products" trigger in the table — keep the WP button look without
+   the inherited admin-area link underline. */
+a.ppom-products-modal,
+a.ppom-products-modal:hover,
+a.ppom-products-modal:focus {
+    text-decoration: none;
+}
+
 #ppom-meta-table .dashicons,
 .dashicons-before:before {
     line-height: unset;

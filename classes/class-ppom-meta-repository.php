@@ -280,6 +280,121 @@ class PPOM_Meta_Repository {
 	}
 
 	/**
+	 * Paged + searchable + sortable rows for the admin list table.
+	 *
+	 * Not cached: cache-key cardinality (per page × per search × per sort) isn't
+	 * worth it at this volume, and writes already invalidate the aggregate
+	 * caches that other call sites rely on.
+	 *
+	 * @param array $args {
+	 *     Query args. Unknown `orderby` falls back to `productmeta_id`.
+	 *
+	 *     @type int    $per_page Page size.
+	 *     @type int    $paged    1-based page number.
+	 *     @type string $search   Match against `productmeta_name`; empty disables.
+	 *     @type string $orderby  Either `productmeta_id` or `productmeta_name`.
+	 *     @type string $order    `ASC` or `DESC`.
+	 * }
+	 * @phpstan-param array{
+	 *     per_page?: int,
+	 *     paged?: int,
+	 *     search?: string,
+	 *     orderby?: string,
+	 *     order?: string,
+	 * } $args
+	 * @return list<PPOM_Meta_Group_Row>
+	 */
+	public function get_paged_rows( array $args = array() ) {
+		$defaults = array(
+			'per_page' => 50,
+			'paged'    => 1,
+			'search'   => '',
+			'orderby'  => 'productmeta_id',
+			'order'    => 'ASC',
+		);
+		$args     = array_merge( $defaults, $args );
+
+		$allowed_orderby = array( 'productmeta_id', 'productmeta_name' );
+		$orderby         = in_array( $args['orderby'], $allowed_orderby, true ) ? $args['orderby'] : 'productmeta_id';
+		$order           = strtoupper( (string) $args['order'] ) === 'DESC' ? 'DESC' : 'ASC';
+		$per_page        = max( 1, (int) $args['per_page'] );
+		$paged           = max( 1, (int) $args['paged'] );
+		$offset          = ( $paged - 1 ) * $per_page;
+		$search          = trim( (string) $args['search'] );
+
+		$table = $this->table_name();
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared -- list table queries; results not separately cached; %i identifier placeholders are validated by wpdb.
+		if ( '' === $search ) {
+			// %i is whitelisted for identifiers (WP 6.2+); ORDER direction is
+			// branched on so each template stays a literal string for prepare().
+			$sql = 'ASC' === $order
+				? 'SELECT * FROM %i ORDER BY %i ASC LIMIT %d OFFSET %d'
+				: 'SELECT * FROM %i ORDER BY %i DESC LIMIT %d OFFSET %d';
+
+			$rows = $this->wpdb->get_results(
+				$this->wpdb->prepare( $sql, $table, $orderby, $per_page, $offset )
+			);
+		} else {
+			$sql = 'ASC' === $order
+				? 'SELECT * FROM %i WHERE productmeta_name LIKE %s ORDER BY %i ASC LIMIT %d OFFSET %d'
+				: 'SELECT * FROM %i WHERE productmeta_name LIKE %s ORDER BY %i DESC LIMIT %d OFFSET %d';
+
+			$rows = $this->wpdb->get_results(
+				$this->wpdb->prepare(
+					$sql,
+					$table,
+					'%' . $this->wpdb->esc_like( $search ) . '%',
+					$orderby,
+					$per_page,
+					$offset
+				)
+			);
+		}
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
+
+		if ( ! is_array( $rows ) ) {
+			return array();
+		}
+
+		/**
+		 * Result rows.
+		 *
+		 * @var list<PPOM_Meta_Group_Row> $rows
+		 */
+		return $rows;
+	}
+
+	/**
+	 * Count rows matching the optional search term (admin list table pagination).
+	 *
+	 * @param string $search Optional search term matched against `productmeta_name`.
+	 * @return int
+	 */
+	public function count_filtered_rows( $search = '' ) {
+		$table  = $this->table_name();
+		$search = trim( (string) $search );
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared -- list table count; cheap; %i identifier placeholder validated by wpdb.
+		if ( '' === $search ) {
+			$count = (int) $this->wpdb->get_var(
+				$this->wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table )
+			);
+		} else {
+			$count = (int) $this->wpdb->get_var(
+				$this->wpdb->prepare(
+					'SELECT COUNT(*) FROM %i WHERE productmeta_name LIKE %s',
+					$table,
+					'%' . $this->wpdb->esc_like( $search ) . '%'
+				)
+			);
+		}
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
+
+		return $count;
+	}
+
+	/**
 	 * Count of rows. With `$limit`, returns how many rows exist up to that cap (survey / bounded metrics).
 	 *
 	 * @param int|null $limit When set, count is `min( actual_row_count, $limit )`; negative values are clamped to 0.
