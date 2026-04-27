@@ -1,6 +1,7 @@
 export {
 	attachPpomGroupToCategories,
 	attachPpomGroupToProducts,
+	attachPpomGroupToVariations,
 	createPpomGroup,
 	createSimpleTextGroup,
 	getPpomAttachRowMeta,

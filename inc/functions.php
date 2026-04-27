@@ -121,6 +121,46 @@ function ppom_is_field_hidden_by_condition( ...$args ) {
 	return \PPOM\Support\Helpers::is_field_hidden_by_condition( ...$args );
 }
 
+/**
+ * Returns variation display rules for a parent product.
+ *
+ * @param mixed ...$args Forwarded arguments.
+ * @return array<int, int[]>
+ */
+function ppom_get_variation_rule_map( ...$args ) {
+	return \PPOM\Support\Helpers::get_variation_rule_map( ...$args );
+}
+
+/**
+ * Returns the selected variation IDs for one PPOM group on one product.
+ *
+ * @param mixed ...$args Forwarded arguments.
+ * @return int[]
+ */
+function ppom_get_variation_ids_for_group( ...$args ) {
+	return \PPOM\Support\Helpers::get_variation_ids_for_group( ...$args );
+}
+
+/**
+ * Determines whether a PPOM group is active for the selected variation.
+ *
+ * @param mixed ...$args Forwarded arguments.
+ * @return bool
+ */
+function ppom_is_meta_group_active_for_variation( ...$args ) {
+	return \PPOM\Support\Helpers::is_meta_group_active_for_variation( ...$args );
+}
+
+/**
+ * Filters a posted PPOM payload to the groups active for a variation.
+ *
+ * @param mixed ...$args Forwarded arguments.
+ * @return array
+ */
+function ppom_filter_ppom_payload_by_active_variation( ...$args ) {
+	return \PPOM\Support\Helpers::filter_ppom_payload_by_active_variation( ...$args );
+}
+
 function ppom_get_cart_item_max_quantity( ...$args ) {
 	return \PPOM\Support\Helpers::get_cart_item_max_quantity( ...$args );
 }
