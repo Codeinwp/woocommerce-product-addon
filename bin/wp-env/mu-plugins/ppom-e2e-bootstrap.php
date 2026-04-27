@@ -1094,6 +1094,51 @@ add_action( 'wp_ajax_ppom_e2e_attach_ppom_group', 'ppom_e2e_attach_ppom_group' )
 add_action( 'wp_ajax_nopriv_ppom_e2e_attach_ppom_group', 'ppom_e2e_attach_ppom_group' );
 
 /**
+ * Attach a PPOM field group to specific WooCommerce variations.
+ *
+ * Mirrors the production save path used by the attach modal/inline editor by
+ * calling NM_PersonalizedProduct_Admin::save_variation_attachments(), which
+ * also auto-attaches the parent product so the storefront template emits the
+ * `.ppom-variation-rule-group` wrapper with `data-ppom-allowed-variations`.
+ *
+ * @return void
+ */
+function ppom_e2e_attach_ppom_group_to_variations() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$ppom_id               = isset( $_POST['ppom_id'] ) ? absint( wp_unslash( $_POST['ppom_id'] ) ) : 0;
+	$variation_ids         = ppom_e2e_decode_json_request( 'variation_ids', array() );
+	$initial_variation_ids = ppom_e2e_decode_json_request( 'initial_variation_ids', array() );
+
+	foreach ( array( $variation_ids, $initial_variation_ids ) as $decoded_payload ) {
+		if ( is_wp_error( $decoded_payload ) ) {
+			ppom_e2e_send_wp_error( $decoded_payload );
+		}
+	}
+
+	if ( $ppom_id <= 0 ) {
+		ppom_e2e_send_wp_error(
+			new WP_Error(
+				'invalid_ppom_id',
+				__( 'A valid PPOM group is required.', 'woocommerce-product-addon' )
+			)
+		);
+	}
+
+	$result = NM_PersonalizedProduct_Admin::save_variation_attachments(
+		$ppom_id,
+		is_array( $variation_ids ) ? $variation_ids : array(),
+		is_array( $initial_variation_ids ) ? $initial_variation_ids : array(),
+		true
+	);
+
+	wp_send_json_success( $result );
+}
+add_action( 'wp_ajax_ppom_e2e_attach_ppom_group_to_variations', 'ppom_e2e_attach_ppom_group_to_variations' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_attach_ppom_group_to_variations', 'ppom_e2e_attach_ppom_group_to_variations' );
+
+/**
  * Set PPOM license fixture for E2E (drives product_ppom_license_* filters).
  *
  * @return void

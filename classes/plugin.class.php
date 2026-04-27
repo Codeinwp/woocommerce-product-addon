@@ -81,11 +81,11 @@ class NM_PersonalizedProduct {
 
 		// Validating before add to cart
 		if ( ! ppom_is_client_validation_enabled() ) {
-			add_filter( 'woocommerce_add_to_cart_validation', 'ppom_woocommerce_validate_product', 10, 3 );
+			add_filter( 'woocommerce_add_to_cart_validation', 'ppom_woocommerce_validate_product', 10, 5 );
 		}
 
-		// Adding meta to cart form product page
-		add_filter( 'woocommerce_add_cart_item_data', 'ppom_woocommerce_add_cart_item_data', 10, 2 );
+		// Adding meta to cart form product page.
+		add_filter( 'woocommerce_add_cart_item_data', 'ppom_woocommerce_add_cart_item_data', 10, 4 );
 
 		// add_action( 'wp', array($this, 'wp_loaded') );
 

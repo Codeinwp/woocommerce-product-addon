@@ -84,6 +84,7 @@ jQuery( function ( $ ) {
 	 */
 	function initAttachSelects() {
 		const productSelect = $( '#attach-to-products .ppom-attach' );
+		const variationSelect = $( '#attach-to-variations .ppom-attach' );
 		const categorySelect = $( '#attach-to-categories .ppom-attach' );
 		const tagSelect = $( '#attach-to-tags .ppom-attach' );
 		const attachNonce = $( '#ppom-product-form [name="ppom_attached_nonce"]' )
@@ -96,6 +97,7 @@ jQuery( function ( $ ) {
 		}
 
 		initSelect2Search( productSelect, attachNonce, vars?.productsPlaceholder, vars?.searchAction, 'ppom_search_products', parent );
+		initSelect2Search( variationSelect, attachNonce, vars?.variationsPlaceholder, vars?.searchVariationsAction, 'ppom_search_variations', parent );
 		initSelect2Search( categorySelect, attachNonce, vars?.categoriesPlaceholder, vars?.searchCategoriesAction, 'ppom_search_categories', parent );
 		initSelect2Search( tagSelect, attachNonce, vars?.tagsPlaceholder, vars?.searchTagsAction, 'ppom_search_tags', parent );
 	}
@@ -109,11 +111,13 @@ jQuery( function ( $ ) {
 
 		const attachNonce = $container.find( '[name="ppom_attached_nonce"]' ).val();
 		const productSelect = $container.find( '#attach-to-products .ppom-attach' );
+		const variationSelect = $container.find( '#attach-to-variations .ppom-attach' );
 		const categorySelect = $container.find( '#attach-to-categories .ppom-attach' );
 		const tagSelect = $container.find( '#attach-to-tags .ppom-attach' );
 		const vars = window?.ppom_vars?.attach;
 
 		initSelect2Search( productSelect, attachNonce, vars?.productsPlaceholder, vars?.searchAction, 'ppom_search_products' );
+		initSelect2Search( variationSelect, attachNonce, vars?.variationsPlaceholder, vars?.searchVariationsAction, 'ppom_search_variations' );
 		initSelect2Search( categorySelect, attachNonce, vars?.categoriesPlaceholder, vars?.searchCategoriesAction, 'ppom_search_categories' );
 		initSelect2Search( tagSelect, attachNonce, vars?.tagsPlaceholder, vars?.searchTagsAction, 'ppom_search_tags' );
 	} )();

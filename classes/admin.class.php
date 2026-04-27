@@ -69,6 +69,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		// Getting products list
 		add_action( 'wp_ajax_ppom_get_products', array( $this, 'get_products' ) );
 		add_action( 'wp_ajax_ppom_search_products', array( $this, 'search_products' ) );
+		add_action( 'wp_ajax_ppom_search_variations', array( $this, 'search_variations' ) );
 		add_action( 'wp_ajax_ppom_search_categories', array( $this, 'search_categories' ) );
 		add_action( 'wp_ajax_ppom_search_tags', array( $this, 'search_tags' ) );
 		add_action( 'wp_ajax_ppom_attach_ppoms', array( $this, 'ppom_attach_ppoms' ) );
@@ -390,6 +391,29 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$popup_components[] =
 			new \PPOM\Attach\ContainerItem( $attach_to_tags_component->get_id(), $attach_to_tags_component );
 
+		$select_variations_component = ( new \PPOM\Attach\SelectComponent() )
+			->set_status( $license_status )
+			->set_id( 'attach-to-variations' )
+			->set_title( __( 'Display on Specific Variations', 'woocommerce-product-addon' ) )
+			->set_description( __( 'Select the WooCommerce variations where these product fields should appear. Selecting a variation also attaches this group to its parent product.', 'woocommerce-product-addon' ) )
+			->set_select(
+				array_merge(
+					array(
+						'label'               => __( 'Choose Variations:', 'woocommerce-product-addon' ),
+						'name'                => 'ppom-attach-to-variations[]',
+						'multiple'            => true,
+						'is_used'             => true,
+						'render_empty_option' => false,
+					),
+					$this->get_wc_variations( $ppom_id )
+				)
+			);
+		if ( 'valid' !== $license_status ) {
+			$select_variations_component = $select_variations_component->set_status( 'invalid' );
+		}
+		$popup_components[] =
+			new \PPOM\Attach\ContainerItem( $select_variations_component->get_id(), $select_variations_component );
+
 
 		$popup_components = apply_filters( 'pppom_popup_components', $popup_components, $ppom_id );
 
@@ -491,6 +515,103 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 	/**
+	 * Returns paginated variation matches for the attach modal Select2 control.
+	 *
+	 * @return void
+	 */
+	public function search_variations() {
+		$nonce = isset( $_GET['ppom_attached_nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['ppom_attached_nonce'] ) ) : '';
+
+		if ( ! wp_verify_nonce( $nonce, 'ppom_attached_nonce_action' ) || ! ppom_security_role() ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'woocommerce-product-addon' ),
+				),
+				403
+			);
+		}
+
+		$search_term = '';
+		if ( isset( $_GET['q'] ) ) {
+			$search_term = sanitize_text_field( wp_unslash( $_GET['q'] ) );
+		} elseif ( isset( $_GET['term'] ) ) {
+			$search_term = sanitize_text_field( wp_unslash( $_GET['term'] ) );
+		}
+
+		$page     = isset( $_GET['page'] ) ? max( 1, absint( $_GET['page'] ) ) : 1;
+		$per_page = 20;
+
+		$query_args = array(
+			'post_type'              => 'product_variation',
+			'post_status'            => array( 'publish', 'private' ),
+			'posts_per_page'         => $per_page,
+			'paged'                  => $page,
+			'orderby'                => 'title',
+			'order'                  => 'ASC',
+			'fields'                 => 'ids',
+			'no_found_rows'          => false,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		);
+
+		if ( '' !== $search_term ) {
+			$query_args['s'] = $search_term;
+		}
+
+		$query         = new WP_Query( $query_args );
+		$variation_ids = array_map( 'absint', $query->posts );
+
+		if ( '' !== $search_term ) {
+			$parent_products = get_posts(
+				array(
+					'post_type'              => 'product',
+					'post_status'            => 'publish',
+					'posts_per_page'         => $per_page,
+					's'                      => $search_term,
+					'fields'                 => 'ids',
+					'no_found_rows'          => true,
+					'update_post_meta_cache' => false,
+					'update_post_term_cache' => false,
+				)
+			);
+
+			if ( ! empty( $parent_products ) ) {
+				$parent_variations = get_posts(
+					array(
+						'post_type'              => 'product_variation',
+						'post_status'            => array( 'publish', 'private' ),
+						'post_parent__in'        => array_map( 'absint', $parent_products ),
+						'posts_per_page'         => $per_page,
+						'fields'                 => 'ids',
+						'no_found_rows'          => true,
+						'update_post_meta_cache' => false,
+						'update_post_term_cache' => false,
+					)
+				);
+				$variation_ids     = array_merge( $variation_ids, array_map( 'absint', $parent_variations ) );
+			}
+		}
+
+		$variation_ids = array_slice( array_values( array_unique( array_filter( $variation_ids ) ) ), 0, $per_page );
+		$results       = array();
+		foreach ( $variation_ids as $variation_id ) {
+			$results[] = array(
+				'id'   => (string) $variation_id,
+				'text' => self::get_variation_label( $variation_id ),
+			);
+		}
+
+		wp_send_json(
+			array(
+				'results'    => $results,
+				'pagination' => array(
+					'more' => '' === $search_term && $page < (int) $query->max_num_pages,
+				),
+			)
+		);
+	}
+
+	/**
 	 * Returns product IDs currently attached to a PPOM field group.
 	 *
 	 * Supports both the current serialized-array storage and the older scalar
@@ -582,6 +703,98 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Returns variation selector options for the attach popup.
+	 *
+	 * @param int $ppom_id PPOM field-group ID.
+	 *
+	 * @return array
+	 * @phpstan-return PPOM_Attach_Select_Data
+	 */
+	public function get_wc_variations( $ppom_id ) {
+		return self::get_wc_variations_static( $ppom_id );
+	}
+
+	/**
+	 * Returns only the currently-attached variation IDs for a PPOM field group.
+	 *
+	 * @param int $ppom_id PPOM field-group ID.
+	 * @return int[]
+	 */
+	public static function get_attached_variation_ids( $ppom_id ) {
+		$ppom_id = absint( $ppom_id );
+		if ( 0 === $ppom_id ) {
+			return array();
+		}
+
+		$product_ids = get_posts(
+			array(
+				'post_type'              => 'product',
+				'post_status'            => 'publish',
+				'posts_per_page'         => -1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'meta_key'               => PPOM_VARIATION_META_KEY,
+			)
+		);
+
+		$variation_ids = array();
+		foreach ( $product_ids as $product_id ) {
+			$variation_ids = array_merge(
+				$variation_ids,
+				\PPOM\Support\Helpers::get_variation_ids_for_group( $product_id, $ppom_id )
+			);
+		}
+
+		return array_values( array_unique( array_filter( array_map( 'absint', $variation_ids ) ) ) );
+	}
+
+	/**
+	 * Builds a readable variation label for Select2 options.
+	 *
+	 * @param int $variation_id Variation ID.
+	 * @return string
+	 */
+	public static function get_variation_label( $variation_id ) {
+		$variation = wc_get_product( $variation_id );
+		if ( ! $variation || ! $variation->is_type( 'variation' ) ) {
+			return get_the_title( $variation_id );
+		}
+
+		$parent = wc_get_product( $variation->get_parent_id() );
+		$label  = $parent ? $parent->get_name() : get_the_title( $variation->get_parent_id() );
+
+		$attributes = array();
+		foreach ( $variation->get_attributes() as $attribute_name => $attribute_value ) {
+			if ( '' === $attribute_value ) {
+				continue;
+			}
+
+			$attribute_key = str_replace( 'attribute_', '', $attribute_name );
+			$value_label   = $attribute_value;
+			if ( taxonomy_exists( $attribute_key ) ) {
+				$term = get_term_by( 'slug', $attribute_value, $attribute_key );
+				if ( $term && ! is_wp_error( $term ) ) {
+					$value_label = $term->name;
+				}
+			}
+
+			$attributes[] = sprintf(
+				'%1$s: %2$s',
+				wc_attribute_label( $attribute_key, $parent ),
+				$value_label
+			);
+		}
+
+		if ( ! empty( $attributes ) ) {
+			$label .= ' - ' . implode( ', ', $attributes );
+		}
+
+		return sprintf( '#%1$d %2$s', absint( $variation_id ), $label );
 	}
 
 	/**
@@ -891,6 +1104,30 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$popup_components[] =
 			new \PPOM\Attach\ContainerItem( $attach_to_tags_component->get_id(), $attach_to_tags_component );
 
+		$select_variations_component = ( new \PPOM\Attach\SelectComponent() )
+			->set_inline()
+			->set_status( $license_status )
+			->set_id( 'attach-to-variations' )
+			->set_title( __( 'Display on Specific Variations', 'woocommerce-product-addon' ) )
+			->set_description( __( 'Select the WooCommerce variations where these product fields should appear. Selecting a variation also attaches this group to its parent product.', 'woocommerce-product-addon' ) )
+			->set_select(
+				array_merge(
+					array(
+						'label'               => __( 'Choose Variations:', 'woocommerce-product-addon' ),
+						'name'                => 'ppom-attach-to-variations[]',
+						'multiple'            => true,
+						'is_used'             => true,
+						'render_empty_option' => false,
+					),
+					self::get_wc_variations_static( $ppom_id )
+				)
+			);
+		if ( 'valid' !== $license_status ) {
+			$select_variations_component = $select_variations_component->set_status( 'invalid' );
+		}
+		$popup_components[] =
+			new \PPOM\Attach\ContainerItem( $select_variations_component->get_id(), $select_variations_component );
+
 		$popup_components = apply_filters( 'pppom_popup_components', $popup_components, $ppom_id );
 
 		$rendered = array();
@@ -960,6 +1197,30 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 	/**
+	 * Static wrapper for get_wc_variations() to use in static contexts.
+	 *
+	 * @param int $ppom_id PPOM field-group ID.
+	 * @return array
+	 * @phpstan-return PPOM_Attach_Select_Data
+	 */
+	private static function get_wc_variations_static( $ppom_id ) {
+		$result = array(
+			'options' => array(),
+			'is_used' => true,
+		);
+
+		foreach ( self::get_attached_variation_ids( $ppom_id ) as $variation_id ) {
+			$result['options'][] = array(
+				'value'    => (string) $variation_id,
+				'selected' => true,
+				'label'    => self::get_variation_label( $variation_id ),
+			);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Static wrapper for get_wc_categories() to use in static contexts.
 	 *
 	 * @param array $current_values The current saved values.
@@ -983,6 +1244,285 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	private static function get_wc_tags_static( $current_values ) {
 		$admin = new self();
 		return $admin->get_wc_tags( $current_values );
+	}
+
+	/**
+	 * Whether the current request contains inline attach selectors.
+	 *
+	 * @return bool
+	 */
+	public static function has_attach_selections_in_request() {
+		return isset( $_POST['ppom_attached_nonce'] )
+			|| isset( $_POST['ppom-attach-to-products-initial'] )
+			|| isset( $_POST['ppom-attach-to-categories-initial'] )
+			|| isset( $_POST['ppom-attach-to-tags-initial'] )
+			|| isset( $_POST['ppom-attach-to-variations-initial'] );
+	}
+
+	/**
+	 * Reconciles product, variation, category, and tag attachment selections from $_POST.
+	 *
+	 * @param int       $ppom_id     PPOM field-group ID.
+	 * @param bool|null $is_pro_user Whether multi-group product attachment is allowed.
+	 * @return array{products:int,categories:int,tags:int,variations:int}
+	 */
+	public static function save_attach_selections_from_request( $ppom_id, $is_pro_user = null ) {
+		$ppom_id = absint( $ppom_id );
+		if ( $ppom_id <= 0 ) {
+			return array(
+				'products'   => 0,
+				'categories' => 0,
+				'tags'       => 0,
+				'variations' => 0,
+			);
+		}
+
+		if ( null === $is_pro_user ) {
+			$is_pro_user = 'valid' === apply_filters( 'product_ppom_license_status', '' );
+		}
+
+		$products_to_attach         = self::posted_absint_list( 'ppom-attach-to-products' );
+		$products_to_attach_initial = self::posted_initial_absint_list( 'ppom-attach-to-products-initial' );
+		$updated_products           = self::save_product_attachments( $ppom_id, $products_to_attach, $products_to_attach_initial, (bool) $is_pro_user );
+
+		$variations_to_attach         = self::posted_absint_list( 'ppom-attach-to-variations' );
+		$variations_to_attach_initial = self::posted_initial_absint_list( 'ppom-attach-to-variations-initial' );
+		$variation_updates            = self::save_variation_attachments( $ppom_id, $variations_to_attach, $variations_to_attach_initial, (bool) $is_pro_user );
+
+		$categories_to_attach = self::posted_slug_list( 'ppom-attach-to-categories' );
+		$updated_cat          = count( $categories_to_attach );
+
+		$tags_to_attach = self::posted_slug_list( 'ppom-attach-to-tags' );
+		$updated_tags   = count( $tags_to_attach );
+
+		self::save_categories_and_tags( $ppom_id, $categories_to_attach, $tags_to_attach );
+
+		return array(
+			'products'   => $updated_products + (int) $variation_updates['attached_products'],
+			'categories' => $updated_cat,
+			'tags'       => $updated_tags,
+			'variations' => (int) $variation_updates['updated_variations'],
+		);
+	}
+
+	/**
+	 * Reconciles direct product attachments for a PPOM field group.
+	 *
+	 * @param int   $ppom_id          PPOM field-group ID.
+	 * @param int[] $products         Submitted product IDs.
+	 * @param int[] $initial_products Product IDs loaded when the form opened.
+	 * @param bool  $is_pro_user      Whether multi-group product attachment is allowed.
+	 * @return int Number of added/removed product assignments.
+	 */
+	private static function save_product_attachments( $ppom_id, array $products, array $initial_products, $is_pro_user ) {
+		$products         = array_values( array_unique( array_filter( array_map( 'absint', $products ) ) ) );
+		$initial_products = array_values( array_unique( array_filter( array_map( 'absint', $initial_products ) ) ) );
+
+		$products_to_add = array_diff( $products, $initial_products );
+		foreach ( $products_to_add as $product_to_add ) {
+			self::attach_group_to_product( $product_to_add, $ppom_id, $is_pro_user );
+		}
+
+		$products_to_remove = array_diff( $initial_products, $products );
+		foreach ( $products_to_remove as $product_to_remove ) {
+			self::detach_group_from_product( $product_to_remove, $ppom_id );
+		}
+
+		return count( $products_to_add ) + count( $products_to_remove );
+	}
+
+	/**
+	 * Stores variation restrictions and auto-attaches parent products.
+	 *
+	 * @param int   $ppom_id            PPOM field-group ID.
+	 * @param int[] $variation_ids      Submitted variation IDs.
+	 * @param int[] $initial_variations Variation IDs loaded when the form opened.
+	 * @param bool  $is_pro_user        Whether multi-group product attachment is allowed.
+	 * @return array{updated_variations:int,attached_products:int}
+	 */
+	public static function save_variation_attachments( $ppom_id, array $variation_ids, array $initial_variations = array(), $is_pro_user = false ) {
+		$ppom_id            = absint( $ppom_id );
+		$variation_ids      = array_values( array_unique( array_filter( array_map( 'absint', $variation_ids ) ) ) );
+		$initial_variations = array_values( array_unique( array_filter( array_map( 'absint', $initial_variations ) ) ) );
+
+		if ( $ppom_id <= 0 ) {
+			return array(
+				'updated_variations' => 0,
+				'attached_products'  => 0,
+			);
+		}
+
+		$current_by_parent = self::group_variations_by_parent_product( $variation_ids );
+		$initial_by_parent = self::group_variations_by_parent_product( $initial_variations );
+		$parent_ids        = array_values( array_unique( array_merge( array_keys( $current_by_parent ), array_keys( $initial_by_parent ) ) ) );
+
+		foreach ( $parent_ids as $parent_id ) {
+			$rules = \PPOM\Support\Helpers::get_variation_rule_map( $parent_id );
+			if ( empty( $current_by_parent[ $parent_id ] ) ) {
+				unset( $rules[ $ppom_id ] );
+			} else {
+				$rules[ $ppom_id ] = $current_by_parent[ $parent_id ];
+			}
+			\PPOM\Support\Helpers::update_variation_rule_map( $parent_id, $rules );
+		}
+
+		$attached_products = 0;
+		foreach ( array_keys( $current_by_parent ) as $parent_id ) {
+			if ( self::attach_group_to_product( $parent_id, $ppom_id, $is_pro_user ) ) {
+				++$attached_products;
+			}
+		}
+
+		return array(
+			'updated_variations' => count( array_diff( $variation_ids, $initial_variations ) ) + count( array_diff( $initial_variations, $variation_ids ) ),
+			'attached_products'  => $attached_products,
+		);
+	}
+
+	/**
+	 * Groups valid variation IDs by parent product.
+	 *
+	 * @param int[] $variation_ids Variation IDs.
+	 * @return array<int, int[]>
+	 */
+	private static function group_variations_by_parent_product( array $variation_ids ) {
+		$grouped = array();
+		foreach ( $variation_ids as $variation_id ) {
+			$variation = wc_get_product( $variation_id );
+			if ( ! $variation || ! $variation->is_type( 'variation' ) ) {
+				continue;
+			}
+
+			$parent_id = absint( $variation->get_parent_id() );
+			if ( $parent_id <= 0 ) {
+				continue;
+			}
+
+			if ( ! isset( $grouped[ $parent_id ] ) ) {
+				$grouped[ $parent_id ] = array();
+			}
+			$grouped[ $parent_id ][] = absint( $variation_id );
+		}
+
+		foreach ( $grouped as $parent_id => $ids ) {
+			$grouped[ $parent_id ] = array_values( array_unique( $ids ) );
+		}
+
+		return $grouped;
+	}
+
+	/**
+	 * Attaches a PPOM group to a product using the existing product workflow.
+	 *
+	 * @param int  $product_id   Product ID.
+	 * @param int  $ppom_id      PPOM field-group ID.
+	 * @param bool $is_pro_user  Whether multi-group product attachment is allowed.
+	 * @return bool True when a new attachment was added or the product was updated.
+	 */
+	private static function attach_group_to_product( $product_id, $ppom_id, $is_pro_user ) {
+		$product_id = absint( $product_id );
+		$ppom_id    = absint( $ppom_id );
+		if ( $product_id <= 0 || $ppom_id <= 0 ) {
+			return false;
+		}
+
+		$current_attached_fields = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
+		$already_attached        = is_array( $current_attached_fields )
+			? in_array( $ppom_id, array_map( 'absint', $current_attached_fields ), true )
+			: ( is_numeric( $current_attached_fields ) && absint( $current_attached_fields ) === $ppom_id );
+
+		if ( $is_pro_user ) {
+			if ( is_array( $current_attached_fields ) ) {
+				$current_attached_fields[] = $ppom_id;
+				$current_attached_fields   = array_unique( $current_attached_fields );
+			} elseif ( is_numeric( $current_attached_fields ) ) {
+				$current_attached_fields = array( absint( $current_attached_fields ), $ppom_id );
+			} else {
+				$current_attached_fields = array( $ppom_id );
+			}
+
+			$current_attached_fields = array_values( array_filter( array_map( 'absint', $current_attached_fields ) ) );
+			update_post_meta( $product_id, PPOM_PRODUCT_META_KEY, $current_attached_fields );
+		} else {
+			update_post_meta( $product_id, PPOM_PRODUCT_META_KEY, array( $ppom_id ) );
+		}
+
+		return ! $already_attached;
+	}
+
+	/**
+	 * Detaches a PPOM group from a product.
+	 *
+	 * @param int $product_id Product ID.
+	 * @param int $ppom_id    PPOM field-group ID.
+	 * @return void
+	 */
+	private static function detach_group_from_product( $product_id, $ppom_id ) {
+		$should_delete           = true;
+		$current_attached_fields = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
+		if ( is_array( $current_attached_fields ) ) {
+			$key = array_search( absint( $ppom_id ), array_map( 'absint', $current_attached_fields ), true );
+			if ( false !== $key ) {
+				unset( $current_attached_fields[ $key ] );
+				if ( ! empty( $current_attached_fields ) ) {
+					$should_delete = false;
+					update_post_meta( $product_id, PPOM_PRODUCT_META_KEY, array_values( $current_attached_fields ) );
+				}
+			}
+		}
+
+		if ( $should_delete ) {
+			delete_post_meta( $product_id, PPOM_PRODUCT_META_KEY );
+		}
+
+		$variation_rules = \PPOM\Support\Helpers::get_variation_rule_map( $product_id );
+		if ( isset( $variation_rules[ $ppom_id ] ) ) {
+			unset( $variation_rules[ $ppom_id ] );
+			\PPOM\Support\Helpers::update_variation_rule_map( $product_id, $variation_rules );
+		}
+	}
+
+	/**
+	 * Reads an absint array from $_POST.
+	 *
+	 * @param string $key Request key.
+	 * @return int[]
+	 */
+	private static function posted_absint_list( $key ) {
+		if ( ! isset( $_POST[ $key ] ) || ! is_array( $_POST[ $key ] ) ) {
+			return array();
+		}
+
+		return array_values( array_unique( array_filter( array_map( 'absint', wp_unslash( $_POST[ $key ] ) ) ) ) );
+	}
+
+	/**
+	 * Reads a comma-separated absint list from $_POST.
+	 *
+	 * @param string $key Request key.
+	 * @return int[]
+	 */
+	private static function posted_initial_absint_list( $key ) {
+		$value = isset( $_POST[ $key ] ) && is_string( $_POST[ $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $key ] ) ) : '';
+		if ( '' === $value ) {
+			return array();
+		}
+
+		return array_values( array_unique( array_filter( array_map( 'absint', explode( ',', $value ) ) ) ) );
+	}
+
+	/**
+	 * Reads a sanitize_key array from $_POST.
+	 *
+	 * @param string $key Request key.
+	 * @return string[]
+	 */
+	private static function posted_slug_list( $key ) {
+		if ( ! isset( $_POST[ $key ] ) || ! is_array( $_POST[ $key ] ) ) {
+			return array();
+		}
+
+		return array_values( array_unique( array_filter( array_map( 'sanitize_key', wp_unslash( $_POST[ $key ] ) ) ) ) );
 	}
 
 	/**
@@ -1013,78 +1553,17 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			wp_send_json( $response );
 		}
 
-		$ppom_id     = isset( $_POST['ppom_id'] ) ? absint( $_POST['ppom_id'] ) : 0;
-		$is_pro_user = 'valid' === apply_filters( 'product_ppom_license_status', '' );
-
-		// +----- Attach Field to Product -----+
-		$products_to_attach         = isset( $_POST['ppom-attach-to-products'] ) && is_array( $_POST['ppom-attach-to-products'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-products'] ) : array();
-		$products_to_attach_initial = isset( $_POST['ppom-attach-to-products-initial'] ) && is_string( $_POST['ppom-attach-to-products-initial'] ) ? sanitize_text_field( $_POST['ppom-attach-to-products-initial'] ) : '';
-		$products_to_attach_initial = array_filter( explode( ',', $products_to_attach_initial ) );
-
-		$products_to_add = array_diff( $products_to_attach, $products_to_attach_initial );
-		foreach ( $products_to_add as $product_to_add ) {
-
-			// NOTE: PRO users can add the field to multiple products.
-			if ( $is_pro_user ) {
-				$current_attached_fields = get_post_meta( $product_to_add, PPOM_PRODUCT_META_KEY, true );
-
-				if ( is_array( $current_attached_fields ) ) {
-					$current_attached_fields[] = $ppom_id;
-					$current_attached_fields   = array_unique( $current_attached_fields );
-				} elseif ( is_numeric( $current_attached_fields ) ) {
-					// NOTE: Backward compatibility.
-					$current_attached_fields = array( $current_attached_fields, $ppom_id );
-				} else {
-					$current_attached_fields = array( $ppom_id );
-				}
-
-				$current_attached_fields = array_filter( $current_attached_fields, 'is_numeric' );
-				update_post_meta( $product_to_add, PPOM_PRODUCT_META_KEY, $current_attached_fields );
-			} else {
-				update_post_meta( $product_to_add, PPOM_PRODUCT_META_KEY, array( $ppom_id ) );
-			}
-		}
-
-		$products_to_remove = array_diff( $products_to_attach_initial, $products_to_attach );
-		foreach ( $products_to_remove as $product_to_remove ) {
-			$should_delete           = true;
-			$current_attached_fields = get_post_meta( $product_to_remove, PPOM_PRODUCT_META_KEY, true );
-			if ( is_array( $current_attached_fields ) ) {
-				$key = array_search( $ppom_id, $current_attached_fields );
-				if ( false !== $key ) {
-					unset( $current_attached_fields[ $key ] );
-					if ( ! empty( $current_attached_fields ) ) {
-						$should_delete = false;
-						update_post_meta( $product_to_remove, PPOM_PRODUCT_META_KEY, $current_attached_fields );
-					}
-				}
-			}
-
-			if ( $should_delete ) {
-				delete_post_meta( $product_to_remove, PPOM_PRODUCT_META_KEY );
-			}
-		}
-
-		$updated_products = count( $products_to_add ) + count( $products_to_remove );
-
-		// +----- Attach Field to Categories -----+
-		$categories_to_attach = isset( $_POST['ppom-attach-to-categories'] ) && is_array( $_POST['ppom-attach-to-categories'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-categories'] ) : array();
-		$updated_cat          = count( $categories_to_attach );
-
-		// +----- Attach Field to Tags -----+
-		// Match categories: unchecked tag checkboxes are omitted from POST, so default to [] (clear stored tags), not false (skip update). See ppom-pro#625.
-		$tags_to_attach = isset( $_POST['ppom-attach-to-tags'] ) && is_array( $_POST['ppom-attach-to-tags'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-tags'] ) : array();
-		$updated_tags   = count( $tags_to_attach );
-
-		self::save_categories_and_tags( $ppom_id, $categories_to_attach, $tags_to_attach );
+		$ppom_id = isset( $_POST['ppom_id'] ) ? absint( $_POST['ppom_id'] ) : 0;
+		$counts  = self::save_attach_selections_from_request( $ppom_id );
 
 		$response = array(
 			'message' => sprintf(
-				// translators: %1$d: number of products, %2$d: number of categories, %3$d: number of tags.
-				__( 'PPOM updated for %1$d Products, %2$d Categories and %3$d Tags.', 'woocommerce-product-addon' ),
-				$updated_products,
-				$updated_cat,
-				$updated_tags
+				// translators: %1$d: number of products, %2$d: number of variations, %3$d: number of categories, %4$d: number of tags.
+				__( 'PPOM updated for %1$d Products, %2$d Variations, %3$d Categories and %4$d Tags.', 'woocommerce-product-addon' ),
+				$counts['products'],
+				$counts['variations'],
+				$counts['categories'],
+				$counts['tags']
 			),
 			'status'  => 'success',
 		);

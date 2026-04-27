@@ -327,8 +327,10 @@ final class CartHandler {
 	 * The posted payload remains untrusted and is revalidated and repriced later in
 	 * the cart and checkout lifecycle.
 	 *
-	 * @param array $cart       Cart item data.
-	 * @param int   $product_id Product ID.
+	 * @param array $cart         Cart item data.
+	 * @param int   $product_id   Product ID.
+	 * @param int   $variation_id Selected variation ID, or 0 for simple products.
+	 * @param int   $quantity     Requested quantity (unused; kept for filter compatibility).
 	 *
 	 * @return array
 	 *
@@ -336,7 +338,7 @@ final class CartHandler {
 	 * @see ppom_price_controller()
 	 * @see Helpers::make_meta_data()
 	 */
-	public static function add_cart_item_data( $cart, $product_id ) {
+	public static function add_cart_item_data( $cart, $product_id, $variation_id = 0, $quantity = 1 ) {
 
 		if ( ! isset( $_POST['ppom'] ) ) {
 			return $cart;
@@ -356,7 +358,12 @@ final class CartHandler {
 
 		// PPOM also saving cropped images under this filter.
 		$ppom_posted_fields = apply_filters( 'ppom_add_cart_item_data', $_POST['ppom'], $_POST );
-		$cart['ppom']       = $ppom_posted_fields;
+		$ppom_posted_fields = Helpers::filter_ppom_payload_by_active_variation( (array) $ppom_posted_fields, $product_id, $variation_id );
+		if ( empty( $ppom_posted_fields['fields'] ) ) {
+			return $cart;
+		}
+
+		$cart['ppom'] = $ppom_posted_fields;
 
 		return $cart;
 	}
@@ -371,8 +378,10 @@ final class CartHandler {
 			return $cart_items;
 		}
 
-		$wc_product = $cart_items['data'];
-		$product_id = Helpers::get_product_id( $wc_product );
+		$wc_product     = $cart_items['data'];
+		$product_id     = Helpers::get_product_id( $wc_product );
+		$variation_id   = isset( $cart_items['variation_id'] ) ? absint( $cart_items['variation_id'] ) : 0;
+		$values['ppom'] = Helpers::filter_ppom_payload_by_active_variation( (array) $values['ppom'], $product_id, $variation_id );
 
 		$ppom_meta_ids = '';
 		// removing id field

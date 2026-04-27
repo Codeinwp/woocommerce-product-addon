@@ -202,6 +202,8 @@ class PPOM_Fields_Meta {
 			'attach'            => array(
 				'searchAction'           => 'ppom_search_products',
 				'productsPlaceholder'    => __( 'Search products...', 'woocommerce-product-addon' ),
+				'searchVariationsAction' => 'ppom_search_variations',
+				'variationsPlaceholder'  => __( 'Search variations...', 'woocommerce-product-addon' ),
 				'searchCategoriesAction' => 'ppom_search_categories',
 				'categoriesPlaceholder'  => __( 'Search categories...', 'woocommerce-product-addon' ),
 				'searchTagsAction'       => 'ppom_search_tags',

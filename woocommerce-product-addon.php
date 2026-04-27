@@ -36,6 +36,7 @@ define( 'PPOM_PRODUCT_SLUG', PPOM_BASENAME );
 define( 'PPOM_VERSION', '33.0.18' );
 define( 'PPOM_DB_VERSION', '32.0.0' );
 define( 'PPOM_PRODUCT_META_KEY', '_product_meta_id' );
+define( 'PPOM_VARIATION_META_KEY', '_ppom_variation_meta_rules' );
 define( 'PPOM_TABLE_META', 'nm_personalized' );
 define( 'PPOM_UPLOAD_DIR_NAME', 'ppom_files' );
 define( 'PPOM_GROUPS_COUNT_CACHE_KEY', 'ppom_groups_count_cache' );

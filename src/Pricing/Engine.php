@@ -174,6 +174,9 @@ final class Engine {
 
 		$field_prices  = array();
 		$ppom_meta_ids = apply_filters( 'ppom_meta_ids_in_cart', null, $item );
+		if ( is_array( $ppom_fields_post ) ) {
+			$ppom_fields_post = Helpers::filter_posted_ppom_fields_by_active_variation( $ppom_fields_post, $product_id, $variation_id );
+		}
 
 		// ppom_pa($item);
 		foreach ( $ppom_fields_post as $data_name => $value ) {
