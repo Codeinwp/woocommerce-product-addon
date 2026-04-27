@@ -111,6 +111,7 @@
 <violation file="classes/admin.class.php" sniff="WordPress.WP.Capabilities.RoleFound" signature="24c61dbfa731465cf6a5202e84f7045448006195"/>
 <violation file="classes/attach-popup/container-item.class.php" sniff="Squiz.Commenting.FileComment.Missing" signature="9166a7b7093b6ef318e436c6b16866e360ab4381"/>
 <violation file="classes/attach-popup/container-view.class.php" sniff="Squiz.Commenting.FileComment.Missing" signature="9166a7b7093b6ef318e436c6b16866e360ab4381"/>
+<violation file="classes/attach-popup/select-component.class.php" sniff="Generic.Commenting.DocComment.MissingShort" signature="284bb1c0a6a64972c68a756bf21669aaebcb50ae"/>
 <violation file="classes/class-ppom-meta-repository.php" sniff="Generic.Commenting.DocComment.MissingShort" signature="4d635590086a339ff743073eb350df3fc0e3cab3"/>
 <violation file="classes/fields.class.php" sniff="Generic.CodeAnalysis.UnusedFunctionParameter.Found" signature="b3f87f7423ded5fd04e9aeae2c62d867e974ed67"/>
 <violation file="classes/fields.class.php" sniff="Generic.Commenting.DocComment.ShortNotCapital" signature="d3e42c8d31243fc6fa3eac4b8061acf2af3d6973"/>
