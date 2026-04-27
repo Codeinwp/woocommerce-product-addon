@@ -218,6 +218,10 @@ class PPOM_Fields_Meta {
 					'checkFieldTitle' => __( 'Please at least check one field!', 'woocommerce-product-addon' ),
 
 				),
+				'toggle'                 => array(
+					'enabled'  => __( 'Enabled', 'woocommerce-product-addon' ),
+					'disabled' => __( 'Disabled', 'woocommerce-product-addon' ),
+				),
 				'errorOccurred'          => __( 'An error occurred. Please try again.', 'woocommerce-product-addon' ),
 				'yes'                    => __( 'Yes', 'woocommerce-product-addon' ),
 				'no'                     => __( 'No', 'woocommerce-product-addon' ),

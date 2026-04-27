@@ -44,6 +44,7 @@ final class Manager {
 				$ppom         = new PPOM_Meta( $post_id );
 
 				$ppom_settings_url = admin_url( 'admin.php?page=ppom' );
+				$disabled_badge    = ' <span class="ppom-disabled-badge">' . esc_html__( 'Disabled', 'woocommerce-product-addon' ) . '</span>';
 
 				if ( $ppom->has_multiple_meta() ) {
 					$total_items  = count( $ppom->meta_id ); // Get the total number of items.
@@ -64,28 +65,48 @@ final class Manager {
 								),
 								$ppom_settings_url
 							);
-							printf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $meta_title );
+							$is_disabled_group = isset( $ppom_setting->productmeta_disabled ) && 'on' === $ppom_setting->productmeta_disabled;
+							printf(
+								'<a href="%1$s">%2$s</a>%3$s',
+								esc_url( $url_edit ),
+								esc_html( $meta_title ),
+								$is_disabled_group ? $disabled_badge : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static markup.
+							);
 							// Add a comma only if it's not the last item
 							if ( $current_item < $total_items ) {
 								echo ', ';
 							}
 							$has_fields = true;
-						}               
+						}
 					}
 					if ( ! $has_fields ) {
-						printf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
+						printf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), esc_html__( 'Add Fields', 'woocommerce-product-addon' ) );
 					}
-				} elseif ( $ppom->ppom_settings ) {
-					$url_edit = add_query_arg(
-						array(
-							'productmeta_id' => $ppom->meta_id,
-							'do_meta'        => 'edit',
-						),
-						$ppom_settings_url
-					);
-					printf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $ppom->meta_title );
 				} else {
-					printf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
+					// Resolve the row directly so disabled groups still show their
+					// name + badge in the admin product list (settings() returns
+					// null for disabled to skip frontend rendering).
+					$attached_id = is_numeric( $ppom->meta_id ) ? absint( $ppom->meta_id ) : 0;
+					$row         = $attached_id > 0 ? $ppom->get_settings_by_id( $attached_id ) : null;
+
+					if ( $row && isset( $row->productmeta_name ) ) {
+						$is_disabled_group = isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled;
+						$url_edit          = add_query_arg(
+							array(
+								'productmeta_id' => $attached_id,
+								'do_meta'        => 'edit',
+							),
+							$ppom_settings_url
+						);
+						printf(
+							'<a href="%1$s">%2$s</a>%3$s',
+							esc_url( $url_edit ),
+							esc_html( stripslashes( (string) $row->productmeta_name ) ),
+							$is_disabled_group ? $disabled_badge : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static markup.
+						);
+					} else {
+						printf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), esc_html__( 'Add Fields', 'woocommerce-product-addon' ) );
+					}
 				}
 
 				break;
@@ -646,6 +667,58 @@ final class Manager {
 		$rows_effected = MetaRepositoryAccessor::instance()->update_the_meta_only( (int) $ppom_id, $json );
 
 		return (bool) $rows_effected;
+	}
+
+	// Field group enable/disable.
+
+	/**
+	 * Toggles the disabled state of a PPOM field group from the admin list.
+	 *
+	 * Verifies the admin nonce and capability, then flips the
+	 * `productmeta_disabled` flag on the row. Product attachments and the
+	 * stored field schema are left untouched so the toggle is reversible.
+	 *
+	 * @return void
+	 */
+	public static function toggle_meta_disabled() {
+
+		$ppom_meta_nonce = isset( $_POST['ppom_meta_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_meta_nonce'] ) ) : '';
+
+		if ( empty( $ppom_meta_nonce )
+		|| ! wp_verify_nonce( $ppom_meta_nonce, 'ppom_meta_nonce_action' )
+		|| ! Helpers::security_role()
+		) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'woocommerce-product-addon' ),
+				)
+			);
+		}
+
+		$productmeta_id = isset( $_POST['productmeta_id'] ) ? absint( wp_unslash( $_POST['productmeta_id'] ) ) : 0;
+		$disabled       = ! empty( $_POST['disabled'] ) && '1' === (string) wp_unslash( $_POST['disabled'] );
+
+		if ( $productmeta_id <= 0 ) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'message' => __( 'Invalid field group ID.', 'woocommerce-product-addon' ),
+				)
+			);
+		}
+
+		MetaRepositoryAccessor::instance()->set_disabled( $productmeta_id, $disabled );
+
+		wp_send_json(
+			array(
+				'status'   => 'success',
+				'disabled' => $disabled,
+				'message'  => $disabled
+					? __( 'Field group disabled.', 'woocommerce-product-addon' )
+					: __( 'Field group enabled.', 'woocommerce-product-addon' ),
+			)
+		);
 	}
 
 	// Field group deletion.

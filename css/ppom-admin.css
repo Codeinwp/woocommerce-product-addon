@@ -1932,6 +1932,119 @@ header.ppom-modal-header {
     text-decoration: none;
 }
 
+/* PPOM Field Groups list table column widths — give the Meta summary
+   most of the horizontal real estate, since each row lists every field's
+   label/type/options. */
+.ppom-existing-meta-wrapper .wp-list-table .column-id {
+    width: 80px;
+}
+
+.ppom-existing-meta-wrapper .wp-list-table .column-name {
+    width: 20%;
+}
+
+/* Meta carries the field-by-field summary, so give it ~2x the Name column
+   and let it absorb any leftover space (the other columns are fixed). */
+.ppom-existing-meta-wrapper .wp-list-table .column-meta {
+    width: 40%;
+    min-width: 320px;
+}
+
+.ppom-existing-meta-wrapper .wp-list-table .column-status {
+    width: 130px;
+}
+
+.ppom-existing-meta-wrapper .wp-list-table .column-attach {
+    width: 170px;
+}
+
+/* Field group enable/disable toggle (PPOM list table Status column).
+   `.ppom-wrapper label` forces `display:inline-block; margin-bottom:.5rem`,
+   which kills flex `gap`. The `.ppom-wrapper label.ppom-toggle` selector has
+   higher specificity (0,2,1 vs 0,1,1) and restores the inline-flex layout. */
+.ppom-toggle,
+.ppom-wrapper label.ppom-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    line-height: 18px;
+    white-space: nowrap;
+    vertical-align: middle;
+    margin-bottom: 0;
+}
+
+.ppom-toggle-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+}
+
+.ppom-toggle-track {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 18px;
+    background: #c3c4c7;
+    border-radius: 9999px;
+    transition: background-color 0.15s ease-in-out;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.ppom-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.15s ease-in-out;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.ppom-toggle-input:checked + .ppom-toggle-track {
+    background: #2271b1;
+}
+
+.ppom-toggle-input:checked + .ppom-toggle-track .ppom-toggle-thumb {
+    transform: translateX(16px);
+}
+
+.ppom-toggle-input:focus-visible + .ppom-toggle-track {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2271b1;
+}
+
+.ppom-toggle--busy {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.ppom-toggle-label {
+    font-size: 12px;
+    line-height: 18px;
+    color: #50575e;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ppom-disabled-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: #f0f0f1;
+    color: #646970;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
 div.ppom-banner .themeisle-sale {
     margin: 0 0 10px 0;
 }

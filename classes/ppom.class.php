@@ -305,7 +305,14 @@ class PPOM_Meta {
 			return null;
 		}
 
-		$row           = ppom_meta_repository()->get_row_by_id( $id );
+		$row = ppom_meta_repository()->get_row_by_id( $id );
+
+		// Skip groups admins have toggled off; configuration and product
+		// attachments are preserved so re-enabling restores the form.
+		if ( $row && isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled ) {
+			return null;
+		}
+
 		$meta_settings = $row ? array( $row ) : array();
 		$filter_meta   = array_filter(
 			$meta_settings,
@@ -349,6 +356,10 @@ class PPOM_Meta {
 					continue;
 				}
 
+				if ( isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled ) {
+					continue;
+				}
+
 				$fields = json_decode( $row->the_meta, true );
 
 				if ( is_array( $fields ) ) {
@@ -358,6 +369,9 @@ class PPOM_Meta {
 		} else {
 			$meta_id     = absint( $this->meta_id );
 			$row         = $repo->get_row_by_id( $meta_id );
+			if ( $row && isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled ) {
+				return null;
+			}
 			$raw         = ( $row && isset( $row->the_meta ) && is_string( $row->the_meta ) ) ? $row->the_meta : '';
 			$meta_fields = json_decode( $raw, true );
 		}

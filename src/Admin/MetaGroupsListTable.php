@@ -54,6 +54,7 @@ final class MetaGroupsListTable extends WP_List_Table {
 			'id'     => __( 'Meta ID', 'woocommerce-product-addon' ),
 			'name'   => __( 'Name', 'woocommerce-product-addon' ),
 			'meta'   => __( 'Meta', 'woocommerce-product-addon' ),
+			'status' => __( 'Status', 'woocommerce-product-addon' ),
 			'attach' => __( 'Select Products', 'woocommerce-product-addon' ),
 		);
 	}
@@ -161,6 +162,40 @@ final class MetaGroupsListTable extends WP_List_Table {
 	}
 
 	/**
+	 * Status column. Renders an accessible toggle switch that flips the
+	 * group's disabled flag via AJAX. Disabled groups are skipped during
+	 * frontend resolution but keep their schema and product attachments,
+	 * so re-enabling restores the form instantly.
+	 *
+	 * @param PPOM_Meta_Group_Row $item Field-group row.
+	 * @return string
+	 */
+	public function column_status( $item ) {
+		$id          = (int) $item->productmeta_id;
+		$is_disabled = isset( $item->productmeta_disabled ) && 'on' === $item->productmeta_disabled;
+		$state_label = $is_disabled
+			? __( 'Disabled', 'woocommerce-product-addon' )
+			: __( 'Enabled', 'woocommerce-product-addon' );
+		/* translators: %s: field-group name. */
+		$aria_label = sprintf(
+			__( 'Toggle %s', 'woocommerce-product-addon' ),
+			stripcslashes( (string) $item->productmeta_name )
+		);
+
+		return sprintf(
+			'<label class="ppom-toggle" data-ppom-id="%1$d">'
+				. '<input type="checkbox" class="ppom-toggle-input" %2$s aria-label="%3$s" />'
+				. '<span class="ppom-toggle-track" aria-hidden="true"><span class="ppom-toggle-thumb"></span></span>'
+				. '<span class="ppom-toggle-label">%4$s</span>'
+				. '</label>',
+			$id,
+			$is_disabled ? '' : 'checked',
+			esc_attr( $aria_label ),
+			esc_html( $state_label )
+		);
+	}
+
+	/**
 	 * Attach-to-Products column. Renders the modal trigger button — JS in
 	 * `js/admin/ppom-meta-table.js` opens the modal on click.
 	 *
@@ -182,8 +217,10 @@ final class MetaGroupsListTable extends WP_List_Table {
 	 */
 	public function get_bulk_actions() {
 		return array(
-			'delete' => __( 'Delete', 'woocommerce-product-addon' ),
-			'export' => ppom_pro_is_installed()
+			'enable'  => __( 'Enable', 'woocommerce-product-addon' ),
+			'disable' => __( 'Disable', 'woocommerce-product-addon' ),
+			'delete'  => __( 'Delete', 'woocommerce-product-addon' ),
+			'export'  => ppom_pro_is_installed()
 				? __( 'Export', 'woocommerce-product-addon' )
 				: __( 'Export (Pro)', 'woocommerce-product-addon' ),
 		);
@@ -195,8 +232,9 @@ final class MetaGroupsListTable extends WP_List_Table {
 	 * @return void
 	 */
 	public function process_bulk_action() {
-		$action = $this->current_action();
-		if ( 'delete' !== $action && 'export' !== $action ) {
+		$action  = $this->current_action();
+		$handled = array( 'delete', 'export', 'enable', 'disable' );
+		if ( ! in_array( $action, $handled, true ) ) {
 			return;
 		}
 
@@ -227,6 +265,18 @@ final class MetaGroupsListTable extends WP_List_Table {
 			MetaRepositoryAccessor::instance()->delete_by_ids( $ids );
 			$redirect = remove_query_arg( array( '_wpnonce', 'action', 'action2', 'ppom_meta', '_wp_http_referer' ) );
 			$redirect = add_query_arg( array( 'ppom_deleted' => count( $ids ) ), $redirect );
+			wp_safe_redirect( $redirect );
+			exit;
+		}
+
+		if ( 'enable' === $action || 'disable' === $action ) {
+			$disabled = 'disable' === $action;
+			MetaRepositoryAccessor::instance()->set_disabled_for_ids( $ids, $disabled );
+			$redirect = remove_query_arg( array( '_wpnonce', 'action', 'action2', 'ppom_meta', '_wp_http_referer' ) );
+			$redirect = add_query_arg(
+				array( $disabled ? 'ppom_disabled' : 'ppom_enabled' => count( $ids ) ),
+				$redirect
+			);
 			wp_safe_redirect( $redirect );
 			exit;
 		}

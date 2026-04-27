@@ -11,6 +11,7 @@
  *     productmeta_id: numeric-string,
  *     productmeta_name: string,
  *     productmeta_validation: string|null,
+ *     productmeta_disabled: string|null,
  *     dynamic_price_display: string|null,
  *     send_file_attachment: string,
  *     show_cart_thumb: string|null,
@@ -31,12 +32,13 @@
  *     productmeta_categories?: string,
  *     productmeta_tags?: string
  * }
- * @phpstan-type PPOM_Meta_Group_ColumnKey 'productmeta_id'|'productmeta_name'|'productmeta_validation'|'dynamic_price_display'|'send_file_attachment'|'show_cart_thumb'|'aviary_api_key'|'productmeta_style'|'productmeta_js'|'productmeta_categories'|'productmeta_tags'|'the_meta'|'productmeta_created'
+ * @phpstan-type PPOM_Meta_Group_ColumnKey 'productmeta_id'|'productmeta_name'|'productmeta_validation'|'productmeta_disabled'|'dynamic_price_display'|'send_file_attachment'|'show_cart_thumb'|'aviary_api_key'|'productmeta_style'|'productmeta_js'|'productmeta_categories'|'productmeta_tags'|'the_meta'|'productmeta_created'
  * @phpstan-type PPOM_Meta_Group_ColumnData array<PPOM_Meta_Group_ColumnKey, mixed>
- * @phpstan-type PPOM_Meta_Demo_ColumnKey 'productmeta_name'|'productmeta_validation'|'dynamic_price_display'|'send_file_attachment'|'show_cart_thumb'|'aviary_api_key'|'productmeta_style'|'productmeta_js'|'productmeta_categories'|'productmeta_tags'|'the_meta'|'productmeta_created'
+ * @phpstan-type PPOM_Meta_Demo_ColumnKey 'productmeta_name'|'productmeta_validation'|'productmeta_disabled'|'dynamic_price_display'|'send_file_attachment'|'show_cart_thumb'|'aviary_api_key'|'productmeta_style'|'productmeta_js'|'productmeta_categories'|'productmeta_tags'|'the_meta'|'productmeta_created'
  * @phpstan-type PPOM_Meta_Demo_Export_Input array{
  *     productmeta_name?: string,
  *     productmeta_validation?: string,
+ *     productmeta_disabled?: string,
  *     dynamic_price_display?: string,
  *     send_file_attachment?: string,
  *     show_cart_thumb?: string,
@@ -146,6 +148,7 @@ class PPOM_Meta_Repository {
 		productmeta_id INT(5) NOT NULL AUTO_INCREMENT,
 		productmeta_name VARCHAR(50) NOT NULL,
 		productmeta_validation VARCHAR(3),
+		productmeta_disabled VARCHAR(3) NOT NULL DEFAULT '',
         dynamic_price_display VARCHAR(10),
         send_file_attachment VARCHAR(3) NOT NULL,
         show_cart_thumb VARCHAR(3),
@@ -683,6 +686,80 @@ class PPOM_Meta_Repository {
 	}
 
 	/**
+	 * Set the disabled flag for one row.
+	 *
+	 * `'on'` disables the group (skipped during frontend resolution); empty
+	 * string re-enables it. Product attachments and `the_meta` JSON are left
+	 * untouched so toggling is fully reversible.
+	 *
+	 * @param int  $id       Row id.
+	 * @param bool $disabled Whether the group should be disabled.
+	 * @return int|false Rows updated, or false on failure.
+	 */
+	public function set_disabled( $id, $disabled ) {
+		$id = (int) $id;
+		if ( $id <= 0 ) {
+			return false;
+		}
+
+		$result = $this->wpdb->update(
+			$this->table_name(),
+			array( 'productmeta_disabled' => $disabled ? 'on' : '' ),
+			array( 'productmeta_id' => $id ),
+			array( '%s' ),
+			array( '%d' )
+		);
+		$this->invalidate_row_cache( $id );
+		$this->invalidate_aggregate_list_caches();
+
+		return $result;
+	}
+
+	/**
+	 * Bulk-set the disabled flag for many rows in a single prepared statement.
+	 *
+	 * @param array<int> $ids      Row ids.
+	 * @param bool       $disabled Whether the rows should be disabled.
+	 * @return int|false Rows affected or false.
+	 */
+	public function set_disabled_for_ids( array $ids, $disabled ) {
+		$ids = array_values(
+			array_unique(
+				array_filter(
+					array_map( 'absint', $ids ),
+					static function ( $v ) {
+						return $v > 0;
+					}
+				)
+			)
+		);
+
+		if ( empty( $ids ) ) {
+			return false;
+		}
+
+		$table   = $this->table_name();
+		$ids_sql = implode( ',', $ids );
+		// 'on' / '' is server-controlled (see $disabled cast above), and the
+		// IN list is absint'd. No request data reaches the SQL.
+		$value = $disabled ? 'on' : '';
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- table name internal; value is trusted enum.
+		$result = $this->wpdb->query( "UPDATE `{$table}` SET productmeta_disabled = '{$value}' WHERE productmeta_id IN ({$ids_sql})" );
+
+		foreach ( $ids as $id ) {
+			$this->invalidate_row_cache( (int) $id );
+		}
+		$this->invalidate_aggregate_list_caches();
+
+		if ( false === $result ) {
+			return false;
+		}
+
+		return (int) $result;
+	}
+
+	/**
 	 * Delete one row.
 	 *
 	 * @param int $id Row id.
@@ -840,6 +917,7 @@ class PPOM_Meta_Repository {
 		$allowed = array(
 			'productmeta_name',
 			'productmeta_validation',
+			'productmeta_disabled',
 			'dynamic_price_display',
 			'send_file_attachment',
 			'show_cart_thumb',
