@@ -37,11 +37,14 @@ jQuery( function ( $ ) {
 	 * Delete multiple saved PPOM groups after an explicit confirmation step.
 	 *
 	 * @param {number[]} checkedProducts_ids
+	 * @param {string} checkedProducts_names
 	 * @return {void}
 	 */
-	function deleteSelectedProducts( checkedProducts_ids ) {
+	function deleteSelectedProducts( checkedProducts_ids, checkedProducts_names = '' ) {
+		let title = window?.ppom_vars?.i18n.popup.deleteGroup;
+		title = checkedProducts_names ? title.replace( '%s', checkedProducts_names ) : window?.ppom_vars?.i18n.popup.confirmTitle;
 		window?.ppomPopup?.open( {
-			title: window?.ppom_vars?.i18n.popup.confirmTitle,
+			title: title,
 			onConfirmation: () => {
 				$( '#ppom_delete_selected_products_btn' ).html( 'Deleting...' );
 
@@ -141,9 +144,12 @@ jQuery( function ( $ ) {
 	$( 'body' ).on( 'click', 'a.ppom-delete-single-product', function ( e ) {
 		e.preventDefault();
 		const productmeta_id = $( this ).attr( 'data-product-id' );
+		let title = window?.ppom_vars?.i18n.popup.deleteGroup;
+		const productName = $( this ).data( 'name' );
+		title = productName ? title.replace( '%s', productName ) : window?.ppom_vars?.i18n.popup.confirmTitle;
 
 		window?.ppomPopup?.open( {
-			title: window?.ppom_vars?.i18n.popup.confirmTitle,
+			title: title,
 			onConfirmation: () => {
 				$( '#del-file-' + productmeta_id ).html(
 					'<img src="' + ppom_vars.loader + '">'
@@ -196,10 +202,18 @@ jQuery( function ( $ ) {
 			return;
 		}
 
+		const checkedProductsNames = $( '.ppom_product_checkbox:checked' )
+ 			.map( function () {
+				return this.dataset.name && this.dataset.name.trim() !== ''
+					? this.dataset.name
+					: this.value;
+			} )
+			.get()
+			.join( ', ' );
 		// Only one action runs per selection. Resetting the select afterwards
 		// prevents DataTables redraws from accidentally replaying the last action.
 		if ( 'delete' === type ) {
-			deleteSelectedProducts( checkedProducts_ids );
+			deleteSelectedProducts( checkedProducts_ids, checkedProductsNames );
 		} else if ( 'export' === type ) {
 			$( '#ppom-groups-export-form' ).submit();
 		}
