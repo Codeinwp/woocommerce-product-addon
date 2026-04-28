@@ -367,8 +367,8 @@ class PPOM_Meta {
 				}
 			}
 		} else {
-			$meta_id     = absint( $this->meta_id );
-			$row         = $repo->get_row_by_id( $meta_id );
+			$meta_id = absint( $this->meta_id );
+			$row     = $repo->get_row_by_id( $meta_id );
 			if ( $row && isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled ) {
 				return null;
 			}

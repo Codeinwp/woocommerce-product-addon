@@ -57,8 +57,8 @@ final class Manager {
 						$mid          = absint( $meta_id );
 						$ppom_setting = ( $mid > 0 && isset( $settings_map[ $mid ] ) ) ? $settings_map[ $mid ] : null;
 						if ( $ppom_setting ) {
-							$meta_title = stripslashes( $ppom_setting->productmeta_name );
-							$url_edit   = add_query_arg(
+							$meta_title        = stripslashes( $ppom_setting->productmeta_name );
+							$url_edit          = add_query_arg(
 								array(
 									'productmeta_id' => $ppom_setting->productmeta_id,
 									'do_meta'        => 'edit',
@@ -72,7 +72,7 @@ final class Manager {
 								esc_html( $meta_title ),
 								$is_disabled_group ? $disabled_badge : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static markup.
 							);
-							// Add a comma only if it's not the last item
+							// Add a comma only if it's not the last item.
 							if ( $current_item < $total_items ) {
 								echo ', ';
 							}
@@ -136,7 +136,7 @@ final class Manager {
 		$ppom         = new PPOM_Meta( $post->ID );
 		$all_meta     = PPOM()->get_product_meta_list_for_ui();
 		$ppom_setting = admin_url( 'admin.php?page=ppom' );
-	
+
 		$html = '<div class="options_group ppom-settings-container" style="max-height:375px; overflow:auto;">';
 
 		if ( count( $all_meta ) > 1 ) {
@@ -163,7 +163,7 @@ final class Manager {
 		$html .= '<th>' . __( 'Group Name', 'woocommerce-product-addon' ) . '</th>';
 		$html .= '<th>' . __( 'Edit', 'woocommerce-product-addon' ) . '</th>';
 		$html .= '</tr></thead>';
-	
+
 		foreach ( $all_meta as $meta ) {
 			$html .= '<tr data-ppom-search="' . esc_attr( sanitize_key( $meta->productmeta_name ) ) . '" style="cursor: move;">';
 
@@ -281,15 +281,15 @@ final class Manager {
 
 
 		$ppom_meta_selected = isset( $_POST ['ppom_product_meta'] ) ? $_POST ['ppom_product_meta'] : array();
-	
+
 		if ( is_numeric( $ppom_meta_selected ) ) {
 			$ppom_meta_selected = array( $ppom_meta_selected );
 		} elseif ( ! is_array( $ppom_meta_selected ) ) {
 			$ppom_meta_selected = array();
 		}
-	
+
 		$ppom_meta_selected = array_map( 'intval', $ppom_meta_selected );
-	
+
 		// ppom_pa($ppom_meta_selected); exit;
 		update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $ppom_meta_selected );
 
@@ -452,7 +452,7 @@ final class Manager {
 				return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] );
 			}
 		);
-	
+
 		// Updating PPOM Meta with ppom_id in each meta array
 		self::update_ppom_meta_only( $ppom_id, $product_meta );
 
@@ -561,7 +561,7 @@ final class Manager {
 			}
 		);
 		$product_meta = json_encode( $product_meta );
-	
+
 		$productmeta_name     = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
 		$dynamic_price_hide   = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
 		$send_file_attachment = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
@@ -685,8 +685,8 @@ final class Manager {
 		$ppom_meta_nonce = isset( $_POST['ppom_meta_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_meta_nonce'] ) ) : '';
 
 		if ( empty( $ppom_meta_nonce )
-		|| ! wp_verify_nonce( $ppom_meta_nonce, 'ppom_meta_nonce_action' )
-		|| ! Helpers::security_role()
+			|| ! wp_verify_nonce( $ppom_meta_nonce, 'ppom_meta_nonce_action' )
+			|| ! Helpers::security_role()
 		) {
 			wp_send_json(
 				array(
@@ -697,7 +697,7 @@ final class Manager {
 		}
 
 		$productmeta_id = isset( $_POST['productmeta_id'] ) ? absint( wp_unslash( $_POST['productmeta_id'] ) ) : 0;
-		$disabled       = ! empty( $_POST['disabled'] ) && '1' === (string) wp_unslash( $_POST['disabled'] );
+		$disabled       = isset( $_POST['disabled'] ) && ! empty( $_POST['disabled'] ) && '1' === (string) wp_unslash( $_POST['disabled'] );
 
 		if ( $productmeta_id <= 0 ) {
 			wp_send_json(

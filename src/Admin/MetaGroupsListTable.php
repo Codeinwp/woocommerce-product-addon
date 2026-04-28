@@ -178,6 +178,7 @@ final class MetaGroupsListTable extends WP_List_Table {
 			: __( 'Enabled', 'woocommerce-product-addon' );
 		/* translators: %s: field-group name. */
 		$aria_label = sprintf(
+			// translators: %s: field-group name.
 			__( 'Toggle %s', 'woocommerce-product-addon' ),
 			stripcslashes( (string) $item->productmeta_name )
 		);
