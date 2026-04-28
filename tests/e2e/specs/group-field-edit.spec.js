@@ -6,6 +6,7 @@ import { test, expect } from "@wordpress/e2e-test-utils-playwright";
 import {
     addNewField,
 	addNewOptionInModal,
+	clickAddGroup,
 	createSimpleGroupField,
 	fillFieldNameAndId,
 	fillOptionNameAndValue,
@@ -54,7 +55,7 @@ test.describe("Group Fields Edit", () => {
     test("change select option order on saving", async ({ page, admin }) => {
         await admin.visitAdminPage("admin.php?page=ppom");
 
-		await page.getByRole("link", { name: "Add New Group" }).click();
+		await clickAddGroup(page);
 		await page
 			.getByRole("textbox")
 			.fill("Change Select Option order");
