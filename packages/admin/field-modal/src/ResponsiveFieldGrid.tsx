@@ -1,6 +1,6 @@
 /**
- * Two-column grid with full-width rows for most textarea / block controls.
- * The `description` setting stays one column so it aligns with Title / Data name.
+ * Responsive grid with full-width rows reserved for block controls.
+ * Short textareas stay in the regular grid so settings remain compact.
  */
 import { Grid, GridItem } from '@chakra-ui/react';
 import { renderSettingRow } from './schemaSettingControl';
@@ -11,20 +11,38 @@ export interface ResponsiveFieldGridProps {
 	ctx: SettingRowContext;
 }
 
+const FULL_ROW_TEXTAREA_KEYS = new Set( [ 'html' ] );
+
+function settingType( meta: Record< string, unknown > ) {
+	return meta.type ? String( meta.type ) : 'text';
+}
+
+function visibleEntries(
+	entries: Array< { key: string; meta: Record< string, unknown > } >
+) {
+	return entries.filter( ( entry ) => ! entry.meta.hidden );
+}
+
 export function ResponsiveFieldGrid( {
 	entries,
 	ctx,
 }: ResponsiveFieldGridProps ) {
-	if ( ! entries.length ) {
+	const layoutEntries = visibleEntries( entries );
+
+	if ( ! layoutEntries.length ) {
 		return null;
 	}
 	return (
 		<Grid
-			templateColumns={ { base: '1fr', md: 'repeat(2, minmax(0, 1fr))' } }
+			templateColumns={ {
+				base: '1fr',
+				md: 'repeat(2, minmax(0, 1fr))',
+				xl: 'repeat(3, minmax(0, 1fr))',
+			} }
 			columnGap={ { base: 3, md: 4 } }
 			rowGap={ 2 }
 		>
-			{ entries.map(
+			{ layoutEntries.map(
 				( {
 					key,
 					meta,
@@ -32,9 +50,10 @@ export function ResponsiveFieldGrid( {
 					key: string;
 					meta: Record< string, unknown >;
 				} ) => {
-					const type = meta.type ? String( meta.type ) : 'text';
+					const type = settingType( meta );
 					const fullRow =
-						( type === 'textarea' && key !== 'description' ) ||
+						( type === 'textarea' &&
+							FULL_ROW_TEXTAREA_KEYS.has( key ) ) ||
 						type === 'html-conditions' ||
 						type === 'paired' ||
 						type === 'paired-cropper' ||
@@ -42,7 +61,11 @@ export function ResponsiveFieldGrid( {
 					return (
 						<GridItem
 							key={ key }
-							colSpan={ { base: 1, md: fullRow ? 2 : 1 } }
+							colSpan={ {
+								base: 1,
+								md: fullRow ? 2 : 1,
+								xl: fullRow ? 3 : 1,
+							} }
 						>
 							{ renderSettingRow( key, meta, ctx ) }
 						</GridItem>

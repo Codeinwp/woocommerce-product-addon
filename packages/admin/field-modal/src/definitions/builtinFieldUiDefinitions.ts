@@ -303,7 +303,7 @@ const SELECT_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'field-settings',
 		tab: FieldTab.Settings,
 		labelKey: SectionLabelKey.FieldSettings,
-		keys: [ 'required', 'selected', 'first_option', 'onetime' ],
+		keys: [ 'required', 'onetime', 'selected', 'first_option' ],
 	},
 	{
 		kind: 'section',
@@ -359,7 +359,7 @@ const CHECKBOX_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'field-settings',
 		tab: FieldTab.Settings,
 		labelKey: SectionLabelKey.FieldSettings,
-		keys: [ 'required', 'checked', 'onetime' ],
+		keys: [ 'required', 'onetime', 'checked' ],
 	},
 	{
 		kind: 'section',
@@ -422,7 +422,7 @@ const RADIO_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'field-settings',
 		tab: FieldTab.Settings,
 		labelKey: SectionLabelKey.FieldSettings,
-		keys: [ 'required', 'selected', 'onetime' ],
+		keys: [ 'required', 'onetime', 'selected' ],
 	},
 	{
 		kind: 'section',
@@ -541,15 +541,14 @@ const TIMEZONE_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'layout',
 		tab: FieldTab.Settings,
 		labelKey: SectionLabelKey.Display,
-		keys: [ 'class', 'width', 'visibility', 'visibility_role' ],
-		advanced: true,
-	},
-	{
-		kind: 'section',
-		id: 'behavior',
-		tab: FieldTab.Settings,
-		labelKey: SectionLabelKey.Behavior,
-		keys: [ 'show_time', 'desc_tooltip' ],
+		keys: [
+			'show_time',
+			'desc_tooltip',
+			'class',
+			'width',
+			'visibility',
+			'visibility_role',
+		],
 		advanced: true,
 	},
 	{
@@ -700,7 +699,7 @@ const FILE_BLOCKS = withConditions(
 		'field-settings',
 		FieldTab.Settings,
 		SectionLabelKey.FieldSettings,
-		[ 'required', 'file_cost', 'onetime' ]
+		[ 'required', 'onetime', 'file_cost' ]
 	),
 	sectionBlock(
 		'constraints',
@@ -1127,7 +1126,7 @@ const SWITCHER_BLOCKS = withConditions(
 		'field-settings',
 		FieldTab.Settings,
 		SectionLabelKey.FieldSettings,
-		[ 'required', 'selected', 'onetime' ]
+		[ 'required', 'onetime', 'selected' ]
 	),
 	sectionBlock(
 		'validation',
@@ -1179,7 +1178,7 @@ const CHAINED_BLOCKS = withConditions(
 		'field-settings',
 		FieldTab.Settings,
 		SectionLabelKey.FieldSettings,
-		[ 'required', 'selected', 'first_option', 'onetime' ]
+		[ 'required', 'onetime', 'selected', 'first_option' ]
 	),
 	sectionBlock(
 		'validation',
@@ -1504,7 +1503,7 @@ const EMOJIS_BLOCKS = withConditions(
 		'field-settings',
 		FieldTab.Settings,
 		SectionLabelKey.FieldSettings,
-		[ 'required', 'emojis_display_type', 'onetime' ]
+		[ 'required', 'onetime', 'emojis_display_type' ]
 	),
 	sectionBlock(
 		'validation',
@@ -1699,7 +1698,7 @@ const PALETTES_BLOCKS = withConditions(
 		'field-settings',
 		FieldTab.Settings,
 		SectionLabelKey.FieldSettings,
-		[ 'required', 'selected', 'onetime', 'multiple_allowed' ]
+		[ 'required', 'onetime', 'multiple_allowed', 'selected' ]
 	),
 	sectionBlock(
 		'validation',

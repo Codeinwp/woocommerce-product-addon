@@ -95,13 +95,70 @@ export function DefinitionDrivenFieldEditor( {
 		return renderWidgetBlock( block );
 	}
 
+	function renderFlatSectionBlocks(
+		blocks: Array< Extract< FieldUiBlock, { kind: 'section' } > >,
+		key: string
+	) {
+		if ( blocks.length === 0 ) {
+			return null;
+		}
+
+		return (
+			<GroupedFieldSections
+				key={ key }
+				{ ...shared }
+				sections={ blocks.map( ( block ) => ( {
+					label: block.labelKey,
+					keys: block.keys,
+				} ) ) }
+				variant="flat"
+			/>
+		);
+	}
+
+	function renderAdvancedBlocks( blocks: FieldUiBlock[] ) {
+		const rendered: Array< JSX.Element > = [];
+		let pendingSections: Array<
+			Extract< FieldUiBlock, { kind: 'section' } >
+		> = [];
+
+		function flushPendingSections( nextKey: string ) {
+			const flatSections = renderFlatSectionBlocks(
+				pendingSections,
+				nextKey
+			);
+			if ( flatSections ) {
+				rendered.push( flatSections );
+			}
+			pendingSections = [];
+		}
+
+		blocks.forEach( ( block, index ) => {
+			if ( block.kind === 'section' ) {
+				pendingSections.push( block );
+				return;
+			}
+
+			flushPendingSections( `advanced-sections-before-${ block.id }` );
+			rendered.push( renderWidgetBlock( block ) );
+
+			if ( index === blocks.length - 1 ) {
+				flushPendingSections( 'advanced-sections-end' );
+			}
+		} );
+
+		flushPendingSections( 'advanced-sections-end' );
+
+		return rendered;
+	}
+
 	function renderSettingsTabContent( blocks: FieldUiBlock[] ) {
 		const primary: Array< JSX.Element > = [];
-		const advanced: Array< JSX.Element > = [];
+		const advancedBlocks: FieldUiBlock[] = [];
 
 		blocks.forEach( ( block ) => {
 			if ( block.advanced ) {
-				advanced.push( renderBlock( block ) );
+				advancedBlocks.push( block );
 				return;
 			}
 			primary.push( renderBlock( block ) );
@@ -115,12 +172,12 @@ export function DefinitionDrivenFieldEditor( {
 		return (
 			<VStack align="stretch" gap={ 3 }>
 				{ primary }
-				{ advanced.length > 0 && (
+				{ advancedBlocks.length > 0 && (
 					<AdvancedSettingsPanel
 						showLabel={ showAdvanced }
 						hideLabel={ hideAdvanced }
 					>
-						{ advanced }
+						{ renderAdvancedBlocks( advancedBlocks ) }
 					</AdvancedSettingsPanel>
 				) }
 			</VStack>

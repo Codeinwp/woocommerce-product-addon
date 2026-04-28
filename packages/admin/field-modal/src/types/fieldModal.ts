@@ -105,6 +105,7 @@ export type FieldEditorComponent = ComponentType< FieldEditorBaseProps >;
 
 export interface GroupedFieldSectionsProps extends FieldEditorBaseProps {
 	sections: Array< { label: string; keys: string[] } >;
+	variant?: 'sectioned' | 'flat';
 }
 
 export interface SettingRowContext {

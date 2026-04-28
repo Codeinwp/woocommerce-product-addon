@@ -80,6 +80,7 @@ export function LegacyAdvancedFieldStack( {
 					{ ...shared }
 					i18n={ i18n }
 					sections={ advanced }
+					variant="flat"
 				/>
 			);
 		} else {
@@ -92,6 +93,7 @@ export function LegacyAdvancedFieldStack( {
 							{ ...shared }
 							i18n={ i18n }
 							sections={ before }
+							variant="flat"
 						/>
 					) }
 					{ advancedInsertion }
@@ -100,6 +102,7 @@ export function LegacyAdvancedFieldStack( {
 							{ ...shared }
 							i18n={ i18n }
 							sections={ after }
+							variant="flat"
 						/>
 					) }
 				</>
