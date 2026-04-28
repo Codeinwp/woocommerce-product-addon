@@ -33,11 +33,11 @@ function ppom_woocommerce_load_scripts() {
 /**
  * Filter callback for woocommerce_add_to_cart_validation.
  *
- * @param bool      $passed       Validation state from earlier callbacks.
- * @param int       $product_id   Product ID.
- * @param int|float $qty          Requested quantity.
- * @param int       $variation_id Selected variation ID, or 0 for simple products.
- * @param array     $variations   Selected variation attributes.
+ * @param bool                 $passed       Validation state from earlier callbacks.
+ * @param int                  $product_id   Product ID.
+ * @param int|float            $qty          Requested quantity.
+ * @param int                  $variation_id Selected variation ID, or 0 for simple products.
+ * @param array<string, mixed> $variations   Selected variation attributes.
  *
  * @return bool
  */
@@ -52,10 +52,10 @@ function ppom_woocommerce_ajax_validate() {
 /**
  * Validates posted PPOM fields against the product field schema.
  *
- * @param int   $product_id   Product ID.
- * @param array $post_data    Posted request payload.
- * @param bool  $passed       Validation state from earlier checks.
- * @param int   $variation_id Selected variation ID, or 0 for simple products.
+ * @param int                  $product_id   Product ID.
+ * @param array<string, mixed> $post_data    Posted request payload.
+ * @param bool                 $passed       Validation state from earlier checks.
+ * @param int                  $variation_id Selected variation ID, or 0 for simple products.
  *
  * @return bool
  */

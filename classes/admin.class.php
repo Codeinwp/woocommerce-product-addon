@@ -559,7 +559,12 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		}
 
 		$query         = new WP_Query( $query_args );
-		$variation_ids = array_map( 'absint', $query->posts );
+		$variation_ids = array_map(
+			static function ( $post ) {
+				return absint( $post );
+			},
+			$query->posts
+		);
 
 		if ( '' !== $search_term ) {
 			$parent_products = get_posts(
@@ -778,14 +783,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			$value_label   = $attribute_value;
 			if ( taxonomy_exists( $attribute_key ) ) {
 				$term = get_term_by( 'slug', $attribute_value, $attribute_key );
-				if ( $term && ! is_wp_error( $term ) ) {
+				if ( $term ) {
 					$value_label = $term->name;
 				}
 			}
 
 			$attributes[] = sprintf(
 				'%1$s: %2$s',
-				wc_attribute_label( $attribute_key, $parent ),
+				wc_attribute_label( $attribute_key, $parent ? $parent : null ),
 				$value_label
 			);
 		}
