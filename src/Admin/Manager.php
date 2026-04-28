@@ -452,6 +452,10 @@ final class Manager {
 			$redirect_to = get_permalink( $product_id );
 		}
 
+		if ( $ppom_id && \NM_PersonalizedProduct_Admin::has_attach_selections_in_request() ) {
+			\NM_PersonalizedProduct_Admin::save_attach_selections_from_request( (int) $ppom_id );
+		}
+
 		$resp = array();
 		if ( $ppom_id ) {
 
@@ -597,6 +601,10 @@ final class Manager {
 		$rows_effected = MetaRepositoryAccessor::instance()->update_group( (int) $productmeta_id, $dt, $format, $where, $where_format );
 
 		// $wpdb->show_errors(); $wpdb->print_error();
+
+		if ( \NM_PersonalizedProduct_Admin::has_attach_selections_in_request() ) {
+			\NM_PersonalizedProduct_Admin::save_attach_selections_from_request( (int) $productmeta_id );
+		}
 
 		$return_page = isset( $_REQUEST['ppom_meta'] ) ? 'ppom-energy' : 'ppom';
 

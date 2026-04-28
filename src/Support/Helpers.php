@@ -273,7 +273,8 @@ final class Helpers {
 			$variation_id = $cart_item['variation_id'];
 		}
 
-		$product_id = self::get_product_id( $cart_item['data'] );
+		$product_id                  = self::get_product_id( $cart_item['data'] );
+		$cart_item['ppom']['fields'] = self::filter_posted_ppom_fields_by_active_variation( $cart_item['ppom']['fields'], $product_id, $variation_id );
 
 		// Fields sanitization.
 		$ppom = new PPOM_Meta( $product_id );
@@ -1483,6 +1484,237 @@ final class Helpers {
 		}
 
 		return apply_filters( 'ppom_is_field_hidden_by_condition', $ppom_is_hidden );
+	}
+
+	/**
+	 * Normalizes PPOM group IDs from scalar, comma-separated, or array payloads.
+	 *
+	 * @param mixed $meta_ids PPOM group IDs.
+	 * @return int[]
+	 */
+	public static function normalize_ppom_meta_ids( $meta_ids ) {
+		if ( is_string( $meta_ids ) ) {
+			$meta_ids = explode( ',', $meta_ids );
+		} elseif ( is_numeric( $meta_ids ) ) {
+			$meta_ids = array( $meta_ids );
+		} elseif ( ! is_array( $meta_ids ) ) {
+			$meta_ids = array();
+		}
+
+		$normalized = array();
+		foreach ( $meta_ids as $meta_id ) {
+			$meta_id = absint( $meta_id );
+			if ( $meta_id > 0 ) {
+				$normalized[] = $meta_id;
+			}
+		}
+
+		return array_values( array_unique( $normalized ) );
+	}
+
+	/**
+	 * Returns variation display rules for a parent product.
+	 *
+	 * Stored shape is: [ ppom_group_id => [ variation_id, ... ] ]. Data is
+	 * normalized on write by {@see self::update_variation_rule_map()}, so the
+	 * read path trusts the stored value.
+	 *
+	 * @param int $product_id Parent product ID.
+	 * @return array<int, int[]>
+	 */
+	public static function get_variation_rule_map( $product_id ) {
+		$product_id = absint( $product_id );
+		if ( $product_id <= 0 ) {
+			return array();
+		}
+
+		$rules = get_post_meta( $product_id, PPOM_VARIATION_META_KEY, true );
+
+		return is_array( $rules ) ? $rules : array();
+	}
+
+	/**
+	 * Saves normalized variation display rules for a parent product.
+	 *
+	 * @param int                                 $product_id Parent product ID.
+	 * @param array<int|string, array<int>|mixed> $rules    Rule map keyed by PPOM group ID.
+	 * @return void
+	 */
+	public static function update_variation_rule_map( $product_id, array $rules ) {
+		$product_id = absint( $product_id );
+		if ( $product_id <= 0 ) {
+			return;
+		}
+
+		$normalized = array();
+		foreach ( $rules as $ppom_id => $variation_ids ) {
+			$ppom_id = absint( $ppom_id );
+			if ( $ppom_id <= 0 || ! is_array( $variation_ids ) ) {
+				continue;
+			}
+
+			$variation_ids = array_values(
+				array_unique(
+					array_filter(
+						array_map( 'absint', $variation_ids ),
+						function ( $variation_id ) {
+							return $variation_id > 0;
+						}
+					)
+				)
+			);
+
+			if ( ! empty( $variation_ids ) ) {
+				$normalized[ $ppom_id ] = $variation_ids;
+			}
+		}
+
+		if ( empty( $normalized ) ) {
+			delete_post_meta( $product_id, PPOM_VARIATION_META_KEY );
+			return;
+		}
+
+		update_post_meta( $product_id, PPOM_VARIATION_META_KEY, $normalized );
+	}
+
+	/**
+	 * Returns the selected variation IDs for one PPOM group on one product.
+	 *
+	 * @param int $product_id Parent product ID.
+	 * @param int $ppom_id    PPOM group ID.
+	 * @return int[]
+	 */
+	public static function get_variation_ids_for_group( $product_id, $ppom_id ) {
+		$rules   = self::get_variation_rule_map( $product_id );
+		$ppom_id = absint( $ppom_id );
+
+		return isset( $rules[ $ppom_id ] ) ? $rules[ $ppom_id ] : array();
+	}
+
+	/**
+	 * Determines whether a PPOM group should be active for the selected variation.
+	 *
+	 * Empty restrictions mean unrestricted legacy behavior.
+	 *
+	 * @param int $product_id   Parent product ID.
+	 * @param int $ppom_id      PPOM group ID.
+	 * @param int $variation_id Selected WooCommerce variation ID.
+	 * @return bool
+	 */
+	public static function is_meta_group_active_for_variation( $product_id, $ppom_id, $variation_id ) {
+		$allowed_variations = self::get_variation_ids_for_group( $product_id, $ppom_id );
+		if ( empty( $allowed_variations ) ) {
+			return true;
+		}
+
+		$variation_id = absint( $variation_id );
+		if ( $variation_id <= 0 ) {
+			return false;
+		}
+
+		return in_array( $variation_id, $allowed_variations, true );
+	}
+
+	/**
+	 * Filters posted PPOM field values to the groups active for a variation.
+	 *
+	 * @param array<string, mixed> $posted_fields Posted ppom[fields] payload.
+	 * @param int                  $product_id    Parent product ID.
+	 * @param int                  $variation_id  Selected WooCommerce variation ID.
+	 * @return array<string, mixed>
+	 */
+	public static function filter_posted_ppom_fields_by_active_variation( array $posted_fields, $product_id, $variation_id ) {
+		$ppom = new PPOM_Meta( $product_id );
+		if ( empty( $ppom->fields ) ) {
+			return $posted_fields;
+		}
+
+		$inactive_datanames = array();
+		foreach ( $ppom->fields as $field ) {
+			$ppom_id = isset( $field['ppom_id'] ) ? absint( $field['ppom_id'] ) : 0;
+			if ( $ppom_id <= 0 || self::is_meta_group_active_for_variation( $product_id, $ppom_id, $variation_id ) ) {
+				continue;
+			}
+
+			if ( ! empty( $field['data_name'] ) ) {
+				$inactive_datanames[ sanitize_key( $field['data_name'] ) ] = true;
+			}
+		}
+
+		foreach ( array_keys( $posted_fields ) as $data_name ) {
+			if ( 'id' === $data_name ) {
+				continue;
+			}
+
+			if ( isset( $inactive_datanames[ sanitize_key( $data_name ) ] ) ) {
+				unset( $posted_fields[ $data_name ] );
+			}
+		}
+
+		if ( isset( $posted_fields['id'] ) ) {
+			$active_meta_ids = array();
+			foreach ( self::normalize_ppom_meta_ids( $posted_fields['id'] ) as $ppom_id ) {
+				if ( self::is_meta_group_active_for_variation( $product_id, $ppom_id, $variation_id ) ) {
+					$active_meta_ids[] = $ppom_id;
+				}
+			}
+
+			if ( empty( $active_meta_ids ) ) {
+				unset( $posted_fields['id'] );
+			} else {
+				$posted_fields['id'] = implode( ',', $active_meta_ids );
+			}
+		}
+
+		return $posted_fields;
+	}
+
+	/**
+	 * Filters a full PPOM payload to the groups active for a variation.
+	 *
+	 * @param array<string, mixed> $ppom_payload Posted ppom payload.
+	 * @param int                  $product_id   Parent product ID.
+	 * @param int                  $variation_id Selected WooCommerce variation ID.
+	 * @return array<string, mixed>
+	 */
+	public static function filter_ppom_payload_by_active_variation( array $ppom_payload, $product_id, $variation_id ) {
+		if ( empty( $ppom_payload['fields'] ) || ! is_array( $ppom_payload['fields'] ) ) {
+			return $ppom_payload;
+		}
+
+		$original_fields        = $ppom_payload['fields'];
+		$ppom_payload['fields'] = self::filter_posted_ppom_fields_by_active_variation( $ppom_payload['fields'], $product_id, $variation_id );
+		$inactive_datanames     = array_diff( array_keys( $original_fields ), array_keys( $ppom_payload['fields'] ) );
+
+		if ( ! empty( $inactive_datanames ) && ! empty( $ppom_payload['ppom_option_price'] ) ) {
+			$option_prices = json_decode( wp_unslash( $ppom_payload['ppom_option_price'] ), true );
+			if ( is_array( $option_prices ) ) {
+				$inactive_map = array();
+				foreach ( $inactive_datanames as $data_name ) {
+					$inactive_map[ sanitize_key( $data_name ) ] = true;
+				}
+
+				$option_prices = array_values(
+					array_filter(
+						$option_prices,
+						function ( $option ) use ( $inactive_map ) {
+							if ( ! is_array( $option ) || empty( $option['data_name'] ) ) {
+								return true;
+							}
+
+							return ! isset( $inactive_map[ sanitize_key( $option['data_name'] ) ] );
+						}
+					)
+				);
+
+				$encoded_option_prices = wp_json_encode( $option_prices );
+				if ( false !== $encoded_option_prices ) {
+					$ppom_payload['ppom_option_price'] = $encoded_option_prices;
+				}
+			}
+		}
+
+		return $ppom_payload;
 	}
 
 	// Get cart item max quantity for matrix

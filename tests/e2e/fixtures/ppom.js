@@ -86,6 +86,21 @@ async function attachPpomGroupToCategories(
 	} );
 }
 
+async function attachPpomGroupToVariations(
+	requestUtils,
+	{ ppomId, variationIds, initialVariationIds = [] }
+) {
+	return postBootstrapAction(
+		requestUtils,
+		'ppom_e2e_attach_ppom_group_to_variations',
+		{
+			ppom_id: ppomId,
+			variation_ids: variationIds,
+			initial_variation_ids: initialVariationIds,
+		}
+	);
+}
+
 async function getPpomAttachRowMeta( requestUtils, { ppomId } ) {
 	return postBootstrapAction( requestUtils, 'ppom_e2e_get_ppom_attach_row', {
 		ppom_id: ppomId,
@@ -95,6 +110,7 @@ async function getPpomAttachRowMeta( requestUtils, { ppomId } ) {
 export {
 	attachPpomGroupToCategories,
 	attachPpomGroupToProducts,
+	attachPpomGroupToVariations,
 	createPpomGroup,
 	createSimpleTextGroup,
 	getPpomAttachRowMeta,

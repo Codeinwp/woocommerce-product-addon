@@ -158,13 +158,13 @@ final class Engine {
 	 * Uses submitted field selections to look up field definitions and build the
 	 * normalized pricing rows used by cart line pricing and cart fees.
 	 *
-	 * @param array      $ppom_fields_post Posted PPOM field values.
-	 * @param int        $product_id       Product ID.
-	 * @param float|int  $product_quantity Product quantity.
-	 * @param int|string $variation_id     Variation ID.
-	 * @param array|null $item             Cart item context.
+	 * @param mixed                     $ppom_fields_post Posted PPOM field values.
+	 * @param int                       $product_id       Product ID.
+	 * @param float|int                 $product_quantity Product quantity.
+	 * @param int|string                $variation_id     Variation ID.
+	 * @param array<string, mixed>|null $item             Cart item context.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 *
 	 * @see Helpers::get_field_meta_by_dataname()
 	 * @see self::price_get_product_base()
@@ -174,6 +174,9 @@ final class Engine {
 
 		$field_prices  = array();
 		$ppom_meta_ids = apply_filters( 'ppom_meta_ids_in_cart', null, $item );
+		if ( is_array( $ppom_fields_post ) ) {
+			$ppom_fields_post = Helpers::filter_posted_ppom_fields_by_active_variation( $ppom_fields_post, $product_id, (int) $variation_id );
+		}
 
 		// ppom_pa($item);
 		foreach ( $ppom_fields_post as $data_name => $value ) {
