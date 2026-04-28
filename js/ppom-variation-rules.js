@@ -76,6 +76,30 @@ jQuery( function ( $ ) {
 	}
 
 	/**
+	 * Fires ppom_field_shown / ppom_field_hidden once per field inside the group,
+	 * matching the payload shape (`{ field: <data_name> }`) that PPOM's conditional
+	 * logic, validator, and file-upload listeners expect. Without the payload those
+	 * listeners read `e.field` as undefined and either no-op or throw on subsequent
+	 * `field_meta.type` access.
+	 *
+	 * @param {jQuery} $group    - A `.ppom-variation-rule-group` element.
+	 * @param {string} eventType - 'ppom_field_shown' or 'ppom_field_hidden'.
+	 */
+	function triggerFieldEvents( $group, eventType ) {
+		$group.find( '.ppom-field-wrapper' ).each( function () {
+			const dataName = $( this ).attr( 'data-data_name' );
+			if ( ! dataName ) {
+				return;
+			}
+			$.event.trigger( {
+				type: eventType,
+				field: dataName,
+				time: new Date(),
+			} );
+		} );
+	}
+
+	/**
 	 * Shows or hides a single variation-restricted group.
 	 * Handles visibility, input disabled state, conditional-logic class,
 	 * accessibility, and fires ppom_field_shown/hidden events.
@@ -88,12 +112,12 @@ jQuery( function ( $ ) {
 			$group.show().attr( 'aria-hidden', 'false' );
 			setInputsDisabled( $group, false );
 			setConditionHiddenClass( $group, false );
-			$( document ).trigger( 'ppom_field_shown' );
+			triggerFieldEvents( $group, 'ppom_field_shown' );
 		} else {
 			$group.hide().attr( 'aria-hidden', 'true' );
 			setInputsDisabled( $group, true );
 			setConditionHiddenClass( $group, true );
-			$( document ).trigger( 'ppom_field_hidden' );
+			triggerFieldEvents( $group, 'ppom_field_hidden' );
 		}
 	}
 
