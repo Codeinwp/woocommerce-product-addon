@@ -743,25 +743,35 @@ class PPOM_Meta_Repository {
 			return false;
 		}
 
-		$table   = $this->table_name();
-		$ids_sql = implode( ',', $ids );
-		// 'on' / '' is server-controlled (see $disabled cast above), and the
-		// IN list is absint'd. No request data reaches the SQL.
-		$value = $disabled ? 'on' : '';
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- table name internal; value is trusted enum.
-		$result = $this->wpdb->query( "UPDATE `{$table}` SET productmeta_disabled = '{$value}' WHERE productmeta_id IN ({$ids_sql})" );
+		$table    = $this->table_name();
+		$value    = $disabled ? 'on' : '';
+		$affected = 0;
+		$failed   = false;
 
 		foreach ( $ids as $id ) {
-			$this->invalidate_row_cache( (int) $id );
+			$result = $this->wpdb->update(
+				$table,
+				array( 'productmeta_disabled' => $value ),
+				array( 'productmeta_id' => $id ),
+				array( '%s' ),
+				array( '%d' )
+			);
+
+			if ( false === $result ) {
+				$failed = true;
+				continue;
+			}
+
+			$affected += (int) $result;
+			$this->invalidate_row_cache( $id );
 		}
 		$this->invalidate_aggregate_list_caches();
 
-		if ( false === $result ) {
+		if ( $failed && 0 === $affected ) {
 			return false;
 		}
 
-		return (int) $result;
+		return $affected;
 	}
 
 	/**

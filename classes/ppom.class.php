@@ -340,11 +340,6 @@ class PPOM_Meta {
 			return null;
 		}
 
-		// Meta created without any fields
-		if ( ! $this->ppom_settings ) {
-			return null;
-		}
-
 		$meta_fields = array();
 		$repo        = ppom_meta_repository();
 
@@ -367,6 +362,12 @@ class PPOM_Meta {
 				}
 			}
 		} else {
+			// Single-meta only: settings() already resolved (and possibly nulled) the
+			// primary row. Multi-meta resolves each row independently above.
+			if ( ! $this->ppom_settings ) {
+				return null;
+			}
+
 			$meta_id = absint( $this->meta_id );
 			$row     = $repo->get_row_by_id( $meta_id );
 			if ( $row && isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled ) {

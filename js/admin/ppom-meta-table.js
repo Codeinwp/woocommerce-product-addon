@@ -64,9 +64,9 @@ jQuery( function ( $ ) {
 		window?.ppomPopup?.open( {
 			title: title,
 			onConfirmation: () => {
-				$( '#del-file-' + productmeta_id ).html(
-					'<img src="' + ppom_vars.loader + '">'
-				);
+				const $link = $( '#del-file-' + productmeta_id );
+				const originalHtml = $link.html();
+				$link.html( '<img src="' + ppom_vars.loader + '">' );
 
 				const data = {
 					action: 'ppom_delete_meta',
@@ -75,9 +75,6 @@ jQuery( function ( $ ) {
 				};
 
 				$.post( ajaxurl, data, function ( resp ) {
-					$( '#del-file-' + productmeta_id ).html(
-						'<span class="dashicons dashicons-no"></span>'
-					);
 					if ( resp.status === 'success' ) {
 						window?.ppomPopup?.open( {
 							title: window?.ppom_vars?.i18n.popup.finishTitle,
@@ -86,6 +83,7 @@ jQuery( function ( $ ) {
 							onClose: () => location.reload(),
 						} );
 					} else {
+						$link.html( originalHtml );
 						window?.ppomPopup?.open( {
 							title: window.ppom_vars.i18n.popup.errorTitle,
 							text: resp.message,
