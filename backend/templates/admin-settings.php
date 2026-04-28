@@ -154,7 +154,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 															<?php if ( $_type == 'section' ) { ?>
 																<tr
 																		data-conditions="<?php echo esc_attr( wp_json_encode( $conditions ) ); ?>"
-																		class="<?php echo esc_attr( $condition_class ); ?>"
+																		class="ppom-card-header-row <?php echo esc_attr( $condition_class ); ?>"
 																>
 																	<td class="nmsf-section-type" colspan="2">
 																		<?php if ( $is_available && ! $is_input_available ) : ?>
@@ -184,27 +184,36 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																			<?php if ( isset( $ppom_section_icons[ $_id ] ) ) : ?>
 																				<span class="ppom-section-icon dashicons <?php echo esc_attr( $ppom_section_icons[ $_id ] ); ?>"></span>
 																			<?php endif; ?>
-																			<?php echo esc_html( $_title ); ?>
-																			<?php if ( ! empty( $desc ) ) { ?>
-																				<span class="nmsf-field-desc"><?php echo esc_html( $desc ); ?></span>
-																			<?php } ?>
-																			<?php
-																			$ppom_badge_map = array(
-																				'ppom_integrations_rest' => 'ppom_api_enable',
-																				'ppom_integrations_wcfm' => 'ppom_wcfm_allow_vendors',
-																			);
-																			if ( isset( $ppom_badge_map[ $_id ] ) ) {
-																				$badge_field_id = $ppom_badge_map[ $_id ];
-																				$badge_enabled  = $class_ins::get_saved_settings( $badge_field_id );
-																				$badge_active   = ( $badge_enabled === 'on' || $badge_enabled === '1' || $badge_enabled === 'yes' );
-																				$badge_class    = $badge_active ? 'ppom-status-badge ppom-badge-active' : 'ppom-status-badge ppom-badge-inactive';
-																				$badge_text     = $badge_active ? __( 'Active', 'woocommerce-product-addon' ) : __( 'Inactive', 'woocommerce-product-addon' );
-																				?>
-																				<span class="<?php echo esc_attr( $badge_class ); ?>"
-																					data-field-id="<?php echo esc_attr( $badge_field_id ); ?>"><?php echo esc_html( $badge_text ); ?></span>
-																				<?php
-																			}
-																			?>
+																			<div class="ppom-card-title-row">
+																				<div class="ppom-card-title">
+																					<div class="ppom-title-badge-row">
+																						<span class="ppom-card-title-text"><?php echo esc_html( $_title ); ?></span>
+																						<?php
+																						$ppom_badge_map = array(
+																							'ppom_integrations_rest' => 'ppom_api_enable',
+																							'ppom_integrations_wcfm' => 'ppom_wcfm_allow_vendors',
+																						);
+																						if ( isset( $ppom_badge_map[ $_id ] ) ) {
+																							$badge_field_id = $ppom_badge_map[ $_id ];
+																							$badge_enabled  = $class_ins::get_saved_settings( $badge_field_id );
+																							$badge_active   = ( $badge_enabled === 'on' || $badge_enabled === '1' || $badge_enabled === 'yes' );
+																							$badge_class    = $badge_active ? 'ppom-status-badge ppom-badge-active' : 'ppom-status-badge ppom-badge-inactive';
+																							$badge_text     = $badge_active ? __( 'Active', 'woocommerce-product-addon' ) : __( 'Inactive', 'woocommerce-product-addon' );
+																							?>
+																							<span class="<?php echo esc_attr( $badge_class ); ?>"
+																								data-field-id="<?php echo esc_attr( $badge_field_id ); ?>"><?php echo esc_html( $badge_text ); ?></span>
+																							<?php
+																						}
+																						?>
+																					</div>
+																					<button class="ppom-card-toggle" aria-expanded="true" data-section="<?php echo esc_attr( $_id ); ?>">
+																						<span class="dashicons dashicons-arrow-up-alt2"></span>
+																					</button>
+																				</div>
+																				<?php if ( ! empty( $desc ) ) { ?>
+																					<p class="ppom-card-desc"><?php echo esc_html( $desc ); ?></p>
+																				<?php } ?>
+																			</div>
 																		</h3>
 																	</td>
 																</tr>
@@ -217,7 +226,7 @@ $migrate_url = wp_nonce_url( $migrate_url, 'ppom_migrate_nonce_action', 'ppom_mi
 																?>
 																<tr
 																		data-conditions="<?php echo esc_attr( wp_json_encode( $conditions ) ); ?>"
-																		class="<?php echo esc_attr( $condition_class ); ?>"
+																		class="ppom-card-body-row <?php echo esc_attr( $condition_class ); ?>"
 																>
 																	<th>
 																		<label for=""><?php echo esc_html( $_title ); ?></label>
