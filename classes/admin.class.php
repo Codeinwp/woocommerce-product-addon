@@ -566,26 +566,34 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			$query->posts
 		);
 
+		$parent_products_query = null;
 		if ( '' !== $search_term ) {
-			$parent_products = get_posts(
+			$parent_products_query = new WP_Query(
 				array(
 					'post_type'              => 'product',
 					'post_status'            => 'publish',
 					'posts_per_page'         => $per_page,
+					'paged'                  => $page,
 					's'                      => $search_term,
 					'fields'                 => 'ids',
-					'no_found_rows'          => true,
+					'no_found_rows'          => false,
 					'update_post_meta_cache' => false,
 					'update_post_term_cache' => false,
 				)
 			);
 
-			if ( ! empty( $parent_products ) ) {
-				$parent_variations = get_posts(
+			if ( ! empty( $parent_products_query->posts ) ) {
+				$parent_product_ids = array_map(
+					static function ( $post ) {
+						return absint( $post );
+					},
+					$parent_products_query->posts
+				);
+				$parent_variations  = get_posts(
 					array(
 						'post_type'              => 'product_variation',
 						'post_status'            => array( 'publish', 'private' ),
-						'post_parent__in'        => array_map( 'absint', $parent_products ),
+						'post_parent__in'        => $parent_product_ids,
 						'posts_per_page'         => $per_page,
 						'fields'                 => 'ids',
 						'no_found_rows'          => true,
@@ -593,11 +601,12 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 						'update_post_term_cache' => false,
 					)
 				);
-				$variation_ids     = array_merge( $variation_ids, array_map( 'absint', $parent_variations ) );
+				$variation_ids      = array_merge( $variation_ids, array_map( 'absint', $parent_variations ) );
 			}
 		}
 
-		$variation_ids = array_slice( array_values( array_unique( array_filter( $variation_ids ) ) ), 0, $per_page );
+		$merged_unique = array_values( array_unique( array_filter( $variation_ids ) ) );
+		$variation_ids = array_slice( $merged_unique, 0, $per_page );
 		$results       = array();
 		foreach ( $variation_ids as $variation_id ) {
 			$results[] = array(
@@ -606,11 +615,15 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			);
 		}
 
+		$has_more = $page < (int) $query->max_num_pages
+			|| ( $parent_products_query && $page < (int) $parent_products_query->max_num_pages )
+			|| count( $merged_unique ) > $per_page;
+
 		wp_send_json(
 			array(
 				'results'    => $results,
 				'pagination' => array(
-					'more' => '' === $search_term && $page < (int) $query->max_num_pages,
+					'more' => $has_more,
 				),
 			)
 		);
@@ -734,6 +747,12 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			return array();
 		}
 
+		// The rule map is stored as `[ ppom_group_id => [ variation_id, ... ] ]`,
+		// so the requested group always serializes as `i:<ppom_id>;a:` (integer key
+		// followed by the start of an array value). Inner array elements are always
+		// integers, never arrays, so this pattern only matches top-level keys.
+		$serialized_key_anchor = sprintf( 'i:%d;a:', $ppom_id );
+
 		$product_ids = get_posts(
 			array(
 				'post_type'              => 'product',
@@ -743,7 +762,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
-				'meta_key'               => PPOM_VARIATION_META_KEY,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Narrowed by serialized-key LIKE so we don't scan every product with any variation rule.
+				'meta_query'             => array(
+					array(
+						'key'     => PPOM_VARIATION_META_KEY,
+						'value'   => $serialized_key_anchor,
+						'compare' => 'LIKE',
+					),
+				),
 			)
 		);
 
