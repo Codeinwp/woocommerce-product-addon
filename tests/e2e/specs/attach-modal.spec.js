@@ -10,54 +10,26 @@ import {
 	getPpomAttachRowMeta,
 	setPpomLicenseFixture,
 } from "../fixtures/index.js";
-import { addNewField, createSimpleGroupField, fillFieldNameAndId, pickFieldTypeInModal, saveFieldInModal, saveFields } from "../utils";
+import {
+	addNewField,
+	createSimpleGroupField,
+	fillFieldNameAndId,
+	getInlineAttachContainer,
+	getInlineAttachSelect,
+	pickFieldTypeInModal,
+	saveFieldInModal,
+	saveFields,
+	saveInlineAttach,
+	searchAndSelectInlineProduct,
+	selectInlineAttachTerms,
+} from "../utils";
 
-test.describe("Attach Modal", () => {
-	async function saveAttachModal(page) {
-		page.once("dialog", (dialog) => dialog.accept());
-		await page
-			.locator("#ppom-product-form")
-			.getByRole("button", { name: "Save", exact: true })
-			.click();
-		await page.locator("#ppom-product-modal").waitFor({ state: "hidden" });
-	}
-
-	async function searchAndSelectProduct(page, productName) {
-		const selection = page.locator(
-			"#attach-to-products .select2-selection--multiple",
-		);
-		const searchResponsePromise = page.waitForResponse((response) => {
-			const url = new URL(response.url());
-
-			return (
-				url.pathname.endsWith("/wp-admin/admin-ajax.php") &&
-				url.searchParams.get("action") === "ppom_search_products" &&
-				url.searchParams.get("q") === productName
-			);
-		});
-
-		await selection.click();
-		await page.keyboard.type(productName);
-
-		const searchResponse = await searchResponsePromise;
-		expect(searchResponse.ok()).toBeTruthy();
-		expect(searchResponse.status()).toBe(200);
-
-		const resultOption = page
-			.locator(".select2-results__option[aria-selected]")
-			.filter({ hasText: productName });
-
-		await expect(resultOption).toHaveCount(1);
-		await resultOption.click();
-		await expect(
-			page.locator("#attach-to-products .select2-selection__choice"),
-		).toContainText(productName);
-	}
-
+test.describe("Inline Attach", () => {
 	/**
-	 * Attach a new group field to a searched product in a larger catalog then check.
+	 * Attach a new group to a searched product in a larger catalog and
+	 * verify it renders only on that product.
 	 */
-	test("searches 25 products in attach modal and attaches the selected match", async ({ page, admin, requestUtils }) => {
+	test("searches 25 products and attaches the selected match", async ({ page, admin, requestUtils }) => {
 		const suffix = Date.now();
 		const products = await createSimpleProducts(
 			requestUtils,
@@ -73,11 +45,11 @@ test.describe("Attach Modal", () => {
 		const controlProduct = products[0];
 
 		const { ppomId } = await createSimpleGroupField(admin, page);
-		await page.locator(".ppom-products-modal").click();
-		await page.locator("#ppom-product-form").waitFor({ state: "visible" });
+		await expect(getInlineAttachContainer(page)).toBeVisible();
 
-		await searchAndSelectProduct(page, targetProduct.name);
-		await saveAttachModal(page);
+		await searchAndSelectInlineProduct(page, targetProduct.name);
+		await saveInlineAttach(page);
+
 		await page.goto(`/?p=${targetProduct.id}`);
 
 		const elements = page.locator(`.ppom-id-${ppomId}`);
@@ -101,28 +73,24 @@ test.describe("Attach Modal", () => {
 		const productsToCheck = await Promise.all(
 			categoriesToUse.map((category, index) =>
 				createSimpleProduct(requestUtils, {
-					name: `Attach Modal Product ${index + 1}`,
+					name: `Inline Attach Product ${index + 1}`,
 					categories: [{ id: category.id }],
 				}),
 			),
 		);
 
 		const { ppomId } = await createSimpleGroupField(admin, page);
-		await page.locator(".ppom-products-modal").click();
-		await page.locator("#ppom-product-form").waitFor({ state: "visible" });
+		await expect(getInlineAttachContainer(page)).toBeVisible();
 
-		await page.evaluate(() => {
-			document.querySelector('#attach-to-categories > div.postbox').classList.remove('closed');
-		});
-
-		const categoriesSelector = page.locator(
-			'#ppom-product-modal select[name="ppom-attach-to-categories\\[\\]"]',
+		await selectInlineAttachTerms(
+			page,
+			"categories",
+			categoriesToUse.map((category) => ({
+				value: category.slug,
+				label: category.name,
+			})),
 		);
-
-		await categoriesSelector.selectOption(
-			categoriesToUse.map((category) => ({ value: category.slug })),
-		);
-		await saveAttachModal(page);
+		await saveInlineAttach(page);
 
 		for (const product of productsToCheck) {
 			await page.goto(`/?p=${product.id}`);
@@ -136,17 +104,18 @@ test.describe("Attach Modal", () => {
 	/**
 	 * Regression for ppom-pro#625: clearing tag attachment rules must persist.
 	 *
-	 * Workflow (not “a product tagged then untagged”):
-	 * 1. Seed a WooCommerce product tag so the attach modal can list it (same idea as seeding categories).
-	 * 2. Create a PPOM field group, open “Attach to Products”, and under “Display in Specific Product Tags”
-	 *    choose that tag — this writes `productmeta_tags` on the PPOM row (show group when catalog products have the tag).
-	 * 3. Save via the real modal form, then read the PPOM row from the DB (bootstrap) to confirm the slug was stored.
-	 * 4. Reopen the modal, clear the multiselect (`selectOption([])` = merchant deselected every tag), save again.
-	 * 5. DB must be empty and the UI must show no selected options after reopening (tag must not “come back”).
-	 *
-	 * `page.evaluate` only expands the Tags postbox (WP admin starts it collapsed); it does not edit tag data.
+	 * Workflow (not "a product tagged then untagged"):
+	 * 1. Seed a WooCommerce product tag so the inline attach UI can list it.
+	 * 2. Create a PPOM field group, then under "Display in Specific Product Tags"
+	 *    choose that tag — this writes `productmeta_tags` on the PPOM row.
+	 * 3. Save the field group form, then read the PPOM row from the DB to
+	 *    confirm the slug was stored.
+	 * 4. Clear the multiselect (`selectOption([])` = merchant deselected every
+	 *    tag), save again.
+	 * 5. DB must be empty and after a reload the UI must show no selected
+	 *    options (tag must not "come back").
 	 */
-	test("detach all product tags from attach modal persists (ppom-pro#625)", async ( {
+	test("detach all product tags persists (ppom-pro#625)", async ( {
 		page,
 		admin,
 		requestUtils,
@@ -157,62 +126,46 @@ test.describe("Attach Modal", () => {
 		const tag = await createProductTag( requestUtils );
 		const { ppomId } = await createSimpleGroupField( admin, page );
 
-		// --- Round 1: attach PPOM group to that catalog tag; save; verify DB ---
-		await page.locator( ".ppom-products-modal" ).click();
-		await page.locator( "#ppom-product-form" ).waitFor( { state: "visible" } );
-
-		// Uncollapse the Tags section (mirrors the categories test; not related to removing tags).
-		await page.evaluate( () => {
-			document
-				.querySelector( "#attach-to-tags > div.postbox" )
-				?.classList.remove( "closed" );
-		} );
-
-		const tagsSelect = page.locator(
-			'#ppom-product-modal select[name="ppom-attach-to-tags\\[\\]"]',
-		);
-		await tagsSelect.waitFor( { state: "visible" } );
-		await tagsSelect.selectOption( [ tag.slug ] );
-		await saveAttachModal( page );
+		// --- Round 1: attach group to that catalog tag; save; verify DB ---
+		await expect( getInlineAttachSelect( page, "tags" ) ).toBeAttached();
+		await selectInlineAttachTerms( page, "tags", [
+			{ value: tag.slug, label: tag.name },
+		] );
+		await saveInlineAttach( page );
 
 		let row = await getPpomAttachRowMeta( requestUtils, { ppomId } );
 		expect( row.productmeta_tags ).toContain( tag.slug );
 
-		// --- Round 2: merchant clears all tag rules; save; DB must stay empty (bug was: old tags reappeared) ---
-		await page.locator( ".ppom-products-modal" ).click();
-		await page.locator( "#ppom-product-form" ).waitFor( { state: "visible" } );
-		await page.evaluate( () => {
-			document
-				.querySelector( "#attach-to-tags > div.postbox" )
-				?.classList.remove( "closed" );
-		} );
-		await tagsSelect.selectOption( [] );
-		await saveAttachModal( page );
+		// --- Round 2: merchant clears all tag rules; save; DB must stay empty
+		// (bug was: old tags reappeared). Round 1's selected slug is already
+		// rendered as `<option selected>` post-reload, so no injection here.
+		await selectInlineAttachTerms( page, "tags", [] );
+		await saveInlineAttach( page );
 
 		row = await getPpomAttachRowMeta( requestUtils, { ppomId } );
 		expect( row.productmeta_tags ).toBe( "" );
 
-		// --- Round 3: reopen modal; UI must match DB (no tag still selected) ---
-		await page.locator( ".ppom-products-modal" ).click();
-		await page.locator( "#ppom-product-form" ).waitFor( { state: "visible" } );
-		await page.evaluate( () => {
-			document
-				.querySelector( "#attach-to-tags > div.postbox" )
-				?.classList.remove( "closed" );
-		} );
-		await expect( tagsSelect.locator( "option:checked" ) ).toHaveCount( 0 );
+		// --- Round 3: reload page; UI must match DB (no tag still selected) ---
+		await page.reload();
+		await expect(
+			getInlineAttachSelect( page, "tags" ).locator( "option:checked" ),
+		).toHaveCount( 0 );
 	} );
 
 	/**
-	 * Attach Modal should be visible only for existing PPOM fields.
+	 * The inline attach UI should appear only after the group exists.
+	 *
+	 * `templates/admin/ppom-fields.php` gates the render with
+	 * `$is_edit_screen && ! $is_new_group`, so a brand-new group should not
+	 * render the container, and the same page after the first save should.
 	 */
-	test("attach modal visibility on Group Edit page", async ({ page, admin }) => {
+	test("inline attach UI visibility on Group Edit page", async ({ page, admin }) => {
 		await admin.visitAdminPage("admin.php?page=ppom");
 
 		await page.getByRole("link", { name: "Add New Group" }).click();
-		await page.getByRole("textbox").fill("Test Attach Modal visibility");
+		await page.getByRole("textbox").fill("Test Inline Attach visibility");
 
-		await expect( page.locator('[data-formmodal-id="ppom-product-modal"]') ).toBeHidden();
+		await expect( getInlineAttachContainer(page) ).toHaveCount(0);
 
 		await addNewField(page);
 		await pickFieldTypeInModal(page, "text");
@@ -225,9 +178,7 @@ test.describe("Attach Modal", () => {
 		await saveFieldInModal(page, 1);
 		await saveFields(page);
 
-		await page.waitForLoadState("networkidle");
-		await page.reload();
-
-		await expect( page.locator('[data-formmodal-id="ppom-product-modal"]') ).toBeVisible();
+		await page.waitForURL(/&productmeta_id=\d+&do_meta=edit/);
+		await expect( getInlineAttachContainer(page) ).toBeVisible();
 	});
 });
