@@ -199,11 +199,11 @@ final class ProductHandler {
 	 * Treats posted PPOM values as untrusted input and validates them against the
 	 * resolved field schema for the product.
 	 *
-	 * @param bool      $passed       Validation state from earlier callbacks.
-	 * @param int       $product_id   Product ID.
-	 * @param int|float $qty          Requested quantity.
-	 * @param int       $variation_id Selected variation ID, or 0 for simple products.
-	 * @param array     $variations   Selected variation attributes (unused; kept for filter compatibility).
+	 * @param bool                 $passed       Validation state from earlier callbacks.
+	 * @param int                  $product_id   Product ID.
+	 * @param int|float            $qty          Requested quantity.
+	 * @param int                  $variation_id Selected variation ID, or 0 for simple products.
+	 * @param array<string, mixed> $variations   Selected variation attributes (unused; kept for filter compatibility).
 	 *
 	 * @return bool
 	 *

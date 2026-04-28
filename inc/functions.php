@@ -155,7 +155,7 @@ function ppom_is_meta_group_active_for_variation( ...$args ) {
  * Filters a posted PPOM payload to the groups active for a variation.
  *
  * @param mixed ...$args Forwarded arguments.
- * @return array
+ * @return array<string, mixed>
  */
 function ppom_filter_ppom_payload_by_active_variation( ...$args ) {
 	return \PPOM\Support\Helpers::filter_ppom_payload_by_active_variation( ...$args );

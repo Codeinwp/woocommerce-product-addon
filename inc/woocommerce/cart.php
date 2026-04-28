@@ -13,12 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Filter callback for woocommerce_add_cart_item_data.
  *
- * @param array $cart         Cart item data.
- * @param int   $product_id   Product ID.
- * @param int   $variation_id Selected variation ID, or 0 for simple products.
- * @param int   $quantity     Requested quantity.
+ * @param array<string, mixed> $cart         Cart item data.
+ * @param int                  $product_id   Product ID.
+ * @param int                  $variation_id Selected variation ID, or 0 for simple products.
+ * @param int                  $quantity     Requested quantity.
  *
- * @return array
+ * @return array<string, mixed>
  */
 function ppom_woocommerce_add_cart_item_data( $cart, $product_id, $variation_id = 0, $quantity = 1 ) {
 	return \PPOM\WooCommerce\Cart\CartHandler::add_cart_item_data( $cart, $product_id, $variation_id, $quantity );

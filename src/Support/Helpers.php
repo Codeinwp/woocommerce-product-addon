@@ -1536,8 +1536,8 @@ final class Helpers {
 	/**
 	 * Saves normalized variation display rules for a parent product.
 	 *
-	 * @param int   $product_id Parent product ID.
-	 * @param array $rules      Rule map keyed by PPOM group ID.
+	 * @param int                                 $product_id Parent product ID.
+	 * @param array<int|string, array<int>|mixed> $rules    Rule map keyed by PPOM group ID.
 	 * @return void
 	 */
 	public static function update_variation_rule_map( $product_id, array $rules ) {
@@ -1618,14 +1618,14 @@ final class Helpers {
 	/**
 	 * Filters posted PPOM field values to the groups active for a variation.
 	 *
-	 * @param array $posted_fields Posted ppom[fields] payload.
-	 * @param int   $product_id    Parent product ID.
-	 * @param int   $variation_id  Selected WooCommerce variation ID.
-	 * @return array
+	 * @param array<string, mixed> $posted_fields Posted ppom[fields] payload.
+	 * @param int                  $product_id    Parent product ID.
+	 * @param int                  $variation_id  Selected WooCommerce variation ID.
+	 * @return array<string, mixed>
 	 */
 	public static function filter_posted_ppom_fields_by_active_variation( array $posted_fields, $product_id, $variation_id ) {
 		$ppom = new PPOM_Meta( $product_id );
-		if ( empty( $ppom->fields ) || ! is_array( $ppom->fields ) ) {
+		if ( empty( $ppom->fields ) ) {
 			return $posted_fields;
 		}
 
@@ -1672,10 +1672,10 @@ final class Helpers {
 	/**
 	 * Filters a full PPOM payload to the groups active for a variation.
 	 *
-	 * @param array $ppom_payload Posted ppom payload.
-	 * @param int   $product_id   Parent product ID.
-	 * @param int   $variation_id Selected WooCommerce variation ID.
-	 * @return array
+	 * @param array<string, mixed> $ppom_payload Posted ppom payload.
+	 * @param int                  $product_id   Parent product ID.
+	 * @param int                  $variation_id Selected WooCommerce variation ID.
+	 * @return array<string, mixed>
 	 */
 	public static function filter_ppom_payload_by_active_variation( array $ppom_payload, $product_id, $variation_id ) {
 		if ( empty( $ppom_payload['fields'] ) || ! is_array( $ppom_payload['fields'] ) ) {
