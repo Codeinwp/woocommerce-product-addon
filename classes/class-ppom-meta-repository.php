@@ -719,7 +719,7 @@ class PPOM_Meta_Repository {
 	 * Bulk-set the disabled flag for many rows in a single prepared statement.
 	 *
 	 * @param array<int|string> $ids Row ids.
-	 * @param bool       $disabled Whether the rows should be disabled.
+	 * @param bool              $disabled Whether the rows should be disabled.
 	 * @return int|false Rows affected or false.
 	 */
 	public function set_disabled_for_ids( array $ids, $disabled ) {

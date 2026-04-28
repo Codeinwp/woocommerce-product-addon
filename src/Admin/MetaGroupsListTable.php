@@ -249,7 +249,7 @@ final class MetaGroupsListTable extends WP_List_Table {
 		$raw_ids = isset( $_REQUEST['ppom_meta'] ) && is_array( $_REQUEST['ppom_meta'] )
 			? wp_unslash( $_REQUEST['ppom_meta'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- normalized below.
 			: array();
-		$ids = array();
+		$ids     = array();
 		foreach ( $raw_ids as $raw_id ) {
 			if ( is_int( $raw_id ) && $raw_id > 0 ) {
 				$ids[] = $raw_id;
