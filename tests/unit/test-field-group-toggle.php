@@ -90,6 +90,19 @@ class Test_Field_Group_Toggle extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Repository: malformed nested arrays must not be coerced to ID 1.
+	 *
+	 * @return void
+	 */
+	public function test_set_disabled_for_ids_ignores_non_scalar_ids() {
+		$repo    = ppom_meta_repository();
+		$meta_id = $this->insert_ppom_meta( array( $this->build_text_field( 'nested_array_id' ) ) );
+
+		$this->assertFalse( $repo->set_disabled_for_ids( array( array( $meta_id ) ), true ) );
+		$this->assertSame( '', (string) $repo->get_row_by_id( $meta_id )->productmeta_disabled );
+	}
+
+	/**
 	 * Frontend: PPOM_Meta::settings() and ::get_fields() return null/empty when
 	 * the attached group is disabled, and recover when re-enabled. Attachments
 	 * and the_meta JSON must survive the toggle.

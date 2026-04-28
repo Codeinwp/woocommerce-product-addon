@@ -247,16 +247,23 @@ final class MetaGroupsListTable extends WP_List_Table {
 		}
 
 		$raw_ids = isset( $_REQUEST['ppom_meta'] ) && is_array( $_REQUEST['ppom_meta'] )
-			? wp_unslash( $_REQUEST['ppom_meta'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- intval below sanitizes.
+			? wp_unslash( $_REQUEST['ppom_meta'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- normalized below.
 			: array();
-		$ids     = array_values(
-			array_filter(
-				array_map( 'intval', $raw_ids ),
-				static function ( $v ) {
-					return $v > 0;
+		$ids = array();
+		foreach ( $raw_ids as $raw_id ) {
+			if ( is_int( $raw_id ) && $raw_id > 0 ) {
+				$ids[] = $raw_id;
+				continue;
+			}
+
+			if ( is_string( $raw_id ) && ctype_digit( $raw_id ) ) {
+				$id = absint( $raw_id );
+				if ( $id > 0 ) {
+					$ids[] = $id;
 				}
-			)
-		);
+			}
+		}
+		$ids = array_values( array_unique( $ids ) );
 
 		if ( empty( $ids ) ) {
 			return;

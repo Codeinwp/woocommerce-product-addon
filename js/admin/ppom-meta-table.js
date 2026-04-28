@@ -154,6 +154,13 @@ jQuery( function ( $ ) {
 				$label.removeClass( 'ppom-toggle--busy' );
 				$input.prop( 'disabled', false );
 				$input.prop( 'checked', ! $input.is( ':checked' ) );
+				window?.ppomPopup?.open( {
+					title:
+						window?.ppom_vars?.i18n?.errorOccurred ??
+						window?.ppom_vars?.i18n?.popup?.errorTitle ??
+						'Error',
+					hideCloseBtn: true,
+				} );
 			} );
 		}
 	);

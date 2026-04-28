@@ -718,21 +718,26 @@ class PPOM_Meta_Repository {
 	/**
 	 * Bulk-set the disabled flag for many rows in a single prepared statement.
 	 *
-	 * @param array<int> $ids      Row ids.
+	 * @param array<int|string> $ids Row ids.
 	 * @param bool       $disabled Whether the rows should be disabled.
 	 * @return int|false Rows affected or false.
 	 */
 	public function set_disabled_for_ids( array $ids, $disabled ) {
-		$ids = array_values(
-			array_unique(
-				array_filter(
-					array_map( 'absint', $ids ),
-					static function ( $v ) {
-						return $v > 0;
-					}
-				)
-			)
-		);
+		$normalized_ids = array();
+		foreach ( $ids as $id ) {
+			if ( is_int( $id ) && $id > 0 ) {
+				$normalized_ids[] = $id;
+				continue;
+			}
+
+			if ( is_string( $id ) && ctype_digit( $id ) ) {
+				$id = absint( $id );
+				if ( $id > 0 ) {
+					$normalized_ids[] = $id;
+				}
+			}
+		}
+		$ids = array_values( array_unique( $normalized_ids ) );
 
 		if ( empty( $ids ) ) {
 			return false;

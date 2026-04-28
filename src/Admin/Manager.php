@@ -708,7 +708,16 @@ final class Manager {
 			);
 		}
 
-		MetaRepositoryAccessor::instance()->set_disabled( $productmeta_id, $disabled );
+		$result = MetaRepositoryAccessor::instance()->set_disabled( $productmeta_id, $disabled );
+
+		if ( false === $result || 0 === (int) $result ) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'message' => __( 'Field group could not be updated. Please refresh and try again.', 'woocommerce-product-addon' ),
+				)
+			);
+		}
 
 		wp_send_json(
 			array(
