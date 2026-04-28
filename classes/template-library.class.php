@@ -49,13 +49,19 @@ class PPOM_Template_Library {
 	}
 
 	/**
-	 * Returns the lowest license category required to use every field in the
-	 * given template definition.
+	 * Returns the lowest license category required to use a template.
+	 *
+	 * Honors an explicit `plan` key on the template definition, otherwise
+	 * derives from the field types: any Pro-only type promotes the template
+	 * to LICENSE_PLAN_1.
 	 *
 	 * @param array<string, mixed> $template Template definition.
 	 * @return int LICENSE_PLAN_FREE or LICENSE_PLAN_1.
 	 */
 	public static function derive_template_plan( array $template ) {
+		if ( isset( $template['plan'] ) && is_int( $template['plan'] ) ) {
+			return $template['plan'];
+		}
 		$fields = isset( $template['fields'] ) && is_array( $template['fields'] ) ? $template['fields'] : array();
 		foreach ( $fields as $field ) {
 			$type = isset( $field['type'] ) ? (string) $field['type'] : '';
@@ -249,15 +255,6 @@ class PPOM_Template_Library {
 					'description' => __( 'Up to 200 characters.', 'woocommerce-product-addon' ),
 					'maxlength'   => '200',
 					'width'       => 12,
-					'logic'       => 'on',
-					'conditions'  => array(
-						array(
-							'field'    => 'add_gift_message',
-							'operator' => 'is',
-							'value'    => __( 'Yes, include a gift message', 'woocommerce-product-addon' ),
-							'action'   => 'show',
-						),
-					),
 				),
 			),
 		);
@@ -339,15 +336,6 @@ class PPOM_Template_Library {
 					'description' => __( 'Optional message printed on the card.', 'woocommerce-product-addon' ),
 					'maxlength'   => '200',
 					'width'       => 12,
-					'logic'       => 'on',
-					'conditions'  => array(
-						array(
-							'field'    => 'gift_wrapping',
-							'operator' => 'is',
-							'value'    => __( 'Add gift wrapping', 'woocommerce-product-addon' ),
-							'action'   => 'show',
-						),
-					),
 				),
 			),
 		);
@@ -440,15 +428,6 @@ class PPOM_Template_Library {
 					'data_name'   => 'artwork_file',
 					'description' => __( 'PNG, JPG or PDF. Up to 10MB.', 'woocommerce-product-addon' ),
 					'width'       => 12,
-					'logic'       => 'on',
-					'conditions'  => array(
-						array(
-							'field'    => 'upload_artwork_toggle',
-							'operator' => 'is',
-							'value'    => __( 'I want to upload my own artwork', 'woocommerce-product-addon' ),
-							'action'   => 'show',
-						),
-					),
 				),
 			),
 		);
@@ -574,6 +553,7 @@ class PPOM_Template_Library {
 			'icon'         => 'fa-trophy',
 			'group_name'   => __( 'Clothing — Name & Number', 'woocommerce-product-addon' ),
 			'uses_feature' => __( 'Uses one-time fees for personalisation', 'woocommerce-product-addon' ),
+			'plan'         => NM_PersonalizedProduct::LICENSE_PLAN_1,
 			'fields'       => array(
 				array(
 					'type'      => 'radio',
@@ -771,7 +751,8 @@ class PPOM_Template_Library {
 			'description'  => __( 'Rings and pendants. Metal with price tiers, ring size and optional engraving text and font.', 'woocommerce-product-addon' ),
 			'icon'         => 'fa-diamond',
 			'group_name'   => __( 'Jewellery / Engraving', 'woocommerce-product-addon' ),
-			'uses_feature' => __( 'Uses metal price tiers and conditional engraving fields', 'woocommerce-product-addon' ),
+			'uses_feature' => __( 'Uses metal price tiers and engraving add-ons', 'woocommerce-product-addon' ),
+			'plan'         => NM_PersonalizedProduct::LICENSE_PLAN_1,
 			'fields'       => array(
 				array(
 					'type'      => 'radio',
@@ -862,22 +843,13 @@ class PPOM_Template_Library {
 					'placeholder' => __( 'Up to 20 characters', 'woocommerce-product-addon' ),
 					'maxlength'   => '20',
 					'width'       => 6,
-					'logic'       => 'on',
-					'conditions'  => array(
-						array(
-							'field'    => 'engrave_toggle',
-							'operator' => 'is',
-							'value'    => __( 'Engrave this piece', 'woocommerce-product-addon' ),
-							'action'   => 'show',
-						),
-					),
 				),
 				array(
-					'type'       => 'select',
-					'title'      => __( 'Engraving font', 'woocommerce-product-addon' ),
-					'data_name'  => 'engraving_font',
-					'width'      => 6,
-					'options'    => array(
+					'type'      => 'select',
+					'title'     => __( 'Engraving font', 'woocommerce-product-addon' ),
+					'data_name' => 'engraving_font',
+					'width'     => 6,
+					'options'   => array(
 						array(
 							'option' => __( 'Block', 'woocommerce-product-addon' ),
 							'price'  => '0',
@@ -889,15 +861,6 @@ class PPOM_Template_Library {
 						array(
 							'option' => __( 'Roman', 'woocommerce-product-addon' ),
 							'price'  => '0',
-						),
-					),
-					'logic'      => 'on',
-					'conditions' => array(
-						array(
-							'field'    => 'engrave_toggle',
-							'operator' => 'is',
-							'value'    => __( 'Engrave this piece', 'woocommerce-product-addon' ),
-							'action'   => 'show',
 						),
 					),
 				),
@@ -917,7 +880,8 @@ class PPOM_Template_Library {
 			'description'  => __( 'On-site services. Service type, booking date, time slot and optional address and phone.', 'woocommerce-product-addon' ),
 			'icon'         => 'fa-calendar-check-o',
 			'group_name'   => __( 'Service Booking', 'woocommerce-product-addon' ),
-			'uses_feature' => __( 'Uses conditional fields tied to service type', 'woocommerce-product-addon' ),
+			'uses_feature' => __( 'Uses tiered service pricing and contact fields', 'woocommerce-product-addon' ),
+			'plan'         => NM_PersonalizedProduct::LICENSE_PLAN_1,
 			'fields'       => array(
 				array(
 					'type'      => 'radio',
@@ -974,15 +938,6 @@ class PPOM_Template_Library {
 					'data_name'   => 'address',
 					'description' => __( 'Required for on-site visits.', 'woocommerce-product-addon' ),
 					'width'       => 6,
-					'logic'       => 'on',
-					'conditions'  => array(
-						array(
-							'field'    => 'service_type',
-							'operator' => 'is',
-							'value'    => __( 'On-site visit', 'woocommerce-product-addon' ),
-							'action'   => 'show',
-						),
-					),
 				),
 				array(
 					'type'        => 'text',
@@ -990,15 +945,6 @@ class PPOM_Template_Library {
 					'data_name'   => 'phone',
 					'description' => __( 'So we can confirm the visit.', 'woocommerce-product-addon' ),
 					'width'       => 6,
-					'logic'       => 'on',
-					'conditions'  => array(
-						array(
-							'field'    => 'service_type',
-							'operator' => 'is',
-							'value'    => __( 'On-site visit', 'woocommerce-product-addon' ),
-							'action'   => 'show',
-						),
-					),
 				),
 			),
 		);

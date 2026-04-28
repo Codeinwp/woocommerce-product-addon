@@ -378,6 +378,8 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 		return;
 	}
 
+	var defaultErrorMsg = '<?php echo esc_js( __( 'Could not import the template. Please try again.', 'woocommerce-product-addon' ) ); ?>';
+
 	function showUpsell() {
 		$( '.ppom-modal-box' ).fadeOut( 'fast', function () {
 			if ( $( '#ppom-import-upsell' ).length ) {
@@ -388,7 +390,6 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 
 	$modal.on( 'click', '.ppom-template-locked', function ( e ) {
 		var $target = $( e.target );
-		// Allow real Upgrade-link navigation through.
 		if ( $target.is( 'a' ) || $target.closest( 'a.ppom-template-card__upgrade' ).length ) {
 			return;
 		}
@@ -420,10 +421,10 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 				return;
 			}
 			$card.removeClass( 'is-busy' );
-			window.alert( response && response.message ? response.message : '<?php echo esc_js( __( 'Could not import the template. Please try again.', 'woocommerce-product-addon' ) ); ?>' );
+			window.alert( response && response.message ? response.message : defaultErrorMsg );
 		} ).fail( function () {
 			$card.removeClass( 'is-busy' );
-			window.alert( '<?php echo esc_js( __( 'Could not import the template. Please try again.', 'woocommerce-product-addon' ) ); ?>' );
+			window.alert( defaultErrorMsg );
 		} );
 	} );
 } )( jQuery );
