@@ -253,12 +253,6 @@ parameters:
 			path: classes/admin.class.php
 
 		-
-			message: '#^Parameter \#1 \$maybeint of function absint expects array\|bool\|float\|int\|resource\|string\|null, int\|WP_Post given\.$#'
-			identifier: argument.type
-			count: 1
-			path: classes/admin.class.php
-
-		-
 			message: '#^Parameter \#2 \$categories of method PPOM_Meta_Repository\:\:save_categories_and_tags\(\) expects list\<string\>, array given\.$#'
 			identifier: argument.type
 			count: 1
