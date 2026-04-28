@@ -57,9 +57,12 @@ jQuery( function ( $ ) {
 	$( 'body' ).on( 'click', 'a.ppom-delete-single-product', function ( e ) {
 		e.preventDefault();
 		const productmeta_id = $( this ).attr( 'data-product-id' );
+		let title = window?.ppom_vars?.i18n.popup.deleteGroup;
+		const productName = $( this ).data( 'name' );
+		title = productName ? title.replace( '%s', productName ) : window?.ppom_vars?.i18n.popup.confirmTitle;
 
 		window?.ppomPopup?.open( {
-			title: window?.ppom_vars?.i18n.popup.confirmTitle,
+			title: title,
 			onConfirmation: () => {
 				$( '#del-file-' + productmeta_id ).html(
 					'<img src="' + ppom_vars.loader + '">'
@@ -192,8 +195,24 @@ jQuery( function ( $ ) {
 
 			e.preventDefault();
 
+			const checkedNames = $form
+				.find( '.ppom_product_checkbox:checked' )
+				.map( function () {
+					return this.dataset.name && this.dataset.name.trim() !== ''
+						? this.dataset.name
+						: this.value;
+				} )
+				.get()
+				.join( ', ' );
+
+			const deleteGroupTpl = window?.ppom_vars?.i18n?.popup?.deleteGroup;
+			const title =
+				checkedNames && deleteGroupTpl
+					? deleteGroupTpl.replace( '%s', checkedNames )
+					: window?.ppom_vars?.i18n?.popup?.confirmTitle;
+
 			window?.ppomPopup?.open( {
-				title: window?.ppom_vars?.i18n.popup.confirmTitle,
+				title: title,
 				onConfirmation: () => {
 					$form.data( 'ppomConfirmed', true );
 					$form.trigger( 'submit' );

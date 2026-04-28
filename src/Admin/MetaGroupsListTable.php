@@ -80,12 +80,14 @@ final class MetaGroupsListTable extends WP_List_Table {
 	 * @return string
 	 */
 	public function column_cb( $item ) {
-		$id = (int) $item->productmeta_id;
+		$id   = (int) $item->productmeta_id;
+		$name = stripcslashes( (string) $item->productmeta_name );
 		return sprintf(
 			'<label class="screen-reader-text" for="cb-select-%1$d">%2$s</label>'
-				. '<input type="checkbox" id="cb-select-%1$d" class="ppom_product_checkbox" name="ppom_meta[]" value="%1$d" />',
+				. '<input type="checkbox" id="cb-select-%1$d" class="ppom_product_checkbox" name="ppom_meta[]" value="%1$d" data-name="%3$s" />',
 			$id,
-			esc_html__( 'Select field group', 'woocommerce-product-addon' )
+			esc_html__( 'Select field group', 'woocommerce-product-addon' ),
+			esc_attr( $name )
 		);
 	}
 
@@ -141,9 +143,10 @@ final class MetaGroupsListTable extends WP_List_Table {
 				esc_html__( 'Clone', 'woocommerce-product-addon' )
 			),
 			'delete' => sprintf(
-				'<a href="#" id="del-file-%1$d" class="ppom-delete-single-product submitdelete" data-product-id="%1$d">%2$s</a>',
+				'<a href="#" id="del-file-%1$d" class="ppom-delete-single-product submitdelete" data-product-id="%1$d" data-name="%3$s">%2$s</a>',
 				$id,
-				esc_html__( 'Delete', 'woocommerce-product-addon' )
+				esc_html__( 'Delete', 'woocommerce-product-addon' ),
+				esc_attr( stripcslashes( (string) $item->productmeta_name ) )
 			),
 		);
 

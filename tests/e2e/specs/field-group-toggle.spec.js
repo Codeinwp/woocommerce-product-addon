@@ -60,7 +60,11 @@ test.describe("Field Group enable/disable toggle", () => {
 		await expect(page.locator(`.ppom-id-${ppomId}`).first()).toBeVisible();
 
 		// Toggle off via the list table.
-		await admin.visitAdminPage("admin.php?page=ppom");
+		// Sort by id desc so newly created groups appear on page 1 of the
+		// paginated WP_List_Table (default 50 per page, ascending by id).
+		await admin.visitAdminPage(
+			"admin.php?page=ppom&orderby=productmeta_id&order=desc",
+		);
 		const toggleInput = page.locator(
 			`.ppom-toggle[data-ppom-id="${ppomId}"] .ppom-toggle-input`,
 		);
@@ -74,7 +78,11 @@ test.describe("Field Group enable/disable toggle", () => {
 		await expect(page.locator(`.ppom-id-${ppomId}`)).toHaveCount(0);
 
 		// Toggle back on.
-		await admin.visitAdminPage("admin.php?page=ppom");
+		// Sort by id desc so newly created groups appear on page 1 of the
+		// paginated WP_List_Table (default 50 per page, ascending by id).
+		await admin.visitAdminPage(
+			"admin.php?page=ppom&orderby=productmeta_id&order=desc",
+		);
 		await expect(toggleInput).not.toBeChecked();
 		const enableResp = await clickToggleAndWait(page, ppomId);
 		expect(enableResp.disabled).toBe(false);
@@ -116,7 +124,11 @@ test.describe("Field Group enable/disable toggle", () => {
 			productIds: [product.id],
 		});
 
-		await admin.visitAdminPage("admin.php?page=ppom");
+		// Sort by id desc so newly created groups appear on page 1 of the
+		// paginated WP_List_Table (default 50 per page, ascending by id).
+		await admin.visitAdminPage(
+			"admin.php?page=ppom&orderby=productmeta_id&order=desc",
+		);
 
 		// Select both rows by their checkbox ids (column_cb in the list table).
 		await page.locator(`#cb-select-${groupA.ppomId}`).check();
