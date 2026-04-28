@@ -703,12 +703,6 @@ parameters:
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Variable \$localize_data might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
 			message: '#^Method PPOM_InputManager\:\:input_classes_array\(\) should return list\<string\> but returns \(array\|null\)\.$#'
 			identifier: return.type
 			count: 1

@@ -92,8 +92,12 @@ jQuery( function ( $ ) {
 	ppom_init_js_for_ppom_fields( ppom_input_vars.ppom_inputs );
 
 	// Re-init ppom fields.
-	$( document ).on( 'ppom_reinit', function ( e ) {
-		if ( typeof ppom_input_vars !== 'undefined' && ppom_input_vars.ppom_inputs ) {
+	$( document ).on( 'ppom_reinit', function ( e, product_id ) {
+		if ( typeof product_id !== 'undefined' ) {
+			ppom_input_vars = ppom_get_product_data( product_id );
+		}
+
+		if ( null !== ppom_input_vars && typeof 'undefined' !== ppom_input_vars && ppom_input_vars.ppom_inputs ) {
 			ppom_init_js_for_ppom_fields( ppom_input_vars.ppom_inputs );
 		}
 	} );
@@ -603,4 +607,26 @@ function ppom_bulkquantity_price_manager( quantity, data_name ) {
 
 String.prototype.ppom_js_stripSlashes = function () {
 	return this.replace( /\\(.)/gm, '$1' );
+};
+
+/**
+ * Get the localized data for a specific product.
+ * falling back to the single-product structure if needed.
+ *
+ * @param {number} productId
+ * @returns {object|null}
+ */
+function ppom_get_product_data(productId) {
+	if (typeof window['ppom_input_vars_by_product'] !== 'undefined' && 
+		window['ppom_input_vars_by_product'][productId]) {
+		return window['ppom_input_vars_by_product'][productId];
+	}
+
+	// Fallback to single-product data for backward compatibility
+	if (typeof window['ppom_input_vars'] !== 'undefined' && 
+		window['ppom_input_vars'].product_id == productId) {
+		return window['ppom_input_vars'];
+	}
+
+	return null;
 };
