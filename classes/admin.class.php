@@ -564,7 +564,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$query         = new WP_Query( $query_args );
 		$variation_ids = array_map(
 			static function ( $post ) {
-				return absint( $post );
+				return is_object( $post ) ? absint( $post->ID ) : absint( $post );
 			},
 			$query->posts
 		);
@@ -588,7 +588,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			if ( ! empty( $parent_products_query->posts ) ) {
 				$parent_product_ids = array_map(
 					static function ( $post ) {
-						return absint( $post );
+						return is_object( $post ) ? absint( $post->ID ) : absint( $post );
 					},
 					$parent_products_query->posts
 				);
