@@ -89,7 +89,7 @@ jQuery( function ( $ ) {
 
 				setSavePreviewAvailabilityState(
 					false,
-					response?.message || ppom_vars.i18n.previewDisabledHint
+					ppom_vars.i18n.previewDisabledHint
 				);
 			} )
 			.catch( () => {
