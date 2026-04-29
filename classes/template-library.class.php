@@ -110,17 +110,6 @@ class PPOM_Template_Library {
 	}
 
 	/**
-	 * Returns the number of fields in a template definition.
-	 *
-	 * @param array<string, mixed> $template Template definition.
-	 * @return int
-	 */
-	public static function get_field_count( array $template ) {
-		$fields = isset( $template['fields'] ) && is_array( $template['fields'] ) ? $template['fields'] : array();
-		return count( $fields );
-	}
-
-	/**
 	 * Returns the full template registry, keyed by slug.
 	 *
 	 * @return array<string, array<string, mixed>>

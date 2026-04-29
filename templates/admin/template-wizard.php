@@ -54,11 +54,24 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 
 		<?php wp_nonce_field( 'ppom_import_template_action', 'ppom_import_template_nonce' ); ?>
 
-		<?php if ( ! empty( $free_templates ) ) : ?>
-			<div class="ppom-template-grid">
-				<?php foreach ( $free_templates as $template ) : ?>
+		<div class="ppom-template-grid">
+			<div class="ppom-template-card ppom-template-card--free ppom-template-card--scratch"
+				data-href="<?php echo esc_url( $start_from_scratch_url ); ?>">
+				<button type="button" class="ppom-template-card__inner">
+					<div class="ppom-template-card__header">
+						<i class="fa fa-plus ppom-template-card__icon" aria-hidden="true"></i>
+					</div>
+					<h3 class="ppom-template-card__title"><?php esc_html_e( 'Start from scratch', 'woocommerce-product-addon' ); ?></h3>
+					<p class="ppom-template-card__description">
+						<?php esc_html_e( 'Build your own field group with the fields you need.', 'woocommerce-product-addon' ); ?>
+					</p>
+				</button>
+			</div>
+
+			<?php foreach ( $free_templates as $template ) : ?>
+				<div class="ppom-template-card ppom-template-card--free">
 					<button type="button"
-						class="ppom-template-card ppom-template-tile ppom-template-card--free"
+						class="ppom-template-card__inner ppom-template-tile"
 						data-template="<?php echo esc_attr( $template['slug'] ); ?>">
 						<div class="ppom-template-card__header">
 							<i class="fa <?php echo esc_attr( $template['icon'] ); ?> ppom-template-card__icon" aria-hidden="true"></i>
@@ -67,28 +80,15 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 						<p class="ppom-template-card__description">
 							<?php echo esc_html( $template['description'] ); ?>
 						</p>
-						<span class="ppom-template-card__field-count">
-							<?php
-							$count = PPOM_Template_Library::get_field_count( $template );
-							/* translators: %d: number of fields in the template */
-							echo esc_html( sprintf( _n( '%d field', '%d fields', $count, 'woocommerce-product-addon' ), $count ) );
-							?>
-						</span>
 					</button>
-				<?php endforeach; ?>
-			</div>
-		<?php endif; ?>
+				</div>
+			<?php endforeach; ?>
+		</div>
 
 		<?php if ( ! empty( $pro_templates ) ) : ?>
 			<div class="ppom-template-divider">
 				<span class="ppom-template-divider__label">
-					<?php
-					if ( $user_has_pro ) {
-						esc_html_e( 'Pro templates', 'woocommerce-product-addon' );
-					} else {
-						esc_html_e( 'Available with Pro', 'woocommerce-product-addon' );
-					}
-					?>
+					<?php esc_html_e( 'Pro templates', 'woocommerce-product-addon' ); ?>
 				</span>
 			</div>
 
@@ -98,8 +98,7 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 					<div class="ppom-template-card ppom-template-card--pro <?php echo $is_locked ? 'ppom-template-card--locked' : ''; ?>">
 						<button type="button"
 							class="ppom-template-card__inner ppom-template-tile <?php echo $is_locked ? 'ppom-template-locked' : ''; ?>"
-							data-template="<?php echo esc_attr( $template['slug'] ); ?>"
-							<?php echo $is_locked ? 'data-locked="1"' : ''; ?>>
+							data-template="<?php echo esc_attr( $template['slug'] ); ?>">
 							<div class="ppom-template-card__header">
 								<i class="fa <?php echo esc_attr( $template['icon'] ); ?> ppom-template-card__icon" aria-hidden="true"></i>
 								<span class="ppom-template-card__pro-badge"><?php esc_html_e( 'PRO', 'woocommerce-product-addon' ); ?></span>
@@ -108,16 +107,18 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 							<p class="ppom-template-card__description">
 								<?php echo esc_html( $template['description'] ); ?>
 							</p>
-							<?php if ( ! empty( $template['uses_feature'] ) ) : ?>
-								<p class="ppom-template-card__uses">
-									<?php echo esc_html( $template['uses_feature'] ); ?>
-								</p>
-							<?php endif; ?>
 						</button>
 						<?php if ( $is_locked ) : ?>
-							<a class="ppom-template-card__upgrade ppom-template-locked" data-locked="1" target="_blank" rel="noopener" href="<?php echo esc_url( $upgrade_url ); ?>">
-								<?php esc_html_e( 'Upgrade to Pro', 'woocommerce-product-addon' ); ?> <span aria-hidden="true">&rarr;</span>
-							</a>
+							<div class="ppom-template-card__upgrade-row">
+								<?php if ( ! empty( $template['uses_feature'] ) ) : ?>
+									<p class="ppom-template-card__uses">
+										<?php echo esc_html( $template['uses_feature'] ); ?>
+									</p>
+								<?php endif; ?>
+								<a class="ppom-template-card__upgrade" target="_blank" rel="noopener" href="<?php echo esc_url( $upgrade_url ); ?>">
+									<?php esc_html_e( 'Upgrade to Pro', 'woocommerce-product-addon' ); ?> <span aria-hidden="true">&rarr;</span>
+								</a>
+							</div>
 						<?php endif; ?>
 					</div>
 				<?php endforeach; ?>
@@ -127,9 +128,6 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 	</div>
 
 	<footer class="ppom-template-wizard-footer">
-		<a href="<?php echo esc_url( $start_from_scratch_url ); ?>" class="button-link">
-			<?php esc_html_e( 'Start from scratch', 'woocommerce-product-addon' ); ?>
-		</a>
 		<button type="button" class="button ppom-js-modal-close">
 			<?php esc_html_e( 'Cancel', 'woocommerce-product-addon' ); ?>
 		</button>
@@ -158,8 +156,8 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 	color: #0f172a;
 	line-height: 1.3;
 }
-.ppom-template-wizard-body {
-	padding: 14px 20px 4px;
+.ppom-modal-box.ppom-template-wizard .ppom-modal-body.ppom-template-wizard-body {
+	padding: 1em 1.5em;
 	overflow-y: auto;
 	flex: 1 1 auto;
 }
@@ -167,37 +165,48 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	grid-auto-rows: 1fr;
-	gap: 10px;
+	gap: 15px;
 	margin: 0;
 }
-.ppom-template-card {
+.ppom-template-wizard .ppom-template-card {
 	display: flex;
 	flex-direction: column;
 	background: #fff;
 	border: 1px solid #e2e8f0;
 	border-radius: 8px;
-	padding: 12px 14px;
-	text-align: left;
-	cursor: pointer;
-	transition: border-color 0.15s ease, box-shadow 0.15s ease;
-	font: inherit;
-	color: inherit;
-	width: 100%;
+	padding: 0;
 	min-height: 120px;
 	overflow: hidden;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
 	box-shadow: none;
-	-webkit-appearance: none;
-	appearance: none;
 }
-.ppom-template-card:hover,
-.ppom-template-card:focus-visible {
+.ppom-template-wizard .ppom-template-card:is(:hover, :focus-within) {
 	border-color: #2271b1;
 	box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
-	outline: none;
 }
 .ppom-template-card.is-busy {
 	opacity: 0.6;
 	pointer-events: none;
+}
+.ppom-template-card__inner {
+	display: flex;
+	flex-direction: column;
+	background: transparent;
+	border: 0;
+	border-radius: 0;
+	padding: 12px 14px;
+	text-align: left;
+	cursor: pointer;
+	font: inherit;
+	color: inherit;
+	width: 100%;
+	flex: 1 1 auto;
+	box-shadow: none;
+	-webkit-appearance: none;
+	appearance: none;
+}
+.ppom-template-card__inner:focus {
+	outline: none;
 }
 .ppom-template-card__header {
 	display: flex;
@@ -215,75 +224,44 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 	margin-left: auto;
 	flex: 0 0 auto;
 }
-.ppom-template-wizard h3.ppom-template-card__title,
-.ppom-template-wizard .ppom-template-card__title {
+.ppom-template-wizard :is(h3.ppom-template-card__title, .ppom-template-card__title) {
 	margin: 0 0 6px;
 	font-size: 0.95rem;
 	font-weight: 600;
 	color: #0f172a;
 	line-height: 1.3;
 }
-.ppom-template-card__description {
-	margin: 0 0 8px;
+.ppom-template-wizard .ppom-template-card__description {
+	margin: 0 0 0.5rem;
 	font-size: 12px;
 	line-height: 1.4;
 	color: #475569;
 }
-.ppom-template-card__field-count {
-	align-self: flex-start;
-	margin-top: auto;
-	background: #f1f5f9;
-	color: #475569;
-	font-size: 11px;
-	font-weight: 500;
-	padding: 2px 8px;
-	border-radius: 999px;
-}
-.ppom-template-card--pro {
-	display: flex;
-	flex-direction: column;
-	background: #fff;
-	border: 1px solid #e2e8f0;
-	border-radius: 8px;
-	padding: 0;
-	min-height: 120px;
-	overflow: hidden;
-}
-.ppom-template-card--pro .ppom-template-card__inner {
-	display: flex;
-	flex-direction: column;
-	background: transparent;
-	border: 0;
-	border-radius: 0;
-	box-shadow: none;
-	padding: 12px 14px 4px;
-	text-align: left;
-	font: inherit;
-	color: inherit;
-	cursor: pointer;
-	width: 100%;
-	flex: 1 1 auto;
-	-webkit-appearance: none;
-	appearance: none;
-}
 .ppom-template-card--pro .ppom-template-card__icon {
 	color: #94a3b8;
 }
+.ppom-template-wizard .ppom-template-card--scratch {
+	background: #f8fafc;
+	border-color: #cbd5e1;
+}
+.ppom-template-wizard .ppom-template-card--scratch:is(:hover, :focus-within) {
+	background: #f1f5f9;
+	border-color: #2271b1;
+}
 .ppom-template-card--locked {
 	background: #f8fafc;
-	border-color: #e2e8f0;
 }
-.ppom-template-card--locked:hover {
+.ppom-template-wizard .ppom-template-card--locked .ppom-template-card__inner {
+	cursor: not-allowed;
+}
+.ppom-template-wizard .ppom-template-card--locked:is(:hover, :focus-within) {
 	border-color: #cbd5e1;
 	box-shadow: none;
 }
-.ppom-template-card--locked .ppom-template-card__inner {
-	cursor: pointer;
-}
-.ppom-template-card--locked .ppom-template-card__title-text {
+.ppom-template-wizard .ppom-template-card--locked .ppom-template-card__title {
 	color: #475569;
 }
-.ppom-template-card--locked .ppom-template-card__description {
+.ppom-template-wizard .ppom-template-card--locked .ppom-template-card__description {
 	color: #64748b;
 }
 .ppom-template-card__pro-badge {
@@ -299,8 +277,11 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 	text-transform: uppercase;
 	line-height: 1.4;
 }
-.ppom-template-card__uses {
-	margin: 0 0 4px;
+.ppom-template-card__upgrade-row {
+	padding: 0 14px 10px;
+}
+.ppom-template-wizard .ppom-template-card__uses {
+	margin: 0 0 6px;
 	font-size: 11px;
 	color: #94a3b8;
 	font-style: italic;
@@ -308,14 +289,13 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 }
 .ppom-template-card__upgrade {
 	display: inline-block;
-	margin: 0 14px 10px;
+	margin: 0;
 	font-size: 12px;
 	font-weight: 600;
 	color: #2271b1;
 	text-decoration: none;
 }
-.ppom-template-card__upgrade:hover,
-.ppom-template-card__upgrade:focus {
+.ppom-template-card__upgrade:is(:hover, :focus) {
 	color: #135e96;
 	text-decoration: underline;
 }
@@ -341,27 +321,20 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 }
 .ppom-template-wizard .ppom-template-wizard-footer {
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-end;
 	align-items: center;
 	gap: 12px;
 	padding: 10px 20px;
 	border-top: 1px solid #e2e8f0;
 	background: #fff;
-	text-align: left;
+	text-align: right;
 	box-shadow: none;
-}
-.ppom-template-wizard .ppom-template-wizard-footer .button-link {
-	margin: 0;
-	font-size: 14px;
-	font-weight: 500;
 }
 @media (max-width: 720px) {
 	.ppom-template-grid {
 		grid-template-columns: 1fr;
 	}
-	.ppom-template-wizard-header,
-	.ppom-template-wizard-body,
-	.ppom-template-wizard-footer {
+	:is(.ppom-template-wizard-header, .ppom-template-wizard-body, .ppom-template-wizard-footer) {
 		padding-left: 14px;
 		padding-right: 14px;
 	}
@@ -380,21 +353,11 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 
 	var defaultErrorMsg = '<?php echo esc_js( __( 'Could not import the template. Please try again.', 'woocommerce-product-addon' ) ); ?>';
 
-	function showUpsell() {
-		$( '.ppom-modal-box' ).fadeOut( 'fast', function () {
-			if ( $( '#ppom-import-upsell' ).length ) {
-				$( '#ppom-import-upsell' ).fadeIn();
-			}
-		} );
-	}
-
-	$modal.on( 'click', '.ppom-template-locked', function ( e ) {
-		var $target = $( e.target );
-		if ( $target.is( 'a' ) || $target.closest( 'a.ppom-template-card__upgrade' ).length ) {
-			return;
+	$modal.on( 'click', '.ppom-template-card--scratch', function () {
+		var href = $( this ).data( 'href' );
+		if ( href ) {
+			window.location.href = href;
 		}
-		e.preventDefault();
-		showUpsell();
 	} );
 
 	$modal.on( 'click', '.ppom-template-tile:not(.ppom-template-locked)', function ( e ) {
