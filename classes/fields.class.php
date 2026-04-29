@@ -138,6 +138,18 @@ class PPOM_Fields_Meta {
 						wp_json_encode( $css_code_editor )
 					)
 				);
+
+				// CSS Example Editor (read-only).
+				$css_example_editor                              = $css_code_editor;
+				$css_example_editor['codemirror']['readOnly']    = 'nocursor';
+				$css_example_editor['codemirror']['lineNumbers'] = false;
+				wp_add_inline_script(
+					'code-editor',
+					sprintf(
+						'jQuery( function() { wp.codeEditor.initialize( "ppom-css-example-editor", %s ); } );',
+						wp_json_encode( $css_example_editor )
+					)
+				);
 			}
 
 			// Js Code Editor Files
@@ -155,6 +167,19 @@ class PPOM_Fields_Meta {
 						wp_json_encode( $js_code_editor )
 					)
 				);
+
+				// JS Example Editor (read-only).
+				$js_example_editor                              = $js_code_editor;
+				$js_example_editor['codemirror']['readOnly']    = 'nocursor';
+				$js_example_editor['codemirror']['lineNumbers'] = false;
+				wp_add_inline_script(
+					'code-editor',
+					sprintf(
+						'jQuery( function() { wp.codeEditor.initialize( "ppom-js-example-editor", %s ); } );',
+						wp_json_encode( $js_example_editor )
+					)
+				);
+
 			}
 		}
 
