@@ -26,6 +26,7 @@ $product_meta         = array();
 $ppom_field_index     = 1;
 $is_edit_screen       = false;
 $is_new_group         = false;
+$is_legacy_user       = ppom_is_legacy_user();
 
 if ( isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'new' ) {
 	$is_edit_screen = true;
@@ -525,8 +526,8 @@ $fields_groups = array(
 												title="<?php _e( 'For your reference.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
-									<input type="text" class="form-control" maxlength="50" name="productmeta_name"
-											value="<?php echo $productmeta_name; ?>">
+									<input type="text" class="form-control ppom-form-control" maxlength="50" name="productmeta_name"
+											value="<?php echo esc_attr( $productmeta_name ); ?>" placeholder="<?php esc_attr_e( 'Enter meta group name', 'woocommerce-product-addon' ); ?>">
 								</div>
 							</div>
 							<div class="col-md-6 col-sm-12">
@@ -536,7 +537,7 @@ $fields_groups = array(
 												title="<?php _e( 'Control how price table will be shown for options or disable.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
-									<select name="dynamic_price_hide" class="form-control">
+									<select name="dynamic_price_hide" class="form-control ppom-form-control">
 										<option value="no"><?php _e( 'Select Option', 'woocommerce-product-addon' ); ?></option>
 										<option value="hide" <?php selected( $dynamic_price_hide, 'hide' ); ?>><?php _e( 'Do Not Show Price Table', 'woocommerce-product-addon' ); ?></option>
 										<option value="option_sum" <?php selected( $dynamic_price_hide, 'option_sum' ); ?>><?php _e( "Show Only Option's Total", 'woocommerce-product-addon' ); ?></option>
@@ -561,9 +562,12 @@ $fields_groups = array(
 
 					<!--Style Tab-->
 					<input type="radio" name="css-tabs" id="ppom-style-tab">
-					<label for="ppom-style-tab" class="ppom-tab-label">Style</label>
+					<label for="ppom-style-tab" class="ppom-tab-label">
+						<?php esc_html_e( 'Style', 'woocommerce-product-addon' ); ?>
+						<span class="ppom-badge"><?php esc_html_e( 'css/js', 'woocommerce-product-addon' ); ?></span>
+					</label>
 					<div class="ppom-admin-tab-content">
-						<?php if ( ppom_is_legacy_user() ) : ?>
+						<?php if ( $is_legacy_user ) : ?>
 							<div class="row">
 								<div class="col-md-12 col-sm-12">
 									<div class="notice notice-info">
@@ -588,27 +592,88 @@ $fields_groups = array(
 							<div class="col-md-6 col-sm-12">
 								<div class="form-group">
 									<label><?php _e( 'Custom CSS', 'woocommerce-product-addon' ); ?>
+										<?php if ( $is_legacy_user ) : ?>
+											<span class="ppom-pro-badge">
+												<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ff0000">
+													<path d="M19 11H5C3.89543 11 3 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 20.1046 11 19 11Z" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+												<?php esc_html_e( 'PRO', 'woocommerce-product-addon' ); ?>
+											</span>
+										<?php endif; ?>
 										<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip"
 												title="<?php _e( 'Add your own CSS.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
-									<textarea id="ppom-css-editor" class="form-control" name="productmeta_style"><?php echo wp_unslash( $productmeta_style ); ?></textarea>
+									<div class="ppom-editor-wrapper<?php echo $is_legacy_user ? ' ppom-locked' : ''; ?>">
+										<?php if ( $is_legacy_user ) : ?>
+										<div class="ppom-locked-overlay">
+											<div class="ppom-lock-icon">
+												<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ff0000">
+													<path d="M19 11H5C3.89543 11 3 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 20.1046 11 19 11Z" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+											</div>
+											<div class="ppom-lock-text"><?php esc_html_e( 'Locked on free plan', 'woocommerce-product-addon' ); ?></div>
+											<div class="ppom-lock-subtext"><?php esc_html_e( 'Upgrade to add CSS', 'woocommerce-product-addon' ); ?></div>
+										</div>
+										<?php endif; ?>
+										<textarea id="ppom-css-editor" class="form-control"
+												name="productmeta_style"><?php echo esc_textarea( wp_unslash( $productmeta_style ) ); ?></textarea>
+									</div>
 									<br>
-									<p><?php esc_html_e( 'Use', 'woocommerce-product-addon' ); ?> <code>selector</code> <?php esc_html_e( 'to target block wrapper.', 'woocommerce-product-addon' ); ?></p>
-									<p><?php esc_html_e( 'Example:', 'woocommerce-product-addon' ); ?></p>
-									<pre className="ppom-css-editor-help"><?php echo esc_html( "selector {\n    background: #000;\n}\nselector img {\n    border-radius: 100%;\n}" ); ?></pre>
-									<p><?php esc_html_e( 'You can also use other CSS syntax here, such as media queries.', 'woocommerce-product-addon' ); ?></p>
+									<div class="ppom-style-usage-example css-example<?php echo $is_legacy_user ? ' ppom-locked-example' : ''; ?>">
+										<p>
+											<span class="ppom-info-icon dashicons dashicons-info-outline"></span>
+											<strong><?php esc_html_e( 'How to use', 'woocommerce-product-addon' ); ?></strong></p>
+										<p><?php esc_html_e( 'Use', 'woocommerce-product-addon' ); ?> <code>selector</code> <?php esc_html_e( 'to target block wrapper.', 'woocommerce-product-addon' ); ?></p>
+										<p><?php esc_html_e( 'Example:', 'woocommerce-product-addon' ); ?></p>
+										<textarea id="ppom-css-example-editor" class="ppom-css-example-code" readonly><?php echo esc_textarea( "selector {\n    background: #000;\n}\nselector img {\n    border-radius: 100%;\n}" ); ?></textarea>
+										<p><?php esc_html_e( 'You can also use other CSS syntax here, such as media queries.', 'woocommerce-product-addon' ); ?></p>
+									</div>
 								</div>
 							</div>
 							<div class="col-md-6 col-sm-12">
 								<div class="form-group">
 									<label><?php _e( 'Custom Javascipt', 'woocommerce-product-addon' ); ?>
+										<?php if ( $is_legacy_user ) : ?>
+											<span class="ppom-pro-badge">
+												<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ff0000">
+													<path d="M19 11H5C3.89543 11 3 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 20.1046 11 19 11Z" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+												<?php esc_html_e( 'PRO', 'woocommerce-product-addon' ); ?>
+											</span>
+										<?php endif; ?>
 										<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip"
 												title="<?php _e( 'Add your own javascipt script.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
-									<textarea id="ppom-js-editor" class="form-control"
-												name="productmeta_js"><?php echo wp_unslash( $productmeta_js ); ?></textarea>
+									<div class="ppom-editor-wrapper<?php echo $is_legacy_user ? ' ppom-locked' : ''; ?>">
+										<?php if ( $is_legacy_user ) : ?>
+										<div class="ppom-locked-overlay">
+											<div class="ppom-lock-icon">
+												<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ff0000">
+													<path d="M19 11H5C3.89543 11 3 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 20.1046 11 19 11Z" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+											</div>
+											<div class="ppom-lock-text"><?php esc_html_e( 'Locked on free plan', 'woocommerce-product-addon' ); ?></div>
+											<div class="ppom-lock-subtext"><?php esc_html_e( 'Upgrade to add JavaScript', 'woocommerce-product-addon' ); ?></div>
+										</div>
+										<?php endif; ?>
+										<textarea id="ppom-js-editor" class="form-control"
+												name="productmeta_js"><?php echo esc_textarea( wp_unslash( $productmeta_js ) ); ?></textarea>
+									</div>
+									<br>
+									<div class="ppom-style-usage-example<?php echo $is_legacy_user ? ' ppom-locked-example' : ''; ?>">
+										<p>
+											<span class="ppom-info-icon dashicons dashicons-info-outline"></span>
+											<strong><?php esc_html_e( 'How to use', 'woocommerce-product-addon' ); ?></strong></p>
+										<p><?php esc_html_e( 'Write plain JavaScript to control field behaviour. The code runs after the field is rendered on the page.', 'woocommerce-product-addon' ); ?></p>
+										<p><?php esc_html_e( 'Example:', 'woocommerce-product-addon' ); ?></p>
+										<textarea id="ppom-js-example-editor" class="ppom-js-example-code" readonly><?php echo esc_textarea( "document.querySelector('.ppom-wrapper')\n  .addEventListener('change', function(e) {\n    console.log(e.target.value);\n});" ); ?></textarea>
+									</div>
 								</div>
 							</div>
 						</div>
