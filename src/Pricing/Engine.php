@@ -1595,9 +1595,17 @@ final class Engine {
 		if ( ! function_exists( 'wc_get_price_excluding_tax' ) || $option_price == '' ) {
 			return $option_price;
 		}
+		
+		$taxable_option_price = Helpers::get_option( 'ppom_taxable_option_price' );
 
-		if ( 'yes' != Helpers::get_option( 'ppom_taxable_option_price' ) && ! wc_tax_enabled() ) {
-			return $option_price;
+		if ( 'yes' !== $taxable_option_price ) {
+			if ( false === $taxable_option_price || null === $taxable_option_price ) {
+				if ( ! wc_tax_enabled() ) {
+					return $option_price;
+				}
+			} else {
+				return $option_price;
+			}
 		}
 
 		if ( $option_price >= 0 && ( ! is_product() && apply_filters( 'ppom_handle_option_price_vat_in_cart', true ) === true ) ) {
