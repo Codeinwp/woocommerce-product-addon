@@ -619,7 +619,7 @@ $fields_groups = array(
 										</div>
 										<?php endif; ?>
 										<textarea id="ppom-css-editor" class="form-control"
-												name="productmeta_css"><?php echo esc_textarea( wp_unslash( $productmeta_style ) ); ?></textarea>
+												name="productmeta_style"><?php echo esc_textarea( wp_unslash( $productmeta_style ) ); ?></textarea>
 									</div>
 									<br>
 									<div class="ppom-style-usage-example css-example<?php echo $is_legacy_user ? ' ppom-locked-example' : ''; ?>">
