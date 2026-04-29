@@ -6,6 +6,7 @@ import {
 	createProductCategory,
 	createProductTag,
 	createSimpleProduct,
+	createSimpleProducts,
 	getPpomAttachRowMeta,
 	setPpomLicenseFixture,
 } from "../fixtures/index.js";
@@ -21,32 +22,72 @@ test.describe("Attach Modal", () => {
 		await page.locator("#ppom-product-modal").waitFor({ state: "hidden" });
 	}
 
+	async function searchAndSelectProduct(page, productName) {
+		const selection = page.locator(
+			"#attach-to-products .select2-selection--multiple",
+		);
+		const searchResponsePromise = page.waitForResponse((response) => {
+			const url = new URL(response.url());
+
+			return (
+				url.pathname.endsWith("/wp-admin/admin-ajax.php") &&
+				url.searchParams.get("action") === "ppom_search_products" &&
+				url.searchParams.get("q") === productName
+			);
+		});
+
+		await selection.click();
+		await page.keyboard.type(productName);
+
+		const searchResponse = await searchResponsePromise;
+		expect(searchResponse.ok()).toBeTruthy();
+		expect(searchResponse.status()).toBe(200);
+
+		const resultOption = page
+			.locator(".select2-results__option[aria-selected]")
+			.filter({ hasText: productName });
+
+		await expect(resultOption).toHaveCount(1);
+		await resultOption.click();
+		await expect(
+			page.locator("#attach-to-products .select2-selection__choice"),
+		).toContainText(productName);
+	}
+
 	/**
-	 * Attach a new group field to the first product in list then check if it is rendered.
+	 * Attach a new group field to a searched product in a larger catalog then check.
 	 */
-	test("attach to products and check", async ({ page, admin, requestUtils }) => {
-		const product = await createSimpleProduct(requestUtils);
+	test("searches 25 products in attach modal and attaches the selected match", async ({ page, admin, requestUtils }) => {
+		const suffix = Date.now();
+		const products = await createSimpleProducts(
+			requestUtils,
+			Array.from({ length: 25 }, (_, index) => {
+				const productNumber = String(index + 1).padStart(2, "0");
+
+				return {
+					name: `PPOM Search Product ${suffix} ${productNumber}`,
+				};
+			}),
+		);
+		const targetProduct = products[22];
+		const controlProduct = products[0];
 
 		const { ppomId } = await createSimpleGroupField(admin, page);
 		await page.locator(".ppom-products-modal").click();
 		await page.locator("#ppom-product-form").waitFor({ state: "visible" });
 
-		const productSelector = page
-			.locator("#ppom-product-form div")
-			.filter({ hasText: "Display on Specific Products" })
-			.first()
-			.locator('select[name="ppom-attach-to-products\\[\\]"]');
-		await productSelector.selectOption(String(product.id));
-
-		const selectedOption = await productSelector.inputValue();
+		await searchAndSelectProduct(page, targetProduct.name);
 		await saveAttachModal(page);
-		await page.goto(`/?p=${selectedOption}`);
+		await page.goto(`/?p=${targetProduct.id}`);
 
 		const elements = page.locator(`.ppom-id-${ppomId}`);
 		const count = await elements.count();
 		for (let i = 0; i < count; i++) {
 			await expect(elements.nth(i)).toBeVisible();
 		}
+
+		await page.goto(`/?p=${controlProduct.id}`);
+		await expect(page.locator(`.ppom-id-${ppomId}`)).toHaveCount(0);
 	});
 
 	/**

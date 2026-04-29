@@ -16,5 +16,6 @@ export {
 	createProductTag,
 	createProductVariation,
 	createSimpleProduct,
+	createSimpleProducts,
 	createVariableProduct,
 } from './woocommerce.js';
