@@ -20,6 +20,46 @@ jQuery( function ( $ ) {
 	const previewRefreshBtn = previewModal.find( '.ppom-preview-refresh' );
 	const savePreviewBtn = $( '.ppom-save-and-preview' );
 	const savePreviewTooltipAnchor = $( '.ppom-save-preview-tooltip-anchor' );
+	const savePreviewTooltipEl = $( '#ppom-save-preview-tooltip' );
+
+	function hideSavePreviewTooltip() {
+		if ( savePreviewTooltipEl.length ) {
+			savePreviewTooltipEl.attr( 'hidden', true );
+		}
+	}
+
+	function showSavePreviewTooltip() {
+		if (
+			! savePreviewTooltipEl.length ||
+			! savePreviewTooltipAnchor.hasClass(
+				'ppom-save-preview-is-disabled'
+			)
+		) {
+			return;
+		}
+		if ( ! savePreviewTooltipEl.text().trim() ) {
+			return;
+		}
+		savePreviewTooltipEl.removeAttr( 'hidden' );
+	}
+
+	function syncSavePreviewTooltipBody( enabled, message ) {
+		if ( ! savePreviewTooltipEl.length ) {
+			return;
+		}
+		hideSavePreviewTooltip();
+		if ( enabled ) {
+			savePreviewTooltipEl.text( '' );
+			return;
+		}
+		const checkingMsg = ppom_vars.i18n.previewCheckingAvailability || '';
+		const hintFull = ppom_vars.i18n.previewDisabledHint || '';
+		const text =
+			message && message === checkingMsg
+				? checkingMsg
+				: hintFull || message || '';
+		savePreviewTooltipEl.text( text );
+	}
 
 	let shouldOpenPreviewAfterSave = false;
 	let previewSelectInitialized = false;
@@ -52,12 +92,31 @@ jQuery( function ( $ ) {
 			return;
 		}
 
+		const message = hintMessage || '';
+		const checkingMsg = ppom_vars.i18n.previewCheckingAvailability || '';
+		const disabledAria = ppom_vars.i18n.previewSavePreviewDisabledAria || '';
+
 		savePreviewBtn.prop( 'disabled', ! enabled );
 		savePreviewBtn.attr( 'aria-disabled', ! enabled ? 'true' : 'false' );
+
 		if ( enabled ) {
+			savePreviewTooltipAnchor.removeClass( 'ppom-save-preview-is-disabled' );
 			savePreviewTooltipAnchor.removeAttr( 'title' );
+			savePreviewBtn.removeAttr( 'aria-label' );
+			syncSavePreviewTooltipBody( true, '' );
+			return;
+		}
+
+		savePreviewTooltipAnchor.addClass( 'ppom-save-preview-is-disabled' );
+		savePreviewTooltipAnchor.removeAttr( 'title' );
+		syncSavePreviewTooltipBody( false, message );
+
+		if ( message && message === checkingMsg ) {
+			savePreviewBtn.attr( 'aria-label', checkingMsg );
+		} else if ( disabledAria ) {
+			savePreviewBtn.attr( 'aria-label', disabledAria );
 		} else {
-			savePreviewTooltipAnchor.attr( 'title', hintMessage || '' );
+			savePreviewBtn.removeAttr( 'aria-label' );
 		}
 	}
 
@@ -312,6 +371,9 @@ jQuery( function ( $ ) {
 	document.addEventListener( 'ppom:attachments-updated', function () {
 		checkSavePreviewAvailability();
 	} );
+
+	savePreviewTooltipAnchor.on( 'mouseenter', showSavePreviewTooltip );
+	savePreviewTooltipAnchor.on( 'mouseleave', hideSavePreviewTooltip );
 
 	checkSavePreviewAvailability();
 } );

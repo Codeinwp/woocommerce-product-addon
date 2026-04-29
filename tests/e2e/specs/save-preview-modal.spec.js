@@ -30,7 +30,7 @@ test.describe("Save & Preview Modal", () => {
 		}
 	}
 
-	test("save and preview stays disabled with tooltip when no product is eligible", async ({
+	test("save and preview stays disabled when no product is eligible", async ({
 		admin,
 		page,
 	}) => {
@@ -41,13 +41,15 @@ test.describe("Save & Preview Modal", () => {
 		);
 
 		const previewButton = page.locator(".ppom-save-and-preview");
-		const tooltipAnchor = page.locator(".ppom-save-preview-tooltip-anchor");
+		const previewAnchor = page.locator(".ppom-save-preview-tooltip-anchor");
 
 		await expect(previewButton).toBeDisabled();
-		await expect.poll(
-			async () => await tooltipAnchor.getAttribute("title"),
-		).toContain(
-			"Attach this group to at least one product, category, or tag to enable preview.",
+		await expect.poll(async () =>
+			previewAnchor.evaluate((el) => el.classList.contains("ppom-save-preview-is-disabled")),
+		).toBe(true);
+		await expect(previewButton).toHaveAttribute(
+			"aria-label",
+			/Save & Preview is unavailable until this group is attached/,
 		);
 	});
 

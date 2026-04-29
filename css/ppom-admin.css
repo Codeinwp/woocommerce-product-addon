@@ -1938,20 +1938,56 @@ div.ppom-banner .themeisle-sale {
 }
 
 .ppom-preview-controls {
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
     margin-bottom: 12px;
 }
 
 .ppom-preview-product-control {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
 }
 
 .ppom-preview-product-control label {
     display: block;
     margin-bottom: 6px;
     font-weight: 600;
+}
+
+.ppom-preview-select-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Explicit row layout for the preview dropdown + Refresh (matches #ppom-live-preview-modal … > .ppom-preview-controls > div > div). */
+#ppom-live-preview-modal .ppom-preview-product-control > .ppom-preview-select-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Select2 uses width:100%; that must be 100% of this cell, not the full row, or Refresh wraps below. */
+.ppom-preview-select-cell {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.ppom-preview-select-cell .select2-container {
+    max-width: 100%;
+}
+
+.ppom-preview-select-row .ppom-preview-refresh {
+    flex-shrink: 0;
+}
+
+.ppom-wrapper .ppom-preview-refresh.btn,
+#ppom-live-preview-modal .ppom-preview-refresh.btn {
+    line-height: 1;
 }
 
 .ppom-preview-iframe-wrap {
@@ -1993,4 +2029,81 @@ div.ppom-banner .themeisle-sale {
 
 .ppom-save-preview-tooltip-anchor {
     display: inline-block;
+    cursor: default;
+}
+
+.ppom-save-preview-tooltip-anchor.ppom-save-preview-is-disabled {
+    cursor: not-allowed;
+}
+
+.ppom-save-preview-inner {
+    position: relative;
+    display: inline-block;
+}
+
+/* Outline secondary next to solid primary “Save Fields”; disabled = flat neutral grey. */
+.ppom-save-preview-tooltip-anchor:not(.ppom-save-preview-is-disabled) .ppom-save-and-preview.btn-outline-secondary {
+    color: #50575e;
+    border-color: #c3c4c7;
+    background-color: #f6f7f7;
+}
+
+.ppom-save-preview-tooltip-anchor:not(.ppom-save-preview-is-disabled) .ppom-save-and-preview.btn-outline-secondary:hover {
+    color: #1d2327;
+    border-color: #8c8f94;
+    background-color: #f0f0f1;
+}
+
+.ppom-save-preview-tooltip-anchor:not(.ppom-save-preview-is-disabled) .ppom-save-and-preview.btn-outline-secondary:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #fff, 0 0 0 2px #2271b1;
+    outline: none;
+}
+
+.ppom-save-preview-tooltip-anchor.ppom-save-preview-is-disabled .ppom-save-and-preview.btn-outline-secondary {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 1;
+    color: #787c82 !important;
+    background-color: #f0f0f1 !important;
+    border-color: #c3c4c7 !important;
+    box-shadow: none;
+}
+
+/* Instant custom tooltip (hover passes through disabled button to .ppom-save-preview-inner). */
+.ppom-save-preview-tooltip {
+    position: absolute;
+    z-index: 100050;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+    margin-bottom: 6px;
+    padding: 8px 10px;
+    min-width: 230px;
+    max-width: 280px;
+    font-size: 12px;
+    line-height: 1.45;
+    font-weight: 400;
+    color: #fff;
+    text-align: left;
+    text-decoration: none;
+    white-space: normal;
+    background: #1d2327;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+}
+
+.ppom-save-preview-tooltip[hidden] {
+    display: none !important;
+}
+
+.ppom-save-preview-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border: 6px solid transparent;
+    border-top-color: #1d2327;
 }

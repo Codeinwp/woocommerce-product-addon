@@ -730,10 +730,13 @@ $fields_groups = array(
 							<div class="ppom-submit-btn text-right">
 								<span class="ppom-meta-save-notice"></span>
 								<?php if ( $is_edit_screen && ! $is_new_group ) { ?>
-									<span class="ppom-save-preview-tooltip-anchor" title="">
-										<button type="button" class="btn btn-secondary ppom-save-and-preview" disabled="disabled" aria-disabled="true">
-											<?php _e( 'Save & Preview', 'woocommerce-product-addon' ); ?>
-										</button>
+									<span class="ppom-save-preview-tooltip-anchor ppom-save-preview-is-disabled">
+										<span class="ppom-save-preview-inner">
+											<button type="button" class="btn btn-outline-secondary ppom-save-and-preview" disabled="disabled" aria-disabled="true" id="ppom-save-and-preview-btn">
+												<?php _e( 'Save & Preview', 'woocommerce-product-addon' ); ?>
+											</button>
+											<span id="ppom-save-preview-tooltip" class="ppom-save-preview-tooltip" role="tooltip" hidden></span>
+										</span>
 									</span>
 								<?php } ?>
 								<input type="submit" class="btn btn-primary"
@@ -830,11 +833,15 @@ $fields_groups = array(
 					<div class="ppom-preview-controls">
 						<div class="ppom-preview-product-control">
 							<label for="ppom-preview-product-select"><?php esc_html_e( 'Preview product', 'woocommerce-product-addon' ); ?></label>
-							<select id="ppom-preview-product-select" class="form-control"></select>
+							<div class="ppom-preview-select-row">
+								<div class="ppom-preview-select-cell">
+									<select id="ppom-preview-product-select" class="form-control"></select>
+								</div>
+								<button type="button" class="btn btn-primary ppom-preview-refresh">
+									<?php esc_html_e( 'Refresh', 'woocommerce-product-addon' ); ?>
+								</button>
+							</div>
 						</div>
-						<button type="button" class="btn btn-primary ppom-preview-refresh">
-							<?php esc_html_e( 'Refresh', 'woocommerce-product-addon' ); ?>
-						</button>
 					</div>
 					<div class="ppom-preview-notice ppom-preview-notice-error ppom-hide-element"></div>
 					<div class="ppom-preview-notice ppom-preview-notice-warning ppom-hide-element">
