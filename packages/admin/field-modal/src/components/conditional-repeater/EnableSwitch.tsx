@@ -58,7 +58,12 @@ export function EnableSwitch( {
 					) : null }
 				</HStack>
 				{ desc ? (
-					<Text fontSize="xs" color="gray.600" lineHeight="1.5">
+					<Text
+						fontSize="xs"
+						color="gray.600"
+						lineHeight="1.4"
+						m={ 0 }
+					>
 						{ desc }
 					</Text>
 				) : null }
