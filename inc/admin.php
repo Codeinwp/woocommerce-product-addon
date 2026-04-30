@@ -49,6 +49,13 @@ function ppom_admin_delete_selected_meta() {
 	\PPOM\Admin\Manager::delete_selected_meta();
 }
 
+/**
+ * AJAX wrapper that imports a curated template into a new PPOM field group.
+ */
+function ppom_admin_import_template(): void {
+	\PPOM\Admin\Manager::import_template();
+}
+
 function ppom_admin_simplify_meta( $meta ) {
 	return \PPOM\Admin\Manager::simplify_meta( $meta );
 }

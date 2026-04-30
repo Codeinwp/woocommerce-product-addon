@@ -87,7 +87,8 @@ require_once PPOM_PATH . '/classes/attach-popup/select-component.class.php';
 // include_once PPOM_PATH . "/classes/nm-framework.php";
 require_once PPOM_PATH . '/classes/input.class.php';
 require_once PPOM_PATH . '/classes/fields.class.php';
-// include_once PPOM_PATH . "/classes/field.class.php"; // Fronend PPOM Fields
+require_once PPOM_PATH . '/classes/template-library.class.php';
+// include_once PPOM_PATH . "/classes/field.class.php"; // Fronend PPOM Fields.
 require_once PPOM_PATH . '/classes/ppom.class.php';
 require_once PPOM_PATH . '/classes/class-ppom-meta-repository.php';
 require_once PPOM_PATH . '/inc/ppom-meta-repository-functions.php';

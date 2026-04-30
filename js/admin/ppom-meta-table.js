@@ -239,7 +239,7 @@ jQuery( function ( $ ) {
 			${ exportOption }
 		</select>`;
 
-	const btn = `<a class="btn btn-success btn-sm float-right mr-4" href="${ ppom_vars.i18n.addGroupUrl }"><span class="dashicons dashicons-plus"></span>${ ppom_vars.i18n.addGroupLabel }</a>`;
+	const btn = `<a class="btn btn-success btn-sm float-right mr-4" href="${ ppom_vars.i18n.addGroupUrl }" data-modal-id="ppom-template-wizard-modal"><span class="dashicons dashicons-plus"></span>${ ppom_vars.i18n.addGroupLabel }</a>`;
 
 	// DataTables creates the placeholder container, then PPOM injects the
 	// toolbar HTML after initialization so the controls stay inside the table UI.

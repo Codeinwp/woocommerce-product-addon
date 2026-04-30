@@ -4447,12 +4447,6 @@ parameters:
 			path: src/Admin/Manager.php
 
 		-
-			message: '#^Parameter \#1 \$url of function esc_url_raw expects string, string\|false given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Admin/Manager.php
-
-		-
 			message: '#^Parameter \$post of method PPOM\\Admin\\Manager\:\:meta_list\(\) has invalid type PPOM\\Admin\\WP_Post\.$#'
 			identifier: class.notFound
 			count: 1
