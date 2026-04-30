@@ -91,12 +91,6 @@ parameters:
 			path: backend/templates/admin-settings.php
 
 		-
-			message: '#^Variable \$class_ins might not be defined\.$#'
-			identifier: variable.undefined
-			count: 8
-			path: backend/templates/admin-settings.php
-
-		-
 			message: '#^Variable \$tabs might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
