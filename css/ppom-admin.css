@@ -115,6 +115,98 @@ button[data-modal-id="ppom_fields_model_id"]{
     font-size: 12px;
 }
 
+.ppom-fields-list-table-wrapper {
+    overflow-x: auto;
+}
+
+.ppom-fields-list-table-wrapper .tablenav {
+    height: auto;
+    margin: 8px 0;
+}
+
+.ppom-fields-list-table-wrapper .tablenav .actions {
+    padding: 0;
+}
+
+.ppom-fields-list-table-wrapper .ppom-submit-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ppom_field_table .column-order {
+    width: 36px;
+    text-align: center;
+}
+
+.ppom_field_table .column-cb {
+    width: 36px;
+}
+
+.ppom_field_table .column-status,
+.ppom_field_table .column-required {
+    width: 85px;
+}
+
+.ppom_field_table .column-type {
+    width: 110px;
+}
+
+.ppom_field_table .column-actions {
+    width: 120px;
+    white-space: nowrap;
+}
+
+.ppom_field_table .column-actions .button + .button {
+    margin-left: 6px;
+}
+
+.ppom-fields-tablenav .alignleft.actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ppom_remove_field.button {
+    color: #b32d2e;
+    border-color: #b32d2e;
+}
+
+.ppom_remove_field.button:hover,
+.ppom_remove_field.button:focus {
+    color: #fff;
+    background: #b32d2e;
+    border-color: #8a1f20;
+}
+
+.ppom_remove_field.button:focus {
+    box-shadow: 0 0 0 1px #8a1f20;
+    outline: 2px solid transparent;
+}
+
+.ppom_remove_field.button:disabled,
+.ppom_remove_field.button[disabled] {
+    color: #b32d2e !important;
+    border-color: #b32d2e !important;
+    background: #fff !important;
+    opacity: 0.5;
+}
+
+.ppom_field_table .column-placeholder {
+    width: 18%;
+}
+
+.ppom_field_table .ppom-sortable-handle {
+    display: inline-block;
+    color: #787c82;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.ppom_field_table .button .dashicons {
+    line-height: 1.5;
+}
+
 #ppom_fields_id,
 #ppom_fields_id .inside {
     position: unset;
@@ -992,6 +1084,11 @@ ul.ppom-options-container li label {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+}
+
+.onoffswitch--busy {
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 .onoffswitch-checkbox {
@@ -1959,85 +2056,11 @@ header.ppom-modal-header {
 }
 
 .ppom-existing-meta-wrapper .wp-list-table .column-status {
-    width: 130px;
+    width: 85px;
 }
 
 .ppom-existing-meta-wrapper .wp-list-table .column-attach {
     width: 170px;
-}
-
-/* Field group enable/disable toggle (PPOM list table Status column).
-   `.ppom-wrapper label` forces `display:inline-block; margin-bottom:.5rem`,
-   which kills flex `gap`. The `.ppom-wrapper label.ppom-toggle` selector has
-   higher specificity (0,2,1 vs 0,1,1) and restores the inline-flex layout. */
-.ppom-toggle,
-.ppom-wrapper label.ppom-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    user-select: none;
-    line-height: 18px;
-    white-space: nowrap;
-    vertical-align: middle;
-    margin-bottom: 0;
-}
-
-.ppom-toggle-input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-    width: 0;
-    height: 0;
-}
-
-.ppom-toggle-track {
-    position: relative;
-    display: inline-block;
-    width: 34px;
-    height: 18px;
-    background: #c3c4c7;
-    border-radius: 9999px;
-    transition: background-color 0.15s ease-in-out;
-    flex-shrink: 0;
-    vertical-align: middle;
-}
-
-.ppom-toggle-thumb {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 14px;
-    height: 14px;
-    background: #fff;
-    border-radius: 50%;
-    transition: transform 0.15s ease-in-out;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.ppom-toggle-input:checked + .ppom-toggle-track {
-    background: #2271b1;
-}
-
-.ppom-toggle-input:checked + .ppom-toggle-track .ppom-toggle-thumb {
-    transform: translateX(16px);
-}
-
-.ppom-toggle-input:focus-visible + .ppom-toggle-track {
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2271b1;
-}
-
-.ppom-toggle--busy {
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-.ppom-toggle-label {
-    font-size: 12px;
-    line-height: 18px;
-    color: #50575e;
-    display: inline-flex;
-    align-items: center;
 }
 
 .ppom-disabled-badge {
