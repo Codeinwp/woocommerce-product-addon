@@ -729,6 +729,16 @@ $fields_groups = array(
 						<th colspan="12">
 							<div class="ppom-submit-btn text-right">
 								<span class="ppom-meta-save-notice"></span>
+								<?php if ( $is_edit_screen && ! $is_new_group ) { ?>
+									<span class="ppom-save-preview-tooltip-anchor ppom-save-preview-is-disabled">
+										<span class="ppom-save-preview-inner">
+											<button type="button" class="btn btn-outline-secondary ppom-save-and-preview" disabled="disabled" aria-disabled="true" id="ppom-save-and-preview-btn">
+												<?php _e( 'Save & Preview', 'woocommerce-product-addon' ); ?>
+											</button>
+											<span id="ppom-save-preview-tooltip" class="ppom-save-preview-tooltip" role="tooltip" hidden></span>
+										</span>
+									</span>
+								<?php } ?>
 								<input type="submit" class="btn btn-primary"
 										value="<?php _e( 'Save Fields', 'woocommerce-product-addon' ); ?>">
 							</div>
@@ -811,6 +821,46 @@ $fields_groups = array(
 				</table>
 			</div>
 		</form>
+
+		<?php if ( $is_edit_screen && ! $is_new_group ) { ?>
+			<div id="ppom-live-preview-modal" class="ppom-modal-box ppom-live-preview-modal">
+				<header class="ppom-live-preview-header">
+					<div class="ppom-live-preview-title-wrap">
+						<h3><?php esc_html_e( 'Live Product Preview', 'woocommerce-product-addon' ); ?></h3>
+					</div>
+				</header>
+				<div class="ppom-modal-body">
+					<div class="ppom-preview-controls">
+						<div class="ppom-preview-product-control">
+							<label for="ppom-preview-product-select"><?php esc_html_e( 'Preview product', 'woocommerce-product-addon' ); ?></label>
+							<div class="ppom-preview-select-row">
+								<div class="ppom-preview-select-cell">
+									<select id="ppom-preview-product-select" class="form-control"></select>
+								</div>
+								<button type="button" class="btn btn-primary ppom-preview-refresh">
+									<?php esc_html_e( 'Refresh', 'woocommerce-product-addon' ); ?>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="ppom-preview-notice ppom-preview-notice-error ppom-hide-element"></div>
+					<div class="ppom-preview-notice ppom-preview-notice-warning ppom-hide-element">
+						<p class="ppom-preview-empty-message"></p>
+						<button type="button" class="btn btn-secondary ppom-preview-go-to-assignment"></button>
+					</div>
+					<div class="ppom-preview-iframe-wrap ppom-hide-element">
+						<iframe
+							id="ppom-live-preview-iframe"
+							title="<?php esc_attr_e( 'Product page preview', 'woocommerce-product-addon' ); ?>"
+							loading="lazy"
+						></iframe>
+					</div>
+				</div>
+				<footer>
+					<button type="button" class="btn btn-default ppom-js-modal-close"><?php esc_html_e( 'Close', 'woocommerce-product-addon' ); ?></button>
+				</footer>
+			</div>
+		<?php } ?>
 	</div>
 </div>
 

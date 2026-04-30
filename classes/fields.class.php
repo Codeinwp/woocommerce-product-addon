@@ -192,24 +192,45 @@ class PPOM_Fields_Meta {
 			PPOM_VERSION,
 			true 
 		);
+		wp_enqueue_script(
+			'ppom-preview-modal',
+			PPOM_URL . '/js/admin/ppom-preview-modal.js',
+			array(
+				'jquery',
+				'ppom-field',
+				'ppom-select2',
+			),
+			PPOM_VERSION,
+			true
+		);
 
 		wp_enqueue_media();
+
+		$preview_ppom_id           = absint( (string) filter_input( INPUT_GET, 'productmeta_id', FILTER_SANITIZE_NUMBER_INT ) );
+		$preview_do_meta           = (string) filter_input( INPUT_GET, 'do_meta', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$is_preview_edit           = 'edit' === $preview_do_meta && $preview_ppom_id > 0;
+		$assigned_preview_products = $is_preview_edit ? $this->get_assigned_products_for_meta( $preview_ppom_id ) : array();
 
 		$ppom_admin_meta = array(
 			'plugin_admin_page' => admin_url( 'admin.php?page=ppom' ),
 			'loader'            => PPOM_URL . '/images/loading.gif',
 			'ppomProActivated'  => ppom_pro_is_installed() && PPOM()->is_license_of_type( 'pro' ) ? 'yes' : 'no',
+			'preview'           => array(
+				'nonce'            => wp_create_nonce( 'ppom_preview_nonce_action' ),
+				'ppomId'           => $preview_ppom_id,
+				'assignedProducts' => $assigned_preview_products,
+			),
 			'i18n'              => array(
-				'addGroupUrl'            => esc_url( add_query_arg( array( 'action' => 'new' ) ) ),
-				'addGroupLabel'          => esc_html__( 'Add New Group', 'woocommerce-product-addon' ),
-				'bulkActionsLabel'       => esc_html__( 'Bulk Actions', 'woocommerce-product-addon' ),
-				'deleteLabel'            => esc_html__( 'Delete', 'woocommerce-product-addon' ),
-				'exportLabel'            => esc_html__( 'Export', 'woocommerce-product-addon' ),
-				'exportLockedLabel'      => esc_html__( 'Export', 'woocommerce-product-addon' ) . ' (' . esc_html__( 'PRO', 'woocommerce-product-addon' ) . ')',
-				'importLabel'            => esc_html__( 'Import Field Groups ', 'woocommerce-product-addon' ),
-				'freemiumCFRContent'     => \PPOM_Freemium::get_instance()->get_freemium_cfr_content(),
-				'freemiumCFRTab'         => \PPOM_Freemium::TAB_KEY_FREEMIUM_CFR,
-				'popup'                  => array(
+				'addGroupUrl'                    => esc_url( add_query_arg( array( 'action' => 'new' ) ) ),
+				'addGroupLabel'                  => esc_html__( 'Add New Group', 'woocommerce-product-addon' ),
+				'bulkActionsLabel'               => esc_html__( 'Bulk Actions', 'woocommerce-product-addon' ),
+				'deleteLabel'                    => esc_html__( 'Delete', 'woocommerce-product-addon' ),
+				'exportLabel'                    => esc_html__( 'Export', 'woocommerce-product-addon' ),
+				'exportLockedLabel'              => esc_html__( 'Export', 'woocommerce-product-addon' ) . ' (' . esc_html__( 'PRO', 'woocommerce-product-addon' ) . ')',
+				'importLabel'                    => esc_html__( 'Import Field Groups ', 'woocommerce-product-addon' ),
+				'freemiumCFRContent'             => \PPOM_Freemium::get_instance()->get_freemium_cfr_content(),
+				'freemiumCFRTab'                 => \PPOM_Freemium::TAB_KEY_FREEMIUM_CFR,
+				'popup'                          => array(
 					'confirmTitle'    => __( 'Are you sure?', 'woocommerce-product-addon' ),
 					// translators: %s is the name of the field group being deleted.
 					'deleteGroup'     => __( 'Are you sure you want to delete the \'%s\' group? This action cannot be undone.', 'woocommerce-product-addon' ),
@@ -220,18 +241,27 @@ class PPOM_Fields_Meta {
 					'checkFieldTitle' => __( 'Please at least check one field!', 'woocommerce-product-addon' ),
 
 				),
-				'errorOccurred'          => __( 'An error occurred. Please try again.', 'woocommerce-product-addon' ),
-				'yes'                    => __( 'Yes', 'woocommerce-product-addon' ),
-				'no'                     => __( 'No', 'woocommerce-product-addon' ),
-				'updatedField'           => __( 'Update Field', 'woocommerce-product-addon' ),
-				'pricePlaceholder'       => __( 'Price (fix or %)', 'woocommerce-product-addon' ),
-				'choseFile'              => __( 'Choose File', 'woocommerce-product-addon' ),
-				'upload'                 => __( 'Upload', 'woocommerce-product-addon' ),
-				'stock'                  => __( 'Stock', 'woocommerce-product-addon' ),
-				'metaIds'                => __( 'Meta IDs', 'woocommerce-product-addon' ),
-				'cannotRemoveMoreOption' => __( 'Cannot Remove More Option', 'woocommerce-product-addon' ),
-				'dataNameRequired'       => __( 'Data Name must be required', 'woocommerce-product-addon' ),
-				'dataNameExists'         => __( 'Data Name already exists', 'woocommerce-product-addon' ),
+				'errorOccurred'                  => __( 'An error occurred. Please try again.', 'woocommerce-product-addon' ),
+				'yes'                            => __( 'Yes', 'woocommerce-product-addon' ),
+				'no'                             => __( 'No', 'woocommerce-product-addon' ),
+				'updatedField'                   => __( 'Update Field', 'woocommerce-product-addon' ),
+				'pricePlaceholder'               => __( 'Price (fix or %)', 'woocommerce-product-addon' ),
+				'choseFile'                      => __( 'Choose File', 'woocommerce-product-addon' ),
+				'upload'                         => __( 'Upload', 'woocommerce-product-addon' ),
+				'stock'                          => __( 'Stock', 'woocommerce-product-addon' ),
+				'metaIds'                        => __( 'Meta IDs', 'woocommerce-product-addon' ),
+				'cannotRemoveMoreOption'         => __( 'Cannot Remove More Option', 'woocommerce-product-addon' ),
+				'dataNameRequired'               => __( 'Data Name must be required', 'woocommerce-product-addon' ),
+				'dataNameExists'                 => __( 'Data Name already exists', 'woocommerce-product-addon' ),
+				'previewLoading'                 => __( 'Loading preview...', 'woocommerce-product-addon' ),
+				'previewNoProduct'               => __( 'No eligible product found for preview. Assign this group to products/categories/tags and try again.', 'woocommerce-product-addon' ),
+				'previewNoUrl'                   => __( 'Could not load the preview URL.', 'woocommerce-product-addon' ),
+				'previewSaveFirst'               => __( 'Save failed. Fix errors before opening preview.', 'woocommerce-product-addon' ),
+				'previewSelectPlaceholder'       => __( 'Search products...', 'woocommerce-product-addon' ),
+				'previewGoToAssignment'          => __( 'Go to assignment', 'woocommerce-product-addon' ),
+				'previewCheckingAvailability'    => __( 'Checking preview availability...', 'woocommerce-product-addon' ),
+				'previewDisabledHint'            => __( 'Attach this group to at least one product, category, or tag to enable preview.', 'woocommerce-product-addon' ),
+				'previewSavePreviewDisabledAria' => __( 'Save & Preview is unavailable until this group is attached to a product, category, or tag.', 'woocommerce-product-addon' ),
 			),
 		);
 
@@ -249,6 +279,80 @@ class PPOM_Fields_Meta {
 		}
 
 		do_action( 'themeisle_internal_page', PPOM_PRODUCT_SLUG, $page_slug );
+	}
+
+	/**
+	 * Returns products directly attached to the given PPOM group.
+	 *
+	 * @param int $ppom_id PPOM field-group ID.
+	 *
+	 * @return array<int, array{id:int,text:string}>
+	 */
+	protected function get_assigned_products_for_meta( $ppom_id ) {
+		$query = new WP_Query(
+			array(
+				'post_type'      => 'product',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+			)
+		);
+
+		if ( empty( $query->posts ) ) {
+			return array();
+		}
+
+		$assigned_ids = array();
+		foreach ( $query->posts as $product_id ) {
+			if ( ! is_int( $product_id ) ) {
+				continue;
+			}
+
+			$attached_meta = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
+
+			if ( is_array( $attached_meta ) && in_array( $ppom_id, array_map( 'intval', $attached_meta ), true ) ) {
+				$assigned_ids[] = (int) $product_id;
+				continue;
+			}
+
+			if ( is_numeric( $attached_meta ) && (int) $attached_meta === (int) $ppom_id ) {
+				$assigned_ids[] = (int) $product_id;
+			}
+		}
+
+		usort(
+			$assigned_ids,
+			static function ( $left, $right ) {
+				$left_post  = get_post( $left );
+				$right_post = get_post( $right );
+
+				$left_timestamp  = 0;
+				$right_timestamp = 0;
+
+				if ( $left_post instanceof WP_Post ) {
+					$left_modified  = strtotime( $left_post->post_modified_gmt );
+					$left_timestamp = false === $left_modified ? 0 : $left_modified;
+				}
+
+				if ( $right_post instanceof WP_Post ) {
+					$right_modified  = strtotime( $right_post->post_modified_gmt );
+					$right_timestamp = false === $right_modified ? 0 : $right_modified;
+				}
+
+				return $right_timestamp <=> $left_timestamp;
+			}
+		);
+
+		$assigned_products = array();
+		foreach ( $assigned_ids as $assigned_id ) {
+			$assigned_products[] = array(
+				'id'   => (int) $assigned_id,
+				'text' => get_the_title( $assigned_id ),
+			);
+		}
+
+		return $assigned_products;
 	}
 
 

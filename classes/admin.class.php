@@ -65,6 +65,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		// Getting products list
 		add_action( 'wp_ajax_ppom_get_products', array( $this, 'get_products' ) );
 		add_action( 'wp_ajax_ppom_attach_ppoms', array( $this, 'ppom_attach_ppoms' ) );
+		add_action( 'wp_ajax_ppom_get_preview_url', array( $this, 'get_preview_url' ) );
+		add_action( 'wp_ajax_ppom_search_products', array( $this, 'search_products' ) );
 
 		// Adding setting tab in WooCommerce
 		if ( ! ppom_settings_migrated() ) {
@@ -598,6 +600,328 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$rows = ppom_meta_repository()->get_categories_and_tags_columns( (int) $ppom_field_id );
 
 		return ! empty( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * Returns Select2-compatible product search results for preview modal.
+	 *
+	 * @return void
+	 */
+	public function search_products() {
+		$nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : '';
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'ppom_preview_nonce_action' ) || ! ppom_security_role() ) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
+					'results' => array(),
+				)
+			);
+		}
+
+		$term = isset( $_REQUEST['term'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['term'] ) ) : '';
+		if ( '' === $term ) {
+			wp_send_json(
+				array(
+					'status'  => 'success',
+					'results' => array(),
+				)
+			);
+		}
+
+		$query = new WP_Query(
+			array(
+				'post_type'      => 'product',
+				'post_status'    => 'publish',
+				'posts_per_page' => 20,
+				's'              => $term,
+				'orderby'        => 'modified',
+				'order'          => 'DESC',
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+			)
+		);
+
+		$results = array();
+		if ( ! empty( $query->posts ) ) {
+			foreach ( $query->posts as $product_id ) {
+				if ( ! is_int( $product_id ) ) {
+					continue;
+				}
+
+				$results[] = array(
+					'id'   => (int) $product_id,
+					'text' => get_the_title( $product_id ),
+				);
+			}
+		}
+
+		wp_send_json(
+			array(
+				'status'  => 'success',
+				'results' => $results,
+			)
+		);
+	}
+
+	/**
+	 * Resolves and returns a product permalink for the live preview modal.
+	 *
+	 * @return void
+	 */
+	public function get_preview_url() {
+		$nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : '';
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'ppom_preview_nonce_action' ) || ! ppom_security_role() ) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
+				)
+			);
+		}
+
+		$ppom_id    = isset( $_REQUEST['ppom_id'] ) ? absint( $_REQUEST['ppom_id'] ) : 0;
+		$product_id = isset( $_REQUEST['product_id'] ) ? absint( $_REQUEST['product_id'] ) : 0;
+
+		if ( ! $product_id && $ppom_id ) {
+			$product_id = $this->resolve_preview_product_id( $ppom_id );
+		}
+
+		if ( ! $product_id || 'product' !== get_post_type( $product_id ) || 'publish' !== get_post_status( $product_id ) ) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'code'    => 'ppom_preview_no_product',
+					'message' => __( 'No eligible product found for preview.', 'woocommerce-product-addon' ),
+				)
+			);
+		}
+
+		$preview_url = get_permalink( $product_id );
+		if ( empty( $preview_url ) ) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'code'    => 'ppom_preview_url_missing',
+					'message' => __( 'Could not generate preview URL.', 'woocommerce-product-addon' ),
+				)
+			);
+		}
+
+		wp_send_json(
+			array(
+				'status'      => 'success',
+				'preview_url' => esc_url_raw( $preview_url ),
+				'product'     => array(
+					'id'   => $product_id,
+					'text' => get_the_title( $product_id ),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Resolves a default preview product for a PPOM group.
+	 *
+	 * Priority:
+	 * 1) Directly attached products.
+	 * 2) Category/tag derived products.
+	 *
+	 * @param int $ppom_id PPOM field-group ID.
+	 *
+	 * @return int
+	 */
+	protected function resolve_preview_product_id( $ppom_id ) {
+		$direct_product_ids = $this->get_direct_product_ids_for_ppom( (int) $ppom_id );
+		if ( ! empty( $direct_product_ids ) ) {
+			return (int) reset( $direct_product_ids );
+		}
+
+		$fallback_product_ids = $this->get_category_tag_product_ids_for_ppom( (int) $ppom_id );
+		if ( ! empty( $fallback_product_ids ) ) {
+			return (int) reset( $fallback_product_ids );
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Returns directly attached products sorted by most recent update.
+	 *
+	 * @param int $ppom_id PPOM field-group ID.
+	 *
+	 * @return int[]
+	 */
+	protected function get_direct_product_ids_for_ppom( $ppom_id ) {
+		$query = new WP_Query(
+			array(
+				'post_type'      => 'product',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+			)
+		);
+
+		if ( empty( $query->posts ) ) {
+			return array();
+		}
+
+		$attached_product_ids = array();
+		foreach ( $query->posts as $product_id ) {
+			if ( ! is_int( $product_id ) ) {
+				continue;
+			}
+
+			$attached_meta = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
+
+			if ( is_array( $attached_meta ) && in_array( $ppom_id, array_map( 'intval', $attached_meta ), true ) ) {
+				$attached_product_ids[] = (int) $product_id;
+				continue;
+			}
+
+			if ( is_numeric( $attached_meta ) && (int) $attached_meta === $ppom_id ) {
+				$attached_product_ids[] = (int) $product_id;
+			}
+		}
+
+		return $this->sort_product_ids_by_recency( $attached_product_ids );
+	}
+
+	/**
+	 * Returns category/tag-derived candidate products sorted by recency.
+	 *
+	 * @param int $ppom_id PPOM field-group ID.
+	 *
+	 * @return int[]
+	 */
+	protected function get_category_tag_product_ids_for_ppom( $ppom_id ) {
+		$row = $this->get_db_field( $ppom_id );
+		if ( empty( $row ) ) {
+			return array();
+		}
+
+		$category_slugs = array();
+		if ( ! empty( $row['productmeta_categories'] ) && is_string( $row['productmeta_categories'] ) ) {
+			$category_lines = preg_split( '/\r\n|\n/', $row['productmeta_categories'] );
+			if ( false === $category_lines ) {
+				$category_lines = array();
+			}
+
+			$category_slugs = array_filter(
+				array_map(
+					'sanitize_title',
+					$category_lines
+				)
+			);
+		}
+
+		$tag_slugs = array();
+		if ( ! empty( $row['productmeta_tags'] ) ) {
+			$parsed_tags = maybe_unserialize( $row['productmeta_tags'] );
+			if ( is_array( $parsed_tags ) ) {
+				$tag_slugs = array_filter( array_map( 'sanitize_title', $parsed_tags ) );
+			}
+		}
+
+		$tax_query = array();
+		if ( ! empty( $category_slugs ) ) {
+			$tax_query[] = array(
+				'taxonomy' => 'product_cat',
+				'field'    => 'slug',
+				'terms'    => $category_slugs,
+			);
+		}
+
+		if ( ! empty( $tag_slugs ) ) {
+			$tax_query[] = array(
+				'taxonomy' => 'product_tag',
+				'field'    => 'slug',
+				'terms'    => $tag_slugs,
+			);
+		}
+
+		if ( empty( $tax_query ) ) {
+			return array();
+		}
+
+		if ( count( $tax_query ) > 1 ) {
+			$tax_query['relation'] = 'OR';
+		}
+
+		$query = new WP_Query(
+			array(
+				'post_type'      => 'product',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'tax_query'      => $tax_query,
+				'orderby'        => 'modified',
+				'order'          => 'DESC',
+				'no_found_rows'  => true,
+			)
+		);
+
+		if ( empty( $query->posts ) ) {
+			return array();
+		}
+
+		$product_ids = array();
+		foreach ( $query->posts as $product_id ) {
+			if ( is_int( $product_id ) ) {
+				$product_ids[] = $product_id;
+			}
+		}
+
+		return $product_ids;
+	}
+
+	/**
+	 * Sorts products by modified date desc, then publish date desc.
+	 *
+	 * @param int[] $product_ids Product IDs.
+	 *
+	 * @return int[]
+	 */
+	protected function sort_product_ids_by_recency( $product_ids ) {
+		$product_ids = array_values( array_unique( array_map( 'intval', $product_ids ) ) );
+		usort(
+			$product_ids,
+			function ( $left, $right ) {
+				$left_modified  = $this->get_post_timestamp( $left, 'post_modified_gmt' );
+				$right_modified = $this->get_post_timestamp( $right, 'post_modified_gmt' );
+
+				if ( $left_modified === $right_modified ) {
+					$left_date  = $this->get_post_timestamp( $left, 'post_date_gmt' );
+					$right_date = $this->get_post_timestamp( $right, 'post_date_gmt' );
+
+					return $right_date <=> $left_date;
+				}
+
+				return $right_modified <=> $left_modified;
+			}
+		);
+
+		return $product_ids;
+	}
+
+	/**
+	 * Returns a comparable timestamp for a post date field.
+	 *
+	 * @param int    $post_id    Product/post ID.
+	 * @param string $date_field Post field name (e.g. post_modified_gmt).
+	 *
+	 * @return int
+	 */
+	protected function get_post_timestamp( $post_id, $date_field ) {
+		$post = get_post( $post_id );
+		if ( ! $post instanceof WP_Post || ! isset( $post->{$date_field} ) || ! is_string( $post->{$date_field} ) ) {
+			return 0;
+		}
+
+		$timestamp = strtotime( $post->{$date_field} );
+
+		return false === $timestamp ? 0 : $timestamp;
 	}
 
 	/**
