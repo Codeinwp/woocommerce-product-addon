@@ -1022,49 +1022,51 @@ function ppom_update_get_prices() {
 	const apply_as_discount = ppom_pricematrix_discount == 'on' ? true : false;
 
 	if ( ppom_pricematrix !== undefined ) {
-		const matrixData = JSON.parse(ppom_pricematrix);
-		const product_qty = parseInt(ppom_get_order_quantity(), 10);
+		const matrixData = JSON.parse( ppom_pricematrix );
+		const product_qty = parseInt( ppom_get_order_quantity(), 10 );
 
 		// Pre-process keys ONCE (fix performance + ordering issue)
-		const parsedKeys = Object.keys(matrixData).map((range) => {
-			if (range.includes('-')) {
-				const [start, end] = range.split('-').map(Number);
+		const parsedKeys = Object.keys( matrixData ).map( ( range ) => {
+			if ( range.includes( '-' ) ) {
+				const [ start, end ] = range.split( '-' ).map( Number );
 				return { type: 'range', start, end, key: range };
 			} else {
-				return { type: 'single', value: Number(range), key: range };
+				return { type: 'single', value: Number( range ), key: range };
 			}
-		});
+		} );
 
-		parsedKeys.sort((a, b) => {
+		parsedKeys.sort( ( a, b ) => {
 			const aVal = a.type === 'range' ? a.start : a.value;
 			const bVal = b.type === 'range' ? b.start : b.value;
 			return aVal - bVal;
-		});
+		} );
 
-		const firstKey = parsedKeys[0]?.key;
-		const lastKey = parsedKeys[parsedKeys.length - 1]?.key;
+		const firstKey = parsedKeys[ 0 ]?.key;
+		const lastKey = parsedKeys[ parsedKeys.length - 1 ]?.key;
 
-		jQuery.each(matrixData, function (range, meta) {
+		jQuery.each( matrixData, function ( range, meta ) {
 			const option_price = {};
 			let isMatch = false;
 
-			if (range.indexOf('-') !== -1) {
-				const [range_from, range_to] = range.split('-').map(Number);
+			if ( range.indexOf( '-' ) !== -1 ) {
+				const [ range_from, range_to ] = range
+					.split( '-' )
+					.map( Number );
 
-				if (product_qty >= range_from && product_qty <= range_to) {
+				if ( product_qty >= range_from && product_qty <= range_to ) {
 					isMatch = true;
 				}
 			} else {
-				const value = Number(range);
+				const value = Number( range );
 
-				if (range === firstKey && product_qty <= value) {
+				if ( range === firstKey && product_qty <= value ) {
 					isMatch = true;
-				} else if (range === lastKey && product_qty >= value) {
+				} else if ( range === lastKey && product_qty >= value ) {
 					isMatch = true;
 				}
 			}
 
-			if (isMatch) {
+			if ( isMatch ) {
 				option_price.label = meta.label;
 				option_price.price = meta.price;
 				option_price.percent = meta.percent;
@@ -1075,11 +1077,11 @@ function ppom_update_get_prices() {
 				option_price.data_name = ppom_pricematrix_id;
 				option_price.matrix_fixed = meta.matrix_fixed === 'on';
 
-				options_price_added.push(option_price);
+				options_price_added.push( option_price );
 
 				return false;
 			}
-		});
+		} );
 	}
 
 	// Variation quantities

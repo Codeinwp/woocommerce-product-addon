@@ -34,10 +34,7 @@ export function ImageselectFieldEditor( {
 
 	const allSections = useMemo(
 		() =>
-			buildFallbackGroupedSections(
-				schema,
-				fieldType || 'imageselect'
-			),
+			buildFallbackGroupedSections( schema, fieldType || 'imageselect' ),
 		[ schema, fieldType ]
 	);
 

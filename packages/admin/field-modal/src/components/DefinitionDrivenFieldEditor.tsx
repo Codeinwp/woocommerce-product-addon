@@ -167,8 +167,7 @@ export function DefinitionDrivenFieldEditor( {
 			primary.push( renderBlock( block ) );
 		} );
 
-		const advancedLabel =
-			i18n.advancedSettings || 'Advanced settings';
+		const advancedLabel = i18n.advancedSettings || 'Advanced settings';
 		const advancedSectionLabels = advancedBlocks.flatMap( ( block ) =>
 			block.kind === 'section' ? [ block.labelKey ] : []
 		);

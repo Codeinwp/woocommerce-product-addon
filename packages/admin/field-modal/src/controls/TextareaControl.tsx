@@ -38,14 +38,14 @@ export function TextareaControl( {
 							<Textarea
 								size="sm"
 								rows={ 2 }
-									resize="vertical"
-									required={ labelRequired }
-									value={
-										field.state.value === null ||
-										field.state.value === undefined
-											? ''
-											: String( field.state.value )
-									}
+								resize="vertical"
+								required={ labelRequired }
+								value={
+									field.state.value === null ||
+									field.state.value === undefined
+										? ''
+										: String( field.state.value )
+								}
 								onChange={ ( e ) =>
 									field.handleChange( e.target.value )
 								}

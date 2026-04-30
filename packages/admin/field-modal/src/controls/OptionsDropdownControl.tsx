@@ -71,12 +71,12 @@ export function OptionsDropdownControl( {
 	if ( AppField ) {
 		return (
 			<AppField name={ settingKey }>
-					{ ( field: any ) => {
-						const currentValue =
-							field.state.value === null ||
-							field.state.value === undefined
-								? ''
-								: String( field.state.value );
+				{ ( field: any ) => {
+					const currentValue =
+						field.state.value === null ||
+						field.state.value === undefined
+							? ''
+							: String( field.state.value );
 					const { options, isEmpty } = buildOptions(
 						rawOptions,
 						currentValue

@@ -39,14 +39,14 @@ export function SelectControl( {
 								<Field.RequiredIndicator />
 							</Field.Label>
 							<NativeSelect.Root size="sm">
-									<NativeSelect.Field
-										required={ labelRequired }
-										value={
-											field.state.value === null ||
-											field.state.value === undefined
-												? ''
-												: String( field.state.value )
-										}
+								<NativeSelect.Field
+									required={ labelRequired }
+									value={
+										field.state.value === null ||
+										field.state.value === undefined
+											? ''
+											: String( field.state.value )
+									}
 									onChange={ ( e ) =>
 										field.handleChange( e.target.value )
 									}

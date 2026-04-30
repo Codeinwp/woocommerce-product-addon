@@ -110,12 +110,7 @@ export function AdvancedSettingsPanel( {
 				</Box>
 			</chakra.button>
 			{ description ? (
-				<Text
-					m={ 0 }
-					fontSize="xs"
-					color="#6b7280"
-					lineHeight="1.4"
-				>
+				<Text m={ 0 } fontSize="xs" color="#6b7280" lineHeight="1.4">
 					{ description }
 				</Text>
 			) : null }

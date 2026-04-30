@@ -43,14 +43,14 @@ export function TextControl( {
 							</Field.Label>
 							<Input
 								size="sm"
-									type={ inputType }
-									required={ labelRequired }
-									value={
-										field.state.value === null ||
-										field.state.value === undefined
-											? ''
-											: String( field.state.value )
-									}
+								type={ inputType }
+								required={ labelRequired }
+								value={
+									field.state.value === null ||
+									field.state.value === undefined
+										? ''
+										: String( field.state.value )
+								}
 								onChange={ ( e ) =>
 									field.handleChange( e.target.value )
 								}

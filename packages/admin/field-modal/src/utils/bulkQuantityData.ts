@@ -19,13 +19,13 @@ export function parseOptionsRaw( raw: unknown ): BulkQuantityRow[] {
 		return raw.map( ( row ) => {
 			if ( ! row || typeof row !== 'object' || Array.isArray( row ) ) {
 				return {};
-				}
-				const o: BulkQuantityRow = {};
-				for ( const [ k, v ] of Object.entries( row ) ) {
-					o[ k ] = v === null || v === undefined ? '' : String( v );
-				}
-				return o;
-			} );
+			}
+			const o: BulkQuantityRow = {};
+			for ( const [ k, v ] of Object.entries( row ) ) {
+				o[ k ] = v === null || v === undefined ? '' : String( v );
+			}
+			return o;
+		} );
 	}
 	return [];
 }

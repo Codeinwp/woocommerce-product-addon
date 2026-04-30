@@ -399,8 +399,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		useCallback(
 			( action ) => {
 				const current =
-					state.selectedId === null ||
-					state.selectedId === undefined
+					state.selectedId === null || state.selectedId === undefined
 						? null
 						: state.fields.find(
 								( f ) => f.clientId === state.selectedId

@@ -869,9 +869,14 @@ function ppom_setup_file_upload_input( file_input ) {
 
 			Error( up, err ) {
 				if ( -600 === err.code && file_input.file_size ) {
-					alert( ppom_file_vars.max_file_size.replace( '%s', file_input.file_size.toUpperCase() )  );
+					alert(
+						ppom_file_vars.max_file_size.replace(
+							'%s',
+							file_input.file_size.toUpperCase()
+						)
+					);
 				} else if ( -601 === err.code && file_input.file_types ) {
-					alert( ppom_file_vars.invalid_file_type);
+					alert( ppom_file_vars.invalid_file_type );
 				} else if ( -602 === err.code ) {
 					alert( ppom_file_vars.duplicate_file );
 				} else {

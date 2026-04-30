@@ -40,9 +40,14 @@ jQuery( function ( $ ) {
 	 * @param {string} checkedProducts_names
 	 * @return {void}
 	 */
-	function deleteSelectedProducts( checkedProducts_ids, checkedProducts_names = '' ) {
+	function deleteSelectedProducts(
+		checkedProducts_ids,
+		checkedProducts_names = ''
+	) {
 		let title = window?.ppom_vars?.i18n.popup.deleteGroup;
-		title = checkedProducts_names ? title.replace( '%s', checkedProducts_names ) : window?.ppom_vars?.i18n.popup.confirmTitle;
+		title = checkedProducts_names
+			? title.replace( '%s', checkedProducts_names )
+			: window?.ppom_vars?.i18n.popup.confirmTitle;
 		window?.ppomPopup?.open( {
 			title: title,
 			onConfirmation: () => {
@@ -146,7 +151,9 @@ jQuery( function ( $ ) {
 		const productmeta_id = $( this ).attr( 'data-product-id' );
 		let title = window?.ppom_vars?.i18n.popup.deleteGroup;
 		const productName = $( this ).data( 'name' );
-		title = productName ? title.replace( '%s', productName ) : window?.ppom_vars?.i18n.popup.confirmTitle;
+		title = productName
+			? title.replace( '%s', productName )
+			: window?.ppom_vars?.i18n.popup.confirmTitle;
 
 		window?.ppomPopup?.open( {
 			title: title,
@@ -203,7 +210,7 @@ jQuery( function ( $ ) {
 		}
 
 		const checkedProductsNames = $( '.ppom_product_checkbox:checked' )
- 			.map( function () {
+			.map( function () {
 				return this.dataset.name && this.dataset.name.trim() !== ''
 					? this.dataset.name
 					: this.value;

@@ -61,20 +61,20 @@ export function normalizeConditions( raw: unknown ): ConditionsState {
 					r && typeof r === 'object'
 						? {
 								...emptyRule(),
-									...r,
-									'cond-between-interval': between
-										? {
-												from:
-													between.from !== null &&
-													between.from !== undefined
-														? String( between.from )
-														: '',
-												to:
-													between.to !== null &&
-													between.to !== undefined
-														? String( between.to )
-														: '',
-										  }
+								...r,
+								'cond-between-interval': between
+									? {
+											from:
+												between.from !== null &&
+												between.from !== undefined
+													? String( between.from )
+													: '',
+											to:
+												between.to !== null &&
+												between.to !== undefined
+													? String( between.to )
+													: '',
+									  }
 									: { from: '', to: '' },
 						  }
 						: emptyRule();
@@ -131,26 +131,26 @@ export function getComparisonOptionValues( field: Record< string, unknown > ) {
 	if ( Array.isArray( opts ) ) {
 		opts.forEach( ( o: unknown ) => {
 			if (
-					o &&
-					typeof o === 'object' &&
-					'option' in o &&
-					( o as { option?: unknown } ).option !== null &&
-					( o as { option?: unknown } ).option !== undefined
-				) {
-					push( ( o as { option: unknown } ).option );
-				}
+				o &&
+				typeof o === 'object' &&
+				'option' in o &&
+				( o as { option?: unknown } ).option !== null &&
+				( o as { option?: unknown } ).option !== undefined
+			) {
+				push( ( o as { option: unknown } ).option );
+			}
 		} );
 	} else if ( opts && typeof opts === 'object' ) {
 		Object.values( opts as Record< string, unknown > ).forEach( ( o ) => {
 			if (
-					o &&
-					typeof o === 'object' &&
-					'option' in o &&
-					( o as { option?: unknown } ).option !== null &&
-					( o as { option?: unknown } ).option !== undefined
-				) {
-					push( ( o as { option: unknown } ).option );
-				}
+				o &&
+				typeof o === 'object' &&
+				'option' in o &&
+				( o as { option?: unknown } ).option !== null &&
+				( o as { option?: unknown } ).option !== undefined
+			) {
+				push( ( o as { option: unknown } ).option );
+			}
 		} );
 	}
 
@@ -158,14 +158,14 @@ export function getComparisonOptionValues( field: Record< string, unknown > ) {
 	if ( Array.isArray( imgs ) ) {
 		imgs.forEach( ( img: unknown ) => {
 			if (
-					img &&
-					typeof img === 'object' &&
-					'title' in img &&
-					( img as { title?: unknown } ).title !== null &&
-					( img as { title?: unknown } ).title !== undefined
-				) {
-					push( ( img as { title: unknown } ).title );
-				}
+				img &&
+				typeof img === 'object' &&
+				'title' in img &&
+				( img as { title?: unknown } ).title !== null &&
+				( img as { title?: unknown } ).title !== undefined
+			) {
+				push( ( img as { title: unknown } ).title );
+			}
 		} );
 	}
 
