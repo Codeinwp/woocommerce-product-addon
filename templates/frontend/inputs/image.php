@@ -18,7 +18,7 @@ $legacy_view       = $fm->get_meta_value( 'legacy_view' );
 $multiple_allowed  = $fm->get_meta_value( 'multiple_allowed' );
 $show_popup        = $fm->get_meta_value( 'show_popup' );
 $max_img_selection = $fm->get_meta_value( 'max_checked' );
-$required = isset($field_meta['required']) && $field_meta['required'] === 'on';
+$required          = isset( $field_meta['required'] ) && $field_meta['required'] === 'on';
 
 $input_classes = $fm->input_classes();
 
@@ -45,7 +45,7 @@ $custom_attr = array();
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 	<!-- Legacy View -->
@@ -64,6 +64,7 @@ $custom_attr = array();
 				$image_price = isset( $image['price'] ) ? $image['price'] : 0;
 				$option_id   = $fm->data_name() . '-' . $image_id;
 				$opt_percent = isset( $value['percent'] ) ? $value['percent'] : '';
+				$image_price = apply_filters( 'ppom_option_price', $image_price );
 
 				// If price set in %
 				if ( strpos( $image['price'], '%' ) !== false ) {
@@ -104,7 +105,7 @@ $custom_attr = array();
 						</a>
 					<?php } else { ?>
 						<img class="img-thumbnail" data-model-id="modalImage<?php echo esc_attr( $image_id ); ?>"
-							 src="<?php echo esc_url( $image_url ); ?>">
+							src="<?php echo esc_url( $image_url ); ?>">
 						<?php 
 					}
 
@@ -167,6 +168,7 @@ $custom_attr = array();
 					$image_price = isset( $image['price'] ) ? $image['price'] : 0;
 					$option_id   = $fm->data_name() . '-' . $image_id;
 					$opt_percent = isset( $image['percent'] ) ? $image['percent'] : '';
+					$image_price = apply_filters( 'ppom_option_price', $image_price );
 
 
 					// Actually image URL is link
@@ -225,12 +227,22 @@ $custom_attr = array();
 									data-optionid="<?php echo esc_attr( $option_id ); ?>"
 									data-data_name="<?php echo esc_attr( $fm->data_name() ); ?>"
 									value="<?php echo esc_attr( json_encode( $image ) ); ?>"
-									<?php if( $max_img_selection ) { ?> data-max-selection="<?php echo esc_attr( $max_img_selection ); ?>" <?php } ?>
-									<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
-									<?php if( $multiple_allowed ) { ?> data-allow-multiple="yes" <?php } ?>
-									<?php if( $required ) { ?>data-required="yes"<?php } ?>
 									<?php
-									if(!$multiple_allowed) { // backward compatibility for removed radio input ?>
+									if ( $max_img_selection ) {
+										?>
+										data-max-selection="<?php echo esc_attr( $max_img_selection ); ?>" <?php } ?>
+									<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
+									<?php
+									if ( $multiple_allowed ) {
+										?>
+										data-allow-multiple="yes" <?php } ?>
+									<?php
+									if ( $required ) {
+										?>
+										data-required="yes"<?php } ?>
+									<?php
+									if ( ! $multiple_allowed ) { // backward compatibility for removed radio input 
+										?>
 										data-type="image"
 										data-builder="<?php echo esc_attr( $builder ); ?>"
 										<?php
@@ -260,9 +272,9 @@ $custom_attr = array();
 										false,
 										array(
 											'data-image-tooltip' => wp_get_attachment_url( $image['image_id'] ),
-											'class'              => 'img-thumbnail ppom-zoom-' . esc_attr( $fm->data_name() ),
-											'title'              => esc_attr( $image_label ),
-											'data-ppom-tooltip'  => 'ppom_tooltip',
+											'class' => 'img-thumbnail ppom-zoom-' . esc_attr( $fm->data_name() ),
+											'title' => esc_attr( $image_label ),
+											'data-ppom-tooltip' => 'ppom_tooltip',
 										)
 									);
 									?>
@@ -279,8 +291,8 @@ $custom_attr = array();
 								} else {
 									?>
 									<img class="img-thumbnail ppom-zoom-<?php echo esc_attr( $fm->data_name() ); ?>"
-										 data-image-tooltip="<?php echo esc_url( $image['link'] ); ?>"
-										 src="<?php echo esc_url( $image['link'] ); ?>">
+										data-image-tooltip="<?php echo esc_url( $image['link'] ); ?>"
+										src="<?php echo esc_url( $image['link'] ); ?>">
 									<?php
 								}
 								?>
@@ -293,7 +305,7 @@ $custom_attr = array();
 						</span> <!-- pre_upload_image -->
 					</label>
 					<?php
-					$img_index ++;
+					++$img_index;
 				}
 			}
 			?>

@@ -23,17 +23,6 @@ test.describe("Group Fields Edit", () => {
 	 */
 	test("change fields order on saving", async ({ page, admin }) => {
 		await createSimpleGroupField(admin, page);
-		await page.waitForTimeout(500);
-		await admin.visitAdminPage("admin.php?page=ppom");
-
-		const firstRow = page
-			.locator("#ppom-groups-export-form tbody tr")
-			.first();
-		const ppomId = await firstRow.locator("td").nth(1).innerText();
-
-		await admin.visitAdminPage(
-			`admin.php?page=ppom&productmeta_id=${ppomId}&do_meta=edit`,
-		);
 
 		const fieldIds = await page.$$eval("td.ppom_meta_field_id", (tds) =>
 			tds.map((td) => td.innerText),
@@ -66,6 +55,10 @@ test.describe("Group Fields Edit", () => {
         await admin.visitAdminPage("admin.php?page=ppom");
 
 		await page.getByRole("link", { name: "Add New Group" }).click();
+		await page
+			.locator("#ppom-template-wizard-modal .ppom-template-card--scratch")
+			.click();
+		await page.waitForURL(/action=new/);
 		await page
 			.getByRole("textbox")
 			.fill("Change Select Option order");

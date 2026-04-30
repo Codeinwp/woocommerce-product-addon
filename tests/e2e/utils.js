@@ -1,3 +1,5 @@
+import { expect } from "@wordpress/e2e-test-utils-playwright";
+
 /**
  * Pick the field type in the inputs modal.
  *
@@ -28,12 +30,16 @@ export async function openFieldEditModal(page, modelId) {
  * @param {object} admin The admin object to interact with the admin panel.
  * @param {import("@playwright/test").Page} page The page object to interact with the web page.
  * @param {number} [fieldsNumber=2] The number of fields to create in the group.
- * @returns {Promise<string>} The base name of the created fields.
+ * @returns {Promise<{ baseName: string, ppomId: number }>} The created group info.
  */
 export async function createSimpleGroupField(admin, page, fieldsNumber = 2) {
 	await admin.visitAdminPage("admin.php?page=ppom");
 
 	await page.getByRole("link", { name: "Add New Group" }).click();
+	await page
+		.locator("#ppom-template-wizard-modal .ppom-template-card--scratch")
+		.click();
+	await page.waitForURL(/action=new/);
 	await page.getByRole("textbox").fill("Test Group Field");
 
 	const randomNumber = Math.floor(Math.random() * 1000);
@@ -50,8 +56,25 @@ export async function createSimpleGroupField(admin, page, fieldsNumber = 2) {
 		await saveFieldInModal(page, i);
 	}
 
-	await saveFields(page);
-	return `test ${randomNumber}`;
+	await Promise.all([
+		page.waitForURL(/wp-admin\/admin\.php\?page=ppom&productmeta_id=\d+&do_meta=edit/),
+		saveFields(page),
+	]);
+	await expect(
+		page.getByRole("button", { name: "Save Fields" }),
+	).toBeVisible();
+
+	const url = new URL(page.url());
+	const ppomId = Number(url.searchParams.get("productmeta_id"));
+
+	if (!Number.isInteger(ppomId) || ppomId <= 0) {
+		throw new Error(`Failed to resolve PPOM id from URL: ${page.url()}`);
+	}
+
+	return {
+		baseName: `test ${randomNumber}`,
+		ppomId,
+	};
 }
 
 /**

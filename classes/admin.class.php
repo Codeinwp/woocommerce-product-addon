@@ -1,6 +1,9 @@
 <?php
-/*
- * working behind the seen
+/**
+ * Coordinates PPOM admin pages, attach flows, and settings bridges.
+ *
+ * @package PPOM
+ * @subpackage Admin
  */
 
 /*
@@ -10,6 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Not Allowed' );
 }
 
+/**
+ * Coordinates the PPOM admin UI, settings flows, and field-group attachment workflows.
+ *
+ * Registers the PPOM menu pages, AJAX attach handlers, legacy WooCommerce
+ * settings tab, and admin initialization hooks that prepare the PPOM schema.
+ */
 class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 
@@ -22,7 +31,12 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 */
 	public $plugin_meta = array();
 
-	function __construct() {
+	/**
+	 * Registers PPOM admin menus, AJAX handlers, and settings hooks.
+	 *
+	 * @return void
+	 */
+	public function __construct() {
 
 		// setting plugin meta saved in config.php
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -80,6 +94,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		add_action( 'admin_init', array( $this, 'ppom_create_db_tables' ) );
 	}
 
+	// Admin page registration.
+
 	/**
 	 * Menu page options.
 	 */
@@ -105,6 +121,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @return array
 	 */
 	public function upgrade_to_pro_plugin_action( $actions, $plugin_file ) {
+		if ( apply_filters( 'themeisle_sdk_is_black_friday_sale', false ) ) {
+			return $actions;
+		}
+
 		if ( apply_filters( 'product_ppom_license_status', '' ) === 'valid' || apply_filters( 'product_ppom_license_status', '' ) === 'active_expired' ) {
 			return $actions;
 		}
@@ -112,23 +132,24 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		return array_merge(
 			array(
 				'upgrade_link' => '<a href="' . add_query_arg(
-						array(
-							'utm_source'   => 'wpadmin',
-							'utm_medium'   => 'plugins',
-							'utm_campaign' => 'rowaction',
-						),
-						tsdk_translate_link( PPOM_UPGRADE_URL )
-					) . '" title="' . __( 'More Features', 'woocommerce-product-addon' ) . '"  target="_blank" rel="noopener noreferrer" style="color: #009E29; font-weight: 700;" onmouseover="this.style.color=\'#008a20\';" onmouseout="this.style.color=\'#009528\';" >' . __( 'Get Pro', 'woocommerce-product-addon' ) . '</a>',
+					array(
+						'utm_source'   => 'wpadmin',
+						'utm_medium'   => 'plugins',
+						'utm_campaign' => 'rowaction',
+					),
+					tsdk_translate_link( PPOM_UPGRADE_URL )
+				) . '" title="' . __( 'More Features', 'woocommerce-product-addon' ) . '"  target="_blank" rel="noopener noreferrer" style="color: #009E29; font-weight: 700;" onmouseover="this.style.color=\'#008a20\';" onmouseout="this.style.color=\'#009528\';" >' . __( 'Get Pro', 'woocommerce-product-addon' ) . '</a>',
 			),
 			$actions
 		);
-
 	}
 
-	/*
-	 * creating menu page for this plugin
-	*/
-	function add_menu_pages() {
+	/**
+	 * Registers the PPOM admin menu entries and page-load callbacks.
+	 *
+	 * @return string|void
+	 */
+	public function add_menu_pages() {
 
 		if ( ! $this->menu_pages ) {
 			return '';
@@ -186,33 +207,43 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		}
 	}
 
+	// Field-group pages and attach UI.
 
-	/*
-	 * CALLBACKS
-	*/
-	function product_meta() {
-		//hide this on PPOM page since is conflicting with floating widget.
+	/**
+	 * Renders the main PPOM field-group management screen.
+	 *
+	 * Routes between the field-group list, field editor, clone flow, addons
+	 * listing, and changelog views based on the current admin request.
+	 *
+	 * @return void
+	 *
+	 * @see PPOM_Fields_Meta::render_field_settings()
+	 * @see ppom_admin_save_form_meta()
+	 * @see ppom_admin_update_form_meta()
+	 */
+	public function product_meta() {
+		// hide this on PPOM page since is conflicting with floating widget.
 		add_filter( 'update_footer', '__return_empty_string' );
 		echo '<div id="ppom-pre-loading"></div>';
 
 		echo '<div class="ppom-admin-wrap woocommerce ppom-wrapper" style="display:none">';
 
-		$action  = ( isset( $_REQUEST ['action'] ) ? sanitize_text_field( $_REQUEST ['action'] ) : '' );
-		$do_meta = ( isset( $_REQUEST ['do_meta'] ) ? sanitize_text_field( $_REQUEST ['do_meta'] ) : '' );
-		$view    = ( isset( $_REQUEST ['view'] ) ? sanitize_text_field( $_REQUEST ['view'] ) : '' );
-		$ppom_settings_url = admin_url( "admin.php?page=wc-settings&tab=ppom_settings" );
-		$addons           = add_query_arg( array( 'view' => 'addons' ) );
-		$changelog_url           = add_query_arg( array( 'view' => 'changelog' ) );
+		$action            = ( isset( $_REQUEST ['action'] ) ? sanitize_text_field( $_REQUEST ['action'] ) : '' );
+		$do_meta           = ( isset( $_REQUEST ['do_meta'] ) ? sanitize_text_field( $_REQUEST ['do_meta'] ) : '' );
+		$view              = ( isset( $_REQUEST ['view'] ) ? sanitize_text_field( $_REQUEST ['view'] ) : '' );
+		$ppom_settings_url = admin_url( 'admin.php?page=wc-settings&tab=ppom_settings' );
+		$addons            = add_query_arg( array( 'view' => 'addons' ) );
+		$changelog_url     = add_query_arg( array( 'view' => 'changelog' ) );
 
 		if ( $action != 'new' && $do_meta != 'edit' && $do_meta != 'clone' && $view != 'addons' && $view != 'changelog' ) {
 			?>
 			<div class="ppom-manage-fields-topbar d-flex">
-				<h1 class="ppom-heading-style"><?php esc_html_e('PPOM Field Groups', 'woocommerce-product-addon'); ?></h1>
+				<h1 class="ppom-heading-style"><?php esc_html_e( 'PPOM Field Groups', 'woocommerce-product-addon' ); ?></h1>
 				<div class="ppom-top-nav">
-					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($addons); ?>">+ <?php esc_html_e( 'All Addons', 'woocommerce-product-addon' ); ?></a>
-					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url($changelog_url); ?>"><?php esc_html_e( 'Changelog', 'woocommerce-product-addon' ); ?></a>
-                    <a  class="mr-3" href="<?php echo esc_url( admin_url( '/admin.php?page=ti-about-woocommerce_product_addon' ) ); ?>"><?php esc_html_e('About Us', 'woocommerce-product-addon'); ?></a>
-					<a href="<?php echo esc_url($ppom_settings_url); ?>"><?php esc_html_e('General Settings', 'woocommerce-product-addon'); ?></a>
+					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url( $addons ); ?>">+ <?php esc_html_e( 'All Addons', 'woocommerce-product-addon' ); ?></a>
+					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url( $changelog_url ); ?>"><?php esc_html_e( 'Changelog', 'woocommerce-product-addon' ); ?></a>
+					<a  class="mr-3" href="<?php echo esc_url( admin_url( '/admin.php?page=ti-about-woocommerce_product_addon' ) ); ?>"><?php esc_html_e( 'About Us', 'woocommerce-product-addon' ); ?></a>
+					<a href="<?php echo esc_url( $ppom_settings_url ); ?>"><?php esc_html_e( 'General Settings', 'woocommerce-product-addon' ); ?></a>
 					<?php if ( ppom_pro_is_installed() && class_exists( 'PPOM_Pro\Addons\Texter\Texter' ) ) : ?>
 						<a class="ml-3" href="<?php echo esc_url( add_query_arg( 'post_type', 'nm_ppom_texter', admin_url( 'edit.php' ) ) ); ?>"><?php esc_html_e( 'Manage Personalization Previews', 'woocommerce-product-addon' ); ?></a>
 					<?php endif; ?>
@@ -245,6 +276,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		// existing meta group tables show only ppom main page
 		if ( $action != 'new' && $do_meta != 'edit' && $view != 'addons' && $view != 'changelog' ) {
 			ppom_load_template( 'admin/existing-meta.php' );
+			ppom_load_template( 'admin/template-wizard.php' );
 
 			// NOTE: Allow only for Tier 1 Plan or lower if license is present.
 			$should_load_banner = NM_PersonalizedProduct::LICENSE_PLAN_1 >= NM_PersonalizedProduct::get_license_category( intval( apply_filters( 'product_ppom_license_plan', 0 ) ) );
@@ -252,16 +284,20 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			if ( $should_load_banner ) {
 				do_action( 'themeisle_sdk_load_banner', 'ppom' );
 			}
-
 		}
 
 		echo '</div>';
 	}
 
-	/*
-	 * Get Products
-	*/
-	function get_products() {
+	/**
+	 * Renders the attach-to-products popup content for a field group.
+	 *
+	 * Loads the product, category, and tag selectors used to attach or detach a
+	 * PPOM field group from WooCommerce catalog objects.
+	 *
+	 * @return void
+	 */
+	public function get_products() {
 
 		if ( ! ppom_security_role() ) {
 			_e( 'Sorry, you are not allowed to perform this action', 'woocommerce-product-addon' );
@@ -273,10 +309,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			die( 0 );
 		}
 
-		$ppom_id                      = intval( $_GET['ppom_id'] );
-		$license_status               = apply_filters( 'product_ppom_license_status', '' );
-		$current_saved_value          = $this->get_db_field( $ppom_id );
-		$pro_multiple_fields          = ! ppom_pro_is_installed() || 'valid' !== $license_status
+		$ppom_id             = intval( $_GET['ppom_id'] );
+		$license_status      = apply_filters( 'product_ppom_license_status', '' );
+		$current_saved_value = $this->get_db_field( $ppom_id );
+		$pro_multiple_fields = ! ppom_pro_is_installed() || 'valid' !== $license_status
 			? '</br><i style="font-size: 90%">' . sprintf(
 				// translators: %1$s: the link to the store with label 'upgrade'.
 				__( 'Your current plan supports adding one group of fields per product. To add multiple groups to the same product, please %1$s your plan!', 'woocommerce-product-addon' ),
@@ -297,7 +333,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 						'label'    => __( 'Choose Products:', 'woocommerce-product-addon' ),
 						'name'     => 'ppom-attach-to-products[]',
 						'multiple' => true,
-						'is_used'  => true
+						'is_used'  => true,
 					),
 					$this->get_wc_products( $ppom_id )
 				)
@@ -312,7 +348,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 					array(
 						'label'    => __( 'Choose Categories:', 'woocommerce-product-addon' ),
 						'name'     => 'ppom-attach-to-categories[]',
-						'multiple' => true
+						'multiple' => true,
 					),
 					$this->get_wc_categories( $current_saved_value )
 				)
@@ -321,7 +357,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		$popup_components = array(
 			new \PPOM\Attach\ContainerItem( $select_products_id_component->get_id(), $select_products_id_component ),
-			new \PPOM\Attach\ContainerItem( $attach_to_categories_component->get_id(), $attach_to_categories_component )
+			new \PPOM\Attach\ContainerItem( $attach_to_categories_component->get_id(), $attach_to_categories_component ),
 		);
 
 		$tags = $this->get_wc_tags( $current_saved_value );
@@ -341,30 +377,33 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 						$this->get_wc_tags( $current_saved_value )
 					)
 				);
-			if('valid' !== $license_status ){
+			if ( 'valid' !== $license_status ) {
 				$attach_to_tags_component = $attach_to_tags_component->set_status( 'invalid' );
 			}
-			$popup_components[]       =
+			$popup_components[] =
 				new \PPOM\Attach\ContainerItem( $attach_to_tags_component->get_id(), $attach_to_tags_component );
 		}
 
 
 		$popup_components = apply_filters( 'pppom_popup_components', $popup_components, $ppom_id );
 
-		add_filter( 'ppom_render_attach_popup', function ( $html_content ) use ( $popup_components ) {
-			if ( empty( $popup_components ) || ! is_array( $popup_components ) ) {
-				return $html_content;
-			}
-
-			foreach ( $popup_components as $component ) {
-				if ( ! $component instanceof \PPOM\Attach\ContainerItem ) {
-					continue;
+		add_filter(
+			'ppom_render_attach_popup',
+			function ( $html_content ) use ( $popup_components ) {
+				if ( empty( $popup_components ) || ! is_array( $popup_components ) ) {
+					return $html_content;
 				}
-				$html_content .= $component->get_renderer()->render();
-			}
 
-			return $html_content;
-		} );
+				foreach ( $popup_components as $component ) {
+					if ( ! $component instanceof \PPOM\Attach\ContainerItem ) {
+						continue;
+					}
+					$html_content .= $component->get_renderer()->render();
+				}
+
+				return $html_content;
+			} 
+		);
 
 		ob_start();
 		$vars = array(
@@ -380,23 +419,27 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 	/**
-	 * Retrieves WooCommerce products and checks if they are associated with a given PPOM ID.
+	 * Returns product selector options for the attach popup.
 	 *
-	 * @param int $ppom_id The PPOM ID to check against the products.
-	 * @return array An array containing the product options and a flag indicating if any product is used.
+	 * Marks which products already reference the current PPOM ID through
+	 * {@see PPOM_PRODUCT_META_KEY}.
+	 *
+	 * @param int $ppom_id PPOM field-group ID being attached.
+	 *
+	 * @return array
 	 */
-	function get_wc_products( $ppom_id ) {
+	public function get_wc_products( $ppom_id ) {
 		$result = array(
 			'options' => array(),
-			'is_used' => true
+			'is_used' => true,
 		);
 
 		if ( 'valid' === apply_filters( 'product_ppom_license_status', '' ) ) {
-			$result['options'][]= array(
+			$result['options'][] = array(
 				'value'    => '-1',
 				'selected' => false,
-				'label'    => __( 'Select a product', 'woocommerce-product-addon'),
-				'disabled' => true
+				'label'    => __( 'Select a product', 'woocommerce-product-addon' ),
+				'disabled' => true,
 			);
 		}
 
@@ -404,7 +447,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			array(
 				'post_type'      => 'product',
 				'posts_per_page' => -1, // Get all products
-				'post_status'    => 'publish'
+				'post_status'    => 'publish',
 			)
 		);
 
@@ -421,7 +464,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 			if ( is_array( $attached_meta ) ) {
 				$is_used = in_array( $ppom_id, $attached_meta );
-			} else if ( is_numeric( $attached_meta ) ) {
+			} elseif ( is_numeric( $attached_meta ) ) {
 				$is_used = $product_id === $attached_meta; // Note: Legacy format.
 			}
 
@@ -429,10 +472,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				$result['is_used'] = true;
 			}
 
-			$result['options'][]= array(
+			$result['options'][] = array(
 				'value'    => $product_id,
 				'selected' => $is_used,
-				'label'    => get_the_title()
+				'label'    => get_the_title(),
 			);
 		}
 
@@ -449,7 +492,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	public function get_wc_categories( $current_values ) {
 		$result = array(
 			'options' => array(),
-			'is_used' => false
+			'is_used' => false,
 		);
 
 		$product_categories = get_terms(
@@ -468,21 +511,21 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		$used_categories = array();
 		if ( ! empty( $current_values['productmeta_categories'] ) ) {
-			$used_categories = preg_split('/\r\n|\n/', $current_values['productmeta_categories'] );
+			$used_categories = preg_split( '/\r\n|\n/', $current_values['productmeta_categories'] );
 		}
 
 		foreach ( $product_categories as $category ) {
 			$category_slug = $category->slug;
-			$is_used = in_array( $category_slug, $used_categories );
+			$is_used       = in_array( $category_slug, $used_categories );
 
-			if( $is_used ) {
+			if ( $is_used ) {
 				$result['is_used'] = true;
 			}
 
-			$result['options'][]= array(
+			$result['options'][] = array(
 				'value'    => $category_slug,
 				'selected' => $is_used,
-				'label'    => $category->name
+				'label'    => $category->name,
 			);
 		}
 
@@ -496,10 +539,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 *
 	 * @return array An array containing the options of product tags and a flag indicating if any category is used.
 	 */
-	function get_wc_tags( $current_values ) {
+	public function get_wc_tags( $current_values ) {
 		$result = array(
 			'options' => array(),
-			'is_used' => false
+			'is_used' => false,
 		);
 
 		$product_tags = get_terms(
@@ -527,16 +570,16 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		foreach ( $product_tags as $tag ) {
 			$tag_slug = $tag->slug;
-			$is_used = in_array( $tag_slug, $used_tags );
+			$is_used  = in_array( $tag_slug, $used_tags );
 
 			if ( $is_used ) {
 				$result['is_used'] = true;
 			}
 
-			$result['options'][]= array(
+			$result['options'][] = array(
 				'value'    => $tag_slug,
 				'selected' => $is_used,
-				'label'    => $tag->name
+				'label'    => $tag->name,
 			);
 		}
 
@@ -552,31 +595,30 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @param int $ppom_field_id The ID of the PPOM field to retrieve data for.
 	 * @return array
 	 */
-	function get_db_field( $ppom_field_id ) {
-		global $wpdb;
-		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT productmeta_categories, productmeta_tags FROM $ppom_table WHERE productmeta_id = %d",
-				$ppom_field_id
-			),
-			ARRAY_A
-		);
+	public function get_db_field( $ppom_field_id ) {
+		$rows = ppom_meta_repository()->get_categories_and_tags_columns( (int) $ppom_field_id );
 
-		return 0 < count( $rows ) && ! empty( $rows[0] ) ? $rows[0] : array();
+		return ! empty( $rows ) ? $rows : array();
 	}
 
 	/**
-	 * Ajax handler for "Attach to Product" feature.
-	 * Attaches products to the PPOM Field Group.
-	 * Removes prodducts from the PPOM Field Group.
+	 * AJAX handler for attaching products, categories, and tags to a PPOM field group.
+	 *
+	 * Reconciles the submitted attach selections against the stored
+	 * {@see PPOM_PRODUCT_META_KEY} product assignments and then stores the
+	 * category and tag rules on the PPOM custom-table row.
+	 *
+	 * Product edit screen: the same meta key is saved from the product metabox via
+	 * ppom_admin_process_product_meta(); this handler does not call that function.
 	 *
 	 * @return void
+	 *
+	 * @see ppom_admin_process_product_meta()
 	 */
-	function ppom_attach_ppoms() {
+	public function ppom_attach_ppoms() {
 		if ( ! isset( $_POST['ppom_attached_nonce'] )
-			 || ! wp_verify_nonce( $_POST['ppom_attached_nonce'], 'ppom_attached_nonce_action' )
-			 || ! ppom_security_role()
+			|| ! wp_verify_nonce( $_POST['ppom_attached_nonce'], 'ppom_attached_nonce_action' )
+			|| ! ppom_security_role()
 		) {
 			$response = array(
 				'status'  => 'error',
@@ -586,13 +628,13 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			wp_send_json( $response );
 		}
 
-		$ppom_id          = intval( $_POST['ppom_id'] );
-		$is_pro_user      = 'valid' === apply_filters( 'product_ppom_license_status', '' );
+		$ppom_id     = intval( $_POST['ppom_id'] );
+		$is_pro_user = 'valid' === apply_filters( 'product_ppom_license_status', '' );
 
 		// +----- Attach Field to Product -----+
 		$products_to_attach         = isset( $_POST['ppom-attach-to-products'] ) && is_array( $_POST['ppom-attach-to-products'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-products'] ) : array();
 		$products_to_attach_initial = isset( $_POST['ppom-attach-to-products-initial'] ) && is_string( $_POST['ppom-attach-to-products-initial'] ) ? sanitize_text_field( $_POST['ppom-attach-to-products-initial'] ) : '';
-		$products_to_attach_initial = array_filter( explode( ',' , $products_to_attach_initial ) );
+		$products_to_attach_initial = array_filter( explode( ',', $products_to_attach_initial ) );
 
 		$products_to_add = array_diff( $products_to_attach, $products_to_attach_initial );
 		foreach ( $products_to_add as $product_to_add ) {
@@ -602,9 +644,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				$current_attached_fields = get_post_meta( $product_to_add, PPOM_PRODUCT_META_KEY, true );
 
 				if ( is_array( $current_attached_fields ) ) {
-					$current_attached_fields[]= $ppom_id;
-					$current_attached_fields  = array_unique( $current_attached_fields );
-				} else if ( is_numeric( $current_attached_fields ) ) {
+					$current_attached_fields[] = $ppom_id;
+					$current_attached_fields   = array_unique( $current_attached_fields );
+				} elseif ( is_numeric( $current_attached_fields ) ) {
 					// NOTE: Backward compatibility.
 					$current_attached_fields = array( $current_attached_fields, $ppom_id );
 				} else {
@@ -612,9 +654,9 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				}
 
 				$current_attached_fields = array_filter( $current_attached_fields, 'is_numeric' );
-				update_post_meta( $product_to_add , PPOM_PRODUCT_META_KEY, $current_attached_fields );
+				update_post_meta( $product_to_add, PPOM_PRODUCT_META_KEY, $current_attached_fields );
 			} else {
-				update_post_meta( $product_to_add , PPOM_PRODUCT_META_KEY, array( $ppom_id ) );
+				update_post_meta( $product_to_add, PPOM_PRODUCT_META_KEY, array( $ppom_id ) );
 			}
 		}
 
@@ -623,12 +665,12 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			$should_delete           = true;
 			$current_attached_fields = get_post_meta( $product_to_remove, PPOM_PRODUCT_META_KEY, true );
 			if ( is_array( $current_attached_fields ) ) {
-				$key = array_search($ppom_id, $current_attached_fields);
+				$key = array_search( $ppom_id, $current_attached_fields );
 				if ( false !== $key ) {
-					unset( $current_attached_fields[$key] );
+					unset( $current_attached_fields[ $key ] );
 					if ( ! empty( $current_attached_fields ) ) {
 						$should_delete = false;
-						update_post_meta( $product_to_remove , PPOM_PRODUCT_META_KEY, $current_attached_fields );
+						update_post_meta( $product_to_remove, PPOM_PRODUCT_META_KEY, $current_attached_fields );
 					}
 				}
 			}
@@ -645,15 +687,16 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$updated_cat          = count( $categories_to_attach );
 
 		// +----- Attach Field to Tags -----+
-		$tags_to_attach = isset( $_POST['ppom-attach-to-tags'] ) && is_array( $_POST['ppom-attach-to-tags'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-tags'] ) : false;
-		$updated_tags   = is_array( $tags_to_attach) ? count( $tags_to_attach ) : 0;
+		// Match categories: unchecked tag checkboxes are omitted from POST, so default to [] (clear stored tags), not false (skip update). See ppom-pro#625.
+		$tags_to_attach = isset( $_POST['ppom-attach-to-tags'] ) && is_array( $_POST['ppom-attach-to-tags'] ) ? array_map( 'sanitize_key', $_POST['ppom-attach-to-tags'] ) : array();
+		$updated_tags   = count( $tags_to_attach );
 
 		self::save_categories_and_tags( $ppom_id, $categories_to_attach, $tags_to_attach );
 
 		$response = array(
 			'message' => sprintf(
 				// translators: %1$d: number of products, %2$d: number of categories, %3$d: number of tags.
-				__('PPOM updated for %1$d Products, %2$d Categories and %3$d Tags.', 'woocommerce-product-addon'),
+				__( 'PPOM updated for %1$d Products, %2$d Categories and %3$d Tags.', 'woocommerce-product-addon' ),
 				$updated_products,
 				$updated_cat,
 				$updated_tags
@@ -665,40 +708,26 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 	/**
-	 * Save the categories and tags to the given PPOM field.
+	 * Stores category and tag attachment rules on a PPOM field-group row.
 	 *
-	 * @param int        $ppom_id    The ID of the PPOM field.
-	 * @param array      $categories An array of categories to save.
-	 * @param array|bool $tags       An array of tags to save.
+	 * @param int         $ppom_id    PPOM field-group ID.
+	 * @param array       $categories Category slugs attached to the field group.
+	 * @param array|false $tags      Serialized tag slugs, an empty array to clear tags, or false to leave tags unchanged.
 	 *
-	 * @global wpdb $wpdb       WordPress database abstraction object.
-	 *
+	 * @return void
 	 */
 	public static function save_categories_and_tags( $ppom_id, $categories, $tags ) {
-		global $wpdb;
-		$ppom_table = $wpdb->prefix . PPOM_TABLE_META;
-
-		$data_to_update = array(
-			'productmeta_categories' => implode( "\r\n", $categories ), // NOTE: Keep the backward compatible format.
-		);
-
-		if ( is_array( $tags ) ) {
-			$data_to_update['productmeta_tags'] = serialize( $tags );
-		}
-
-		$wpdb->update(
-			$ppom_table,
-			$data_to_update,
-			array( 'productmeta_id' => $ppom_id ), // Where clause
-			array( '%s' ), // Data format
-			array( '%d' )  // Where format
-		);
+		ppom_meta_repository()->save_categories_and_tags( (int) $ppom_id, $categories, $tags );
 	}
 
-	/*
-	 * Plugin Validation
-	*/
-	function validate_plugin() {
+	// Legacy settings bridge and setup.
+
+	/**
+	 * Renders the legacy PPOM plugin-validation screen.
+	 *
+	 * @return void
+	 */
+	public function validate_plugin() {
 
 		echo '<div class="wrap">';
 		echo '<h2>' . __( 'Provide API key below:', 'woocommerce-product-addon' ) . '</h2>';
@@ -715,28 +744,50 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	public static function add_settings_tab( $settings_tabs ) {
 
 		if ( current_user_can( 'manage_options' ) ) {
-			$settings_tabs['ppom_settings'] = __('PPOM Settings', 'woocommerce-product-addon');
+			$settings_tabs['ppom_settings'] = __( 'PPOM Settings', 'woocommerce-product-addon' );
 		}
 
 		return $settings_tabs;
 	}
 
-	function settings_tab() {
+	/**
+	 * Renders the legacy WooCommerce settings tab for PPOM.
+	 *
+	 * @return void
+	 *
+	 * @see ppom_array_settings()
+	 */
+	public function settings_tab() {
 
 		if ( current_user_can( 'manage_options' ) ) {
 			woocommerce_admin_fields( ppom_array_settings() );
 		}
-
 	}
 
-	function save_settings() {
+	/**
+	 * Saves the legacy WooCommerce settings tab for PPOM.
+	 *
+	 * @return void
+	 *
+	 * @see ppom_array_settings()
+	 */
+	public function save_settings() {
 
 		if ( current_user_can( 'manage_options' ) ) {
 			woocommerce_update_options( ppom_array_settings() );
 		}
 	}
 
-	function ppom_setting_wpml( $value, $option, $raw_value ) {
+	/**
+	 * Translates text settings through WPML during WooCommerce option saves.
+	 *
+	 * @param mixed $value Sanitized setting value.
+	 * @param array $option WooCommerce setting definition.
+	 * @param mixed $raw_value Raw submitted setting value.
+	 *
+	 * @return mixed
+	 */
+	public function ppom_setting_wpml( $value, $option, $raw_value ) {
 
 		if ( isset( $option['type'] ) && isset( $option['type'] ) == 'text' ) {
 			$value = ppom_wpml_translate( $value, 'PPOM' );
@@ -745,75 +796,87 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		return $value;
 	}
 
-	function ppom_tabs_custom_style() {
+	/**
+	 * Prints admin CSS overrides used by the PPOM metabox and list screens.
+	 *
+	 * @return void
+	 */
+	public function ppom_tabs_custom_style() {
 		?>
-        <style>
-            #woocommerce-product-data .ppom_extra_options_panel label {
-                margin: 0 !important;
-            }
+		<style>
+			#woocommerce-product-data .ppom_extra_options_panel label {
+				margin: 0 !important;
+			}
 
-            /* PPOM Meta in column */
-            th.column-ppom_meta {
-                width: 10% !important;
-            }
+			/* PPOM Meta in column */
+			th.column-ppom_meta {
+				width: 10% !important;
+			}
 
-            /* PPOM File Upload uploaded files display */
-            td.ppom-files-display {
-                display: flex;
-                flex-direction: column;
-                gap: 3px;
-            }
+			/* PPOM File Upload uploaded files display */
+			td.ppom-files-display {
+				display: flex;
+				flex-direction: column;
+				gap: 3px;
+			}
 
-            td.ppom-files-display a.button {
-                text-align: center;
-            }
+			td.ppom-files-display a.button {
+				text-align: center;
+			}
 
-            .ppom-settings-container {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-                margin: 10px 15px;
-            }
+			.ppom-settings-container {
+				display: flex;
+				flex-direction: column;
+				gap: 15px;
+				margin: 10px 15px;
+			}
 
-            .ppom-settings-container-item {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
+			.ppom-settings-container-item {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
 
-            label.ppom-settings-container-item {
-                width: 100%;
-                max-width: 600px;
-                margin: unset;
-            }
+			label.ppom-settings-container-item {
+				width: 100%;
+				max-width: 600px;
+				margin: unset;
+			}
 
-            .ppom-settings-container .ppom-upsell-link {
-                display: inline-flex;
-                align-items: center;
-                padding: 0.5rem 1rem;
-                font-size: 0.875rem;
-                font-weight: 500;
-                color: #2563eb;
-                background-color: #eff6ff;
-                border: 1px solid #bfdbfe;
-                border-radius: 0.375rem;
-                text-decoration: none;
-                transition: all 150ms ease-in-out;
-            }
+			.ppom-settings-container .ppom-upsell-link {
+				display: inline-flex;
+				align-items: center;
+				padding: 0.5rem 1rem;
+				font-size: 0.875rem;
+				font-weight: 500;
+				color: #2563eb;
+				background-color: #eff6ff;
+				border: 1px solid #bfdbfe;
+				border-radius: 0.375rem;
+				text-decoration: none;
+				transition: all 150ms ease-in-out;
+			}
 
-            .ppom-settings-container .ppom-upsell-link:hover {
-                background-color: #dbeafe;
-                color: #1d4ed8;
-            }
+			.ppom-settings-container .ppom-upsell-link:hover {
+				background-color: #dbeafe;
+				color: #1d4ed8;
+			}
 
-            .ppom-settings-container .ppom-disabled-text {
-                color: #8d8d8d;
-            }
-        </style>
+			.ppom-settings-container .ppom-disabled-text {
+				color: #8d8d8d;
+			}
+		</style>
 		<?php
 	}
 
-	function ppom_multi_select_role_setting( $value ) {
+	/**
+	 * Renders the multi-select field used for PPOM role permissions.
+	 *
+	 * @param array $value WooCommerce setting definition.
+	 *
+	 * @return void
+	 */
+	public function ppom_multi_select_role_setting( $value ) {
 		$selections = get_option( $value['id'] ) ? get_option( $value['id'] ) : 'administrator';
 
 
@@ -827,16 +890,16 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 
 		?>
-        <tr valign="top">
-            <th scope="row" class="titledesc">
-                <label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?> <span
-                            class="woocommerce-help-tip" data-tip="<?php echo $value['desc']; ?>"></span></label>
-            </th>
-            <td class="forminp">
-                <select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="width:350px"
-                        data-placeholder="<?php esc_attr_e( 'Choose Roles', 'woocommerce-product-addon' ); ?>"
-                        aria-label="<?php esc_attr_e( 'Roles', 'woocommerce-product-addon' ); ?>"
-                        class="wc-enhanced-select">
+		<tr valign="top">
+			<th scope="row" class="titledesc">
+				<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?> <span
+							class="woocommerce-help-tip" data-tip="<?php echo $value['desc']; ?>"></span></label>
+			</th>
+			<td class="forminp">
+				<select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="width:350px"
+						data-placeholder="<?php esc_attr_e( 'Choose Roles', 'woocommerce-product-addon' ); ?>"
+						aria-label="<?php esc_attr_e( 'Roles', 'woocommerce-product-addon' ); ?>"
+						class="wc-enhanced-select">
 					<?php
 					if ( ! empty( $selected_roles ) ) {
 						foreach ( $selected_roles as $key => $val ) {
@@ -844,14 +907,13 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 						}
 					}
 					?>
-                </select> <br/><a class="select_all button"
-                                  href="#"><?php esc_html_e( 'Select all', 'woocommerce-product-addon' ); ?></a> <a
-                        class="select_none button"
-                        href="#"><?php esc_html_e( 'Select none', 'woocommerce-product-addon' ); ?></a>
-            </td>
-        </tr>
+				</select> <br/><a class="select_all button"
+									href="#"><?php esc_html_e( 'Select all', 'woocommerce-product-addon' ); ?></a> <a
+						class="select_none button"
+						href="#"><?php esc_html_e( 'Select none', 'woocommerce-product-addon' ); ?></a>
+			</td>
+		</tr>
 		<?php
-
 	}
 
 	/**
@@ -872,10 +934,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			return;
 		}
 
-		global $wpdb;
-		$ppom_meta_table = $wpdb->prefix . PPOM_TABLE_META;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$res = $wpdb->get_results( "SELECT * FROM `$ppom_meta_table` WHERE `productmeta_js` != '' OR `productmeta_style` != ''" );
+		$res = ppom_meta_repository()->get_rows_with_non_empty_style_or_js();
 		update_option( 'ppom_legacy_user', ! empty( $res ) ? 'yes' : 'no' );
 	}
 
