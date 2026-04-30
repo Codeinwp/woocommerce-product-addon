@@ -395,8 +395,11 @@ final class Manager {
 			$redirect_to = (string) add_query_arg( $ppom_args, admin_url( 'admin.php' ) );
 		}
 
-		if ( ! empty( $product_id ) && $ppom_id ) {
-			$redirect_to = (string) get_permalink( $product_id );
+		if ( $ppom_id && self::is_attachable_product( $product_id ) ) {
+			$product_link = (string) get_permalink( $product_id );
+			if ( '' !== $product_link ) {
+				$redirect_to = $product_link;
+			}
 		}
 
 		$resp = array();
@@ -486,11 +489,37 @@ final class Manager {
 
 		self::update_ppom_meta_only( $ppom_id, $product_meta );
 
-		if ( ! empty( $product_id ) ) {
+		if ( self::is_attachable_product( $product_id ) ) {
 			Helpers::attach_fields_to_product( $ppom_id, $product_id );
 		}
 
 		return (int) $ppom_id;
+	}
+
+	/**
+	 * Returns true when the supplied ID resolves to an existing WooCommerce
+	 * product the current user is allowed to edit.
+	 *
+	 * Guards the product-attach + product-permalink redirect paths against
+	 * arbitrary or non-existent post IDs, which would otherwise create orphan
+	 * postmeta rows and produce empty redirect URLs from `get_permalink()`.
+	 *
+	 * @param mixed $product_id Candidate product ID from the request.
+	 * @return bool
+	 */
+	private static function is_attachable_product( $product_id ) {
+
+		$product_id = (int) $product_id;
+		if ( $product_id <= 0 ) {
+			return false;
+		}
+
+		$post = get_post( $product_id );
+		if ( ! $post || 'product' !== $post->post_type ) {
+			return false;
+		}
+
+		return current_user_can( 'edit_post', $product_id );
 	}
 
 	/**
@@ -591,8 +620,11 @@ final class Manager {
 			admin_url( 'admin.php' )
 		);
 
-		if ( ! empty( $product_id ) ) {
-			$redirect_to = (string) get_permalink( $product_id );
+		if ( self::is_attachable_product( $product_id ) ) {
+			$product_link = (string) get_permalink( $product_id );
+			if ( '' !== $product_link ) {
+				$redirect_to = $product_link;
+			}
 		}
 
 		wp_send_json(
