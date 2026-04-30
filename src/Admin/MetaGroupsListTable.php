@@ -380,18 +380,30 @@ final class MetaGroupsListTable extends WP_List_Table {
 	/**
 	 * Empty-state message.
 	 *
+	 * Renders a designed empty-state card when no groups exist. Falls back to
+	 * a plain message when the table is empty due to a search query, so the
+	 * onboarding CTA only shows on a genuinely empty list.
+	 *
 	 * @return void
 	 */
 	public function no_items() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only search query param; no state change.
+		if ( ! empty( $_REQUEST['s'] ) ) {
+			esc_html_e( 'No field groups match your search.', 'woocommerce-product-addon' );
+			return;
+		}
 		$add_url = add_query_arg( array( 'action' => 'new' ), admin_url( 'admin.php?page=ppom' ) );
-		printf(
-			/* translators: %s: link to add a new field group. */
-			esc_html__( 'No PPOM field groups yet. %s', 'woocommerce-product-addon' ),
-			sprintf(
-				'<a href="%1$s">%2$s</a>',
-				esc_url( $add_url ),
-				esc_html__( 'Add the first one', 'woocommerce-product-addon' )
-			)
-		);
+		?>
+		<div class="ppom-empty-state">
+			<span class="dashicons dashicons-media-text ppom-empty-icon" aria-hidden="true"></span>
+			<h3 class="ppom-empty-title"><?php esc_html_e( 'No field groups yet', 'woocommerce-product-addon' ); ?></h3>
+			<p class="ppom-empty-desc">
+				<?php esc_html_e( 'Field groups let you attach custom input fields to your products — like text boxes, dropdowns, file uploads, and more.', 'woocommerce-product-addon' ); ?>
+			</p>
+			<a href="<?php echo esc_url( $add_url ); ?>" class="button button-primary button-hero ppom-empty-cta">
+				<?php esc_html_e( 'Create your first field group', 'woocommerce-product-addon' ); ?>
+			</a>
+		</div>
+		<?php
 	}
 }
