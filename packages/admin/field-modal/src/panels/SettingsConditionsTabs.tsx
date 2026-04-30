@@ -1,7 +1,7 @@
 /**
  * Top-level Settings / Conditions / optional Conditional Repeater tabs for legacy field editors.
  */
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { Box, Tabs } from '@chakra-ui/react';
 import type { I18nDict } from '../types/fieldModal';
 
@@ -42,6 +42,16 @@ export function SettingsConditionsTabs( {
 	const conditionsTabValue = 'conditions';
 	const repeaterTabValue = 'repeater';
 
+	const triggers = [
+		{ value: settingsTabValue, label: settingsLabel, show: true },
+		{
+			value: conditionsTabValue,
+			label: conditionsLabel,
+			show: hasConditions,
+		},
+		{ value: repeaterTabValue, label: repeaterLabel, show: showRepeater },
+	].filter( ( t ) => t.show );
+
 	return (
 		<Tabs.Root
 			variant="line"
@@ -49,35 +59,28 @@ export function SettingsConditionsTabs( {
 			lazyMount
 			defaultValue={ settingsTabValue }
 		>
-			<Tabs.List borderBottomColor="gray.200" mb={ 3 } gap={ 1 }>
-				<Tabs.Trigger
-					value={ settingsTabValue }
-					fontWeight="semibold"
-					px={ 1 }
-					py={ 1.5 }
-				>
-					{ settingsLabel }
-				</Tabs.Trigger>
-				{ hasConditions ? (
-					<Tabs.Trigger
-						value={ conditionsTabValue }
-						fontWeight="semibold"
-						px={ 1 }
-						py={ 1.5 }
-					>
-						{ conditionsLabel }
-					</Tabs.Trigger>
-				) : null }
-				{ showRepeater ? (
-					<Tabs.Trigger
-						value={ repeaterTabValue }
-						fontWeight="semibold"
-						px={ 1 }
-						py={ 1.5 }
-					>
-						{ repeaterLabel }
-					</Tabs.Trigger>
-				) : null }
+			<Tabs.List borderBottomColor="gray.200" mb={ 3 } gap={ 2 }>
+				{ triggers.map( ( t, idx ) => (
+					<Fragment key={ t.value }>
+						{ idx > 0 ? (
+							<Box
+								aria-hidden
+								alignSelf="center"
+								w="1px"
+								h="16px"
+								bg="gray.300"
+							/>
+						) : null }
+						<Tabs.Trigger
+							value={ t.value }
+							fontWeight="semibold"
+							px={ 2 }
+							py={ 1.5 }
+						>
+							{ t.label }
+						</Tabs.Trigger>
+					</Fragment>
+				) ) }
 			</Tabs.List>
 			<Tabs.ContentGroup>
 				<Tabs.Content value={ settingsTabValue } px={ 0 } pt={ 0 }>

@@ -1,7 +1,7 @@
 /**
  * Definition-driven tab shell for field modal editors (replaces `SettingsConditionsTabs` long-term).
  */
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { Box, Tabs } from '@chakra-ui/react';
 
 export interface FieldTabItem {
@@ -31,17 +31,27 @@ export function FieldTabs( { tabs, defaultTabId }: FieldTabsProps ) {
 			lazyMount
 			defaultValue={ defaultValue }
 		>
-			<Tabs.List borderBottomColor="gray.200" mb={ 3 } gap={ 1 }>
-				{ tabs.map( ( t ) => (
-					<Tabs.Trigger
-						key={ t.id }
-						value={ t.id }
-						fontWeight="semibold"
-						px={ 1 }
-						py={ 1.5 }
-					>
-						{ t.label }
-					</Tabs.Trigger>
+			<Tabs.List borderBottomColor="gray.200" mb={ 3 } gap={ 2 }>
+				{ tabs.map( ( t, idx ) => (
+					<Fragment key={ t.id }>
+						{ idx > 0 ? (
+							<Box
+								aria-hidden
+								alignSelf="center"
+								w="1px"
+								h="16px"
+								bg="gray.300"
+							/>
+						) : null }
+						<Tabs.Trigger
+							value={ t.id }
+							fontWeight="semibold"
+							px={ 2 }
+							py={ 1.5 }
+						>
+							{ t.label }
+						</Tabs.Trigger>
+					</Fragment>
 				) ) }
 			</Tabs.List>
 			<Tabs.ContentGroup>
