@@ -10,3 +10,4 @@ languages/woocommerce-product-addon.pot
 artifacts
 .phpunit.result.cache
 tests/e2e/fixtures/generated/
+packages/admin/field-modal/build/

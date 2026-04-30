@@ -2648,9 +2648,12 @@ document
 		return;
 	}
 
-	var defaultErrorMsg = ( window.ppom_vars && window.ppom_vars.i18n && window.ppom_vars.i18n.errorOccurred )
-		? window.ppom_vars.i18n.errorOccurred
-		: 'An error occurred. Please try again.';
+	var defaultErrorMsg =
+		window.ppom_vars &&
+		window.ppom_vars.i18n &&
+		window.ppom_vars.i18n.errorOccurred
+			? window.ppom_vars.i18n.errorOccurred
+			: 'An error occurred. Please try again.';
 
 	$modal.on( 'click', '.ppom-template-card--scratch', function () {
 		var href = $( this ).data( 'href' );
@@ -2659,34 +2662,52 @@ document
 		}
 	} );
 
-	$modal.on( 'click', '.ppom-template-tile:not(.ppom-template-locked)', function ( e ) {
-		e.preventDefault();
+	$modal.on(
+		'click',
+		'.ppom-template-tile:not(.ppom-template-locked)',
+		function ( e ) {
+			e.preventDefault();
 
-		var $btn  = $( this );
-		var $card = $btn.closest( '.ppom-template-card' ).length ? $btn.closest( '.ppom-template-card' ) : $btn;
-		var slug  = $btn.data( 'template' );
-		var nonce = $modal.find( '[name="ppom_import_template_nonce"]' ).val();
+			var $btn = $( this );
+			var $card = $btn.closest( '.ppom-template-card' ).length
+				? $btn.closest( '.ppom-template-card' )
+				: $btn;
+			var slug = $btn.data( 'template' );
+			var nonce = $modal
+				.find( '[name="ppom_import_template_nonce"]' )
+				.val();
 
-		if ( ! slug || $card.hasClass( 'is-busy' ) ) {
-			return;
-		}
-
-		$card.addClass( 'is-busy' );
-
-		$.post( ajaxurl, {
-			action: 'ppom_import_template',
-			template: slug,
-			ppom_import_template_nonce: nonce,
-		} ).done( function ( response ) {
-			if ( response && 'success' === response.status && response.redirect_to ) {
-				window.location.href = response.redirect_to;
+			if ( ! slug || $card.hasClass( 'is-busy' ) ) {
 				return;
 			}
-			$card.removeClass( 'is-busy' );
-			window.alert( response && response.message ? response.message : defaultErrorMsg );
-		} ).fail( function () {
-			$card.removeClass( 'is-busy' );
-			window.alert( defaultErrorMsg );
-		} );
-	} );
+
+			$card.addClass( 'is-busy' );
+
+			$.post( ajaxurl, {
+				action: 'ppom_import_template',
+				template: slug,
+				ppom_import_template_nonce: nonce,
+			} )
+				.done( function ( response ) {
+					if (
+						response &&
+						'success' === response.status &&
+						response.redirect_to
+					) {
+						window.location.href = response.redirect_to;
+						return;
+					}
+					$card.removeClass( 'is-busy' );
+					window.alert(
+						response && response.message
+							? response.message
+							: defaultErrorMsg
+					);
+				} )
+				.fail( function () {
+					$card.removeClass( 'is-busy' );
+					window.alert( defaultErrorMsg );
+				} );
+		}
+	);
 } )( jQuery );

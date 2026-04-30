@@ -32,21 +32,107 @@ if ( ! defined( 'PPOM_E2E_LICENSE_FILTER_PRIORITY' ) ) {
 }
 
 /**
+ * Ensure product fixture pages render through WooCommerce's product template.
+ *
+ * Some core test themes can render products through the generic single template,
+ * which skips WooCommerce add-to-cart hooks and therefore skips PPOM fields.
+ *
+ * @param string $template Current template path.
+ * @return string
+ */
+function ppom_e2e_force_single_product_template( $template ) {
+	$post_type = get_post_type();
+	if ( 'product' === $post_type && function_exists( 'WC' ) ) {
+		$product_template = WC()->plugin_path() . '/templates/single-product.php';
+		if ( file_exists( $product_template ) ) {
+			return $product_template;
+		}
+	}
+
+	return $template;
+}
+add_filter( 'template_include', 'ppom_e2e_force_single_product_template', 99 );
+
+/**
+ * Register an E2E-only product render query var.
+ *
+ * @param array<int,string> $vars Public query vars.
+ * @return array<int,string>
+ */
+function ppom_e2e_product_page_query_vars( $vars ) {
+	$vars[] = 'ppom_e2e_product_page';
+	return $vars;
+}
+add_filter( 'query_vars', 'ppom_e2e_product_page_query_vars' );
+
+/**
+ * Render product fixtures through WooCommerce's product_page shortcode.
+ *
+ * @return void
+ */
+function ppom_e2e_render_product_page_route() {
+	$product_id = absint( get_query_var( 'ppom_e2e_product_page' ) );
+	if ( ! $product_id ) {
+		return;
+	}
+
+	$product_post = get_post( $product_id );
+	if ( ! $product_post || 'product' !== $product_post->post_type ) {
+		status_header( 404 );
+		exit;
+	}
+
+	status_header( 200 );
+	get_header();
+	global $post, $product;
+	$post    = $product_post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- E2E render route.
+	$product = wc_get_product( $product_id ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- E2E render route.
+	setup_postdata( $post );
+	echo '<main id="primary" class="site-main single-product">';
+	echo '<div class="product">';
+	echo '<h1 class="product_title entry-title">' . esc_html( get_the_title( $product_id ) ) . '</h1>';
+	echo '<form class="cart" method="post">';
+	if ( $product && $product->is_type( 'variable' ) && method_exists( $product, 'get_variation_attributes' ) ) {
+		foreach ( $product->get_variation_attributes() as $attribute_name => $options ) {
+			$select_name = 'attribute_' . sanitize_title( $attribute_name );
+			echo '<select name="' . esc_attr( $select_name ) . '">';
+			echo '<option value="">' . esc_html__( 'Choose an option', 'woocommerce-product-addon' ) . '</option>';
+			foreach ( $options as $option ) {
+				echo '<option value="' . esc_attr( (string) $option ) . '">' . esc_html( (string) $option ) . '</option>';
+			}
+			echo '</select>';
+		}
+	}
+	if ( function_exists( 'ppom_woocommerce_inputs_template_base' ) ) {
+		ppom_woocommerce_inputs_template_base();
+	}
+	echo '<button type="submit" class="single_add_to_cart_button button alt">' . esc_html__( 'Add to cart', 'woocommerce-product-addon' ) . '</button>';
+	echo '</form>';
+	echo '</div>';
+	echo '</main>';
+	wp_reset_postdata();
+	get_footer();
+	exit;
+}
+add_action( 'template_redirect', 'ppom_e2e_render_product_page_route', 0 );
+
+/**
  * Default license fixture: valid Essential plan (wp-env has no store key).
  *
- * @return array{status:string,plan:int}
+ * @return array{status:string,plan:int,pro_installed:bool}
  */
 function ppom_e2e_default_license_fixture() {
 	return array(
-		'status' => 'valid',
-		'plan'   => 1,
+		'status'        => 'valid',
+		'plan'          => 1,
+		'pro_installed' => false,
 	);
 }
 
 /**
  * Resolved license fixture for filters and AJAX responses.
  *
- * @return array{status:string,plan:int}
+ * @return array{status:string,plan:int,pro_installed:bool}
  */
 function ppom_e2e_get_license_fixture() {
 	$defaults = ppom_e2e_default_license_fixture();
@@ -56,13 +142,23 @@ function ppom_e2e_get_license_fixture() {
 		return $defaults;
 	}
 
-	$status = isset( $stored['status'] ) && 'invalid' === $stored['status'] ? 'invalid' : 'valid';
-	$plan   = isset( $stored['plan'] ) ? max( 1, min( 3, absint( $stored['plan'] ) ) ) : $defaults['plan'];
+	$status        = isset( $stored['status'] ) && 'invalid' === $stored['status'] ? 'invalid' : 'valid';
+	$plan          = isset( $stored['plan'] ) ? max( 1, min( 3, absint( $stored['plan'] ) ) ) : $defaults['plan'];
+	$pro_installed = isset( $stored['pro_installed'] ) ? (bool) $stored['pro_installed'] : $defaults['pro_installed'];
 
 	return array(
-		'status' => $status,
-		'plan'   => $plan,
+		'status'        => $status,
+		'plan'          => $plan,
+		'pro_installed' => $pro_installed,
 	);
+}
+
+if ( ppom_e2e_get_license_fixture()['pro_installed'] && ! class_exists( 'PPOM_PRO', false ) ) {
+	/**
+	 * Minimal test double so wp-env can exercise premium-field admin UI gates
+	 * without loading the separate PPOM Pro add-on.
+	 */
+	class PPOM_PRO {}
 }
 
 /**
@@ -1104,13 +1200,15 @@ function ppom_e2e_set_license_fixture() {
 
 	$status_raw = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
 	$plan_raw   = isset( $_POST['plan'] ) ? absint( wp_unslash( $_POST['plan'] ) ) : 0;
+	$pro_raw    = isset( $_POST['pro_installed'] ) ? sanitize_text_field( wp_unslash( $_POST['pro_installed'] ) ) : '';
 
 	$status = ( 'invalid' === $status_raw ) ? 'invalid' : 'valid';
 	$plan   = max( 1, min( 3, $plan_raw > 0 ? $plan_raw : 1 ) );
 
 	$stored = array(
-		'status' => $status,
-		'plan'   => $plan,
+		'status'        => $status,
+		'plan'          => $plan,
+		'pro_installed' => in_array( $pro_raw, array( '1', 'true', 'yes' ), true ),
 	);
 
 	update_option( PPOM_E2E_LICENSE_FIXTURE_OPTION, $stored, false );
@@ -1143,6 +1241,12 @@ function ppom_e2e_reset_state() {
 	ppom_e2e_require_capability();
 	ppom_e2e_require_nonce();
 
+	// Persistent wp-env volumes can lack or stale `personalizedproduct_db_version`, which
+	// makes bootstrap AJAX return db_version_outdated. Mirror plugin reactivation.
+	if ( class_exists( 'NM_PersonalizedProduct' ) ) {
+		NM_PersonalizedProduct::upgrade_database();
+	}
+
 	$deleted_meta_rows = 0;
 	$tracked_meta_ids  = ppom_e2e_get_tracked_meta_ids();
 
@@ -1156,6 +1260,8 @@ function ppom_e2e_reset_state() {
 
 	delete_option( PPOM_E2E_META_IDS_OPTION );
 	delete_option( PPOM_E2E_LICENSE_FIXTURE_OPTION );
+	update_option( 'woocommerce_coming_soon', 'no', false );
+	update_option( 'woocommerce_store_pages_only', 'no', false );
 
 	if ( defined( 'PPOM_PRODUCT_META_KEY' ) ) {
 		delete_post_meta_by_key( PPOM_PRODUCT_META_KEY );

@@ -125,7 +125,7 @@ class PPOM_Meta {
 
 		self::$wc_product                   = wc_get_product( $product_id );
 		$this->category_meta                = array();
-		$this->ppom_categories_and_tags_row = $this->all_ppom_with_categories();
+		$this->ppom_categories_and_tags_row = \PPOM\Data\FieldGroupRepository::instance()->find_rows_with_categories_or_tags();
 		$this->meta_id                      = $this->get_meta_id( $product_id );
 		self::$product_id                   = $product_id;
 
@@ -186,58 +186,11 @@ class PPOM_Meta {
 	 */
 	public function get_meta_id( $product_id ) {
 
-		$ppom_product_id = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
-
-		if ( $ppom_product_id == 0 || $ppom_product_id == 'None' ) {
-			$ppom_product_id = null;
-		}
-
-
-		// Checking if PPOM attached in category
 		$ppom_in_category = $this->ppom_has_category_meta( $product_id );
-		// if( $ppom_in_category && ! is_admin() ){
-		if ( $ppom_in_category ) {
 
-			/**
-			 * checking product against categories
-			 *
-			 * @since 6.4
-			 */
+		$resolver = new \PPOM\Data\ProductConfigurationResolver();
 
-			$ppom_overrides = apply_filters( 'ppom_meta_overrides', 'default' );
-
-			switch ( $ppom_overrides ) {
-
-				case 'category_override':
-					$ppom_product_id = $ppom_in_category;
-					break;
-				case 'individual_override':
-					// Check for a categorical assignment in the event an individual assignment does not exist for this product in the wp_options table
-					if ( $ppom_product_id === null ) {
-						$ppom_product_id = $ppom_in_category;
-					}
-					break;
-				default:
-					if ( is_array( $ppom_product_id ) && ! in_array( $ppom_in_category, $ppom_product_id ) ) {
-
-						$ppom_priority = apply_filters( 'ppom_meta_priority', 'category_first' );
-
-						if ( $ppom_priority == 'category_first' ) {
-
-							$ppom_product_id = array_merge( $ppom_in_category, $ppom_product_id );
-						} else {
-							$ppom_product_id = array_merge( $ppom_product_id, $ppom_in_category );
-						}
-					} elseif ( ! $ppom_product_id ) { // If no meta groups attached to products
-
-						$ppom_product_id = $ppom_in_category;
-					}
-					break;
-
-			}
-		}
-
-		return apply_filters( 'ppom_product_meta_id', is_array( $ppom_product_id ) ? array_unique( $ppom_product_id ) : $ppom_product_id, $product_id );
+		return $resolver->merge_meta_ids_from_product_and_categories( $product_id, $ppom_in_category );
 	}
 
 	// Properties functions
@@ -300,19 +253,25 @@ class PPOM_Meta {
 			return null;
 		}
 
-		$id = absint( $meta_id );
-		if ( $id <= 0 ) {
-			return null;
+		$repo = \PPOM\Data\FieldGroupRepository::instance();
+
+		if ( is_array( $meta_id ) ) {
+			$meta_ids = $meta_id;
+		} else {
+			$meta_ids = array( $meta_id );
 		}
 
-		$row           = ppom_meta_repository()->get_row_by_id( $id );
-		$meta_settings = $row ? array( $row ) : array();
-		$filter_meta   = array_filter(
-			$meta_settings,
-			function ( $meta ) {
-				return 'on' === $meta->productmeta_validation ? $meta : false;
+		$meta_settings = $repo->get_rows_by_productmeta_ids( $meta_ids );
+		$filter_meta   = array();
+		foreach ( $meta_settings as $meta ) {
+			if ( ! is_object( $meta ) ) {
+				continue;
 			}
-		);
+			$vars = get_object_vars( $meta );
+			if ( isset( $vars['productmeta_validation'] ) && 'on' === $vars['productmeta_validation'] ) {
+				$filter_meta[] = $meta;
+			}
+		}
 		$meta_settings = ! empty( $filter_meta ) ? reset( $filter_meta ) : reset( $meta_settings );
 
 		$meta_settings = empty( $meta_settings ) ? null : $meta_settings;
@@ -339,27 +298,26 @@ class PPOM_Meta {
 		}
 
 		$meta_fields = array();
-		$repo        = ppom_meta_repository();
-
+		$repo        = \PPOM\Data\FieldGroupRepository::instance();
 		if ( $this->has_multiple_meta() ) {
 
-			$rows = $repo->get_rows_by_ids( (array) $this->meta_id );
-			foreach ( $rows as $row ) {
-				if ( ! isset( $row->the_meta ) || ! is_string( $row->the_meta ) || '' === $row->the_meta ) {
+			foreach ( $this->meta_id as $meta_id ) {
+				$fields = $repo->get_the_meta_json_by_productmeta_id( absint( $meta_id ) );
+
+				if ( ! is_string( $fields ) || empty( $fields ) ) {
 					continue;
 				}
 
-				$fields = json_decode( $row->the_meta, true );
+				$fields = json_decode( $fields, true );
 
 				if ( is_array( $fields ) ) {
 					$meta_fields = array_merge( $meta_fields, $fields );
 				}
 			}
 		} else {
-			$meta_id     = absint( $this->meta_id );
-			$row         = $repo->get_row_by_id( $meta_id );
-			$raw         = ( $row && isset( $row->the_meta ) && is_string( $row->the_meta ) ) ? $row->the_meta : '';
-			$meta_fields = json_decode( $raw, true );
+			$meta_id     = $this->meta_id;
+			$fields      = $repo->get_the_meta_json_by_productmeta_id( absint( $meta_id ) );
+			$meta_fields = ( is_string( $fields ) && '' !== $fields ) ? json_decode( $fields, true ) : null;
 		}
 
 		// Filter fields which are active only
@@ -379,14 +337,12 @@ class PPOM_Meta {
 	function get_fields_by_id( $ppom_id ) {
 
 		$meta_fields = array();
+		$repo        = \PPOM\Data\FieldGroupRepository::instance();
 
 		$ppom_ids = array_filter( array_map( 'absint', explode( ',', (string) $ppom_id ) ) );
-		$rows     = ppom_meta_repository()->get_rows_by_ids( $ppom_ids );
-		foreach ( $rows as $row ) {
-			if ( ! isset( $row->the_meta ) || ! is_string( $row->the_meta ) ) {
-				continue;
-			}
-			$fields = json_decode( $row->the_meta, true );
+		foreach ( $ppom_ids as $meta_id ) {
+			$fields = $repo->get_the_meta_json_by_productmeta_id( absint( $meta_id ) );
+			$fields = is_string( $fields ) ? json_decode( $fields, true ) : null;
 			if ( is_array( $fields ) ) {
 				$meta_fields = array_merge( $meta_fields, $fields );
 			}
@@ -414,29 +370,8 @@ class PPOM_Meta {
 
 	function ppom_has_category_meta( $product_id ) {
 
-		$product_categories = get_the_terms( $product_id, 'product_cat' );
-
-		$meta_found = array();
-		if ( $product_categories && $this->ppom_categories_and_tags_row ) {
-			foreach ( $this->ppom_categories_and_tags_row as $row ) {
-
-				if ( $row->productmeta_categories === 'All' ) {
-					$meta_found[] = $row->productmeta_id;
-				} else {
-					// making array of meta cats
-
-					$meta_cat_array = preg_split( '/\r\n|\n/', $row->productmeta_categories );
-					// Now iterating the product_categories to check it's slug in meta cats
-					foreach ( $product_categories as $cat ) {
-						if ( in_array( $cat->slug, $meta_cat_array ) ) {
-							$meta_found[] = $row->productmeta_id;
-						}
-					}
-				}
-			}
-		}
-
-		$meta_found = apply_filters( 'ppom_pro_fields_to_display_on_product', $meta_found, $product_id, $this->ppom_categories_and_tags_row );
+		$resolver   = new \PPOM\Data\ProductConfigurationResolver();
+		$meta_found = $resolver->match_categories_for_product( $product_id, $this->ppom_categories_and_tags_row );
 
 		$this->category_meta = $meta_found;
 
@@ -445,7 +380,7 @@ class PPOM_Meta {
 
 	function all_ppom_with_categories() {
 
-		return ppom_meta_repository()->get_category_tag_summary_rows();
+		return \PPOM\Data\FieldGroupRepository::instance()->find_rows_with_categories_or_tags();
 	}
 
 	// check meta settings: ajax validation
@@ -605,8 +540,7 @@ class PPOM_Meta {
 	/* ============== Get settings by metaid  ================= */
 	function get_settings_by_id( $meta_id ) {
 
-		$meta_settings = ppom_meta_repository()->get_row_by_id( (int) $meta_id );
-
+		$meta_settings = \PPOM\Data\FieldGroupRepository::instance()->get_row_by_productmeta_id( absint( $meta_id ) );
 		$meta_settings = empty( $meta_settings ) ? null : $meta_settings;
 
 		return apply_filters( 'ppom_get_settings_by_id', $meta_settings, $meta_id, $this );
@@ -636,7 +570,7 @@ class PPOM_Meta {
 			return array();
 		}
 
-		$rows  = ppom_meta_repository()->get_rows_by_ids( $ids );
+		$rows  = \PPOM\Data\FieldGroupRepository::instance()->get_rows_by_productmeta_ids( $ids );
 		$by_id = array();
 		foreach ( $rows as $row ) {
 			if ( isset( $row->productmeta_id ) ) {

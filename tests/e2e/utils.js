@@ -7,6 +7,23 @@ import { expect } from "@wordpress/e2e-test-utils-playwright";
  * @param {string} fieldType The field type.
  */
 export async function pickFieldTypeInModal(page, fieldType) {
+	const dialog = page.getByRole("dialog").first();
+	if (await dialog.isVisible().catch(() => false)) {
+		const fieldTypeLabels = {
+			checkbox: "Checkbox",
+			select: "Select",
+			text: "Text Input",
+		};
+		const label = fieldTypeLabels[fieldType] || fieldType;
+
+		await dialog
+			.getByRole("button", { name: new RegExp(`^${label}\\b`, "i") })
+			.first()
+			.click();
+		await expect(dialog.getByLabel("Data name")).toBeVisible();
+		return;
+	}
+
 	await page
 		.locator(
 			`.ppom-fields-name-model .ppom-field-item[data-field-type="${fieldType}"]`,
@@ -22,6 +39,10 @@ export async function pickFieldTypeInModal(page, fieldType) {
  */
 export async function openFieldEditModal(page, modelId) {
 	await page.locator(`#ppom_sort_id_${modelId} .ppom-edit-field`).click();
+	const dialog = page.getByRole("dialog").first();
+	if (await dialog.isVisible().catch(() => false)) {
+		await expect(dialog).toBeVisible();
+	}
 }
 
 /**
@@ -56,10 +77,14 @@ export async function createSimpleGroupField(admin, page, fieldsNumber = 2) {
 		await saveFieldInModal(page, i);
 	}
 
-	await Promise.all([
-		page.waitForURL(/wp-admin\/admin\.php\?page=ppom&productmeta_id=\d+&do_meta=edit/),
-		saveFields(page),
-	]);
+	const usingReactFieldModal =
+		(await page.locator(".ppom-react-field-modal-open").count()) > 0;
+	if (!usingReactFieldModal) {
+		await Promise.all([
+			page.waitForURL(/wp-admin\/admin\.php\?page=ppom&productmeta_id=\d+&do_meta=edit/),
+			saveFields(page),
+		]);
+	}
 	await expect(
 		page.getByRole("button", { name: "Save Fields" }),
 	).toBeVisible();
@@ -86,6 +111,13 @@ export async function createSimpleGroupField(admin, page, fieldsNumber = 2) {
  * @param {string} id The field ID.
  */
 export async function fillFieldNameAndId(page, modelId, name, id) {
+	const dialog = page.getByRole("dialog").first();
+	if (await dialog.isVisible().catch(() => false)) {
+		await dialog.getByLabel("Title").fill(name);
+		await dialog.getByLabel("Data name").fill(id);
+		return;
+	}
+
 	await page
 		.locator(`input[name="ppom\\[${modelId}\\]\\[title\\]"]`)
 		.fill(name);
@@ -110,6 +142,21 @@ export async function fillOptionNameAndValue(
 	name,
 	value,
 ) {
+	const dialog = page.getByRole("dialog").first();
+	if (await dialog.isVisible().catch(() => false)) {
+		while ((await dialog.locator('input[placeholder="Option"]').count()) <= optionId) {
+			await dialog
+				.getByRole("button", { name: /Add (your first )?option/i })
+				.click();
+		}
+		await dialog.locator('input[placeholder="Option"]').nth(optionId).fill(name);
+		const optionIdInputs = dialog.locator('input[placeholder="Option ID"]');
+		if ((await optionIdInputs.count()) > optionId) {
+			await optionIdInputs.nth(optionId).fill(value);
+		}
+		return;
+	}
+
 	await page
 		.locator(
 			`input[name="ppom\\[${modelId}\\]\\[options\\]\\[${optionId}\\]\\[option\\]"]`,
@@ -149,6 +196,17 @@ export async function switchToConditionsModalTab(page, modelId) {
  * @param {string|number} modelId The input field model id.
  */
 export async function switchToOptionsModalTab(page, modelId) {
+	const dialog = page.getByRole("dialog").first();
+	if (await dialog.isVisible().catch(() => false)) {
+		const optionsTab = dialog.getByRole("tab", { name: /Options|Add options/i });
+		if ((await optionsTab.count()) > 0) {
+			await optionsTab.click();
+		} else {
+			await expect(dialog.getByText(/Add options/i).first()).toBeVisible();
+		}
+		return;
+	}
+
 	await page
 		.locator(`#ppom_field_model_${modelId}`)
 		.getByText("Add Options", { exact: true })
@@ -162,6 +220,14 @@ export async function switchToOptionsModalTab(page, modelId) {
  * @param {string|number} modelId The input field model id.
  */
 export async function addNewOptionInModal(page, modelId) {
+	const dialog = page.getByRole("dialog").first();
+	if (await dialog.isVisible().catch(() => false)) {
+		await dialog
+			.getByRole("button", { name: /Add (your first )?option/i })
+			.click();
+		return;
+	}
+
 	await page
 		.locator(`#ppom_field_model_${modelId} button.ppom-add-option`)
 		.last()
@@ -193,6 +259,16 @@ export async function addNewField(page) {
  * @param {string|number} modelId The input field model id.
  */
 export async function saveFieldInModal(page, modelId) {
+	const dialog = page.getByRole("dialog").first();
+	if (await dialog.isVisible().catch(() => false)) {
+		await Promise.all([
+			page.waitForEvent("framenavigated", { timeout: 15000 }).catch(() => {}),
+			dialog.getByRole("button", { name: "Save" }).click(),
+		]);
+		await page.waitForLoadState("networkidle").catch(() => {});
+		return;
+	}
+
 	await page
 		.locator(
 			`.ppom_sort_id_${modelId} :is(.ppom-add-field, .ppom-update-field)`,

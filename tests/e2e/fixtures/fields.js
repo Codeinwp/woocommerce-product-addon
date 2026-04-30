@@ -36,6 +36,33 @@ function buildSelectField( { options = [], ...args } ) {
 	} );
 }
 
+function buildPriceMatrixField( { options = [], ...args } ) {
+	return buildField( 'pricematrix', {
+		...args,
+		discount_type: 'base',
+		options: options.map( ( option ) => ( {
+			option: option.option,
+			price: option.price ?? '',
+			label: option.label ?? '',
+			id: option.id ?? '',
+			isfixed: option.isfixed ?? '',
+		} ) ),
+	} );
+}
+
+function buildPalettesField( { options = [], ...args } ) {
+	return buildField( 'palettes', {
+		...args,
+		options: options.map( ( option ) => ( {
+			option: option.option,
+			price: option.price ?? '',
+			label: option.label ?? '',
+			id: option.id ?? '',
+			isfixed: option.isfixed ?? '',
+		} ) ),
+	} );
+}
+
 function buildCheckboxField( { options = [], checked = [], ...args } ) {
 	return buildField( 'checkbox', {
 		...args,
@@ -46,4 +73,10 @@ function buildCheckboxField( { options = [], checked = [], ...args } ) {
 	} );
 }
 
-export { buildCheckboxField, buildSelectField, buildTextField };
+export {
+	buildCheckboxField,
+	buildPalettesField,
+	buildPriceMatrixField,
+	buildSelectField,
+	buildTextField,
+};
