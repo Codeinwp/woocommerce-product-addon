@@ -16,7 +16,7 @@ export function OriginFieldSelector( {
 	onChange,
 }: OriginFieldSelectorProps ) {
 	return (
-		<Field.Root mb={ 4 }>
+		<Field.Root>
 			<Field.Label fontSize="sm">
 				{ i18n.cfrOriginLabel || 'Origin' }
 			</Field.Label>

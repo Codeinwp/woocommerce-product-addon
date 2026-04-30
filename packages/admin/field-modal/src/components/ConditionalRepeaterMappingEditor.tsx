@@ -5,7 +5,7 @@
  * @see ppom-pro/assets/conditional_field_repeater/admin/src/main.js
  */
 import { useMemo, useState } from '@wordpress/element';
-import { Box } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
@@ -17,6 +17,7 @@ import {
 import { EnableSwitch } from './conditional-repeater/EnableSwitch';
 import { OriginFieldSelector } from './conditional-repeater/OriginFieldSelector';
 import { MagicTagsBox } from './conditional-repeater/MagicTagsBox';
+import { RepeaterEmptyState } from './conditional-repeater/RepeaterEmptyState';
 
 export {
 	getCfrOriginCandidates,
@@ -99,37 +100,44 @@ export function ConditionalRepeaterMappingEditor( {
 	};
 
 	return (
-		<Box
+		<VStack
+			align="stretch"
+			gap={ 0 }
 			borderWidth="1px"
-			borderColor="blue.100"
+			borderColor="gray.200"
 			borderRadius="md"
-			p={ { base: 3, md: 4 } }
-			bg="blue.50"
+			bg="white"
+			px={ { base: 3, md: 4 } }
+			py={ 3 }
 		>
 			<EnableSwitch
 				enabled={ enabled }
 				i18n={ i18n }
 				docsUrl={ modalContext?.links.cfrDocsUrl || '' }
 				onToggle={ setEnabled }
+				withDivider={ enabled }
 			/>
-			<Box
-				display={ enabled ? 'block' : 'none' }
-				opacity={ enabled ? 1 : 0 }
-				pointerEvents={ enabled ? 'auto' : 'none' }
-			>
-				<OriginFieldSelector
-					origin={ origin }
-					candidates={ candidates }
+			{ enabled ? (
+				<VStack align="stretch" gap={ 3 } mt={ 3 }>
+					<OriginFieldSelector
+						origin={ origin }
+						candidates={ candidates }
+						i18n={ i18n }
+						onChange={ setOrigin }
+					/>
+					<MagicTagsBox
+						showOptionTitleTag={ showOptionTitleTag }
+						copiedHint={ copiedHint }
+						i18n={ i18n }
+						onCopy={ copyTag }
+					/>
+				</VStack>
+			) : (
+				<RepeaterEmptyState
 					i18n={ i18n }
-					onChange={ setOrigin }
+					onEnable={ () => setEnabled( true ) }
 				/>
-				<MagicTagsBox
-					showOptionTitleTag={ showOptionTitleTag }
-					copiedHint={ copiedHint }
-					i18n={ i18n }
-					onCopy={ copyTag }
-				/>
-			</Box>
-		</Box>
+			) }
+		</VStack>
 	);
 }

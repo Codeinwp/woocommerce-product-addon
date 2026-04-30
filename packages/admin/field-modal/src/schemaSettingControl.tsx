@@ -34,6 +34,10 @@ export function renderSettingRow(
 		return null;
 	}
 
+	if ( key === 'logic' ) {
+		return null;
+	}
+
 	if ( type === 'html-conditions' ) {
 		const builderFields = ctx.builderFields || [];
 		const conditionsProEnabled = !! ctx.conditionsProEnabled;

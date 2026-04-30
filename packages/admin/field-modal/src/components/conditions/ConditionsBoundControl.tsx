@@ -1,6 +1,6 @@
-import { Field, HStack, NativeSelect, Text } from '@chakra-ui/react';
+import { HStack, NativeSelect, Text } from '@chakra-ui/react';
 import type { I18nDict } from '../../types/fieldModal';
-import { controlSurface, labelProps } from './styles';
+import { controlSurface } from './styles';
 
 export interface ConditionsBoundControlProps {
 	visibility: string;
@@ -18,55 +18,43 @@ export function ConditionsBoundControl( {
 	onBoundChange,
 }: ConditionsBoundControlProps ) {
 	return (
-		<HStack align="flex-end" flexWrap="wrap" gap={ 2 }>
-			<Field.Root maxW="200px">
-				<Field.Label { ...labelProps }>
-					{ i18n.condShowHide || 'Show / Hide' }
-				</Field.Label>
-				<NativeSelect.Root>
-					<NativeSelect.Field
-						size="sm"
-						value={ visibility }
-						onValueChange={ ( e ) =>
-							onVisibilityChange( e.target.value )
-						}
-						{ ...controlSurface }
-					>
-						<option value="Show">
-							{ i18n.condShow || 'Show' }
-						</option>
-						<option value="Hide">
-							{ i18n.condHide || 'Hide' }
-						</option>
-					</NativeSelect.Field>
-					<NativeSelect.Indicator />
-				</NativeSelect.Root>
-			</Field.Root>
-			<Text fontSize="sm" color="gray.600" pb={ 2 }>
-				{ i18n.condOnlyIf || 'only if' }
-			</Text>
-			<Field.Root maxW="200px">
-				<Field.Label { ...labelProps }>
-					{ i18n.condAllAny || 'All / Any' }
-				</Field.Label>
-				<NativeSelect.Root>
-					<NativeSelect.Field
-						size="sm"
-						value={ bound }
-						onValueChange={ ( e ) =>
-							onBoundChange( e.target.value )
-						}
-						{ ...controlSurface }
-					>
-						<option value="All">{ i18n.condAll || 'All' }</option>
-						<option value="Any">{ i18n.condAny || 'Any' }</option>
-					</NativeSelect.Field>
-					<NativeSelect.Indicator />
-				</NativeSelect.Root>
-			</Field.Root>
-			<Text fontSize="sm" color="gray.600" pb={ 2 }>
-				{ i18n.condFollowingMatches || 'of the following match' }
-			</Text>
+		<HStack
+			align="center"
+			flexWrap="wrap"
+			gap={ 2 }
+			fontSize="sm"
+			color="gray.700"
+		>
+			<NativeSelect.Root width="auto" minW="100px">
+				<NativeSelect.Field
+					size="sm"
+					value={ visibility }
+					onValueChange={ ( e ) =>
+						onVisibilityChange( e.target.value )
+					}
+					aria-label={ i18n.condShowHide || 'Visibility' }
+					{ ...controlSurface }
+				>
+					<option value="Show">{ i18n.condShow || 'Show' }</option>
+					<option value="Hide">{ i18n.condHide || 'Hide' }</option>
+				</NativeSelect.Field>
+				<NativeSelect.Indicator />
+			</NativeSelect.Root>
+			<Text>{ i18n.condThisFieldWhen || 'this field when' }</Text>
+			<NativeSelect.Root width="auto" minW="100px">
+				<NativeSelect.Field
+					size="sm"
+					value={ bound }
+					onValueChange={ ( e ) => onBoundChange( e.target.value ) }
+					aria-label={ i18n.condAllAny || 'Match mode' }
+					{ ...controlSurface }
+				>
+					<option value="All">{ i18n.condAll || 'All' }</option>
+					<option value="Any">{ i18n.condAny || 'Any' }</option>
+				</NativeSelect.Field>
+				<NativeSelect.Indicator />
+			</NativeSelect.Root>
+			<Text>{ i18n.condConditionsMatch || 'conditions match.' }</Text>
 		</HStack>
 	);
 }

@@ -12,10 +12,3 @@ export const controlSurface = {
 		boxShadow: '0 0 0 1px #2271b1',
 	},
 };
-
-export const labelProps = {
-	fontSize: '13px',
-	fontWeight: '600',
-	color: 'gray.800',
-	mb: 1,
-};

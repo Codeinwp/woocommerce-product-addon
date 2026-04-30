@@ -141,6 +141,28 @@ export const conditionStrings: I18nDict = {
 		'Enable Conditional Repeat',
 		'woocommerce-product-addon'
 	),
+	cfrEditorTitle: __(
+		'Conditional Repeater',
+		'woocommerce-product-addon'
+	),
+	cfrEditorDesc: __(
+		'Repeat this field based on the value of another field.',
+		'woocommerce-product-addon'
+	),
+	cfrEnabled: __( 'Enabled', 'woocommerce-product-addon' ),
+	cfrDisabled: __( 'Disabled', 'woocommerce-product-addon' ),
+	cfrDisabledTitle: __(
+		'Conditional repeater is disabled',
+		'woocommerce-product-addon'
+	),
+	cfrDisabledHint: __(
+		'Turn it on to repeat this field based on another field’s value.',
+		'woocommerce-product-addon'
+	),
+	cfrEnableButton: __(
+		'Enable conditional repeater',
+		'woocommerce-product-addon'
+	),
 	cfrOriginLabel: __( 'Origin', 'woocommerce-product-addon' ),
 	cfrOriginPlaceholder: __(
 		'Select origin field…',
@@ -202,6 +224,58 @@ export const conditionStrings: I18nDict = {
 		'woocommerce-product-addon'
 	),
 	conditionUpgradeCta: __( 'Upgrade to Unlock', 'woocommerce-product-addon' ),
+	condEditorTitle: __( 'Conditional logic', 'woocommerce-product-addon' ),
+	condEditorDesc: __(
+		'Show or hide this field based on other product options.',
+		'woocommerce-product-addon'
+	),
+	condEnabled: __( 'Enabled', 'woocommerce-product-addon' ),
+	condDisabled: __( 'Disabled', 'woocommerce-product-addon' ),
+	condDisabledTitle: __(
+		'Conditional logic is disabled',
+		'woocommerce-product-addon'
+	),
+	condDisabledHint: __(
+		'Turn it on to create rules for showing or hiding this field.',
+		'woocommerce-product-addon'
+	),
+	condEnableButton: __(
+		'Enable conditional logic',
+		'woocommerce-product-addon'
+	),
+	condThisFieldWhen: __( 'this field when', 'woocommerce-product-addon' ),
+	condConditionsMatch: __(
+		'conditions match.',
+		'woocommerce-product-addon'
+	),
+	condConditionsLabel: __( 'Conditions', 'woocommerce-product-addon' ),
+	condFieldHeader: __( 'Field', 'woocommerce-product-addon' ),
+	condOperatorHeader: __( 'Operator', 'woocommerce-product-addon' ),
+	condValueHeader: __( 'Value', 'woocommerce-product-addon' ),
+	condAddCondition: __( 'Add condition', 'woocommerce-product-addon' ),
+	condRemoveCondition: __( 'Remove condition', 'woocommerce-product-addon' ),
+	condDragHandle: __( 'Drag to reorder', 'woocommerce-product-addon' ),
+	condSummaryAll: __(
+		'All conditions must match for this field to be shown.',
+		'woocommerce-product-addon'
+	),
+	condSummaryAny: __(
+		'Any condition matching will show this field.',
+		'woocommerce-product-addon'
+	),
+	condSummaryAllHide: __(
+		'This field will be hidden when all conditions match.',
+		'woocommerce-product-addon'
+	),
+	condSummaryAnyHide: __(
+		'This field will be hidden when any condition matches.',
+		'woocommerce-product-addon'
+	),
+	condDismissSummary: __( 'Dismiss', 'woocommerce-product-addon' ),
+	condEnterValuePlaceholder: __(
+		'Enter value',
+		'woocommerce-product-addon'
+	),
 };
 
 export const optionEditorStrings: I18nDict = {
