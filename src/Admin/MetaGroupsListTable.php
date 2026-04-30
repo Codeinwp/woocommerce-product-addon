@@ -176,26 +176,22 @@ final class MetaGroupsListTable extends WP_List_Table {
 	public function column_status( $item ) {
 		$id          = (int) $item->productmeta_id;
 		$is_disabled = isset( $item->productmeta_disabled ) && 'on' === $item->productmeta_disabled;
-		$state_label = $is_disabled
-			? __( 'Disabled', 'woocommerce-product-addon' )
-			: __( 'Enabled', 'woocommerce-product-addon' );
-		/* translators: %s: field-group name. */
-		$aria_label = sprintf(
+		$input_id    = 'ppom-onoffswitch-group-' . $id;
+		$aria_label  = sprintf(
 			// translators: %s: field-group name.
 			__( 'Toggle %s', 'woocommerce-product-addon' ),
 			stripcslashes( (string) $item->productmeta_name )
 		);
 
 		return sprintf(
-			'<label class="ppom-toggle" data-ppom-id="%1$d">'
-				. '<input type="checkbox" class="ppom-toggle-input" %2$s aria-label="%3$s" />'
-				. '<span class="ppom-toggle-track" aria-hidden="true"><span class="ppom-toggle-thumb"></span></span>'
-				. '<span class="ppom-toggle-label">%4$s</span>'
-				. '</label>',
+			'<div class="onoffswitch" data-ppom-id="%1$d">'
+				. '<input type="checkbox" class="onoffswitch-checkbox" id="%2$s" %3$s aria-label="%4$s" tabindex="0" />'
+				. '<label class="onoffswitch-label" for="%2$s"><span class="onoffswitch-inner"></span><span class="onoffswitch-switch"></span></label>'
+				. '</div>',
 			$id,
+			esc_attr( $input_id ),
 			$is_disabled ? '' : 'checked',
-			esc_attr( $aria_label ),
-			esc_html( $state_label )
+			esc_attr( $aria_label )
 		);
 	}
 

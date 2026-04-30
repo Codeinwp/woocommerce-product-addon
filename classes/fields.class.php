@@ -273,6 +273,7 @@ class PPOM_Fields_Meta {
 				'errorOccurred'                  => __( 'An error occurred. Please try again.', 'woocommerce-product-addon' ),
 				'yes'                            => __( 'Yes', 'woocommerce-product-addon' ),
 				'no'                             => __( 'No', 'woocommerce-product-addon' ),
+				'selectField'                    => __( 'Select field', 'woocommerce-product-addon' ),
 				'updatedField'                   => __( 'Update Field', 'woocommerce-product-addon' ),
 				'pricePlaceholder'               => __( 'Price (fix or %)', 'woocommerce-product-addon' ),
 				'choseFile'                      => __( 'Choose File', 'woocommerce-product-addon' ),
