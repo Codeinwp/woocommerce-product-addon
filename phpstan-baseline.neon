@@ -7455,7 +7455,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$text of function esc_attr expects string, int\<1, max\> given\.$#'
 			identifier: argument.type
-			count: 13
+			count: 4
 			path: templates/admin/ppom-fields.php
 
 		-

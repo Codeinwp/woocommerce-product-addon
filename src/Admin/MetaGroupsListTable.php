@@ -176,26 +176,22 @@ final class MetaGroupsListTable extends WP_List_Table {
 	public function column_status( $item ) {
 		$id          = (int) $item->productmeta_id;
 		$is_disabled = isset( $item->productmeta_disabled ) && 'on' === $item->productmeta_disabled;
-		$state_label = $is_disabled
-			? __( 'Disabled', 'woocommerce-product-addon' )
-			: __( 'Enabled', 'woocommerce-product-addon' );
-		/* translators: %s: field-group name. */
-		$aria_label = sprintf(
+		$input_id    = 'ppom-onoffswitch-group-' . $id;
+		$aria_label  = sprintf(
 			// translators: %s: field-group name.
 			__( 'Toggle %s', 'woocommerce-product-addon' ),
 			stripcslashes( (string) $item->productmeta_name )
 		);
 
 		return sprintf(
-			'<label class="ppom-toggle" data-ppom-id="%1$d">'
-				. '<input type="checkbox" class="ppom-toggle-input" %2$s aria-label="%3$s" />'
-				. '<span class="ppom-toggle-track" aria-hidden="true"><span class="ppom-toggle-thumb"></span></span>'
-				. '<span class="ppom-toggle-label">%4$s</span>'
-				. '</label>',
+			'<div class="onoffswitch" data-ppom-id="%1$d">'
+				. '<input type="checkbox" class="onoffswitch-checkbox" id="%2$s" %3$s aria-label="%4$s" tabindex="0" />'
+				. '<label class="onoffswitch-label" for="%2$s"><span class="onoffswitch-inner"></span><span class="onoffswitch-switch"></span></label>'
+				. '</div>',
 			$id,
+			esc_attr( $input_id ),
 			$is_disabled ? '' : 'checked',
-			esc_attr( $aria_label ),
-			esc_html( $state_label )
+			esc_attr( $aria_label )
 		);
 	}
 
@@ -384,18 +380,30 @@ final class MetaGroupsListTable extends WP_List_Table {
 	/**
 	 * Empty-state message.
 	 *
+	 * Renders a designed empty-state card when no groups exist. Falls back to
+	 * a plain message when the table is empty due to a search query, so the
+	 * onboarding CTA only shows on a genuinely empty list.
+	 *
 	 * @return void
 	 */
 	public function no_items() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only search query param; no state change.
+		if ( ! empty( $_REQUEST['s'] ) ) {
+			esc_html_e( 'No field groups match your search.', 'woocommerce-product-addon' );
+			return;
+		}
 		$add_url = add_query_arg( array( 'action' => 'new' ), admin_url( 'admin.php?page=ppom' ) );
-		printf(
-			/* translators: %s: link to add a new field group. */
-			esc_html__( 'No PPOM field groups yet. %s', 'woocommerce-product-addon' ),
-			sprintf(
-				'<a href="%1$s">%2$s</a>',
-				esc_url( $add_url ),
-				esc_html__( 'Add the first one', 'woocommerce-product-addon' )
-			)
-		);
+		?>
+		<div class="ppom-empty-state">
+			<span class="dashicons dashicons-media-text ppom-empty-icon" aria-hidden="true"></span>
+			<h3 class="ppom-empty-title"><?php esc_html_e( 'No field groups yet', 'woocommerce-product-addon' ); ?></h3>
+			<p class="ppom-empty-desc">
+				<?php esc_html_e( 'Field groups let you attach custom input fields to your products — like text boxes, dropdowns, file uploads, and more.', 'woocommerce-product-addon' ); ?>
+			</p>
+			<a href="<?php echo esc_url( $add_url ); ?>" class="button button-primary button-hero ppom-empty-cta">
+				<?php esc_html_e( 'Create your first field group', 'woocommerce-product-addon' ); ?>
+			</a>
+		</div>
+		<?php
 	}
 }

@@ -25,8 +25,10 @@ test.describe("Field Group enable/disable toggle", () => {
 				response.request().postData()?.includes("ppom_toggle_meta_disabled"),
 		);
 		// The <input> is visually hidden (position:absolute; opacity:0), so
-		// click the visible <label> wrapper — that flips the checkbox naturally.
-		await page.locator(`.ppom-toggle[data-ppom-id="${ppomId}"]`).click();
+		// click the visible <label> inside the wrapper — that flips the checkbox naturally.
+		await page
+			.locator(`.onoffswitch[data-ppom-id="${ppomId}"] .onoffswitch-label`)
+			.click();
 		const response = await responsePromise;
 		const json = await response.json();
 		expect(json.status).toBe("success");
@@ -66,7 +68,7 @@ test.describe("Field Group enable/disable toggle", () => {
 			"admin.php?page=ppom&orderby=productmeta_id&order=desc",
 		);
 		const toggleInput = page.locator(
-			`.ppom-toggle[data-ppom-id="${ppomId}"] .ppom-toggle-input`,
+			`.onoffswitch[data-ppom-id="${ppomId}"] .onoffswitch-checkbox`,
 		);
 		await expect(toggleInput).toBeChecked();
 		const disableResp = await clickToggleAndWait(page, ppomId);
@@ -145,12 +147,12 @@ test.describe("Field Group enable/disable toggle", () => {
 		// After redirect, both rows should render as off.
 		await expect(
 			page.locator(
-				`.ppom-toggle[data-ppom-id="${groupA.ppomId}"] .ppom-toggle-input`,
+				`.onoffswitch[data-ppom-id="${groupA.ppomId}"] .onoffswitch-checkbox`,
 			),
 		).not.toBeChecked();
 		await expect(
 			page.locator(
-				`.ppom-toggle[data-ppom-id="${groupB.ppomId}"] .ppom-toggle-input`,
+				`.onoffswitch[data-ppom-id="${groupB.ppomId}"] .onoffswitch-checkbox`,
 			),
 		).not.toBeChecked();
 
