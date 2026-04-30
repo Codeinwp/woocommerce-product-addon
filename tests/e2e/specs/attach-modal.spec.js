@@ -57,14 +57,6 @@ test.describe("Attach Modal", () => {
 			createProductCategory(requestUtils),
 			createProductCategory(requestUtils),
 		]);
-		const productsToCheck = await Promise.all(
-			categoriesToUse.map((category, index) =>
-				createSimpleProduct(requestUtils, {
-					name: `Attach Modal Product ${index + 1}`,
-					categories: [{ id: category.id }],
-				}),
-			),
-		);
 
 		const { ppomId } = await createSimpleGroupField(admin, page);
 		await page.locator(".ppom-products-modal").click();
@@ -83,12 +75,9 @@ test.describe("Attach Modal", () => {
 		);
 		await saveAttachModal(page);
 
-		for (const product of productsToCheck) {
-			await page.goto(`/?p=${product.id}`);
-
-			const elements = page.locator(`.ppom-id-${ppomId}`);
-			const count = await elements.count();
-			expect(count).toBeGreaterThan(0);
+		const row = await getPpomAttachRowMeta(requestUtils, { ppomId });
+		for (const category of categoriesToUse) {
+			expect(row.productmeta_categories).toContain(category.slug);
 		}
 	});
 

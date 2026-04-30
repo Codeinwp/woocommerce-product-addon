@@ -74,7 +74,7 @@ test.describe( 'Bootstrap Fixtures', () => {
 			productIds: [ product.id ],
 		} );
 
-		await page.goto( `/?p=${ product.id }` );
+		await page.goto( `/?ppom_e2e_product_page=${ product.id }` );
 
 		const variationSelect = page.locator( 'select[name="attribute_size"]' );
 
@@ -124,7 +124,7 @@ test.describe( 'Bootstrap Fixtures', () => {
 		expect( attachResult.updated_products ).toBe( 0 );
 
 		for ( const product of products ) {
-			await page.goto( `/?p=${ product.id }` );
+			await page.goto( `/?ppom_e2e_product_page=${ product.id }` );
 			await expect( page.locator( '.single-product' ) ).toBeVisible();
 			await expect( page.locator( `.ppom-id-${ ppomId }` ) ).toBeVisible();
 			await expect( page.getByLabel( 'Gift Note' ) ).toBeVisible();

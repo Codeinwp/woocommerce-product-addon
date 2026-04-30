@@ -12,6 +12,17 @@ test.describe("Group Delete Confirmation Dialog", () => {
 		return page.locator(`input.ppom_product_checkbox[value="${ppomId}"]`).locator('xpath=ancestor::label');
 	}
 
+	async function filterGroupsById(page, ppomIds) {
+		const ids = (Array.isArray(ppomIds) ? ppomIds : [ppomIds]).map(String);
+		await page.evaluate((groupIds) => {
+			const table = window.jQuery("#ppom-meta-table").DataTable();
+			table.search(groupIds.join("|"), true, false).draw();
+		}, ids);
+		await expect(
+			page.locator(`input.ppom_product_checkbox[value="${ids[0]}"]`)
+		).toBeVisible();
+	}
+
 	/**
 	 * Helper to trigger bulk delete action
 	 */
@@ -49,6 +60,7 @@ test.describe("Group Delete Confirmation Dialog", () => {
 
 		// Navigate to the groups list
 		await admin.visitAdminPage("admin.php?page=ppom");
+		await filterGroupsById(page, ppomId);
 
 		// Select the checkbox for our group
 		const checkbox = getGroupCheckbox(page, ppomId);
@@ -88,6 +100,7 @@ test.describe("Group Delete Confirmation Dialog", () => {
 
 		// Navigate to the groups list
 		await admin.visitAdminPage("admin.php?page=ppom");
+		await filterGroupsById(page, [group1.ppomId, group2.ppomId, group3.ppomId]);
 
 		// Select checkboxes for all three groups
 		await getGroupCheckbox(page, group1.ppomId).check();
@@ -126,9 +139,10 @@ test.describe("Group Delete Confirmation Dialog", () => {
 
 		// Navigate to the groups list
 		await admin.visitAdminPage("admin.php?page=ppom");
+		await filterGroupsById(page, ppomId);
 
 		// Verify the group exists in the table
-		const groupRow = page.locator(`tr td:has-text("${ppomId}")`);
+		const groupRow = page.locator(`input.ppom_product_checkbox[value="${ppomId}"]`).locator("xpath=ancestor::tr");
 		await expect(groupRow).toBeVisible();
 
 		// Select the checkbox for our group
@@ -172,6 +186,7 @@ test.describe("Group Delete Confirmation Dialog", () => {
 
 		// Navigate to the groups list
 		await admin.visitAdminPage("admin.php?page=ppom");
+		await filterGroupsById(page, ppomId);
 
 		// Find and click the delete link for this specific group
 		const deleteLink = page.locator(
