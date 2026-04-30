@@ -18,6 +18,7 @@ final class LegacyRuntimeLoader {
 	 * @return void
 	 */
 	public static function load(): void {
+		require_once PPOM_PATH . '/inc/compat/functions-embedded.php';
 		require_once PPOM_PATH . '/inc/functions.php';
 		require_once PPOM_PATH . '/inc/validation.php';
 		require_once PPOM_PATH . '/inc/deprecated.php';

@@ -59,7 +59,7 @@ test.describe( 'Conditions', () => {
 			productIds: [ product.id ],
 		} );
 
-		await page.goto( `/?ppom_e2e_product_page=${ product.id }` );
+		await page.goto( `/?p=${ product.id }` );
 
 		await expect( page.getByLabel( 'Output' ) ).toBeHidden();
 
