@@ -103,12 +103,6 @@ parameters:
 			path: backend/templates/admin-settings.php
 
 		-
-			message: '#^Variable \$class_ins might not be defined\.$#'
-			identifier: variable.undefined
-			count: 8
-			path: backend/templates/admin-settings.php
-
-		-
 			message: '#^Variable \$tabs might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
@@ -4491,12 +4485,6 @@ parameters:
 		-
 			message: '#^Method PPOM\\Admin\\Manager\:\:update_ppom_meta_only\(\) has parameter \$ppom_meta with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/Admin/Manager.php
-
-		-
-			message: '#^Parameter \#1 \$url of function esc_url_raw expects string, string\|false given\.$#'
-			identifier: argument.type
 			count: 1
 			path: src/Admin/Manager.php
 

@@ -2,25 +2,58 @@
  * WordPress dependencies
  */
 import { test, expect } from "@wordpress/e2e-test-utils-playwright";
-import { createSimpleGroupField } from "../utils";
+import { createSimpleTextGroup } from "../fixtures/index.js";
 
 test.describe("Group Delete Confirmation Dialog", () => {
-	/**
-	 * Helper to get checkbox for a specific group
-	 */
-	function getGroupCheckbox(page, ppomId) {
-		return page.locator(`input.ppom_product_checkbox[value="${ppomId}"]`).locator('xpath=ancestor::label');
+	function getVisibleGroupRows(page) {
+		return page.locator(
+			"#ppom-meta-table tbody tr:has(input.ppom_product_checkbox)"
+		);
 	}
 
-	async function filterGroupsById(page, ppomIds) {
-		const ids = (Array.isArray(ppomIds) ? ppomIds : [ppomIds]).map(String);
-		await page.evaluate((groupIds) => {
-			const table = window.jQuery("#ppom-meta-table").DataTable();
-			table.search(groupIds.join("|"), true, false).draw();
-		}, ids);
-		await expect(
-			page.locator(`input.ppom_product_checkbox[value="${ids[0]}"]`)
-		).toBeVisible();
+	function getGroupRowById(page, ppomId) {
+		return page.locator(
+			`#ppom-meta-table tbody tr:has(input.ppom_product_checkbox[value="${ppomId}"])`
+		);
+	}
+
+	async function searchGroupsTable(page, searchTerm) {
+		const searchInput = page.locator(
+			'#ppom-meta-table_filter input[type="search"]'
+		);
+
+		await expect(searchInput).toBeVisible();
+		await searchInput.fill(String(searchTerm));
+	}
+
+	async function createVisibleGroups(requestUtils, page, admin, count) {
+		const groupNamePrefix = `Delete Dialog ${Date.now()}`;
+
+		for (let index = 1; index <= count; index++) {
+			await createSimpleTextGroup(requestUtils, {
+				groupName: `${groupNamePrefix} ${index}`,
+			});
+		}
+
+		await admin.visitAdminPage("admin.php?page=ppom");
+		await searchGroupsTable(page, groupNamePrefix);
+		await expect(getVisibleGroupRows(page)).toHaveCount(count);
+
+		return groupNamePrefix;
+	}
+
+	async function getVisibleGroupData(row) {
+		const checkbox = row.locator("input.ppom_product_checkbox");
+
+		return {
+			id: await checkbox.getAttribute("value"),
+			name: await checkbox.getAttribute("data-name"),
+		};
+	}
+
+	async function selectVisibleGroupRow(row) {
+		await row.locator("td.ppom-checkboxe-style label").click();
+		await expect(row.locator("input.ppom_product_checkbox")).toBeChecked();
 	}
 
 	/**
@@ -55,16 +88,14 @@ test.describe("Group Delete Confirmation Dialog", () => {
 	test("displays single group name in delete confirmation dialog", async ({
 		page,
 		admin,
+		requestUtils,
 	}) => {
-		const { baseName, ppomId } = await createSimpleGroupField(admin, page);
-
-		// Navigate to the groups list
-		await admin.visitAdminPage("admin.php?page=ppom");
-		await filterGroupsById(page, ppomId);
+		await createVisibleGroups(requestUtils, page, admin, 1);
+		const row = getVisibleGroupRows(page).first();
+		const group = await getVisibleGroupData(row);
 
 		// Select the checkbox for our group
-		const checkbox = getGroupCheckbox(page, ppomId);
-		await checkbox.click();
+		await selectVisibleGroupRow(row);
 
 		// Trigger bulk delete
 		await triggerBulkDelete(page);
@@ -78,7 +109,7 @@ test.describe("Group Delete Confirmation Dialog", () => {
 
 		const titleText = await popupTitle.textContent();
 
-		expect(titleText).toContain("Test Group Field");
+		expect(titleText).toContain(group.name);
 
 		// Verify it's formatted correctly (should replace %s with the group name)
 		expect(titleText).not.toContain("%s");
@@ -92,20 +123,20 @@ test.describe("Group Delete Confirmation Dialog", () => {
 	test("displays multiple group names in delete confirmation dialog", async ({
 		page,
 		admin,
+		requestUtils,
 	}) => {
-		// Create three groups
-		const group1 = await createSimpleGroupField(admin, page);
-		const group2 = await createSimpleGroupField(admin, page);
-		const group3 = await createSimpleGroupField(admin, page);
-
-		// Navigate to the groups list
-		await admin.visitAdminPage("admin.php?page=ppom");
-		await filterGroupsById(page, [group1.ppomId, group2.ppomId, group3.ppomId]);
+		await createVisibleGroups(requestUtils, page, admin, 3);
+		const rows = getVisibleGroupRows(page);
+		const groups = [
+			await getVisibleGroupData(rows.nth(0)),
+			await getVisibleGroupData(rows.nth(1)),
+			await getVisibleGroupData(rows.nth(2)),
+		];
 
 		// Select checkboxes for all three groups
-		await getGroupCheckbox(page, group1.ppomId).check();
-		await getGroupCheckbox(page, group2.ppomId).check();
-		await getGroupCheckbox(page, group3.ppomId).check();
+		await selectVisibleGroupRow(rows.nth(0));
+		await selectVisibleGroupRow(rows.nth(1));
+		await selectVisibleGroupRow(rows.nth(2));
 
 		// Trigger bulk delete
 		await triggerBulkDelete(page);
@@ -119,8 +150,9 @@ test.describe("Group Delete Confirmation Dialog", () => {
 
 		const titleText = await popupTitle.textContent();
 
-		// All three group names should be in the confirmation (all are "Test Group Field")
-		expect(titleText).toContain("Test Group Field");
+		for (const group of groups) {
+			expect(titleText).toContain(group.name);
+		}
 
 		// Should be comma-separated.
 		expect(titleText).toMatch(/,/);
@@ -134,19 +166,17 @@ test.describe("Group Delete Confirmation Dialog", () => {
 	test("successfully deletes selected groups after confirmation", async ({
 		page,
 		admin,
+		requestUtils,
 	}) => {
-		const { baseName, ppomId } = await createSimpleGroupField(admin, page);
-
-		// Navigate to the groups list
-		await admin.visitAdminPage("admin.php?page=ppom");
-		await filterGroupsById(page, ppomId);
+		await createVisibleGroups(requestUtils, page, admin, 1);
+		const groupRow = getVisibleGroupRows(page).first();
+		const group = await getVisibleGroupData(groupRow);
 
 		// Verify the group exists in the table
-		const groupRow = page.locator(`input.ppom_product_checkbox[value="${ppomId}"]`).locator("xpath=ancestor::tr");
 		await expect(groupRow).toBeVisible();
 
 		// Select the checkbox for our group
-		await getGroupCheckbox(page, ppomId).check();
+		await selectVisibleGroupRow(groupRow);
 
 		// Trigger bulk delete
 		await triggerBulkDelete(page);
@@ -154,7 +184,7 @@ test.describe("Group Delete Confirmation Dialog", () => {
 		// Wait for confirmation popup and verify it shows the group name
 		const popup = await waitForPopup(page);
 		const popupTitle = popup.locator(".ppom-popup-title");
-		await expect(popupTitle).toContainText("Test Group Field");
+		await expect(popupTitle).toContainText(group.name);
 
 		// Confirm the deletion
 		await confirmDeletion(page);
@@ -169,10 +199,16 @@ test.describe("Group Delete Confirmation Dialog", () => {
 		const successText = await successTitle.textContent();
 
 		expect(successText).toEqual("Done");
-		await confirmDeletion(page);
+		await Promise.all([
+			page.waitForURL(/admin\.php\?page=ppom/, {
+				waitUntil: "domcontentloaded",
+			}),
+			confirmDeletion(page),
+		]);
 
 		// Verify the group is no longer in the table
-		await expect(groupRow).not.toBeVisible();
+		await searchGroupsTable(page, group.id);
+		await expect(getGroupRowById(page, group.id)).not.toBeVisible();
 	});
 
 	/**
@@ -181,18 +217,15 @@ test.describe("Group Delete Confirmation Dialog", () => {
 	test("displays group name when deleting via single delete link", async ({
 		page,
 		admin,
+		requestUtils,
 	}) => {
-		const { baseName, ppomId } = await createSimpleGroupField(admin, page);
-
-		// Navigate to the groups list
-		await admin.visitAdminPage("admin.php?page=ppom");
-		await filterGroupsById(page, ppomId);
+		await createVisibleGroups(requestUtils, page, admin, 1);
+		const row = getVisibleGroupRows(page).first();
+		const group = await getVisibleGroupData(row);
 
 		// Find and click the delete link for this specific group
-		const deleteLink = page.locator(
-			`a.ppom-delete-single-product[data-product-id="${ppomId}"]`
-		);
-		await deleteLink.waitFor({ state: "visible" });
+		const deleteLink = row.locator("a.ppom-delete-single-product");
+		await expect(deleteLink).toBeVisible();
 		await deleteLink.click();
 
 		// Wait for confirmation popup
@@ -205,7 +238,7 @@ test.describe("Group Delete Confirmation Dialog", () => {
 		const titleText = await popupTitle.textContent();
 
 		// The confirmation should contain the group name
-		expect(titleText).toContain("Test Group Field");
+		expect(titleText).toContain(group.name);
 
 		await cancelDeletion(page);
 	});

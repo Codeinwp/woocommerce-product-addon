@@ -57,6 +57,10 @@ export async function createSimpleGroupField(admin, page, fieldsNumber = 2) {
 	await admin.visitAdminPage("admin.php?page=ppom");
 
 	await page.getByRole("link", { name: "Add New Group" }).click();
+	await page
+		.locator("#ppom-template-wizard-modal .ppom-template-card--scratch")
+		.click();
+	await page.waitForURL(/action=new/);
 	await page.getByRole("textbox").fill("Test Group Field");
 
 	const randomNumber = Math.floor(Math.random() * 1000);

@@ -35,6 +35,7 @@ final class LegacyRuntimeLoader {
 
 		require_once PPOM_PATH . '/classes/input.class.php';
 		require_once PPOM_PATH . '/classes/fields.class.php';
+		require_once PPOM_PATH . '/classes/template-library.class.php';
 		require_once PPOM_PATH . '/classes/ppom.class.php';
 		require_once PPOM_PATH . '/classes/class-ppom-meta-repository.php';
 		require_once PPOM_PATH . '/inc/ppom-meta-repository-functions.php';

@@ -2623,3 +2623,70 @@ document
 			}
 		} );
 	} );
+
+/**
+ * PPOM_Template_Wizard
+ *
+ * Behavior for the Quick Setup template-library modal rendered by
+ * templates/admin/template-wizard.php. Handles three click flows on
+ * #ppom-template-wizard-modal:
+ *   - "Start from scratch" card → navigate to data-href on the wrapper.
+ *   - Free / unlocked Pro template tile → POST ppom_import_template,
+ *     redirect to the new field-group editor on success.
+ *   - Locked Pro template tile → no-op (the inline upgrade link handles
+ *     the upsell on its own).
+ *
+ * Styles for the modal live in css/ppom-admin.css under the
+ * "Quick Setup template-library wizard" section.
+ */
+( function ( $ ) {
+	'use strict';
+
+	var $modal = $( '#ppom-template-wizard-modal' );
+
+	if ( ! $modal.length ) {
+		return;
+	}
+
+	var defaultErrorMsg = ( window.ppom_vars && window.ppom_vars.i18n && window.ppom_vars.i18n.errorOccurred )
+		? window.ppom_vars.i18n.errorOccurred
+		: 'An error occurred. Please try again.';
+
+	$modal.on( 'click', '.ppom-template-card--scratch', function () {
+		var href = $( this ).data( 'href' );
+		if ( href ) {
+			window.location.href = href;
+		}
+	} );
+
+	$modal.on( 'click', '.ppom-template-tile:not(.ppom-template-locked)', function ( e ) {
+		e.preventDefault();
+
+		var $btn  = $( this );
+		var $card = $btn.closest( '.ppom-template-card' ).length ? $btn.closest( '.ppom-template-card' ) : $btn;
+		var slug  = $btn.data( 'template' );
+		var nonce = $modal.find( '[name="ppom_import_template_nonce"]' ).val();
+
+		if ( ! slug || $card.hasClass( 'is-busy' ) ) {
+			return;
+		}
+
+		$card.addClass( 'is-busy' );
+
+		$.post( ajaxurl, {
+			action: 'ppom_import_template',
+			template: slug,
+			ppom_import_template_nonce: nonce,
+		} ).done( function ( response ) {
+			if ( response && 'success' === response.status && response.redirect_to ) {
+				window.location.href = response.redirect_to;
+				return;
+			}
+			$card.removeClass( 'is-busy' );
+			window.alert( response && response.message ? response.message : defaultErrorMsg );
+		} ).fail( function () {
+			$card.removeClass( 'is-busy' );
+			window.alert( defaultErrorMsg );
+		} );
+	} );
+} )( jQuery );

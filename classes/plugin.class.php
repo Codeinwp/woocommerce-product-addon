@@ -83,6 +83,7 @@ class NM_PersonalizedProduct {
 		add_action( 'wp_ajax_ppom_update_form_meta', 'ppom_admin_update_form_meta' );
 		add_action( 'wp_ajax_ppom_delete_meta', 'ppom_admin_delete_meta' );
 		add_action( 'wp_ajax_ppom_delete_selected_meta', 'ppom_admin_delete_selected_meta' );
+		add_action( 'wp_ajax_ppom_import_template', 'ppom_admin_import_template' );
 
 		/*
 		 * saving product meta in admin/product signel page

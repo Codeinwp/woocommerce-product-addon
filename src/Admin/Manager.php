@@ -335,12 +335,7 @@ final class Manager {
 			wp_send_json( $resp );
 		}
 
-		$send_file_attachment = 'NA';
-		$aviary_api_key       = 'NA';
-		$show_cart_thumb      = 'NA';
-
-		$ppom           = array();
-		$productmeta_id = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
+		$ppom = array();
 
 		if ( is_string( $_REQUEST['ppom'] ) ) {
 			$ppom_encoded = $_REQUEST['ppom'];
@@ -358,22 +353,12 @@ final class Manager {
 			wp_send_json( $resp );
 		}
 
-		$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );
-		$product_meta = Validator::sanitize_array_data( $product_meta );
-		$product_meta = array_filter(
-			$product_meta,
-			function ( $pm ) {
-				return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] );
-			}
-		);
-		$product_meta = json_encode( $product_meta );
-
 		// sanitize
 		$productmeta_name     = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
 		$dynamic_price_hide   = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
-		$send_file_attachment = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
-		$show_cart_thumb      = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
-		$aviary_api_key       = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
+		$send_file_attachment = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : 'NA';
+		$show_cart_thumb      = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : 'NA';
+		$aviary_api_key       = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : 'NA';
 		$productmeta_style    = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
 		$productmeta_js       = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
 		$product_id           = isset( $_REQUEST['product_id'] ) ? intval( $_REQUEST['product_id'] ) : 0;
@@ -387,53 +372,17 @@ final class Manager {
 			wp_send_json( $resp );
 		}
 
-		$ppom_settings_meta_data = array(
+		$settings = array(
 			'productmeta_name'      => $productmeta_name,
 			'dynamic_price_display' => $dynamic_price_hide,
 			'send_file_attachment'  => $send_file_attachment,
 			'show_cart_thumb'       => $show_cart_thumb,
-			'aviary_api_key'        => trim( $aviary_api_key ),
-			'the_meta'              => $product_meta,
-			'productmeta_created'   => current_time( 'mysql' ),
+			'aviary_api_key'        => $aviary_api_key,
+			'productmeta_style'     => $productmeta_style,
+			'productmeta_js'        => $productmeta_js,
 		);
 
-		if ( ! Helpers::is_legacy_user() ) {
-			$ppom_settings_meta_data['productmeta_style'] = $productmeta_style;
-			$ppom_settings_meta_data['productmeta_js']    = $productmeta_js;
-		}
-
-		$dt = apply_filters( 'ppom_settings_meta_data_new', $ppom_settings_meta_data );
-
-		// wp_send_json($dt);
-
-		$format = array(
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-		);
-
-		$ppom_id = MetaRepositoryAccessor::instance()->insert_group( $dt, $format );
-		if ( is_string( $ppom ) ) {
-			$ppom_encoded = $ppom;
-			parse_str( $ppom_encoded, $ppom_decoded );
-			$ppom = $ppom_decoded['ppom'];
-		}
-
-		$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom, $ppom_id );
-		$product_meta = Validator::sanitize_array_data( $product_meta );
-		$product_meta = array_filter(
-			$product_meta,
-			function ( $pm ) {
-				return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] );
-			}
-		);
-	
-		// Updating PPOM Meta with ppom_id in each meta array
-		self::update_ppom_meta_only( $ppom_id, $product_meta );
+		$ppom_id = self::create_group_from_fields( (array) $ppom_meta, $settings, $product_id );
 
 		$redirect_to = '';
 
@@ -443,13 +392,14 @@ final class Manager {
 				'productmeta_id' => $ppom_id,
 				'do_meta'        => 'edit',
 			);
-			$redirect_to = add_query_arg( $ppom_args, admin_url( 'admin.php' ) );
+			$redirect_to = (string) add_query_arg( $ppom_args, admin_url( 'admin.php' ) );
 		}
 
-
-		if ( ! empty( $product_id ) ) {
-			Helpers::attach_fields_to_product( $ppom_id, $product_id );
-			$redirect_to = get_permalink( $product_id );
+		if ( $ppom_id && self::is_attachable_product( $product_id ) ) {
+			$product_link = (string) get_permalink( $product_id );
+			if ( '' !== $product_link ) {
+				$redirect_to = $product_link;
+			}
 		}
 
 		$resp = array();
@@ -471,6 +421,220 @@ final class Manager {
 		}
 
 		wp_send_json( $resp );
+	}
+
+	/**
+	 * Persists a new PPOM field group from a normalized payload.
+	 *
+	 * Runs the `ppom_meta_data_saving` filter twice (once before insert with an
+	 * empty id, once after with the resolved id) to match WPML/registration
+	 * expectations, sanitizes via {@see Validator::sanitize_array_data()},
+	 * inserts via {@see MetaRepositoryAccessor::insert_group()}, then rewrites
+	 * `the_meta` so each field row carries the new ppom_id. When a product ID
+	 * is supplied, the new group is attached to that product.
+	 *
+	 * Shared by {@see self::save_form_meta()} and {@see self::import_template()}.
+	 *
+	 * @param array<int, array<string, mixed>> $fields     Untouched field schema (filter input, the_meta shape).
+	 * @param array<string, string>            $settings   Group settings: productmeta_name, dynamic_price_display, send_file_attachment, show_cart_thumb, aviary_api_key, productmeta_style, productmeta_js.
+	 * @param int                              $product_id Optional WooCommerce product ID to attach the new group to. 0 to skip.
+	 * @return int New productmeta_id, or 0 on insert failure.
+	 */
+	private static function create_group_from_fields( array $fields, array $settings, $product_id = 0 ) {
+
+		$product_meta      = apply_filters( 'ppom_meta_data_saving', $fields, '' );
+		$product_meta      = Validator::sanitize_array_data( $product_meta );
+		$product_meta      = array_filter(
+			$product_meta,
+			function ( $pm ) {
+				return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] );
+			}
+		);
+		$product_meta_json = wp_json_encode( $product_meta );
+
+		$row = array(
+			'productmeta_name'      => isset( $settings['productmeta_name'] ) ? (string) $settings['productmeta_name'] : '',
+			'dynamic_price_display' => isset( $settings['dynamic_price_display'] ) ? (string) $settings['dynamic_price_display'] : '',
+			'send_file_attachment'  => isset( $settings['send_file_attachment'] ) ? (string) $settings['send_file_attachment'] : 'NA',
+			'show_cart_thumb'       => isset( $settings['show_cart_thumb'] ) ? (string) $settings['show_cart_thumb'] : 'NA',
+			'aviary_api_key'        => trim( isset( $settings['aviary_api_key'] ) ? (string) $settings['aviary_api_key'] : 'NA' ),
+			'the_meta'              => $product_meta_json,
+			'productmeta_created'   => current_time( 'mysql' ),
+		);
+
+		if ( ! Helpers::is_legacy_user() ) {
+			$row['productmeta_style'] = isset( $settings['productmeta_style'] ) ? (string) $settings['productmeta_style'] : '';
+			$row['productmeta_js']    = isset( $settings['productmeta_js'] ) ? (string) $settings['productmeta_js'] : '';
+		}
+
+		$row = apply_filters( 'ppom_settings_meta_data_new', $row );
+
+		$format  = array_fill( 0, count( $row ), '%s' );
+		$ppom_id = MetaRepositoryAccessor::instance()->insert_group( $row, $format );
+
+		if ( ! $ppom_id ) {
+			return 0;
+		}
+
+		// Re-run the filter with the resolved id so listeners (e.g. WPML)
+		// register against the final productmeta_id.
+		$product_meta = apply_filters( 'ppom_meta_data_saving', $fields, $ppom_id );
+		$product_meta = Validator::sanitize_array_data( $product_meta );
+		$product_meta = array_filter(
+			$product_meta,
+			function ( $pm ) {
+				return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] );
+			}
+		);
+
+		self::update_ppom_meta_only( $ppom_id, $product_meta );
+
+		if ( self::is_attachable_product( $product_id ) ) {
+			Helpers::attach_fields_to_product( $ppom_id, $product_id );
+		}
+
+		return (int) $ppom_id;
+	}
+
+	/**
+	 * Returns true when the supplied ID resolves to an existing WooCommerce
+	 * product the current user is allowed to edit.
+	 *
+	 * Guards the product-attach + product-permalink redirect paths against
+	 * arbitrary or non-existent post IDs, which would otherwise create orphan
+	 * postmeta rows and produce empty redirect URLs from `get_permalink()`.
+	 *
+	 * @param mixed $product_id Candidate product ID from the request.
+	 * @return bool
+	 */
+	private static function is_attachable_product( $product_id ) {
+
+		$product_id = (int) $product_id;
+		if ( $product_id <= 0 ) {
+			return false;
+		}
+
+		$post = get_post( $product_id );
+		if ( ! $post || 'product' !== $post->post_type ) {
+			return false;
+		}
+
+		return current_user_can( 'edit_post', $product_id );
+	}
+
+	/**
+	 * Imports a curated template into a new PPOM field group.
+	 *
+	 * Verifies the import nonce + capability, looks up the requested template
+	 * by slug from {@see PPOM_Template_Library}, enforces the server-side Pro
+	 * gate, then delegates persistence to
+	 * {@see self::create_group_from_fields()} so the same filter chain and
+	 * sanitization that `save_form_meta` uses applies.
+	 *
+	 * Responds with `{ status, message, productmeta_id, redirect_to }` JSON.
+	 *
+	 * @return void
+	 */
+	public static function import_template() {
+
+		$db_version = floatval( get_option( 'personalizedproduct_db_version' ) );
+		$nonce      = isset( $_POST['ppom_import_template_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_import_template_nonce'] ) ) : '';
+
+		if ( $db_version < 22.1 ) {
+			wp_send_json(
+				array(
+					'message' => __( 'Since version 22.0, Database has some changes. Please Deactivate & then activate the PPOM plugin.', 'woocommerce-product-addon' ),
+					'status'  => 'error',
+				)
+			);
+		}
+
+		if ( empty( $nonce )
+			|| ! wp_verify_nonce( $nonce, 'ppom_import_template_action' )
+			|| ! Helpers::security_role()
+		) {
+			wp_send_json(
+				array(
+					'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
+					'status'  => 'error',
+				)
+			);
+		}
+
+		$slug     = isset( $_POST['template'] ) ? sanitize_key( wp_unslash( $_POST['template'] ) ) : '';
+		$template = $slug ? \PPOM_Template_Library::get_template( $slug ) : null;
+
+		if ( null === $template ) {
+			wp_send_json(
+				array(
+					'message' => __( 'Unknown template.', 'woocommerce-product-addon' ),
+					'status'  => 'error',
+				)
+			);
+		}
+
+		if ( ! \PPOM_Template_Library::user_can_use( $template ) ) {
+			wp_send_json(
+				array(
+					'message' => __( 'This template requires PPOM Pro with an active license.', 'woocommerce-product-addon' ),
+					'status'  => 'error',
+				)
+			);
+		}
+
+		$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0;
+
+		$group_name = isset( $template['group_name'] ) ? (string) $template['group_name'] : '';
+		if ( strlen( $group_name ) > 50 ) {
+			$group_name = substr( $group_name, 0, 50 );
+		}
+
+		$settings = array(
+			'productmeta_name'      => $group_name,
+			'dynamic_price_display' => '',
+			'send_file_attachment'  => 'NA',
+			'show_cart_thumb'       => 'NA',
+			'aviary_api_key'        => 'NA',
+			'productmeta_style'     => '',
+			'productmeta_js'        => '',
+		);
+
+		$fields  = isset( $template['fields'] ) && is_array( $template['fields'] ) ? $template['fields'] : array();
+		$ppom_id = self::create_group_from_fields( $fields, $settings, $product_id );
+
+		if ( ! $ppom_id ) {
+			wp_send_json(
+				array(
+					'message' => __( 'Could not import the template. Please try again.', 'woocommerce-product-addon' ),
+					'status'  => 'error',
+				)
+			);
+		}
+
+		$redirect_to = (string) add_query_arg(
+			array(
+				'page'           => 'ppom',
+				'productmeta_id' => $ppom_id,
+				'do_meta'        => 'edit',
+			),
+			admin_url( 'admin.php' )
+		);
+
+		if ( self::is_attachable_product( $product_id ) ) {
+			$product_link = (string) get_permalink( $product_id );
+			if ( '' !== $product_link ) {
+				$redirect_to = $product_link;
+			}
+		}
+
+		wp_send_json(
+			array(
+				'message'        => __( 'Template imported successfully.', 'woocommerce-product-addon' ),
+				'status'         => 'success',
+				'productmeta_id' => $ppom_id,
+				'redirect_to'    => esc_url_raw( $redirect_to ),
+			)
+		);
 	}
 
 	/**
