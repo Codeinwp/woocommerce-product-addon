@@ -100,14 +100,7 @@ export const editorSectionStrings: I18nDict = {
 	settingsTab: __( 'Settings', 'woocommerce-product-addon' ),
 	conditionsTab: __( 'Conditions', 'woocommerce-product-addon' ),
 	repeaterTab: __( 'Conditional Repeater', 'woocommerce-product-addon' ),
-	showAdvancedSettings: __(
-		'Show advanced settings',
-		'woocommerce-product-addon'
-	),
-	hideAdvancedSettings: __(
-		'Hide advanced settings',
-		'woocommerce-product-addon'
-	),
+	advancedSettings: __( 'Advanced settings', 'woocommerce-product-addon' ),
 	editorSectionBasic: __( 'Basic', 'woocommerce-product-addon' ),
 	editorSectionFieldSettings: __(
 		'Field Settings',

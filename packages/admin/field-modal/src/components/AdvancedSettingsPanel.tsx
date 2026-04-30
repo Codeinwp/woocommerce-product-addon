@@ -1,57 +1,132 @@
 /**
- * Switch toggle that reveals additional field sections (switch first, label after).
+ * Disclosure button that reveals additional field sections (gear + label + chevron).
  */
 import { useId, useState } from '@wordpress/element';
-import { HStack, Switch, Text, VStack } from '@chakra-ui/react';
+import { __, sprintf } from '@wordpress/i18n';
+import { Box, chakra, Text, VStack } from '@chakra-ui/react';
+import { LuChevronDown, LuSettings } from 'react-icons/lu';
+
+/**
+ * Builds the helper text shown under the disclosure button from the
+ * advanced section labels. Lowercases items so they read as a sentence
+ * fragment ("Configure validation, display & layout, and behavior.").
+ */
+export function formatAdvancedDescription( labels: string[] ): string {
+	if ( labels.length === 0 ) {
+		return '';
+	}
+	const lowercased = labels.map( ( s ) => s.toLowerCase() );
+	const list = new Intl.ListFormat( undefined, {
+		style: 'long',
+		type: 'conjunction',
+	} ).format( lowercased );
+	return sprintf(
+		/* translators: %s is a comma-separated list of advanced section names. */
+		__( 'Configure %s.', 'woocommerce-product-addon' ),
+		list
+	);
+}
 
 export interface AdvancedSettingsPanelProps {
-	/** Label when the panel is collapsed (e.g. “Show advanced settings”). */
-	showLabel: string;
-	/** Label when the panel is expanded (e.g. “Hide advanced settings”). */
-	hideLabel: string;
+	/** Label shown on the disclosure button (e.g. “Advanced settings”). */
+	label: string;
+	/** Optional helper text rendered below the button when collapsed and expanded. */
+	description?: string;
 	children: React.ReactNode;
 }
 
 export function AdvancedSettingsPanel( {
-	showLabel,
-	hideLabel,
+	label,
+	description,
 	children,
 }: AdvancedSettingsPanelProps ) {
 	const [ open, setOpen ] = useState( false );
-	const switchId = useId();
-	const labelText = open ? hideLabel : showLabel;
+	const contentId = useId();
 
 	return (
-		<VStack align="stretch" gap={ 0 } width="100%">
-			<HStack align="center" gap={ 2.5 } width="100%" py={ 1 }>
-				<Switch.Root
-					colorPalette="blue"
-					checked={ open }
-					onCheckedChange={ ( { checked } ) =>
-						setOpen( Boolean( checked ) )
-					}
+		<VStack align="stretch" gap={ 2 } width="100%">
+			<chakra.button
+				type="button"
+				appearance="none"
+				alignSelf="flex-start"
+				display="inline-flex"
+				alignItems="center"
+				gap={ 2 }
+				height="auto"
+				py={ 1.5 }
+				px={ 3 }
+				bg="#ffffff"
+				borderRadius="md"
+				borderWidth="1px"
+				borderColor="#d7dce3"
+				cursor="pointer"
+				textAlign="left"
+				fontSize="sm"
+				fontWeight="medium"
+				lineHeight="1.4"
+				color="#1f2937"
+				transition="background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease"
+				onClick={ () => setOpen( ( prev ) => ! prev ) }
+				_hover={ {
+					bg: '#f8fafc',
+					borderColor: '#bfc7d3',
+					boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.12)',
+				} }
+				_focusVisible={ {
+					outline: '2px solid #6366f1',
+					outlineOffset: '1px',
+				} }
+				aria-expanded={ open }
+				aria-controls={ contentId }
+			>
+				<Box
+					as="span"
+					display="inline-flex"
+					alignItems="center"
+					justifyContent="center"
 					flexShrink={ 0 }
+					width="14px"
+					height="14px"
+					color="#6b7280"
+					fontSize="14px"
 				>
-					<Switch.HiddenInput />
-					<Switch.Control />
-				</Switch.Root>
+					<LuSettings aria-hidden="true" />
+				</Box>
+				<chakra.span>{ label }</chakra.span>
+				<Box
+					as="span"
+					display="inline-flex"
+					alignItems="center"
+					justifyContent="center"
+					flexShrink={ 0 }
+					width="14px"
+					height="14px"
+					color="#6b7280"
+					fontSize="14px"
+					transition="transform 0.2s ease"
+					transform={ `rotate(${ open ? 180 : 0 }deg)` }
+				>
+					<LuChevronDown aria-hidden="true" />
+				</Box>
+			</chakra.button>
+			{ description ? (
 				<Text
-					as="label"
-					flex="1"
-					minW={ 0 }
-					mb={ 0 }
-					fontWeight="medium"
-					fontSize="sm"
-					color="gray.700"
-					cursor="pointer"
+					m={ 0 }
+					fontSize="xs"
+					color="#6b7280"
 					lineHeight="1.4"
-					onClick={ () => setOpen( ( prev ) => ! prev ) }
 				>
-					{ labelText }
+					{ description }
 				</Text>
-			</HStack>
+			) : null }
 			{ open ? (
-				<VStack align="stretch" gap={ 3 } pt={ 3 } width="100%">
+				<VStack
+					id={ contentId }
+					align="stretch"
+					gap={ 3 }
+					pt={ 1 }
+					width="100%"
+				>
 					{ children }
 				</VStack>
 			) : null }

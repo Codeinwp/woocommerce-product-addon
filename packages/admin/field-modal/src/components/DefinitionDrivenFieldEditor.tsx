@@ -8,7 +8,10 @@ import { GroupedFieldSections } from '../editors/GroupedFieldSections';
 import { ConditionalRepeaterSection } from './ConditionalRepeaterSection';
 import { shouldShowConditionalRepeaterTab } from '../panels/shouldShowConditionalRepeaterTab';
 import { renderFieldWidget } from '../widgets/registry';
-import { AdvancedSettingsPanel } from './AdvancedSettingsPanel';
+import {
+	AdvancedSettingsPanel,
+	formatAdvancedDescription,
+} from './AdvancedSettingsPanel';
 import type {
 	FieldUiDefinition,
 	FieldUiBlock,
@@ -164,18 +167,22 @@ export function DefinitionDrivenFieldEditor( {
 			primary.push( renderBlock( block ) );
 		} );
 
-		const showAdvanced =
-			i18n.showAdvancedSettings || 'Show advanced settings';
-		const hideAdvanced =
-			i18n.hideAdvancedSettings || 'Hide advanced settings';
+		const advancedLabel =
+			i18n.advancedSettings || 'Advanced settings';
+		const advancedSectionLabels = advancedBlocks.flatMap( ( block ) =>
+			block.kind === 'section' ? [ block.labelKey ] : []
+		);
+		const advancedDescription = formatAdvancedDescription(
+			advancedSectionLabels
+		);
 
 		return (
 			<VStack align="stretch" gap={ 3 }>
 				{ primary }
 				{ advancedBlocks.length > 0 && (
 					<AdvancedSettingsPanel
-						showLabel={ showAdvanced }
-						hideLabel={ hideAdvanced }
+						label={ advancedLabel }
+						description={ advancedDescription || undefined }
 					>
 						{ renderAdvancedBlocks( advancedBlocks ) }
 					</AdvancedSettingsPanel>

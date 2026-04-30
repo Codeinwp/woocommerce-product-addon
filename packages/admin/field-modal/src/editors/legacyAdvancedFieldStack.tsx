@@ -4,7 +4,10 @@
 import type { ReactNode } from 'react';
 import { useMemo } from '@wordpress/element';
 import { VStack } from '@chakra-ui/react';
-import { AdvancedSettingsPanel } from '../components/AdvancedSettingsPanel';
+import {
+	AdvancedSettingsPanel,
+	formatAdvancedDescription,
+} from '../components/AdvancedSettingsPanel';
 import { GroupedFieldSections } from './GroupedFieldSections';
 import type { GroupedFieldSectionsProps } from '../types/fieldModal';
 
@@ -61,8 +64,10 @@ export function LegacyAdvancedFieldStack( {
 		() => splitSections( sections ),
 		[ sections ]
 	);
-	const showLabel = i18n.showAdvancedSettings || 'Show advanced settings';
-	const hideLabel = i18n.hideAdvancedSettings || 'Hide advanced settings';
+	const advancedLabel = i18n.advancedSettings || 'Advanced settings';
+	const advancedDescription = formatAdvancedDescription(
+		advanced.map( ( s ) => s.label )
+	);
 
 	const insertionIdx =
 		advancedInsertion !== null &&
@@ -122,8 +127,8 @@ export function LegacyAdvancedFieldStack( {
 			{ betweenPrimaryAndAdvanced }
 			{ advanced.length > 0 && (
 				<AdvancedSettingsPanel
-					showLabel={ showLabel }
-					hideLabel={ hideLabel }
+					label={ advancedLabel }
+					description={ advancedDescription || undefined }
 				>
 					{ advancedPanelBody }
 				</AdvancedSettingsPanel>
