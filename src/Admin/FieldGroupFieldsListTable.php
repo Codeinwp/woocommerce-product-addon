@@ -149,10 +149,25 @@ final class FieldGroupFieldsListTable extends WP_List_Table {
 	/**
 	 * Empty state.
 	 *
+	 * Renders a designed empty-state card with a CTA that opens the existing
+	 * field-picker modal (`#ppom_fields_model_id`) via the global
+	 * `[data-modal-id]` handler in `js/admin/ppom-admin.js`.
+	 *
 	 * @return void
 	 */
 	public function no_items() {
-		esc_html_e( 'No fields found.', 'woocommerce-product-addon' );
+		?>
+		<div class="ppom-empty-state">
+			<span class="dashicons dashicons-forms ppom-empty-icon" aria-hidden="true"></span>
+			<h3 class="ppom-empty-title"><?php esc_html_e( 'No fields in this group yet', 'woocommerce-product-addon' ); ?></h3>
+			<p class="ppom-empty-desc">
+				<?php esc_html_e( 'Add fields like text boxes, dropdowns, checkboxes, file uploads, and more to collect input from your customers.', 'woocommerce-product-addon' ); ?>
+			</p>
+			<button type="button" class="button button-primary button-hero ppom-empty-cta" data-modal-id="ppom_fields_model_id">
+				<?php esc_html_e( 'Add your first field', 'woocommerce-product-addon' ); ?>
+			</button>
+		</div>
+		<?php
 	}
 
 	/**
