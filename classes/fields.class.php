@@ -874,16 +874,11 @@ class PPOM_Fields_Meta {
 					$condition_rules = isset( $values['rules'] ) ? $values['rules'] : array();
 					$last_array_id   = max( array_keys( $condition_rules ) );
 
-					$visibility_show = ( $values['visibility'] === 'Show' ) ? 'selected="selected"' : '';
-					$visibility_hide = ( $values['visibility'] === 'Hide' ) ? 'selected="selected"' : '';
-					$bound_all       = ( $values['bound'] === 'All' ) ? 'selected="selected"' : '';
-					$bound_any       = ( $values['bound'] === 'Any' ) ? 'selected="selected"' : '';
-
 					$html_input  = '<div class="row ppom-condition-style-wrap">';
 					$html_input .= '<div class="col-md-3 col-sm-3">';
 					$html_input .= '<select name="ppom[' . esc_attr( $field_index ) . '][conditions][visibility]" class="form-control ppom-condition-visible-bound" data-metatype="visibility">';
-					$html_input .= '<option ' . $visibility_show . ' value="Show">' . __( 'Show', 'woocommerce-product-addon' ) . '</option>';
-					$html_input .= '<option ' . $visibility_hide . ' value="Hide">' . __( 'Hide', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option ' . ( isset( $values['visibility'] ) ? selected( 'Show', $values['visibility'], false ) : '' ) . ' value="Show">' . __( 'Show', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option ' . ( isset( $values['visibility'] ) ? selected( 'Hide', $values['visibility'], false ) : '' ) . ' value="Hide">' . __( 'Hide', 'woocommerce-product-addon' ) . '</option>';
 					$html_input .= '</select>';
 					$html_input .= '</div>';
 
@@ -893,8 +888,8 @@ class PPOM_Fields_Meta {
 
 					$html_input .= '<div class="col-md-3 col-sm-3">';
 					$html_input .= '<select name="ppom[' . esc_attr( $field_index ) . '][conditions][bound]" class="form-control ppom-condition-visible-bound" data-metatype="bound">';
-					$html_input .= '<option ' . $bound_all . ' value="All">' . __( 'All', 'woocommerce-product-addon' ) . '</option>';
-					$html_input .= '<option ' . $bound_any . ' value="Any">' . __( 'Any', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option ' . ( isset( $values['bound'] ) ? selected( 'All', $values['bound'], false ) : '' ) . ' value="All">' . __( 'All', 'woocommerce-product-addon' ) . '</option>';
+					$html_input .= '<option ' . ( isset( $values['bound'] ) ? selected( 'Any', $values['bound'], false ) : '' ) . ' value="Any">' . __( 'Any', 'woocommerce-product-addon' ) . '</option>';
 					$html_input .= '</select>';
 					$html_input .= '</div>';
 
@@ -918,11 +913,6 @@ class PPOM_Fields_Meta {
 							$element_between_value_from = isset( $condition['cond-between-interval']['from'] ) ? $condition['cond-between-interval']['from'] : '';
 						}
 
-						$operator_is      = ( $condition['operators'] == 'is' ) ? 'selected="selected"' : '';
-						$operator_not     = ( $condition['operators'] == 'not' ) ? 'selected="selected"' : '';
-						$operator_greater = ( $condition['operators'] == 'greater than' ) ? 'selected="selected"' : '';
-						$operator_less    = ( $condition['operators'] == 'less than' ) ? 'selected="selected"' : '';
-
 						$html_input .= '<div class="webcontact-rules" id="rule-box-' . esc_attr( $rule_i ) . '">';
 						$html_input .= '<div class="col-md-12 col-sm-12"><label>' . __( 'Rule', 'woocommerce-product-addon' ) . ' ' . $rule_i++ . '</label></div>';
 
@@ -941,25 +931,25 @@ class PPOM_Fields_Meta {
 						$html_input .= '<select name="ppom[' . esc_attr( $field_index ) . '][conditions][rules][' . esc_attr( $rule_index ) . '][operators]" class="form-control ppom-conditional-keys" data-metatype="operators">';
 
 						$html_input .= '<optgroup label="' . __( 'Value Comparison', 'woocommerce-product-addon' ) . '">';
-						$html_input .= '<option ' . $operator_is . ' value="is">' . __( 'is', 'woocommerce-product-addon' ) . '</option>';
-						$html_input .= '<option ' . $operator_not . ' value="not">' . __( 'is not', 'woocommerce-product-addon' ) . '</option>';
-						$html_input .= '<option ' . selected( 'empty', $condition['operators'], false ) . ' value="empty">' . __( 'is empty', 'woocommerce-product-addon' ) . '</option>';
-						$html_input .= '<option ' . selected( 'any', $condition['operators'], false ) . ' value="any">' . __( 'has any value', 'woocommerce-product-addon' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'is', $condition['operators'], false ) : '' ) . ' value="is">' . __( 'is', 'woocommerce-product-addon' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'not', $condition['operators'], false ) : '' ) . ' value="not">' . __( 'is not', 'woocommerce-product-addon' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'empty', $condition['operators'], false ) : '' ) . ' value="empty">' . __( 'is empty', 'woocommerce-product-addon' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'any', $condition['operators'], false ) : '' ) . ' value="any">' . __( 'has any value', 'woocommerce-product-addon' ) . '</option>';
 						$html_input .= '</optgroup>';
 
 						$html_input .= '<optgroup label="' . __( 'Text Matching', 'woocommerce-product-addon' ) . '">';
-						$html_input .= '<option ' . selected( 'contains', $condition['operators'], false ) . ' value="contains" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'contains', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
-						$html_input .= '<option ' . selected( 'not-contains', $condition['operators'], false ) . ' value="not-contains" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'does not contain', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
-						$html_input .= '<option ' . selected( 'regex', $condition['operators'], false ) . ' value="regex" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'matches RegEx', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'contains', $condition['operators'], false ) : '' ) . ' value="contains" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'contains', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'not-contains', $condition['operators'], false ) : '' ) . ' value="not-contains" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'does not contain', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'regex', $condition['operators'], false ) : '' ) . ' value="regex" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'matches RegEx', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
 						$html_input .= '</optgroup>';
 
 						$html_input .= '<optgroup label="' . __( 'Numeric Comparison', 'woocommerce-product-addon' ) . '">';
-						$html_input .= '<option ' . $operator_greater . ' value="greater than">' . __( 'greater than', 'woocommerce-product-addon' ) . '</option>';
-						$html_input .= '<option ' . $operator_less . ' value="less than">' . __( 'less than', 'woocommerce-product-addon' ) . '</option>';
-						$html_input .= '<option ' . selected( 'between', $condition['operators'], false ) . ' value="between" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'is between', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
-						$html_input .= '<option ' . selected( 'number-multiplier', $condition['operators'], false ) . ' value="number-multiplier" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'is multiple of', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
-						$html_input .= '<option ' . selected( 'even-number', $condition['operators'], false ) . ' value="even-number" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'is even', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
-						$html_input .= '<option ' . selected( 'odd-number', $condition['operators'], false ) . ' value="odd-number" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'is odd', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'greater than', $condition['operators'], false ) : '' ) . ' value="greater than">' . __( 'greater than', 'woocommerce-product-addon' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'less than', $condition['operators'], false ) : '' ) . ' value="less than">' . __( 'less than', 'woocommerce-product-addon' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'between', $condition['operators'], false ) : '' ) . ' value="between" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'is between', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'number-multiplier', $condition['operators'], false ) : '' ) . ' value="number-multiplier" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'is multiple of', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'even-number', $condition['operators'], false ) : '' ) . ' value="even-number" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'is even', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
+						$html_input .= '<option ' . ( isset( $condition['operators'] ) ? selected( 'odd-number', $condition['operators'], false ) : '' ) . ' value="odd-number" ' . disabled( false, $pro_enabled, false ) . '>' . __( 'is odd', 'woocommerce-product-addon' ) . ( ! $pro_enabled ? ' (' . __( 'PRO', 'woocommerce-product-addon' ) . ')' : '' ) . '</option>';
 						$html_input .= '</optgroup>';
 
 						$html_input .= '</select> ';
