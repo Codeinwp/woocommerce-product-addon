@@ -350,11 +350,13 @@ class PPOM_Meta {
 
 		$meta_fields = array();
 		$repo        = ppom_meta_repository();
+		$valid_ids   = array();
 
 		if ( $this->has_multiple_meta() ) {
 
 			$rows = $repo->get_rows_by_ids( (array) $this->meta_id );
 			foreach ( $rows as $row ) {
+				$valid_ids[] = (int) $row->productmeta_id;
 				if ( ! isset( $row->the_meta ) || ! is_string( $row->the_meta ) || '' === $row->the_meta ) {
 					continue;
 				}
@@ -381,8 +383,18 @@ class PPOM_Meta {
 			if ( $row && isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled ) {
 				return null;
 			}
+			$valid_ids[] = $row ? (int) $row->productmeta_id : 0;
 			$raw         = ( $row && isset( $row->the_meta ) && is_string( $row->the_meta ) ) ? $row->the_meta : '';
 			$meta_fields = json_decode( $raw, true );
+		}
+
+		// Cleanup meta_id if there are any invalid entries.
+		if ( count( $valid_ids ) !== count( (array) $this->meta_id ) ) {
+			if ( ! empty( $valid_ids ) ) {
+				update_post_meta( self::$product_id, PPOM_PRODUCT_META_KEY, $valid_ids );
+			} else {
+				delete_post_meta( self::$product_id, PPOM_PRODUCT_META_KEY );
+			}
 		}
 
 		// Filter fields which are active only
