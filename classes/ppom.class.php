@@ -479,13 +479,27 @@ class PPOM_Meta {
 			return null;
 		}
 
-		if (
-			isset( $this->ppom_settings->productmeta_style ) &&
-			is_string( $this->ppom_settings->productmeta_style ) &&
-			$this->ppom_settings->productmeta_style !== ''
-		) {
+		if ( $this->has_multiple_meta() ) {
+			$rows = ppom_meta_repository()->get_rows_by_ids( $this->meta_id );
+			foreach ( $rows as $row ) {
+				if ( is_string( $row->productmeta_style ) && '' !== $row->productmeta_style ) {
+					$template = stripslashes( wp_strip_all_tags( $row->productmeta_style ) );
+					$selector = '';
+					if ( is_array( $this->meta_id ) ) {
+						$field_selector = array();
+						foreach ( $this->meta_id as $field_id ) {
+							$field_selector[] = '.ppom-id-' . $field_id;
+						}
+						$selector = ':where(' . implode( ', ', $field_selector ) . ')';
+					} elseif ( is_numeric( $this->meta_id ) ) {
+						$selector = '.ppom-id-' . $this->meta_id;
+					}
+					$inline_css .= str_replace( 'selector', $selector, $template );
+				}
+			}
+		} elseif ( isset( $this->ppom_settings->productmeta_style ) && is_string( $this->ppom_settings->productmeta_style ) && '' !== $this->ppom_settings->productmeta_style ) {
 			$selector = '';
-			$template = stripslashes( strip_tags( $this->ppom_settings->productmeta_style ) );
+			$template = stripslashes( wp_strip_all_tags( $this->ppom_settings->productmeta_style ) );
 
 			if ( is_array( $this->meta_id ) ) {
 				$field_selector = array();
@@ -497,6 +511,11 @@ class PPOM_Meta {
 				$selector = '.ppom-id-' . $this->meta_id;
 			}
 			$inline_css = str_replace( 'selector', $selector, $template );
+		}
+
+		$inline_css = trim( $inline_css );
+		if ( $inline_css === '' ) {
+			$inline_css = '';
 		}
 
 		return apply_filters( 'ppom_inline_css', $inline_css, $this );
@@ -516,8 +535,20 @@ class PPOM_Meta {
 			return null;
 		}
 
-		if ( isset( $this->ppom_settings->productmeta_js ) && $this->ppom_settings->productmeta_js != '' ) {
-			$inline_js = stripslashes( strip_tags( $this->ppom_settings->productmeta_js ) );
+		if ( $this->has_multiple_meta() ) {
+			$rows = ppom_meta_repository()->get_rows_by_ids( $this->meta_id );
+			foreach ( $rows as $row ) {
+				if ( is_string( $row->productmeta_js ) && '' !== $row->productmeta_js ) {
+					$inline_js .= stripslashes( $row->productmeta_js );
+				}
+			}
+		} elseif ( isset( $this->ppom_settings->productmeta_js ) && $this->ppom_settings->productmeta_js != '' ) {
+				$inline_js = stripslashes( $this->ppom_settings->productmeta_js );
+		}
+
+		$inline_js = trim( $inline_js );
+		if ( $inline_js === '' ) {
+			$inline_js = '';
 		}
 
 		return apply_filters( 'ppom_inline_js', $inline_js, $this );
