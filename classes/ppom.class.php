@@ -677,7 +677,7 @@ class PPOM_Meta {
 	/**
 	 * Generates inline CSS.
 	 *
-	 * @param string $style meta field css.
+	 * @param string|null $style meta field css.
 	 * @return string
 	 */
 	private function generate_inline_css( $style ) {
