@@ -569,6 +569,9 @@ class PPOM_FRONTEND_SCRIPTS {
 	/**
 	 * Localizes runtime data onto an enqueued PPOM frontend script handle.
 	 *
+	 * Data is structured by product ID to support multiple products on the same page.
+	 * Each product's data is stored under its product ID key in the global object.
+	 *
 	 * @param string     $handle         Registered script handle.
 	 * @param string     $var_name       JS variable name.
 	 * @param WC_Product $product        Product in the current render context.
@@ -582,6 +585,9 @@ class PPOM_FRONTEND_SCRIPTS {
 		if ( ! wp_script_is( $handle ) ) {
 			return;
 		}
+
+		$product_id    = $product->get_id();
+		$localize_data = array();
 
 		switch ( $handle ) {
 
@@ -654,6 +660,22 @@ class PPOM_FRONTEND_SCRIPTS {
 		$localize_data = array_merge( $js_vars, $localize_data, $global_js_vars );
 
 		$localize_data = apply_filters( $var_name, $localize_data, $product );
+
+		if ( 'ppom_input_vars' === $var_name ) {
+			// Store data in a product-keyed structure for multi-product support.
+			$multi_product_var = 'ppom_input_vars_by_product';
+
+			$existing_data = array();
+			if ( isset( $GLOBALS[ $multi_product_var ] ) && is_array( $GLOBALS[ $multi_product_var ] ) ) {
+				$existing_data = $GLOBALS[ $multi_product_var ];
+			}
+
+			$existing_data[ $product_id ]  = $localize_data;
+			$GLOBALS[ $multi_product_var ] = $existing_data;
+
+			// Localize the multi-product data structure.
+			PPOM_SCRIPTS::localize_script( $handle, $multi_product_var, $existing_data );
+		}
 
 		PPOM_SCRIPTS::localize_script( $handle, $var_name, $localize_data );
 	}
