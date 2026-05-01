@@ -366,10 +366,13 @@ class PPOM_Meta {
 		}
 
 		// Cleanup meta_id if there are any invalid entries.
+		$valid_ids = array_filter( $valid_ids );
 		if ( count( $valid_ids ) !== count( (array) $this->meta_id ) ) {
 			if ( ! empty( $valid_ids ) ) {
+				$this->meta_id = $this->has_multiple_meta() ? $valid_ids : (int) reset( $valid_ids );
 				update_post_meta( self::$product_id, PPOM_PRODUCT_META_KEY, $valid_ids );
 			} else {
+				$this->meta_id = null;
 				delete_post_meta( self::$product_id, PPOM_PRODUCT_META_KEY );
 			}
 		}
@@ -494,35 +497,10 @@ class PPOM_Meta {
 		if ( $this->has_multiple_meta() ) {
 			$rows = ppom_meta_repository()->get_rows_by_ids( $this->meta_id );
 			foreach ( $rows as $row ) {
-				if ( is_string( $row->productmeta_style ) && '' !== $row->productmeta_style ) {
-					$template = stripslashes( wp_strip_all_tags( $row->productmeta_style ) );
-					$selector = '';
-					if ( is_array( $this->meta_id ) ) {
-						$field_selector = array();
-						foreach ( $this->meta_id as $field_id ) {
-							$field_selector[] = '.ppom-id-' . $field_id;
-						}
-						$selector = ':where(' . implode( ', ', $field_selector ) . ')';
-					} elseif ( is_numeric( $this->meta_id ) ) {
-						$selector = '.ppom-id-' . $this->meta_id;
-					}
-					$inline_css .= str_replace( 'selector', $selector, $template );
-				}
+				$inline_css .= $this->generate_inline_css( $row->productmeta_style );
 			}
-		} elseif ( isset( $this->ppom_settings->productmeta_style ) && is_string( $this->ppom_settings->productmeta_style ) && '' !== $this->ppom_settings->productmeta_style ) {
-			$selector = '';
-			$template = stripslashes( wp_strip_all_tags( $this->ppom_settings->productmeta_style ) );
-
-			if ( is_array( $this->meta_id ) ) {
-				$field_selector = array();
-				foreach ( $this->meta_id as $field_id ) {
-					$field_selector[] = '.ppom-id-' . $field_id;
-				}
-				$selector = ':where(' . implode( ', ', $field_selector ) . ')';
-			} elseif ( is_numeric( $this->meta_id ) ) {
-				$selector = '.ppom-id-' . $this->meta_id;
-			}
-			$inline_css = str_replace( 'selector', $selector, $template );
+		} elseif ( isset( $this->ppom_settings->productmeta_style ) ) {
+			$inline_css = $this->generate_inline_css( $this->ppom_settings->productmeta_style );
 		}
 
 		$inline_css = trim( $inline_css );
@@ -551,7 +529,7 @@ class PPOM_Meta {
 			$rows = ppom_meta_repository()->get_rows_by_ids( $this->meta_id );
 			foreach ( $rows as $row ) {
 				if ( is_string( $row->productmeta_js ) && '' !== $row->productmeta_js ) {
-					$inline_js .= stripslashes( $row->productmeta_js );
+					$inline_js .= stripslashes( $row->productmeta_js ) . "\n";
 				}
 			}
 		} elseif ( isset( $this->ppom_settings->productmeta_js ) && $this->ppom_settings->productmeta_js != '' ) {
@@ -694,5 +672,35 @@ class PPOM_Meta {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * Generates inline CSS.
+	 *
+	 * @param string $style meta field css.
+	 * @return string
+	 */
+	private function generate_inline_css( $style ) {
+		$inline_css = '';
+		if ( is_string( $style ) && '' !== $style ) {
+			$template = stripslashes( wp_strip_all_tags( $style ) );
+			$selector = '';
+			if ( is_array( $this->meta_id ) ) {
+				$field_selector = array();
+				foreach ( $this->meta_id as $field_id ) {
+					if ( $field_id == 0 || $field_id == 'None' ) {
+						continue;
+					}
+
+					$field_selector[] = '.ppom-id-' . $field_id;
+				}
+				$selector = ':where(' . implode( ', ', $field_selector ) . ')';
+			} elseif ( is_numeric( $this->meta_id ) ) {
+				$selector = '.ppom-id-' . $this->meta_id;
+			}
+			$inline_css .= str_replace( 'selector', $selector, $template );
+		}
+
+		return $inline_css;
 	}
 }
