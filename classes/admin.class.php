@@ -796,17 +796,24 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			return array();
 		}
 
+		/**
+		 * The products assigned to a PPOM field group.
+		 * 
+		 * @var int[] $product_ids The product ids
+		 */
+		$product_ids = $query->posts;
+
 		$verified = array();
-		foreach ( $query->posts as $product_id ) {
-			$meta = get_post_meta( (int) $product_id, PPOM_PRODUCT_META_KEY, true );
+		foreach ( $product_ids as $product_id ) {
+			$meta = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
 
 			if ( is_array( $meta ) && in_array( $ppom_id, array_map( 'intval', $meta ), true ) ) {
-				$verified[] = (int) $product_id;
+				$verified[] = $product_id;
 				continue;
 			}
 
 			if ( is_numeric( $meta ) && (int) $meta === $ppom_id ) {
-				$verified[] = (int) $product_id;
+				$verified[] = $product_id;
 			}
 		}
 
