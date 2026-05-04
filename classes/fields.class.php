@@ -279,9 +279,7 @@ class PPOM_Fields_Meta {
 				'dataNameRequired'               => __( 'Data Name must be required', 'woocommerce-product-addon' ),
 				'dataNameExists'                 => __( 'Data Name already exists', 'woocommerce-product-addon' ),
 				'previewLoading'                 => __( 'Loading preview...', 'woocommerce-product-addon' ),
-				'previewNoProduct'               => __( 'No eligible product found for preview. Assign this group to products/categories/tags and try again.', 'woocommerce-product-addon' ),
 				'previewNoUrl'                   => __( 'Could not load the preview URL.', 'woocommerce-product-addon' ),
-				'previewSaveFirst'               => __( 'Save failed. Fix errors before opening preview.', 'woocommerce-product-addon' ),
 				'previewSelectPlaceholder'       => __( 'Search products...', 'woocommerce-product-addon' ),
 				'previewGoToAssignment'          => __( 'Go to assignment', 'woocommerce-product-addon' ),
 				'previewCheckingAvailability'    => __( 'Checking preview availability...', 'woocommerce-product-addon' ),
@@ -314,60 +312,7 @@ class PPOM_Fields_Meta {
 	 * @return array<int, array{id:int,text:string}>
 	 */
 	protected function get_assigned_products_for_meta( $ppom_id ) {
-		$query = new WP_Query(
-			array(
-				'post_type'      => 'product',
-				'post_status'    => 'publish',
-				'posts_per_page' => -1,
-				'fields'         => 'ids',
-				'no_found_rows'  => true,
-			)
-		);
-
-		if ( empty( $query->posts ) ) {
-			return array();
-		}
-
-		$assigned_ids = array();
-		foreach ( $query->posts as $product_id ) {
-			if ( ! is_int( $product_id ) ) {
-				continue;
-			}
-
-			$attached_meta = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
-
-			if ( is_array( $attached_meta ) && in_array( $ppom_id, array_map( 'intval', $attached_meta ), true ) ) {
-				$assigned_ids[] = (int) $product_id;
-				continue;
-			}
-
-			if ( is_numeric( $attached_meta ) && (int) $attached_meta === (int) $ppom_id ) {
-				$assigned_ids[] = (int) $product_id;
-			}
-		}
-
-		usort(
-			$assigned_ids,
-			static function ( $left, $right ) {
-				$left_post  = get_post( $left );
-				$right_post = get_post( $right );
-
-				$left_timestamp  = 0;
-				$right_timestamp = 0;
-
-				if ( $left_post instanceof WP_Post ) {
-					$left_modified  = strtotime( $left_post->post_modified_gmt );
-					$left_timestamp = false === $left_modified ? 0 : $left_modified;
-				}
-
-				if ( $right_post instanceof WP_Post ) {
-					$right_modified  = strtotime( $right_post->post_modified_gmt );
-					$right_timestamp = false === $right_modified ? 0 : $right_modified;
-				}
-
-				return $right_timestamp <=> $left_timestamp;
-			}
-		);
+		$assigned_ids = NM_PersonalizedProduct_Admin::query_product_ids_assigned_to_ppom( $ppom_id );
 
 		$assigned_products = array();
 		foreach ( $assigned_ids as $assigned_id ) {

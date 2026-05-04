@@ -747,20 +747,48 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	}
 
 	/**
-	 * Returns directly attached products sorted by most recent update.
+	 * Returns published products attached to a PPOM group, ordered by recency.
+	 *
+	 * Pushes the assignment filter into the database via meta_query so the
+	 * query touches only matching rows instead of the full catalog. Handles
+	 * both legacy scalar storage and serialized-array storage of
+	 * {@see PPOM_PRODUCT_META_KEY}.
 	 *
 	 * @param int $ppom_id PPOM field-group ID.
+	 * @param int $limit   Max rows; -1 for unlimited.
 	 *
 	 * @return int[]
 	 */
-	protected function get_direct_product_ids_for_ppom( $ppom_id ) {
+	public static function query_product_ids_assigned_to_ppom( $ppom_id, $limit = -1 ) {
+		$ppom_id = (int) $ppom_id;
+		if ( $ppom_id <= 0 ) {
+			return array();
+		}
+
 		$query = new WP_Query(
 			array(
 				'post_type'      => 'product',
 				'post_status'    => 'publish',
-				'posts_per_page' => -1,
+				'posts_per_page' => $limit,
 				'fields'         => 'ids',
 				'no_found_rows'  => true,
+				'orderby'        => 'modified',
+				'order'          => 'DESC',
+				'meta_query'     => array(
+					'relation' => 'OR',
+					array(
+						'key'     => PPOM_PRODUCT_META_KEY,
+						'value'   => (string) $ppom_id,
+						'compare' => '=',
+					),
+					array(
+						'key'     => PPOM_PRODUCT_META_KEY,
+						// Serialized int inside an array: matches "i:N;" with the trailing
+						// semicolon so "i:7;" cannot collide with "i:70;".
+						'value'   => 'i:' . $ppom_id . ';',
+						'compare' => 'LIKE',
+					),
+				),
 			)
 		);
 
@@ -768,25 +796,32 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			return array();
 		}
 
-		$attached_product_ids = array();
+		$verified = array();
 		foreach ( $query->posts as $product_id ) {
-			if ( ! is_int( $product_id ) ) {
+			$meta = get_post_meta( (int) $product_id, PPOM_PRODUCT_META_KEY, true );
+
+			if ( is_array( $meta ) && in_array( $ppom_id, array_map( 'intval', $meta ), true ) ) {
+				$verified[] = (int) $product_id;
 				continue;
 			}
 
-			$attached_meta = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
-
-			if ( is_array( $attached_meta ) && in_array( $ppom_id, array_map( 'intval', $attached_meta ), true ) ) {
-				$attached_product_ids[] = (int) $product_id;
-				continue;
-			}
-
-			if ( is_numeric( $attached_meta ) && (int) $attached_meta === $ppom_id ) {
-				$attached_product_ids[] = (int) $product_id;
+			if ( is_numeric( $meta ) && (int) $meta === $ppom_id ) {
+				$verified[] = (int) $product_id;
 			}
 		}
 
-		return $this->sort_product_ids_by_recency( $attached_product_ids );
+		return $verified;
+	}
+
+	/**
+	 * Returns directly attached products sorted by most recent update.
+	 *
+	 * @param int $ppom_id PPOM field-group ID.
+	 *
+	 * @return int[]
+	 */
+	protected function get_direct_product_ids_for_ppom( $ppom_id ) {
+		return self::query_product_ids_assigned_to_ppom( $ppom_id );
 	}
 
 	/**
@@ -854,7 +889,8 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			array(
 				'post_type'      => 'product',
 				'post_status'    => 'publish',
-				'posts_per_page' => -1,
+				// Caller (resolve_preview_product_id) only reads the first ID.
+				'posts_per_page' => 1,
 				'fields'         => 'ids',
 				'tax_query'      => $tax_query,
 				'orderby'        => 'modified',
@@ -875,54 +911,6 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		}
 
 		return $product_ids;
-	}
-
-	/**
-	 * Sorts products by modified date desc, then publish date desc.
-	 *
-	 * @param int[] $product_ids Product IDs.
-	 *
-	 * @return int[]
-	 */
-	protected function sort_product_ids_by_recency( $product_ids ) {
-		$product_ids = array_values( array_unique( array_map( 'intval', $product_ids ) ) );
-		usort(
-			$product_ids,
-			function ( $left, $right ) {
-				$left_modified  = $this->get_post_timestamp( $left, 'post_modified_gmt' );
-				$right_modified = $this->get_post_timestamp( $right, 'post_modified_gmt' );
-
-				if ( $left_modified === $right_modified ) {
-					$left_date  = $this->get_post_timestamp( $left, 'post_date_gmt' );
-					$right_date = $this->get_post_timestamp( $right, 'post_date_gmt' );
-
-					return $right_date <=> $left_date;
-				}
-
-				return $right_modified <=> $left_modified;
-			}
-		);
-
-		return $product_ids;
-	}
-
-	/**
-	 * Returns a comparable timestamp for a post date field.
-	 *
-	 * @param int    $post_id    Product/post ID.
-	 * @param string $date_field Post field name (e.g. post_modified_gmt).
-	 *
-	 * @return int
-	 */
-	protected function get_post_timestamp( $post_id, $date_field ) {
-		$post = get_post( $post_id );
-		if ( ! $post instanceof WP_Post || ! isset( $post->{$date_field} ) || ! is_string( $post->{$date_field} ) ) {
-			return 0;
-		}
-
-		$timestamp = strtotime( $post->{$date_field} );
-
-		return false === $timestamp ? 0 : $timestamp;
 	}
 
 	/**
