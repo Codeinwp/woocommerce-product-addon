@@ -50,6 +50,7 @@ export interface FieldModalLinks {
 	cfrUpgradeUrl?: string;
 	cfrViewDemoUrl?: string;
 	conditionUpgradeUrl?: string;
+	conditionViewDemoUrl?: string;
 }
 
 /** `GET ppom/v1/admin/field-groups/context` response. */

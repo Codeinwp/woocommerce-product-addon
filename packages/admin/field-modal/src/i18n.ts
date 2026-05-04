@@ -134,7 +134,7 @@ export const editorSectionStrings: I18nDict = {
 export const conditionStrings: I18nDict = {
 	cfrSectionTitle: __( 'Conditional Repeater', 'woocommerce-product-addon' ),
 	cfrLockedBody: __(
-		'Repeat fields based on another field’s value (e.g. quantity). Upgrade to PPOM Pro Plus or higher to enable Conditional Repeater.',
+		'Automatically repeat fields based on the value entered in another field, such as a Number, Variation Quantity, or Quantity Pack field.',
 		'woocommerce-product-addon'
 	),
 	cfrEnableLabel: __(
@@ -182,7 +182,7 @@ export const conditionStrings: I18nDict = {
 	cfrCopied: __( 'Copied', 'woocommerce-product-addon' ),
 	cfrCopyFallback: __( 'Copy this value:', 'woocommerce-product-addon' ),
 	cfrUpgradeCta: __( 'Upgrade to Pro', 'woocommerce-product-addon' ),
-	cfrViewDemoLabel: __( 'View demo', 'woocommerce-product-addon' ),
+	cfrViewDemoLabel: __( 'View Demo', 'woocommerce-product-addon' ),
 	condShow: __( 'Show', 'woocommerce-product-addon' ),
 	condHide: __( 'Hide', 'woocommerce-product-addon' ),
 	condAll: __( 'All', 'woocommerce-product-addon' ),
@@ -224,6 +224,10 @@ export const conditionStrings: I18nDict = {
 		'woocommerce-product-addon'
 	),
 	conditionUpgradeCta: __( 'Upgrade to Unlock', 'woocommerce-product-addon' ),
+	condLockedBody: __(
+		'Show or hide this field based on the values of other fields in the form. Build rules using simple comparisons or advanced operators.',
+		'woocommerce-product-addon'
+	),
 	condEditorTitle: __( 'Conditional logic', 'woocommerce-product-addon' ),
 	condEditorDesc: __(
 		'Show or hide this field based on other product options.',

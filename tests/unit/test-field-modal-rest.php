@@ -57,6 +57,7 @@ class Test_Field_Modal_Rest extends PPOM_Test_Case {
 		$this->assertArrayHasKey( 'cfrUpgradeUrl', $data['links'] );
 		$this->assertArrayHasKey( 'cfrViewDemoUrl', $data['links'] );
 		$this->assertArrayHasKey( 'conditionUpgradeUrl', $data['links'] );
+		$this->assertArrayHasKey( 'conditionViewDemoUrl', $data['links'] );
 		$this->assertArrayNotHasKey( 'i18n', $data, 'Static React modal copy should not be shipped in REST context.' );
 		$this->assertArrayHasKey( 'conditions_pro_enabled', $data );
 		$this->assertIsBool( $data['conditions_pro_enabled'] );

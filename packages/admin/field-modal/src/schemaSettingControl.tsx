@@ -5,6 +5,7 @@ import { renderPrimitiveSettingControl } from './controls';
 import { ConditionsEditor } from './ConditionsEditor';
 import { PairedCropperEditor } from './components/PairedCropperEditor';
 import { PairedQuantityEditor } from './components/PairedQuantityEditor';
+import { ProFeatureUpsellCard } from './components/ProFeatureUpsellCard';
 import type { SettingRowContext } from './types/fieldModal';
 
 export function openLegacyFieldModal( ppomFieldIndex: number ) {
@@ -41,6 +42,23 @@ export function renderSettingRow(
 	if ( type === 'html-conditions' ) {
 		const builderFields = ctx.builderFields || [];
 		const conditionsProEnabled = !! ctx.conditionsProEnabled;
+		const links = ctx.links || {};
+
+		if ( ! conditionsProEnabled ) {
+			return (
+				<ProFeatureUpsellCard
+					key={ key }
+					title={ i18n.condEditorTitle || 'Conditional logic' }
+					description={ i18n.condLockedBody || '' }
+					primaryUrl={ links.conditionUpgradeUrl }
+					primaryLabel={ i18n.cfrUpgradeCta || 'Upgrade to Pro' }
+					secondaryUrl={ links.conditionViewDemoUrl }
+					secondaryLabel={ i18n.cfrViewDemoLabel || 'View Demo' }
+					badgeLabel={ i18n.proBadge || 'PRO' }
+				/>
+			);
+		}
+
 		return (
 			<ConditionsEditor
 				key={ key }
@@ -50,7 +68,7 @@ export function renderSettingRow(
 				i18n={ i18n }
 				builderFields={ builderFields }
 				conditionsProEnabled={ conditionsProEnabled }
-				links={ ctx.links || {} }
+				links={ links }
 			/>
 		);
 	}

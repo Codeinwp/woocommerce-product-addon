@@ -1,11 +1,14 @@
 /**
  * Conditional Field Repeater (Plus) — boot-gated; not driven by PHP schema tabs.
  */
-import { Steps, Alert, Link, Text, VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import { ConditionalRepeaterMappingEditor } from './ConditionalRepeaterMappingEditor';
-import type { FieldRow } from '../types/fieldModal';
-import type { I18nDict, ModalContextValue } from '../types/fieldModal';
+import { ProFeatureUpsellCard } from './ProFeatureUpsellCard';
+import type {
+	FieldRow,
+	I18nDict,
+	ModalContextValue,
+} from '../types/fieldModal';
 
 export interface ConditionalRepeaterSectionProps {
 	i18n: I18nDict;
@@ -44,38 +47,14 @@ export function ConditionalRepeaterSection( {
 	}
 
 	return (
-		<Alert.Root status="warning" variant="subtle" borderRadius="md">
-			<Alert.Indicator />
-			<VStack align="stretch" gap={ 2 }>
-				<Text fontWeight="semibold" fontSize="sm">
-					{ title } (PRO)
-				</Text>
-				<Text fontSize="sm" lineHeight="1.5">
-					{ i18n.cfrLockedBody ||
-						'Upgrade to PPOM Pro Plus or higher to enable Conditional Repeater.' }
-				</Text>
-				{ upgradeUrl ? (
-					<Link
-						href={ upgradeUrl }
-						color="blue.600"
-						fontWeight="semibold"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{ i18n.cfrUpgradeCta || 'Upgrade to Pro' }
-					</Link>
-				) : null }
-				{ demoUrl ? (
-					<Link
-						href={ demoUrl }
-						fontSize="sm"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{ i18n.cfrViewDemoLabel || 'View demo' }
-					</Link>
-				) : null }
-			</VStack>
-		</Alert.Root>
+		<ProFeatureUpsellCard
+			title={ title }
+			description={ i18n.cfrLockedBody }
+			primaryUrl={ upgradeUrl }
+			primaryLabel={ i18n.cfrUpgradeCta || 'Upgrade to Pro' }
+			secondaryUrl={ demoUrl }
+			secondaryLabel={ i18n.cfrViewDemoLabel || 'View Demo' }
+			badgeLabel={ i18n.proBadge || 'PRO' }
+		/>
 	);
 }
