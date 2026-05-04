@@ -27,8 +27,7 @@ function titleSetting( desc?: string ): SettingMeta {
 	return setting(
 		'text',
 		__( 'Title', 'woocommerce-product-addon' ),
-		desc ||
-			__( 'It will be shown as field label', 'woocommerce-product-addon' )
+		desc ?? ''
 	);
 }
 
@@ -48,11 +47,7 @@ function descriptionSetting( desc?: string ): SettingMeta {
 	return setting(
 		'textarea',
 		__( 'Description', 'woocommerce-product-addon' ),
-		desc ||
-			__(
-				'Small description, it will be display near name title.',
-				'woocommerce-product-addon'
-			)
+		desc ?? ''
 	);
 }
 
@@ -60,7 +55,7 @@ function placeholderSetting( desc?: string ): SettingMeta {
 	return setting(
 		'text',
 		__( 'Placeholder', 'woocommerce-product-addon' ),
-		desc || __( 'Optional.', 'woocommerce-product-addon' )
+		desc ?? ''
 	);
 }
 
@@ -68,10 +63,7 @@ function errorMessageSetting(): SettingMeta {
 	return setting(
 		'text',
 		__( 'Error message', 'woocommerce-product-addon' ),
-		__(
-			'Insert the error message for validation.',
-			'woocommerce-product-addon'
-		)
+		''
 	);
 }
 
@@ -79,11 +71,7 @@ function classSetting( desc?: string ): SettingMeta {
 	return setting(
 		'text',
 		__( 'Class', 'woocommerce-product-addon' ),
-		desc ||
-			__(
-				'Insert an additional class(es) (separated by comma) for more personalization.',
-				'woocommerce-product-addon'
-			),
+		desc ?? '',
 		{ col_classes: HALF_WIDTH }
 	);
 }
@@ -108,7 +96,7 @@ function widthSetting( desc?: string ): SettingMeta {
 	return setting(
 		'select',
 		__( 'Width', 'woocommerce-product-addon' ),
-		desc || __( 'Select width column.', 'woocommerce-product-addon' ),
+		desc ?? '',
 		{
 			options: widthOptions(),
 			default: 12,
@@ -130,10 +118,7 @@ function visibilitySetting(): SettingMeta {
 	return setting(
 		'select',
 		__( 'Visibility', 'woocommerce-product-addon' ),
-		__(
-			'Set field visibility based on user.',
-			'woocommerce-product-addon'
-		),
+		'',
 		{
 			options: visibilityOptions(),
 			default: 'everyone',
@@ -146,7 +131,7 @@ function visibilityRoleSetting(): SettingMeta {
 	return setting(
 		'text',
 		__( 'User Roles', 'woocommerce-product-addon' ),
-		__( 'Role separated by comma.', 'woocommerce-product-addon' ),
+		'',
 		{ hidden: true }
 	);
 }
@@ -155,10 +140,7 @@ function descTooltipSetting(): SettingMeta {
 	return setting(
 		'checkbox',
 		__( 'Show tooltip', 'woocommerce-product-addon' ),
-		__(
-			'Show Description in Tooltip with Help Icon',
-			'woocommerce-product-addon'
-		),
+		'',
 		{ col_classes: HALF_WIDTH }
 	);
 }
@@ -167,10 +149,7 @@ function requiredSetting(): SettingMeta {
 	return setting(
 		'checkbox',
 		__( 'Required', 'woocommerce-product-addon' ),
-		__(
-			'Select this if it must be required.',
-			'woocommerce-product-addon'
-		),
+		'',
 		{ col_classes: HALF_WIDTH }
 	);
 }
@@ -179,10 +158,7 @@ function logicSetting(): SettingMeta {
 	return setting(
 		'switch',
 		__( 'Enable Conditions', 'woocommerce-product-addon' ),
-		__(
-			'Tick it to turn conditional logic to work below',
-			'woocommerce-product-addon'
-		)
+		''
 	);
 }
 
@@ -262,9 +238,7 @@ function textSettings(): SettingSchema {
 		title: titleSetting(),
 		data_name: dataNameSetting(),
 		description: descriptionSetting(),
-		placeholder: placeholderSetting(
-			__( 'Optionally placeholder.', 'woocommerce-product-addon' )
-		),
+		placeholder: placeholderSetting(),
 		error_message: errorMessageSetting(),
 		maxlength: setting(
 			'text',
@@ -287,10 +261,7 @@ function textSettings(): SettingSchema {
 		default_value: setting(
 			'text',
 			__( 'Set default value', 'woocommerce-product-addon' ),
-			__(
-				'Pre-defined value for text input',
-				'woocommerce-product-addon'
-			),
+			'',
 			{ col_classes: HALF_WIDTH }
 		),
 		price: setting(
@@ -388,16 +359,11 @@ function textareaSettings(): SettingSchema {
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
-		width: widthSetting(
-			__( 'Select width column', 'woocommerce-product-addon' )
-		),
+		width: widthSetting(),
 		visibility: setting(
 			'select',
 			__( 'Visibility', 'woocommerce-product-addon' ),
-			__(
-				'Set field visibility based on user.',
-				'woocommerce-product-addon'
-			),
+			'',
 			{
 				options: visibilityOptions(),
 				default: 'everyone',
@@ -435,10 +401,7 @@ function emailSettings(): SettingSchema {
 		visibility: setting(
 			'select',
 			__( 'Visibility', 'woocommerce-product-addon' ),
-			__(
-				'Set field visibility based on user.',
-				'woocommerce-product-addon'
-			),
+			'',
 			{
 				options: visibilityOptions(),
 				default: 'everyone',
@@ -457,9 +420,7 @@ function numberSettings(): SettingSchema {
 		title: titleSetting(),
 		data_name: dataNameSetting(),
 		description: descriptionSetting(),
-		placeholder: placeholderSetting(
-			__( 'Optionally placeholder.', 'woocommerce-product-addon' )
-		),
+		placeholder: placeholderSetting(),
 		error_message: errorMessageSetting(),
 		max: setting(
 			'text',
@@ -491,10 +452,7 @@ function numberSettings(): SettingSchema {
 		default_value: setting(
 			'text',
 			__( 'Set default value', 'woocommerce-product-addon' ),
-			__(
-				'Pre-defined value for text input',
-				'woocommerce-product-addon'
-			),
+			'',
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
@@ -502,10 +460,7 @@ function numberSettings(): SettingSchema {
 		visibility: setting(
 			'select',
 			__( 'Visibility', 'woocommerce-product-addon' ),
-			__(
-				'Set field visibility based on user.',
-				'woocommerce-product-addon'
-			),
+			'',
 			{
 				options: visibilityOptions(),
 				default: 'everyone',
@@ -536,10 +491,7 @@ function hiddenSettings(): SettingSchema {
 		visibility: setting(
 			'select',
 			__( 'Visibility', 'woocommerce-product-addon' ),
-			__(
-				'Set field visibility based on user.',
-				'woocommerce-product-addon'
-			),
+			'',
 			{
 				options: visibilityOptions(),
 				default: 'everyone',
@@ -581,15 +533,13 @@ function selectSettings(): SettingSchema {
 			'text',
 			__( 'First option', 'woocommerce-product-addon' ),
 			__(
-				'Just for info e.g: Select your option.',
+				'Placeholder shown before a customer selects an option.',
 				'woocommerce-product-addon'
 			),
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
-		width: widthSetting(
-			__( 'Select width column', 'woocommerce-product-addon' )
-		),
+		width: widthSetting(),
 		visibility: visibilitySetting(),
 		visibility_role: visibilityRoleSetting(),
 		desc_tooltip: descTooltipSetting(),
@@ -615,9 +565,7 @@ function checkboxSettings(): SettingSchema {
 			)
 		),
 		class: classSetting(),
-		width: widthSetting(
-			__( 'Select width column.', 'woocommerce-product-addon' )
-		),
+		width: widthSetting(),
 		checked: setting(
 			'textarea',
 			__( 'Checked option(s)', 'woocommerce-product-addon' ),
@@ -647,10 +595,7 @@ function checkboxSettings(): SettingSchema {
 		visibility: setting(
 			'select',
 			__( 'Visibility', 'woocommerce-product-addon' ),
-			__(
-				'Set field visibility based on user.',
-				'woocommerce-product-addon'
-			),
+			'',
 			{
 				options: visibilityOptions(),
 				default: 'everyone',
@@ -669,12 +614,7 @@ function radioSettings(): SettingSchema {
 	return {
 		title: titleSetting(),
 		data_name: dataNameSetting(),
-		description: descriptionSetting(
-			__(
-				'Small description, it will be diplay near name title.',
-				'woocommerce-product-addon'
-			)
-		),
+		description: descriptionSetting(),
 		error_message: errorMessageSetting(),
 		options: setting(
 			'paired',
@@ -693,16 +633,11 @@ function radioSettings(): SettingSchema {
 			)
 		),
 		class: classSetting(),
-		width: widthSetting(
-			__( 'Select width column', 'woocommerce-product-addon' )
-		),
+		width: widthSetting(),
 		visibility: setting(
 			'select',
 			__( 'Visibility', 'woocommerce-product-addon' ),
-			__(
-				'Set field visibility based on user.',
-				'woocommerce-product-addon'
-			),
+			'',
 			{
 				options: visibilityOptions(),
 				default: 'everyone',
@@ -721,12 +656,7 @@ function switcherSettings(): SettingSchema {
 	return {
 		title: titleSetting(),
 		data_name: dataNameSetting(),
-		description: descriptionSetting(
-			__(
-				'Small description, it will be diplay near name title.',
-				'woocommerce-product-addon'
-			)
-		),
+		description: descriptionSetting(),
 		error_message: errorMessageSetting(),
 		options: setting(
 			'paired-switch',
@@ -796,16 +726,11 @@ function switcherSettings(): SettingSchema {
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
-		width: widthSetting(
-			__( 'Select width column', 'woocommerce-product-addon' )
-		),
+		width: widthSetting(),
 		visibility: setting(
 			'select',
 			__( 'Visibility', 'woocommerce-product-addon' ),
-			__(
-				'Set field visibility based on user.',
-				'woocommerce-product-addon'
-			),
+			'',
 			{
 				options: visibilityOptions(),
 				default: 'everyone',
@@ -832,18 +757,13 @@ function dateSettings(): SettingSchema {
 		description: descriptionSetting(),
 		placeholder: placeholderSetting(),
 		error_message: errorMessageSetting(),
-		class: classSetting(
-			__(
-				'Insert an additional class(es) (separate by comma) for more personalization.',
-				'woocommerce-product-addon'
-			)
-		),
+		class: classSetting(),
 		width: widthSetting(),
 		date_formats: setting(
 			'select',
 			__( 'Date format', 'woocommerce-product-addon' ),
 			__(
-				'[ This feature requires jQuery datePicker ] Select your preferred date format.',
+				'Select your preferred date format.',
 				'woocommerce-product-addon'
 			),
 			{
@@ -855,7 +775,7 @@ function dateSettings(): SettingSchema {
 			'text',
 			__( 'Default Date', 'woocommerce-product-addon' ),
 			__(
-				'[ This feature requires jQuery datePicker ] The default highlighted date if the date field is blank.  Enter a date or use shortcode (examples: +10d, +17d, +1m +7d). Full dates should follow the same date format you have selected for this field.',
+				'The default highlighted date if the date field is blank. Enter a date or use shortcode (examples: +10d, +17d, +1m +7d). Full dates should follow the same date format you have selected for this field.',
 				'woocommerce-product-addon'
 			),
 			{
@@ -870,7 +790,7 @@ function dateSettings(): SettingSchema {
 			'text',
 			__( 'Min Date', 'woocommerce-product-addon' ),
 			__(
-				'[ This feature requires jQuery datePicker ] The earliest selectable date. Enter a date or use shortcode (examples: +10d, +17d, +1m +7d). Full dates should follow the same date format you have selected for this field.',
+				'The earliest selectable date. Enter a date or use shortcode (examples: +10d, +17d, +1m +7d). Full dates should follow the same date format you have selected for this field.',
 				'woocommerce-product-addon'
 			),
 			{
@@ -885,7 +805,7 @@ function dateSettings(): SettingSchema {
 			'text',
 			__( 'Max Date', 'woocommerce-product-addon' ),
 			__(
-				'[ This feature requires jQuery datePicker ] The maximum selectable date. Enter a date or use shortcode (examples: +10d, +17d, +1m +7d). Full dates should follow the same date format you have selected for this field.',
+				'The maximum selectable date. Enter a date or use shortcode (examples: +10d, +17d, +1m +7d). Full dates should follow the same date format you have selected for this field.',
 				'woocommerce-product-addon'
 			),
 			{
@@ -900,7 +820,7 @@ function dateSettings(): SettingSchema {
 			'text',
 			__( 'Year Range', 'woocommerce-product-addon' ),
 			__(
-				'[ This feature requires jQuery datePicker ] Years to allow date selections. Example: c-10:c+10.',
+				'Years to allow date selections. Example: c-10:c+10.',
 				'woocommerce-product-addon'
 			),
 			{
@@ -915,7 +835,7 @@ function dateSettings(): SettingSchema {
 			'select',
 			__( 'First day of week', 'woocommerce-product-addon' ),
 			__(
-				'[ This feature requires jQuery datePicker ] First day of the week to show on the popup calendar.',
+				'First day of the week to show on the popup calendar.',
 				'woocommerce-product-addon'
 			),
 			{
@@ -943,7 +863,7 @@ function dateSettings(): SettingSchema {
 			'checkbox',
 			__( 'Disable Weekends', 'woocommerce-product-addon' ),
 			__(
-				'[ This feature requires jQuery datePicker ] Prevent display &amp; selection of weekends.',
+				'Prevent display &amp; selection of weekends.',
 				'woocommerce-product-addon'
 			),
 			{ col_classes: HALF_WIDTH }
@@ -952,7 +872,7 @@ function dateSettings(): SettingSchema {
 			'checkbox',
 			__( 'Disable Past Dates', 'woocommerce-product-addon' ),
 			__(
-				"[ This feature requires jQuery datePicker ] Prevent selection of dates prior to today's date.",
+				"Prevent selection of dates prior to today's date.",
 				'woocommerce-product-addon'
 			),
 			{ col_classes: HALF_WIDTH }
@@ -983,7 +903,7 @@ function timezoneSettings(): SettingSchema {
 			'text',
 			__( 'First option', 'woocommerce-product-addon' ),
 			__(
-				'Just for info e.g: Select your option.',
+				'Placeholder shown before a customer selects an option.',
 				'woocommerce-product-addon'
 			),
 			{ col_classes: HALF_WIDTH }
@@ -998,9 +918,7 @@ function timezoneSettings(): SettingSchema {
 			{ default: 'All' }
 		),
 		class: classSetting(),
-		width: widthSetting(
-			__( 'Select width column', 'woocommerce-product-addon' )
-		),
+		width: widthSetting(),
 		visibility: visibilitySetting(),
 		visibility_role: visibilityRoleSetting(),
 		show_time: setting(
@@ -1052,7 +970,7 @@ function colorSettings(): SettingSchema {
 		palettes_mode: setting(
 			'select',
 			__( 'Palettes mode', 'woocommerce-product-addon' ),
-			__( 'Select Mode', 'woocommerce-product-addon' ),
+			'',
 			{
 				options: {
 					hsl: 'Hue, Saturation, Lightness',
@@ -1061,9 +979,7 @@ function colorSettings(): SettingSchema {
 				col_classes: HALF_WIDTH,
 			}
 		),
-		width: widthSetting(
-			__( 'Select width column.', 'woocommerce-product-addon' )
-		),
+		width: widthSetting(),
 		visibility: visibilitySetting(),
 		visibility_role: visibilityRoleSetting(),
 		show_palettes: setting(
@@ -1866,15 +1782,13 @@ function chainedSettings(): SettingSchema {
 			'text',
 			__( 'First option', 'woocommerce-product-addon' ),
 			__(
-				'Just for info e.g: Select your option.',
+				'Placeholder shown before a customer selects an option.',
 				'woocommerce-product-addon'
 			),
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
-		width: widthSetting(
-			__( 'Select width column', 'woocommerce-product-addon' )
-		),
+		width: widthSetting(),
 		visibility: visibilitySetting(),
 		visibility_role: visibilityRoleSetting(),
 		desc_tooltip: descTooltipSetting(),
@@ -2019,7 +1933,7 @@ function cropperSettings(): SettingSchema {
 			'text',
 			__( 'First option', 'woocommerce-product-addon' ),
 			__(
-				'Just for info e.g: Select your option.',
+				'Placeholder shown before a customer selects an option.',
 				'woocommerce-product-addon'
 			),
 			{ col_classes: HALF_WIDTH }
@@ -2174,7 +2088,7 @@ function emojisSettings(): SettingSchema {
 		emojis_display_type: setting(
 			'select',
 			__( 'Input Type', 'woocommerce-product-addon' ),
-			__( 'Set input type.', 'woocommerce-product-addon' ),
+			'',
 			{
 				options: {
 					textarea: __( 'Textarea', 'woocommerce-product-addon' ),
@@ -2187,28 +2101,26 @@ function emojisSettings(): SettingSchema {
 		search_placeholder: setting(
 			'text',
 			__( 'Search Placeholder', 'woocommerce-product-addon' ),
-			__( 'Set search placeholder.', 'woocommerce-product-addon' ),
+			'',
 			{ col_classes: HALF_WIDTH }
 		),
-		placeholder: placeholderSetting(
-			__( 'Set placeholder.', 'woocommerce-product-addon' )
-		),
+		placeholder: placeholderSetting(),
 		filters_position: setting(
 			'select',
 			__( 'Filters Position', 'woocommerce-product-addon' ),
-			__( 'Set filters position.', 'woocommerce-product-addon' ),
+			'',
 			{ options: topBottomOptions(), col_classes: HALF_WIDTH }
 		),
 		search_position: setting(
 			'select',
 			__( 'Search Position', 'woocommerce-product-addon' ),
-			__( 'Set search position.', 'woocommerce-product-addon' ),
+			'',
 			{ options: topBottomOptions(), col_classes: HALF_WIDTH }
 		),
 		picker_position: setting(
 			'select',
 			__( 'Emojis Picker Position', 'woocommerce-product-addon' ),
-			__( 'Set emojis picker position.', 'woocommerce-product-addon' ),
+			'',
 			{
 				options: {
 					top: __( 'Top', 'woocommerce-product-addon' ),
@@ -2221,7 +2133,7 @@ function emojisSettings(): SettingSchema {
 		tones_Style: setting(
 			'select',
 			__( 'Tones Style', 'woocommerce-product-addon' ),
-			__( 'Set tones style.', 'woocommerce-product-addon' ),
+			'',
 			{
 				options: {
 					bullet: __( 'Bullet', 'woocommerce-product-addon' ),
@@ -2235,19 +2147,19 @@ function emojisSettings(): SettingSchema {
 		recent_emojis: setting(
 			'checkbox',
 			__( 'Enable Recent Emojis', 'woocommerce-product-addon' ),
-			__( 'Enable recent emojis.', 'woocommerce-product-addon' ),
+			'',
 			{ col_classes: HALF_WIDTH }
 		),
 		tones: setting(
 			'checkbox',
 			__( 'Enable Tones', 'woocommerce-product-addon' ),
-			__( 'Enable tones.', 'woocommerce-product-addon' ),
+			'',
 			{ col_classes: HALF_WIDTH }
 		),
 		search: setting(
 			'checkbox',
 			__( 'Enable Search', 'woocommerce-product-addon' ),
-			__( 'Enable search.', 'woocommerce-product-addon' ),
+			'',
 			{ col_classes: HALF_WIDTH }
 		),
 		visibility: visibilitySetting(),
@@ -2440,7 +2352,7 @@ function imageselectSettings(): SettingSchema {
 		title: setting(
 			'text',
 			__( 'Titles', 'woocommerce-product-addon' ),
-			__( 'It will be shown as field label', 'woocommerce-product-addon' )
+			''
 		),
 		data_name: dataNameSetting(),
 		description: setting(
