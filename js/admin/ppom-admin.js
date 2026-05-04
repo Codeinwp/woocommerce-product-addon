@@ -395,6 +395,40 @@ jQuery( function ( $ ) {
 	);
 
 	/**
+	  8- Delete a single field row (delegates to the bulk Remove flow so both
+	  paths share the exact same delete behaviour).
+	 */
+	$( '.ppom-main-field-wrapper' ).on(
+		'click',
+		'.ppom-delete-field',
+		function ( e ) {
+			e.preventDefault();
+
+			const field_id = $( this ).attr( 'id' );
+			const $checkboxes = $(
+				'.ppom_field_table tbody .check-column input[type="checkbox"]'
+			);
+			const previouslyChecked = $checkboxes
+				.filter( ':checked' )
+				.map( function () {
+					return this.value;
+				} )
+				.get()
+				.filter( ( id ) => id !== field_id );
+
+			$checkboxes.prop( 'checked', false );
+			$( `#ppom-field-cb-${ field_id }` ).prop( 'checked', true );
+			$( '.ppom_remove_field' ).first().trigger( 'click' );
+
+			// Restore the user's prior selection so other checked rows are
+			// not silently un-selected by the temporary single-row tick above.
+			previouslyChecked.forEach( ( id ) => {
+				$( `#ppom-field-cb-${ id }` ).prop( 'checked', true );
+			} );
+		}
+	);
+
+	/**
 	  9- Edit Existing Fields
 	 */
 	var lockedDataName = false;

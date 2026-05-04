@@ -335,12 +335,14 @@ final class FieldGroupFieldsListTable extends WP_List_Table {
 
 		return sprintf(
 			'<button type="button" class="button ppom_copy_field%1$s" data-field-type="%2$s" title="%3$s" id="%4$d"><span class="dashicons dashicons-admin-page" aria-hidden="true"></span><span class="screen-reader-text">%3$s</span></button> '
-				. '<button type="button" class="button ppom-edit-field%1$s" data-modal-id="ppom_field_model_%4$d" id="%4$d" title="%5$s"><span class="dashicons dashicons-edit" aria-hidden="true"></span><span class="screen-reader-text">%5$s</span></button>',
+				. '<button type="button" class="button ppom-edit-field%1$s" data-modal-id="ppom_field_model_%4$d" id="%4$d" title="%5$s"><span class="dashicons dashicons-edit" aria-hidden="true"></span><span class="screen-reader-text">%5$s</span></button> '
+				. '<button type="button" class="button ppom-delete-field" id="%4$d" title="%6$s"><span class="dashicons dashicons-trash" aria-hidden="true"></span><span class="screen-reader-text">%6$s</span></button>',
 			esc_attr( $pro_class ),
 			esc_attr( $field_type ),
 			esc_attr__( 'Copy Field', 'woocommerce-product-addon' ),
 			$index,
-			esc_attr__( 'Edit Field', 'woocommerce-product-addon' )
+			esc_attr__( 'Edit Field', 'woocommerce-product-addon' ),
+			esc_attr__( 'Delete Field', 'woocommerce-product-addon' )
 		);
 	}
 

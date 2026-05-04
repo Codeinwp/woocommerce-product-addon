@@ -153,12 +153,29 @@ button[data-modal-id="ppom_fields_model_id"]{
 }
 
 .ppom_field_table .column-actions {
-    width: 120px;
     white-space: nowrap;
 }
 
-.ppom_field_table .column-actions .button + .button {
-    margin-left: 6px;
+.ppom_field_table td.column-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.ppom-delete-field.button {
+    color: #b32d2e;
+    border-color: #b32d2e;
+}
+
+.ppom-delete-field.button:hover,
+.ppom-delete-field.button:focus {
+    color: #fff;
+    background: #b32d2e;
+    border-color: #8a1f20;
+}
+
+.ppom-delete-field.button:focus {
+    box-shadow: 0 0 0 1px #8a1f20;
+    outline: 2px solid transparent;
 }
 
 .ppom-fields-tablenav .alignleft.actions {
