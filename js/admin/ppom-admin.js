@@ -165,6 +165,9 @@ jQuery( function ( $ ) {
 	$( '.ppom-save-fields-meta' ).on( 'submit', function ( e ) {
 		e.preventDefault();
 
+		const openPreviewOnSuccess =
+			window.ppomPreviewModal?.consumeSaveAndPreviewIntent?.() || false;
+
 		jQuery( '.ppom-meta-save-notice' )
 			.html( '<img src="' + ppom_vars.loader + '">' )
 			.show();
@@ -199,19 +202,29 @@ jQuery( function ( $ ) {
 		} )
 			.then( ( response ) => response.json() )
 			.then( ( resp ) => {
-				const bg_color =
-					resp.status == 'success' ? '#4e694859' : '#ee8b94';
+				const isSuccess = resp.status === 'success';
 				jQuery( '.ppom-meta-save-notice' ).html( resp.message ).css( {
-					'background-color': bg_color,
+					'background-color': isSuccess ? '#4e694859' : '#ee8b94',
 					padding: '8px',
-					'border-left': '5px solid #008c00',
+					'border-left':
+						'5px solid ' + ( isSuccess ? '#008c00' : '#c00' ),
 				} );
-				if ( resp.status == 'success' ) {
-					if ( resp.redirect_to != '' ) {
-						window.location = resp.redirect_to;
-					} else {
-						window.location.reload();
-					}
+
+				if ( ! isSuccess ) {
+					return;
+				}
+
+				unsaved = false;
+
+				if ( openPreviewOnSuccess ) {
+					window.ppomPreviewModal?.open?.( resp.productmeta_id );
+					return;
+				}
+
+				if ( resp.redirect_to != '' ) {
+					window.location = resp.redirect_to;
+				} else {
+					window.location.reload();
 				}
 			} )
 			.catch( () => {
@@ -962,6 +975,7 @@ jQuery( function ( $ ) {
 			.then( ( response ) => response.json() )
 			.then( ( resp ) => {
 				alert( resp.message );
+				document.dispatchEvent( new CustomEvent( 'ppom:attachments-updated' ) );
 
 				const openModalBtn = document.querySelector(
 					'.ppom-products-modal'
