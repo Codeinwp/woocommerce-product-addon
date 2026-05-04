@@ -45,19 +45,39 @@ wp_nonce_field( 'ppom_meta_nonce_action', 'ppom_meta_nonce' );
 ppom_load_template( 'admin/product-modal.php' );
 ?>
 
-<!-- Upgrade to pro modal -->
-<div id="ppom-import-upsell" class="ppom-modal-box ppom-upsell-modal" style="display: none;">
+<?php
+$ppom_upsell_modals = array(
+	array(
+		'id'    => 'ppom-import-upsell',
+		'title' => __( 'Importing fields is a PRO feature', 'woocommerce-product-addon' ),
+		'body'  => __( 'We\'re sorry, importing fields is not available on your plan. Please upgrade to the Pro plan to unlock all these features and enhance your product fields management capabilities.', 'woocommerce-product-addon' ),
+		'utm'   => 'lockedimport',
+	),
+	array(
+		'id'    => 'ppom-export-upsell',
+		'title' => __( 'Exporting fields is a PRO feature', 'woocommerce-product-addon' ),
+		'body'  => __( 'We\'re sorry, exporting fields is not available on your plan. Please upgrade to the Pro plan to unlock all these features and enhance your product fields management capabilities.', 'woocommerce-product-addon' ),
+		'utm'   => 'lockedexport',
+	),
+);
+
+if ( ! ppom_pro_is_installed() ) :
+	foreach ( $ppom_upsell_modals as $ppom_upsell_modal ) :
+		?>
+<div id="<?php echo esc_attr( $ppom_upsell_modal['id'] ); ?>" class="ppom-modal-box ppom-upsell-modal" style="display: none;">
 	<div class="ppom-modal-body">
 		<button type="button" aria-label="close" class="close-model ppom-js-modal-close"><span class="dashicons dashicons-no-alt"></span></button>
 		<div class="ppom-lock-icon">
 			<span class="dashicons dashicons-lock"></span>
 		</div>
-		<h3><?php esc_html_e( 'Importing fields is a PRO feature', 'woocommerce-product-addon' ); ?></h3>
-		<p>
-			<?php esc_html_e( 'We\'re sorry, importing fields is not available on your plan. Please upgrade to the Pro plan to unlock all these features and enhance your product fields management capabilities.', 'woocommerce-product-addon' ); ?>
-		</p>
-		<a class="btn btn-success" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'lockedimport' ) ); ?>" target="_blank">
+		<h3><?php echo esc_html( $ppom_upsell_modal['title'] ); ?></h3>
+		<p><?php echo esc_html( $ppom_upsell_modal['body'] ); ?></p>
+		<a class="btn btn-success" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), $ppom_upsell_modal['utm'] ) ); ?>" target="_blank">
 			<?php esc_html_e( 'Upgrade to PRO', 'woocommerce-product-addon' ); ?>
 		</a>
 	</div>
 </div>
+		<?php
+	endforeach;
+endif;
+?>

@@ -31,38 +31,36 @@ jQuery( function ( $ ) {
 	// Load the product-assignment UI lazily so the heavy modal table is fetched
 	// only when the merchant asks to attach a group to products. Delegated from
 	// `body` so it works in both the field groups list and the field editor.
-	$( 'body' ).on(
-		'click',
-		'a.ppom-products-modal',
-		function ( e ) {
-			e.preventDefault();
+	$( 'body' ).on( 'click', 'a.ppom-products-modal', function ( e ) {
+		e.preventDefault();
 
-			$( '.ppom-table' ).DataTable();
-			const ppom_id = $( this ).data( 'ppom_id' );
-			const get_url =
-				ajaxurl + '?action=ppom_get_products&ppom_id=' + ppom_id;
-			const model_id = $( this ).attr( 'data-formmodal-id' );
+		$( '.ppom-table' ).DataTable();
+		const ppom_id = $( this ).data( 'ppom_id' );
+		const get_url =
+			ajaxurl + '?action=ppom_get_products&ppom_id=' + ppom_id;
+		const model_id = $( this ).attr( 'data-formmodal-id' );
 
-			$.get( get_url, function ( html ) {
-				$( '#ppom-product-modal .ppom-modal-body' ).html( html );
-				initAttachSelects();
-				$( '#ppom_id' ).val( ppom_id );
-				$( 'body' ).append( append_overlay_modal );
-				$( '#' + model_id ).fadeIn();
-				$( '#attach-to-products input' ).focus();
-			} );
-		}
-	);
+		$.get( get_url, function ( html ) {
+			$( '#ppom-product-modal .ppom-modal-body' ).html( html );
+			initAttachSelects();
+			$( '#ppom_id' ).val( ppom_id );
+			$( 'body' ).append( append_overlay_modal );
+			$( '#' + model_id ).fadeIn();
+			$( '#attach-to-products input' ).focus();
+		} );
+	} );
 
 	$( 'body' ).on( 'click', 'a.ppom-delete-single-product', function ( e ) {
 		e.preventDefault();
 		const productmeta_id = $( this ).attr( 'data-product-id' );
 		let title = window?.ppom_vars?.i18n.popup.deleteGroup;
 		const productName = $( this ).data( 'name' );
-		title = productName ? title.replace( '%s', productName ) : window?.ppom_vars?.i18n.popup.confirmTitle;
+		title = productName
+			? title.replace( '%s', productName )
+			: window?.ppom_vars?.i18n.popup.confirmTitle;
 
 		window?.ppomPopup?.open( {
-			title: title,
+			title,
 			onConfirmation: () => {
 				const $link = $( '#del-file-' + productmeta_id );
 				const originalHtml = $link.html();
@@ -98,73 +96,69 @@ jQuery( function ( $ ) {
 	// Per-row enable/disable toggle. Sends an AJAX request to flip
 	// `productmeta_disabled`; product attachments and field schema are
 	// untouched, so this is a pure visibility switch on the frontend.
-	$( 'body' ).on(
-		'change',
-		'.ppom-toggle .ppom-toggle-input',
-		function () {
-			const $input = $( this );
-			const $label = $input.closest( '.ppom-toggle' );
-			const ppomId = $label.data( 'ppomId' );
-			const disabled = ! $input.is( ':checked' );
+	$( 'body' ).on( 'change', '.ppom-toggle .ppom-toggle-input', function () {
+		const $input = $( this );
+		const $label = $input.closest( '.ppom-toggle' );
+		const ppomId = $label.data( 'ppomId' );
+		const disabled = ! $input.is( ':checked' );
 
-			$label.addClass( 'ppom-toggle--busy' );
-			$input.prop( 'disabled', true );
+		$label.addClass( 'ppom-toggle--busy' );
+		$input.prop( 'disabled', true );
 
-			$.post(
-				ajaxurl,
-				{
-					action: 'ppom_toggle_meta_disabled',
-					productmeta_id: ppomId,
-					disabled: disabled ? '1' : '0',
-					ppom_meta_nonce: $( '#ppom_meta_nonce' ).val(),
-				},
-				function ( resp ) {
-					$label.removeClass( 'ppom-toggle--busy' );
-					$input.prop( 'disabled', false );
-
-					if ( ! resp || resp.status !== 'success' ) {
-						// Roll back the visual state on error.
-						$input.prop( 'checked', ! $input.is( ':checked' ) );
-						const message =
-							resp && resp.message
-								? resp.message
-								: window?.ppom_vars?.i18n?.popup
-										?.errorTitle ?? 'Error';
-						window?.ppomPopup?.open( {
-							title: message,
-							hideCloseBtn: true,
-						} );
-						return;
-					}
-
-					$label.toggleClass(
-						'ppom-toggle--off',
-						resp.disabled === true
-					);
-					$label
-						.find( '.ppom-toggle-label' )
-						.text(
-							resp.disabled
-								? window?.ppom_vars?.i18n?.toggle?.disabled ??
-										'Disabled'
-								: window?.ppom_vars?.i18n?.toggle?.enabled ??
-										'Enabled'
-						);
-				}
-			).fail( function () {
+		$.post(
+			ajaxurl,
+			{
+				action: 'ppom_toggle_meta_disabled',
+				productmeta_id: ppomId,
+				disabled: disabled ? '1' : '0',
+				ppom_meta_nonce: $( '#ppom_meta_nonce' ).val(),
+			},
+			function ( resp ) {
 				$label.removeClass( 'ppom-toggle--busy' );
 				$input.prop( 'disabled', false );
-				$input.prop( 'checked', ! $input.is( ':checked' ) );
-				window?.ppomPopup?.open( {
-					title:
-						window?.ppom_vars?.i18n?.errorOccurred ??
-						window?.ppom_vars?.i18n?.popup?.errorTitle ??
-						'Error',
-					hideCloseBtn: true,
-				} );
+
+				if ( ! resp || resp.status !== 'success' ) {
+					// Roll back the visual state on error.
+					$input.prop( 'checked', ! $input.is( ':checked' ) );
+					const message =
+						resp && resp.message
+							? resp.message
+							: window?.ppom_vars?.i18n?.popup?.errorTitle ??
+							  'Error';
+					window?.ppomPopup?.open( {
+						title: message,
+						hideCloseBtn: true,
+					} );
+					return;
+				}
+
+				$label.toggleClass(
+					'ppom-toggle--off',
+					resp.disabled === true
+				);
+				$label
+					.find( '.ppom-toggle-label' )
+					.text(
+						resp.disabled
+							? window?.ppom_vars?.i18n?.toggle?.disabled ??
+									'Disabled'
+							: window?.ppom_vars?.i18n?.toggle?.enabled ??
+									'Enabled'
+					);
+			}
+		).fail( function () {
+			$label.removeClass( 'ppom-toggle--busy' );
+			$input.prop( 'disabled', false );
+			$input.prop( 'checked', ! $input.is( ':checked' ) );
+			window?.ppomPopup?.open( {
+				title:
+					window?.ppom_vars?.i18n?.errorOccurred ??
+					window?.ppom_vars?.i18n?.popup?.errorTitle ??
+					'Error',
+				hideCloseBtn: true,
 			} );
-		}
-	);
+		} );
+	} );
 
 	// Confirmation popup for the native WP_List_Table "Delete" bulk action.
 	// `WP_List_Table` exposes both top (`action`) and bottom (`action2`)
@@ -184,8 +178,15 @@ jQuery( function ( $ ) {
 				top && top !== '-1'
 					? top
 					: bottom && bottom !== '-1'
-						? bottom
-						: '';
+					? bottom
+					: '';
+
+			// Show the upsell modal on free version.
+			if ( chosen === 'export' && $( '#ppom-export-upsell' ).length ) {
+				e.preventDefault();
+				$( '#ppom-export-upsell' ).fadeIn();
+				return;
+			}
 
 			if ( chosen !== 'delete' ) {
 				return;
@@ -210,7 +211,7 @@ jQuery( function ( $ ) {
 					: window?.ppom_vars?.i18n?.popup?.confirmTitle;
 
 			window?.ppomPopup?.open( {
-				title: title,
+				title,
 				onConfirmation: () => {
 					$form.data( 'ppomConfirmed', true );
 					$form.trigger( 'submit' );
