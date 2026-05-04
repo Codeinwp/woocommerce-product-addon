@@ -651,12 +651,8 @@ final class Callbacks {
 
 		foreach ( $meta_data as $index => $data ) {
 
-			// Derive data_name from title only when title exists; otherwise leave
-			// the stored value alone so rows whose settings UI isn't loaded
-			// (e.g. Pro field types while Pro is deactivated) aren't blanked.
-			if ( empty( $data['data_name'] ) && ! empty( $data['title'] ) ) {
-				$data['data_name'] = sanitize_key( $data['title'] );
-			}
+			// If Dataname is not provided then generate it.
+			$data['data_name'] = empty( $data['data_name'] ) ? sanitize_key( $data['title'] ) : $data['data_name'];
 
 			// title
 			if ( isset( $data['title'] ) ) {

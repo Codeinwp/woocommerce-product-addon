@@ -104,6 +104,24 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		add_action( 'admin_init', array( $this, 'set_legacy_user' ) );
 		add_action( 'admin_init', array( $this, 'ppom_create_db_tables' ) );
+
+		// Persist the per-page Screen Option for the field groups list table.
+		add_filter( 'set_screen_option_ppom_groups_per_page', array( __CLASS__, 'save_groups_per_page_option' ), 10, 3 );
+	}
+
+	/**
+	 * Persists the "Field groups per page" Screen Option.
+	 *
+	 * @param mixed  $status Default save status.
+	 * @param string $option Option key.
+	 * @param mixed  $value  Submitted value.
+	 * @return int|mixed
+	 */
+	public static function save_groups_per_page_option( $status, $option, $value ) {
+		if ( 'ppom_groups_per_page' === $option ) {
+			return (int) $value;
+		}
+		return $status;
 	}
 
 	// Admin page registration.
