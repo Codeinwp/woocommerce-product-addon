@@ -1522,7 +1522,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		}
 
 		$category_slugs = array();
-		if ( ! empty( $row['productmeta_categories'] ) && is_string( $row['productmeta_categories'] ) ) {
+		if ( ! empty( $row['productmeta_categories'] ) ) {
 			$category_lines = preg_split( '/\r\n|\n/', $row['productmeta_categories'] );
 			if ( false === $category_lines ) {
 				$category_lines = array();
