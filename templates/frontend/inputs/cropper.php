@@ -54,7 +54,10 @@ $input_classes = $fm->input_classes() . ' ppom-cropping-size';
 		>
 			<?php echo esc_html( $btn_label ); ?>
 		</a>
-		<span class="ppom-dragdrop-text"><?php echo _e( 'Drag file/directory here', 'woocommerce-product-addon' ); ?></span>
+		<span class="ppom-dragdrop-text"><?php esc_html_e( 'Drag file/directory here', 'woocommerce-product-addon' ); ?></span>
+		<span class="ppom-field-notice">
+			<?php echo esc_html( \PPOM\Support\Helpers::get_file_uploader_notice( $fm ) ); ?>
+		</span>
 	</div> <!-- ppom-file-container -->
 
 	<div id="filelist-<?php echo esc_attr( $fm->data_name() ); ?>" class="filelist"></div>
