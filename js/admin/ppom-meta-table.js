@@ -71,6 +71,22 @@ jQuery( function ( $ ) {
 
 		$el.select2( config );
 
+		// Clear the typed search keyword after each selection while keeping the dropdown open
+		// (closeOnSelect:false) so additional items can be picked without retyping or stale filtering.
+		$el.on( 'select2:select', function () {
+			const instance = $el.data( 'select2' );
+			const $search =
+				instance && instance.dropdown && instance.dropdown.$search
+					? instance.dropdown.$search
+					: ( dropdownParent || $( document.body ) ).find(
+							'.select2-search__field'
+					  );
+			if ( $search && $search.length ) {
+				$search.val( '' );
+				$search.trigger( 'input.select2' );
+			}
+		} );
+
 		if ( isLocked ) {
 			$el.prop( 'disabled', true ).trigger( 'change' );
 		}

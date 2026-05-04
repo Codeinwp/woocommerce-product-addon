@@ -324,4 +324,114 @@ class Test_Variation_Attach extends PPOM_Test_Case {
 			Helpers::get_variation_rule_map( $bundle['product']->get_id() )
 		);
 	}
+
+	private function attached_groups_for_product( $product_id ) {
+		$attached = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
+		if ( is_array( $attached ) ) {
+			return array_values( array_filter( array_map( 'absint', $attached ) ) );
+		}
+		if ( is_numeric( $attached ) && (int) $attached > 0 ) {
+			return array( absint( $attached ) );
+		}
+		return array();
+	}
+
+	public function test_save_variation_attachments_detaches_parent_when_all_variations_removed_and_parent_not_in_direct_list() {
+		$bundle  = $this->make_variable_with_two_variations();
+		$ppom_id = 71;
+
+		Helpers::update_variation_rule_map(
+			$bundle['product']->get_id(),
+			array( $ppom_id => array( $bundle['variation_a']->get_id() ) )
+		);
+		update_post_meta( $bundle['product']->get_id(), PPOM_PRODUCT_META_KEY, array( $ppom_id ) );
+
+		$_POST['ppom-attach-to-products']           = array();
+		$_POST['ppom-attach-to-products-initial']   = '';
+		$_POST['ppom-attach-to-variations']         = array();
+		$_POST['ppom-attach-to-variations-initial'] = (string) $bundle['variation_a']->get_id();
+
+		NM_PersonalizedProduct_Admin::save_attach_selections_from_request( $ppom_id, true );
+
+		$this->assertNotContains(
+			$ppom_id,
+			$this->attached_groups_for_product( $bundle['product']->get_id() ),
+			'Parent product should be auto-detached when all its variations are removed and it is not in the direct product list.'
+		);
+		$this->assertSame( array(), Helpers::get_variation_rule_map( $bundle['product']->get_id() ) );
+	}
+
+	public function test_save_variation_attachments_preserves_parent_attach_when_parent_is_in_direct_list() {
+		$bundle  = $this->make_variable_with_two_variations();
+		$ppom_id = 72;
+
+		Helpers::update_variation_rule_map(
+			$bundle['product']->get_id(),
+			array( $ppom_id => array( $bundle['variation_a']->get_id() ) )
+		);
+		update_post_meta( $bundle['product']->get_id(), PPOM_PRODUCT_META_KEY, array( $ppom_id ) );
+
+		$_POST['ppom-attach-to-products']           = array( (string) $bundle['product']->get_id() );
+		$_POST['ppom-attach-to-products-initial']   = (string) $bundle['product']->get_id();
+		$_POST['ppom-attach-to-variations']         = array();
+		$_POST['ppom-attach-to-variations-initial'] = (string) $bundle['variation_a']->get_id();
+
+		NM_PersonalizedProduct_Admin::save_attach_selections_from_request( $ppom_id, true );
+
+		$this->assertContains(
+			$ppom_id,
+			$this->attached_groups_for_product( $bundle['product']->get_id() ),
+			'Parent must remain attached when it is explicitly listed in the direct product list, even if all variations are removed.'
+		);
+		$this->assertSame( array(), Helpers::get_variation_rule_map( $bundle['product']->get_id() ) );
+	}
+
+	public function test_save_variation_attachments_no_detach_when_some_variations_remain() {
+		$bundle  = $this->make_variable_with_two_variations();
+		$ppom_id = 73;
+
+		Helpers::update_variation_rule_map(
+			$bundle['product']->get_id(),
+			array( $ppom_id => array( $bundle['variation_a']->get_id(), $bundle['variation_b']->get_id() ) )
+		);
+		update_post_meta( $bundle['product']->get_id(), PPOM_PRODUCT_META_KEY, array( $ppom_id ) );
+
+		$_POST['ppom-attach-to-products']           = array();
+		$_POST['ppom-attach-to-products-initial']   = '';
+		$_POST['ppom-attach-to-variations']         = array( (string) $bundle['variation_b']->get_id() );
+		$_POST['ppom-attach-to-variations-initial'] = $bundle['variation_a']->get_id() . ',' . $bundle['variation_b']->get_id();
+
+		NM_PersonalizedProduct_Admin::save_attach_selections_from_request( $ppom_id, true );
+
+		$this->assertContains(
+			$ppom_id,
+			$this->attached_groups_for_product( $bundle['product']->get_id() ),
+			'Parent must stay attached while at least one variation rule remains.'
+		);
+		$this->assertSame(
+			array( $ppom_id => array( $bundle['variation_b']->get_id() ) ),
+			Helpers::get_variation_rule_map( $bundle['product']->get_id() )
+		);
+	}
+
+	public function test_save_variation_attachments_no_effect_when_group_had_no_variations() {
+		$bundle  = $this->make_variable_with_two_variations();
+		$ppom_id = 74;
+
+		// Parent attached directly; never had a variation rule for this group.
+		update_post_meta( $bundle['product']->get_id(), PPOM_PRODUCT_META_KEY, array( $ppom_id ) );
+
+		$_POST['ppom-attach-to-products']           = array( (string) $bundle['product']->get_id() );
+		$_POST['ppom-attach-to-products-initial']   = (string) $bundle['product']->get_id();
+		$_POST['ppom-attach-to-variations']         = array();
+		$_POST['ppom-attach-to-variations-initial'] = '';
+
+		NM_PersonalizedProduct_Admin::save_attach_selections_from_request( $ppom_id, true );
+
+		$this->assertContains(
+			$ppom_id,
+			$this->attached_groups_for_product( $bundle['product']->get_id() ),
+			'A direct-only attachment must not be affected by the variation save path.'
+		);
+	}
 }

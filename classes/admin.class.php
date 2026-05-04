@@ -1638,7 +1638,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		$variations_to_attach         = self::posted_absint_list( 'ppom-attach-to-variations' );
 		$variations_to_attach_initial = self::posted_initial_absint_list( 'ppom-attach-to-variations-initial' );
-		$variation_updates            = self::save_variation_attachments( $ppom_id, $variations_to_attach, $variations_to_attach_initial, (bool) $is_pro_user );
+		$variation_updates            = self::save_variation_attachments( $ppom_id, $variations_to_attach, $variations_to_attach_initial, (bool) $is_pro_user, $products_to_attach );
 
 		$categories_to_attach = self::posted_slug_list( 'ppom-attach-to-categories' );
 		$updated_cat          = count( $categories_to_attach );
@@ -1685,16 +1685,27 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	/**
 	 * Stores variation restrictions and auto-attaches parent products.
 	 *
+	 * When a parent has had all of its variation rules cleared for this group, the parent
+	 * is auto-detached from the group via {@see self::detach_group_from_product()} unless
+	 * it is also present in $direct_products (i.e. the merchant explicitly attached it via
+	 * the "Attach to products" list). This keeps the variation flow symmetric: selecting
+	 * a variation auto-attaches the parent, and removing every variation auto-detaches it
+	 * — without overriding direct attachments.
+	 *
 	 * @param int   $ppom_id            PPOM field-group ID.
 	 * @param int[] $variation_ids      Submitted variation IDs.
 	 * @param int[] $initial_variations Variation IDs loaded when the form opened.
 	 * @param bool  $is_pro_user        Whether multi-group product attachment is allowed.
+	 * @param int[] $direct_products    Product IDs explicitly listed in the direct
+	 *                                  "Attach to products" submission. Parents present
+	 *                                  here are never auto-detached.
 	 * @return array{updated_variations:int,attached_products:int}
 	 */
-	public static function save_variation_attachments( $ppom_id, array $variation_ids, array $initial_variations = array(), $is_pro_user = false ) {
+	public static function save_variation_attachments( $ppom_id, array $variation_ids, array $initial_variations = array(), $is_pro_user = false, $direct_products = array() ) {
 		$ppom_id            = absint( $ppom_id );
 		$variation_ids      = array_values( array_unique( array_filter( array_map( 'absint', $variation_ids ) ) ) );
 		$initial_variations = array_values( array_unique( array_filter( array_map( 'absint', $initial_variations ) ) ) );
+		$direct_products    = array_values( array_unique( array_filter( array_map( 'absint', (array) $direct_products ) ) ) );
 
 		if ( $ppom_id <= 0 ) {
 			return array(
@@ -1708,13 +1719,20 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$parent_ids        = array_values( array_unique( array_merge( array_keys( $current_by_parent ), array_keys( $initial_by_parent ) ) ) );
 
 		foreach ( $parent_ids as $parent_id ) {
-			$rules = \PPOM\Support\Helpers::get_variation_rule_map( $parent_id );
-			if ( empty( $current_by_parent[ $parent_id ] ) ) {
+			$rules             = \PPOM\Support\Helpers::get_variation_rule_map( $parent_id );
+			$had_rule          = isset( $rules[ $ppom_id ] );
+			$has_no_variations = empty( $current_by_parent[ $parent_id ] );
+
+			if ( $has_no_variations ) {
 				unset( $rules[ $ppom_id ] );
 			} else {
 				$rules[ $ppom_id ] = $current_by_parent[ $parent_id ];
 			}
 			\PPOM\Support\Helpers::update_variation_rule_map( $parent_id, $rules );
+
+			if ( $had_rule && $has_no_variations && ! in_array( $parent_id, $direct_products, true ) ) {
+				self::detach_group_from_product( $parent_id, $ppom_id );
+			}
 		}
 
 		$attached_products = 0;
