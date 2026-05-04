@@ -57,6 +57,41 @@ function definitionNeedsServerSchema( slug: string ): boolean {
 	return slug === 'texter';
 }
 
+function stripCopySuffix( name: string ): string {
+	return name.replace( /_copy(_\d+)?$/, '' );
+}
+
+function makeUniqueCopyDataName(
+	source: string,
+	existing: Set< string >
+): string {
+	const base = `${ stripCopySuffix( source ) }_copy`;
+	if ( ! existing.has( base ) ) {
+		return base;
+	}
+	let n = 2;
+	while ( existing.has( `${ base }_${ n }` ) ) {
+		n++;
+	}
+	return `${ base }_${ n }`;
+}
+
+function cloneFieldForDuplicate(
+	source: FieldRow,
+	allFields: FieldRow[]
+): FieldRow {
+	const existingDataNames = new Set(
+		allFields.map( ( f ) => String( f.data_name || '' ) )
+	);
+	const dup = JSON.parse( JSON.stringify( source ) ) as FieldRow;
+	dup.clientId = newClientId();
+	dup.data_name = makeUniqueCopyDataName(
+		String( source.data_name || '' ),
+		existingDataNames
+	);
+	return dup;
+}
+
 export function useFieldModalController( productmetaId: number | undefined ) {
 	const [ state, dispatch ] = useReducer(
 		modalReducer,
@@ -101,14 +136,64 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		[ productmetaId ]
 	);
 
+	const loadContextThenDuplicate = useCallback(
+		async ( sourceFieldIndex?: number ) => {
+			if (
+				typeof sourceFieldIndex !== 'number' ||
+				sourceFieldIndex < 1
+			) {
+				return loadContext();
+			}
+			dispatch( { type: 'LOAD_CONTEXT_START' } );
+			try {
+				const res = await fetchFieldModalContext( productmetaId );
+				const rows = withClientIds( res.fields || [] );
+				dispatch( {
+					type: 'LOAD_CONTEXT_SUCCESS',
+					ctx: res,
+					fields: rows,
+					cleanFieldSnapshots: Object.fromEntries(
+						rows.map( ( row ) => [
+							row.clientId,
+							serializePersistedField( row ),
+						] )
+					),
+					selectedId: null,
+				} );
+				const source = rows[ sourceFieldIndex - 1 ];
+				if ( ! source ) {
+					return;
+				}
+				const dup = cloneFieldForDuplicate( source, rows );
+				dispatch( {
+					type: 'DUPLICATE_FIELD_ROW',
+					sourceClientId: source.clientId,
+					newRow: dup,
+					snapshot: serializePersistedField( dup ),
+				} );
+			} catch ( e ) {
+				dispatch( {
+					type: 'LOAD_CONTEXT_ERROR',
+					message: errorMessage( e ),
+				} );
+			}
+		},
+		[ productmetaId, loadContext ]
+	);
+
 	useEffect( () => {
 		return bindPpomReactFieldModalOpenButtons( {
 			onOpen: ( { entry, selectFieldIndex } ) => {
+				if ( entry === 'copy' ) {
+					dispatch( { type: 'OPEN', entry: 'manage' } );
+					void loadContextThenDuplicate( selectFieldIndex );
+					return;
+				}
 				dispatch( { type: 'OPEN', entry } );
 				void loadContext( selectFieldIndex );
 			},
 		} );
-	}, [ loadContext ] );
+	}, [ loadContext, loadContextThenDuplicate ] );
 
 	const editDraft = useMemo( () => {
 		if ( ! state.selectedId ) {

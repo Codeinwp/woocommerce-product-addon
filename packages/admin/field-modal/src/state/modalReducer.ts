@@ -132,6 +132,28 @@ export function modalReducer(
 				pickerOpen: false,
 				pickerQuery: '',
 			};
+		case 'DUPLICATE_FIELD_ROW': {
+			const idx = state.fields.findIndex(
+				( f ) => f.clientId === action.sourceClientId
+			);
+			const next = [ ...state.fields ];
+			if ( idx < 0 ) {
+				next.push( action.newRow );
+			} else {
+				next.splice( idx + 1, 0, action.newRow );
+			}
+			return {
+				...state,
+				fields: next,
+				cleanFieldSnapshots: {
+					...state.cleanFieldSnapshots,
+					[ action.newRow.clientId ]: action.snapshot,
+				},
+				selectedId: action.newRow.clientId,
+				pickerOpen: false,
+				pickerQuery: '',
+			};
+		}
 		case 'REMOVE_FIELD_ROW': {
 			const next = state.fields.filter(
 				( f ) => f.clientId !== action.clientId

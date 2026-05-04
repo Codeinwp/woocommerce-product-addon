@@ -55,6 +55,12 @@ export type ModalReducerAction =
 			row: FieldRow;
 			snapshot: string;
 	  }
+	| {
+			type: 'DUPLICATE_FIELD_ROW';
+			sourceClientId: string;
+			newRow: FieldRow;
+			snapshot: string;
+	  }
 	| { type: 'REMOVE_FIELD_ROW'; clientId: string }
 	| { type: 'SET_SAVING'; saving: boolean }
 	| { type: 'SET_MODAL_ENTRY'; entry: 'picker' | 'manage' };
