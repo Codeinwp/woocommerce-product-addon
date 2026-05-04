@@ -147,6 +147,7 @@ class PPOM_Meta {
 			'get_fields',
 			'has_unique_datanames',
 			'get_instance',
+			'generate_inline_css',
 		);
 
 		foreach ( $methods as $method ) {
