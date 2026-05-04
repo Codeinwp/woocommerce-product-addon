@@ -20,9 +20,26 @@ jQuery( function ( $ ) {
 	function initAttachSelects() {
 		const attachSelects = $( '.ppom-attach-container-item select' );
 
-		if ( typeof $.fn.select2 === 'function' ) {
-			attachSelects.select2();
+		if ( typeof $.fn.select2 !== 'function' ) {
+			return;
 		}
+
+		attachSelects.select2();
+
+		// Clear the typed keyword after a result is picked. Select2 keeps the
+		// search input populated by default; reset both the dropdown and inline
+		// search fields so the next query starts fresh.
+		attachSelects.on( 'select2:select', function () {
+			const instance = $( this ).data( 'select2' );
+
+			if ( instance && instance.dropdown && instance.dropdown.$search ) {
+				instance.dropdown.$search.val( '' );
+			}
+
+			if ( instance && instance.selection && instance.selection.$search ) {
+				instance.selection.$search.val( '' );
+			}
+		} );
 	}
 
 	const append_overlay_modal =

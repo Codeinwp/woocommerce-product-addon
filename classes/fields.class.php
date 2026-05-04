@@ -385,6 +385,18 @@ class PPOM_Fields_Meta {
 		$html  = '';
 		$html .= '<div data-table-id="' . esc_attr( $fields_type ) . '" class="row ppom-tabs ppom-fields-actions" data-field-no="' . esc_attr( $field_index ) . '">';
 		$html .= '<input type="hidden" name="ppom[' . $field_index . '][type]" value="' . $fields_type . '" class="ppom-meta-field" data-metatype="type">';
+
+		// When the input class isn't registered (e.g. a Pro field type while Pro is deactivated),
+		// the settings loop below renders nothing and the form round-trip would drop title/data_name.
+		// Emit hidden inputs for stored values so the row keeps its identity on save.
+		if ( empty( $field_meta ) && is_array( $save_meta ) ) {
+			foreach ( array( 'title', 'data_name' ) as $preserved_key ) {
+				if ( isset( $save_meta[ $preserved_key ] ) ) {
+					$html .= '<input type="hidden" name="ppom[' . esc_attr( $field_index ) . '][' . esc_attr( $preserved_key ) . ']" value="' . esc_attr( $save_meta[ $preserved_key ] ) . '" />';
+				}
+			}
+		}
+
 		$html .= '<div class="col-md-12 ppom-tabs-header">';
 
 
