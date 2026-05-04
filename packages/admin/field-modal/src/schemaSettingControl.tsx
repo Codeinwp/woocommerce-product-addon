@@ -3,9 +3,9 @@
  */
 import { renderPrimitiveSettingControl } from './controls';
 import { ConditionsEditor } from './ConditionsEditor';
+import { ConditionsLockedPreview } from './components/ConditionsLockedPreview';
 import { PairedCropperEditor } from './components/PairedCropperEditor';
 import { PairedQuantityEditor } from './components/PairedQuantityEditor';
-import { ProFeatureUpsellCard } from './components/ProFeatureUpsellCard';
 import type { SettingRowContext } from './types/fieldModal';
 
 export function openLegacyFieldModal( ppomFieldIndex: number ) {
@@ -46,15 +46,11 @@ export function renderSettingRow(
 
 		if ( ! conditionsProEnabled ) {
 			return (
-				<ProFeatureUpsellCard
+				<ConditionsLockedPreview
 					key={ key }
-					title={ i18n.condEditorTitle || 'Conditional logic' }
-					description={ i18n.condLockedBody || '' }
-					primaryUrl={ links.conditionUpgradeUrl }
-					primaryLabel={ i18n.cfrUpgradeCta || 'Upgrade to Pro' }
-					secondaryUrl={ links.conditionViewDemoUrl }
-					secondaryLabel={ i18n.cfrViewDemoLabel || 'View Demo' }
-					badgeLabel={ i18n.proBadge || 'PRO' }
+					meta={ meta }
+					i18n={ i18n }
+					links={ links }
 				/>
 			);
 		}

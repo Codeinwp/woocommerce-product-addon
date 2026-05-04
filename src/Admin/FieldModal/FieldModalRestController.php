@@ -287,7 +287,6 @@ final class FieldModalRestController {
 				'cfrUpgradeUrl'      => esc_url( $cfr_upgrade_url ),
 				'cfrViewDemoUrl'     => 'https://demo-ppom-lite.vertisite.cloud/product/personalized-caps-using-conditional-repeater/',
 				'conditionUpgradeUrl' => esc_url( $condition_upgrade_url ),
-				'conditionViewDemoUrl' => '',
 			),
 			'rest_url'                         => rest_url( self::REST_NAMESPACE . '/' ),
 			'nonce'                            => wp_create_nonce( 'wp_rest' ),

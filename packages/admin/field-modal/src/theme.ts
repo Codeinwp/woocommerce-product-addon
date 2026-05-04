@@ -73,6 +73,24 @@ export const fieldModalTheme = createSystem(
 							value: '#0a4b78',
 						},
 					},
+					// Pro-feature upsell accent (used by ProFeatureUpsellCard).
+					orange: {
+						50: {
+							value: '#fffaf6',
+						},
+						100: {
+							value: '#ffe3d1',
+						},
+						200: {
+							value: '#ffd9bf',
+						},
+						500: {
+							value: '#ff5a00',
+						},
+						600: {
+							value: '#e65000',
+						},
+					},
 				},
 			},
 

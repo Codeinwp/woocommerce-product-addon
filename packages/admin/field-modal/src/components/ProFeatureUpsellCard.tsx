@@ -4,20 +4,12 @@
 import { Box, Flex, HStack, Icon, Link, Text, VStack } from '@chakra-ui/react';
 import { LuLock } from 'react-icons/lu';
 
-const ORANGE = {
-	accent: '#ff5a00',
-	accentHover: '#e65000',
-	surface: '#fffaf6',
-	border: '#ffd9bf',
-	soft: '#ffe3d1',
-};
-
 export interface ProFeatureUpsellCardProps {
 	title: string;
 	description: string;
 	primaryLabel: string;
 	primaryUrl?: string;
-	secondaryLabel: string;
+	secondaryLabel?: string;
 	secondaryUrl?: string;
 	badgeLabel?: string;
 }
@@ -38,9 +30,9 @@ export function ProFeatureUpsellCard( {
 			align="stretch"
 			gap={ 4 }
 			p={ { base: 4, md: 5 } }
-			bg={ ORANGE.surface }
+			bg="orange.50"
 			borderWidth="1px"
-			borderColor={ ORANGE.border }
+			borderColor="orange.200"
 			borderRadius="md"
 			color="gray.900"
 		>
@@ -49,8 +41,8 @@ export function ProFeatureUpsellCard( {
 					w={ 10 }
 					h={ 10 }
 					borderRadius="md"
-					bg={ ORANGE.soft }
-					color={ ORANGE.accent }
+					bg="orange.100"
+					color="orange.500"
 					align="center"
 					justify="center"
 					flexShrink={ 0 }
@@ -72,7 +64,7 @@ export function ProFeatureUpsellCard( {
 							px={ 2 }
 							py="2px"
 							borderRadius="sm"
-							bg={ ORANGE.accent }
+							bg="orange.500"
 							color="white"
 							fontSize="10px"
 							fontWeight="700"
@@ -94,7 +86,7 @@ export function ProFeatureUpsellCard( {
 
 			{ hasActions ? (
 				<>
-					<Box h="1px" bg={ ORANGE.border } />
+					<Box h="1px" bg="orange.200" />
 					<HStack align="stretch" gap={ 2 } flexWrap="wrap">
 						{ primaryUrl ? (
 							<Link
@@ -108,30 +100,19 @@ export function ProFeatureUpsellCard( {
 								px={ 4 }
 								py={ 1.5 }
 								borderRadius="md"
-								bg={ ORANGE.accent }
+								bg="orange.500"
 								color="white"
 								fontWeight="semibold"
 								fontSize="sm"
 								textDecoration="none"
 								whiteSpace="nowrap"
 								w={ { base: 'full', sm: 'auto' } }
-								_hover={ {
-									bg: ORANGE.accentHover,
-									color: 'white',
-									textDecoration: 'none',
-								} }
-								css={ {
-									'&&:hover, &&:focus, &&:active, &&:visited':
-										{
-											color: 'white',
-											textDecoration: 'none',
-										},
-								} }
+								_hover={ { bg: 'orange.600' } }
 							>
 								{ primaryLabel }
 							</Link>
 						) : null }
-						{ secondaryUrl ? (
+						{ secondaryUrl && secondaryLabel ? (
 							<Link
 								href={ secondaryUrl }
 								target="_blank"
@@ -144,26 +125,15 @@ export function ProFeatureUpsellCard( {
 								py={ 1.5 }
 								borderRadius="md"
 								bg="white"
-								color={ ORANGE.accentHover }
+								color="orange.600"
 								borderWidth="1px"
-								borderColor={ ORANGE.border }
+								borderColor="orange.200"
 								fontWeight="semibold"
 								fontSize="sm"
 								textDecoration="none"
 								whiteSpace="nowrap"
 								w={ { base: 'full', sm: 'auto' } }
-								_hover={ {
-									bg: ORANGE.soft,
-									color: ORANGE.accentHover,
-									textDecoration: 'none',
-								} }
-								css={ {
-									'&&:hover, &&:focus, &&:active, &&:visited':
-										{
-											color: ORANGE.accentHover,
-											textDecoration: 'none',
-										},
-								} }
+								_hover={ { bg: 'orange.100' } }
 							>
 								{ secondaryLabel }
 							</Link>
