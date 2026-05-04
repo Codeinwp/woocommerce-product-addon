@@ -1340,7 +1340,33 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 }
 
 .ppom-top-nav {
-    line-height:35px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    line-height: 35px;
+}
+
+.ppom-top-nav .dashicons {
+    margin-right: 4px;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+}
+
+.ppom-top-nav-link {
+    display: inline-flex;
+    align-items: center;
+}
+
+.ppom-top-nav .button {
+    display: inline-flex;
+    align-items: center;
+}
+
+.ppom-manage-fields-topbar .ppom-top-nav a:is(:link, :visited, :hover, :focus, :active) {
+    text-decoration: none;
 }
 
 .ppom_addons_model_cards span.badge {
@@ -2687,16 +2713,17 @@ div.ppom-banner .themeisle-sale {
 }
 
 .ppom-empty-state .ppom-empty-cta.button-primary {
-    background: #F95700;
-    border-color: #F95700;
+    background: #2271b1;
+    border-color: #2271b1;
     color: #fff;
-    box-shadow: 0 2px 8px rgba(249, 87, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(34, 113, 177, 0.3);
+    text-decoration: none;
 }
 
 .ppom-empty-state .ppom-empty-cta.button-primary:hover,
 .ppom-empty-state .ppom-empty-cta.button-primary:focus {
-    background: #E7632A;
-    border-color: #E7632A;
+    background: #135e96;
+    border-color: #135e96;
     color: #fff;
-    box-shadow: 0 2px 10px rgba(249, 87, 0, 0.4);
+    box-shadow: 0 2px 10px rgba(34, 113, 177, 0.4);
 }

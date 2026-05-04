@@ -270,13 +270,28 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			<div class="ppom-manage-fields-topbar d-flex">
 				<h1 class="ppom-heading-style"><?php esc_html_e( 'PPOM Field Groups', 'woocommerce-product-addon' ); ?></h1>
 				<div class="ppom-top-nav">
-					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url( $addons ); ?>">+ <?php esc_html_e( 'All Addons', 'woocommerce-product-addon' ); ?></a>
-					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url( $changelog_url ); ?>"><?php esc_html_e( 'Changelog', 'woocommerce-product-addon' ); ?></a>
-					<a  class="mr-3" href="<?php echo esc_url( admin_url( '/admin.php?page=ti-about-woocommerce_product_addon' ) ); ?>"><?php esc_html_e( 'About Us', 'woocommerce-product-addon' ); ?></a>
-					<a href="<?php echo esc_url( $ppom_settings_url ); ?>"><?php esc_html_e( 'General Settings', 'woocommerce-product-addon' ); ?></a>
+					<a class="ppom-top-nav-link" href="<?php echo esc_url( admin_url( '/admin.php?page=ti-about-woocommerce_product_addon' ) ); ?>">
+						<span class="dashicons dashicons-info-outline" aria-hidden="true"></span>
+						<?php esc_html_e( 'About Us', 'woocommerce-product-addon' ); ?>
+					</a>
+					<a class="ppom-top-nav-link" href="<?php echo esc_url( $changelog_url ); ?>">
+						<span class="dashicons dashicons-list-view" aria-hidden="true"></span>
+						<?php esc_html_e( 'Changelog', 'woocommerce-product-addon' ); ?>
+					</a>
 					<?php if ( ppom_pro_is_installed() && class_exists( 'PPOM_Pro\Addons\Texter\Texter' ) ) : ?>
-						<a class="ml-3" href="<?php echo esc_url( add_query_arg( 'post_type', 'nm_ppom_texter', admin_url( 'edit.php' ) ) ); ?>"><?php esc_html_e( 'Manage Personalization Previews', 'woocommerce-product-addon' ); ?></a>
+						<a class="ppom-top-nav-link" href="<?php echo esc_url( add_query_arg( 'post_type', 'nm_ppom_texter', admin_url( 'edit.php' ) ) ); ?>">
+							<span class="dashicons dashicons-edit-page" aria-hidden="true"></span>
+							<?php esc_html_e( 'Manage Personalization Previews', 'woocommerce-product-addon' ); ?>
+						</a>
 					<?php endif; ?>
+					<a id="ppom-all-addons" class="button button-secondary" href="<?php echo esc_url( $addons ); ?>">
+						<span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
+						<?php esc_html_e( 'All Addons', 'woocommerce-product-addon' ); ?>
+					</a>
+					<a class="button button-primary" href="<?php echo esc_url( $ppom_settings_url ); ?>">
+						<span class="dashicons dashicons-admin-generic" aria-hidden="true"></span>
+						<?php esc_html_e( 'General Settings', 'woocommerce-product-addon' ); ?>
+					</a>
 				</div>
 			</div>
 			<div id="tsdk_banner" class="ppom-banner"></div>
@@ -1282,14 +1297,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			return;
 		}
 
-		add_screen_option(
-			'per_page',
-			array(
-				'default' => 50,
-				'option'  => 'ppom_groups_per_page',
-				'label'   => __( 'Field groups per page', 'woocommerce-product-addon' ),
-			)
-		);
+		add_filter( 'screen_options_show_screen', '__return_false' );
 
 		$this->meta_groups_list_table = new \PPOM\Admin\MetaGroupsListTable();
 		$this->meta_groups_list_table->prepare_items();
