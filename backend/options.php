@@ -733,30 +733,45 @@ function ppom_load_pro_options() {
 
 	$integration_settings = array();
 
-	$integration_settings['ppom_integrations_rest'] = array(
+	$integration_settings['ppom_integrations_rest']   = array(
 		'type'  => 'section',
 		'title' => __( 'REST API', 'woocommerce-product-addon' ),
+		'desc'  => __( 'Connect your store with external applications using the REST API.', 'woocommerce-product-addon' ),
 	);
-	$integration_settings['ppom_api_enable']        = array(
+	$integration_settings['ppom_api_enable']          = array(
 		'type'  => 'checkbox',
 		'title' => __( 'PPOM REST API', 'woocommerce-product-addon' ),
-		'desc'  => __( 'Check this option to enable PPOM REST API.', 'woocommerce-product-addon' ),
+		'desc'  => __( 'Enable this option to make PPOM REST API available.', 'woocommerce-product-addon' ),
 	);
-	$integration_settings['ppom_rest_secret_key']   = array(
-		'type'  => 'text',
+	$integration_settings['ppom_rest_base_url']       = array(
+		'type'     => 'text',
+		'title'    => __( 'Base URL', 'woocommerce-product-addon' ),
+		'desc'     => __( 'This is the REST API endpoint for your store.', 'woocommerce-product-addon' ),
+		'disabled' => true,
+		'default'  => rest_url( 'ppom/v1' ),
+		'class'    => 'ppom-rest-url-input',
+	);
+	$integration_settings['ppom_rest_secret_key']     = array(
+		'type'  => 'password',
 		'title' => __( 'Secret Key', 'woocommerce-product-addon' ),
-		'desc'  => __( 'Enter any characters to create a secret key. This key must be provided when making API requests.', 'woocommerce-product-addon' ),
+		'desc'  => __( 'This key will be used to authenticate API requests.', 'woocommerce-product-addon' ),
+	);
+	$integration_settings['ppom_available_endpoints'] = array(
+		'type'  => 'textarea',
+		'title' => __( 'Available Endpoints', 'woocommerce-product-addon' ),
+		'desc'  => __( 'List of available API routes that you can use.', 'woocommerce-product-addon' ),
 	);
 
 	$integration_settings['ppom_integrations_wcfm']  = array(
 		'type'  => 'section',
 		'title' => __( 'WCFM Vendors', 'woocommerce-product-addon' ),
+		'desc'  => __( 'Let vendors manage their own PPOM field groups.', 'woocommerce-product-addon' ),
 	);
 	$integration_settings['ppom_wcfm_allow_vendors'] = array(
 		'type'  => 'checkbox',
 		'title' => __( 'Allow Vendors to Create/Edit PPOM Fields', 'woocommerce-product-addon' ),
 		'desc'  => __( 'Enable this option to allow vendors to create or edit PPOM fields. These fields will be global.', 'woocommerce-product-addon' ),
-		'label' => __( 'Yes', 'woocommerce-product-addon' ),
+		'label' => __( 'Enable', 'woocommerce-product-addon' ),
 	);
 	$integration_settings['ppom_label_wcfm']         = array(
 		'type'    => 'text',

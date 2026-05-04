@@ -964,6 +964,9 @@ class PPOM_SettingsFramework {
 				$localize_data = array(
 					'migrate_back_msg'                     => __( 'Are you sure?', 'woocommerce-product-addon' ),
 					'administrator_role_cannot_be_removed' => esc_html__( 'The administrator role cannot be removed.', 'woocommerce-product-addon' ),
+					'active'                               => esc_html__( 'Active', 'woocommerce-product-addon' ),
+					'inactive'                             => esc_html__( 'Inactive', 'woocommerce-product-addon' ),
+					'copied'                               => esc_html__( 'Copied', 'woocommerce-product-addon' ),
 				);
 
 				break;
