@@ -122,6 +122,7 @@ export function LegacyAdvancedFieldStack( {
 					{ ...shared }
 					i18n={ i18n }
 					sections={ primary }
+					variant="flat"
 				/>
 			) }
 			{ betweenPrimaryAndAdvanced }

@@ -12,6 +12,7 @@ export interface ResponsiveFieldGridProps {
 }
 
 const FULL_ROW_TEXTAREA_KEYS = new Set( [ 'html' ] );
+const BOOLEAN_CONTROL_TYPES = new Set( [ 'checkbox', 'switch' ] );
 
 function settingType( meta: Record< string, unknown > ) {
 	return meta.type ? String( meta.type ) : 'text';
@@ -58,6 +59,7 @@ export function ResponsiveFieldGrid( {
 						type === 'paired' ||
 						type === 'paired-cropper' ||
 						type === 'paired-quantity';
+					const isBoolean = BOOLEAN_CONTROL_TYPES.has( type );
 					return (
 						<GridItem
 							key={ key }
@@ -66,6 +68,7 @@ export function ResponsiveFieldGrid( {
 								md: fullRow ? 2 : 1,
 								xl: fullRow ? 3 : 1,
 							} }
+							alignSelf={ isBoolean ? 'center' : 'stretch' }
 						>
 							{ renderSettingRow( key, meta, ctx ) }
 						</GridItem>

@@ -1,4 +1,4 @@
-import { CheckboxCard, Field } from '@chakra-ui/react';
+import { Box, Checkbox, Field, Stack } from '@chakra-ui/react';
 import {
 	labelProps,
 	type PrimitiveSettingControlProps,
@@ -9,11 +9,10 @@ import {
 	updateFallbackSettingValue,
 } from './shared';
 
-function checkboxCardProps() {
+function checkboxRootProps() {
 	return {
-		width: '100%',
-		variant: 'outline' as const,
-		size: 'sm' as const,
+		gap: '3' as const,
+		alignItems: 'flex-start' as const,
 		colorPalette: 'blue' as const,
 	};
 }
@@ -39,8 +38,8 @@ export function CheckboxControl( {
 							width="100%"
 							mb={ 0 }
 						>
-							<CheckboxCard.Root
-								{ ...checkboxCardProps() }
+							<Checkbox.Root
+								{ ...checkboxRootProps() }
 								checked={ checked }
 								invalid={ Boolean( error ) }
 								onCheckedChange={ ( d ) =>
@@ -50,24 +49,25 @@ export function CheckboxControl( {
 								}
 								onBlur={ field.handleBlur }
 							>
-								<CheckboxCard.HiddenInput />
-								<CheckboxCard.Control>
-									<CheckboxCard.Content>
-										<CheckboxCard.Label
-											{ ...labelProps }
-											mb={ 0 }
+								<Checkbox.HiddenInput />
+								<Checkbox.Control />
+								<Stack gap="1">
+									<Checkbox.Label
+										{ ...labelProps }
+										mb={ 0 }
+									>
+										{ title }
+									</Checkbox.Label>
+									{ description ? (
+										<Box
+											textStyle="sm"
+											color="fg.muted"
 										>
-											{ title }
-										</CheckboxCard.Label>
-										{ description ? (
-											<CheckboxCard.Description>
-												{ description }
-											</CheckboxCard.Description>
-										) : null }
-									</CheckboxCard.Content>
-									<CheckboxCard.Indicator />
-								</CheckboxCard.Control>
-							</CheckboxCard.Root>
+											{ description }
+										</Box>
+									) : null }
+								</Stack>
+							</Checkbox.Root>
 							{ error ? (
 								<Field.ErrorText mt={ 1 }>
 									{ String( error ) }
@@ -84,8 +84,8 @@ export function CheckboxControl( {
 
 	return (
 		<Field.Root width="100%" mb={ 0 }>
-			<CheckboxCard.Root
-				{ ...checkboxCardProps() }
+			<Checkbox.Root
+				{ ...checkboxRootProps() }
 				checked={ checked }
 				onCheckedChange={ ( d ) =>
 					updateFallbackSettingValue(
@@ -95,21 +95,19 @@ export function CheckboxControl( {
 					)
 				}
 			>
-				<CheckboxCard.HiddenInput />
-				<CheckboxCard.Control>
-					<CheckboxCard.Content>
-						<CheckboxCard.Label { ...labelProps } mb={ 0 }>
-							{ title }
-						</CheckboxCard.Label>
-						{ description ? (
-							<CheckboxCard.Description>
-								{ description }
-							</CheckboxCard.Description>
-						) : null }
-					</CheckboxCard.Content>
-					<CheckboxCard.Indicator />
-				</CheckboxCard.Control>
-			</CheckboxCard.Root>
+				<Checkbox.HiddenInput />
+				<Checkbox.Control />
+				<Stack gap="1">
+					<Checkbox.Label { ...labelProps } mb={ 0 }>
+						{ title }
+					</Checkbox.Label>
+					{ description ? (
+						<Box textStyle="sm" color="fg.muted">
+							{ description }
+						</Box>
+					) : null }
+				</Stack>
+			</Checkbox.Root>
 		</Field.Root>
 	);
 }

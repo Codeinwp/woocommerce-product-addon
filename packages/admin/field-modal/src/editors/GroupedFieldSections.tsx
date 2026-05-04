@@ -6,6 +6,32 @@ import { Text, VStack } from '@chakra-ui/react';
 import { ResponsiveFieldGrid } from '../ResponsiveFieldGrid';
 import type { GroupedFieldSectionsProps } from '../types/fieldModal';
 
+const BOOLEAN_CONTROL_TYPES = new Set( [ 'checkbox', 'switch' ] );
+
+function isBooleanEntry( entry: {
+	meta: Record< string, unknown > | undefined;
+} ) {
+	const type =
+		entry.meta && entry.meta.type ? String( entry.meta.type ) : '';
+	return BOOLEAN_CONTROL_TYPES.has( type );
+}
+
+/** Sink boolean (checkbox/switch) controls to the end while preserving relative order in each partition. */
+function partitionBooleansLast< T extends { meta: Record< string, unknown > } >(
+	entries: T[]
+): T[] {
+	const nonBoolean: T[] = [];
+	const booleans: T[] = [];
+	for ( const entry of entries ) {
+		if ( isBooleanEntry( entry ) ) {
+			booleans.push( entry );
+		} else {
+			nonBoolean.push( entry );
+		}
+	}
+	return [ ...nonBoolean, ...booleans ];
+}
+
 function sectionEntries(
 	sections: Array< { label: string; keys: string[] } >,
 	settings: Record< string, Record< string, unknown > >
@@ -67,7 +93,9 @@ export function GroupedFieldSections( {
 	const groups = sectionEntries( sections, settings );
 
 	if ( variant === 'flat' ) {
-		const entries = groups.flatMap( ( group ) => group.entries );
+		const entries = partitionBooleansLast(
+			groups.flatMap( ( group ) => group.entries )
+		);
 
 		if ( entries.length === 0 ) {
 			return null;

@@ -119,16 +119,23 @@ export function DefinitionDrivenFieldEditor( {
 		);
 	}
 
-	function renderAdvancedBlocks( blocks: FieldUiBlock[] ) {
+	function renderBlockSequenceFlat(
+		blocks: FieldUiBlock[],
+		keyPrefix: string
+	) {
 		const rendered: Array< JSX.Element > = [];
 		let pendingSections: Array<
 			Extract< FieldUiBlock, { kind: 'section' } >
 		> = [];
+		let runIndex = 0;
 
-		function flushPendingSections( nextKey: string ) {
+		function flushPendingSections() {
+			if ( pendingSections.length === 0 ) {
+				return;
+			}
 			const flatSections = renderFlatSectionBlocks(
 				pendingSections,
-				nextKey
+				`${ keyPrefix }-run-${ runIndex++ }`
 			);
 			if ( flatSections ) {
 				rendered.push( flatSections );
@@ -136,27 +143,27 @@ export function DefinitionDrivenFieldEditor( {
 			pendingSections = [];
 		}
 
-		blocks.forEach( ( block, index ) => {
+		blocks.forEach( ( block ) => {
 			if ( block.kind === 'section' ) {
 				pendingSections.push( block );
 				return;
 			}
-
-			flushPendingSections( `advanced-sections-before-${ block.id }` );
+			flushPendingSections();
 			rendered.push( renderWidgetBlock( block ) );
-
-			if ( index === blocks.length - 1 ) {
-				flushPendingSections( 'advanced-sections-end' );
-			}
 		} );
 
-		flushPendingSections( 'advanced-sections-end' );
+		flushPendingSections();
 
 		return rendered;
 	}
 
 	function renderSettingsTabContent( blocks: FieldUiBlock[] ) {
-		const primary: Array< JSX.Element > = [];
+		const primarySections: Array<
+			Extract< FieldUiBlock, { kind: 'section' } >
+		> = [];
+		const primaryWidgets: Array<
+			Extract< FieldUiBlock, { kind: 'widget' } >
+		> = [];
 		const advancedBlocks: FieldUiBlock[] = [];
 
 		blocks.forEach( ( block ) => {
@@ -164,7 +171,11 @@ export function DefinitionDrivenFieldEditor( {
 				advancedBlocks.push( block );
 				return;
 			}
-			primary.push( renderBlock( block ) );
+			if ( block.kind === 'section' ) {
+				primarySections.push( block );
+				return;
+			}
+			primaryWidgets.push( block );
 		} );
 
 		const advancedLabel = i18n.advancedSettings || 'Advanced settings';
@@ -175,15 +186,24 @@ export function DefinitionDrivenFieldEditor( {
 			advancedSectionLabels
 		);
 
+		const primarySectionsCard = renderFlatSectionBlocks(
+			primarySections,
+			'settings-primary'
+		);
+
 		return (
 			<VStack align="stretch" gap={ 3 }>
-				{ primary }
+				{ primarySectionsCard }
+				{ primaryWidgets.map( ( block ) => renderWidgetBlock( block ) ) }
 				{ advancedBlocks.length > 0 && (
 					<AdvancedSettingsPanel
 						label={ advancedLabel }
 						description={ advancedDescription || undefined }
 					>
-						{ renderAdvancedBlocks( advancedBlocks ) }
+						{ renderBlockSequenceFlat(
+							advancedBlocks,
+							'settings-advanced'
+						) }
 					</AdvancedSettingsPanel>
 				) }
 			</VStack>
