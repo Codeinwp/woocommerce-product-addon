@@ -307,13 +307,14 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				'admin/existing-meta.php',
 				array( 'list_table' => $this->meta_groups_list_table )
 			);
+			ppom_load_template( 'admin/template-wizard.php' );
 
 			// NOTE: Allow only for Tier 1 Plan or lower if license is present.
 			$should_load_banner = NM_PersonalizedProduct::LICENSE_PLAN_1 >= NM_PersonalizedProduct::get_license_category( intval( apply_filters( 'product_ppom_license_plan', 0 ) ) );
 
 			if ( $should_load_banner ) {
 				do_action( 'themeisle_sdk_load_banner', 'ppom' );
-			}       
+			}
 		}
 
 		echo '</div>';

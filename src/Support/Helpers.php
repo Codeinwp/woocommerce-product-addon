@@ -2086,6 +2086,54 @@ final class Helpers {
 		return apply_filters( 'ppom_option_price_attached', $is_price_attached, $fields_posted, $product_id );
 	}
 
+	/**
+	 * Builds a legacy ppom_option_price structure from posted field values.
+	 *
+	 * @param array<string, mixed> $fields_posted Posted ppom[fields] payload.
+	 * @param int                  $product_id    Product ID to look up field metadata against.
+	 *
+	 * @return array<array<string, mixed>> Option-price entries (empty when no priced options match).
+	 */
+	public static function compute_option_price_from_fields( $fields_posted, $product_id ) {
+
+		$option_prices = array();
+		$ppom_id       = isset( $fields_posted['id'] ) ? $fields_posted['id'] : null;
+
+		foreach ( $fields_posted as $data_name => $value ) {
+
+			$field_meta = self::get_field_meta_by_dataname( $product_id, $data_name, $ppom_id );
+			if ( empty( $field_meta ) ) {
+				continue;
+			}
+
+			$apply = ( isset( $field_meta['onetime'] ) && 'on' === $field_meta['onetime'] ) ? 'onetime' : 'variable';
+
+			if ( is_array( $value ) ) {
+				foreach ( $value as $cb_value ) {
+					$price = self::get_field_option_price( $field_meta, $cb_value );
+					if ( 0 != $price ) {
+						$option_prices[] = array(
+							'apply'     => $apply,
+							'price'     => $price,
+							'data_name' => $data_name,
+						);
+					}
+				}
+			} else {
+				$price = self::get_field_option_price( $field_meta, $value );
+				if ( 0 != $price ) {
+					$option_prices[] = array(
+						'apply'     => $apply,
+						'price'     => $price,
+						'data_name' => $data_name,
+					);
+				}
+			}
+		}
+
+		return $option_prices;
+	}
+
 	// PPOM Get settings
 	public static function get_option( $key, $default_val = false ) {
 

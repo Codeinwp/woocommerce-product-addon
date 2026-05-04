@@ -373,7 +373,7 @@ final class MetaGroupsListTable extends WP_List_Table {
 		);
 
 		printf(
-			'<a class="button button-primary" href="%1$s"><span class="dashicons dashicons-plus" aria-hidden="true"></span><span>%2$s</span></a>',
+			'<a class="button button-primary" href="%1$s" data-modal-id="ppom-template-wizard-modal"><span class="dashicons dashicons-plus" aria-hidden="true"></span><span>%2$s</span></a>',
 			esc_url( $add_url ),
 			esc_html__( 'Add Group', 'woocommerce-product-addon' )
 		);

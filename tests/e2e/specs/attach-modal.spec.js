@@ -177,6 +177,12 @@ test.describe("Attach Modal", () => {
 		await admin.visitAdminPage("admin.php?page=ppom");
 
 		await clickAddGroup( page );
+		await Promise.all([
+			page.waitForURL(/action=new/),
+			page
+				.locator("#ppom-template-wizard-modal .ppom-template-card--scratch")
+				.click(),
+		]);
 		await page.getByRole("textbox").fill("Test Attach Modal visibility");
 
 		await expect( page.locator('[data-formmodal-id="ppom-product-modal"]') ).toBeHidden();

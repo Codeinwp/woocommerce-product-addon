@@ -57,6 +57,10 @@ test.describe("Group Fields Edit", () => {
 
 		await clickAddGroup(page);
 		await page
+			.locator("#ppom-template-wizard-modal .ppom-template-card--scratch")
+			.click();
+		await page.waitForURL(/action=new/);
+		await page
 			.getByRole("textbox")
 			.fill("Change Select Option order");
 
