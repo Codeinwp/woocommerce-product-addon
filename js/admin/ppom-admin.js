@@ -500,13 +500,18 @@ jQuery( function ( $ ) {
 		html +=
 			'<td class="order column-order"><span class="ppom-sortable-handle dashicons dashicons-move" aria-hidden="true"></span></td>';
 		html += '<th scope="row" class="check-column">';
-		html += '<label>';
 		html +=
-			'<span class="screen-reader-text">' +
+			'<label class="screen-reader-text" for="ppom-field-cb-' +
+			id +
+			'">' +
 			ppom_vars.i18n.selectField +
-			'</span>';
-		html += '<input type="checkbox" value="' + id + '">';
-		html += '</label>';
+			'</label>';
+		html +=
+			'<input type="checkbox" id="ppom-field-cb-' +
+			id +
+			'" value="' +
+			id +
+			'" />';
 		html += '</th>';
 
 		html += '<td class="status column-status">';
@@ -560,9 +565,14 @@ jQuery( function ( $ ) {
 			'" data-modal-id="ppom_field_model_' +
 			id +
 			'"><span class="dashicons dashicons-edit" aria-hidden="true"></span></button>';
+		html +=
+			' <button type="button" class="button ppom-delete-field" id="' +
+			id +
+			'"><span class="dashicons dashicons-trash" aria-hidden="true"></span></button>';
 		html += '</td>';
 		html += '</tr>';
 		html = $.parseHTML( html );
+		$( '.ppom_field_table tbody tr.no-items' ).remove();
 		// console.log(copy_model_id);
 		if ( copy_model_id != '' && copy_model_id != undefined ) {
 			$( html )

@@ -25,7 +25,7 @@ test.describe("Group Fields Edit", () => {
 	test("change fields order on saving", async ({ page, admin }) => {
 		await createSimpleGroupField(admin, page);
 
-		const fieldIds = await page.$$eval("td.ppom_meta_field_id", (tds) =>
+		const fieldIds = await page.$$eval("td.column-data_name", (tds) =>
 			tds.map((td) => td.innerText),
 		);
 
@@ -42,7 +42,7 @@ test.describe("Group Fields Edit", () => {
 		await saveFields(page);
 
 		const newOrderFieldIds = await page.$$eval(
-			"td.ppom_meta_field_id",
+			"td.column-data_name",
 			(tds) => tds.map((td) => td.innerText),
 		);
 
