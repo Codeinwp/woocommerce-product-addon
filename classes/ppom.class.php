@@ -577,27 +577,24 @@ class PPOM_Meta {
 
 			$type = isset( $field['type'] ) ? $field['type'] : '';
 
-			// pricematrix does not have dataname
-			if ( $type == 'pricematrix' ) {
-				continue;
-			}
-			// ignore collapased fields
-			if ( $type == 'collapse' ) {
+			$skip_types = array( 'pricematrix', 'collapse', 'section', 'divider' );
+
+			if ( in_array( $type, $skip_types, true ) ) {
 				continue;
 			}
 
-			if ( ! isset( $field['data_name'] ) ) {
+			if ( ! isset( $field['data_name'] ) || '' === trim( $field['data_name'] ) ) {
+				continue;
+			}
+
+			$data_name = sanitize_key( $field['data_name'] );
+			if ( in_array( $data_name, $datanames_array, true ) ) {
+
 				$has_unique = false;
 				break;
 			}
 
-			if ( in_array( $field['data_name'], $datanames_array ) ) {
-
-				$has_unique = false;
-				break;
-			}
-
-			$datanames_array[] = $field['data_name'];
+			$datanames_array[] = $data_name;
 
 		}
 

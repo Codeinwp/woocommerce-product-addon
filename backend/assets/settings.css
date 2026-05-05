@@ -436,7 +436,6 @@ div.nmsf-panels-area .nmsf-panels-content p {
 
 .nmsf-panel-table td,
 .nmsf-panel-table th {
-    vertical-align: middle;
     padding-left: 0px;
 }
 
@@ -647,3 +646,417 @@ div.nmsf-panels-area .nmsf-panels-content p {
 .ppom-is-locked-field select,
 .ppom-is-locked-panel select{   cursor: not-allowed;
     pointer-events: none; }
+
+h3.ppom-section-heading {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    margin: 0;
+    font-size: 0.95em;
+    color: #1d2327;
+}
+
+.ppom-status-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72em;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 12px;
+    margin-left: 8px;
+    vertical-align: middle;
+    line-height: 1.6;
+    white-space: nowrap;
+}
+
+.ppom-badge-active {
+    background: #e6f9ed;
+    color: #1a7a40;
+    border: 1px solid #b4e8c5;
+}
+
+.ppom-badge-inactive {
+    background: #f2f2f2;
+    color: #888;
+    border: 1px solid #d0d0d0;
+}
+
+.ppom-section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #6576ff;
+    color: #fff;
+    font-size: 15px;
+    flex-shrink: 0;
+    margin-right: 4px;
+}
+
+.ppom-rest-url-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0 6px;
+    flex-wrap: wrap;
+}
+
+.ppom-rest-url-input {
+    flex: 1;
+    min-width: 200px;
+    background: #f0f0f1 !important;
+    border: 1px solid #ddd !important;
+    color: #3c434a !important;
+    font-family: monospace;
+    font-size: 0.85em !important;
+    cursor: default;
+}
+
+.ppom-api-guide-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 12px;
+    color: #6576ff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.ppom-api-guide-link:hover {
+    color: #4a5be0;
+    text-decoration: underline;
+}
+
+.ppom-endpoint-group {
+    border-top: 1px solid #f0f0f1;
+}
+
+.ppom-endpoint-group-label {
+    display: block;
+    font-weight: 700;
+    color: #8c8f94;
+    margin-bottom: 4px;
+}
+
+.ppom-endpoint-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.ppom-method-badge {
+    display: inline-block;
+    font-size: 0.75em;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    min-width: 36px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.ppom-method-get {
+    background: #e6f9ed;
+    color: #1a7a40;
+    border: 1px solid #b4e8c5;
+}
+
+.ppom-method-post {
+    background: #fff3e0;
+    color: #b85d00;
+    border: 1px solid #ffd699;
+}
+
+.ppom-endpoint-path {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 12px;
+    color: #3c434a;
+    font-family: monospace;
+}
+
+.ppom-endpoint-desc {
+    color: #514b4b;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.ppom-endpoint-auth {
+    font-size: 13px !important;
+    width: 13px !important;
+    height: 13px !important;
+    color: #8c8f94;
+    flex-shrink: 0;
+}
+
+.ppom-password-field-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ppom-password-field-wrap input[type="password"],
+.ppom-password-field-wrap input[type="text"] {
+    flex: 1;
+    min-width: 0;
+}
+
+.ppom-eye-toggle .dashicons,
+.ppom-copy-btn .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+
+.ppom-copy-btn.ppom-copied {
+    color: #1a7a40;
+}
+
+.ppom-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    line-height: 1;
+}
+
+.ppom-toggle > input[type="checkbox"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    margin: 0;
+    pointer-events: none;
+}
+
+.ppom-toggle-track {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+    border-radius: 11px;
+    background: #c0ccda;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+}
+
+.ppom-toggle-track::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.ppom-toggle > input:checked + .ppom-toggle-track {
+    background: #6576ff;
+}
+
+.ppom-toggle > input:checked + .ppom-toggle-track::before {
+    transform: translateX(18px);
+}
+
+.ppom-toggle > input:disabled + .ppom-toggle-track {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ppom-toggle > input:focus-visible + .ppom-toggle-track {
+    outline: 2px solid #6576ff;
+    outline-offset: 2px;
+}
+
+.ppom-toggle-label {
+    font-size: 13px;
+    color: #3c4d62;
+    font-weight: 400;
+}
+
+.ppom-is-locked-panel .ppom-toggle,
+.ppom-is-locked-field .ppom-toggle {
+    pointer-events: none;
+}
+
+.nmsf-panel-table.form-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* Spacer row between cards */
+.ppom-card-spacer-row > td {
+    height: 16px;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+/* Card header row */
+.ppom-card-header-row > td.nmsf-section-type {
+    border: 1px solid #e2e4e7;
+    border-bottom: 1px solid #e2e4e7;
+    border-radius: 6px 6px 0 0;
+    padding: 0 !important;
+    background: #fff;
+}
+
+/* Card with no body rows — full border radius */
+.ppom-card-header-row.ppom-card-no-body > td.nmsf-section-type {
+    border-bottom: 1px solid #e2e4e7;
+    border-radius: 6px;
+}
+
+/* Card body rows — left / right border only */
+.ppom-card-body-row > th {
+    border-left: 1px solid #e2e4e7;
+    background: #fff;
+    padding: 10px 10px 10px 16px !important;
+}
+.ppom-card-body-row > td {
+    border-right: 1px solid #e2e4e7;
+    background: #fff;
+    padding: 10px 16px 10px 10px !important;
+}
+
+.ppom-available-endpoints-row > th {
+    border-left: 1px solid #e2e4e7;
+    border-bottom: 1px solid #e2e4e7;
+    border-radius: 0 0 0 6px;
+    background: #fff;
+    padding: 10px 10px 10px 16px !important;
+}
+.ppom-available-endpoints-row > td {
+    border-right: 1px solid #e2e4e7;
+    border-bottom: 1px solid #e2e4e7;
+    border-radius: 0 0 6px 0;
+    background: #fff;
+    padding: 10px 16px 10px 10px !important;
+}
+
+.ppom-card-title-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.ppom-card-title {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.ppom-card-title-text {
+    font-weight: 600;
+    font-size: 1em;
+    flex: 1;
+}
+
+.ppom-card-desc {
+    margin: 4px 0 0 36px;
+    font-size: 0.82em;
+    color: #6c757d;
+    font-weight: 400;
+}
+
+/* Collapse toggle button */
+.ppom-card-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 3px;
+    color: #8c8f94;
+    line-height: 1;
+    border-radius: 4px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.ppom-card-toggle:hover {
+    background: #f0f0f1;
+    color: #1d2327;
+}
+
+.ppom-card-toggle .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    transition: transform 0.2s ease;
+    display: block;
+}
+
+.ppom-card-toggle[aria-expanded="false"] .dashicons {
+    transform: rotate(180deg);
+}
+
+.ppom-endpoints-panel {
+    border: 1px solid #e2e4e7;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+    font-size: 12px;
+}
+
+.ppom-endpoints-panel-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 6px 10px;
+    border-bottom: 1px solid #f0f0f1;
+    background: #fafafa;
+}
+
+.ppom-endpoint-group {
+    border-top: 1px solid #f0f0f1;
+    padding: 4px 10px 6px;
+}
+
+.ppom-endpoint-group:first-of-type {
+    border-top: none;
+}
+
+.ppom-endpoint-group-label {
+    display: block;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    color: #3e3e3e;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+    padding: 4px 0 2px;
+}
+
+.ppom-endpoint-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.ppom-endpoint-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.ppom-endpoint-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #6c757d;
+    font-size: 11px;
+    flex-shrink: 0;
+}

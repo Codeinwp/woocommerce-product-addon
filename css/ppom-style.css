@@ -615,3 +615,7 @@ span.ppom-tooltip .ppom-tooltip-icon::after {
     line-height: 13px;
     font-weight: 700;
 }
+span.ppom-field-notice {
+  display: block;
+  font-size: 14px;
+}
