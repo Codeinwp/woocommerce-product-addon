@@ -34,7 +34,7 @@ define( 'PPOM_WP_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) )
 define( 'PPOM_BASENAME', basename( PPOM_WP_PLUGIN_DIR ) );
 define( 'PPOM_PRODUCT_SLUG', PPOM_BASENAME );
 define( 'PPOM_VERSION', '33.0.18' );
-define( 'PPOM_DB_VERSION', '32.0.0' );
+define( 'PPOM_DB_VERSION', '32.1.0' );
 define( 'PPOM_PRODUCT_META_KEY', '_product_meta_id' );
 define( 'PPOM_TABLE_META', 'nm_personalized' );
 define( 'PPOM_UPLOAD_DIR_NAME', 'ppom_files' );
