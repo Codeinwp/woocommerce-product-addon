@@ -573,6 +573,7 @@ jQuery( function ( $ ) {
 		html += '</tr>';
 		html = $.parseHTML( html );
 		$( '.ppom_field_table tbody tr.no-items' ).remove();
+		$( '.ppom-empty-state' ).remove();
 		// console.log(copy_model_id);
 		if ( copy_model_id != '' && copy_model_id != undefined ) {
 			$( html )
