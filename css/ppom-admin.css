@@ -1386,6 +1386,20 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
     text-decoration: none;
 }
 
+#ppom-upgrade-to-pro.button {
+    background: #E7632A;
+    border-color: #E7632A;
+    color: #fff;
+}
+
+#ppom-upgrade-to-pro.button:hover,
+#ppom-upgrade-to-pro.button:focus {
+    background: #cf5723;
+    border-color: #cf5723;
+    color: #fff;
+    box-shadow: 0 0 0 1px #cf5723;
+}
+
 .ppom_addons_model_cards span.badge {
     font-size:13px;
     float:right;

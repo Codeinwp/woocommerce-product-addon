@@ -262,7 +262,6 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$do_meta           = ( isset( $_REQUEST ['do_meta'] ) ? sanitize_text_field( $_REQUEST ['do_meta'] ) : '' );
 		$view              = ( isset( $_REQUEST ['view'] ) ? sanitize_text_field( $_REQUEST ['view'] ) : '' );
 		$ppom_settings_url = admin_url( 'admin.php?page=wc-settings&tab=ppom_settings' );
-		$addons            = add_query_arg( array( 'view' => 'addons' ) );
 		$changelog_url     = add_query_arg( array( 'view' => 'changelog' ) );
 
 		if ( $action != 'new' && $do_meta != 'edit' && $do_meta != 'clone' && $view != 'addons' && $view != 'changelog' ) {
@@ -284,10 +283,12 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 							<?php esc_html_e( 'Manage Personalization Previews', 'woocommerce-product-addon' ); ?>
 						</a>
 					<?php endif; ?>
-					<a id="ppom-all-addons" class="button button-secondary" href="<?php echo esc_url( $addons ); ?>">
-						<span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
-						<?php esc_html_e( 'All Addons', 'woocommerce-product-addon' ); ?>
-					</a>
+					<?php if ( ! ppom_pro_is_installed() ) : ?>
+						<a id="ppom-upgrade-to-pro" class="button button-secondary" href="https://themeisle.com/plugins/ppom-pro/" target="_blank" rel="noopener">
+							<span class="dashicons dashicons-star-filled" aria-hidden="true"></span>
+							<?php esc_html_e( 'Upgrade to Pro', 'woocommerce-product-addon' ); ?>
+						</a>
+					<?php endif; ?>
 					<a class="button button-primary" href="<?php echo esc_url( $ppom_settings_url ); ?>">
 						<span class="dashicons dashicons-admin-generic" aria-hidden="true"></span>
 						<?php esc_html_e( 'General Settings', 'woocommerce-product-addon' ); ?>
