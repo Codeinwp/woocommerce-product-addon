@@ -8,32 +8,10 @@ import { ConditionsEditor } from '../ConditionsEditor';
 import { ProFeatureUpsellCard } from './ProFeatureUpsellCard';
 import type { FieldModalLinks, FieldRow, I18nDict } from '../types/fieldModal';
 
-const PREVIEW_BUILDER_FIELDS: FieldRow[] = [
-	{
-		clientId: 'preview-source',
-		type: 'text',
-		title: 'Engraving Type',
-		data_name: 'engraving_type',
-	},
-];
-
 const PREVIEW_VALUES: FieldRow = {
 	clientId: 'preview-target',
-	data_name: 'engraving_text',
+	data_name: '',
 	logic: 'on',
-	conditions: {
-		visibility: 'Show',
-		bound: 'All',
-		rules: {
-			0: {
-				elements: 'engraving_type',
-				operators: 'is',
-				element_values: 'gift',
-				element_constant: '',
-				'cond-between-interval': { from: '', to: '' },
-			},
-		},
-	},
 };
 
 const NOOP_ON_CHANGE: Dispatch< SetStateAction< FieldRow | null > > = () =>
@@ -74,7 +52,7 @@ export function ConditionsLockedPreview( {
 					values={ PREVIEW_VALUES }
 					onChange={ NOOP_ON_CHANGE }
 					i18n={ i18n }
-					builderFields={ PREVIEW_BUILDER_FIELDS }
+					builderFields={ [] }
 					conditionsProEnabled={ true }
 					links={ links }
 				/>

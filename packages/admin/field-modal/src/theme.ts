@@ -27,6 +27,19 @@ export const fieldModalTheme = createSystem(
 				'& .chakra-select::-ms-expand': {
 					display: 'none',
 				},
+				/**
+				 * wp-admin sets `#wpwrap a:hover/:focus { color: #135e96 }` (specificity 1,1,1),
+				 * which would otherwise repaint the upsell CTA text blue. The ID-scoped class
+				 * selectors below land at (1,2,1) and win without `!important`.
+				 */
+				'& .ppom-upsell-cta--primary, & .ppom-upsell-cta--primary:hover, & .ppom-upsell-cta--primary:focus, & .ppom-upsell-cta--primary:focus-visible, & .ppom-upsell-cta--primary:active':
+					{
+						color: '#fff',
+					},
+				'& .ppom-upsell-cta--secondary, & .ppom-upsell-cta--secondary:hover, & .ppom-upsell-cta--secondary:focus, & .ppom-upsell-cta--secondary:focus-visible, & .ppom-upsell-cta--secondary:active':
+					{
+						color: '#e65000',
+					},
 			},
 		},
 

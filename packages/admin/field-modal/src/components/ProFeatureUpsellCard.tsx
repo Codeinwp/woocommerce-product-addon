@@ -90,6 +90,7 @@ export function ProFeatureUpsellCard( {
 					<HStack align="stretch" gap={ 2 } flexWrap="wrap">
 						{ primaryUrl ? (
 							<Link
+								className="ppom-upsell-cta ppom-upsell-cta--primary"
 								href={ primaryUrl }
 								target="_blank"
 								rel="noopener noreferrer"
@@ -107,13 +108,20 @@ export function ProFeatureUpsellCard( {
 								textDecoration="none"
 								whiteSpace="nowrap"
 								w={ { base: 'full', sm: 'auto' } }
-								_hover={ { bg: 'orange.600' } }
+								_hover={ { bg: 'orange.600', color: 'white' } }
+								_focus={ { bg: 'orange.600', color: 'white' } }
+								_focusVisible={ {
+									bg: 'orange.600',
+									color: 'white',
+								} }
+								_active={ { bg: 'orange.600', color: 'white' } }
 							>
 								{ primaryLabel }
 							</Link>
 						) : null }
 						{ secondaryUrl && secondaryLabel ? (
 							<Link
+								className="ppom-upsell-cta ppom-upsell-cta--secondary"
 								href={ secondaryUrl }
 								target="_blank"
 								rel="noopener noreferrer"
@@ -133,7 +141,16 @@ export function ProFeatureUpsellCard( {
 								textDecoration="none"
 								whiteSpace="nowrap"
 								w={ { base: 'full', sm: 'auto' } }
-								_hover={ { bg: 'orange.100' } }
+								_hover={ { bg: 'orange.100', color: 'orange.600' } }
+								_focus={ { bg: 'orange.100', color: 'orange.600' } }
+								_focusVisible={ {
+									bg: 'orange.100',
+									color: 'orange.600',
+								} }
+								_active={ {
+									bg: 'orange.100',
+									color: 'orange.600',
+								} }
 							>
 								{ secondaryLabel }
 							</Link>

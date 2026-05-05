@@ -30,6 +30,7 @@ export function App( { productmetaId }: AppProps ) {
 		schemaFetchError,
 		modalEntry,
 		isDirty,
+		isNewField,
 		i18n,
 		ppomFieldIndex,
 		catalogGroups,
@@ -133,6 +134,7 @@ export function App( { productmetaId }: AppProps ) {
 				saving={ saving }
 				hasCtx={ Boolean( ctx ) }
 				confirmingCancel={ confirmingCancel }
+				isNewField={ isNewField }
 				onClose={ requestClose }
 				onSave={ handleSave }
 			/>

@@ -13,23 +13,27 @@ export interface FieldModalFooterProps {
 	saving: boolean;
 	hasCtx: boolean;
 	confirmingCancel?: boolean;
+	isNewField?: boolean;
 	onClose: () => void;
 	onSave: () => void;
 }
 
 export function FieldModalFooter( {
-	i18n,
 	pickerOpen,
 	loading,
 	saving,
 	hasCtx,
 	confirmingCancel = false,
+	isNewField = false,
 	onClose,
 	onSave,
 }: FieldModalFooterProps ) {
 	const cancelLabel = confirmingCancel
 		? __( 'Confirm', 'woocommerce-product-addon' )
 		: __( 'Cancel', 'woocommerce-product-addon' );
+	const saveLabel = isNewField
+		? __( 'Add Field', 'woocommerce-product-addon' )
+		: __( 'Save', 'woocommerce-product-addon' );
 
 	return (
 		<Dialog.Footer
@@ -58,7 +62,7 @@ export function FieldModalFooter( {
 						disabled={ loading || ! hasCtx }
 					>
 						<LuCheck />
-						{ __( 'Save', 'woocommerce-product-addon' ) }
+						{ saveLabel }
 					</Button>
 				) }
 			</HStack>

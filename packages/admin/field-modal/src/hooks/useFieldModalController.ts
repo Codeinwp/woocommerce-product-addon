@@ -236,6 +236,13 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		);
 	}, [ state.dirtyClientIds, state.removedPersistedClientIds ] );
 
+	const isNewField = useMemo( () => {
+		if ( ! state.selectedId ) {
+			return false;
+		}
+		return ! state.persistedClientIds.includes( state.selectedId );
+	}, [ state.selectedId, state.persistedClientIds ] );
+
 	const fetchSchemaForType = useCallback(
 		async ( type: string | undefined ) => {
 			if ( ! type ) {
@@ -525,6 +532,7 @@ export function useFieldModalController( productmetaId: number | undefined ) {
 		schemaFetchError: state.schemaFetchError,
 		modalEntry: state.modalEntry,
 		isDirty,
+		isNewField,
 		i18n,
 		ppomFieldIndex,
 		catalogGroups,
