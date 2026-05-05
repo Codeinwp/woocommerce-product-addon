@@ -145,12 +145,20 @@ final class Handler {
 	 *
 	 * @param string $file_name The file name.
 	 * @param string $file_ext The file extension.
+	 * @param string $dir_path Optional directory path to check for uniqueness.
 	 *
 	 * @return string The new file name.
 	 */
-	public static function create_unique_file_name( $file_name, $file_ext ) {
-		$seed = $file_name . microtime( true ) . wp_rand();
-		return $file_name . '.' . substr( wp_hash( $seed ), 0, 6 ) . '.' . $file_ext;
+	public static function create_unique_file_name( $file_name, $file_ext, $dir_path = '' ) {
+		$seed           = $file_name . microtime( true ) . wp_rand();
+		$generated_name = $file_name . '.' . substr( wp_hash( $seed ), 0, 6 ) . '.' . $file_ext;
+
+		// Ensure the filename is truly unique in the target directory to prevent collisions.
+		if ( ! empty( $dir_path ) ) {
+			$generated_name = wp_unique_filename( $dir_path, $generated_name );
+		}
+
+		return $generated_name;
 	}
 
 	/**
@@ -361,7 +369,7 @@ final class Handler {
 		if ( ! $chunks || $chunk === $chunks - 1 ) {
 
 			// Give a unique name to prevent name collisions.
-			$file_name        = self::create_unique_file_name( $original_name, $file_ext );
+			$file_name        = self::create_unique_file_name( $original_name, $file_ext, $file_dir_path );
 			$unique_file_path = $file_dir_path . $file_name;
 
 			rename( $chunk_file_path, $unique_file_path );
