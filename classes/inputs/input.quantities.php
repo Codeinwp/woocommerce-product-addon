@@ -148,7 +148,7 @@ class NM_Quantities_wooproduct extends PPOM_Inputs {
 			'enable_plusminus' => array(
 				'type'  => 'checkbox',
 				'title' => __( 'Enhance -/+ controls', 'woocommerce-product-addon' ),
-				'desc'  => __( 'Add the -/+ buttons', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Add clickable -/+ buttons next to the input.', 'woocommerce-product-addon' ),
 			),
 			'manage_stock'     => array(
 				'type'  => 'checkbox',

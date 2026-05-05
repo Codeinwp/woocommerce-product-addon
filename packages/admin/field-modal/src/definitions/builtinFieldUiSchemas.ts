@@ -2661,7 +2661,10 @@ function quantitiesSettings(): SettingSchema {
 		enable_plusminus: setting(
 			'checkbox',
 			__( 'Enhance -/+ controls', 'woocommerce-product-addon' ),
-			__( 'Add the -/+ buttons.', 'woocommerce-product-addon' ),
+			__(
+				'Add clickable -/+ buttons next to the input.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		manage_stock: setting(
@@ -3003,7 +3006,10 @@ function vqmatrixSettings(): SettingSchema {
 		enable_plusminus: setting(
 			'checkbox',
 			__( 'Enhance -/+ controls', 'woocommerce-product-addon' ),
-			__( 'Add the -/+ buttons.', 'woocommerce-product-addon' ),
+			__(
+				'Add clickable -/+ buttons next to the input.',
+				'woocommerce-product-addon'
+			),
 			{ col_classes: HALF_WIDTH }
 		),
 		width: widthSetting(),
