@@ -284,7 +284,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 						</a>
 					<?php endif; ?>
 					<?php if ( ! ppom_pro_is_installed() ) : ?>
-						<a id="ppom-upgrade-to-pro" class="button button-secondary" href="https://themeisle.com/plugins/ppom-pro/" target="_blank" rel="noopener">
+						<a id="ppom-upgrade-to-pro" class="button button-secondary" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'topnav', 'fieldgroups' ) ); ?>" target="_blank" rel="noopener">
 							<span class="dashicons dashicons-star-filled" aria-hidden="true"></span>
 							<?php esc_html_e( 'Upgrade to Pro', 'woocommerce-product-addon' ); ?>
 						</a>
