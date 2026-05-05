@@ -96,13 +96,13 @@ jQuery( function ( $ ) {
 	// Per-row enable/disable toggle. Sends an AJAX request to flip
 	// `productmeta_disabled`; product attachments and field schema are
 	// untouched, so this is a pure visibility switch on the frontend.
-	$( 'body' ).on( 'change', '.ppom-toggle .ppom-toggle-input', function () {
+	$( 'body' ).on( 'change', '.ppom-existing-meta-wrapper .onoffswitch .onoffswitch-checkbox', function () {
 		const $input = $( this );
-		const $label = $input.closest( '.ppom-toggle' );
-		const ppomId = $label.data( 'ppomId' );
+		const $wrap = $input.closest( '.onoffswitch' );
+		const ppomId = $wrap.data( 'ppomId' );
 		const disabled = ! $input.is( ':checked' );
 
-		$label.addClass( 'ppom-toggle--busy' );
+		$wrap.addClass( 'onoffswitch--busy' );
 		$input.prop( 'disabled', true );
 
 		$.post(
@@ -114,7 +114,7 @@ jQuery( function ( $ ) {
 				ppom_meta_nonce: $( '#ppom_meta_nonce' ).val(),
 			},
 			function ( resp ) {
-				$label.removeClass( 'ppom-toggle--busy' );
+				$wrap.removeClass( 'onoffswitch--busy' );
 				$input.prop( 'disabled', false );
 
 				if ( ! resp || resp.status !== 'success' ) {
@@ -129,25 +129,10 @@ jQuery( function ( $ ) {
 						title: message,
 						hideCloseBtn: true,
 					} );
-					return;
 				}
-
-				$label.toggleClass(
-					'ppom-toggle--off',
-					resp.disabled === true
-				);
-				$label
-					.find( '.ppom-toggle-label' )
-					.text(
-						resp.disabled
-							? window?.ppom_vars?.i18n?.toggle?.disabled ??
-									'Disabled'
-							: window?.ppom_vars?.i18n?.toggle?.enabled ??
-									'Enabled'
-					);
 			}
 		).fail( function () {
-			$label.removeClass( 'ppom-toggle--busy' );
+			$wrap.removeClass( 'onoffswitch--busy' );
 			$input.prop( 'disabled', false );
 			$input.prop( 'checked', ! $input.is( ':checked' ) );
 			window?.ppomPopup?.open( {
