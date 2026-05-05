@@ -116,6 +116,7 @@ export function PalettesFieldEditor( {
 			onChange={ onChange }
 			i18n={ i18n }
 			title={ optionsTitle }
+			optionVariant="color"
 		/>
 	) : null;
 

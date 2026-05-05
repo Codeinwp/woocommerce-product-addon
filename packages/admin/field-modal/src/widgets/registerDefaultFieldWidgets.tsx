@@ -201,6 +201,7 @@ registerMetaTypeWidget( {
 			onChange={ ctx.updateField }
 			i18n={ ctx.i18n }
 			title={ title }
+			optionVariant="color"
 		/>
 	),
 } );

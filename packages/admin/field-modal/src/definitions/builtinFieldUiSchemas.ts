@@ -2476,7 +2476,7 @@ function palettesSettings(): SettingSchema {
 			)
 		),
 		selected: setting(
-			'text',
+			'color',
 			__( 'Selected color', 'woocommerce-product-addon' ),
 			__(
 				'Type color code if you want one already selected.',

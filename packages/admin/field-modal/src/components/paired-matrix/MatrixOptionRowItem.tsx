@@ -1,6 +1,10 @@
-import { Checkbox, Input } from '@chakra-ui/react';
+import { Checkbox, ColorPicker, HStack, Input, parseColor } from '@chakra-ui/react';
 import { DraggableOptionRow } from '../draggable-options/DraggableOptionRow';
 import type { I18nDict } from '../../types/fieldModal';
+import {
+	colorFromStoredValue,
+	persistColorValueAsHex,
+} from '../../controls/colorHelpers';
 import {
 	type MatrixOptionRow,
 	isMatrixFixedChecked,
@@ -19,6 +23,25 @@ export interface MatrixOptionRowItemProps {
 	onDragStart: ( index: number ) => void;
 	onDragEnd: () => void;
 	onDrop: ( slot: number ) => void;
+	optionVariant?: 'text' | 'color';
+}
+
+/**
+ * Try to parse the user's free-form option string as a color for the swatch.
+ * Falls back to opaque black silently — palette options accept any CSS
+ * background-color value (named colors, rgba, gradients), so we shouldn't
+ * surface a parse error just because the swatch can't render it.
+ */
+function safeColorFromOption( raw: unknown ) {
+	const trimmed = String( raw ?? '' ).trim();
+	if ( ! trimmed ) {
+		return parseColor( '#000000' );
+	}
+	try {
+		return colorFromStoredValue( trimmed );
+	} catch {
+		return parseColor( '#000000' );
+	}
 }
 
 export function MatrixOptionRowItem( {
@@ -34,7 +57,66 @@ export function MatrixOptionRowItem( {
 	onDragStart,
 	onDragEnd,
 	onDrop,
+	optionVariant = 'text',
 }: MatrixOptionRowItemProps ) {
+	const optionInput = (
+		<Input
+			size="sm"
+			flex="1 1 120px"
+			minW={ 0 }
+			placeholder={ i18n.pairedMatrixOption || 'Option' }
+			value={ String( row.option ?? '' ) }
+			onChange={ ( e ) =>
+				onPatch( index, { option: e.target.value } )
+			}
+		/>
+	);
+
+	const optionField =
+		optionVariant === 'color' ? (
+			<HStack flex="1 1 120px" minW={ 0 } gap={ 1.5 }>
+				<ColorPicker.Root
+					value={ safeColorFromOption( row.option ) }
+					onValueChange={ ( details ) =>
+						onPatch( index, {
+							option: persistColorValueAsHex( details.value ),
+						} )
+					}
+					size="sm"
+				>
+					<ColorPicker.HiddenInput />
+					<ColorPicker.Trigger
+						aria-label={
+							i18n.pairedMatrixPickColor || 'Pick color'
+						}
+						flexShrink={ 0 }
+					>
+						<ColorPicker.ValueSwatch
+							boxSize={ 6 }
+							borderWidth="1px"
+							borderColor="gray.300"
+							borderRadius="sm"
+						/>
+					</ColorPicker.Trigger>
+					<ColorPicker.Positioner>
+						<ColorPicker.Content>
+							<ColorPicker.Area />
+							<HStack mt={ 2 }>
+								<ColorPicker.EyeDropper
+									size="xs"
+									variant="outline"
+								/>
+								<ColorPicker.Sliders />
+							</HStack>
+						</ColorPicker.Content>
+					</ColorPicker.Positioner>
+				</ColorPicker.Root>
+				{ optionInput }
+			</HStack>
+		) : (
+			optionInput
+		);
+
 	return (
 		<DraggableOptionRow
 			index={ index }
@@ -49,16 +131,7 @@ export function MatrixOptionRowItem( {
 			removeLabel={ i18n.pairedOptionsRemove || 'Remove' }
 			flexWrap="wrap"
 		>
-			<Input
-				size="sm"
-				flex="1 1 120px"
-				minW={ 0 }
-				placeholder={ i18n.pairedMatrixOption || 'Option' }
-				value={ String( row.option ?? '' ) }
-				onChange={ ( e ) =>
-					onPatch( index, { option: e.target.value } )
-				}
-			/>
+			{ optionField }
 			<Input
 				size="sm"
 				flex="1 1 100px"

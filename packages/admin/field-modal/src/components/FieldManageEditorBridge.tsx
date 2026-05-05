@@ -135,8 +135,13 @@ function FieldManageEditorBridgeInner( {
 				return;
 			}
 			applyFieldRowToForm( form, next );
+			// TanStack form's form-level `listeners.onChange` only fires for keys
+			// owned by a registered `<form.Field>`. Widget-driven keys (e.g. the
+			// paired-palettes `options` array) never register a Field, so the
+			// listener wouldn't propagate them to `editDraft`. Push them up here.
+			onEditDraftChange( form.state.values as FieldRow );
 		},
-		[ form ]
+		[ form, onEditDraftChange ]
 	);
 
 	const slug = editDraft.type ? String( editDraft.type ) : '';

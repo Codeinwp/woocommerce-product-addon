@@ -21,6 +21,11 @@ export interface PairedMatrixOptionsEditorProps {
 	onChange: Dispatch< SetStateAction< FieldRow | null > >;
 	i18n: I18nDict;
 	title: string;
+	/**
+	 * `'color'` adds a color-picker swatch next to the option input. The text input
+	 * stays free-form so `black` / `rgba(...)` / gradients still pass through.
+	 */
+	optionVariant?: 'text' | 'color';
 }
 
 export function PairedMatrixOptionsEditor( {
@@ -28,6 +33,7 @@ export function PairedMatrixOptionsEditor( {
 	onChange,
 	i18n,
 	title,
+	optionVariant = 'text',
 }: PairedMatrixOptionsEditorProps ) {
 	const rows = normalizeMatrixOptions( values.options );
 
@@ -40,18 +46,30 @@ export function PairedMatrixOptionsEditor( {
 		} );
 	};
 
+	const mutateRows = (
+		mutator: ( current: MatrixOptionRow[] ) => MatrixOptionRow[]
+	) => {
+		onChange( ( prev ) => {
+			if ( ! prev ) {
+				return prev;
+			}
+			const current = normalizeMatrixOptions( prev.options );
+			return { ...prev, options: mutator( current ) };
+		} );
+	};
+
 	const updateRow = ( index: number, patch: Partial< MatrixOptionRow > ) => {
-		setRows(
-			rows.map( ( r, i ) => ( i === index ? { ...r, ...patch } : r ) )
+		mutateRows( ( current ) =>
+			current.map( ( r, i ) => ( i === index ? { ...r, ...patch } : r ) )
 		);
 	};
 
 	const addRow = () => {
-		setRows( [ ...rows, emptyMatrixRow() ] );
+		mutateRows( ( current ) => [ ...current, emptyMatrixRow() ] );
 	};
 
 	const removeRow = ( index: number ) => {
-		setRows( rows.filter( ( _, i ) => i !== index ) );
+		mutateRows( ( current ) => current.filter( ( _, i ) => i !== index ) );
 	};
 
 	const toggleFixed = ( index: number, checked: boolean ) => {
@@ -87,6 +105,7 @@ export function PairedMatrixOptionsEditor( {
 						onDragStart={ dragHandlers.onDragStart }
 						onDragEnd={ dragHandlers.onDragEnd }
 						onDrop={ dragHandlers.onDrop }
+						optionVariant={ optionVariant }
 					/>
 				) ) }
 				<Button
