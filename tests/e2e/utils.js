@@ -46,6 +46,15 @@ export async function openFieldEditModal(page, modelId) {
 }
 
 /**
+ * Click the admin action for creating a PPOM field group.
+ *
+ * @param {import("@playwright/test").Page} page The page object.
+ */
+export async function clickAddGroup(page) {
+	await page.getByRole("link", { name: /^Add (New )?Group$/ }).click();
+}
+
+/**
  * Creates a simple group field in the admin panel.
  *
  * @param {object} admin The admin object to interact with the admin panel.
@@ -56,7 +65,7 @@ export async function openFieldEditModal(page, modelId) {
 export async function createSimpleGroupField(admin, page, fieldsNumber = 2) {
 	await admin.visitAdminPage("admin.php?page=ppom");
 
-	await page.getByRole("link", { name: "Add New Group" }).click();
+	await clickAddGroup(page);
 	await page
 		.locator("#ppom-template-wizard-modal .ppom-template-card--scratch")
 		.click();

@@ -262,17 +262,27 @@ class PPOM_Meta {
 		}
 
 		$meta_settings = $repo->get_rows_by_productmeta_ids( $meta_ids );
+		$active_meta   = array();
 		$filter_meta   = array();
 		foreach ( $meta_settings as $meta ) {
 			if ( ! is_object( $meta ) ) {
 				continue;
 			}
+
+			// Skip groups admins have toggled off; configuration and product
+			// attachments are preserved so re-enabling restores the form.
+			if ( isset( $meta->productmeta_disabled ) && 'on' === $meta->productmeta_disabled ) {
+				continue;
+			}
+
+			$active_meta[] = $meta;
+
 			$vars = get_object_vars( $meta );
 			if ( isset( $vars['productmeta_validation'] ) && 'on' === $vars['productmeta_validation'] ) {
 				$filter_meta[] = $meta;
 			}
 		}
-		$meta_settings = ! empty( $filter_meta ) ? reset( $filter_meta ) : reset( $meta_settings );
+		$meta_settings = ! empty( $filter_meta ) ? reset( $filter_meta ) : reset( $active_meta );
 
 		$meta_settings = empty( $meta_settings ) ? null : $meta_settings;
 
@@ -292,32 +302,44 @@ class PPOM_Meta {
 			return null;
 		}
 
-		// Meta created without any fields
-		if ( ! $this->ppom_settings ) {
-			return null;
-		}
-
 		$meta_fields = array();
 		$repo        = \PPOM\Data\FieldGroupRepository::instance();
 		if ( $this->has_multiple_meta() ) {
 
-			foreach ( $this->meta_id as $meta_id ) {
-				$fields = $repo->get_the_meta_json_by_productmeta_id( absint( $meta_id ) );
-
-				if ( ! is_string( $fields ) || empty( $fields ) ) {
+			$rows = $repo->get_rows_by_productmeta_ids( array_map( 'absint', (array) $this->meta_id ) );
+			foreach ( $rows as $row ) {
+				if ( ! is_object( $row ) ) {
 					continue;
 				}
 
-				$fields = json_decode( $fields, true );
+				if ( isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled ) {
+					continue;
+				}
+
+				if ( ! isset( $row->the_meta ) || ! is_string( $row->the_meta ) || '' === $row->the_meta ) {
+					continue;
+				}
+
+				$fields = json_decode( $row->the_meta, true );
 
 				if ( is_array( $fields ) ) {
 					$meta_fields = array_merge( $meta_fields, $fields );
 				}
 			}
 		} else {
-			$meta_id     = $this->meta_id;
-			$fields      = $repo->get_the_meta_json_by_productmeta_id( absint( $meta_id ) );
-			$meta_fields = ( is_string( $fields ) && '' !== $fields ) ? json_decode( $fields, true ) : null;
+			// Single-meta only: settings() already resolved (and possibly nulled) the
+			// primary row. Multi-meta resolves each row independently above.
+			if ( ! $this->ppom_settings ) {
+				return null;
+			}
+
+			$meta_id = absint( $this->meta_id );
+			$row     = $repo->get_row_by_productmeta_id( $meta_id );
+			if ( $row && isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled ) {
+				return null;
+			}
+			$raw         = ( $row && isset( $row->the_meta ) && is_string( $row->the_meta ) ) ? $row->the_meta : '';
+			$meta_fields = json_decode( $raw, true );
 		}
 
 		// Filter fields which are active only

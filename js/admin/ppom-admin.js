@@ -323,34 +323,33 @@ jQuery( function ( $ ) {
 
 	$( '.ppom-main-field-wrapper' ).on(
 		'click',
-		'.ppom-check-all-field input',
+		'.ppom_field_table thead .check-column input, .ppom_field_table tfoot .check-column input',
 		function ( event ) {
-			if ( $( this ).prop( 'checked' ) ) {
-				$(
-					'.ppom_field_table .ppom-checkboxe-style input[type="checkbox"]'
-				).prop( 'checked', true );
-			} else {
-				$(
-					'.ppom_field_table .ppom-checkboxe-style input[type="checkbox"]'
-				).prop( 'checked', false );
-			}
+			$( '.ppom_field_table tbody .check-column input[type="checkbox"]' ).prop(
+				'checked',
+				$( this ).prop( 'checked' )
+			);
 		}
 	);
 	$( '.ppom-main-field-wrapper' ).on(
 		'change',
-		'.ppom_field_table tbody .ppom-checkboxe-style input[type="checkbox"]',
+		'.ppom_field_table tbody .check-column input[type="checkbox"]',
 		function ( event ) {
 			if (
 				$(
-					'.ppom_field_table tbody .ppom-checkboxe-style input[type="checkbox"]:checked'
+					'.ppom_field_table tbody .check-column input[type="checkbox"]:checked'
 				).length ==
 				$(
-					'.ppom_field_table tbody .ppom-checkboxe-style input[type="checkbox"]'
+					'.ppom_field_table tbody .check-column input[type="checkbox"]'
 				).length
 			) {
-				$( '.ppom-check-all-field input' ).prop( 'checked', true );
+				$(
+					'.ppom_field_table thead .check-column input, .ppom_field_table tfoot .check-column input'
+				).prop( 'checked', true );
 			} else {
-				$( '.ppom-check-all-field input' ).prop( 'checked', false );
+				$(
+					'.ppom_field_table thead .check-column input, .ppom_field_table tfoot .check-column input'
+				).prop( 'checked', false );
 			}
 		}
 	);
@@ -365,7 +364,7 @@ jQuery( function ( $ ) {
 			e.preventDefault();
 
 			const inputsToRemove = document.querySelectorAll(
-				'.ppom_field_table .ppom-check-one-field input:checked'
+				'.ppom_field_table tbody .check-column input:checked'
 			);
 
 			if ( inputsToRemove.length > 0 ) {
@@ -392,6 +391,40 @@ jQuery( function ( $ ) {
 					hideCloseBtn: true,
 				} );
 			}
+		}
+	);
+
+	/**
+	  8- Delete a single field row (delegates to the bulk Remove flow so both
+	  paths share the exact same delete behaviour).
+	 */
+	$( '.ppom-main-field-wrapper' ).on(
+		'click',
+		'.ppom-delete-field',
+		function ( e ) {
+			e.preventDefault();
+
+			const field_id = $( this ).attr( 'id' );
+			const $checkboxes = $(
+				'.ppom_field_table tbody .check-column input[type="checkbox"]'
+			);
+			const previouslyChecked = $checkboxes
+				.filter( ':checked' )
+				.map( function () {
+					return this.value;
+				} )
+				.get()
+				.filter( ( id ) => id !== field_id );
+
+			$checkboxes.prop( 'checked', false );
+			$( `#ppom-field-cb-${ field_id }` ).prop( 'checked', true );
+			$( '.ppom_remove_field' ).first().trigger( 'click' );
+
+			// Restore the user's prior selection so other checked rows are
+			// not silently un-selected by the temporary single-row tick above.
+			previouslyChecked.forEach( ( id ) => {
+				$( `#ppom-field-cb-${ id }` ).prop( 'checked', true );
+			} );
 		}
 	);
 
@@ -465,20 +498,26 @@ jQuery( function ( $ ) {
 			id +
 			'">';
 		html +=
-			'<td class="ppom-sortable-handle"><i class="fa fa-arrows" aria-hidden="true"></i></td>';
-		html += '<td class="ppom-check-one-field ppom-checkboxe-style">';
-		html += '<label>';
-		html += '<input type="checkbox" value="' + id + '">';
-		html += '<span></span>';
-		html += '</label>';
-		html += '</td>';
+			'<td class="order column-order"><span class="ppom-sortable-handle dashicons dashicons-move" aria-hidden="true"></span></td>';
+		html += '<th scope="row" class="check-column">';
+		html +=
+			'<label class="screen-reader-text" for="ppom-field-cb-' +
+			id +
+			'">' +
+			ppom_vars.i18n.selectField +
+			'</label>';
+		html +=
+			'<input type="checkbox" id="ppom-field-cb-' +
+			id +
+			'" value="' +
+			id +
+			'" />';
+		html += '</th>';
 
-		html += '<td>';
+		html += '<td class="status column-status">';
 		html += '<div class="onoffswitch">';
 		html +=
-			'<input checked type="checkbox" name="ppom[' +
-			id +
-			'][status]" class="onoffswitch-checkbox" id="ppom-onoffswitch-' +
+			'<input checked type="checkbox" class="onoffswitch-checkbox" id="ppom-onoffswitch-' +
 			id +
 			'" tabindex="0">';
 		html +=
@@ -488,31 +527,52 @@ jQuery( function ( $ ) {
 		html += '<span class="onoffswitch-inner"></span>';
 		html += '<span class="onoffswitch-switch"></span>';
 		html += '</label>';
+		html +=
+			'<input type="hidden" value="on" name="ppom[' + id + '][status]">';
 		html += '</div>';
 		html += '</td>';
 
-		// html += '<td class="ppom-check-one-field"><input type="checkbox" value="'+id+'"></td>';
-		html += '<td class="ppom_meta_field_id">' + data_name + '</td>';
-		html += '<td class="ppom_meta_field_type">' + type + '</td>';
-		html += '<td class="ppom_meta_field_title">' + title + '</td>';
-		html += '<td class="ppom_meta_field_plchlder">' + placeholder + '</td>';
-		html += '<td class="ppom_meta_field_req">' + _ok + '</td>';
-		html += '<td>';
 		html +=
-			'<button class="ppom_copy_field btn" id="' +
+			'<td class="data_name column-data_name"><span class="ppom_meta_field_id">' +
+			data_name +
+			'</span></td>';
+		html +=
+			'<td class="type column-type"><span class="ppom_meta_field_type">' +
+			type +
+			'</span></td>';
+		html +=
+			'<td class="title column-title"><span class="ppom_meta_field_title">' +
+			title +
+			'</span></td>';
+		html +=
+			'<td class="placeholder column-placeholder"><span class="ppom_meta_field_plchlder">' +
+			placeholder +
+			'</span></td>';
+		html +=
+			'<td class="required column-required"><span class="ppom_meta_field_req">' +
+			_ok +
+			'</span></td>';
+		html += '<td class="actions column-actions">';
+		html +=
+			'<button type="button" class="button ppom_copy_field" id="' +
 			id +
 			'" data-field-type="' +
-			field_title +
-			'" style="margin-right: 4px;"><i class="fa fa-clone" aria-hidden="true"></i></button>';
+			type +
+			'" style="margin-right: 4px;"><span class="dashicons dashicons-admin-page" aria-hidden="true"></span></button>';
 		html +=
-			'<button class="ppom-edit-field btn" id="' +
+			'<button type="button" class="button ppom-edit-field" id="' +
 			id +
 			'" data-modal-id="ppom_field_model_' +
 			id +
-			'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
+			'"><span class="dashicons dashicons-edit" aria-hidden="true"></span></button>';
+		html +=
+			' <button type="button" class="button ppom-delete-field" id="' +
+			id +
+			'"><span class="dashicons dashicons-trash" aria-hidden="true"></span></button>';
 		html += '</td>';
 		html += '</tr>';
 		html = $.parseHTML( html );
+		$( '.ppom_field_table tbody tr.no-items' ).remove();
 		// console.log(copy_model_id);
 		if ( copy_model_id != '' && copy_model_id != undefined ) {
 			$( html )
@@ -1688,7 +1748,7 @@ jQuery( function ( $ ) {
 			.find( '[data-metatype="data_name"]' )
 			.val();
 		const allDataName = $( document )
-			.find( 'table.ppom_field_table td.ppom_meta_field_id' )
+			.find( 'table.ppom_field_table .ppom_meta_field_id' )
 			.map( function () {
 				const metaFieldId = $.trim( jQuery( this ).text() );
 				if (
@@ -2492,7 +2552,10 @@ jQuery( function ( $ ) {
 	// accidental navigation does not discard a large field-group edit session.
 	let unsaved = false;
 	$( '.ppom-main-field-wrapper :input' ).change( function () {
-		if ( $( this ).parents( '.ppom-checkboxe-style' )?.length > 0 ) {
+		if (
+			$( this ).parents( '.ppom-checkboxe-style, .check-column' )
+				?.length > 0
+		) {
 			unsaved = false;
 			return;
 		}
@@ -2500,7 +2563,7 @@ jQuery( function ( $ ) {
 	} );
 	$( document ).on(
 		'click',
-		'.ppom-submit-btn input.btn, button.ppom_copy_field, button.ppom-add-fields-js-action, button.ppom-js-modal-close',
+		'.ppom-submit-btn input, button.ppom_copy_field, button.ppom-add-fields-js-action, button.ppom-js-modal-close',
 		function () {
 			if (
 				$( this ).hasClass( 'ppom_copy_field' ) ||

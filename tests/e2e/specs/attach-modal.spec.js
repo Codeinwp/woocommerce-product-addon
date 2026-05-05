@@ -9,7 +9,15 @@ import {
 	getPpomAttachRowMeta,
 	setPpomLicenseFixture,
 } from "../fixtures/index.js";
-import { addNewField, createSimpleGroupField, fillFieldNameAndId, pickFieldTypeInModal, saveFieldInModal, saveFields } from "../utils";
+import {
+	addNewField,
+	clickAddGroup,
+	createSimpleGroupField,
+	fillFieldNameAndId,
+	pickFieldTypeInModal,
+	saveFieldInModal,
+	saveFields,
+} from "../utils";
 
 test.describe("Attach Modal", () => {
 	async function saveAttachModal(page) {
@@ -157,7 +165,7 @@ test.describe("Attach Modal", () => {
 	test("attach modal visibility on Group Edit page", async ({ page, admin }) => {
 		await admin.visitAdminPage("admin.php?page=ppom");
 
-		await page.getByRole("link", { name: "Add New Group" }).click();
+		await clickAddGroup( page );
 		await Promise.all([
 			page.waitForURL(/action=new/),
 			page

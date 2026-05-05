@@ -727,12 +727,6 @@ parameters:
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Variable \$localize_data might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
 			message: '#^Method PPOM_InputManager\:\:input_classes_array\(\) should return list\<string\> but returns \(array\|null\)\.$#'
 			identifier: return.type
 			count: 1
@@ -1377,12 +1371,6 @@ parameters:
 		-
 			message: '#^Method NM_PersonalizedProduct\:\:ppom_decode_entities\(\) has parameter \$arr with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: classes/plugin.class.php
-
-		-
-			message: '#^Method NM_PersonalizedProduct\:\:ppom_export_meta\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: classes/plugin.class.php
 
@@ -7563,7 +7551,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$text of function esc_attr expects string, int\<1, max\> given\.$#'
 			identifier: argument.type
-			count: 13
+			count: 4
 			path: templates/admin/ppom-fields.php
 
 		-

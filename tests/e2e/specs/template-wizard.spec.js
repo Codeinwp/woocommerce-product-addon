@@ -132,7 +132,7 @@ test.describe( "Template Library Wizard", () => {
 
 		// Each templated field is present in the summary table by data_name.
 		const renderedDataNames = await page.$$eval(
-			"td.ppom_meta_field_id",
+			"td.column-data_name",
 			( tds ) => tds.map( ( td ) => td.innerText.trim() )
 		);
 
