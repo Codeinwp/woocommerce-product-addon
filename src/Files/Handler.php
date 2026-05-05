@@ -149,8 +149,8 @@ final class Handler {
 	 * @return string The new file name.
 	 */
 	public static function create_unique_file_name( $file_name, $file_ext ) {
-		$seed = $file_name . microtime( true ) . mt_rand();
-		return $file_name . '.' . wp_hash( $seed ) . '.' . $file_ext;
+		$seed = $file_name . microtime( true ) . wp_rand();
+		return $file_name . '.' . substr( wp_hash( $seed ), 0, 6 ) . '.' . $file_ext;
 	}
 
 	/**
