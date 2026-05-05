@@ -293,6 +293,7 @@ class Test_Pricing_Engine extends WP_UnitTestCase {
 			$this->markTestSkipped( 'WooCommerce not available.' );
 		}
 
+		// Ensure ppom_taxable_option_price is not set and WC tax is disabled.
 		delete_option( 'ppom_taxable_option_price' );
 		update_option( 'woocommerce_calc_taxes', 'no' );
 
@@ -315,6 +316,9 @@ class Test_Pricing_Engine extends WP_UnitTestCase {
 		if ( ! $this->product ) {
 			$this->markTestSkipped( 'WooCommerce not available.' );
 		}
+
+		// Ensure ppom_taxable_option_price is not set.
+		delete_option( 'ppom_taxable_option_price' );
 
 		// Enable WooCommerce tax calculation
 		update_option( 'woocommerce_calc_taxes', 'yes' );
@@ -341,6 +345,37 @@ class Test_Pricing_Engine extends WP_UnitTestCase {
 			$expected_price_with_tax,
 			$result_price,
 			$delta
+		);
+
+		// Enabled PPOM taxable option price setting and WC tax, price should still include tax.
+		update_option( 'ppom_taxable_option_price', 'yes' );
+
+		$this->go_to( get_permalink( $this->product->get_id() ) );
+
+		$result_price = Engine::option_price_handle_vat( $base_addon_price, $this->product );
+
+		$this->assertGreaterThan(
+			$base_addon_price,
+			$result_price
+		);
+
+		$delta = 0.01;
+		$this->assertEqualsWithDelta(
+			$expected_price_with_tax,
+			$result_price,
+			$delta
+		);
+
+		// Disabled PPOM taxable option price setting, price should still not include tax.
+		update_option( 'ppom_taxable_option_price', 'no' );
+
+		$this->go_to( get_permalink( $this->product->get_id() ) );
+
+		$result_price = Engine::option_price_handle_vat( $base_addon_price, $this->product );
+
+		$this->assertEquals(
+			$base_addon_price,
+			$result_price
 		);
 	}
 

@@ -9,6 +9,8 @@
  * @see ppom_load_pro_options()
  */
 
+use PPOM\Support\Helpers;
+
 /* 
 **========== Block direct access =========== 
 */
@@ -395,7 +397,15 @@ class PPOM_SettingsFramework {
 				},
 				ARRAY_FILTER_USE_KEY 
 			);
-			// $settings_meta = $_REQUEST[self::$save_key];
+
+			// If taxable option is explicitly disabled, store it with "no" value.
+			if ( ! isset( $_REQUEST[ self::$save_key ]['ppom_taxable_option_price'] ) || 'yes' !== $_REQUEST[ self::$save_key ]['ppom_taxable_option_price'] ) {
+				$taxable_option_price = Helpers::get_option( 'ppom_taxable_option_price' );
+				if ( 'yes' === $taxable_option_price ) {
+					$_REQUEST[ self::$save_key ]['ppom_taxable_option_price'] = 'no';
+				}
+			}
+
 			$settings_meta = array_map(
 				function ( $setting ) {
 
