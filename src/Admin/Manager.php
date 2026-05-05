@@ -697,7 +697,13 @@ final class Manager {
 			$_REQUEST['ppom'] = $ppom_decoded['ppom'];
 		}
 
-		$ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];
+		$ppom_meta = array();
+		if ( isset( $_REQUEST['ppom_meta'] ) && is_array( $_REQUEST['ppom_meta'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized recursively below after Pro-disabled rows are preserved.
+			$ppom_meta = $_REQUEST['ppom_meta']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized recursively below after Pro-disabled rows are preserved.
+		} elseif ( isset( $_REQUEST['ppom'] ) && is_array( $_REQUEST['ppom'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized recursively below after Pro-disabled rows are preserved.
+			$ppom_meta = $_REQUEST['ppom']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized recursively below after Pro-disabled rows are preserved.
+		}
+		$ppom_meta    = self::preserve_unavailable_field_rows( (array) $ppom_meta, (int) $productmeta_id );
 		$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );
 		$product_meta = Validator::sanitize_array_data( $product_meta );
 		// Remove the meta row if the type or data_name is empty.
@@ -799,6 +805,62 @@ final class Manager {
 		}
 
 		wp_send_json( $resp );
+	}
+
+	/**
+	 * Keeps saved Pro-only field definitions intact when Pro is unavailable.
+	 *
+	 * The free builder still submits each saved row shell, but unavailable input
+	 * types do not have registered controls for title, data_name, options, or
+	 * conditions. Preserve the existing row instead of replacing it with the
+	 * partial shell.
+	 *
+	 * @param array<int|string, mixed> $submitted_meta Submitted builder rows.
+	 * @param int                      $productmeta_id Field-group ID.
+	 * @return array<int|string, mixed>
+	 */
+	private static function preserve_unavailable_field_rows( array $submitted_meta, $productmeta_id ) {
+		$row = MetaRepositoryAccessor::instance()->get_row_by_id( (int) $productmeta_id );
+		if ( null === $row ) {
+			return $submitted_meta;
+		}
+
+		$existing_meta = json_decode( $row->the_meta, true );
+		if ( ! is_array( $existing_meta ) ) {
+			return $submitted_meta;
+		}
+
+		foreach ( $submitted_meta as $index => $field ) {
+			if ( ! is_array( $field ) ) {
+				continue;
+			}
+
+			$type = isset( $field['type'] ) ? (string) $field['type'] : '';
+			if ( '' === $type
+				|| isset( \PPOM()->inputs[ $type ] )
+				|| ! empty( $field['title'] )
+				|| ! empty( $field['data_name'] )
+			) {
+				continue;
+			}
+
+			if ( ! isset( $existing_meta[ $index ] ) || ! is_array( $existing_meta[ $index ] ) ) {
+				continue;
+			}
+
+			$existing_type = isset( $existing_meta[ $index ]['type'] ) ? (string) $existing_meta[ $index ]['type'] : '';
+			if ( $existing_type !== $type ) {
+				continue;
+			}
+
+			$status                   = isset( $field['status'] ) ? $field['status'] : null;
+			$submitted_meta[ $index ] = $existing_meta[ $index ];
+			if ( null !== $status ) {
+				$submitted_meta[ $index ]['status'] = $status;
+			}
+		}
+
+		return $submitted_meta;
 	}
 
 	/**

@@ -237,6 +237,14 @@ class PPOM_Meta {
 			}
 		}
 
+		$variation_product_id = absint( $product_id );
+		$variation_rule_map   = $variation_product_id > 0 ? \PPOM\Support\Helpers::get_variation_rule_map( $variation_product_id ) : array();
+		if ( ! empty( $variation_rule_map ) ) {
+			$ppom_product_ids = \PPOM\Support\Helpers::normalize_ppom_meta_ids( $ppom_product_id );
+			$variation_ppoms  = \PPOM\Support\Helpers::normalize_ppom_meta_ids( array_keys( $variation_rule_map ) );
+			$ppom_product_id  = array_values( array_unique( array_merge( $ppom_product_ids, $variation_ppoms ) ) );
+		}
+
 		return apply_filters( 'ppom_product_meta_id', is_array( $ppom_product_id ) ? array_unique( $ppom_product_id ) : $ppom_product_id, $product_id );
 	}
 

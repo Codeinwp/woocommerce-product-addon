@@ -1097,9 +1097,7 @@ add_action( 'wp_ajax_nopriv_ppom_e2e_attach_ppom_group', 'ppom_e2e_attach_ppom_g
  * Attach a PPOM field group to specific WooCommerce variations.
  *
  * Mirrors the production save path used by the attach modal/inline editor by
- * calling NM_PersonalizedProduct_Admin::save_variation_attachments(), which
- * also auto-attaches the parent product so the storefront template emits the
- * `.ppom-variation-rule-group` wrapper with `data-ppom-allowed-variations`.
+ * calling NM_PersonalizedProduct_Admin::save_variation_attachments().
  *
  * @return void
  */

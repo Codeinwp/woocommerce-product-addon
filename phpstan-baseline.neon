@@ -411,7 +411,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \.\.\.\$arg1 of function max expects non\-empty\-array, list\<int\|string\> given\.$#'
 			identifier: argument.type
-			count: 8
+			count: 7
 			path: classes/fields.class.php
 
 		-

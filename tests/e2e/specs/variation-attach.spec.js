@@ -52,7 +52,7 @@ test.describe( 'Variation Attach', () => {
 			variationIds: [ small.id ],
 		} );
 
-		expect( attachResult.attached_products ).toBe( 1 );
+		expect( attachResult.attached_products ).toBe( 0 );
 		expect( attachResult.updated_variations ).toBe( 1 );
 
 		await page.goto( `/?p=${ product.id }` );
