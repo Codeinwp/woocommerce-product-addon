@@ -1821,7 +1821,6 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		if ( $should_delete ) {
 			delete_post_meta( $product_id, PPOM_PRODUCT_META_KEY );
 		}
-
 	}
 
 	/**
