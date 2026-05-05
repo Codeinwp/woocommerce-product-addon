@@ -187,24 +187,6 @@ final class FieldGroupFieldsListTable extends WP_List_Table {
 				<?php esc_html_e( 'Add your first field', 'woocommerce-product-addon' ); ?>
 			</button>
 		</div>
-		<script>
-			jQuery( function ( $ ) {
-				const $wrapper = $( '.ppom-fields-list-table-wrapper' );
-				if ( ! $wrapper.length ) {
-					return;
-				}
-
-				// Remove the empty state as soon as a field row is injected.
-				const observer = new MutationObserver( function () {
-					if ( $wrapper.find( '.ppom_field_table tbody tr:not(.no-items)' ).length ) {
-						$wrapper.find( '.ppom-empty-state' ).remove();
-						observer.disconnect();
-					}
-				} );
-
-				observer.observe( $wrapper[ 0 ], { childList: true, subtree: true } );
-			} );
-		</script>
 		<?php
 	}
 
@@ -243,7 +225,7 @@ final class FieldGroupFieldsListTable extends WP_List_Table {
 	public function column_cb( $item ) {
 		$index = (int) $item['index'];
 		return sprintf(
-			'<label class="screen-reader-text" for="ppom-field-cb-%1$d">%2$s</label><input type="checkbox" class="ppom-field-cb" id="ppom-field-cb-%1$d" value="%1$d" />',
+			'<label class="screen-reader-text" for="ppom-field-cb-%1$d">%2$s</label><input type="checkbox" id="ppom-field-cb-%1$d" value="%1$d" />',
 			$index,
 			esc_html__( 'Select field', 'woocommerce-product-addon' )
 		);
