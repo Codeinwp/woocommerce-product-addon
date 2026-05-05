@@ -423,7 +423,7 @@ parameters:
 		-
 			message: '#^Constant PPOM_URL not found\.$#'
 			identifier: constant.notFound
-			count: 22
+			count: 23
 			path: classes/fields.class.php
 
 		-
@@ -4521,7 +4521,7 @@ parameters:
 		-
 			message: '#^Constant PPOM_PATH not found\.$#'
 			identifier: constant.notFound
-			count: 28
+			count: 30
 			path: src/Core/Bootstrap/LegacyRuntimeLoader.php
 
 		-
