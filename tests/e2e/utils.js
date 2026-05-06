@@ -272,7 +272,9 @@ export async function saveFieldInModal(page, modelId) {
 	if (await dialog.isVisible().catch(() => false)) {
 		await Promise.all([
 			page.waitForEvent("framenavigated", { timeout: 15000 }).catch(() => {}),
-			dialog.getByRole("button", { name: "Save" }).click(),
+			dialog
+				.getByRole("button", { name: /^(Save|Add Field)$/ })
+				.click(),
 		]);
 		await page.waitForLoadState("networkidle").catch(() => {});
 		return;

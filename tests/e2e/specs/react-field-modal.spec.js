@@ -53,7 +53,7 @@ test.describe( 'React field modal (opt-in)', () => {
 			name: 'Add field',
 			exact: true,
 		} );
-		await expect( addFieldButton ).toHaveClass( /btn-primary/ );
+		await expect( addFieldButton ).toHaveClass( /button-primary/ );
 		await addFieldButton.click();
 
 		const dialog = page.getByRole( 'dialog' ).first();
