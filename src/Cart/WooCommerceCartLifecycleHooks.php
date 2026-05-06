@@ -19,10 +19,10 @@ final class WooCommerceCartLifecycleHooks {
 	 */
 	public static function register(): void {
 		if ( ! ppom_is_client_validation_enabled() ) {
-			add_filter( 'woocommerce_add_to_cart_validation', 'ppom_woocommerce_validate_product', 10, 3 );
+			add_filter( 'woocommerce_add_to_cart_validation', 'ppom_woocommerce_validate_product', 10, 5 );
 		}
 
-		add_filter( 'woocommerce_add_cart_item_data', 'ppom_woocommerce_add_cart_item_data', 10, 2 );
+		add_filter( 'woocommerce_add_cart_item_data', 'ppom_woocommerce_add_cart_item_data', 10, 4 );
 
 		if ( PriceMode::is_legacy() ) {
 

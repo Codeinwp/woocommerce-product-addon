@@ -51,6 +51,30 @@ async function createSimpleProduct( requestUtils, overrides = {} ) {
 	} );
 }
 
+/**
+ * Create multiple WooCommerce simple products for E2E catalog setup.
+ *
+ * @param {import('@wordpress/e2e-test-utils-playwright').RequestUtils} requestUtils Request utility.
+ * @param {Array<object>} products Product override payloads.
+ *
+ * @return {Promise<Array<object>>}
+ */
+async function createSimpleProducts( requestUtils, products = [] ) {
+	if ( ! Array.isArray( products ) || products.length === 0 ) {
+		return [];
+	}
+
+	const createdProducts = [];
+
+	for ( const productOverrides of products ) {
+		createdProducts.push(
+			await createSimpleProduct( requestUtils, productOverrides )
+		);
+	}
+
+	return createdProducts;
+}
+
 async function createVariableProduct( requestUtils, overrides = {} ) {
 	const suffix = uniqueSuffix();
 
@@ -99,5 +123,6 @@ export {
 	createProductTag,
 	createProductVariation,
 	createSimpleProduct,
+	createSimpleProducts,
 	createVariableProduct,
 };

@@ -687,8 +687,11 @@ final class Callbacks {
 
 		foreach ( $meta_data as $index => $data ) {
 
-			// If Dataname is not provided then generate it.
-			$data['data_name'] = empty( $data['data_name'] ) ? sanitize_key( $data['title'] ) : $data['data_name'];
+			// If Dataname is not provided then generate it from the title when available.
+			if ( empty( $data['data_name'] ) ) {
+				$title             = isset( $data['title'] ) ? (string) $data['title'] : '';
+				$data['data_name'] = sanitize_key( $title );
+			}
 
 			// title
 			if ( isset( $data['title'] ) ) {

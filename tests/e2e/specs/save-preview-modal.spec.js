@@ -3,18 +3,14 @@
  */
 import { test, expect } from "@wordpress/e2e-test-utils-playwright";
 import { createSimpleProduct } from "../fixtures/index.js";
-import { createSimpleGroupField } from "../utils";
+import {
+	createSimpleGroupField,
+	getInlineAttachContainer,
+	saveInlineAttach,
+	selectInlineAttachTerms,
+} from "../utils";
 
 test.describe("Save & Preview Modal", () => {
-	async function saveAttachModal(page) {
-		page.once("dialog", (dialog) => dialog.accept());
-		await page
-			.locator("#ppom-product-form")
-			.getByRole("button", { name: "Save", exact: true })
-			.click();
-		await page.locator("#ppom-product-modal").waitFor({ state: "hidden" });
-	}
-
 	async function createGroupOrSkip(admin, page, fieldsCount = 1) {
 		try {
 			return await createSimpleGroupField(admin, page, fieldsCount);
@@ -67,17 +63,11 @@ test.describe("Save & Preview Modal", () => {
 			`admin.php?page=ppom&productmeta_id=${ ppomId }&do_meta=edit`
 		);
 
-		await page.locator(".ppom-products-modal").click();
-		await page.locator("#ppom-product-form").waitFor({ state: "visible" });
-
-		const productSelector = page
-			.locator("#ppom-product-form div")
-			.filter({ hasText: "Display on Specific Products" })
-			.first()
-			.locator('select[name="ppom-attach-to-products\\[\\]"]');
-
-		await productSelector.selectOption(String(product.id));
-		await saveAttachModal(page);
+		await expect(getInlineAttachContainer(page)).toBeVisible();
+		await selectInlineAttachTerms(page, "products", [
+			{ value: String(product.id), label: product.name },
+		]);
+		await saveInlineAttach(page);
 
 		const previewButton = page.locator(".ppom-save-and-preview");
 		await expect(previewButton).toBeEnabled({ timeout: 15000 });
