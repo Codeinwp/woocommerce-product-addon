@@ -625,12 +625,6 @@ parameters:
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Variable \$localize_data might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
 			message: '#^Method PPOM_InputManager\:\:input_classes_array\(\) should return list\<string\> but returns \(array\|null\)\.$#'
 			identifier: return.type
 			count: 1
@@ -1261,12 +1255,6 @@ parameters:
 			path: classes/plugin.class.php
 
 		-
-			message: '#^Method NM_PersonalizedProduct\:\:ppom_export_meta\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/plugin.class.php
-
-		-
 			message: '#^Method NM_PersonalizedProduct\:\:ppom_free_inputs\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1537,7 +1525,7 @@ parameters:
 			path: classes/ppom.class.php
 
 		-
-			message: '#^Parameter \#2 \$callback of function array_filter expects \(callable\(object\{productmeta_id\: numeric\-string, productmeta_name\: string, productmeta_validation\: string\|null, dynamic_price_display\: string\|null, send_file_attachment\: string, show_cart_thumb\: string\|null, aviary_api_key\: string\|null, productmeta_style\: string\|null, productmeta_js\: string\|null, productmeta_categories\: string\|null, productmeta_tags\: string\|null, the_meta\: string, productmeta_created\: string\}\)\: bool\)\|null, Closure\(mixed\)\: \(object\{productmeta_id\: numeric\-string, productmeta_name\: string, productmeta_validation\: string\|null, dynamic_price_display\: string\|null, send_file_attachment\: string, show_cart_thumb\: string\|null, aviary_api_key\: string\|null, productmeta_style\: string\|null, productmeta_js\: string\|null, productmeta_categories\: string\|null, productmeta_tags\: string\|null, the_meta\: string, productmeta_created\: string\}\|false\) given\.$#'
+			message: '#^Parameter \#2 \$callback of function array_filter expects \(callable\(object\{productmeta_id\: numeric\-string, productmeta_name\: string, productmeta_validation\: string\|null, productmeta_disabled\: string\|null, dynamic_price_display\: string\|null, send_file_attachment\: string, show_cart_thumb\: string\|null, aviary_api_key\: string\|null, productmeta_style\: string\|null, productmeta_js\: string\|null, productmeta_categories\: string\|null, productmeta_tags\: string\|null, the_meta\: string, productmeta_created\: string\}\)\: bool\)\|null, Closure\(mixed\)\: \(object\{productmeta_id\: numeric\-string, productmeta_name\: string, productmeta_validation\: string\|null, productmeta_disabled\: string\|null, dynamic_price_display\: string\|null, send_file_attachment\: string, show_cart_thumb\: string\|null, aviary_api_key\: string\|null, productmeta_style\: string\|null, productmeta_js\: string\|null, productmeta_categories\: string\|null, productmeta_tags\: string\|null, the_meta\: string, productmeta_created\: string\}\|false\) given\.$#'
 			identifier: argument.type
 			count: 1
 			path: classes/ppom.class.php
@@ -7281,7 +7269,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$text of function esc_attr expects string, int\<1, max\> given\.$#'
 			identifier: argument.type
-			count: 13
+			count: 4
 			path: templates/admin/ppom-fields.php
 
 		-

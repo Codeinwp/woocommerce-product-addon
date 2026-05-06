@@ -12,6 +12,7 @@ import {
 } from "../fixtures/index.js";
 import {
 	addNewField,
+	clickAddGroup,
 	createSimpleGroupField,
 	fillFieldNameAndId,
 	getInlineAttachContainer,
@@ -162,7 +163,7 @@ test.describe("Inline Attach", () => {
 	test("inline attach UI visibility on Group Edit page", async ({ page, admin }) => {
 		await admin.visitAdminPage("admin.php?page=ppom");
 
-		await page.getByRole("link", { name: "Add New Group" }).click();
+		await clickAddGroup( page );
 		await Promise.all([
 			page.waitForURL(/action=new/),
 			page

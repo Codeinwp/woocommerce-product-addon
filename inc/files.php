@@ -51,10 +51,11 @@ function ppom_create_thumb_for_meta( $file_name, $product_id, $cropped = false, 
 /**
  * @param string $file_name File name.
  * @param string $file_ext Extension.
+ * @param string $dir_path Directory path.
  * @return string
  */
-function ppom_create_unique_file_name( $file_name, $file_ext ) {
-	return \PPOM\Files\Handler::create_unique_file_name( $file_name, $file_ext );
+function ppom_create_unique_file_name( $file_name, $file_ext, $dir_path = '' ) {
+	return \PPOM\Files\Handler::create_unique_file_name( $file_name, $file_ext, $dir_path );
 }
 
 /**

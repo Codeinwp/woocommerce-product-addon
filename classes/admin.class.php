@@ -36,6 +36,16 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	public $plugin_meta = array();
 
 	/**
+	 * List table for the PPOM Field Groups admin screen.
+	 *
+	 * Populated in `load_admin_menu()` only when the request is the field-groups
+	 * listing (no `do_meta`/`action`/`view`). Null otherwise.
+	 *
+	 * @var \PPOM\Admin\MetaGroupsListTable|null
+	 */
+	public $meta_groups_list_table = null;
+
+	/**
 	 * Registers PPOM admin menus, AJAX handlers, and settings hooks.
 	 *
 	 * @return void
@@ -102,6 +112,24 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		add_action( 'admin_init', array( $this, 'set_legacy_user' ) );
 		add_action( 'admin_init', array( $this, 'ppom_create_db_tables' ) );
+
+		// Persist the per-page Screen Option for the field groups list table.
+		add_filter( 'set_screen_option_ppom_groups_per_page', array( __CLASS__, 'save_groups_per_page_option' ), 10, 3 );
+	}
+
+	/**
+	 * Persists the "Field groups per page" Screen Option.
+	 *
+	 * @param mixed  $status Default save status.
+	 * @param string $option Option key.
+	 * @param mixed  $value  Submitted value.
+	 * @return int|mixed
+	 */
+	public static function save_groups_per_page_option( $status, $option, $value ) {
+		if ( 'ppom_groups_per_page' === $option ) {
+			return (int) $value;
+		}
+		return $status;
 	}
 
 	// Admin page registration.
@@ -242,7 +270,6 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 		$do_meta           = ( isset( $_REQUEST ['do_meta'] ) ? sanitize_text_field( $_REQUEST ['do_meta'] ) : '' );
 		$view              = ( isset( $_REQUEST ['view'] ) ? sanitize_text_field( $_REQUEST ['view'] ) : '' );
 		$ppom_settings_url = admin_url( 'admin.php?page=wc-settings&tab=ppom_settings' );
-		$addons            = add_query_arg( array( 'view' => 'addons' ) );
 		$changelog_url     = add_query_arg( array( 'view' => 'changelog' ) );
 
 		if ( $action != 'new' && $do_meta != 'edit' && $do_meta != 'clone' && $view != 'addons' && $view != 'changelog' ) {
@@ -250,13 +277,30 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			<div class="ppom-manage-fields-topbar d-flex">
 				<h1 class="ppom-heading-style"><?php esc_html_e( 'PPOM Field Groups', 'woocommerce-product-addon' ); ?></h1>
 				<div class="ppom-top-nav">
-					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url( $addons ); ?>">+ <?php esc_html_e( 'All Addons', 'woocommerce-product-addon' ); ?></a>
-					<a id="ppom-all-addons" class="mr-3" href="<?php echo esc_url( $changelog_url ); ?>"><?php esc_html_e( 'Changelog', 'woocommerce-product-addon' ); ?></a>
-					<a  class="mr-3" href="<?php echo esc_url( admin_url( '/admin.php?page=ti-about-woocommerce_product_addon' ) ); ?>"><?php esc_html_e( 'About Us', 'woocommerce-product-addon' ); ?></a>
-					<a href="<?php echo esc_url( $ppom_settings_url ); ?>"><?php esc_html_e( 'General Settings', 'woocommerce-product-addon' ); ?></a>
+					<a class="ppom-top-nav-link" href="<?php echo esc_url( admin_url( '/admin.php?page=ti-about-woocommerce_product_addon' ) ); ?>">
+						<span class="dashicons dashicons-info-outline" aria-hidden="true"></span>
+						<?php esc_html_e( 'About Us', 'woocommerce-product-addon' ); ?>
+					</a>
+					<a class="ppom-top-nav-link" href="<?php echo esc_url( $changelog_url ); ?>">
+						<span class="dashicons dashicons-list-view" aria-hidden="true"></span>
+						<?php esc_html_e( 'Changelog', 'woocommerce-product-addon' ); ?>
+					</a>
 					<?php if ( ppom_pro_is_installed() && class_exists( 'PPOM_Pro\Addons\Texter\Texter' ) ) : ?>
-						<a class="ml-3" href="<?php echo esc_url( add_query_arg( 'post_type', 'nm_ppom_texter', admin_url( 'edit.php' ) ) ); ?>"><?php esc_html_e( 'Manage Personalization Previews', 'woocommerce-product-addon' ); ?></a>
+						<a class="ppom-top-nav-link" href="<?php echo esc_url( add_query_arg( 'post_type', 'nm_ppom_texter', admin_url( 'edit.php' ) ) ); ?>">
+							<span class="dashicons dashicons-edit-page" aria-hidden="true"></span>
+							<?php esc_html_e( 'Manage Personalization Previews', 'woocommerce-product-addon' ); ?>
+						</a>
 					<?php endif; ?>
+					<?php if ( ! ppom_pro_is_installed() ) : ?>
+						<a id="ppom-upgrade-to-pro" class="button button-secondary" href="<?php echo esc_url( tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'topnav', 'fieldgroups' ) ); ?>" target="_blank" rel="noopener">
+							<span class="dashicons dashicons-star-filled" aria-hidden="true"></span>
+							<?php esc_html_e( 'Upgrade to Pro', 'woocommerce-product-addon' ); ?>
+						</a>
+					<?php endif; ?>
+					<a class="button button-primary" href="<?php echo esc_url( $ppom_settings_url ); ?>">
+						<span class="dashicons dashicons-admin-generic" aria-hidden="true"></span>
+						<?php esc_html_e( 'General Settings', 'woocommerce-product-addon' ); ?>
+					</a>
 				</div>
 			</div>
 			<div id="tsdk_banner" class="ppom-banner"></div>
@@ -285,7 +329,10 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 		// existing meta group tables show only ppom main page
 		if ( $action != 'new' && $do_meta != 'edit' && $view != 'addons' && $view != 'changelog' ) {
-			ppom_load_template( 'admin/existing-meta.php' );
+			ppom_load_template(
+				'admin/existing-meta.php',
+				array( 'list_table' => $this->meta_groups_list_table )
+			);
 			ppom_load_template( 'admin/template-wizard.php' );
 
 			// NOTE: Allow only for Tier 1 Plan or lower if license is present.
@@ -2123,11 +2170,43 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 
 	/**
 	 * Load admin menu page.
+	 *
+	 * On the Field Groups listing branch, registers Screen Options and
+	 * instantiates the `WP_List_Table` early so bulk-action redirects fire
+	 * before any output is emitted.
 	 */
 	public function load_admin_menu() {
 		// Call survey class.
 		include_once PPOM_PATH . '/classes/survey.class.php';
 		PPOM_Survey::get_instance()->init();
+
+		if ( ! $this->is_field_groups_listing_request() ) {
+			return;
+		}
+
+		add_filter( 'screen_options_show_screen', '__return_false' );
+
+		$this->meta_groups_list_table = new \PPOM\Admin\MetaGroupsListTable();
+		$this->meta_groups_list_table->prepare_items();
+	}
+
+	/**
+	 * Whether the current request renders the Field Groups list (vs. the
+	 * field editor, clone redirect, addons view, or changelog view).
+	 *
+	 * @return bool
+	 */
+	private function is_field_groups_listing_request() {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only routing of admin menu navigation params; no form processing.
+		$action  = isset( $_REQUEST['action'] ) ? sanitize_text_field( wp_unslash( (string) $_REQUEST['action'] ) ) : '';
+		$do_meta = isset( $_REQUEST['do_meta'] ) ? sanitize_text_field( wp_unslash( (string) $_REQUEST['do_meta'] ) ) : '';
+		$view    = isset( $_REQUEST['view'] ) ? sanitize_text_field( wp_unslash( (string) $_REQUEST['view'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		return 'new' !== $action
+			&& 'edit' !== $do_meta
+			&& 'clone' !== $do_meta
+			&& 'addons' !== $view
+			&& 'changelog' !== $view;
 	}
 
 
