@@ -256,7 +256,7 @@ jQuery( function ( $ ) {
 					delay: 250,
 					data: function ( params ) {
 						return {
-							action: 'ppom_search_products',
+							action: 'ppom_preview_search_products',
 							nonce: ppom_vars.preview.nonce,
 							term: params.term || '',
 						};

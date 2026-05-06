@@ -240,6 +240,16 @@ class PPOM_Fields_Meta {
 			'plugin_admin_page' => admin_url( 'admin.php?page=ppom' ),
 			'loader'            => PPOM_URL . '/images/loading.gif',
 			'ppomProActivated'  => ppom_pro_is_installed() && PPOM()->is_license_of_type( 'pro' ) ? 'yes' : 'no',
+			'attach'            => array(
+				'searchAction'           => 'ppom_search_products',
+				'productsPlaceholder'    => __( 'Search products...', 'woocommerce-product-addon' ),
+				'searchVariationsAction' => 'ppom_search_variations',
+				'variationsPlaceholder'  => __( 'Search variations...', 'woocommerce-product-addon' ),
+				'searchCategoriesAction' => 'ppom_search_categories',
+				'categoriesPlaceholder'  => __( 'Search categories...', 'woocommerce-product-addon' ),
+				'searchTagsAction'       => 'ppom_search_tags',
+				'tagsPlaceholder'        => __( 'Search tags...', 'woocommerce-product-addon' ),
+			),
 			'preview'           => array(
 				'nonce'            => wp_create_nonce( 'ppom_preview_nonce_action' ),
 				'ppomId'           => $preview_ppom_id,
@@ -949,14 +959,15 @@ class PPOM_Fields_Meta {
 				$condition_index = 1;
 				$rule_i          = 1;
 				if ( $values ) {
-					// ppom_pa($values);
-					$condition_rules = isset( $values['rules'] ) ? $values['rules'] : array();
-					$last_array_id   = max( array_keys( $condition_rules ) );
+					$condition_rules = isset( $values['rules'] ) && is_array( $values['rules'] ) ? $values['rules'] : array();
+					$last_array_id   = ! empty( $condition_rules ) ? max( array_keys( $condition_rules ) ) : 0;
+					$visibility      = isset( $values['visibility'] ) ? $values['visibility'] : 'Show';
+					$bound           = isset( $values['bound'] ) ? $values['bound'] : 'All';
 
-					$visibility_show = ( $values['visibility'] === 'Show' ) ? 'selected="selected"' : '';
-					$visibility_hide = ( $values['visibility'] === 'Hide' ) ? 'selected="selected"' : '';
-					$bound_all       = ( $values['bound'] === 'All' ) ? 'selected="selected"' : '';
-					$bound_any       = ( $values['bound'] === 'Any' ) ? 'selected="selected"' : '';
+					$visibility_show = ( $visibility === 'Show' ) ? 'selected="selected"' : '';
+					$visibility_hide = ( $visibility === 'Hide' ) ? 'selected="selected"' : '';
+					$bound_all       = ( $bound === 'All' ) ? 'selected="selected"' : '';
+					$bound_any       = ( $bound === 'Any' ) ? 'selected="selected"' : '';
 
 					$html_input  = '<div class="row ppom-condition-style-wrap">';
 					$html_input .= '<div class="col-md-3 col-sm-3">';
