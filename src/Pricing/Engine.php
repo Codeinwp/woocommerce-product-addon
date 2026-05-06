@@ -1575,9 +1575,10 @@ final class Engine {
 		$matrix_found = array();
 		foreach ( $pricematrix_field as $pm ) {
 
-			$pm_dataname = isset( $pm['data_name'] ) ? $pm['data_name'] : '';
-			// var_dump($pm_dataname, Helpers::is_field_hidden_by_condition( $pm_dataname ));
-			$conditionally_hidden = $cart_items['ppom']['conditionally_hidden'];
+			$pm_dataname          = isset( $pm['data_name'] ) ? $pm['data_name'] : '';
+			$conditionally_hidden = isset( $cart_items['ppom']['conditionally_hidden'] )
+				? $cart_items['ppom']['conditionally_hidden']
+				: '';
 			if ( Helpers::is_field_hidden_by_condition( $pm_dataname, $conditionally_hidden ) ) {
 				continue;
 			}

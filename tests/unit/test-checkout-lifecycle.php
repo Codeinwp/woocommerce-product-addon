@@ -94,6 +94,10 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 		$cart_stub = new class() {
 			public $removed_keys = array();
 
+			public function get_cart_item( $cart_item_key ) {
+				return 'existing-cart-key' === $cart_item_key ? array( 'product_id' => 1 ) : false;
+			}
+
 			public function remove_cart_item( $cart_item_key ) {
 				$this->removed_keys[] = $cart_item_key;
 			}
@@ -113,6 +117,49 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 
 		$this->assertSame( array( 'existing-cart-key' ), $cart_stub->removed_keys );
 		$this->assertSame( $_POST['ppom'], $cart_item['ppom'] );
+	}
+
+	/**
+	 * Ensure unknown or missing ppom_cart_key does not invoke remove_cart_item (W3).
+	 *
+	 * @return void
+	 */
+	public function testAddCartItemDataDoesNotRemoveLineWhenCartKeyMissingOrInvalid() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$cart_stub = new class() {
+			public $removed_keys = array();
+
+			public function get_cart_item( $cart_item_key ) {
+				return false;
+			}
+
+			public function remove_cart_item( $cart_item_key ) {
+				$this->removed_keys[] = $cart_item_key;
+			}
+		};
+
+		WC()->cart = $cart_stub;
+
+		$_POST['ppom'] = array(
+			'fields' => array(
+				'engraving' => 'Hello',
+			),
+		);
+
+		ppom_woocommerce_add_cart_item_data( array(), $product->get_id() );
+		$this->assertSame( array(), $cart_stub->removed_keys );
+
+		$_POST['ppom_cart_key'] = 'not-a-real-cart-key';
+		ppom_woocommerce_add_cart_item_data( array(), $product->get_id() );
+		$this->assertSame( array(), $cart_stub->removed_keys );
 	}
 
 	/**

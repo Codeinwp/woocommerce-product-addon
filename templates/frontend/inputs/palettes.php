@@ -24,6 +24,10 @@ $color_width           = $fm->get_meta_value( 'color_width', 50 );
 $circle                = $fm->get_meta_value( 'circle', 50 );
 $input_classes         = $fm->input_classes();
 $selected_palette_bclr = $fm->get_meta_value( 'selected_palette_bcolor', '#000' );
+$selected_palette_bclr = sanitize_hex_color( $selected_palette_bclr );
+if ( null === $selected_palette_bclr || '' === $selected_palette_bclr ) {
+	$selected_palette_bclr = '#000';
+}
 
 $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $product );
 
@@ -47,7 +51,7 @@ $checked_value = array_map( 'trim', $default_value );
 
 $custom_css  = '';
 $custom_css .= '.ppom-palettes label>input:checked+.ppom-single-palette {
-        border: 2px solid ' . $selected_palette_bclr . ' !important;
+        border: 2px solid ' . esc_attr( $selected_palette_bclr ) . ' !important;
     }';
 
 echo '<style>';
