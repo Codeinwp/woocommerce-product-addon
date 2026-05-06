@@ -250,7 +250,8 @@ $fields_groups = function_exists( 'ppom_get_admin_field_type_groups' ) ? ppom_ge
 						<div class="row">
 							<div class="col-md-12 col-sm-12">
 								<?php
-								echo NM_PersonalizedProduct_Admin::render_inline_attach_selects( $product_meta_id );
+								// Output is composed of pre-escaped HTML built by SelectComponent::render().
+								echo NM_PersonalizedProduct_Admin::render_inline_attach_selects( $product_meta_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 								?>
 							</div>
 						</div>

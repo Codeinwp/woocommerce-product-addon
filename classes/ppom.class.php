@@ -265,10 +265,6 @@ class PPOM_Meta {
 		$active_meta   = array();
 		$filter_meta   = array();
 		foreach ( $meta_settings as $meta ) {
-			if ( ! is_object( $meta ) ) {
-				continue;
-			}
-
 			// Skip groups admins have toggled off; configuration and product
 			// attachments are preserved so re-enabling restores the form.
 			if ( isset( $meta->productmeta_disabled ) && 'on' === $meta->productmeta_disabled ) {
@@ -308,10 +304,6 @@ class PPOM_Meta {
 
 			$rows = $repo->get_rows_by_productmeta_ids( array_map( 'absint', (array) $this->meta_id ) );
 			foreach ( $rows as $row ) {
-				if ( ! is_object( $row ) ) {
-					continue;
-				}
-
 				if ( isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled ) {
 					continue;
 				}

@@ -864,11 +864,11 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				}
 			}
 
-			$attributes[] = sprintf(
-				'%1$s: %2$s',
-				wc_attribute_label( $attribute_key, $parent ? $parent : null ),
-				$value_label
-			);
+			$attribute_label = $parent instanceof \WC_Product
+				? wc_attribute_label( $attribute_key, $parent )
+				: wc_attribute_label( $attribute_key );
+
+			$attributes[] = sprintf( '%1$s: %2$s', $attribute_label, $value_label );
 		}
 
 		if ( ! empty( $attributes ) ) {
@@ -1645,14 +1645,19 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	/**
 	 * Whether the current request contains inline attach selectors.
 	 *
+	 * Only checks key presence; nonce verification is performed by the caller
+	 * (see ppom_save_attached_data() and the product save metabox flow).
+	 *
 	 * @return bool
 	 */
 	public static function has_attach_selections_in_request() {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		return isset( $_POST['ppom_attached_nonce'] )
 			|| isset( $_POST['ppom-attach-to-products-initial'] )
 			|| isset( $_POST['ppom-attach-to-categories-initial'] )
 			|| isset( $_POST['ppom-attach-to-tags-initial'] )
 			|| isset( $_POST['ppom-attach-to-variations-initial'] );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	/**
@@ -1871,25 +1876,33 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	/**
 	 * Reads an absint array from $_POST.
 	 *
+	 * Nonce verification is performed by the caller before invoking this helper.
+	 *
 	 * @param string $key Request key.
 	 * @return int[]
 	 */
 	private static function posted_absint_list( $key ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		if ( ! isset( $_POST[ $key ] ) || ! is_array( $_POST[ $key ] ) ) {
 			return array();
 		}
 
 		return array_values( array_unique( array_filter( array_map( 'absint', wp_unslash( $_POST[ $key ] ) ) ) ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	/**
 	 * Reads a comma-separated absint list from $_POST.
 	 *
+	 * Nonce verification is performed by the caller before invoking this helper.
+	 *
 	 * @param string $key Request key.
 	 * @return int[]
 	 */
 	private static function posted_initial_absint_list( $key ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		$value = isset( $_POST[ $key ] ) && is_string( $_POST[ $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $key ] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		if ( '' === $value ) {
 			return array();
 		}
@@ -1900,15 +1913,19 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	/**
 	 * Reads a sanitize_key array from $_POST.
 	 *
+	 * Nonce verification is performed by the caller before invoking this helper.
+	 *
 	 * @param string $key Request key.
 	 * @return string[]
 	 */
 	private static function posted_slug_list( $key ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		if ( ! isset( $_POST[ $key ] ) || ! is_array( $_POST[ $key ] ) ) {
 			return array();
 		}
 
 		return array_values( array_unique( array_filter( array_map( 'sanitize_key', wp_unslash( $_POST[ $key ] ) ) ) ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	/**
