@@ -101,8 +101,6 @@ export interface FieldEditorBaseProps {
 	form?: FieldFormApiLike;
 }
 
-export type FieldEditorComponent = ComponentType< FieldEditorBaseProps >;
-
 export interface GroupedFieldSectionsProps extends FieldEditorBaseProps {
 	sections: Array< { label: string; keys: string[] } >;
 	variant?: 'sectioned' | 'flat';
@@ -153,7 +151,6 @@ export interface FieldModalManageStepProps {
 	/** Set when lazy `GET .../schema/{type}` fails or returns no schema. */
 	schemaFetchError?: string;
 	activeSchema: SchemaObject | null;
-	TypedEditor: FieldEditorComponent | null;
 	onEditDraftChange: Dispatch< SetStateAction< FieldRow | null > >;
 	ppomFieldIndex: number;
 	modalContext: ModalContextValue;

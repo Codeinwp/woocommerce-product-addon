@@ -1,7 +1,7 @@
 /**
  * Manage step: empty state or active field editor (typed, fallback, or unsupported).
  */
-import { Steps, Box, Button, VStack, Text } from '@chakra-ui/react';
+import { Box, Button, VStack, Text } from '@chakra-ui/react';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { FieldManageEditorBridge } from './FieldManageEditorBridge';
 import type { FieldModalManageStepProps } from '../types/fieldModal';
@@ -16,7 +16,6 @@ export function FieldManagePanel( {
 	schemaLoading,
 	schemaFetchError,
 	activeSchema,
-	TypedEditor,
 	onEditDraftChange,
 	ppomFieldIndex,
 	modalContext,
@@ -70,7 +69,6 @@ export function FieldManagePanel( {
 					schemaLoading={ schemaLoading }
 					schemaFetchError={ schemaFetchError }
 					activeSchema={ activeSchema }
-					TypedEditor={ TypedEditor }
 					onEditDraftChange={ onEditDraftChange }
 					ppomFieldIndex={ ppomFieldIndex }
 					modalContext={ modalContext }

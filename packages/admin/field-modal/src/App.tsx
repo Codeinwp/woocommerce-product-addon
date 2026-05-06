@@ -3,7 +3,7 @@
  */
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { useFieldModalController } from './hooks/useFieldModalController';
+import { useFieldModalSession } from './hooks/useFieldModalSession';
 import { useConfirmClose } from './hooks/useConfirmClose';
 import { FieldModalFrame } from './components/FieldModalFrame';
 import { FieldModalBody } from './components/FieldModalBody';
@@ -15,6 +15,8 @@ export interface AppProps {
 }
 
 export function App( { productmetaId }: AppProps ) {
+	const { state, derived, commands } =
+		useFieldModalSession( productmetaId );
 	const {
 		open,
 		pickerOpen,
@@ -29,6 +31,8 @@ export function App( { productmetaId }: AppProps ) {
 		schemaLoading,
 		schemaFetchError,
 		modalEntry,
+	} = state;
+	const {
 		isDirty,
 		isNewField,
 		i18n,
@@ -37,25 +41,26 @@ export function App( { productmetaId }: AppProps ) {
 		fieldTypeLabel,
 		activeSchema,
 		modalContext,
-		TypedEditor,
-		setPickerOpen,
+	} = derived;
+	const {
+		showPicker,
 		setPickerQuery,
-		setEditDraft,
+		updateDraft,
 		addFieldOfType,
-		handleSave,
-		closeModal,
+		save,
+		close,
 		clearError,
-	} = useFieldModalController( productmetaId );
+	} = commands;
 
 	const onOpenPickerFromManage = () => {
 		setPickerQuery( '' );
-		setPickerOpen( true );
+		showPicker();
 	};
 
 	const onBackToFieldTypes = () => {
 		clearError();
 		setPickerQuery( '' );
-		setPickerOpen( true );
+		showPicker();
 	};
 
 	const modalTitle = useMemo( () => {
@@ -77,7 +82,7 @@ export function App( { productmetaId }: AppProps ) {
 
 	const { confirming: confirmingCancel, requestClose } = useConfirmClose( {
 		requireConfirm: isDirty,
-		onClose: closeModal,
+		onClose: close,
 	} );
 
 	return (
@@ -120,8 +125,7 @@ export function App( { productmetaId }: AppProps ) {
 					schemaLoading,
 					schemaFetchError,
 					activeSchema,
-					TypedEditor,
-					onEditDraftChange: setEditDraft,
+					onEditDraftChange: updateDraft,
 					ppomFieldIndex,
 					modalContext,
 					onOpenPicker: onOpenPickerFromManage,
@@ -136,7 +140,7 @@ export function App( { productmetaId }: AppProps ) {
 				confirmingCancel={ confirmingCancel }
 				isNewField={ isNewField }
 				onClose={ requestClose }
-				onSave={ handleSave }
+				onSave={ save }
 			/>
 		</FieldModalFrame>
 	);

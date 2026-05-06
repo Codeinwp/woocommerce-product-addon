@@ -10,7 +10,7 @@ The canonical saved payload is still the legacy PPOM field row array stored in `
 
 - `src/index.tsx`: mounts React into `#ppom-field-modal-root`, installs the REST nonce middleware from `window.ppomFieldModalBoot`, registers widgets and field UI definitions, and wraps the app in Chakra.
 - `src/App.tsx`: composes the modal frame, body, footer, picker/manage modes, close confirmation, and back behavior.
-- `src/hooks/useFieldModalController.ts`: owns async orchestration for context loading, schema loading, saving, selection, dirty state, and picker transitions.
+- `src/hooks/useFieldModalSession.ts`: owns async orchestration for context loading, schema loading, saving, selection, dirty state, and picker transitions.
 - `src/state/modalReducer.ts`: pure synchronous state transitions only.
 - `src/adapters/wpAdminFieldModalAdapter.ts`: bridges classic admin buttons into React by listening to `.ppom-react-field-modal-open` and capturing `.ppom-edit-field` clicks before legacy jQuery opens the PHP modal.
 - `src/services/fieldModalApi.ts`: REST transport for context, field type schema, and save calls.
@@ -26,7 +26,7 @@ flowchart TD
 
     D --> E["index.tsx boots React on domReady"]
     E --> F["apiFetch nonce middleware from ppomFieldModalBoot"]
-    F --> G["App -> useFieldModalController"]
+    F --> G["App -> useFieldModalSession"]
 
     G --> H["Bind open triggers"]
     H --> I["Add field button .ppom-react-field-modal-open"]

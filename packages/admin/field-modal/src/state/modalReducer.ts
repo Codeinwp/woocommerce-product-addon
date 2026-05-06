@@ -1,7 +1,35 @@
 /**
  * Pure reducer for field modal UI state (sync transitions only).
  */
+import type { FieldRow } from '../types/fieldModal';
 import type { ModalReducerAction, ModalReducerState } from './modalTypes';
+
+function fieldExists( fields: FieldRow[], clientId: string | null ): boolean {
+	return fields.some( ( field ) => field.clientId === clientId );
+}
+
+function nextSelectedIdAfterRemoval(
+	fields: FieldRow[],
+	removedClientId: string,
+	currentSelectedId: string | null
+): string | null {
+	if ( currentSelectedId !== removedClientId ) {
+		return currentSelectedId;
+	}
+
+	const removedIndex = fields.findIndex(
+		( field ) => field.clientId === removedClientId
+	);
+	const nextFields = fields.filter(
+		( field ) => field.clientId !== removedClientId
+	);
+
+	return (
+		nextFields[ removedIndex ]?.clientId ??
+		nextFields[ removedIndex - 1 ]?.clientId ??
+		null
+	);
+}
 
 export function createInitialModalState(): ModalReducerState {
 	return {
@@ -43,7 +71,11 @@ export function modalReducer(
 				...createInitialModalState(),
 			};
 		case 'SET_PICKER_OPEN':
-			return { ...state, pickerOpen: action.open };
+			return {
+				...state,
+				pickerOpen: action.open,
+				selectedId: action.open ? null : state.selectedId,
+			};
 		case 'SET_PICKER_QUERY':
 			return { ...state, pickerQuery: action.query };
 		case 'LOAD_CONTEXT_START':
@@ -66,7 +98,7 @@ export function modalReducer(
 				),
 				dirtyClientIds: [],
 				removedPersistedClientIds: [],
-				selectedId: action.selectedId,
+				selectedId: state.pickerOpen ? null : action.selectedId,
 				schemaFetchError: '',
 			};
 		case 'LOAD_CONTEXT_ERROR':
@@ -97,6 +129,9 @@ export function modalReducer(
 		case 'SET_FIELDS':
 			return { ...state, fields: action.fields };
 		case 'SET_SELECTED_ID':
+			if ( action.id && ! fieldExists( state.fields, action.id ) ) {
+				return state;
+			}
 			return {
 				...state,
 				selectedId: action.id,
@@ -155,11 +190,14 @@ export function modalReducer(
 			};
 		}
 		case 'REMOVE_FIELD_ROW': {
+			const selectedId = nextSelectedIdAfterRemoval(
+				state.fields,
+				action.clientId,
+				state.selectedId
+			);
 			const next = state.fields.filter(
 				( f ) => f.clientId !== action.clientId
 			);
-			const sel =
-				state.selectedId === action.clientId ? null : state.selectedId;
 			const { [ action.clientId ]: _removedSnapshot, ...snapshots } =
 				state.cleanFieldSnapshots;
 			const removedPersistedClientIds = state.persistedClientIds.includes(
@@ -180,7 +218,7 @@ export function modalReducer(
 					( clientId ) => clientId !== action.clientId
 				),
 				removedPersistedClientIds,
-				selectedId: sel,
+				selectedId,
 			};
 		}
 		case 'SET_SAVING':
