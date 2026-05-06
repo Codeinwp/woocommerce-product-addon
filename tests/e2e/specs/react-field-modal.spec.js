@@ -283,6 +283,70 @@ test.describe("React field modal (opt-in)", () => {
 		expect(await optionValues(dialog)).toEqual(["Small", "Medium"]);
 	});
 
+	test("new field is created with a slugified-title data name plus random suffix", async ({
+		page,
+		admin,
+		requestUtils,
+	}) => {
+		const { ppomId } = await createSimpleTextGroup(requestUtils, {
+			fieldsNumber: 1,
+		});
+
+		await visitReactModalGroup(admin, ppomId);
+
+		await page
+			.getByRole("button", { name: "Add field", exact: true })
+			.click();
+		const dialog = page.getByRole("dialog").first();
+		await expect(dialog).toBeVisible();
+
+		await pickTextField(dialog);
+
+		const titleValue = await dialog.getByLabel("Title").inputValue();
+		const dataNameValue = await dialog.getByLabel("Data name").inputValue();
+
+		const expectedSlug = titleValue
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, "_")
+			.replace(/^_+|_+$/g, "");
+		expect(dataNameValue).toMatch(
+			new RegExp(`^${expectedSlug}_[a-z0-9]{1,6}$`),
+		);
+	});
+
+	test("clicking save with prefilled data name passes validation without manual entry", async ({
+		page,
+		admin,
+		requestUtils,
+	}) => {
+		const { ppomId } = await createSimpleTextGroup(requestUtils, {
+			fieldsNumber: 1,
+		});
+
+		await visitReactModalGroup(admin, ppomId);
+
+		await page
+			.getByRole("button", { name: "Add field", exact: true })
+			.click();
+		const dialog = page.getByRole("dialog").first();
+		await expect(dialog).toBeVisible();
+
+		await pickTextField(dialog);
+
+		await dialog.getByLabel("Title").fill("Direct Save Title");
+		await dialog.getByRole("button", { name: "Add Field" }).click();
+
+		await expect(
+			dialog.getByText(/Data Name must be required/i),
+		).toHaveCount(0);
+		await expect(dialog).toBeHidden();
+		await expect(
+			page.locator(".ppom_field_table .ppom_meta_field_title", {
+				hasText: "Direct Save Title",
+			}),
+		).toBeVisible();
+	});
+
 	test("adding a text field stages the row without reloading", async ({
 		page,
 		admin,

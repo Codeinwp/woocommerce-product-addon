@@ -5,6 +5,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useMemo, useReducer } from "@wordpress/element";
 import { getFieldUiDefinition } from "../definitions/registry";
 import { newClientId, stripClientIds, withClientIds } from "../utils/clientIds";
+import { slugifyDataName } from "../utils/slugifyDataName";
 import { createInitialModalState, modalReducer } from "../state/modalReducer";
 import { errorMessage } from "../utils/errorMessage";
 import { stableStringifyFieldRow } from "../utils/fieldFormSync";
@@ -22,6 +23,12 @@ import type {
   ModalContextValue,
   SchemaObject,
 } from "../types/fieldModal";
+
+function makeDefaultDataName(title: string): string {
+  const slug = slugifyDataName(title);
+  const suffix = Math.random().toString(36).slice(2, 8);
+  return slug ? `${slug}_${suffix}` : `field_${suffix}`;
+}
 
 function getFieldSaveValidationError(
   fields: FieldRow[],
@@ -474,7 +481,7 @@ export function useFieldModalSession(
         clientId: newClientId(),
         type: slug,
         title,
-        data_name: "",
+        data_name: makeDefaultDataName(title),
         status: "on",
       };
       dispatch({

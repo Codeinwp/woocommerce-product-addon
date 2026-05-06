@@ -39,7 +39,7 @@ export function RuleValueInput( {
 					size="sm"
 					value={ String( rule.element_values || '' ) }
 					aria-label={ i18n.condValueHeader || 'Value' }
-					onValueChange={ ( e ) =>
+					onChange={ ( e ) =>
 						onPatch( ruleKey, {
 							element_values: e.target.value,
 							element_constant: '',
@@ -72,7 +72,7 @@ export function RuleValueInput( {
 						? rule.element_constant || rule.element_values || ''
 						: rule.element_values || rule.element_constant || ''
 				) }
-				onValueChange={ ( e ) => {
+				onChange={ ( e ) => {
 					const v = e.target.value;
 					if ( usesConstantOnly ) {
 						onPatch( ruleKey, {
@@ -98,7 +98,7 @@ export function RuleValueInput( {
 					size="sm"
 					type="number"
 					value={ String( betweenIv?.from ?? '' ) }
-					onValueChange={ ( e ) =>
+					onChange={ ( e ) =>
 						onPatch( ruleKey, {
 							'cond-between-interval': {
 								from: e.target.value,
@@ -115,7 +115,7 @@ export function RuleValueInput( {
 					size="sm"
 					type="number"
 					value={ String( betweenIv?.to ?? '' ) }
-					onValueChange={ ( e ) =>
+					onChange={ ( e ) =>
 						onPatch( ruleKey, {
 							'cond-between-interval': {
 								from: betweenIv?.from ?? '',

@@ -29,7 +29,7 @@ export function ConditionsBoundControl( {
 				<NativeSelect.Field
 					size="sm"
 					value={ visibility }
-					onValueChange={ ( e ) =>
+					onChange={ ( e ) =>
 						onVisibilityChange( e.target.value )
 					}
 					aria-label={ i18n.condShowHide || 'Visibility' }
@@ -45,7 +45,7 @@ export function ConditionsBoundControl( {
 				<NativeSelect.Field
 					size="sm"
 					value={ bound }
-					onValueChange={ ( e ) => onBoundChange( e.target.value ) }
+					onChange={ ( e ) => onBoundChange( e.target.value ) }
 					aria-label={ i18n.condAllAny || 'Match mode' }
 					{ ...controlSurface }
 				>

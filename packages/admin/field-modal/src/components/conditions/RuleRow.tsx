@@ -143,7 +143,7 @@ export function RuleRow( {
 						size="sm"
 						value={ String( rule.elements || '' ) }
 						aria-label={ i18n.condFieldHeader || 'Field' }
-						onValueChange={ ( e ) => {
+						onChange={ ( e ) => {
 							const elements = e.target.value;
 							const t = findFieldType( builderFields, elements );
 							let operators = String( rule.operators || 'is' );
@@ -181,7 +181,7 @@ export function RuleRow( {
 						size="sm"
 						value={ op }
 						aria-label={ i18n.condOperatorHeader || 'Operator' }
-						onValueChange={ ( e ) => {
+						onChange={ ( e ) => {
 							const operators = e.target.value;
 							const patch: Record< string, unknown > = {
 								operators,

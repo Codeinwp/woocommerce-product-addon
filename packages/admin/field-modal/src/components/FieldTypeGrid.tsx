@@ -1,9 +1,8 @@
 /**
  * Grid of field type tiles (free vs locked Pro) for the type picker.
  */
-import { Fragment, memo } from '@wordpress/element';
+import { memo } from '@wordpress/element';
 import { Button, SimpleGrid, Text } from '@chakra-ui/react';
-import { Tooltip } from './ui/tooltip';
 import { FieldTypeProBadge } from './FieldTypeProBadge';
 import { firstSentence, getFieldGuide } from '../definitions/fieldGuides';
 import type { CatalogItem, I18nDict } from '../types/fieldModal';
@@ -39,8 +38,9 @@ function FieldTypeGridComponent( {
 					? `${ f.title }. ${ tooltipText }`
 					: String( f.title || f.slug );
 
-				const button = (
+				return (
 					<Button
+						key={ f.slug }
 						variant="outline"
 						height="auto"
 						minH="unset"
@@ -104,23 +104,6 @@ function FieldTypeGridComponent( {
 							<FieldTypeProBadge label={ i18n.proBadge } />
 						) : null }
 					</Button>
-				);
-
-				return (
-					<Fragment key={ f.slug }>
-						{ tooltipText ? (
-							<Tooltip
-								content={ tooltipText }
-								openDelay={ 300 }
-								showArrow
-								positioning={ { placement: 'top' } }
-							>
-								{ button }
-							</Tooltip>
-						) : (
-							button
-						) }
-					</Fragment>
 				);
 			} ) }
 		</SimpleGrid>

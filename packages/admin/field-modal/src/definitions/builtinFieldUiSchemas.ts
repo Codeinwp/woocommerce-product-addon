@@ -37,7 +37,7 @@ function dataNameSetting( desc?: string ): SettingMeta {
 		__( 'Data name', 'woocommerce-product-addon' ),
 		desc ||
 			__(
-				'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.',
+				'The identification name of this field, that you can insert into body email configuration. Use only lowercase characters and underscores.',
 				'woocommerce-product-addon'
 			)
 	);
@@ -748,12 +748,7 @@ function switcherSettings(): SettingSchema {
 function dateSettings(): SettingSchema {
 	return {
 		title: titleSetting(),
-		data_name: dataNameSetting(
-			__(
-				'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.',
-				'woocommerce-product-addon'
-			)
-		),
+		data_name: dataNameSetting(),
 		description: descriptionSetting(),
 		placeholder: placeholderSetting(),
 		error_message: errorMessageSetting(),
