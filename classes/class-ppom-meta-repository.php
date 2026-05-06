@@ -11,6 +11,7 @@
  *     productmeta_id: numeric-string,
  *     productmeta_name: string,
  *     productmeta_validation: string|null,
+ *     productmeta_disabled: string|null,
  *     dynamic_price_display: string|null,
  *     send_file_attachment: string,
  *     show_cart_thumb: string|null,
@@ -31,12 +32,13 @@
  *     productmeta_categories?: string,
  *     productmeta_tags?: string
  * }
- * @phpstan-type PPOM_Meta_Group_ColumnKey 'productmeta_id'|'productmeta_name'|'productmeta_validation'|'dynamic_price_display'|'send_file_attachment'|'show_cart_thumb'|'aviary_api_key'|'productmeta_style'|'productmeta_js'|'productmeta_categories'|'productmeta_tags'|'the_meta'|'productmeta_created'
+ * @phpstan-type PPOM_Meta_Group_ColumnKey 'productmeta_id'|'productmeta_name'|'productmeta_validation'|'productmeta_disabled'|'dynamic_price_display'|'send_file_attachment'|'show_cart_thumb'|'aviary_api_key'|'productmeta_style'|'productmeta_js'|'productmeta_categories'|'productmeta_tags'|'the_meta'|'productmeta_created'
  * @phpstan-type PPOM_Meta_Group_ColumnData array<PPOM_Meta_Group_ColumnKey, mixed>
- * @phpstan-type PPOM_Meta_Demo_ColumnKey 'productmeta_name'|'productmeta_validation'|'dynamic_price_display'|'send_file_attachment'|'show_cart_thumb'|'aviary_api_key'|'productmeta_style'|'productmeta_js'|'productmeta_categories'|'productmeta_tags'|'the_meta'|'productmeta_created'
+ * @phpstan-type PPOM_Meta_Demo_ColumnKey 'productmeta_name'|'productmeta_validation'|'productmeta_disabled'|'dynamic_price_display'|'send_file_attachment'|'show_cart_thumb'|'aviary_api_key'|'productmeta_style'|'productmeta_js'|'productmeta_categories'|'productmeta_tags'|'the_meta'|'productmeta_created'
  * @phpstan-type PPOM_Meta_Demo_Export_Input array{
  *     productmeta_name?: string,
  *     productmeta_validation?: string,
+ *     productmeta_disabled?: string,
  *     dynamic_price_display?: string,
  *     send_file_attachment?: string,
  *     show_cart_thumb?: string,
@@ -146,6 +148,7 @@ class PPOM_Meta_Repository {
 		productmeta_id INT(5) NOT NULL AUTO_INCREMENT,
 		productmeta_name VARCHAR(50) NOT NULL,
 		productmeta_validation VARCHAR(3),
+		productmeta_disabled VARCHAR(3) NOT NULL DEFAULT '',
         dynamic_price_display VARCHAR(10),
         send_file_attachment VARCHAR(3) NOT NULL,
         show_cart_thumb VARCHAR(3),
@@ -277,6 +280,121 @@ class PPOM_Meta_Repository {
 		wp_cache_set( self::CACHE_KEY_ALL_ROWS_LIST_UI, $rows, $group, 0 );
 
 		return $rows;
+	}
+
+	/**
+	 * Paged + searchable + sortable rows for the admin list table.
+	 *
+	 * Not cached: cache-key cardinality (per page × per search × per sort) isn't
+	 * worth it at this volume, and writes already invalidate the aggregate
+	 * caches that other call sites rely on.
+	 *
+	 * @param array $args {
+	 *     Query args. Unknown `orderby` falls back to `productmeta_id`.
+	 *
+	 *     @type int    $per_page Page size.
+	 *     @type int    $paged    1-based page number.
+	 *     @type string $search   Match against `productmeta_name`; empty disables.
+	 *     @type string $orderby  Either `productmeta_id` or `productmeta_name`.
+	 *     @type string $order    `ASC` or `DESC`.
+	 * }
+	 * @phpstan-param array{
+	 *     per_page?: int,
+	 *     paged?: int,
+	 *     search?: string,
+	 *     orderby?: string,
+	 *     order?: string,
+	 * } $args
+	 * @return list<PPOM_Meta_Group_Row>
+	 */
+	public function get_paged_rows( array $args = array() ) {
+		$defaults = array(
+			'per_page' => 50,
+			'paged'    => 1,
+			'search'   => '',
+			'orderby'  => 'productmeta_id',
+			'order'    => 'ASC',
+		);
+		$args     = array_merge( $defaults, $args );
+
+		$allowed_orderby = array( 'productmeta_id', 'productmeta_name' );
+		$orderby         = in_array( $args['orderby'], $allowed_orderby, true ) ? $args['orderby'] : 'productmeta_id';
+		$order           = strtoupper( (string) $args['order'] ) === 'DESC' ? 'DESC' : 'ASC';
+		$per_page        = max( 1, (int) $args['per_page'] );
+		$paged           = max( 1, (int) $args['paged'] );
+		$offset          = ( $paged - 1 ) * $per_page;
+		$search          = trim( (string) $args['search'] );
+
+		$table = $this->table_name();
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared -- list table queries; results not separately cached; %i identifier placeholders are validated by wpdb.
+		if ( '' === $search ) {
+			// %i is whitelisted for identifiers (WP 6.2+); ORDER direction is
+			// branched on so each template stays a literal string for prepare().
+			$sql = 'ASC' === $order
+				? 'SELECT * FROM %i ORDER BY %i ASC LIMIT %d OFFSET %d'
+				: 'SELECT * FROM %i ORDER BY %i DESC LIMIT %d OFFSET %d';
+
+			$rows = $this->wpdb->get_results(
+				$this->wpdb->prepare( $sql, $table, $orderby, $per_page, $offset )
+			);
+		} else {
+			$sql = 'ASC' === $order
+				? 'SELECT * FROM %i WHERE productmeta_name LIKE %s ORDER BY %i ASC LIMIT %d OFFSET %d'
+				: 'SELECT * FROM %i WHERE productmeta_name LIKE %s ORDER BY %i DESC LIMIT %d OFFSET %d';
+
+			$rows = $this->wpdb->get_results(
+				$this->wpdb->prepare(
+					$sql,
+					$table,
+					'%' . $this->wpdb->esc_like( $search ) . '%',
+					$orderby,
+					$per_page,
+					$offset
+				)
+			);
+		}
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
+
+		if ( ! is_array( $rows ) ) {
+			return array();
+		}
+
+		/**
+		 * Result rows.
+		 *
+		 * @var list<PPOM_Meta_Group_Row> $rows
+		 */
+		return $rows;
+	}
+
+	/**
+	 * Count rows matching the optional search term (admin list table pagination).
+	 *
+	 * @param string $search Optional search term matched against `productmeta_name`.
+	 * @return int
+	 */
+	public function count_filtered_rows( $search = '' ) {
+		$table  = $this->table_name();
+		$search = trim( (string) $search );
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared -- list table count; cheap; %i identifier placeholder validated by wpdb.
+		if ( '' === $search ) {
+			$count = (int) $this->wpdb->get_var(
+				$this->wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table )
+			);
+		} else {
+			$count = (int) $this->wpdb->get_var(
+				$this->wpdb->prepare(
+					'SELECT COUNT(*) FROM %i WHERE productmeta_name LIKE %s',
+					$table,
+					'%' . $this->wpdb->esc_like( $search ) . '%'
+				)
+			);
+		}
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
+
+		return $count;
 	}
 
 	/**
@@ -568,6 +686,95 @@ class PPOM_Meta_Repository {
 	}
 
 	/**
+	 * Set the disabled flag for one row.
+	 *
+	 * `'on'` disables the group (skipped during frontend resolution); empty
+	 * string re-enables it. Product attachments and `the_meta` JSON are left
+	 * untouched so toggling is fully reversible.
+	 *
+	 * @param int  $id       Row id.
+	 * @param bool $disabled Whether the group should be disabled.
+	 * @return int|false Rows updated, or false on failure.
+	 */
+	public function set_disabled( $id, $disabled ) {
+		$id = (int) $id;
+		if ( $id <= 0 ) {
+			return false;
+		}
+
+		$result = $this->wpdb->update(
+			$this->table_name(),
+			array( 'productmeta_disabled' => $disabled ? 'on' : '' ),
+			array( 'productmeta_id' => $id ),
+			array( '%s' ),
+			array( '%d' )
+		);
+		$this->invalidate_row_cache( $id );
+		$this->invalidate_aggregate_list_caches();
+
+		return $result;
+	}
+
+	/**
+	 * Bulk-set the disabled flag for many rows in a single prepared statement.
+	 *
+	 * @param array<int|string> $ids Row ids.
+	 * @param bool              $disabled Whether the rows should be disabled.
+	 * @return int|false Rows affected or false.
+	 */
+	public function set_disabled_for_ids( array $ids, $disabled ) {
+		$normalized_ids = array();
+		foreach ( $ids as $id ) {
+			if ( is_int( $id ) && $id > 0 ) {
+				$normalized_ids[] = $id;
+				continue;
+			}
+
+			if ( is_string( $id ) && ctype_digit( $id ) ) {
+				$id = absint( $id );
+				if ( $id > 0 ) {
+					$normalized_ids[] = $id;
+				}
+			}
+		}
+		$ids = array_values( array_unique( $normalized_ids ) );
+
+		if ( empty( $ids ) ) {
+			return false;
+		}
+
+		$table    = $this->table_name();
+		$value    = $disabled ? 'on' : '';
+		$affected = 0;
+		$failed   = false;
+
+		foreach ( $ids as $id ) {
+			$result = $this->wpdb->update(
+				$table,
+				array( 'productmeta_disabled' => $value ),
+				array( 'productmeta_id' => $id ),
+				array( '%s' ),
+				array( '%d' )
+			);
+
+			if ( false === $result ) {
+				$failed = true;
+				continue;
+			}
+
+			$affected += (int) $result;
+			$this->invalidate_row_cache( $id );
+		}
+		$this->invalidate_aggregate_list_caches();
+
+		if ( $failed && 0 === $affected ) {
+			return false;
+		}
+
+		return $affected;
+	}
+
+	/**
 	 * Delete one row.
 	 *
 	 * @param int $id Row id.
@@ -725,6 +932,7 @@ class PPOM_Meta_Repository {
 		$allowed = array(
 			'productmeta_name',
 			'productmeta_validation',
+			'productmeta_disabled',
 			'dynamic_price_display',
 			'send_file_attachment',
 			'show_cart_thumb',

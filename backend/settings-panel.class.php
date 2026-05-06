@@ -9,6 +9,8 @@
  * @see ppom_load_pro_options()
  */
 
+use PPOM\Support\Helpers;
+
 /* 
 **========== Block direct access =========== 
 */
@@ -395,7 +397,15 @@ class PPOM_SettingsFramework {
 				},
 				ARRAY_FILTER_USE_KEY 
 			);
-			// $settings_meta = $_REQUEST[self::$save_key];
+
+			// If taxable option is explicitly disabled, store it with "no" value.
+			if ( ! isset( $_REQUEST[ self::$save_key ]['ppom_taxable_option_price'] ) || 'yes' !== $_REQUEST[ self::$save_key ]['ppom_taxable_option_price'] ) {
+				$taxable_option_price = Helpers::get_option( 'ppom_taxable_option_price' );
+				if ( 'yes' === $taxable_option_price ) {
+					$_REQUEST[ self::$save_key ]['ppom_taxable_option_price'] = 'no';
+				}
+			}
+
 			$settings_meta = array_map(
 				function ( $setting ) {
 
@@ -964,6 +974,9 @@ class PPOM_SettingsFramework {
 				$localize_data = array(
 					'migrate_back_msg'                     => __( 'Are you sure?', 'woocommerce-product-addon' ),
 					'administrator_role_cannot_be_removed' => esc_html__( 'The administrator role cannot be removed.', 'woocommerce-product-addon' ),
+					'active'                               => esc_html__( 'Active', 'woocommerce-product-addon' ),
+					'inactive'                             => esc_html__( 'Inactive', 'woocommerce-product-addon' ),
+					'copied'                               => esc_html__( 'Copied', 'woocommerce-product-addon' ),
 				);
 
 				break;

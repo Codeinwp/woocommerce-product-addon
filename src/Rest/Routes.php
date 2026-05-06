@@ -112,7 +112,7 @@ final class Routes {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $p, 'get_ppom_meta_info_product' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'check_read_permission' ),
 			)
 		);
 
@@ -122,7 +122,7 @@ final class Routes {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $p, 'get_ppom_meta_by_id' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'check_read_permission' ),
 			)
 		);
 
@@ -132,7 +132,7 @@ final class Routes {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $p, 'ppom_save_meta_product' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'check_write_permission' ),
 			)
 		);
 
@@ -142,7 +142,7 @@ final class Routes {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $p, 'delete_ppom_fields_product' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'check_write_permission' ),
 			)
 		);
 
@@ -152,7 +152,7 @@ final class Routes {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $o, 'get_ppom_meta_info_order' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'check_write_permission' ),
 			)
 		);
 
@@ -162,7 +162,7 @@ final class Routes {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $o, 'ppom_update_meta_order' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'check_write_permission' ),
 			)
 		);
 
@@ -172,7 +172,7 @@ final class Routes {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $o, 'delete_ppom_fields_order' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => array( $this, 'check_write_permission' ),
 			)
 		);
 	}
@@ -318,6 +318,24 @@ final class Routes {
 	 * @return void
 	 */
 	public function set_headers() {
+	}
+
+	/**
+	 * Checks if the current user can read PPOM REST data.
+	 *
+	 * @return bool
+	 */
+	public function check_read_permission() {
+		return current_user_can( 'edit_products' ); // phpcs:ignore WordPress.WP.Capabilities.Unknown
+	}
+
+	/**
+	 * Checks if the current user can write PPOM REST data.
+	 *
+	 * @return bool
+	 */
+	public function check_write_permission() {
+		return current_user_can( 'manage_woocommerce' ); // phpcs:ignore WordPress.WP.Capabilities.Unknown
 	}
 }
 

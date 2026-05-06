@@ -199,28 +199,43 @@ final class ProductHandler {
 	 * Treats posted PPOM values as untrusted input and validates them against the
 	 * resolved field schema for the product.
 	 *
-	 * @param bool      $passed     Validation state from earlier callbacks.
-	 * @param int       $product_id Product ID.
-	 * @param int|float $qty        Requested quantity.
+	 * @param bool                 $passed       Validation state from earlier callbacks.
+	 * @param int                  $product_id   Product ID.
+	 * @param int|float            $qty          Requested quantity.
+	 * @param int                  $variation_id Selected variation ID, or 0 for simple products.
+	 * @param array<string, mixed> $variations   Selected variation attributes (unused; kept for filter compatibility).
 	 *
 	 * @return bool
 	 *
 	 * @see self::check_validation()
 	 * @see PPOM_Meta::__construct()
 	 */
-	public static function validate_product( $passed, $product_id, $qty ) {
+	public static function validate_product( $passed, $product_id, $qty, $variation_id = 0, $variations = array() ) {
 
 		$ppom = new PPOM_Meta( $product_id );
 		if ( ! $ppom->ajax_validation_enabled ) {
-			$passed = self::check_validation( $product_id, $_POST );
+			$passed = self::check_validation( $product_id, $_POST, true, $variation_id );
 		}
 
-		if ( Helpers::get_price_mode() == 'legacy' && isset( $_POST['ppom']['fields'] ) ) {
+		$posted_fields = isset( $_POST['ppom']['fields'] ) ? wp_unslash( $_POST['ppom']['fields'] ) : null; // phpcs:ignore WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$fields        = is_array( $posted_fields ) ? ppom_sanitize_array_data( $posted_fields ) : null;
+		$product_id    = isset( $_POST['ppom_product_id'] ) ? intval( wp_unslash( $_POST['ppom_product_id'] ) ) : $product_id; // phpcs:ignore WordPress.Security.NonceVerification
 
-			if ( Helpers::is_price_attached_with_fields( $_POST['ppom']['fields'] ) &&
-			empty( $_POST['ppom']['ppom_option_price'] )
-			) {
-				$error_message = __( 'Sorry, an error has occurred. Please enable JavaScript or contact site owner.', 'woocommerce-product-addon' );
+		if ( Helpers::get_price_mode() == 'legacy' && $fields ) {
+
+			if ( Helpers::is_price_attached_with_fields( $fields ) && empty( $_POST['ppom']['ppom_option_price'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+				// Price-matrix pricing is stored in ppom_pricematrix and handled independently.
+				if ( isset( $_POST['ppom']['ppom_pricematrix'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+					return $passed;
+				}
+
+				$computed = Helpers::compute_option_price_from_fields( $fields, $product_id );
+				if ( ! empty( $computed ) ) {
+					$_POST['ppom']['ppom_option_price'] = wp_json_encode( $computed );
+					return $passed;
+				}
+
+				$error_message = __( 'An error occurred while processing your order. Please refresh the page and try again, or contact the site owner.', 'woocommerce-product-addon' );
 				Helpers::wc_add_notice( $error_message );
 				$passed = false;
 
@@ -256,8 +271,9 @@ final class ProductHandler {
 
 		$errors_found = array();
 
-		$product_id = intval( $_POST['ppom_product_id'] );
-		$passed     = self::check_validation( $product_id, $_POST );
+		$product_id   = intval( $_POST['ppom_product_id'] );
+		$variation_id = isset( $_POST['variation_id'] ) ? absint( $_POST['variation_id'] ) : 0;
+		$passed       = self::check_validation( $product_id, $_POST, true, $variation_id );
 
 		$all_notices = wc_get_notices();
 		wc_clear_notices();
@@ -298,9 +314,10 @@ final class ProductHandler {
 	 * Reads posted values from `ppom[fields]`, skips hidden fields, and adds
 	 * WooCommerce notices for failed requirements.
 	 *
-	 * @param int   $product_id Product ID.
-	 * @param array $post_data  Posted request payload.
-	 * @param bool  $passed     Validation state from earlier checks.
+	 * @param int   $product_id   Product ID.
+	 * @param array $post_data    Posted request payload.
+	 * @param bool  $passed       Validation state from earlier checks.
+	 * @param int   $variation_id Selected variation ID, or 0 for simple products.
 	 *
 	 * @return bool
 	 *
@@ -308,9 +325,10 @@ final class ProductHandler {
 	 * @see Helpers::has_posted_field_value()
 	 * @see ppom_woocommerce_add_cart_item_data()
 	 */
-	public static function check_validation( $product_id, $post_data, $passed = true ) {
+	public static function check_validation( $product_id, $post_data, $passed = true, $variation_id = 0 ) {
 
-		$ppom = new PPOM_Meta( $product_id );
+		$ppom         = new PPOM_Meta( $product_id );
+		$variation_id = absint( $variation_id );
 
 		if ( ! $ppom->fields ) {
 			return $passed;
@@ -327,6 +345,11 @@ final class ProductHandler {
 
 			// Check field Visibility settings
 			if ( ! Helpers::is_field_visible( $field ) ) {
+				continue;
+			}
+
+			$ppom_id = isset( $field['ppom_id'] ) ? absint( $field['ppom_id'] ) : 0;
+			if ( $ppom_id > 0 && ! Helpers::is_meta_group_active_for_variation( $product_id, $ppom_id, $variation_id ) ) {
 				continue;
 			}
 
@@ -372,6 +395,6 @@ final class ProductHandler {
 
 		// ppom_pa($post_data); exit;
 
-		return apply_filters( 'ppom_add_to_cart_validation', $passed, $ppom, $product_id );
+		return apply_filters( 'ppom_add_to_cart_validation', $passed, $ppom, $product_id, $variation_id );
 	}
 }

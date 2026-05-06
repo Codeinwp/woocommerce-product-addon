@@ -45,8 +45,22 @@ function ppom_admin_delete_meta() {
 	\PPOM\Admin\Manager::delete_meta();
 }
 
+/**
+ * @return void
+ */
+function ppom_admin_toggle_meta_disabled() {
+	\PPOM\Admin\Manager::toggle_meta_disabled();
+}
+
 function ppom_admin_delete_selected_meta() {
 	\PPOM\Admin\Manager::delete_selected_meta();
+}
+
+/**
+ * AJAX wrapper that imports a curated template into a new PPOM field group.
+ */
+function ppom_admin_import_template(): void {
+	\PPOM\Admin\Manager::import_template();
 }
 
 function ppom_admin_simplify_meta( $meta ) {

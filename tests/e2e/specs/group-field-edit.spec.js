@@ -6,6 +6,7 @@ import { test, expect } from "@wordpress/e2e-test-utils-playwright";
 import {
     addNewField,
 	addNewOptionInModal,
+	clickAddGroup,
 	createSimpleGroupField,
 	fillFieldNameAndId,
 	fillOptionNameAndValue,
@@ -24,7 +25,7 @@ test.describe("Group Fields Edit", () => {
 	test("change fields order on saving", async ({ page, admin }) => {
 		await createSimpleGroupField(admin, page);
 
-		const fieldIds = await page.$$eval("td.ppom_meta_field_id", (tds) =>
+		const fieldIds = await page.$$eval("td.column-data_name", (tds) =>
 			tds.map((td) => td.innerText),
 		);
 
@@ -41,7 +42,7 @@ test.describe("Group Fields Edit", () => {
 		await saveFields(page);
 
 		const newOrderFieldIds = await page.$$eval(
-			"td.ppom_meta_field_id",
+			"td.column-data_name",
 			(tds) => tds.map((td) => td.innerText),
 		);
 
@@ -54,7 +55,11 @@ test.describe("Group Fields Edit", () => {
     test("change select option order on saving", async ({ page, admin }) => {
         await admin.visitAdminPage("admin.php?page=ppom");
 
-		await page.getByRole("link", { name: "Add New Group" }).click();
+		await clickAddGroup(page);
+		await page
+			.locator("#ppom-template-wizard-modal .ppom-template-card--scratch")
+			.click();
+		await page.waitForURL(/action=new/);
 		await page
 			.getByRole("textbox")
 			.fill("Change Select Option order");

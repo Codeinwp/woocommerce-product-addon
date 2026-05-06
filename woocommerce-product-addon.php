@@ -2,7 +2,7 @@
 /**
  * Plugin Name: PPOM for WooCommerce
  * Plugin URI: https://themeisle.com/plugins/ppom-pro/
- * Description: PPOM (Personalized Product Meta Manager) plugin allow WooCommerce Store Admin to create unlimited input fields and files to attach with Product Pages.
+ * Description: PPOM (Personalized Product Option Manager) plugin allow WooCommerce Store Admin to create unlimited input fields and files to attach with Product Pages.
  * Version: 33.0.18
  * Author: Themeisle
  * Text Domain: woocommerce-product-addon
@@ -34,8 +34,9 @@ define( 'PPOM_WP_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) )
 define( 'PPOM_BASENAME', basename( PPOM_WP_PLUGIN_DIR ) );
 define( 'PPOM_PRODUCT_SLUG', PPOM_BASENAME );
 define( 'PPOM_VERSION', '33.0.18' );
-define( 'PPOM_DB_VERSION', '32.0.0' );
+define( 'PPOM_DB_VERSION', '32.1.0' );
 define( 'PPOM_PRODUCT_META_KEY', '_product_meta_id' );
+define( 'PPOM_VARIATION_META_KEY', '_ppom_variation_meta_rules' );
 define( 'PPOM_TABLE_META', 'nm_personalized' );
 define( 'PPOM_UPLOAD_DIR_NAME', 'ppom_files' );
 define( 'PPOM_GROUPS_COUNT_CACHE_KEY', 'ppom_groups_count_cache' );
@@ -87,7 +88,8 @@ require_once PPOM_PATH . '/classes/attach-popup/select-component.class.php';
 // include_once PPOM_PATH . "/classes/nm-framework.php";
 require_once PPOM_PATH . '/classes/input.class.php';
 require_once PPOM_PATH . '/classes/fields.class.php';
-// include_once PPOM_PATH . "/classes/field.class.php"; // Fronend PPOM Fields
+require_once PPOM_PATH . '/classes/template-library.class.php';
+// include_once PPOM_PATH . "/classes/field.class.php"; // Fronend PPOM Fields.
 require_once PPOM_PATH . '/classes/ppom.class.php';
 require_once PPOM_PATH . '/classes/class-ppom-meta-repository.php';
 require_once PPOM_PATH . '/inc/ppom-meta-repository-functions.php';

@@ -33,7 +33,7 @@ $checked = $class_ins::get_saved_settings( $input_id );
 		<?php echo esc_html( $label ); ?>
 	</label>
 <?php } else { ?>
-	<div class="nmsf-fancy-checkbox">
+	<label class="ppom-toggle">
 		<input
 				type="checkbox"
 				name="<?php echo esc_attr( $class_ins::get_form_name( $input_id ) ); ?>"
@@ -42,6 +42,7 @@ $checked = $class_ins::get_saved_settings( $input_id );
 				value="yes"
 				<?php checked( $checked, 'yes', true ); ?>
 		>
-		<label for="<?php echo esc_attr( $input_id ); ?>"><?php echo esc_html( $label ); ?></label>
-	</div>
+		<span class="ppom-toggle-track"></span>
+		<span class="ppom-toggle-label"><?php echo esc_html( $label ); ?></span>
+	</label>
 <?php } ?>

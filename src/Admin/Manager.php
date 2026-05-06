@@ -44,6 +44,7 @@ final class Manager {
 				$ppom         = new PPOM_Meta( $post_id );
 
 				$ppom_settings_url = admin_url( 'admin.php?page=ppom' );
+				$disabled_badge    = ' <span class="ppom-disabled-badge">' . esc_html__( 'Disabled', 'woocommerce-product-addon' ) . '</span>';
 
 				if ( $ppom->has_multiple_meta() ) {
 					$total_items  = count( $ppom->meta_id ); // Get the total number of items.
@@ -56,36 +57,56 @@ final class Manager {
 						$mid          = absint( $meta_id );
 						$ppom_setting = ( $mid > 0 && isset( $settings_map[ $mid ] ) ) ? $settings_map[ $mid ] : null;
 						if ( $ppom_setting ) {
-							$meta_title = stripslashes( $ppom_setting->productmeta_name );
-							$url_edit   = add_query_arg(
+							$meta_title        = stripslashes( $ppom_setting->productmeta_name );
+							$url_edit          = add_query_arg(
 								array(
 									'productmeta_id' => $ppom_setting->productmeta_id,
 									'do_meta'        => 'edit',
 								),
 								$ppom_settings_url
 							);
-							printf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $meta_title );
-							// Add a comma only if it's not the last item
+							$is_disabled_group = isset( $ppom_setting->productmeta_disabled ) && 'on' === $ppom_setting->productmeta_disabled;
+							printf(
+								'<a href="%1$s">%2$s</a>%3$s',
+								esc_url( $url_edit ),
+								esc_html( $meta_title ),
+								$is_disabled_group ? $disabled_badge : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static markup.
+							);
+							// Add a comma only if it's not the last item.
 							if ( $current_item < $total_items ) {
 								echo ', ';
 							}
 							$has_fields = true;
-						}               
+						}
 					}
 					if ( ! $has_fields ) {
-						printf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
+						printf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), esc_html__( 'Add Fields', 'woocommerce-product-addon' ) );
 					}
-				} elseif ( $ppom->ppom_settings ) {
-					$url_edit = add_query_arg(
-						array(
-							'productmeta_id' => $ppom->meta_id,
-							'do_meta'        => 'edit',
-						),
-						$ppom_settings_url
-					);
-					printf( '<a href="%1$s">%2$s</a>', esc_url( $url_edit ), $ppom->meta_title );
 				} else {
-					printf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), __( 'Add Fields', 'woocommerce-product-addon' ) );
+					// Resolve the row directly so disabled groups still show their
+					// name + badge in the admin product list (settings() returns
+					// null for disabled to skip frontend rendering).
+					$attached_id = is_numeric( $ppom->meta_id ) ? absint( $ppom->meta_id ) : 0;
+					$row         = $attached_id > 0 ? $ppom->get_settings_by_id( $attached_id ) : null;
+
+					if ( $row && isset( $row->productmeta_name ) ) {
+						$is_disabled_group = isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled;
+						$url_edit          = add_query_arg(
+							array(
+								'productmeta_id' => $attached_id,
+								'do_meta'        => 'edit',
+							),
+							$ppom_settings_url
+						);
+						printf(
+							'<a href="%1$s">%2$s</a>%3$s',
+							esc_url( $url_edit ),
+							esc_html( stripslashes( (string) $row->productmeta_name ) ),
+							$is_disabled_group ? $disabled_badge : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static markup.
+						);
+					} else {
+						printf( '<a class="btn button" href="%1$s">%2$s</a>', esc_url( $ppom_settings_url ), esc_html__( 'Add Fields', 'woocommerce-product-addon' ) );
+					}
 				}
 
 				break;
@@ -115,7 +136,7 @@ final class Manager {
 		$ppom         = new PPOM_Meta( $post->ID );
 		$all_meta     = PPOM()->get_product_meta_list_for_ui();
 		$ppom_setting = admin_url( 'admin.php?page=ppom' );
-	
+
 		$html = '<div class="options_group ppom-settings-container" style="max-height:375px; overflow:auto;">';
 
 		if ( count( $all_meta ) > 1 ) {
@@ -142,7 +163,7 @@ final class Manager {
 		$html .= '<th>' . __( 'Group Name', 'woocommerce-product-addon' ) . '</th>';
 		$html .= '<th>' . __( 'Edit', 'woocommerce-product-addon' ) . '</th>';
 		$html .= '</tr></thead>';
-	
+
 		foreach ( $all_meta as $meta ) {
 			$html .= '<tr data-ppom-search="' . esc_attr( sanitize_key( $meta->productmeta_name ) ) . '" style="cursor: move;">';
 
@@ -260,15 +281,15 @@ final class Manager {
 
 
 		$ppom_meta_selected = isset( $_POST ['ppom_product_meta'] ) ? $_POST ['ppom_product_meta'] : array();
-	
+
 		if ( is_numeric( $ppom_meta_selected ) ) {
 			$ppom_meta_selected = array( $ppom_meta_selected );
 		} elseif ( ! is_array( $ppom_meta_selected ) ) {
 			$ppom_meta_selected = array();
 		}
-	
+
 		$ppom_meta_selected = array_map( 'intval', $ppom_meta_selected );
-	
+
 		// ppom_pa($ppom_meta_selected); exit;
 		update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $ppom_meta_selected );
 
@@ -335,12 +356,7 @@ final class Manager {
 			wp_send_json( $resp );
 		}
 
-		$send_file_attachment = 'NA';
-		$aviary_api_key       = 'NA';
-		$show_cart_thumb      = 'NA';
-
-		$ppom           = array();
-		$productmeta_id = isset( $_REQUEST['productmeta_id'] ) ? sanitize_text_field( $_REQUEST['productmeta_id'] ) : '';
+		$ppom = array();
 
 		if ( is_string( $_REQUEST['ppom'] ) ) {
 			$ppom_encoded = $_REQUEST['ppom'];
@@ -358,22 +374,12 @@ final class Manager {
 			wp_send_json( $resp );
 		}
 
-		$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );
-		$product_meta = Validator::sanitize_array_data( $product_meta );
-		$product_meta = array_filter(
-			$product_meta,
-			function ( $pm ) {
-				return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] );
-			}
-		);
-		$product_meta = json_encode( $product_meta );
-
 		// sanitize
 		$productmeta_name     = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
 		$dynamic_price_hide   = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
-		$send_file_attachment = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
-		$show_cart_thumb      = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : '';
-		$aviary_api_key       = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : '';
+		$send_file_attachment = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : 'NA';
+		$show_cart_thumb      = isset( $_REQUEST['show_cart_thumb'] ) ? sanitize_text_field( $_REQUEST['show_cart_thumb'] ) : 'NA';
+		$aviary_api_key       = isset( $_REQUEST['aviary_api_key'] ) ? sanitize_text_field( $_REQUEST['aviary_api_key'] ) : 'NA';
 		$productmeta_style    = isset( $_REQUEST['productmeta_style'] ) ? sanitize_text_field( $_REQUEST['productmeta_style'] ) : '';
 		$productmeta_js       = isset( $_REQUEST['productmeta_js'] ) ? sanitize_text_field( $_REQUEST['productmeta_js'] ) : '';
 		$product_id           = isset( $_REQUEST['product_id'] ) ? intval( $_REQUEST['product_id'] ) : 0;
@@ -387,53 +393,17 @@ final class Manager {
 			wp_send_json( $resp );
 		}
 
-		$ppom_settings_meta_data = array(
+		$settings = array(
 			'productmeta_name'      => $productmeta_name,
 			'dynamic_price_display' => $dynamic_price_hide,
 			'send_file_attachment'  => $send_file_attachment,
 			'show_cart_thumb'       => $show_cart_thumb,
-			'aviary_api_key'        => trim( $aviary_api_key ),
-			'the_meta'              => $product_meta,
-			'productmeta_created'   => current_time( 'mysql' ),
+			'aviary_api_key'        => $aviary_api_key,
+			'productmeta_style'     => $productmeta_style,
+			'productmeta_js'        => $productmeta_js,
 		);
 
-		if ( ! Helpers::is_legacy_user() ) {
-			$ppom_settings_meta_data['productmeta_style'] = $productmeta_style;
-			$ppom_settings_meta_data['productmeta_js']    = $productmeta_js;
-		}
-
-		$dt = apply_filters( 'ppom_settings_meta_data_new', $ppom_settings_meta_data );
-
-		// wp_send_json($dt);
-
-		$format = array(
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-		);
-
-		$ppom_id = MetaRepositoryAccessor::instance()->insert_group( $dt, $format );
-		if ( is_string( $ppom ) ) {
-			$ppom_encoded = $ppom;
-			parse_str( $ppom_encoded, $ppom_decoded );
-			$ppom = $ppom_decoded['ppom'];
-		}
-
-		$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom, $ppom_id );
-		$product_meta = Validator::sanitize_array_data( $product_meta );
-		$product_meta = array_filter(
-			$product_meta,
-			function ( $pm ) {
-				return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] );
-			}
-		);
-	
-		// Updating PPOM Meta with ppom_id in each meta array
-		self::update_ppom_meta_only( $ppom_id, $product_meta );
+		$ppom_id = self::create_group_from_fields( (array) $ppom_meta, $settings, $product_id );
 
 		$redirect_to = '';
 
@@ -443,13 +413,18 @@ final class Manager {
 				'productmeta_id' => $ppom_id,
 				'do_meta'        => 'edit',
 			);
-			$redirect_to = add_query_arg( $ppom_args, admin_url( 'admin.php' ) );
+			$redirect_to = (string) add_query_arg( $ppom_args, admin_url( 'admin.php' ) );
 		}
 
+		if ( $ppom_id && self::is_attachable_product( $product_id ) ) {
+			$product_link = (string) get_permalink( $product_id );
+			if ( '' !== $product_link ) {
+				$redirect_to = $product_link;
+			}
+		}
 
-		if ( ! empty( $product_id ) ) {
-			Helpers::attach_fields_to_product( $ppom_id, $product_id );
-			$redirect_to = get_permalink( $product_id );
+		if ( $ppom_id && \NM_PersonalizedProduct_Admin::has_attach_selections_in_request() ) {
+			\NM_PersonalizedProduct_Admin::save_attach_selections_from_request( (int) $ppom_id );
 		}
 
 		$resp = array();
@@ -471,6 +446,220 @@ final class Manager {
 		}
 
 		wp_send_json( $resp );
+	}
+
+	/**
+	 * Persists a new PPOM field group from a normalized payload.
+	 *
+	 * Runs the `ppom_meta_data_saving` filter twice (once before insert with an
+	 * empty id, once after with the resolved id) to match WPML/registration
+	 * expectations, sanitizes via {@see Validator::sanitize_array_data()},
+	 * inserts via {@see MetaRepositoryAccessor::insert_group()}, then rewrites
+	 * `the_meta` so each field row carries the new ppom_id. When a product ID
+	 * is supplied, the new group is attached to that product.
+	 *
+	 * Shared by {@see self::save_form_meta()} and {@see self::import_template()}.
+	 *
+	 * @param array<int, array<string, mixed>> $fields     Untouched field schema (filter input, the_meta shape).
+	 * @param array<string, string>            $settings   Group settings: productmeta_name, dynamic_price_display, send_file_attachment, show_cart_thumb, aviary_api_key, productmeta_style, productmeta_js.
+	 * @param int                              $product_id Optional WooCommerce product ID to attach the new group to. 0 to skip.
+	 * @return int New productmeta_id, or 0 on insert failure.
+	 */
+	private static function create_group_from_fields( array $fields, array $settings, $product_id = 0 ) {
+
+		$product_meta      = apply_filters( 'ppom_meta_data_saving', $fields, '' );
+		$product_meta      = Validator::sanitize_array_data( $product_meta );
+		$product_meta      = array_filter(
+			$product_meta,
+			function ( $pm ) {
+				return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] );
+			}
+		);
+		$product_meta_json = wp_json_encode( $product_meta );
+
+		$row = array(
+			'productmeta_name'      => isset( $settings['productmeta_name'] ) ? (string) $settings['productmeta_name'] : '',
+			'dynamic_price_display' => isset( $settings['dynamic_price_display'] ) ? (string) $settings['dynamic_price_display'] : '',
+			'send_file_attachment'  => isset( $settings['send_file_attachment'] ) ? (string) $settings['send_file_attachment'] : 'NA',
+			'show_cart_thumb'       => isset( $settings['show_cart_thumb'] ) ? (string) $settings['show_cart_thumb'] : 'NA',
+			'aviary_api_key'        => trim( isset( $settings['aviary_api_key'] ) ? (string) $settings['aviary_api_key'] : 'NA' ),
+			'the_meta'              => $product_meta_json,
+			'productmeta_created'   => current_time( 'mysql' ),
+		);
+
+		if ( ! Helpers::is_legacy_user() ) {
+			$row['productmeta_style'] = isset( $settings['productmeta_style'] ) ? (string) $settings['productmeta_style'] : '';
+			$row['productmeta_js']    = isset( $settings['productmeta_js'] ) ? (string) $settings['productmeta_js'] : '';
+		}
+
+		$row = apply_filters( 'ppom_settings_meta_data_new', $row );
+
+		$format  = array_fill( 0, count( $row ), '%s' );
+		$ppom_id = MetaRepositoryAccessor::instance()->insert_group( $row, $format );
+
+		if ( ! $ppom_id ) {
+			return 0;
+		}
+
+		// Re-run the filter with the resolved id so listeners (e.g. WPML)
+		// register against the final productmeta_id.
+		$product_meta = apply_filters( 'ppom_meta_data_saving', $fields, $ppom_id );
+		$product_meta = Validator::sanitize_array_data( $product_meta );
+		$product_meta = array_filter(
+			$product_meta,
+			function ( $pm ) {
+				return ! empty( $pm['type'] ) && ! empty( $pm['data_name'] );
+			}
+		);
+
+		self::update_ppom_meta_only( $ppom_id, $product_meta );
+
+		if ( self::is_attachable_product( $product_id ) ) {
+			Helpers::attach_fields_to_product( $ppom_id, $product_id );
+		}
+
+		return (int) $ppom_id;
+	}
+
+	/**
+	 * Returns true when the supplied ID resolves to an existing WooCommerce
+	 * product the current user is allowed to edit.
+	 *
+	 * Guards the product-attach + product-permalink redirect paths against
+	 * arbitrary or non-existent post IDs, which would otherwise create orphan
+	 * postmeta rows and produce empty redirect URLs from `get_permalink()`.
+	 *
+	 * @param mixed $product_id Candidate product ID from the request.
+	 * @return bool
+	 */
+	private static function is_attachable_product( $product_id ) {
+
+		$product_id = (int) $product_id;
+		if ( $product_id <= 0 ) {
+			return false;
+		}
+
+		$post = get_post( $product_id );
+		if ( ! $post || 'product' !== $post->post_type ) {
+			return false;
+		}
+
+		return current_user_can( 'edit_post', $product_id );
+	}
+
+	/**
+	 * Imports a curated template into a new PPOM field group.
+	 *
+	 * Verifies the import nonce + capability, looks up the requested template
+	 * by slug from {@see PPOM_Template_Library}, enforces the server-side Pro
+	 * gate, then delegates persistence to
+	 * {@see self::create_group_from_fields()} so the same filter chain and
+	 * sanitization that `save_form_meta` uses applies.
+	 *
+	 * Responds with `{ status, message, productmeta_id, redirect_to }` JSON.
+	 *
+	 * @return void
+	 */
+	public static function import_template() {
+
+		$db_version = floatval( get_option( 'personalizedproduct_db_version' ) );
+		$nonce      = isset( $_POST['ppom_import_template_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_import_template_nonce'] ) ) : '';
+
+		if ( $db_version < 22.1 ) {
+			wp_send_json(
+				array(
+					'message' => __( 'Since version 22.0, Database has some changes. Please Deactivate & then activate the PPOM plugin.', 'woocommerce-product-addon' ),
+					'status'  => 'error',
+				)
+			);
+		}
+
+		if ( empty( $nonce )
+			|| ! wp_verify_nonce( $nonce, 'ppom_import_template_action' )
+			|| ! Helpers::security_role()
+		) {
+			wp_send_json(
+				array(
+					'message' => __( 'Sorry, you are not allowed to perform this action.', 'woocommerce-product-addon' ),
+					'status'  => 'error',
+				)
+			);
+		}
+
+		$slug     = isset( $_POST['template'] ) ? sanitize_key( wp_unslash( $_POST['template'] ) ) : '';
+		$template = $slug ? \PPOM_Template_Library::get_template( $slug ) : null;
+
+		if ( null === $template ) {
+			wp_send_json(
+				array(
+					'message' => __( 'Unknown template.', 'woocommerce-product-addon' ),
+					'status'  => 'error',
+				)
+			);
+		}
+
+		if ( ! \PPOM_Template_Library::user_can_use( $template ) ) {
+			wp_send_json(
+				array(
+					'message' => __( 'This template requires PPOM Pro with an active license.', 'woocommerce-product-addon' ),
+					'status'  => 'error',
+				)
+			);
+		}
+
+		$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0;
+
+		$group_name = isset( $template['group_name'] ) ? (string) $template['group_name'] : '';
+		if ( strlen( $group_name ) > 50 ) {
+			$group_name = substr( $group_name, 0, 50 );
+		}
+
+		$settings = array(
+			'productmeta_name'      => $group_name,
+			'dynamic_price_display' => '',
+			'send_file_attachment'  => 'NA',
+			'show_cart_thumb'       => 'NA',
+			'aviary_api_key'        => 'NA',
+			'productmeta_style'     => '',
+			'productmeta_js'        => '',
+		);
+
+		$fields  = isset( $template['fields'] ) && is_array( $template['fields'] ) ? $template['fields'] : array();
+		$ppom_id = self::create_group_from_fields( $fields, $settings, $product_id );
+
+		if ( ! $ppom_id ) {
+			wp_send_json(
+				array(
+					'message' => __( 'Could not import the template. Please try again.', 'woocommerce-product-addon' ),
+					'status'  => 'error',
+				)
+			);
+		}
+
+		$redirect_to = (string) add_query_arg(
+			array(
+				'page'           => 'ppom',
+				'productmeta_id' => $ppom_id,
+				'do_meta'        => 'edit',
+			),
+			admin_url( 'admin.php' )
+		);
+
+		if ( self::is_attachable_product( $product_id ) ) {
+			$product_link = (string) get_permalink( $product_id );
+			if ( '' !== $product_link ) {
+				$redirect_to = $product_link;
+			}
+		}
+
+		wp_send_json(
+			array(
+				'message'        => __( 'Template imported successfully.', 'woocommerce-product-addon' ),
+				'status'         => 'success',
+				'productmeta_id' => $ppom_id,
+				'redirect_to'    => esc_url_raw( $redirect_to ),
+			)
+		);
 	}
 
 	/**
@@ -529,7 +718,13 @@ final class Manager {
 			$_REQUEST['ppom'] = $ppom_decoded['ppom'];
 		}
 
-		$ppom_meta    = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $_REQUEST['ppom'];
+		$ppom_meta = array();
+		if ( isset( $_REQUEST['ppom_meta'] ) && is_array( $_REQUEST['ppom_meta'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized recursively below after Pro-disabled rows are preserved.
+			$ppom_meta = $_REQUEST['ppom_meta']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized recursively below after Pro-disabled rows are preserved.
+		} elseif ( isset( $_REQUEST['ppom'] ) && is_array( $_REQUEST['ppom'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized recursively below after Pro-disabled rows are preserved.
+			$ppom_meta = $_REQUEST['ppom']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized recursively below after Pro-disabled rows are preserved.
+		}
+		$ppom_meta    = self::preserve_unavailable_field_rows( (array) $ppom_meta, (int) $productmeta_id );
 		$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );
 		$product_meta = Validator::sanitize_array_data( $product_meta );
 		// Remove the meta row if the type or data_name is empty.
@@ -540,7 +735,7 @@ final class Manager {
 			}
 		);
 		$product_meta = json_encode( $product_meta );
-	
+
 		$productmeta_name     = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
 		$dynamic_price_hide   = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
 		$send_file_attachment = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
@@ -598,6 +793,10 @@ final class Manager {
 
 		// $wpdb->show_errors(); $wpdb->print_error();
 
+		if ( \NM_PersonalizedProduct_Admin::has_attach_selections_in_request() ) {
+			\NM_PersonalizedProduct_Admin::save_attach_selections_from_request( (int) $productmeta_id );
+		}
+
 		$return_page = isset( $_REQUEST['ppom_meta'] ) ? 'ppom-energy' : 'ppom';
 
 		$ppom_args   = array(
@@ -630,6 +829,62 @@ final class Manager {
 	}
 
 	/**
+	 * Keeps saved Pro-only field definitions intact when Pro is unavailable.
+	 *
+	 * The free builder still submits each saved row shell, but unavailable input
+	 * types do not have registered controls for title, data_name, options, or
+	 * conditions. Preserve the existing row instead of replacing it with the
+	 * partial shell.
+	 *
+	 * @param array<int|string, mixed> $submitted_meta Submitted builder rows.
+	 * @param int                      $productmeta_id Field-group ID.
+	 * @return array<int|string, mixed>
+	 */
+	private static function preserve_unavailable_field_rows( array $submitted_meta, $productmeta_id ) {
+		$row = MetaRepositoryAccessor::instance()->get_row_by_id( (int) $productmeta_id );
+		if ( null === $row ) {
+			return $submitted_meta;
+		}
+
+		$existing_meta = json_decode( $row->the_meta, true );
+		if ( ! is_array( $existing_meta ) ) {
+			return $submitted_meta;
+		}
+
+		foreach ( $submitted_meta as $index => $field ) {
+			if ( ! is_array( $field ) ) {
+				continue;
+			}
+
+			$type = isset( $field['type'] ) ? (string) $field['type'] : '';
+			if ( '' === $type
+				|| isset( \PPOM()->inputs[ $type ] )
+				|| ! empty( $field['title'] )
+				|| ! empty( $field['data_name'] )
+			) {
+				continue;
+			}
+
+			if ( ! isset( $existing_meta[ $index ] ) || ! is_array( $existing_meta[ $index ] ) ) {
+				continue;
+			}
+
+			$existing_type = isset( $existing_meta[ $index ]['type'] ) ? (string) $existing_meta[ $index ]['type'] : '';
+			if ( $existing_type !== $type ) {
+				continue;
+			}
+
+			$status                   = isset( $field['status'] ) ? $field['status'] : null;
+			$submitted_meta[ $index ] = $existing_meta[ $index ];
+			if ( null !== $status ) {
+				$submitted_meta[ $index ]['status'] = $status;
+			}
+		}
+
+		return $submitted_meta;
+	}
+
+	/**
 	 * Rewrites only the stored PPOM field schema for a field group.
 	 *
 	 * @param int   $ppom_id   PPOM field-group ID.
@@ -646,6 +901,67 @@ final class Manager {
 		$rows_effected = MetaRepositoryAccessor::instance()->update_the_meta_only( (int) $ppom_id, $json );
 
 		return (bool) $rows_effected;
+	}
+
+	// Field group enable/disable.
+
+	/**
+	 * Toggles the disabled state of a PPOM field group from the admin list.
+	 *
+	 * Verifies the admin nonce and capability, then flips the
+	 * `productmeta_disabled` flag on the row. Product attachments and the
+	 * stored field schema are left untouched so the toggle is reversible.
+	 *
+	 * @return void
+	 */
+	public static function toggle_meta_disabled() {
+
+		$ppom_meta_nonce = isset( $_POST['ppom_meta_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_meta_nonce'] ) ) : '';
+
+		if ( empty( $ppom_meta_nonce )
+			|| ! wp_verify_nonce( $ppom_meta_nonce, 'ppom_meta_nonce_action' )
+			|| ! Helpers::security_role()
+		) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'message' => __( 'Sorry, you are not allowed to perform this action please try again', 'woocommerce-product-addon' ),
+				)
+			);
+		}
+
+		$productmeta_id = isset( $_POST['productmeta_id'] ) ? absint( wp_unslash( $_POST['productmeta_id'] ) ) : 0;
+		$disabled       = isset( $_POST['disabled'] ) && ! empty( $_POST['disabled'] ) && '1' === (string) wp_unslash( $_POST['disabled'] );
+
+		if ( $productmeta_id <= 0 ) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'message' => __( 'Invalid field group ID.', 'woocommerce-product-addon' ),
+				)
+			);
+		}
+
+		$result = MetaRepositoryAccessor::instance()->set_disabled( $productmeta_id, $disabled );
+
+		if ( false === $result || 0 === (int) $result ) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'message' => __( 'Field group could not be updated. Please refresh and try again.', 'woocommerce-product-addon' ),
+				)
+			);
+		}
+
+		wp_send_json(
+			array(
+				'status'   => 'success',
+				'disabled' => $disabled,
+				'message'  => $disabled
+					? __( 'Field group disabled.', 'woocommerce-product-addon' )
+					: __( 'Field group enabled.', 'woocommerce-product-addon' ),
+			)
+		);
 	}
 
 	// Field group deletion.

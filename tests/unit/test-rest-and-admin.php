@@ -569,4 +569,141 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 		$this->assertNotEmpty( $data1['ppom_file_upload_nonce'] );
 		$this->assertNotEmpty( $data2['ppom_file_upload_nonce'] );
 	}
+
+	/**
+	 * Ensure unauthenticated GET requests are rejected with rest_forbidden.
+	 *
+	 * @return void
+	 */
+	public function testUnauthenticatedGetProductRequestReturnsForbidden() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$response = $this->dispatch_ppom_rest_request(
+			'GET',
+			'/ppom/v1/get/product/',
+			array(
+				'product_id' => $product->get_id(),
+			),
+			'secret-key',
+			false
+		);
+
+		$this->assertSame( 401, $response->get_status() );
+		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
+	}
+
+	/**
+	 * Ensure unauthenticated POST requests are rejected with rest_forbidden.
+	 *
+	 * @return void
+	 */
+	public function testUnauthenticatedPostProductRequestReturnsForbidden() {
+		$product = $this->create_simple_product();
+
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/set/product/',
+			array(
+				'product_id' => $product->get_id(),
+				'secret_key' => 'secret-key',
+				'fields'     => wp_json_encode(
+					array(
+						$this->build_text_field( 'engraving', 'Engraving' ),
+					)
+				),
+			),
+			'secret-key',
+			false
+		);
+
+		$this->assertSame( 401, $response->get_status() );
+		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
+	}
+
+	/**
+	 * Ensure unauthenticated GET order requests are rejected with rest_forbidden.
+	 *
+	 * @return void
+	 */
+	public function testUnauthenticatedGetOrderRequestReturnsForbidden() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$order = $this->create_order_with_ppom_item(
+			$product,
+			array(
+				'engraving' => 'Hello',
+			)
+		);
+
+		$response = $this->dispatch_ppom_rest_request(
+			'GET',
+			'/ppom/v1/get/order/',
+			array(
+				'order_id' => $order->get_id(),
+			),
+			'secret-key',
+			false
+		);
+
+		$this->assertSame( 401, $response->get_status() );
+		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
+	}
+
+	/**
+	 * Ensure unauthenticated POST order requests are rejected with rest_forbidden.
+	 *
+	 * @return void
+	 */
+	public function testUnauthenticatedPostOrderRequestReturnsForbidden() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$order = $this->create_order_with_ppom_item(
+			$product,
+			array(
+				'engraving' => 'Hello',
+			)
+		);
+
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/set/order/',
+			array(
+				'order_id'   => $order->get_id(),
+				'secret_key' => 'secret-key',
+				'fields'     => wp_json_encode(
+					array(
+						$product->get_id() => array(
+							'engraving' => 'Updated',
+						),
+					)
+				),
+			),
+			'secret-key',
+			false
+		);
+
+		$this->assertSame( 401, $response->get_status() );
+		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
+	}
 }
