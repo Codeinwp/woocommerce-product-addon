@@ -52,8 +52,21 @@ if ( isset( $form_obj::$ppom->meta_id ) ) {
 		$ppom                           = new PPOM_Meta();
 		$ppom_settings                  = $ppom->get_settings_by_id( $meta_id );
 		$form_obj::$ppom->ppom_settings = $ppom_settings;
+		$allowed_variations             = ppom_get_variation_ids_for_group( $form_obj->product_id, $meta_id );
+		$wrapper_classes                = $form_obj->wrapper_inner_classes();
+		if ( ! empty( $allowed_variations ) ) {
+			$wrapper_classes .= ' ppom-variation-rule-group';
+		}
 		?>
-		<div class="<?php echo esc_attr( $form_obj->wrapper_inner_classes() ); ?>">
+		<div
+			class="<?php echo esc_attr( $wrapper_classes ); ?>"
+			data-ppom-group-id="<?php echo esc_attr( (string) $meta_id ); ?>"
+			<?php if ( ! empty( $allowed_variations ) ) : ?>
+				data-ppom-allowed-variations="<?php echo esc_attr( implode( ',', array_map( 'absint', $allowed_variations ) ) ); ?>"
+				style="display:none"
+				aria-hidden="true"
+			<?php endif; ?>
+		>
 
 			<?php
 			/**
@@ -72,7 +85,7 @@ if ( isset( $form_obj::$ppom->meta_id ) ) {
 			?>
 
 		</div>
-	<?php endforeach; ?> <!-- end form-row -->
+		<?php endforeach; ?> <!-- end form-row -->
 
 	<!-- Display price table after fields -->
 	<?php

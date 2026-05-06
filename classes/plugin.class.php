@@ -81,11 +81,11 @@ class NM_PersonalizedProduct {
 
 		// Validating before add to cart
 		if ( ! ppom_is_client_validation_enabled() ) {
-			add_filter( 'woocommerce_add_to_cart_validation', 'ppom_woocommerce_validate_product', 10, 3 );
+			add_filter( 'woocommerce_add_to_cart_validation', 'ppom_woocommerce_validate_product', 10, 5 );
 		}
 
-		// Adding meta to cart form product page
-		add_filter( 'woocommerce_add_cart_item_data', 'ppom_woocommerce_add_cart_item_data', 10, 2 );
+		// Adding meta to cart form product page.
+		add_filter( 'woocommerce_add_cart_item_data', 'ppom_woocommerce_add_cart_item_data', 10, 4 );
 
 		// add_action( 'wp', array($this, 'wp_loaded') );
 
@@ -275,6 +275,7 @@ class NM_PersonalizedProduct {
 		add_action( 'wp_ajax_ppom_update_form_meta', 'ppom_admin_update_form_meta' );
 		add_action( 'wp_ajax_ppom_delete_meta', 'ppom_admin_delete_meta' );
 		add_action( 'wp_ajax_ppom_delete_selected_meta', 'ppom_admin_delete_selected_meta' );
+		add_action( 'wp_ajax_ppom_toggle_meta_disabled', 'ppom_admin_toggle_meta_disabled' );
 		add_action( 'wp_ajax_ppom_import_template', 'ppom_admin_import_template' );
 
 		/*
@@ -920,17 +921,21 @@ class NM_PersonalizedProduct {
 		}
 	}
 
-	// Update to PRO Notice
-	function ppom_export_meta() {
-
-		// if( ppom_pro_is_installed() ) return '';
-		$buy_pro = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'export-import', 'tryexport' );
-		$args    = array(
-			'link_url'  => $buy_pro,
-			'link_text' => 'Buy now',
-			'back_link' => true,
-		);
-		wp_die( 'Update to PRO Version for Export/Import', 'Update to PRO', $args );
+	/**
+	 * Free-version fallback for the Export bulk action.
+	 *
+	 * The list-table form is intercepted client-side (see
+	 * `js/admin/ppom-meta-table.js`) so the upsell modal opens instead of
+	 * hitting this handler — but if JS is disabled or the request arrives
+	 * directly, redirect to the upgrade page rather than rendering a raw
+	 * wp_die upgrade screen.
+	 *
+	 * @return void
+	 */
+	public function ppom_export_meta() {
+		$upgrade_url = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'export-import', 'tryexport' );
+		wp_redirect( $upgrade_url ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- trusted upgrade URL.
+		exit;
 	}
 
 	function add_ppom_meta_tabs( $default_tabs ) {

@@ -45,6 +45,13 @@ function ppom_admin_delete_meta() {
 	\PPOM\Admin\Manager::delete_meta();
 }
 
+/**
+ * @return void
+ */
+function ppom_admin_toggle_meta_disabled() {
+	\PPOM\Admin\Manager::toggle_meta_disabled();
+}
+
 function ppom_admin_delete_selected_meta() {
 	\PPOM\Admin\Manager::delete_selected_meta();
 }

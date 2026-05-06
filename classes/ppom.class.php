@@ -237,6 +237,14 @@ class PPOM_Meta {
 			}
 		}
 
+		$variation_product_id = absint( $product_id );
+		$variation_rule_map   = $variation_product_id > 0 ? \PPOM\Support\Helpers::get_variation_rule_map( $variation_product_id ) : array();
+		if ( ! empty( $variation_rule_map ) ) {
+			$ppom_product_ids = \PPOM\Support\Helpers::normalize_ppom_meta_ids( $ppom_product_id );
+			$variation_ppoms  = \PPOM\Support\Helpers::normalize_ppom_meta_ids( array_keys( $variation_rule_map ) );
+			$ppom_product_id  = array_values( array_unique( array_merge( $ppom_product_ids, $variation_ppoms ) ) );
+		}
+
 		return apply_filters( 'ppom_product_meta_id', is_array( $ppom_product_id ) ? array_unique( $ppom_product_id ) : $ppom_product_id, $product_id );
 	}
 
@@ -305,7 +313,14 @@ class PPOM_Meta {
 			return null;
 		}
 
-		$row           = ppom_meta_repository()->get_row_by_id( $id );
+		$row = ppom_meta_repository()->get_row_by_id( $id );
+
+		// Skip groups admins have toggled off; configuration and product
+		// attachments are preserved so re-enabling restores the form.
+		if ( $row && isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled ) {
+			return null;
+		}
+
 		$meta_settings = $row ? array( $row ) : array();
 		$filter_meta   = array_filter(
 			$meta_settings,
@@ -333,11 +348,6 @@ class PPOM_Meta {
 			return null;
 		}
 
-		// Meta created without any fields
-		if ( ! $this->ppom_settings ) {
-			return null;
-		}
-
 		$meta_fields = array();
 		$repo        = ppom_meta_repository();
 
@@ -349,6 +359,10 @@ class PPOM_Meta {
 					continue;
 				}
 
+				if ( isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled ) {
+					continue;
+				}
+
 				$fields = json_decode( $row->the_meta, true );
 
 				if ( is_array( $fields ) ) {
@@ -356,8 +370,17 @@ class PPOM_Meta {
 				}
 			}
 		} else {
-			$meta_id     = absint( $this->meta_id );
-			$row         = $repo->get_row_by_id( $meta_id );
+			// Single-meta only: settings() already resolved (and possibly nulled) the
+			// primary row. Multi-meta resolves each row independently above.
+			if ( ! $this->ppom_settings ) {
+				return null;
+			}
+
+			$meta_id = absint( $this->meta_id );
+			$row     = $repo->get_row_by_id( $meta_id );
+			if ( $row && isset( $row->productmeta_disabled ) && 'on' === $row->productmeta_disabled ) {
+				return null;
+			}
 			$raw         = ( $row && isset( $row->the_meta ) && is_string( $row->the_meta ) ) ? $row->the_meta : '';
 			$meta_fields = json_decode( $raw, true );
 		}
