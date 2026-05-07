@@ -27,6 +27,13 @@ function buildTextField( args ) {
 	return buildField( 'text', args );
 }
 
+function buildImageField( args ) {
+	return buildField( 'image', {
+		images: [],
+		...args,
+	} );
+}
+
 function buildSelectField( { options = [], ...args } ) {
 	return buildField( 'select', {
 		...args,
@@ -75,6 +82,7 @@ function buildCheckboxField( { options = [], checked = [], ...args } ) {
 
 export {
 	buildCheckboxField,
+	buildImageField,
 	buildPalettesField,
 	buildPriceMatrixField,
 	buildSelectField,

@@ -4,12 +4,8 @@
 import type { FieldRow } from '../types/fieldModal';
 import type { ModalReducerAction, ModalReducerState } from './modalTypes';
 
-function fieldExists( fields: FieldRow[], clientId: string | null ): boolean {
-	return fields.some( ( field ) => field.clientId === clientId );
-}
-
 function nextSelectedIdAfterRemoval(
-	fields: FieldRow[],
+	fieldOrder: string[],
 	removedClientId: string,
 	currentSelectedId: string | null
 ): string | null {
@@ -17,18 +13,30 @@ function nextSelectedIdAfterRemoval(
 		return currentSelectedId;
 	}
 
-	const removedIndex = fields.findIndex(
-		( field ) => field.clientId === removedClientId
+	const removedIndex = fieldOrder.findIndex(
+		( id ) => id === removedClientId
 	);
-	const nextFields = fields.filter(
-		( field ) => field.clientId !== removedClientId
-	);
+	const nextOrder = fieldOrder.filter( ( id ) => id !== removedClientId );
 
-	return (
-		nextFields[ removedIndex ]?.clientId ??
-		nextFields[ removedIndex - 1 ]?.clientId ??
-		null
-	);
+	return nextOrder[ removedIndex ] ?? nextOrder[ removedIndex - 1 ] ?? null;
+}
+
+function rowsById( rows: FieldRow[] ): Record< string, FieldRow > {
+	return Object.fromEntries( rows.map( ( row ) => [ row.clientId, row ] ) );
+}
+
+function dirtyIdsAfterDraftChange(
+	state: ModalReducerState,
+	row: FieldRow,
+	snapshot: string
+): string[] {
+	const cleanSnapshot = state.cleanFieldSnapshots[ row.clientId ];
+	const isClean = cleanSnapshot !== undefined && cleanSnapshot === snapshot;
+	return isClean
+		? state.dirtyClientIds.filter(
+				( clientId ) => clientId !== row.clientId
+		  )
+		: Array.from( new Set( [ ...state.dirtyClientIds, row.clientId ] ) );
 }
 
 export function createInitialModalState(): ModalReducerState {
@@ -40,12 +48,15 @@ export function createInitialModalState(): ModalReducerState {
 		saving: false,
 		error: '',
 		ctx: null,
-		fields: [],
+		fieldsById: {},
+		fieldOrder: [],
 		cleanFieldSnapshots: {},
 		persistedClientIds: [],
 		dirtyClientIds: [],
 		removedPersistedClientIds: [],
 		selectedId: null,
+		activeDraft: null,
+		dataNameLockedById: {},
 		schemasCache: {},
 		schemaLoading: false,
 		schemaFetchError: '',
@@ -75,6 +86,7 @@ export function modalReducer(
 				...state,
 				pickerOpen: action.open,
 				selectedId: action.open ? null : state.selectedId,
+				activeDraft: action.open ? null : state.activeDraft,
 			};
 		case 'SET_PICKER_QUERY':
 			return { ...state, pickerQuery: action.query };
@@ -91,14 +103,23 @@ export function modalReducer(
 				...state,
 				loading: false,
 				ctx: action.ctx,
-				fields: action.fields,
+				fieldsById: rowsById( action.fields ),
+				fieldOrder: action.fields.map( ( field ) => field.clientId ),
 				cleanFieldSnapshots: action.cleanFieldSnapshots,
 				persistedClientIds: action.fields.map(
 					( field ) => field.clientId
 				),
-				dirtyClientIds: [],
+				dirtyClientIds: action.dirtyClientIds,
 				removedPersistedClientIds: [],
 				selectedId: state.pickerOpen ? null : action.selectedId,
+				activeDraft:
+					state.pickerOpen || ! action.selectedId
+						? null
+						: action.fields.find(
+								( field ) =>
+									field.clientId === action.selectedId
+						  ) ?? null,
+				dataNameLockedById: {},
 				schemaFetchError: '',
 			};
 		case 'LOAD_CONTEXT_ERROR':
@@ -126,80 +147,98 @@ export function modalReducer(
 			return { ...state, schemaLoading: action.loading };
 		case 'SET_CTX':
 			return { ...state, ctx: action.ctx };
-		case 'SET_FIELDS':
-			return { ...state, fields: action.fields };
 		case 'SET_SELECTED_ID':
-			if ( action.id && ! fieldExists( state.fields, action.id ) ) {
+			if ( action.id && ! state.fieldsById[ action.id ] ) {
 				return state;
 			}
 			return {
 				...state,
 				selectedId: action.id,
+				activeDraft: action.id ? state.fieldsById[ action.id ] : null,
 				schemaFetchError: '',
 			};
-		case 'PATCH_FIELD_ROW_FROM_FORM': {
-			const id = action.row.clientId;
-			const nextFields = state.fields.map( ( f ) =>
-				f.clientId === id ? { ...action.row } : f
-			);
-			const cleanSnapshot = state.cleanFieldSnapshots[ id ];
-			const dirtyClientIds =
-				cleanSnapshot !== undefined && cleanSnapshot === action.snapshot
-					? state.dirtyClientIds.filter(
-							( clientId ) => clientId !== id
-					  )
-					: Array.from( new Set( [ ...state.dirtyClientIds, id ] ) );
+		case 'SET_ACTIVE_DRAFT': {
 			return {
 				...state,
-				fields: nextFields,
-				dirtyClientIds,
+				activeDraft: { ...action.row },
+				dirtyClientIds: dirtyIdsAfterDraftChange(
+					state,
+					action.row,
+					action.snapshot
+				),
+				dataNameLockedById: {
+					...state.dataNameLockedById,
+					[ action.row.clientId ]: action.dataNameLocked,
+				},
 			};
 		}
+		case 'COMMIT_ACTIVE_DRAFT':
+			if ( ! state.activeDraft ) {
+				return state;
+			}
+			return {
+				...state,
+				fieldsById: {
+					...state.fieldsById,
+					[ state.activeDraft.clientId ]: state.activeDraft,
+				},
+			};
 		case 'ADD_FIELD_ROW':
 			return {
 				...state,
-				fields: [ ...state.fields, action.row ],
+				fieldsById: {
+					...state.fieldsById,
+					[ action.row.clientId ]: action.row,
+				},
+				fieldOrder: [ ...state.fieldOrder, action.row.clientId ],
 				cleanFieldSnapshots: {
 					...state.cleanFieldSnapshots,
 					[ action.row.clientId ]: action.snapshot,
 				},
 				selectedId: action.row.clientId,
+				activeDraft: action.row,
 				pickerOpen: false,
 				pickerQuery: '',
 			};
 		case 'DUPLICATE_FIELD_ROW': {
-			const idx = state.fields.findIndex(
-				( f ) => f.clientId === action.sourceClientId
+			const idx = state.fieldOrder.findIndex(
+				( id ) => id === action.sourceClientId
 			);
-			const next = [ ...state.fields ];
+			const next = [ ...state.fieldOrder ];
 			if ( idx < 0 ) {
-				next.push( action.newRow );
+				next.push( action.newRow.clientId );
 			} else {
-				next.splice( idx + 1, 0, action.newRow );
+				next.splice( idx + 1, 0, action.newRow.clientId );
 			}
 			return {
 				...state,
-				fields: next,
+				fieldsById: {
+					...state.fieldsById,
+					[ action.newRow.clientId ]: action.newRow,
+				},
+				fieldOrder: next,
 				cleanFieldSnapshots: {
 					...state.cleanFieldSnapshots,
 					[ action.newRow.clientId ]: action.snapshot,
 				},
 				selectedId: action.newRow.clientId,
+				activeDraft: action.newRow,
 				pickerOpen: false,
 				pickerQuery: '',
 			};
 		}
 		case 'REMOVE_FIELD_ROW': {
 			const selectedId = nextSelectedIdAfterRemoval(
-				state.fields,
+				state.fieldOrder,
 				action.clientId,
 				state.selectedId
 			);
-			const next = state.fields.filter(
-				( f ) => f.clientId !== action.clientId
-			);
+			const { [ action.clientId ]: _removedRow, ...nextFieldsById } =
+				state.fieldsById;
 			const { [ action.clientId ]: _removedSnapshot, ...snapshots } =
 				state.cleanFieldSnapshots;
+			const { [ action.clientId ]: _removedLock, ...dataNameLockedById } =
+				state.dataNameLockedById;
 			const removedPersistedClientIds = state.persistedClientIds.includes(
 				action.clientId
 			)
@@ -212,13 +251,18 @@ export function modalReducer(
 				: state.removedPersistedClientIds;
 			return {
 				...state,
-				fields: next,
+				fieldsById: nextFieldsById,
+				fieldOrder: state.fieldOrder.filter(
+					( id ) => id !== action.clientId
+				),
 				cleanFieldSnapshots: snapshots,
 				dirtyClientIds: state.dirtyClientIds.filter(
 					( clientId ) => clientId !== action.clientId
 				),
 				removedPersistedClientIds,
 				selectedId,
+				activeDraft: selectedId ? state.fieldsById[ selectedId ] : null,
+				dataNameLockedById,
 			};
 		}
 		case 'SET_SAVING':
