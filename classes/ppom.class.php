@@ -523,7 +523,7 @@ class PPOM_Meta {
 			foreach ( $rows as $row ) {
 				$inline_css .= $this->generate_inline_css( $row->productmeta_id, $row->productmeta_style );
 			}
-		} elseif ( isset( $this->ppom_settings->productmeta_style ) ) {
+		} elseif ( isset( $this->ppom_settings->productmeta_id, $this->ppom_settings->productmeta_style ) ) {
 			$inline_css = $this->generate_inline_css( $this->ppom_settings->productmeta_id, $this->ppom_settings->productmeta_style );
 		}
 
@@ -701,16 +701,16 @@ class PPOM_Meta {
 	/**
 	 * Generates inline CSS.
 	 *
-	 * @param int|string $meta_id meta field id for selector.
+	 * @param int|string  $meta_id meta field id for selector.
 	 * @param string|null $style meta field css.
 	 * @return string
 	 */
 	private function generate_inline_css( $meta_id, $style ) {
 		$inline_css = '';
 		if ( is_string( $style ) && '' !== $style ) {
-			$template = stripslashes( wp_strip_all_tags( $style ) );
-			$selector = '';
-			$selector = '.ppom-id-' . $meta_id;
+			$template    = stripslashes( wp_strip_all_tags( $style ) );
+			$selector    = '';
+			$selector    = '.ppom-id-' . $meta_id;
 			$inline_css .= str_replace( 'selector', $selector, $template );
 		}
 
