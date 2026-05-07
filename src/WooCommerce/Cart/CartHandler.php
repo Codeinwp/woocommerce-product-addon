@@ -352,8 +352,11 @@ final class CartHandler {
 		$wc_cart = function_exists( 'WC' ) ? WC()->cart : null;
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by WooCommerce add-to-cart nonce.
-		if ( ! empty( $_POST['ppom_cart_key'] ) && $wc_cart ) {
-			$wc_cart->remove_cart_item( sanitize_key( wp_unslash( $_POST['ppom_cart_key'] ) ) );
+		if ( isset( $_POST['ppom_cart_key'] ) && is_string( $_POST['ppom_cart_key'] ) && $wc_cart ) {
+			$remove_key = sanitize_text_field( wp_unslash( $_POST['ppom_cart_key'] ) );
+			if ( '' !== $remove_key && $wc_cart->get_cart_item( $remove_key ) ) {
+				$wc_cart->remove_cart_item( $remove_key );
+			}
 		}
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 

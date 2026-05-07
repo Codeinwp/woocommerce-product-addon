@@ -148,8 +148,12 @@ test.describe("Group Delete Confirmation Dialog", () => {
 			"admin.php?page=ppom&orderby=productmeta_id&order=desc"
 		);
 
-		// Verify the group exists in the table
-		const groupRow = page.locator(`tr td:has-text("${ppomId}")`);
+		// Verify the group exists in the table. Scope to the row's checkbox
+		// rather than `td:has-text(ppomId)` because Meta cells can contain
+		// the same digits (e.g. timestamp-based labels) and trip strict mode.
+		const groupRow = page.locator(
+			`tr:has(input.ppom_product_checkbox[value="${ppomId}"])`
+		);
 		await expect(groupRow).toBeVisible();
 
 		// Select the checkbox for our group

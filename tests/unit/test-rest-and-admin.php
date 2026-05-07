@@ -626,4 +626,94 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 		$this->assertSame( 401, $response->get_status() );
 		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
 	}
+
+	/**
+	 * Ensure unauthenticated GET /get/id/{id} is rejected with rest_forbidden (R1).
+	 *
+	 * @return void
+	 */
+	public function testUnauthenticatedGetMetaByIdReturnsForbidden() {
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			)
+		);
+
+		$response = $this->dispatch_ppom_rest_request(
+			'GET',
+			'/ppom/v1/get/id/' . $meta_id,
+			array(),
+			'secret-key',
+			false
+		);
+
+		$this->assertSame( 401, $response->get_status() );
+		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
+	}
+
+	/**
+	 * Ensure unauthenticated POST /delete/product/ is rejected with rest_forbidden (R1).
+	 *
+	 * @return void
+	 */
+	public function testUnauthenticatedDeleteProductRequestReturnsForbidden() {
+		$product = $this->create_simple_product();
+
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/delete/product/',
+			array(
+				'product_id' => $product->get_id(),
+				'secret_key' => 'secret-key',
+				'fields'     => wp_json_encode( array( 'engraving' ) ),
+			),
+			'secret-key',
+			false
+		);
+
+		$this->assertSame( 401, $response->get_status() );
+		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
+	}
+
+	/**
+	 * Ensure unauthenticated POST /delete/order/ is rejected with rest_forbidden (R1).
+	 *
+	 * @return void
+	 */
+	public function testUnauthenticatedDeleteOrderRequestReturnsForbidden() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$order = $this->create_order_with_ppom_item(
+			$product,
+			array(
+				'engraving' => 'Hello',
+			)
+		);
+
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/delete/order/',
+			array(
+				'order_id'   => $order->get_id(),
+				'secret_key' => 'secret-key',
+				'fields'     => wp_json_encode(
+					array(
+						$product->get_id() => array( 'engraving' ),
+					)
+				),
+			),
+			'secret-key',
+			false
+		);
+
+		$this->assertSame( 401, $response->get_status() );
+		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
+	}
 }

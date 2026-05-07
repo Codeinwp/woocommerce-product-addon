@@ -2,6 +2,12 @@
 /**
  * Registers PPOM REST API routes for field groups and order metadata.
  *
+ * Anonymous REST clients receive HTTP 401 with body `code: rest_forbidden` when the
+ * route `permission_callback` fails (`check_read_permission` → `edit_products`,
+ * `check_write_permission` → `manage_woocommerce`). Authenticated users who lack
+ * those caps get the same response. Successful permission checks still require a
+ * valid `secret_key` inside POST bodies where the controller validates it.
+ *
  * @package PPOM
  * @subpackage REST
  *
