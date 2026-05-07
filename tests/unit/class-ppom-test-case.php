@@ -576,6 +576,27 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Build a fancycropper field definition (cropped image addon pricing).
+	 *
+	 * @param string $data_name Field data name.
+	 * @param string $title     Field title.
+	 * @param array  $overrides Field overrides.
+	 *
+	 * @return array
+	 */
+	protected function build_fancycropper_field( $data_name, $title = 'Fancy cropper', $overrides = array() ) {
+		return array_merge(
+			array(
+				'type'      => 'fancycropper',
+				'title'     => $title,
+				'data_name' => $data_name,
+				'options'   => array(),
+			),
+			$overrides
+		);
+	}
+
+	/**
 	 * Build a price matrix field definition.
 	 *
 	 * @param string $data_name Field data name.

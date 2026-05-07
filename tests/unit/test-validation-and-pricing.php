@@ -518,6 +518,42 @@ class Test_Validation_And_Pricing extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Ensure price matrix hook tolerates cart items missing conditionally_hidden (W6).
+	 *
+	 * @return void
+	 */
+	public function testPriceCheckPriceMatrixHandlesMissingConditionallyHiddenKey() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_price_matrix_field(
+					'price_matrix',
+					array(
+						array(
+							'option' => '2-4',
+							'price'  => '10',
+							'label'  => 'Visible range',
+							'id'     => 'visible_range',
+						),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$cart_item = ppom_price_check_price_matrix(
+			array(
+				'data' => $product,
+				'ppom' => array(),
+			),
+			array()
+		);
+
+		$this->assertIsArray( $cart_item['ppom']['price_matrix_found'] );
+	}
+
+	/**
 	 * Ensure checkbox validation fails when fewer than the minimum selections are submitted.
 	 *
 	 * @return void
