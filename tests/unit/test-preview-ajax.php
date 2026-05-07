@@ -163,21 +163,21 @@ class Test_Preview_Ajax extends WP_Ajax_UnitTestCase {
 	}
 
 	public function test_search_products_rejects_missing_nonce() {
-		$this->set_request_param( 'action', 'ppom_search_products' );
+		$this->set_request_param( 'action', 'ppom_preview_search_products' );
 		$this->set_request_param( 'term', 'shirt' );
 
-		$response = $this->dispatch_and_decode( 'ppom_search_products' );
+		$response = $this->dispatch_and_decode( 'ppom_preview_search_products' );
 
 		$this->assertSame( 'error', $response['status'] );
 		$this->assertSame( array(), $response['results'] );
 	}
 
 	public function test_search_products_returns_empty_for_blank_term() {
-		$this->set_request_param( 'action', 'ppom_search_products' );
+		$this->set_request_param( 'action', 'ppom_preview_search_products' );
 		$this->set_request_param( 'nonce', wp_create_nonce( 'ppom_preview_nonce_action' ) );
 		$this->set_request_param( 'term', '' );
 
-		$response = $this->dispatch_and_decode( 'ppom_search_products' );
+		$response = $this->dispatch_and_decode( 'ppom_preview_search_products' );
 
 		$this->assertSame( 'success', $response['status'] );
 		$this->assertSame( array(), $response['results'] );
@@ -186,11 +186,11 @@ class Test_Preview_Ajax extends WP_Ajax_UnitTestCase {
 	public function test_search_products_returns_matching_product() {
 		$product_id = $this->create_published_product( 'Unique Test Garment Alpha' );
 
-		$this->set_request_param( 'action', 'ppom_search_products' );
+		$this->set_request_param( 'action', 'ppom_preview_search_products' );
 		$this->set_request_param( 'nonce', wp_create_nonce( 'ppom_preview_nonce_action' ) );
 		$this->set_request_param( 'term', 'Garment Alpha' );
 
-		$response = $this->dispatch_and_decode( 'ppom_search_products' );
+		$response = $this->dispatch_and_decode( 'ppom_preview_search_products' );
 
 		$this->assertSame( 'success', $response['status'] );
 		$this->assertNotEmpty( $response['results'] );
