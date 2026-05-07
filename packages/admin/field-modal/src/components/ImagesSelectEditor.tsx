@@ -2,7 +2,7 @@
  * Inline editor for pre-uploaded images (image + imageselect field types).
  * Mini media-manager: empty-state dropzone, 2-row image cards, drag-to-reorder.
  */
-import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, HStack, Icon, Text, VStack } from '@chakra-ui/react';
 import {
 	useEffect,
 	useRef,
@@ -261,43 +261,28 @@ export function ImagesSelectEditor( {
 			py={ 2.5 }
 			minW={ 0 }
 		>
-			<HStack
-				justify="space-between"
-				align="center"
-				gap={ 3 }
+			<VStack
+				align="start"
+				gap={ 0 }
 				pb={ 1 }
 				mb={ 2 }
 				borderBottomWidth="1px"
 				borderBottomColor="gray.100"
 			>
-				<VStack align="start" gap={ 0 } flex="1" minW={ 0 }>
-					<Text
-						as="h3"
-						fontSize="11px"
-						fontWeight="700"
-						color="gray.500"
-						textTransform="uppercase"
-						letterSpacing="0.08em"
-					>
-						{ title }
-					</Text>
-					<Text fontSize="xs" color="gray.500" mt={ 0.5 }>
-						{ sectionHelper }
-					</Text>
-				</VStack>
-				{ ! isEmpty ? (
-					<Button
-						size="sm"
-						variant="ghost"
-						color="blue.600"
-						_hover={ { bg: 'blue.50' } }
-						onClick={ addImagesFromMedia }
-					>
-						<LuPlus />
-						{ i18n.imagesAddMore || 'Add image' }
-					</Button>
-				) : null }
-			</HStack>
+				<Text
+					as="h3"
+					fontSize="11px"
+					fontWeight="700"
+					color="gray.500"
+					textTransform="uppercase"
+					letterSpacing="0.08em"
+				>
+					{ title }
+				</Text>
+				<Text fontSize="xs" color="gray.500" mt={ 0.5 }>
+					{ sectionHelper }
+				</Text>
+			</VStack>
 
 			{ isEmpty ? (
 				<EmptyState
@@ -334,6 +319,18 @@ export function ImagesSelectEditor( {
 							/>
 						</Box>
 					) ) }
+					<Button
+						size="sm"
+						variant="outline"
+						borderStyle="dashed"
+						color="gray.600"
+						width="full"
+						mt={ 2 }
+						onClick={ addImagesFromMedia }
+					>
+						<Icon as={ LuPlus } boxSize={ 3.5 } mr={ 1 } />
+						{ i18n.imagesAddMore || 'Add image' }
+					</Button>
 					<Text fontSize="11px" color="gray.400" mt={ 2 }>
 						{ rows.length === 1
 							? i18n.imagesFooterSingular || '1 image'
