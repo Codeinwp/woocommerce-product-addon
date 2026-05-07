@@ -6931,12 +6931,6 @@ parameters:
 			path: src/WooCommerce/Cart/CartHandler.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: src/WooCommerce/Cart/CartHandler.php
-
-		-
 			message: '#^Method PPOM\\WooCommerce\\Catalog\\CatalogHandler\:\:alter_price\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
