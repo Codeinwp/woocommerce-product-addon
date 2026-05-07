@@ -269,7 +269,7 @@ class PPOM_Meta {
 		$single_meta = ( $this->meta_id == 0 || $this->meta_id == 'None' || empty( $this->meta_id ) ) ? null : $this->meta_id;
 
 		if ( is_array( $single_meta ) && 0 < count( $single_meta ) ) {
-			$single_meta = $single_meta[0];
+			$single_meta = reset( $single_meta );
 		}
 
 		return $single_meta;
@@ -521,10 +521,10 @@ class PPOM_Meta {
 		if ( $this->has_multiple_meta() ) {
 			$rows = ppom_meta_repository()->get_rows_by_ids( $this->meta_id );
 			foreach ( $rows as $row ) {
-				$inline_css .= $this->generate_inline_css( $row->productmeta_style );
+				$inline_css .= $this->generate_inline_css( $row->productmeta_id, $row->productmeta_style );
 			}
 		} elseif ( isset( $this->ppom_settings->productmeta_style ) ) {
-			$inline_css = $this->generate_inline_css( $this->ppom_settings->productmeta_style );
+			$inline_css = $this->generate_inline_css( $this->ppom_settings->productmeta_id, $this->ppom_settings->productmeta_style );
 		}
 
 		$inline_css = trim( $inline_css );
@@ -701,27 +701,16 @@ class PPOM_Meta {
 	/**
 	 * Generates inline CSS.
 	 *
+	 * @param int|string $meta_id meta field id for selector.
 	 * @param string|null $style meta field css.
 	 * @return string
 	 */
-	private function generate_inline_css( $style ) {
+	private function generate_inline_css( $meta_id, $style ) {
 		$inline_css = '';
 		if ( is_string( $style ) && '' !== $style ) {
 			$template = stripslashes( wp_strip_all_tags( $style ) );
 			$selector = '';
-			if ( is_array( $this->meta_id ) ) {
-				$field_selector = array();
-				foreach ( $this->meta_id as $field_id ) {
-					if ( $field_id == 0 || $field_id == 'None' ) {
-						continue;
-					}
-
-					$field_selector[] = '.ppom-id-' . $field_id;
-				}
-				$selector = ':where(' . implode( ', ', $field_selector ) . ')';
-			} elseif ( is_numeric( $this->meta_id ) ) {
-				$selector = '.ppom-id-' . $this->meta_id;
-			}
+			$selector = '.ppom-id-' . $meta_id;
 			$inline_css .= str_replace( 'selector', $selector, $template );
 		}
 
