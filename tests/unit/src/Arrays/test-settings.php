@@ -106,4 +106,74 @@ class Test_Settings extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'Europe/London', $list );
 		$this->assertArrayHasKey( 'America/New_York', $list );
 	}
+
+	/**
+	 * Regression: identifiers returned by listIdentifiers() that the bundled tzdata cannot
+	 * construct (e.g. America/Ciudad_Juarez on outdated PHP) must not bubble an exception.
+	 *
+	 * @return void
+	 */
+	public function test_get_timezone_list_does_not_throw_for_any_region() {
+		$regions = array( 'All', 'AFRICA', 'AMERICA', 'ANTARCTICA', 'ASIA', 'ATLANTIC', 'AUSTRALIA', 'EUROPE', 'INDIAN', 'PACIFIC' );
+
+		foreach ( $regions as $region ) {
+			try {
+				$list = Settings::get_timezone_list( $region, 'no' );
+			} catch ( \Throwable $e ) {
+				$this->fail( "get_timezone_list( '$region', 'no' ) threw: " . $e->getMessage() );
+			}
+
+			$this->assertIsArray( $list );
+			$this->assertNotEmpty( $list, "Expected non-empty timezone list for region '$region'" );
+		}
+	}
+
+	/**
+	 * Every identifier returned must be constructable — the fix filters out any that aren't.
+	 *
+	 * @return void
+	 */
+	public function test_get_timezone_list_only_returns_constructable_identifiers() {
+		$list = Settings::get_timezone_list( 'All', 'no' );
+
+		foreach ( array_keys( $list ) as $identifier ) {
+			try {
+				new \DateTimeZone( $identifier );
+			} catch ( \Exception $e ) {
+				$this->fail( "Returned identifier '$identifier' is not constructable: " . $e->getMessage() );
+			}
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_get_timezone_list_with_comma_separated_regions() {
+		$list = Settings::get_timezone_list( 'EUROPE,ASIA', 'no' );
+
+		$this->assertArrayHasKey( 'Europe/London', $list );
+		$this->assertArrayHasKey( 'Asia/Tokyo', $list );
+		$this->assertArrayNotHasKey( 'America/New_York', $list );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_get_timezone_list_show_time_toggles_current_time() {
+		$with_time    = Settings::get_timezone_list( 'EUROPE', 'on' );
+		$without_time = Settings::get_timezone_list( 'EUROPE', 'no' );
+
+		$this->assertMatchesRegularExpression( '/\d{1,2}:\d{2}\s?(AM|PM)/', $with_time['Europe/London'] );
+		$this->assertDoesNotMatchRegularExpression( '/\d{1,2}:\d{2}\s?(AM|PM)/', $without_time['Europe/London'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_get_timezone_list_entry_format_includes_utc_offset() {
+		$list = Settings::get_timezone_list( 'EUROPE', 'no' );
+
+		$this->assertStringContainsString( '(UTC', $list['Europe/London'] );
+		$this->assertStringContainsString( 'Europe/London', $list['Europe/London'] );
+	}
 }
