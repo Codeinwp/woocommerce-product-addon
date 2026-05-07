@@ -8,6 +8,7 @@ export {
 } from './ppom.js';
 export {
 	buildCheckboxField,
+	buildFileField,
 	buildSelectField,
 	buildTextField,
 } from './fields.js';
