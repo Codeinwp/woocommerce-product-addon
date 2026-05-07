@@ -41,6 +41,10 @@ if ( ! defined( 'PPOM_E2E_LICENSE_FILTER_PRIORITY' ) ) {
  * @return void
  */
 function ppom_e2e_bootstrap_activate_required_plugins() {
+	if ( defined( 'WP_CLI' ) && WP_CLI ) {
+		return;
+	}
+
 	if ( ! function_exists( 'activate_plugin' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 	}
@@ -62,7 +66,6 @@ function ppom_e2e_bootstrap_activate_required_plugins() {
 		}
 	}
 }
-add_action( 'init', 'ppom_e2e_bootstrap_activate_required_plugins', 1 );
 
 /**
  * Default license fixture: valid Essential plan (wp-env has no store key).
@@ -139,6 +142,8 @@ add_filter(
  * @return void
  */
 function ppom_e2e_require_capability() {
+	ppom_e2e_bootstrap_activate_required_plugins();
+
 	if ( current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' ) ) {
 		return;
 	}
