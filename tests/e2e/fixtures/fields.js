@@ -80,6 +80,15 @@ function buildCheckboxField( { options = [], checked = [], ...args } ) {
 	} );
 }
 
+function buildFileField( args ) {
+	return buildField( 'file', {
+		file_size: '5', // 5MB default
+		files_allowed: '1', // Allow 1 file by default
+		file_types: 'jpg,png,pdf', // Common file types
+		...args,
+	} );
+}
+
 export {
 	buildCheckboxField,
 	buildImageField,
@@ -87,4 +96,5 @@ export {
 	buildPriceMatrixField,
 	buildSelectField,
 	buildTextField,
+	buildFileField,
 };

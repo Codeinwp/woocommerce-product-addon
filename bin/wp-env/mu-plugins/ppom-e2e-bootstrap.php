@@ -117,6 +117,42 @@ function ppom_e2e_render_product_page_route() {
 add_action( 'template_redirect', 'ppom_e2e_render_product_page_route', 0 );
 
 /**
+ * Ensure WooCommerce + PPOM are active in the wp-env test site (8889).
+ *
+ * wp-env activates plugins for the development site, but the Playwright base
+ * config targets the test site by default. Activate required plugins here so
+ * the E2E bootstrap AJAX endpoints can rely on WooCommerce/PPOM classes.
+ *
+ * @return void
+ */
+function ppom_e2e_bootstrap_activate_required_plugins() {
+	if ( defined( 'WP_CLI' ) && WP_CLI ) {
+		return;
+	}
+
+	if ( ! function_exists( 'activate_plugin' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+
+	$plugins = array(
+		'woocommerce/woocommerce.php',
+		'woocommerce-product-addon/woocommerce-product-addon.php',
+	);
+
+	foreach ( $plugins as $plugin ) {
+		if ( is_plugin_active( $plugin ) ) {
+			continue;
+		}
+
+		$result = activate_plugin( $plugin, '', false, false );
+
+		if ( is_wp_error( $result ) ) {
+			error_log( sprintf( 'PPOM E2E bootstrap failed activating %s: %s', $plugin, $result->get_error_message() ) );
+		}
+	}
+}
+
+/**
  * Default license fixture: valid Essential plan (wp-env has no store key).
  *
  * @return array{status:string,plan:int,pro_installed:bool}
@@ -202,6 +238,8 @@ add_filter(
  * @return void
  */
 function ppom_e2e_require_capability() {
+	ppom_e2e_bootstrap_activate_required_plugins();
+
 	if ( current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' ) ) {
 		return;
 	}
