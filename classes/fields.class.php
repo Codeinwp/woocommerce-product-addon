@@ -1108,7 +1108,7 @@ class PPOM_Fields_Meta {
 
 					// conditional elements
 					$html_input .= '<div class="col-md-4 col-sm-4">';
-					$html_input .= '<select name="ppom[' . esc_attr( $field_index ) . '][conditions][rules][0][elements]" class="ppom-conditional-keys form-control" data-metatype="elements"></select>';
+					$html_input .= '<select name="ppom[' . esc_attr( (string) $field_index ) . '][conditions][rules][0][elements]" class="ppom-conditional-keys form-control" data-metatype="elements"></select>';
 					$html_input .= '</div>';
 
 					// is
