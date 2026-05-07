@@ -10,6 +10,39 @@ require_once __DIR__ . '/class-ppom-test-case.php';
 class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 
 	/**
+	 * Create a focused cart double for add-cart item data tests.
+	 *
+	 * @param array $cart_contents Cart contents keyed by cart item key.
+	 *
+	 * @return object
+	 */
+	private function create_add_cart_item_data_cart_stub( $cart_contents = array() ) {
+		return new class( $cart_contents ) {
+			public $cart_contents = array();
+			public $removed_keys  = array();
+
+			public function __construct( $cart_contents ) {
+				$this->cart_contents = $cart_contents;
+			}
+
+			public function get_cart_item( $cart_item_key ) {
+				return isset( $this->cart_contents[ $cart_item_key ] ) ? $this->cart_contents[ $cart_item_key ] : array();
+			}
+
+			public function remove_cart_item( $cart_item_key ) {
+				if ( ! isset( $this->cart_contents[ $cart_item_key ] ) ) {
+					return false;
+				}
+
+				$this->removed_keys[] = $cart_item_key;
+				unset( $this->cart_contents[ $cart_item_key ] );
+
+				return true;
+			}
+		};
+	}
+
+	/**
 	 * Ensure add-to-cart validation fails when a required field is missing.
 	 *
 	 * @return void
@@ -91,17 +124,11 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 			$product->get_id()
 		);
 
-		$cart_stub = new class() {
-			public $removed_keys = array();
-
-			public function get_cart_item( $cart_item_key ) {
-				return 'existing-cart-key' === $cart_item_key ? array( 'product_id' => 1 ) : false;
-			}
-
-			public function remove_cart_item( $cart_item_key ) {
-				$this->removed_keys[] = $cart_item_key;
-			}
-		};
+		$cart_stub = $this->create_add_cart_item_data_cart_stub(
+			array(
+				'existing-cart-key' => array( 'product_id' => 1 ),
+			)
+		);
 
 		WC()->cart = $cart_stub;
 
@@ -134,17 +161,7 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 			$product->get_id()
 		);
 
-		$cart_stub = new class() {
-			public $removed_keys = array();
-
-			public function get_cart_item( $cart_item_key ) {
-				return false;
-			}
-
-			public function remove_cart_item( $cart_item_key ) {
-				$this->removed_keys[] = $cart_item_key;
-			}
-		};
+		$cart_stub = $this->create_add_cart_item_data_cart_stub();
 
 		WC()->cart = $cart_stub;
 
@@ -207,13 +224,7 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 			$product->get_id()
 		);
 
-		$cart_stub = new class() {
-			public $removed_keys = array();
-
-			public function remove_cart_item( $cart_item_key ) {
-				$this->removed_keys[] = $cart_item_key;
-			}
-		};
+		$cart_stub = $this->create_add_cart_item_data_cart_stub();
 
 		WC()->cart = $cart_stub;
 
@@ -244,17 +255,15 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 			$product->get_id()
 		);
 
-		$cart_stub = new class() {
-			public $removed_keys = array();
-
-			public function remove_cart_item( $cart_item_key ) {
-				$this->removed_keys[] = $cart_item_key;
-			}
-		};
+		$raw_cart_key = ' Existing_Cart Key ';
+		$cart_stub    = $this->create_add_cart_item_data_cart_stub(
+			array(
+				sanitize_key( $raw_cart_key ) => array( 'product_id' => $product->get_id() ),
+			)
+		);
 
 		WC()->cart = $cart_stub;
 
-		$raw_cart_key           = ' Existing_Cart Key ';
 		$_POST['ppom_cart_key'] = $raw_cart_key;
 		$_POST['ppom']          = array(
 			'fields' => array(
