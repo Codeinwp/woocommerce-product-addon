@@ -116,6 +116,111 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Ensure add-cart logic does not fatal when WooCommerce cart is missing.
+	 *
+	 * @return void
+	 */
+	public function testWooCommerceAddCartItemDataSkipsRemovalWhenCartMissing() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		WC()->cart = null;
+
+		$_POST['ppom_cart_key'] = 'existing-cart-key';
+		$_POST['ppom']          = array(
+			'fields' => array(
+				'engraving' => 'Hello',
+			),
+		);
+
+		$cart_item = ppom_woocommerce_add_cart_item_data( array(), $product->get_id() );
+
+		$this->assertArrayHasKey( 'ppom', $cart_item );
+		$this->assertSame( $_POST['ppom'], $cart_item['ppom'] );
+	}
+
+	/**
+	 * Ensure add-cart logic skips removal when the cart key is missing.
+	 *
+	 * @return void
+	 */
+	public function testWooCommerceAddCartItemDataSkipsRemovalWithoutCartKey() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$cart_stub = new class() {
+			public $removed_keys = array();
+
+			public function remove_cart_item( $cart_item_key ) {
+				$this->removed_keys[] = $cart_item_key;
+			}
+		};
+
+		WC()->cart = $cart_stub;
+
+		$_POST['ppom'] = array(
+			'fields' => array(
+				'engraving' => 'Hello',
+			),
+		);
+
+		$cart_item = ppom_woocommerce_add_cart_item_data( array(), $product->get_id() );
+
+		$this->assertSame( array(), $cart_stub->removed_keys );
+		$this->assertSame( $_POST['ppom'], $cart_item['ppom'] );
+	}
+
+	/**
+	 * Ensure add-cart logic sanitizes the cart key before removal.
+	 *
+	 * @return void
+	 */
+	public function testWooCommerceAddCartItemDataSanitizesCartKeyBeforeRemoval() {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$cart_stub = new class() {
+			public $removed_keys = array();
+
+			public function remove_cart_item( $cart_item_key ) {
+				$this->removed_keys[] = $cart_item_key;
+			}
+		};
+
+		WC()->cart = $cart_stub;
+
+		$raw_cart_key           = ' Existing_Cart Key ';
+		$_POST['ppom_cart_key'] = $raw_cart_key;
+		$_POST['ppom']          = array(
+			'fields' => array(
+				'engraving' => 'Hello',
+			),
+		);
+
+		ppom_woocommerce_add_cart_item_data( array(), $product->get_id() );
+
+		$this->assertSame( array( sanitize_key( $raw_cart_key ) ), $cart_stub->removed_keys );
+	}
+
+	/**
 	 * Ensure session restore recalculates addon pricing for simple products.
 	 *
 	 * @return void

@@ -1,6 +1,6 @@
 === PPOM - Product Addons & Custom Fields for WooCommerce ===
 Contributors: themeisle
-Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, product addons
+Tags: product addons, woocommerce product addons, woocommerce product options, custom fields, variable products
 Requires at least: 6.2
 Tested up to: 6.9
 Stable tag: 33.0.18

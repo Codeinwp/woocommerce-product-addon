@@ -37,6 +37,7 @@ final class HposCompatibilityRegistration implements RegisterHooks {
 			function () {
 				if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
 					\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', $this->plugin_file, true );
+					\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', $this->plugin_file, false );
 				}
 			}
 		);
