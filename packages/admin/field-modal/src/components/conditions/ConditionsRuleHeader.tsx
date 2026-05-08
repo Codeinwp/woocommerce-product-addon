@@ -10,6 +10,7 @@ export function ConditionsRuleHeader( { i18n }: ConditionsRuleHeaderProps ) {
 		fontSize: 'xs' as const,
 		fontWeight: 'semibold' as const,
 		color: 'gray.600',
+		m: 0,
 	};
 
 	return (
