@@ -47,12 +47,5 @@ export function normalizeChainedRows( raw: unknown ): ChainedOptionRow[] {
 export function serializeChainedRows(
 	rows: ChainedOptionRow[]
 ): ChainedOptionRow[] {
-	const filtered = rows.filter(
-		( row ) =>
-			row.option.trim() !== '' ||
-			row.chained.trim() !== '' ||
-			row.features.trim() !== '' ||
-			row.id.trim() !== ''
-	);
-	return filtered.length > 0 ? filtered : [];
+	return rows.map( ( row ) => ( { ...row } ) );
 }

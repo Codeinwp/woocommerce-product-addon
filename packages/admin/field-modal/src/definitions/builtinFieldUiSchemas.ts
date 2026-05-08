@@ -1442,6 +1442,19 @@ function phoneSettings(): SettingSchema {
 	};
 }
 
+function superlistOptions(): Record< string, string > {
+	return {
+		countries: __( 'Countries', 'woocommerce-product-addon' ),
+		currency: __( 'Currency', 'woocommerce-product-addon' ),
+		currency_symbol: __( 'Currency Symbol', 'woocommerce-product-addon' ),
+		color: __( 'Colors', 'woocommerce-product-addon' ),
+		languages: __( 'Languages', 'woocommerce-product-addon' ),
+		domainname: __( 'Top Level Domains', 'woocommerce-product-addon' ),
+		monthsname: __( 'Months Names', 'woocommerce-product-addon' ),
+		starname: __( 'Stars Names', 'woocommerce-product-addon' ),
+	};
+}
+
 function superlistSettings(): SettingSchema {
 	return {
 		title: titleSetting(),
@@ -1449,12 +1462,10 @@ function superlistSettings(): SettingSchema {
 		description: descriptionSetting(),
 		required: requiredSetting(),
 		listoptions: setting(
-			'textarea',
-			__( 'List options', 'woocommerce-product-addon' ),
-			__(
-				'One option per line or CSV entry.',
-				'woocommerce-product-addon'
-			)
+			'select',
+			__( 'Select Superlist', 'woocommerce-product-addon' ),
+			__( 'Set superlist.', 'woocommerce-product-addon' ),
+			{ options: superlistOptions() }
 		),
 		option_exclude: setting(
 			'textarea',
