@@ -92,6 +92,10 @@ class PPOM_Form {
 		$fields          = array_filter(
 			self::$ppom->fields,
 			function ( $field ) use ( $meta_id ) {
+				if ( ! is_array( $field ) || ! isset( $field['ppom_id'] ) ) {
+					return false;
+				}
+
 				return (int) $meta_id === (int) $field['ppom_id'];
 			}
 		);

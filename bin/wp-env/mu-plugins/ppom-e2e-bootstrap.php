@@ -1189,6 +1189,84 @@ add_action( 'wp_ajax_ppom_e2e_create_ppom_group', 'ppom_e2e_create_ppom_group' )
 add_action( 'wp_ajax_nopriv_ppom_e2e_create_ppom_group', 'ppom_e2e_create_ppom_group' );
 
 /**
+ * Create a PPOM field group whose stored fields intentionally omit `ppom_id`.
+ *
+ * Reproduces legacy/imported data shape: the rendering layer must tolerate
+ * fields that never went through the WPML save filter, otherwise PHP 8 emits
+ * "Undefined array key 'ppom_id'" warnings on the storefront.
+ *
+ * @return void
+ */
+function ppom_e2e_create_legacy_ppom_group() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$fields = ppom_e2e_decode_json_request( 'fields', array() );
+
+	if ( is_wp_error( $fields ) ) {
+		ppom_e2e_send_wp_error( $fields );
+	}
+
+	if ( ! is_array( $fields ) || empty( $fields ) ) {
+		ppom_e2e_send_wp_error(
+			new WP_Error(
+				'no_fields',
+				__( 'Legacy PPOM group requires at least one field.', 'woocommerce-product-addon' )
+			)
+		);
+	}
+
+	$group_name = isset( $_POST['group_name'] ) ? sanitize_text_field( wp_unslash( $_POST['group_name'] ) ) : '';
+
+	$db_version = (float) get_option( 'personalizedproduct_db_version' );
+	if ( $db_version < 22.1 ) {
+		ppom_e2e_send_wp_error(
+			new WP_Error(
+				'db_version_outdated',
+				__( 'PPOM database is outdated.', 'woocommerce-product-addon' )
+			)
+		);
+	}
+
+	$row = array(
+		'productmeta_name'      => $group_name,
+		'dynamic_price_display' => 'no',
+		'send_file_attachment'  => '',
+		'show_cart_thumb'       => 'no',
+		'aviary_api_key'        => '',
+		'the_meta'              => wp_json_encode( array_values( $fields ) ),
+		'productmeta_created'   => current_time( 'mysql' ),
+	);
+
+	if ( ! ppom_is_legacy_user() ) {
+		$row['productmeta_style'] = '';
+		$row['productmeta_js']    = '';
+	}
+
+	$ppom_id = ppom_meta_repository()->insert_group( $row, array_fill( 0, count( $row ), '%s' ) );
+
+	if ( $ppom_id <= 0 ) {
+		ppom_e2e_send_wp_error(
+			new WP_Error(
+				'meta_insert_failed',
+				__( 'Legacy PPOM group could not be saved.', 'woocommerce-product-addon' )
+			)
+		);
+	}
+
+	ppom_e2e_track_meta_id( $ppom_id );
+
+	wp_send_json_success(
+		array(
+			'ppom_id'        => (int) $ppom_id,
+			'productmeta_id' => (int) $ppom_id,
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_create_legacy_ppom_group', 'ppom_e2e_create_legacy_ppom_group' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_create_legacy_ppom_group', 'ppom_e2e_create_legacy_ppom_group' );
+
+/**
  * Attach a PPOM field group to products or categories.
  *
  * @return void

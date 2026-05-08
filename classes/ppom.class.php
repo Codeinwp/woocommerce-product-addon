@@ -147,6 +147,7 @@ class PPOM_Meta {
 			'get_fields',
 			'has_unique_datanames',
 			'get_instance',
+			'stamp_ppom_id_on_fields',
 		);
 
 		foreach ( $methods as $method ) {
@@ -315,6 +316,8 @@ class PPOM_Meta {
 				$fields = json_decode( $row->the_meta, true );
 
 				if ( is_array( $fields ) ) {
+					$row_id      = isset( $row->productmeta_id ) ? (int) $row->productmeta_id : 0;
+					$fields      = self::stamp_ppom_id_on_fields( $fields, $row_id );
 					$meta_fields = array_merge( $meta_fields, $fields );
 				}
 			}
@@ -332,6 +335,9 @@ class PPOM_Meta {
 			}
 			$raw         = ( $row && isset( $row->the_meta ) && is_string( $row->the_meta ) ) ? $row->the_meta : '';
 			$meta_fields = json_decode( $raw, true );
+			if ( is_array( $meta_fields ) ) {
+				$meta_fields = self::stamp_ppom_id_on_fields( $meta_fields, $meta_id );
+			}
 		}
 
 		// Filter fields which are active only
@@ -345,6 +351,27 @@ class PPOM_Meta {
 		// ppom_pa($meta_fields);
 
 		return apply_filters( 'ppom_meta_fields', $meta_fields, $this );
+	}
+
+	/**
+	 * Stamps the owning group id onto each field row.
+	 *
+	 * Legacy/imported `the_meta` JSON predates the WPML save filter that injects
+	 * `ppom_id`, so the rendering filter in PPOM_Form would otherwise fail to
+	 * match fields back to their group and emit "Undefined array key 'ppom_id'".
+	 *
+	 * @param array<int, mixed> $fields  Decoded `the_meta` rows.
+	 * @param int               $ppom_id Owning productmeta_id.
+	 * @return array<int, mixed>
+	 */
+	private static function stamp_ppom_id_on_fields( array $fields, $ppom_id ) {
+		foreach ( $fields as $index => $field ) {
+			if ( is_array( $field ) ) {
+				$fields[ $index ]['ppom_id'] = $ppom_id;
+			}
+		}
+
+		return $fields;
 	}
 
 	// Getting fields by meta id
