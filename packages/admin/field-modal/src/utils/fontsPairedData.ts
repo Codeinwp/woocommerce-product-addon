@@ -42,11 +42,5 @@ export function normalizeFontRows( raw: unknown ): FontOptionRow[] {
 }
 
 export function serializeFontRows( rows: FontOptionRow[] ): FontOptionRow[] {
-	const filtered = rows.filter(
-		( row ) =>
-			row.fontfamily.trim() !== '' ||
-			row.fontdisplay.trim() !== '' ||
-			row.is_customfont === 'on'
-	);
-	return filtered.length > 0 ? filtered : [];
+	return rows.map( ( row ) => ( { ...row } ) );
 }
