@@ -219,6 +219,38 @@ button.ppom-react-field-modal-open {
     color: #787c82;
     line-height: 1;
     vertical-align: middle;
+    cursor: move;
+}
+
+.ppom_field_table tbody tr {
+    cursor: default;
+}
+
+.ppom_field_table.ppom-is-sorting,
+.ppom_field_table.ppom-is-sorting thead,
+.ppom_field_table.ppom-is-sorting tbody,
+.ppom_field_table.ppom-is-sorting tfoot {
+    display: revert;
+}
+
+.ppom_field_table.ppom-is-sorting tr {
+    display: table-row;
+}
+
+.ppom_field_table.ppom-is-sorting tr > th,
+.ppom_field_table.ppom-is-sorting tr > td {
+    display: table-cell;
+}
+
+tr.ui-sortable-helper {
+    display: table-row !important;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba( 0, 0, 0, 0.12 );
+}
+
+tr.ui-sortable-helper > th,
+tr.ui-sortable-helper > td {
+    display: table-cell !important;
 }
 
 .ppom_field_table .button .dashicons {

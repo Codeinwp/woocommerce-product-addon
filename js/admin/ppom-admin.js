@@ -1714,7 +1714,25 @@ jQuery( function ( $ ) {
 		element[ dir == 'top' ? 'insertBefore' : 'insertAfter' ]( el );
 	}
 	$( '.ppom_field_table tbody' ).sortable( {
+		handle: '.ppom-sortable-handle',
+		helper( evt, ui ) {
+			const totalWidth = ui.outerWidth();
+			ui.children().each( function () {
+				$( this ).width( $( this ).outerWidth() );
+			} );
+			ui.width( totalWidth );
+			return ui;
+		},
+		start( evt, ui ) {
+			ui.item.closest( '.ppom_field_table' ).addClass( 'ppom-is-sorting' );
+		},
 		stop( evt, ui ) {
+			ui.item
+				.closest( '.ppom_field_table' )
+				.removeClass( 'ppom-is-sorting' );
+			ui.item.children().css( 'width', '' );
+			ui.item.css( 'width', '' );
+
 			let parent = $( '.ppom_save_fields_model' ),
 				el = parent.find( '.' + ui.item.attr( 'id' ) ),
 				dir = 'top';
