@@ -68,6 +68,22 @@ async function fieldDataNames( page ) {
 		);
 }
 
+async function fieldTitles( page ) {
+	return page
+		.locator( '.ppom_field_table td.column-title' )
+		.evaluateAll( ( cells ) =>
+			cells.map( ( cell ) => cell.textContent.trim() )
+		);
+}
+
+async function saveFieldsAndRevisit( page, admin, ppomId ) {
+	page.once( 'dialog', ( browserDialog ) => browserDialog.accept() );
+	const reloaded = page.waitForEvent( 'load' );
+	await saveFields( page );
+	await reloaded;
+	await visitReactModalGroup( admin, ppomId );
+}
+
 test.describe( 'React field modal (opt-in)', () => {
 	test( 'picker entry opens FieldTypePicker (Add field)', async ( {
 		page,
@@ -429,6 +445,15 @@ test.describe( 'React field modal (opt-in)', () => {
 		expect(
 			dataNames.filter( ( dataName ) => /_copy/.test( dataName ) )
 		).toHaveLength( 2 );
+
+		await saveFieldsAndRevisit( page, admin, ppomId );
+		const persistedDataNames = await fieldDataNames( page );
+		expect(
+			persistedDataNames.filter( ( dataName ) =>
+				/_copy/.test( dataName )
+			)
+		).toHaveLength( 2 );
+		expect( persistedDataNames[ 1 ] ).toMatch( /_copy/ );
 	} );
 
 	test( 'debug logging is disabled unless explicitly enabled', async ( {
@@ -571,6 +596,71 @@ test.describe( 'React field modal (opt-in)', () => {
 		await expect(
 			page.locator( '#ppom_sort_id_1 .ppom_meta_field_title' )
 		).toHaveText( 'React persisted edit' );
+	} );
+
+	test( 'classic delete after a React edit does not resurrect the deleted row', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 2,
+			titlePrefix: 'Delete Drift',
+			dataNamePrefix: 'delete_drift',
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+		const beforeDelete = await fieldTitles( page );
+
+		const dialog = await openFirstFieldReactModal( page );
+		await dialog.getByLabel( 'Title' ).fill( 'React edit before delete' );
+		await dialog.getByRole( 'button', { name: 'Update Field' } ).click();
+		await expect( dialog ).toBeHidden();
+
+		await page.locator( '#ppom_sort_id_2 .ppom-delete-field' ).click();
+		await page.locator( '.ppom-popup-overlay .ppom-btn-confirm' ).click();
+		await expect( page.locator( '#ppom_sort_id_2' ) ).toHaveCount( 0 );
+
+		await saveFieldsAndRevisit( page, admin, ppomId );
+		const afterDelete = await fieldTitles( page );
+		expect( afterDelete ).toEqual( [ 'React edit before delete' ] );
+		expect( afterDelete ).not.toContain( beforeDelete[ 1 ] );
+	} );
+
+	test( 'classic reorder after a React edit persists in the reordered table order', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 2,
+			titlePrefix: 'Reorder Drift',
+			dataNamePrefix: 'reorder_drift',
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+		const originalTitles = await fieldTitles( page );
+
+		const dialog = await openFirstFieldReactModal( page );
+		await dialog.getByLabel( 'Title' ).fill( 'React edit before reorder' );
+		await dialog.getByRole( 'button', { name: 'Update Field' } ).click();
+		await expect( dialog ).toBeHidden();
+
+		await page.evaluate( () => {
+			const row1 = document.getElementById( 'ppom_sort_id_1' );
+			const row2 = document.getElementById( 'ppom_sort_id_2' );
+			row1?.parentElement?.insertBefore( row2, row1 );
+
+			const modal1 = document.getElementById( 'ppom_field_model_1' );
+			const modal2 = document.getElementById( 'ppom_field_model_2' );
+			modal1?.parentElement?.insertBefore( modal2, modal1 );
+		} );
+
+		await saveFieldsAndRevisit( page, admin, ppomId );
+		expect( await fieldTitles( page ) ).toEqual( [
+			originalTitles[ 1 ],
+			'React edit before reorder',
+		] );
 	} );
 
 	test( 'canceling dirty edits does not stage row changes', async ( {

@@ -154,6 +154,11 @@ export function cloneFieldForDuplicate(
 	allFields: FieldRow[]
 ): FieldRow {
 	const dup = JSON.parse( JSON.stringify( source ) ) as FieldRow;
+	Object.keys( dup ).forEach( ( key ) => {
+		if ( key.startsWith( '__' ) ) {
+			delete dup[ key ];
+		}
+	} );
 	dup.clientId = newClientId();
 	dup.data_name = makeUniqueCopyDataName(
 		String( source.data_name || '' ).trim(),

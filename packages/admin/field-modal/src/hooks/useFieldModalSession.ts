@@ -4,7 +4,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useMemo, useReducer } from '@wordpress/element';
 import { getFieldUiDefinition } from '../definitions/registry';
-import { stripClientIds } from '../utils/clientIds';
 import { createInitialModalState, modalReducer } from '../state/modalReducer';
 import { errorMessage } from '../utils/errorMessage';
 import { fieldModalI18n } from '../i18n';
@@ -113,7 +112,57 @@ function fieldAtOneBasedIndex(
 	) {
 		return null;
 	}
-	return rows[ selectFieldIndex - 1 ] ?? null;
+	return (
+		rows.find( ( row ) => fieldClassicIndex( row ) === selectFieldIndex ) ??
+		rows[ selectFieldIndex - 1 ] ??
+		null
+	);
+}
+
+function fieldClassicIndex(
+	field: FieldRow | null | undefined
+): number | undefined {
+	const raw = field?.__classicFieldIndex;
+	let parsed = NaN;
+	if ( typeof raw === 'number' ) {
+		parsed = raw;
+	} else if ( raw ) {
+		parsed = parseInt( String( raw ), 10 );
+	}
+	return Number.isFinite( parsed ) && parsed > 0 ? parsed : undefined;
+}
+
+function stripClientKey( field: FieldRow ): Omit< FieldRow, 'clientId' > {
+	const { clientId, ...rest } = field;
+	return rest;
+}
+
+function mergeClassicRowsWithBootstrapFallback(
+	classicFields: Array< Omit< FieldRow, 'clientId' > >,
+	bootstrapFields: FieldRow[] = []
+): Array< Omit< FieldRow, 'clientId' > > {
+	return classicFields.map( ( field, position ) => {
+		const classicIndex = fieldClassicIndex( field as FieldRow );
+		const fallback = bootstrapFields[
+			classicIndex ? classicIndex - 1 : position
+		] as Record< string, unknown > | undefined;
+		if ( ! fallback ) {
+			return field;
+		}
+		const merged: Record< string, unknown > = { ...fallback, ...field };
+		Object.entries( fallback ).forEach( ( [ key, value ] ) => {
+			const current = merged[ key ];
+			if (
+				Array.isArray( current ) &&
+				current.length === 0 &&
+				Array.isArray( value ) &&
+				value.length > 0
+			) {
+				merged[ key ] = value;
+			}
+		} );
+		return merged as Omit< FieldRow, 'clientId' >;
+	} );
 }
 
 export interface FieldModalSessionState {
@@ -244,8 +293,12 @@ export function useFieldModalSession(
 			try {
 				const res =
 					await adapters.transport.fetchContext( productmetaId );
+				const classicFields = mergeClassicRowsWithBootstrapFallback(
+					adapters.admin.getClassicBuilderFields(),
+					res.fields || []
+				);
 				const normalized = normalizeFieldRowsForSession(
-					res.fields || [],
+					classicFields || [],
 					res.catalog || []
 				);
 				const { rows } = normalized;
@@ -274,7 +327,12 @@ export function useFieldModalSession(
 				} );
 			}
 		},
-		[ adapters.transport, ensureSchemaForType, productmetaId ]
+		[
+			adapters.admin,
+			adapters.transport,
+			ensureSchemaForType,
+			productmetaId,
+		]
 	);
 
 	const openPicker = useCallback( () => {
@@ -310,8 +368,12 @@ export function useFieldModalSession(
 			try {
 				const res =
 					await adapters.transport.fetchContext( productmetaId );
+				const classicFields = mergeClassicRowsWithBootstrapFallback(
+					adapters.admin.getClassicBuilderFields(),
+					res.fields || []
+				);
 				const normalized = normalizeFieldRowsForSession(
-					res.fields || [],
+					classicFields || [],
 					res.catalog || []
 				);
 				const { rows } = normalized;
@@ -327,7 +389,7 @@ export function useFieldModalSession(
 					dirtyClientIds: normalized.dirtyClientIds,
 					selectedId: null,
 				} );
-				const source = rows[ sourceFieldIndex - 1 ];
+				const source = fieldAtOneBasedIndex( rows, sourceFieldIndex );
 				if ( ! source ) {
 					return;
 				}
@@ -346,7 +408,13 @@ export function useFieldModalSession(
 				} );
 			}
 		},
-		[ adapters.transport, ensureSchemaForType, openEditor, productmetaId ]
+		[
+			adapters.admin,
+			adapters.transport,
+			ensureSchemaForType,
+			openEditor,
+			productmetaId,
+		]
 	);
 
 	useMountEffect( () =>
@@ -547,7 +615,10 @@ export function useFieldModalSession(
 			const row = createNewFieldRow( {
 				slug,
 				title,
-				existingRows: committedFields,
+				existingRows: normalizeFieldRowsForSession(
+					adapters.admin.getClassicBuilderFields() as FieldRow[],
+					ctx?.catalog || []
+				).rows,
 			} );
 			logFieldModalDebug(
 				'field row added to session',
@@ -560,7 +631,12 @@ export function useFieldModalSession(
 			} );
 			void ensureSchemaForType( row.type );
 		},
-		[ committedFields, ctx?.catalog, ensureSchemaForType ]
+		[
+			adapters.admin,
+			committedFields.length,
+			ctx?.catalog,
+			ensureSchemaForType,
+		]
 	);
 
 	const removeField = useCallback(
@@ -611,9 +687,39 @@ export function useFieldModalSession(
 		dispatch( { type: 'SET_SAVING', saving: true } );
 		try {
 			dispatch( { type: 'COMMIT_ACTIVE_DRAFT' } );
-			adapters.admin.commitFieldsToClassicForm(
-				stripClientIds( committedFields )
+			const active = state.activeDraft;
+			if ( ! active ) {
+				return;
+			}
+			const activeIndex = fieldClassicIndex( active );
+			const activeDataName = String( active.data_name || '' ).trim();
+			const duplicate = adapters.admin
+				.getClassicBuilderFields()
+				.find(
+					( field ) =>
+						String( field.data_name || '' ).trim() ===
+							activeDataName &&
+						fieldClassicIndex( field as FieldRow ) !== activeIndex
+				);
+			if ( activeDataName && duplicate ) {
+				dispatch( {
+					type: 'LOAD_CONTEXT_ERROR',
+					message: `Data name already exists: ${ activeDataName }`,
+				} );
+				return;
+			}
+			const activePosition = fields.findIndex(
+				( field ) => field.clientId === active.clientId
 			);
+			const previousField =
+				activePosition > 0 ? fields[ activePosition - 1 ] : null;
+			const insertAfterFieldIndex =
+				state.modalEntry === 'manage' && ! activeIndex
+					? fieldClassicIndex( previousField )
+					: undefined;
+			adapters.admin.commitFieldToClassicForm( stripClientKey( active ), {
+				insertAfterFieldIndex,
+			} );
 			dispatch( { type: 'CLOSE' } );
 		} catch ( e ) {
 			dispatch( {
@@ -623,7 +729,15 @@ export function useFieldModalSession(
 		} finally {
 			dispatch( { type: 'SET_SAVING', saving: false } );
 		}
-	}, [ adapters.admin, committedFields, ctx, i18n ] );
+	}, [
+		adapters.admin,
+		committedFields,
+		ctx,
+		fields,
+		i18n,
+		state.activeDraft,
+		state.modalEntry,
+	] );
 
 	const close = useCallback( () => {
 		dispatch( { type: 'CLOSE' } );

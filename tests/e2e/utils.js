@@ -86,14 +86,10 @@ export async function createSimpleGroupField(admin, page, fieldsNumber = 2) {
 		await saveFieldInModal(page, i);
 	}
 
-	const usingReactFieldModal =
-		(await page.locator(".ppom-react-field-modal-open").count()) > 0;
-	if (!usingReactFieldModal) {
-		await Promise.all([
-			page.waitForURL(/wp-admin\/admin\.php\?page=ppom&productmeta_id=\d+&do_meta=edit/),
-			saveFields(page),
-		]);
-	}
+	await Promise.all([
+		page.waitForURL(/wp-admin\/admin\.php\?page=ppom&productmeta_id=\d+&do_meta=edit/),
+		saveFields(page),
+	]);
 	await expect(
 		page.getByRole("button", { name: "Save Fields" }),
 	).toBeVisible();
@@ -270,13 +266,10 @@ export async function addNewField(page) {
 export async function saveFieldInModal(page, modelId) {
 	const dialog = page.getByRole("dialog").first();
 	if (await dialog.isVisible().catch(() => false)) {
-		await Promise.all([
-			page.waitForEvent("framenavigated", { timeout: 15000 }).catch(() => {}),
-			dialog
-				.getByRole("button", { name: /^(Save|Add Field)$/ })
-				.click(),
-		]);
-		await page.waitForLoadState("networkidle").catch(() => {});
+		await dialog
+			.getByRole("button", { name: /^(Save|Add Field)$/ })
+			.click();
+		await expect(dialog).toBeHidden();
 		return;
 	}
 
@@ -408,6 +401,32 @@ export async function searchAndSelectInlineProduct(page, productName) {
 	const resultOption = page
 		.locator(".select2-results__option[aria-selected]")
 		.filter({ hasText: productName });
+
+	for (let pageNumber = 2; (await resultOption.count()) === 0 && pageNumber <= 5; pageNumber++) {
+		const nextSearchResponse = page
+			.waitForResponse((response) => {
+				const url = new URL(response.url());
+
+				return (
+					url.pathname.endsWith("/wp-admin/admin-ajax.php") &&
+					url.searchParams.get("action") === "ppom_search_products" &&
+					url.searchParams.get("q") === productName &&
+					url.searchParams.get("page") === String(pageNumber)
+				);
+			}, { timeout: 5000 })
+			.catch(() => null);
+
+		await page.locator(".select2-results__options").last().evaluate((el) => {
+			el.scrollTop = el.scrollHeight;
+			el.dispatchEvent(new Event("scroll", { bubbles: true }));
+		});
+
+		const pagedResponse = await nextSearchResponse;
+		if (pagedResponse) {
+			expect(pagedResponse.ok()).toBeTruthy();
+			expect(pagedResponse.status()).toBe(200);
+		}
+	}
 
 	await expect(resultOption).toHaveCount(1);
 	await resultOption.click();

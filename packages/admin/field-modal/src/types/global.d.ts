@@ -1,11 +1,9 @@
-import type { PpomFieldModalBoot } from "./fieldModal";
-import type { ClassicFieldRow } from "../adapters/wpAdminFieldModalAdapter";
+import type { PpomFieldModalBoot } from './fieldModal';
 
 declare global {
-  interface Window {
-    ppomFieldModalBoot?: PpomFieldModalBoot;
-    ppomFieldModalClassicDraftFields?: ClassicFieldRow[];
-  }
+	interface Window {
+		ppomFieldModalBoot?: PpomFieldModalBoot;
+	}
 }
 
 export {};

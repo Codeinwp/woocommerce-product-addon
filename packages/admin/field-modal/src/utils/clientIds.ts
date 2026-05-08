@@ -24,5 +24,11 @@ export function withClientIds( rows: FieldRow[] | undefined ): FieldRow[] {
 export function stripClientIds(
 	rows: FieldRow[]
 ): Omit< FieldRow, 'clientId' >[] {
-	return rows.map( ( { clientId, ...rest } ) => rest );
+	return rows.map( ( { clientId, ...rest } ) =>
+		Object.fromEntries(
+			Object.entries( rest ).filter(
+				( [ key ] ) => ! key.startsWith( '__' )
+			)
+		)
+	);
 }

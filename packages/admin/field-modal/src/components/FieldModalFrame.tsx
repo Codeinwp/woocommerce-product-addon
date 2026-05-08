@@ -72,7 +72,9 @@ export function FieldModalFrame( {
 			modal={ modal }
 			trapFocus={ modal }
 			preventScroll={ modal }
-			persistentElements={ mediaPersistentElements }
+			persistentElements={
+				mediaLocked ? mediaPersistentElements : undefined
+			}
 			closeOnInteractOutside={ dismissible }
 			closeOnEscape={ dismissible }
 			motionPreset="slideInBottom"
