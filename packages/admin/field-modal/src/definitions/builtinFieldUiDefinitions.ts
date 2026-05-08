@@ -1021,14 +1021,9 @@ const COLLAPSE_BLOCKS = withConditions(
 	sectionBlock( 'basic', FieldTab.Settings, SectionLabelKey.Basic, [
 		'title',
 		'data_name',
-	] ),
-	sectionBlock(
-		'behavior',
-		FieldTab.Settings,
-		SectionLabelKey.Behavior,
-		[ 'collapse_type', 'default_open' ],
-		true
-	)
+		'collapse_type',
+		'default_open',
+	] )
 );
 
 const QUANTITYOPTION_BLOCKS = withConditions(

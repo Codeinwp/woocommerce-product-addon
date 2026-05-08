@@ -1634,13 +1634,20 @@ function collapseSettings(): SettingSchema {
 		title: titleSetting(),
 		data_name: dataNameSetting(),
 		collapse_type: setting(
-			'text',
-			__( 'Collapse type', 'woocommerce-product-addon' ),
+			'select',
+			__( 'Collapse Type', 'woocommerce-product-addon' ),
 			__(
-				'Style or type identifier for the collapsible section.',
+				'Select collapse type for start or end.',
 				'woocommerce-product-addon'
 			),
-			{ col_classes: HALF_WIDTH }
+			{
+				options: {
+					start: __( 'Start', 'woocommerce-product-addon' ),
+					end: __( 'End', 'woocommerce-product-addon' ),
+				},
+				default: 'start',
+				col_classes: HALF_WIDTH,
+			}
 		),
 		default_open: setting(
 			'checkbox',
