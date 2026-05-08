@@ -8,6 +8,7 @@ import {
 	readControlTitle,
 	readControlValue,
 	renderHelperText,
+	renderMetaLink,
 	updateFallbackSettingValue,
 } from './shared';
 
@@ -55,6 +56,7 @@ export function TextareaControl( {
 							{ renderHelperText( description, {
 								allowHtml: true,
 							} ) }
+							{ renderMetaLink( meta.link ) }
 							{ error ? (
 								<Field.ErrorText>
 									{ String( error ) }
@@ -89,6 +91,7 @@ export function TextareaControl( {
 				{ ...controlSurface }
 			/>
 			{ renderHelperText( description, { allowHtml: true } ) }
+			{ renderMetaLink( meta.link ) }
 		</Field.Root>
 	);
 }

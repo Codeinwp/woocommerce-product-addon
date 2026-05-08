@@ -2827,9 +2827,15 @@ function fontsSettings(): SettingSchema {
 			'textarea',
 			__( 'Custom fonts', 'woocommerce-product-addon' ),
 			__(
-				'Additional custom fonts available in the picker.',
+				'Add your custom font CSS here. After adding it, register the font-family name in the Font Families tab so it appears in the picker.',
 				'woocommerce-product-addon'
-			)
+			),
+			{
+				link:
+					'<a href="https://docs.themeisle.com/product-option-manager/ppom-pro-input-types#fonts-picker-input" target="_blank" rel="noreferrer noopener">' +
+					__( 'Learn more', 'woocommerce-product-addon' ) +
+					'</a>',
+			}
 		),
 		label_placeholder: setting(
 			'text',

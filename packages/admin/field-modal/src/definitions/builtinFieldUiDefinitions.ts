@@ -1276,14 +1276,7 @@ const FONTS_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		'layout',
 		FieldTab.Settings,
 		SectionLabelKey.Display,
-		[ 'width', 'desc_tooltip' ],
-		true
-	),
-	sectionBlock(
-		'custom-fonts',
-		FieldTab.Settings,
-		SectionLabelKey.Display,
-		[ 'custom_fonts' ],
+		[ 'custom_fonts', 'width', 'desc_tooltip' ],
 		true
 	),
 	sectionBlock( 'preview-basic', FieldTab.Preview, 'Preview', [
