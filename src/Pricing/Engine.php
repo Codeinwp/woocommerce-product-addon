@@ -888,9 +888,10 @@ final class Engine {
 					continue;
 				}
 
-				$the_price = floatval( $price['price'] );
+				$the_price = self::normalize_price_value( $price['price'] );
+				$qty       = isset( $price['quantity'] ) ? self::normalize_price_value( $price['quantity'] ) : 0;
 
-				$total_addon += ( $the_price * $price['quantity'] );
+				$total_addon += ( $the_price * $qty );
 
 				/*
 				if( $price['type'] == 'quantities' || $price['type'] == 'bulkquantity' ) {
@@ -913,12 +914,40 @@ final class Engine {
 			foreach ( $price_array as $price ) {
 
 				if ( $price['apply'] == 'cart_fee' ) {
-					$total_cart_fee += $price['price'];
+					$total_cart_fee += self::normalize_price_value( $price['price'] );
 				}
 			}
 		}
 
 		return $total_cart_fee;
+	}
+
+	/**
+	 * Coerce a raw addon price value to a float.
+	 *
+	 * Admins occasionally type currency symbols, spaces, or trailing labels
+	 * into the price field (e.g. "$10", "10 USD"). PHP 8+ raises a fatal
+	 * TypeError if such a value is added to an int, so any value that flows
+	 * into pricing arithmetic must be normalized first.
+	 *
+	 * Delegates to wc_format_decimal() so locale separators (e.g. "1.000,50"
+	 * on European stores) and currency symbols are stripped consistently with
+	 * the rest of WooCommerce's price handling.
+	 *
+	 * @param mixed $value Raw price value as stored in field meta.
+	 * @return float
+	 */
+	private static function normalize_price_value( $value ) {
+
+		if ( is_int( $value ) || is_float( $value ) ) {
+			return (float) $value;
+		}
+
+		if ( ! is_scalar( $value ) ) {
+			return 0.0;
+		}
+
+		return (float) wc_format_decimal( (string) $value );
 	}
 
 	// Get total quantities
