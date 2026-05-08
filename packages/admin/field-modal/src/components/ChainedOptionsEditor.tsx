@@ -1,9 +1,9 @@
 /**
  * Inline editor for chained option rows.
  */
-import { Box, Button, Icon, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, HStack, Icon, Text, VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
-import { LuPlus } from 'react-icons/lu';
+import { LuBookOpen, LuPlus } from 'react-icons/lu';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
 import {
 	type ChainedOptionRow,
@@ -19,6 +19,7 @@ export interface ChainedOptionsEditorProps {
 	onChange: Dispatch< SetStateAction< FieldRow | null > >;
 	i18n: I18nDict;
 	title: string;
+	link?: string;
 }
 
 export function ChainedOptionsEditor( {
@@ -26,6 +27,7 @@ export function ChainedOptionsEditor( {
 	onChange,
 	i18n,
 	title,
+	link,
 }: ChainedOptionsEditorProps ) {
 	const rows = normalizeChainedRows( values.options );
 
@@ -68,9 +70,39 @@ export function ChainedOptionsEditor( {
 			p={ 3 }
 			bg="white"
 		>
-			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
-				{ title }
-			</Text>
+			<HStack
+				justify="space-between"
+				align="center"
+				gap={ 2 }
+				mb={ 3 }
+			>
+				<Text fontWeight="semibold" fontSize="sm">
+					{ title }
+				</Text>
+				{ link ? (
+					<HStack gap={ 1 } align="center" fontSize="xs">
+						<Icon
+							as={ LuBookOpen }
+							boxSize={ 3.5 }
+							color="blue.600"
+							aria-hidden
+						/>
+						<Box
+							color="gray.600"
+							css={ {
+								'& a': {
+									color: 'var(--chakra-colors-blue-600)',
+									textDecoration: 'underline',
+								},
+								'& a:hover': {
+									color: 'var(--chakra-colors-blue-700)',
+								},
+							} }
+							dangerouslySetInnerHTML={ { __html: link } }
+						/>
+					</HStack>
+				) : null }
+			</HStack>
 			<VStack align="stretch" gap={ 2 }>
 				{ rows.map( ( row, index ) => (
 					<ChainedOptionRowItem

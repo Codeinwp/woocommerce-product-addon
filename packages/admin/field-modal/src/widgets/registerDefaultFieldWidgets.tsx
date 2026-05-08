@@ -260,12 +260,13 @@ registerMetaTypeWidget( {
 	metaKey: 'options',
 	metaType: 'chained_options',
 	titleFallback: ( i18n ) => i18n.selectOptionsTitle,
-	render: ( { ctx, title } ) => (
+	render: ( { ctx, title, meta } ) => (
 		<ChainedOptionsEditor
 			values={ ctx.field }
 			onChange={ ctx.updateField }
 			i18n={ ctx.i18n }
 			title={ title }
+			link={ typeof meta.link === 'string' ? meta.link : undefined }
 		/>
 	),
 } );

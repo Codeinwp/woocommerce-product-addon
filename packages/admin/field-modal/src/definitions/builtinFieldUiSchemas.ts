@@ -1774,7 +1774,13 @@ function chainedSettings(): SettingSchema {
 			__(
 				'Add parent and child options for the chained select.',
 				'woocommerce-product-addon'
-			)
+			),
+			{
+				link:
+					'<a href="https://docs.themeisle.com/article/1799-how-to-configure-the-chained-input" target="_blank" rel="noreferrer noopener">' +
+					__( 'Documentation', 'woocommerce-product-addon' ) +
+					'</a>',
+			}
 		),
 		selected: setting(
 			'text',
