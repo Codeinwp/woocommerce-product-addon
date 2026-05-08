@@ -89,6 +89,13 @@ function buildFileField( args ) {
 	} );
 }
 
+function buildHtmlField( { html = '', ...args } ) {
+	return buildField( 'section', {
+		html,
+		...args,
+	} );
+}
+
 export {
 	buildCheckboxField,
 	buildImageField,
@@ -97,4 +104,5 @@ export {
 	buildSelectField,
 	buildTextField,
 	buildFileField,
+	buildHtmlField,
 };
