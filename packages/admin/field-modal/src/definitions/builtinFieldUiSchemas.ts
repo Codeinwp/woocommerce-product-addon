@@ -2869,13 +2869,31 @@ function fontsSettings(): SettingSchema {
 			{ col_classes: HALF_WIDTH }
 		),
 		preview_hide: setting(
-			'checkbox',
-			__( 'Hide preview', 'woocommerce-product-addon' ),
+			'select',
+			__( 'Preview visibility', 'woocommerce-product-addon' ),
 			__(
-				'Hide the preview area by default.',
+				'Change the layout of the textbox with preview.',
 				'woocommerce-product-addon'
 			),
-			{ col_classes: HALF_WIDTH }
+			{
+				options: {
+					none: __( 'None', 'woocommerce-product-addon' ),
+					above_font: __(
+						'Above font',
+						'woocommerce-product-addon'
+					),
+					below_font: __(
+						'Below font',
+						'woocommerce-product-addon'
+					),
+					by_data_name: __(
+						'Specify field data name',
+						'woocommerce-product-addon'
+					),
+				},
+				default: 'below_font',
+				col_classes: HALF_WIDTH,
+			}
 		),
 		preview_data_id: setting(
 			'text',
@@ -2897,9 +2915,9 @@ function fontsSettings(): SettingSchema {
 		),
 		preview_addtocart: setting(
 			'checkbox',
-			__( 'Preview on add to cart', 'woocommerce-product-addon' ),
+			__( 'Disable preview on add to cart', 'woocommerce-product-addon' ),
 			__(
-				'Include the preview text in add to cart actions.',
+				'When enabled, the preview text is not added to the cart line item.',
 				'woocommerce-product-addon'
 			),
 			{ col_classes: HALF_WIDTH }

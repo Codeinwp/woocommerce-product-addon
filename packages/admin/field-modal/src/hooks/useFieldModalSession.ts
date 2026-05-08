@@ -10,6 +10,7 @@ import { fieldModalI18n } from '../i18n';
 import { useMountEffect } from './useMountEffect';
 import {
 	applyDraftDataNamePolicy,
+	applySchemaDefaultsToRow,
 	cloneFieldForDuplicate,
 	createNewFieldRow,
 	normalizeFieldRowsForSession,
@@ -612,7 +613,7 @@ export function useFieldModalSession(
 			}
 			const title = ( entry?.title as string | undefined ) || slug;
 			dispatch( { type: 'COMMIT_ACTIVE_DRAFT' } );
-			const row = createNewFieldRow( {
+			const baseRow = createNewFieldRow( {
 				slug,
 				title,
 				existingRows: normalizeFieldRowsForSession(
@@ -620,6 +621,10 @@ export function useFieldModalSession(
 					ctx?.catalog || []
 				).rows,
 			} );
+			const row = applySchemaDefaultsToRow(
+				baseRow,
+				getLocalDefinitionSchema( baseRow.type )
+			);
 			logFieldModalDebug(
 				'field row added to session',
 				fieldDebugRow( row, committedFields.length )
@@ -717,9 +722,21 @@ export function useFieldModalSession(
 				state.modalEntry === 'manage' && ! activeIndex
 					? fieldClassicIndex( previousField )
 					: undefined;
-			adapters.admin.commitFieldToClassicForm( stripClientKey( active ), {
-				insertAfterFieldIndex,
-			} );
+			const activeWithDefaults = applySchemaDefaultsToRow(
+				active,
+				getLocalDefinitionSchema( active.type ) ??
+					( active.type
+						? state.schemasCache[
+								String( active.type ).toLowerCase()
+						  ] ?? null
+						: null )
+			);
+			adapters.admin.commitFieldToClassicForm(
+				stripClientKey( activeWithDefaults ),
+				{
+					insertAfterFieldIndex,
+				}
+			);
 			dispatch( { type: 'CLOSE' } );
 		} catch ( e ) {
 			dispatch( {
@@ -737,6 +754,7 @@ export function useFieldModalSession(
 		i18n,
 		state.activeDraft,
 		state.modalEntry,
+		state.schemasCache,
 	] );
 
 	const close = useCallback( () => {

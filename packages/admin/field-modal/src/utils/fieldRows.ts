@@ -1,10 +1,33 @@
 /**
  * Canonical field-row helpers for the React field modal.
  */
-import type { CatalogItem, FieldRow } from '../types/fieldModal';
+import { readSettingSchema } from '../definitions/settingMeta';
+import type {
+	CatalogItem,
+	FieldRow,
+	SchemaObject,
+} from '../types/fieldModal';
 import { newClientId, stripClientIds, withClientIds } from './clientIds';
 import { stableStringifyFieldRow } from './fieldFormSync';
 import { slugifyDataName } from './slugifyDataName';
+
+export function applySchemaDefaultsToRow(
+	row: FieldRow,
+	schema: SchemaObject | null | undefined
+): FieldRow {
+	const settings = readSettingSchema( schema );
+	const next: FieldRow = { ...row };
+	for ( const [ key, meta ] of Object.entries( settings ) ) {
+		if ( ! meta || meta.default === undefined ) {
+			continue;
+		}
+		const current = next[ key ];
+		if ( current === undefined || current === null || current === '' ) {
+			next[ key ] = meta.default;
+		}
+	}
+	return next;
+}
 
 export interface NormalizedFieldRows {
 	rows: FieldRow[];
