@@ -611,7 +611,22 @@ export function useFieldModalSession(
 			if ( entry && entry.locked ) {
 				return;
 			}
-			const title = ( entry?.title as string | undefined ) || slug;
+			// Only seed `title` for field types whose schema actually exposes
+			// a `title` setting. Otherwise the picker tile name (e.g. "HTML"
+			// for the section field) gets persisted as the row's title with
+			// no UI to clear it — and the legacy section template appends
+			// that string after the rendered HTML content.
+			const localSchema = getLocalDefinitionSchema( slug );
+			const schemaExposesTitle = Boolean(
+				localSchema?.settings &&
+					Object.prototype.hasOwnProperty.call(
+						localSchema.settings,
+						'title'
+					)
+			);
+			const title = schemaExposesTitle
+				? ( entry?.title as string | undefined ) || slug
+				: '';
 			dispatch( { type: 'COMMIT_ACTIVE_DRAFT' } );
 			const baseRow = createNewFieldRow( {
 				slug,
