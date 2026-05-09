@@ -26,7 +26,7 @@ export function PpomTextInput( { label }: PpomTextInputProps ) {
 				id={ inputId }
 				size="sm"
 				value={ v ?? '' }
-				onValueChange={ ( e ) => field.handleChange( e.target.value ) }
+				onChange={ ( e ) => field.handleChange( e.target.value ) }
 				onBlur={ field.handleBlur }
 				{ ...ppomControlSurface }
 			/>

@@ -76,8 +76,15 @@ export function FieldTypePicker( {
 			flexWrap={ { base: 'wrap', lg: 'nowrap' } }
 			h="full"
 			minH={ 0 }
+			overflow={ { lg: 'hidden' } }
 		>
-			<Box flex="1" minW={ 0 } minH={ 0 } pr={ { lg: 4 } }>
+			<Box
+				flex={ { base: '1 1 100%', lg: '1 1 0' } }
+				minW={ 0 }
+				minH={ 0 }
+				pr={ { lg: 4 } }
+				overflowY={ { lg: 'auto' } }
+			>
 				<VStack align="stretch" gap={ 3 }>
 					<Tabs.Root
 						variant="subtle"
@@ -204,17 +211,15 @@ export function FieldTypePicker( {
 				borderColor="gray.200"
 				pl={ { base: 0, lg: 3 } }
 				pt={ { base: 2, lg: 0 } }
-				mt={ { base: 0, lg: 0 } }
-				position={ { base: 'static', lg: 'sticky' } }
-				top={ { lg: 2 } }
-				alignSelf={ { lg: 'stretch' } }
-				overflow="hidden"
+				h={ { lg: 'full' } }
+				minH={ 0 }
+				overflow={ { lg: 'hidden' } }
 				css={ {
 					overflowWrap: 'anywhere',
 					wordBreak: 'break-word',
 				} }
 			>
-				<Box flex={ { lg: '1 1 auto' } } minH={ 0 } overflowY="auto">
+				<Box flexShrink={ 0 }>
 					<FieldPreviewPanel field={ hoveredField } i18n={ i18n } />
 				</Box>
 				{ showUpsell && upsell ? (

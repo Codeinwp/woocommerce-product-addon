@@ -56,7 +56,7 @@ export function PpomNumberInput( {
 				min={ min }
 				max={ max }
 				step={ step }
-				onValueChange={ ( e ) => {
+				onChange={ ( e ) => {
 					const next = e.target.value;
 					setDraft( next );
 					if ( next === '' ) {

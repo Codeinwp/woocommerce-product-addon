@@ -690,4 +690,49 @@ test.describe( 'React field modal (opt-in)', () => {
 			page.locator( '#ppom_sort_id_1 .ppom_meta_field_title' )
 		).toHaveText( originalTitle?.trim() || '' );
 	} );
+
+	/**
+	 * Regression: Chakra v3 `<Input>`, `<Textarea>` and `<NativeSelect.Field>`
+	 * do not accept `onValueChange`. Passing it makes React drop the handler
+	 * and warn that the field is read-only — which silently broke fields like
+	 * the Bulk Quantity range cell. Fail fast if either warning resurfaces.
+	 */
+	test( 'react modal interactions emit no onValueChange / value-without-onChange warnings', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const warnings = [];
+		page.on( 'console', ( msg ) => {
+			if ( msg.type() !== 'warning' && msg.type() !== 'error' ) {
+				return;
+			}
+			const text = msg.text();
+			if (
+				text.includes(
+					'Unknown event handler property `onValueChange`'
+				) ||
+				text.includes(
+					'You provided a `value` prop to a form field without an `onChange` handler'
+				)
+			) {
+				warnings.push( text );
+			}
+		} );
+
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		const dialog = await openFirstFieldReactModal( page );
+
+		await dialog.getByLabel( 'Title' ).fill( 'Console gate title' );
+		await dialog.getByLabel( 'Data name' ).fill( 'console_gate_field' );
+
+		await openAdvancedSettings( dialog );
+
+		expect( warnings, warnings.join( '\n' ) ).toEqual( [] );
+	} );
 } );

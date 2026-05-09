@@ -60,8 +60,9 @@ export function CheckboxControl( {
 									</Checkbox.Label>
 									{ description ? (
 										<Box
-											textStyle="sm"
-											color="fg.muted"
+											fontSize="xs"
+											color="gray.600"
+											lineHeight="1.45"
 										>
 											{ description }
 										</Box>
@@ -102,7 +103,11 @@ export function CheckboxControl( {
 						{ title }
 					</Checkbox.Label>
 					{ description ? (
-						<Box textStyle="sm" color="fg.muted">
+						<Box
+							fontSize="xs"
+							color="gray.600"
+							lineHeight="1.45"
+						>
 							{ description }
 						</Box>
 					) : null }

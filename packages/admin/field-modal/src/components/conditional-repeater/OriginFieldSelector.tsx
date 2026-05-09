@@ -28,7 +28,7 @@ export function OriginFieldSelector( {
 					placeholder={
 						i18n.cfrOriginPlaceholder || 'Select origin field…'
 					}
-					onValueChange={ ( e ) => onChange( e.target.value ) }
+					onChange={ ( e ) => onChange( e.target.value ) }
 				>
 					<option value="">{ i18n.cfrOriginNone || 'None' }</option>
 					{ candidates.map( ( c ) => (

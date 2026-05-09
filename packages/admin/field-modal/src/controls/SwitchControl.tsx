@@ -71,7 +71,7 @@ export function SwitchControl( {
 									gridColumn={ 2 }
 									fontSize="xs"
 									color="gray.600"
-									lineHeight="1.5"
+									lineHeight="1.45"
 								>
 									{ description }
 								</Text>
@@ -136,7 +136,7 @@ export function SwitchControl( {
 					gridColumn={ 2 }
 					fontSize="xs"
 					color="gray.600"
-					lineHeight="1.5"
+					lineHeight="1.45"
 				>
 					{ description }
 				</Text>

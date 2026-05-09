@@ -32,7 +32,7 @@ export function PpomTextareaInput( {
 				rows={ rows }
 				resize="vertical"
 				value={ v ?? '' }
-				onValueChange={ ( e ) => field.handleChange( e.target.value ) }
+				onChange={ ( e ) => field.handleChange( e.target.value ) }
 				onBlur={ field.handleBlur }
 				{ ...ppomControlSurface }
 			/>

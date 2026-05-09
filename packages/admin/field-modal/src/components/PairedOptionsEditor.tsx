@@ -116,7 +116,7 @@ export function PairedOptionsEditor( {
 				>
 					{ title }
 				</Text>
-				<Text fontSize="xs" color="gray.500" lineHeight="1.3" m={ 0 }>
+				<Text fontSize="xs" color="gray.600" lineHeight="1.45" m={ 0 }>
 					{ helperText }
 				</Text>
 			</VStack>

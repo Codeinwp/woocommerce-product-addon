@@ -99,7 +99,7 @@ export function BulkQuantityTable( {
 									<Input
 										size="sm"
 										value={ row[ col ] ?? '' }
-										onValueChange={ ( e ) =>
+										onChange={ ( e ) =>
 											onUpdateCell(
 												ri,
 												col,

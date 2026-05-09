@@ -1518,24 +1518,6 @@ function texterSettings(): SettingSchema {
 			),
 			{ col_classes: HALF_WIDTH }
 		),
-		btn_color: setting(
-			'color',
-			__( 'Button text color', 'woocommerce-product-addon' ),
-			__( 'Choose the button text color.', 'woocommerce-product-addon' ),
-			{ col_classes: HALF_WIDTH }
-		),
-		btn_bg_color: setting(
-			'color',
-			__( 'Button background color', 'woocommerce-product-addon' ),
-			__(
-				'Choose the button background color.',
-				'woocommerce-product-addon'
-			),
-			{ col_classes: HALF_WIDTH }
-		),
-		width: widthSetting(),
-		visibility: visibilitySetting(),
-		visibility_role: visibilityRoleSetting(),
 		alignment: setting(
 			'select',
 			__( 'Alignment', 'woocommerce-product-addon' ),
@@ -1551,6 +1533,21 @@ function texterSettings(): SettingSchema {
 				},
 				col_classes: HALF_WIDTH,
 			}
+		),
+		btn_color: setting(
+			'color',
+			__( 'Button text color', 'woocommerce-product-addon' ),
+			__( 'Choose the button text color.', 'woocommerce-product-addon' ),
+			{ col_classes: HALF_WIDTH }
+		),
+		btn_bg_color: setting(
+			'color',
+			__( 'Button background color', 'woocommerce-product-addon' ),
+			__(
+				'Choose the button background color.',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
 		),
 		font_size: setting(
 			'text',
@@ -1576,6 +1573,9 @@ function texterSettings(): SettingSchema {
 			),
 			{ col_classes: HALF_WIDTH }
 		),
+		width: widthSetting(),
+		visibility: visibilitySetting(),
+		visibility_role: visibilityRoleSetting(),
 		desc_tooltip: descTooltipSetting(),
 		logic: logicSetting(),
 		conditions: conditionsSetting(),
