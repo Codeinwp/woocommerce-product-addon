@@ -110,6 +110,35 @@ class PPOM_Template_Library {
 	}
 
 	/**
+	 * Option key for cumulative per-template import counts.
+	 */
+	const USAGE_OPTION_KEY = 'ppom_template_usage_counts';
+
+	/**
+	 * Increments the lifetime usage counter for a template slug.
+	 *
+	 * Only known slugs (present in the registry) are counted; unknown slugs
+	 * are ignored so spoofed input cannot bloat the option.
+	 *
+	 * @param string $slug Template slug.
+	 * @return void
+	 */
+	public static function record_usage( $slug ) {
+		$slug = (string) $slug;
+		if ( '' === $slug || null === self::get_template( $slug ) ) {
+			return;
+		}
+
+		$counts = get_option( self::USAGE_OPTION_KEY, array() );
+		if ( ! is_array( $counts ) ) {
+			$counts = array();
+		}
+		$counts[ $slug ] = isset( $counts[ $slug ] ) ? intval( $counts[ $slug ] ) + 1 : 1;
+
+		update_option( self::USAGE_OPTION_KEY, $counts, false );
+	}
+
+	/**
 	 * Returns the full template registry, keyed by slug.
 	 *
 	 * @return array<string, array<string, mixed>>

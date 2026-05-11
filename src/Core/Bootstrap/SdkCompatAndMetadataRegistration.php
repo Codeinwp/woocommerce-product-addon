@@ -19,6 +19,17 @@ final class SdkCompatAndMetadataRegistration implements RegisterHooks {
 	 */
 	public function register(): void {
 		add_filter(
+			'ppom_logger_data',
+			function ( $data ) {
+				$usage = get_option( 'ppom_template_usage_counts', array() );
+				if ( is_array( $usage ) && ! empty( $usage ) ) {
+					$data['template_usage'] = $usage;
+				}
+				return $data;
+			}
+		);
+
+		add_filter(
 			'themeisle_sdk_compatibilities/' . PPOM_BASENAME,
 			function ( $compatibilities ) {
 				$compatibilities['ppompro'] = array(
