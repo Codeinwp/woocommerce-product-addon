@@ -1420,17 +1420,17 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 }
 
 #ppom-upgrade-to-pro.button {
-    background: #E7632A;
-    border-color: #E7632A;
+    background: #28A745;
+    border-color: #28A745;
     color: #fff;
 }
 
 #ppom-upgrade-to-pro.button:hover,
 #ppom-upgrade-to-pro.button:focus {
-    background: #cf5723;
-    border-color: #cf5723;
+    background: #218838;
+    border-color: #218838;
     color: #fff;
-    box-shadow: 0 0 0 1px #cf5723;
+    box-shadow: 0 0 0 1px #218838;
 }
 
 .ppom_addons_model_cards span.badge {
@@ -2669,7 +2669,7 @@ div.ppom-banner .themeisle-sale {
 .ppom-template-card__pro-badge {
 	display: inline-flex;
 	align-items: center;
-	background: #2271b1;
+	background: #28A745;
 	color: #fff;
 	font-size: 9px;
 	font-weight: 700;

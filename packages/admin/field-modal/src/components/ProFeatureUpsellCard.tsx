@@ -30,9 +30,9 @@ export function ProFeatureUpsellCard( {
 			align="stretch"
 			gap={ 4 }
 			p={ { base: 4, md: 5 } }
-			bg="orange.50"
+			bg="transparent"
 			borderWidth="1px"
-			borderColor="orange.200"
+			borderColor="gray.200"
 			borderRadius="md"
 			color="gray.900"
 		>
@@ -41,8 +41,8 @@ export function ProFeatureUpsellCard( {
 					w={ 10 }
 					h={ 10 }
 					borderRadius="md"
-					bg="orange.100"
-					color="orange.500"
+					bg="gray.100"
+					color="gray.500"
 					align="center"
 					justify="center"
 					flexShrink={ 0 }
@@ -64,7 +64,7 @@ export function ProFeatureUpsellCard( {
 							px={ 2 }
 							py="2px"
 							borderRadius="sm"
-							bg="orange.500"
+							bg="#28A745"
 							color="white"
 							fontSize="10px"
 							fontWeight="700"
@@ -86,7 +86,7 @@ export function ProFeatureUpsellCard( {
 
 			{ hasActions ? (
 				<>
-					<Box h="1px" bg="orange.200" />
+					<Box h="1px" bg="gray.200" />
 					<HStack align="stretch" gap={ 2 } flexWrap="wrap">
 						{ primaryUrl ? (
 							<Link
@@ -101,20 +101,20 @@ export function ProFeatureUpsellCard( {
 								px={ 4 }
 								py={ 1.5 }
 								borderRadius="md"
-								bg="orange.500"
+								bg="#28A745"
 								color="white"
 								fontWeight="semibold"
 								fontSize="sm"
 								textDecoration="none"
 								whiteSpace="nowrap"
 								w={ { base: 'full', sm: 'auto' } }
-								_hover={ { bg: 'orange.600', color: 'white' } }
-								_focus={ { bg: 'orange.600', color: 'white' } }
+								_hover={ { bg: '#218838', color: 'white' } }
+								_focus={ { bg: '#218838', color: 'white' } }
 								_focusVisible={ {
-									bg: 'orange.600',
+									bg: '#218838',
 									color: 'white',
 								} }
-								_active={ { bg: 'orange.600', color: 'white' } }
+								_active={ { bg: '#218838', color: 'white' } }
 							>
 								{ primaryLabel }
 							</Link>
@@ -133,23 +133,23 @@ export function ProFeatureUpsellCard( {
 								py={ 1.5 }
 								borderRadius="md"
 								bg="white"
-								color="orange.600"
+								color="#28A745"
 								borderWidth="1px"
-								borderColor="orange.200"
+								borderColor="#28A745"
 								fontWeight="semibold"
 								fontSize="sm"
 								textDecoration="none"
 								whiteSpace="nowrap"
 								w={ { base: 'full', sm: 'auto' } }
-								_hover={ { bg: 'orange.100', color: 'orange.600' } }
-								_focus={ { bg: 'orange.100', color: 'orange.600' } }
+								_hover={ { bg: '#E6F4EA', color: '#218838' } }
+								_focus={ { bg: '#E6F4EA', color: '#218838' } }
 								_focusVisible={ {
-									bg: 'orange.100',
-									color: 'orange.600',
+									bg: '#E6F4EA',
+									color: '#218838',
 								} }
 								_active={ {
-									bg: 'orange.100',
-									color: 'orange.600',
+									bg: '#E6F4EA',
+									color: '#218838',
 								} }
 							>
 								{ secondaryLabel }
