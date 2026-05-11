@@ -409,15 +409,7 @@ class PPOM_SettingsFramework {
 			$allow_data_sharing = ( isset( $_REQUEST[ self::$save_key ]['ppom_allow_data_sharing'] ) && 'yes' === $_REQUEST[ self::$save_key ]['ppom_allow_data_sharing'] ) ? 'yes' : 'no';
 			update_option( 'woocommerce_product_addon_logger_flag', $allow_data_sharing );
 
-			$settings_meta = array_map(
-				function ( $setting ) {
-
-					$setting = is_array( $setting ) ? array_map( 'sanitize_text_field', $setting ) : sanitize_text_field( $setting );
-
-					return $setting;
-				},
-				$_REQUEST[ self::$save_key ]
-			);
+			$settings_meta = map_deep( wp_unslash( $_REQUEST[ self::$save_key ] ), 'sanitize_text_field' );
 
 			// Generate and saved css
 			$this->generate_css( $settings_meta );

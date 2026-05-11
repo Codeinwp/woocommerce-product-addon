@@ -71,6 +71,11 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		$_GET     = array();
 		$_REQUEST = array();
 
+		// WP test framework wipes wp_options in tear_down_after_class, but PPOM only
+		// writes this on activation. Without it, several admin AJAX handlers short-
+		// circuit through wp_send_json -> die, killing the test process mid-suite.
+		update_option( 'personalizedproduct_db_version', PPOM_DB_VERSION );
+
 		$this->unset_ppom_option( 'ppom_rest_secret_key' );
 		$this->unset_ppom_option( 'ppom_api_enable' );
 		$this->unset_ppom_option( 'ppom_enable_client_validation' );
@@ -119,6 +124,14 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		$this->ppom_test_license_plan_value = max( 1, min( 3, (int) $plan ) );
 		$priority                           = PHP_INT_MAX - 10;
 
+		// The wp-env `ppom-pro-env-license.php` mu-plugin pins license to 'valid'
+		// at PHP_INT_MAX, which would override any test filter we add. Suspend
+		// it for the duration of the test; remove_ppom_license_filters restores.
+		if ( function_exists( 'ppom_pro_env_license_status' ) ) {
+			remove_filter( 'product_ppom_license_status', 'ppom_pro_env_license_status', PHP_INT_MAX );
+			remove_filter( 'product_ppom_license_plan', 'ppom_pro_env_license_plan', PHP_INT_MAX );
+		}
+
 		add_filter( 'product_ppom_license_status', array( $this, 'ppom_test_filter_license_status' ), $priority, 1 );
 		add_filter( 'product_ppom_license_plan', array( $this, 'ppom_test_filter_license_plan' ), $priority, 1 );
 		$this->ppom_test_license_filters_active = true;
@@ -136,6 +149,12 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 		$priority = PHP_INT_MAX - 10;
 		remove_filter( 'product_ppom_license_status', array( $this, 'ppom_test_filter_license_status' ), $priority );
 		remove_filter( 'product_ppom_license_plan', array( $this, 'ppom_test_filter_license_plan' ), $priority );
+
+		if ( function_exists( 'ppom_pro_env_license_status' ) ) {
+			add_filter( 'product_ppom_license_status', 'ppom_pro_env_license_status', PHP_INT_MAX );
+			add_filter( 'product_ppom_license_plan', 'ppom_pro_env_license_plan', PHP_INT_MAX );
+		}
+
 		$this->ppom_test_license_filters_active = false;
 	}
 

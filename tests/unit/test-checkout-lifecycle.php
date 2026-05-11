@@ -255,10 +255,11 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 			$product->get_id()
 		);
 
-		$raw_cart_key = ' Existing_Cart Key ';
-		$cart_stub    = $this->create_add_cart_item_data_cart_stub(
+		$raw_cart_key       = ' Existing_Cart Key ';
+		$sanitized_cart_key = sanitize_text_field( wp_unslash( $raw_cart_key ) );
+		$cart_stub          = $this->create_add_cart_item_data_cart_stub(
 			array(
-				sanitize_key( $raw_cart_key ) => array( 'product_id' => $product->get_id() ),
+				$sanitized_cart_key => array( 'product_id' => $product->get_id() ),
 			)
 		);
 
@@ -273,7 +274,7 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 
 		ppom_woocommerce_add_cart_item_data( array(), $product->get_id() );
 
-		$this->assertSame( array( sanitize_key( $raw_cart_key ) ), $cart_stub->removed_keys );
+		$this->assertSame( array( $sanitized_cart_key ), $cart_stub->removed_keys );
 	}
 
 	/**

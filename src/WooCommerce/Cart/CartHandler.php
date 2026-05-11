@@ -659,7 +659,10 @@ final class CartHandler {
 		$display    = isset( $meta['display'] ) ? $meta['display'] : $meta_value;
 		$meta_type  = isset( $meta['type'] ) ? $meta['type'] : '';
 
-		if ( self::should_skip_cart_meta_for_empty_display( $meta_type, $display ) ) {
+		// Empty / unnamed entries (e.g. cropper rows with no cart value) must fall
+		// through to the bottom legacy branch; only skip when the entry actually
+		// names a field whose display value is empty.
+		if ( ! empty( $meta_name ) && self::should_skip_cart_meta_for_empty_display( $meta_type, $display ) ) {
 			return null;
 		}
 
