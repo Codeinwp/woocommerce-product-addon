@@ -406,6 +406,9 @@ class PPOM_SettingsFramework {
 				}
 			}
 
+			$allow_data_sharing = ( isset( $_REQUEST[ self::$save_key ]['ppom_allow_data_sharing'] ) && 'yes' === $_REQUEST[ self::$save_key ]['ppom_allow_data_sharing'] ) ? 'yes' : 'no';
+			update_option( 'woocommerce_product_addon_logger_flag', $allow_data_sharing );
+
 			$settings_meta = array_map(
 				function ( $setting ) {
 
@@ -413,7 +416,7 @@ class PPOM_SettingsFramework {
 
 					return $setting;
 				},
-				$_REQUEST[ self::$save_key ] 
+				$_REQUEST[ self::$save_key ]
 			);
 
 			// Generate and saved css
@@ -538,6 +541,10 @@ class PPOM_SettingsFramework {
 	 * @return mixed|null
 	 */
 	public static function get_saved_settings( $key, $default = null ) {
+
+		if ( 'ppom_allow_data_sharing' === $key ) {
+			return ( 'yes' === get_option( 'woocommerce_product_addon_logger_flag', '' ) ) ? 'yes' : ( $default !== null ? $default : null );
+		}
 
 		$saved_settings = get_option( self::$save_key );
 
