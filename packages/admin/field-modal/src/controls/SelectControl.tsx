@@ -1,6 +1,7 @@
 import { Field, NativeSelect } from '@chakra-ui/react';
 import { controlSurface } from './chakraFieldStyles';
 import { normalizeSelectOptions } from '../schemaTabs';
+import { HelperIcon } from './HelperIcon';
 import {
 	labelProps,
 	type PrimitiveSettingControlProps,
@@ -8,7 +9,6 @@ import {
 	readControlLabelRequired,
 	readControlTitle,
 	readControlValue,
-	renderHelperText,
 	renderMetaLink,
 	updateFallbackSettingValue,
 } from './shared';
@@ -37,6 +37,7 @@ export function SelectControl( {
 							<Field.Label { ...labelProps }>
 								{ title }
 								<Field.RequiredIndicator />
+								<HelperIcon description={ description } />
 							</Field.Label>
 							<NativeSelect.Root size="sm">
 								<NativeSelect.Field
@@ -64,7 +65,6 @@ export function SelectControl( {
 								</NativeSelect.Field>
 								<NativeSelect.Indicator />
 							</NativeSelect.Root>
-							{ renderHelperText( description ) }
 							{ renderMetaLink( meta.link ) }
 							{ error ? (
 								<Field.ErrorText>
@@ -83,6 +83,7 @@ export function SelectControl( {
 			<Field.Label { ...labelProps }>
 				{ title }
 				<Field.RequiredIndicator />
+				<HelperIcon description={ description } />
 			</Field.Label>
 			<NativeSelect.Root size="sm">
 				<NativeSelect.Field
@@ -107,7 +108,6 @@ export function SelectControl( {
 				</NativeSelect.Field>
 				<NativeSelect.Indicator />
 			</NativeSelect.Root>
-			{ renderHelperText( description ) }
 			{ renderMetaLink( meta.link ) }
 		</Field.Root>
 	);

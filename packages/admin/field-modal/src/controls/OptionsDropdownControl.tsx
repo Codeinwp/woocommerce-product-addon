@@ -1,7 +1,8 @@
 import { Field, NativeSelect } from '@chakra-ui/react';
 import { __ } from '@wordpress/i18n';
-import { controlSurface } from './chakraFieldStyles';
+import { controlSurface, helperTextProps } from './chakraFieldStyles';
 import { normalizePairedOptionsArray } from '../utils/pairedOptionsData';
+import { HelperIcon } from './HelperIcon';
 import {
 	labelProps,
 	type PrimitiveSettingControlProps,
@@ -9,7 +10,6 @@ import {
 	readControlLabelRequired,
 	readControlTitle,
 	readControlValue,
-	renderHelperText,
 	updateFallbackSettingValue,
 } from './shared';
 
@@ -82,7 +82,6 @@ export function OptionsDropdownControl( {
 						currentValue
 					);
 					const error = field.state.meta.errors?.[ 0 ];
-					const helperContent = isEmpty ? emptyHelper : description;
 					return (
 						<Field.Root
 							invalid={ Boolean( error ) }
@@ -92,6 +91,7 @@ export function OptionsDropdownControl( {
 							<Field.Label { ...labelProps }>
 								{ title }
 								<Field.RequiredIndicator />
+								<HelperIcon description={ description } />
 							</Field.Label>
 							<NativeSelect.Root size="sm">
 								<NativeSelect.Field
@@ -115,7 +115,11 @@ export function OptionsDropdownControl( {
 								</NativeSelect.Field>
 								<NativeSelect.Indicator />
 							</NativeSelect.Root>
-							{ renderHelperText( helperContent ) }
+							{ isEmpty ? (
+								<Field.HelperText { ...helperTextProps }>
+									{ emptyHelper }
+								</Field.HelperText>
+							) : null }
 							{ error ? (
 								<Field.ErrorText>
 									{ String( error ) }
@@ -130,13 +134,13 @@ export function OptionsDropdownControl( {
 
 	const currentValue = String( readControlValue( settingKey, ctx ) ?? '' );
 	const { options, isEmpty } = buildOptions( rawOptions, currentValue );
-	const helperContent = isEmpty ? emptyHelper : description;
 
 	return (
 		<Field.Root required={ labelRequired } disabled={ isEmpty }>
 			<Field.Label { ...labelProps }>
 				{ title }
 				<Field.RequiredIndicator />
+				<HelperIcon description={ description } />
 			</Field.Label>
 			<NativeSelect.Root size="sm">
 				<NativeSelect.Field
@@ -160,7 +164,11 @@ export function OptionsDropdownControl( {
 				</NativeSelect.Field>
 				<NativeSelect.Indicator />
 			</NativeSelect.Root>
-			{ renderHelperText( helperContent ) }
+			{ isEmpty ? (
+				<Field.HelperText { ...helperTextProps }>
+					{ emptyHelper }
+				</Field.HelperText>
+			) : null }
 		</Field.Root>
 	);
 }

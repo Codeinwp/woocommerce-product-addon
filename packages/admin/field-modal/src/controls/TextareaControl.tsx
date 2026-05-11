@@ -1,5 +1,6 @@
 import { Field, Textarea } from '@chakra-ui/react';
 import { controlSurface } from './chakraFieldStyles';
+import { HelperIcon } from './HelperIcon';
 import {
 	labelProps,
 	type PrimitiveSettingControlProps,
@@ -7,7 +8,6 @@ import {
 	readControlLabelRequired,
 	readControlTitle,
 	readControlValue,
-	renderHelperText,
 	renderMetaLink,
 	updateFallbackSettingValue,
 } from './shared';
@@ -35,6 +35,10 @@ export function TextareaControl( {
 							<Field.Label { ...labelProps }>
 								{ title }
 								<Field.RequiredIndicator />
+								<HelperIcon
+									description={ description }
+									allowHtml
+								/>
 							</Field.Label>
 							<Textarea
 								size="sm"
@@ -53,9 +57,6 @@ export function TextareaControl( {
 								onBlur={ field.handleBlur }
 								{ ...controlSurface }
 							/>
-							{ renderHelperText( description, {
-								allowHtml: true,
-							} ) }
 							{ renderMetaLink( meta.link ) }
 							{ error ? (
 								<Field.ErrorText>
@@ -74,6 +75,7 @@ export function TextareaControl( {
 			<Field.Label { ...labelProps }>
 				{ title }
 				<Field.RequiredIndicator />
+				<HelperIcon description={ description } allowHtml />
 			</Field.Label>
 			<Textarea
 				size="sm"
@@ -90,7 +92,6 @@ export function TextareaControl( {
 				}
 				{ ...controlSurface }
 			/>
-			{ renderHelperText( description, { allowHtml: true } ) }
 			{ renderMetaLink( meta.link ) }
 		</Field.Root>
 	);

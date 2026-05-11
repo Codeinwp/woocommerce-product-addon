@@ -1,6 +1,7 @@
 import { ColorPicker, Field, HStack } from '@chakra-ui/react';
 import { controlSurface } from './chakraFieldStyles';
 import { colorFromStoredValue, persistColorValueAsHex } from './colorHelpers';
+import { HelperIcon } from './HelperIcon';
 import {
 	labelProps,
 	type PrimitiveSettingControlProps,
@@ -8,7 +9,6 @@ import {
 	readControlLabelRequired,
 	readControlTitle,
 	readControlValue,
-	renderHelperText,
 	renderMetaLink,
 	updateFallbackSettingValue,
 } from './shared';
@@ -36,6 +36,7 @@ export function ColorControl( {
 							<Field.Label { ...labelProps }>
 								{ title }
 								<Field.RequiredIndicator />
+								<HelperIcon description={ description } />
 							</Field.Label>
 							<ColorPicker.Root
 								value={ colorFromStoredValue(
@@ -67,7 +68,6 @@ export function ColorControl( {
 									</ColorPicker.Content>
 								</ColorPicker.Positioner>
 							</ColorPicker.Root>
-							{ renderHelperText( description ) }
 							{ renderMetaLink( meta.link ) }
 							{ error ? (
 								<Field.ErrorText>
@@ -86,6 +86,7 @@ export function ColorControl( {
 			<Field.Label { ...labelProps }>
 				{ title }
 				<Field.RequiredIndicator />
+				<HelperIcon description={ description } />
 			</Field.Label>
 			<ColorPicker.Root
 				value={ colorFromStoredValue(
@@ -119,7 +120,6 @@ export function ColorControl( {
 					</ColorPicker.Content>
 				</ColorPicker.Positioner>
 			</ColorPicker.Root>
-			{ renderHelperText( description ) }
 			{ renderMetaLink( meta.link ) }
 		</Field.Root>
 	);

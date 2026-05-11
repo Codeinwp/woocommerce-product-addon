@@ -1,5 +1,6 @@
 import { Field, Input } from '@chakra-ui/react';
 import { controlSurface } from './chakraFieldStyles';
+import { HelperIcon } from './HelperIcon';
 import {
 	labelProps,
 	type PrimitiveSettingControlProps,
@@ -7,7 +8,6 @@ import {
 	readControlLabelRequired,
 	readControlTitle,
 	readControlValue,
-	renderHelperText,
 	renderMetaLink,
 	updateFallbackSettingValue,
 } from './shared';
@@ -40,6 +40,7 @@ export function TextControl( {
 							<Field.Label { ...labelProps }>
 								{ title }
 								<Field.RequiredIndicator />
+								<HelperIcon description={ description } />
 							</Field.Label>
 							<Input
 								size="sm"
@@ -57,7 +58,6 @@ export function TextControl( {
 								onBlur={ field.handleBlur }
 								{ ...controlSurface }
 							/>
-							{ renderHelperText( description ) }
 							{ renderMetaLink( meta.link ) }
 							{ error ? (
 								<Field.ErrorText>
@@ -76,6 +76,7 @@ export function TextControl( {
 			<Field.Label { ...labelProps }>
 				{ title }
 				<Field.RequiredIndicator />
+				<HelperIcon description={ description } />
 			</Field.Label>
 			<Input
 				size="sm"
@@ -91,7 +92,6 @@ export function TextControl( {
 				}
 				{ ...controlSurface }
 			/>
-			{ renderHelperText( description ) }
 			{ renderMetaLink( meta.link ) }
 		</Field.Root>
 	);

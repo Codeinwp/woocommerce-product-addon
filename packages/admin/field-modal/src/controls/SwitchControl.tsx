@@ -1,5 +1,6 @@
-import { Field, Switch, Text } from '@chakra-ui/react';
+import { Field, Switch } from '@chakra-ui/react';
 import { useId } from '@wordpress/element';
+import { HelperIcon } from './HelperIcon';
 import {
 	labelProps,
 	type PrimitiveSettingControlProps,
@@ -32,8 +33,7 @@ export function SwitchControl( {
 							display="grid"
 							gridTemplateColumns="auto minmax(0, 1fr)"
 							columnGap={ 2 }
-							rowGap={ title && description ? 0.5 : 0 }
-							alignItems="start"
+							alignItems="center"
 							width="100%"
 							mb={ 0 }
 						>
@@ -41,8 +41,6 @@ export function SwitchControl( {
 								gridRow={ 1 }
 								gridColumn={ 1 }
 								id={ switchId }
-								mt={ title ? 0.5 : 0 }
-								alignSelf="start"
 								colorPalette="blue"
 								checked={ checked }
 								invalid={ Boolean( error ) }
@@ -63,18 +61,10 @@ export function SwitchControl( {
 									mb={ 0 }
 								>
 									{ title }
+									<HelperIcon
+										description={ description }
+									/>
 								</Field.Label>
-							) : null }
-							{ description ? (
-								<Text
-									gridRow={ title ? 2 : 1 }
-									gridColumn={ 2 }
-									fontSize="xs"
-									color="gray.600"
-									lineHeight="1.45"
-								>
-									{ description }
-								</Text>
 							) : null }
 							{ error ? (
 								<Field.ErrorText gridColumn="1 / -1" mt={ 1 }>
@@ -95,8 +85,7 @@ export function SwitchControl( {
 			display="grid"
 			gridTemplateColumns="auto minmax(0, 1fr)"
 			columnGap={ 2 }
-			rowGap={ title && description ? 0.5 : 0 }
-			alignItems="start"
+			alignItems="center"
 			width="100%"
 			mb={ 0 }
 		>
@@ -104,8 +93,6 @@ export function SwitchControl( {
 				gridRow={ 1 }
 				gridColumn={ 1 }
 				id={ switchId }
-				mt={ title ? 0.5 : 0 }
-				alignSelf="start"
 				colorPalette="blue"
 				checked={ checked }
 				onCheckedChange={ ( { checked: next } ) =>
@@ -128,18 +115,8 @@ export function SwitchControl( {
 					mb={ 0 }
 				>
 					{ title }
+					<HelperIcon description={ description } />
 				</Field.Label>
-			) : null }
-			{ description ? (
-				<Text
-					gridRow={ title ? 2 : 1 }
-					gridColumn={ 2 }
-					fontSize="xs"
-					color="gray.600"
-					lineHeight="1.45"
-				>
-					{ description }
-				</Text>
 			) : null }
 		</Field.Root>
 	);

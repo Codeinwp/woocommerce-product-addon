@@ -1,4 +1,4 @@
-import { Box, Field } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { helperTextProps, labelProps } from './chakraFieldStyles';
 import type { SettingRowContext } from '../types/fieldModal';
 
@@ -51,28 +51,6 @@ export function updateFallbackSettingValue(
 	nextValue: unknown
 ): void {
 	ctx.onChange( { ...ctx.values, [ settingKey ]: nextValue } );
-}
-
-export function renderHelperText(
-	description: string,
-	opts?: { allowHtml?: boolean }
-): JSX.Element | null {
-	if ( ! description ) {
-		return null;
-	}
-	if ( opts?.allowHtml ) {
-		return (
-			<Field.HelperText
-				{ ...helperTextProps }
-				dangerouslySetInnerHTML={ { __html: description } }
-			/>
-		);
-	}
-	return (
-		<Field.HelperText { ...helperTextProps }>
-			{ description }
-		</Field.HelperText>
-	);
 }
 
 export function renderMetaLink( link: unknown ): JSX.Element | null {

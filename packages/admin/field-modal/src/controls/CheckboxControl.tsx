@@ -1,4 +1,5 @@
-import { Box, Checkbox, Field, Stack } from '@chakra-ui/react';
+import { Checkbox, Field } from '@chakra-ui/react';
+import { HelperIcon } from './HelperIcon';
 import {
 	labelProps,
 	type PrimitiveSettingControlProps,
@@ -51,23 +52,15 @@ export function CheckboxControl( {
 							>
 								<Checkbox.HiddenInput />
 								<Checkbox.Control />
-								<Stack gap="1">
-									<Checkbox.Label
-										{ ...labelProps }
-										mb={ 0 }
-									>
-										{ title }
-									</Checkbox.Label>
-									{ description ? (
-										<Box
-											fontSize="xs"
-											color="gray.600"
-											lineHeight="1.45"
-										>
-											{ description }
-										</Box>
-									) : null }
-								</Stack>
+								<Checkbox.Label
+									{ ...labelProps }
+									mb={ 0 }
+								>
+									{ title }
+									<HelperIcon
+										description={ description }
+									/>
+								</Checkbox.Label>
 							</Checkbox.Root>
 							{ error ? (
 								<Field.ErrorText mt={ 1 }>
@@ -98,20 +91,10 @@ export function CheckboxControl( {
 			>
 				<Checkbox.HiddenInput />
 				<Checkbox.Control />
-				<Stack gap="1">
-					<Checkbox.Label { ...labelProps } mb={ 0 }>
-						{ title }
-					</Checkbox.Label>
-					{ description ? (
-						<Box
-							fontSize="xs"
-							color="gray.600"
-							lineHeight="1.45"
-						>
-							{ description }
-						</Box>
-					) : null }
-				</Stack>
+				<Checkbox.Label { ...labelProps } mb={ 0 }>
+					{ title }
+					<HelperIcon description={ description } />
+				</Checkbox.Label>
 			</Checkbox.Root>
 		</Field.Root>
 	);
