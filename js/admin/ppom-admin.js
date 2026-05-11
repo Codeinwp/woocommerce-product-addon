@@ -2256,7 +2256,8 @@ jQuery( function ( $ ) {
 
 	$( document ).on( 'click', '.ppom-condition-tab-js', function ( e ) {
 		e.preventDefault();
-		populate_conditional_elements();
+		const id = $(this).parents('.ppom-tabs.ppom-fields-actions').data('field-no');
+		populate_conditional_elements(id);
 	} );
 
 	/**
@@ -2331,7 +2332,7 @@ jQuery( function ( $ ) {
 	 * @see ppom_add_condition_set_index
 	 * @see ppom_check_conditions in js/ppom-conditions-v2.js
 	 */
-	function populate_conditional_elements() {
+	function populate_conditional_elements(field_id) {
 		// Rebuild the list of condition targets from the current slider state so
 		// newly added, renamed, or cloned fields are immediately available as rule
 		// dependencies without reloading the admin page.
@@ -2362,10 +2363,7 @@ jQuery( function ( $ ) {
 		} );
 
 		// Change the target options for all the rules.
-		document.querySelectorAll( '.ppom-slider' ).forEach( ( item ) => {
-			if ( ! item.id ) {
-				return;
-			}
+		$('.ppom-slider#ppom_field_model_' + field_id ).each( ( index, item ) => {
 			const conditionContainers = item
 				.querySelector( 'div[data-meta-id="conditions"]' )
 				?.querySelectorAll( '.webcontact-rules' );

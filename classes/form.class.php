@@ -95,7 +95,6 @@ class PPOM_Form {
 				if ( ! is_array( $field ) || ! isset( $field['ppom_id'] ) ) {
 					return false;
 				}
-
 				return (int) $meta_id === (int) $field['ppom_id'];
 			}
 		);
