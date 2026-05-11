@@ -109,6 +109,21 @@ function appendHiddenInputsForIndex(
 	appendHiddenInputs( parent, `ppom[${ index }][${ key }]`, value );
 }
 
+function legacyClassicValue(
+	field: ClassicFieldRow,
+	key: string,
+	value: unknown
+): unknown {
+	if (
+		String( field.type || '' ) === 'bulkquantity' &&
+		key === 'options' &&
+		Array.isArray( value )
+	) {
+		return JSON.stringify( value );
+	}
+	return value;
+}
+
 function parsePpomName(
 	name: string
 ): { index: number; keys: string[] } | null {
@@ -398,6 +413,7 @@ function patchClassicFieldModal(
 		if ( value === undefined ) {
 			return;
 		}
+		value = legacyClassicValue( cleanField, key, value );
 		if ( Array.isArray( value ) || isPlainObject( value ) ) {
 			removeTopLevelControls( modal, index, key );
 			appendHiddenInputsForIndex( modal, index, key, value );
