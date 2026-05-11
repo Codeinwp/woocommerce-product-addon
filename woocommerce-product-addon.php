@@ -61,6 +61,17 @@ add_filter(
 	}
 );
 
+add_filter(
+	'ppom_logger_data',
+	function ( $data ) {
+		$usage = get_option( 'ppom_template_usage_counts', array() );
+		if ( is_array( $usage ) && ! empty( $usage ) ) {
+			$data['template_usage'] = $usage;
+		}
+		return $data;
+	}
+);
+
 add_action( 'init', 'ppom_i18n_setup' );
 	/**
 	 * Loads the PPOM textdomain.
