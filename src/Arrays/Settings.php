@@ -148,8 +148,13 @@ final class Settings {
 
 		$timezone_offsets = array();
 		foreach ( $timezones as $timezone ) {
-			$tz                            = new \DateTimeZone( $timezone );
-			$timezone_offsets[ $timezone ] = $tz->getOffset( new \DateTime() );
+			try {
+				$tz                            = new \DateTimeZone( $timezone );
+				$timezone_offsets[ $timezone ] = $tz->getOffset( new \DateTime() );
+			} catch ( \Exception $e ) {
+				// Skip identifiers returned by listIdentifiers() that the bundled tzdata cannot construct (e.g. America/Ciudad_Juarez on outdated PHP).
+				continue;
+			}
 		}
 
 		// sort timezone by timezone name

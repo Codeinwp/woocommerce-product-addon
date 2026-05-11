@@ -82,6 +82,12 @@ function ppom_load_free_options() {
 			'desc'    => __( 'Specify the file types that are restricted from being uploaded in this section.', 'woocommerce-product-addon' ),
 			'default' => __( 'php,php4,php5,php6,php7,phtml,exe,shtml', 'woocommerce-product-addon' ),
 		),
+		'ppom_allow_data_sharing'             => array(
+			'type'  => 'checkbox',
+			'title' => __( 'Allow data sharing', 'woocommerce-product-addon' ),
+			'desc'  => __( 'Share usage data to help us improve the plugin. Data is not shared with any third-party companies.', 'woocommerce-product-addon' ),
+			'label' => __( 'Yes', 'woocommerce-product-addon' ),
+		),
 		'ppom_general_section2'               => array(
 			'type'  => 'section',
 			'title' => __( 'Label Settings', 'woocommerce-product-addon' ),

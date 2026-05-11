@@ -636,6 +636,8 @@ final class Manager {
 			);
 		}
 
+		\PPOM_Template_Library::record_usage( $slug );
+
 		$redirect_to = (string) add_query_arg(
 			array(
 				'page'           => 'ppom',

@@ -145,6 +145,109 @@ class Test_Pricing_Engine extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Regression for #642 — admin saved a cart-fee addon price as "$10".
+	 *
+	 * Prior to the fix, summing the int accumulator with the string "$10" raised
+	 * a fatal TypeError on PHP 8+, taking down the whole cart/checkout. After
+	 * the fix the leading currency symbol is stripped and the value is parsed
+	 * as 10.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_cart_fee_total_normalizes_currency_prefixed_string() {
+		$total = Engine::price_get_cart_fee_total(
+			array(
+				array( 'apply' => 'cart_fee', 'price' => '$10' ),
+				array( 'apply' => 'cart_fee', 'price' => ' 5.50' ),
+				array( 'apply' => 'cart_fee', 'price' => 'USD 2' ),
+			)
+		);
+
+		$this->assertEqualsWithDelta( 17.5, $total, 0.0001 );
+	}
+
+	/**
+	 * Regression for #642 — trailing junk after the number must not crash.
+	 *
+	 * "10abc" was the second example from the bug report. PHP's float cast
+	 * already handles a trailing non-numeric tail, but we assert it here so a
+	 * future refactor cannot silently break the contract.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_cart_fee_total_truncates_trailing_non_numeric() {
+		$total = Engine::price_get_cart_fee_total(
+			array(
+				array( 'apply' => 'cart_fee', 'price' => '10abc' ),
+			)
+		);
+
+		$this->assertEqualsWithDelta( 10.0, $total, 0.0001 );
+	}
+
+	/**
+	 * Non-scalar / unparseable values must degrade to 0 rather than throw.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_cart_fee_total_handles_unparseable_values() {
+		$total = Engine::price_get_cart_fee_total(
+			array(
+				array( 'apply' => 'cart_fee', 'price' => 'free' ),
+				array( 'apply' => 'cart_fee', 'price' => null ),
+				array( 'apply' => 'cart_fee', 'price' => array( 'unexpected' ) ),
+				array( 'apply' => 'cart_fee', 'price' => 7 ),
+			)
+		);
+
+		$this->assertEqualsWithDelta( 7.0, $total, 0.0001 );
+	}
+
+	/**
+	 * Same regression coverage for the addon-apply path so both helpers stay
+	 * symmetric.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_addon_total_normalizes_currency_prefixed_string() {
+		$total = Engine::price_get_addon_total(
+			array(
+				array(
+					'apply'    => 'addon',
+					'price'    => '$10',
+					'quantity' => 2,
+				),
+				array(
+					'apply'    => 'addon',
+					'price'    => '5abc',
+					'quantity' => 1,
+				),
+			)
+		);
+
+		$this->assertEqualsWithDelta( 25.0, $total, 0.0001 );
+	}
+
+	/**
+	 * A non-numeric quantity must not crash the addon sum either.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_addon_total_handles_non_numeric_quantity() {
+		$total = Engine::price_get_addon_total(
+			array(
+				array(
+					'apply'    => 'addon',
+					'price'    => 4,
+					'quantity' => '3x',
+				),
+			)
+		);
+
+		$this->assertEqualsWithDelta( 12.0, $total, 0.0001 );
+	}
+
+	/**
 	 * @return void
 	 */
 	public function test_get_amount_after_percentage_strips_percent_suffix() {
