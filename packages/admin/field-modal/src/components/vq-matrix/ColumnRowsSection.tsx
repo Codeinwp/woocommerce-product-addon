@@ -13,17 +13,6 @@ export interface ColumnRowsSectionProps {
 	onChange: ( rows: MatrixColumnRow[] ) => void;
 }
 
-function isColumnRowEmpty( row: MatrixColumnRow ): boolean {
-	return (
-		row.option.trim() === '' &&
-		row.img_id.trim() === '' &&
-		row.price.trim() === '' &&
-		row.min.trim() === '' &&
-		row.max.trim() === '' &&
-		row.option_id.trim() === ''
-	);
-}
-
 export function ColumnRowsSection( {
 	rows,
 	i18n,
@@ -66,7 +55,6 @@ export function ColumnRowsSection( {
 							i18n.pairedOptionsDragHandle || 'Drag to reorder'
 						}
 						removeLabel={ i18n.pairedOptionsRemove || 'Remove' }
-						hideRemove={ isColumnRowEmpty( row ) }
 						flexWrap="wrap"
 					>
 						<Input

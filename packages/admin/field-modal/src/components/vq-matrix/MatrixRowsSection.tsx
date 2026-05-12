@@ -13,14 +13,6 @@ export interface MatrixRowsSectionProps {
 	onChange: ( rows: MatrixRowRow[] ) => void;
 }
 
-function isMatrixRowEmpty( row: MatrixRowRow ): boolean {
-	return (
-		row.option.trim() === '' &&
-		row.img_id.trim() === '' &&
-		row.option_id.trim() === ''
-	);
-}
-
 export function MatrixRowsSection( {
 	rows,
 	i18n,
@@ -63,7 +55,6 @@ export function MatrixRowsSection( {
 							i18n.pairedOptionsDragHandle || 'Drag to reorder'
 						}
 						removeLabel={ i18n.pairedOptionsRemove || 'Remove' }
-						hideRemove={ isMatrixRowEmpty( row ) }
 						flexWrap="wrap"
 					>
 						<Input
