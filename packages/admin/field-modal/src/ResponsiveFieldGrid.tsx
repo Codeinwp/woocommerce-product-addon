@@ -72,6 +72,7 @@ export function ResponsiveFieldGrid( {
 								xl: fullRow ? 3 : wideRow ? 2 : 1,
 							} }
 							alignSelf={ isBoolean ? 'center' : 'stretch' }
+							mt={ isBoolean ? '10px' : undefined }
 						>
 							{ renderSettingRow( key, meta, ctx ) }
 						</GridItem>

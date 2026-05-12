@@ -1,6 +1,6 @@
 import { Field, NativeSelect } from '@chakra-ui/react';
 import { __ } from '@wordpress/i18n';
-import { controlSurface, helperTextProps } from './chakraFieldStyles';
+import { controlSurface } from './chakraFieldStyles';
 import { normalizePairedOptionsArray } from '../utils/pairedOptionsData';
 import { HelperIcon } from './HelperIcon';
 import {
@@ -63,11 +63,6 @@ export function OptionsDropdownControl( {
 	const rawOptions = readControlValue( 'options', ctx );
 	const AppField = ctx.form?.AppField;
 
-	const emptyHelper = __(
-		'Add options in the Add Options tab first.',
-		'woocommerce-product-addon'
-	);
-
 	if ( AppField ) {
 		return (
 			<AppField name={ settingKey }>
@@ -115,11 +110,6 @@ export function OptionsDropdownControl( {
 								</NativeSelect.Field>
 								<NativeSelect.Indicator />
 							</NativeSelect.Root>
-							{ isEmpty ? (
-								<Field.HelperText { ...helperTextProps }>
-									{ emptyHelper }
-								</Field.HelperText>
-							) : null }
 							{ error ? (
 								<Field.ErrorText>
 									{ String( error ) }
@@ -164,11 +154,6 @@ export function OptionsDropdownControl( {
 				</NativeSelect.Field>
 				<NativeSelect.Indicator />
 			</NativeSelect.Root>
-			{ isEmpty ? (
-				<Field.HelperText { ...helperTextProps }>
-					{ emptyHelper }
-				</Field.HelperText>
-			) : null }
 		</Field.Root>
 	);
 }

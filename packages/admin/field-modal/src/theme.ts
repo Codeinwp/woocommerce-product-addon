@@ -10,23 +10,30 @@ export const fieldModalTheme = createSystem(
 	defaultConfig,
 	defineConfig( {
 		globalCss: {
+			/**
+			 * Chakra Select / NativeSelect draws one chevron via its indicator slot;
+			 * the underlying `<select>` arrow must stay hidden. wp-admin ships
+			 * `.wp-core-ui select { background: #fff url(<chevron svg>) ... !important }`
+			 * which paints a *second* chevron as a background image and ignores
+			 * `appearance: none`. `!important` is required here to beat that rule.
+			 * Rules live at the top level (not under `#ppom-field-modal-root`) because
+			 * Chakra Dialog content is portaled to `document.body`, outside the root —
+			 * a scoped selector would never match. Targeting Chakra-emitted slot
+			 * classes keeps the override contained to this plugin's components.
+			 */
+			'.chakra-select, .chakra-native-select__field': {
+				WebkitAppearance: 'none !important',
+				MozAppearance: 'none !important',
+				appearance: 'none !important',
+				backgroundImage: 'none !important',
+			},
+			'.chakra-select::-ms-expand, .chakra-native-select__field::-ms-expand':
+				{
+					display: 'none',
+				},
 			'#ppom-field-modal-root': {
 				fontSize: '13px',
 				lineHeight: '1.4',
-				/**
-				 * Chakra Select draws one chevron via `.chakra-select__icon`; the native
-				 * `<select>` arrow must stay hidden (`appearance: none`). wp-admin / other
-				 * global styles often reset `appearance` on `select`, which stacks a second
-				 * arrow (looks like a “double” chevron).
-				 */
-				'& .chakra-select': {
-					WebkitAppearance: 'none',
-					MozAppearance: 'none',
-					appearance: 'none',
-				},
-				'& .chakra-select::-ms-expand': {
-					display: 'none',
-				},
 				/**
 				 * wp-admin sets `#wpwrap a:hover/:focus { color: #135e96 }` (specificity 1,1,1),
 				 * which would otherwise repaint the upsell CTA text blue. The ID-scoped class
