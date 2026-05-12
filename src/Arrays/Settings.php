@@ -209,7 +209,7 @@ final class Settings {
 				'title' => 'PPOM Labels',
 				'type'  => 'title',
 				'desc'  => esc_html(
-					__( 'Following settings help you the control and customize plugin as per your need.', 'woocommerce-product-addon' ) . ' ' .
+					__( 'These settings let you control and customize the plugin to suit your needs.', 'woocommerce-product-addon' ) . ' ' .
 					'<a href="' . esc_url( $ppom_fields ) . '">' . __( 'PPOM Fields Manager', 'woocommerce-product-addon' ) . '</a>'
 				),
 				'id'    => 'ppom_labels_settings',
@@ -228,7 +228,7 @@ final class Settings {
 			array(
 				'title'    => __( 'Option Total Suffix', 'woocommerce-product-addon' ),
 				'type'     => 'text',
-				'desc'     => __( 'E.g for Tax/Va info like. Vat included', 'woocommerce-product-addon' ),
+				'desc'     => __( 'E.g., for tax/VAT info like "VAT included".', 'woocommerce-product-addon' ),
 				'default'  => '',
 				'id'       => 'ppom_label_option_total_suffex',
 				'css'      => 'min-width:300px;',
@@ -304,7 +304,7 @@ final class Settings {
 				'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 				'default' => 'no',
 				'id'      => 'ppom_disable_fontawesome',
-				'desc'    => __( 'FontAwesome are being loaded from CDN, it will disable if your site already loading it.', 'woocommerce-product-addon' ),
+				'desc'    => __( 'FontAwesome is loaded from a CDN. You can disable it if your site already loads it.', 'woocommerce-product-addon' ),
 			),
 			array(
 				'title'   => __( 'Enable Legacy Price Calculations', 'woocommerce-product-addon' ),
@@ -365,7 +365,7 @@ final class Settings {
 				'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 				'default' => 'no',
 				'id'      => 'ppom_hide_option_price',
-				'desc'    => __( 'Hides options price in Selec/Radio/Checkbox/Image display prices with label', 'woocommerce-product-addon' ),
+				'desc'    => __( 'Hides option prices in Select/Radio/Checkbox/Image inputs when displaying prices with labels.', 'woocommerce-product-addon' ),
 
 			),
 
@@ -385,7 +385,7 @@ final class Settings {
 				'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 				'default' => 'no',
 				'id'      => 'ppom_hide_clear_fields',
-				'desc'    => __( 'Empty all fields on Product page after to cart.', 'woocommerce-product-addon' ),
+				'desc'    => __( 'Clear all fields on the product page after adding to cart.', 'woocommerce-product-addon' ),
 
 			),
 
@@ -399,12 +399,12 @@ final class Settings {
 			),
 
 			array(
-				'title'   => __( 'Use optimized Price Table Caculation (BETA)', 'woocommerce-product-addon' ),
+				'title'   => __( 'Use optimized Price Table Calculation (BETA)', 'woocommerce-product-addon' ),
 				'type'    => 'checkbox',
 				'label'   => __( 'Yes', 'woocommerce-product-addon' ),
 				'default' => 'no',
 				'id'      => 'ppom_price_table_v2',
-				'desc'    => __( 'A Fast and Optimized script to caculate price on product page in Table.', 'woocommerce-product-addon' ),
+				'desc'    => __( 'A fast, optimized script to calculate prices on the product page in Table view.', 'woocommerce-product-addon' ),
 			),
 
 			array(
@@ -439,7 +439,7 @@ final class Settings {
 			array(
 				'title'    => __( 'PPOM API Secret Key', 'woocommerce-product-addon' ),
 				'type'     => 'text',
-				'desc'     => __( 'Enter any characters to create a secret key. This key must be set while requesting to API', 'woocommerce-product-addon' ),
+				'desc'     => __( 'Enter any characters to create a secret key. This key must be included when making API requests.', 'woocommerce-product-addon' ),
 				'id'       => 'ppom_rest_secret_key',
 				'css'      => 'min-width:300px;',
 				'desc_tip' => true,
@@ -456,7 +456,7 @@ final class Settings {
 					'monthly' => __( 'Monthly', 'woocommerce-product-addon' ),
 				),
 				'id'       => 'ppom_remove_unused_images_schedule',
-				'desc'     => __( 'Set duration to uploaded images of abandoned cart. Re-activate plugin to when update this option', 'woocommerce-product-addon' ),
+				'desc'     => __( 'Set how long uploaded images from abandoned carts are kept. Reactivate the plugin after updating this option to apply changes.', 'woocommerce-product-addon' ),
 				'desc_tip' => true,
 			),
 
@@ -471,7 +471,7 @@ final class Settings {
 					'individual_override' => __( 'Individual Overrides Category Assignment', 'woocommerce-product-addon' ),
 				),
 				'id'       => 'ppom_meta_overrides',
-				'desc'     => __( 'Leave if default if not sure.', 'woocommerce-product-addon' ),
+				'desc'     => __( 'Leave as default if you are not sure.', 'woocommerce-product-addon' ),
 				'desc_tip' => true,
 			),
 
@@ -485,7 +485,7 @@ final class Settings {
 					'individual_first' => __( 'Individual First', 'woocommerce-product-addon' ),
 				),
 				'id'       => 'ppom_meta_priority',
-				'desc'     => __( 'Leave if default if not sure.', 'woocommerce-product-addon' ),
+				'desc'     => __( 'Leave as default if you are not sure.', 'woocommerce-product-addon' ),
 				'desc_tip' => true,
 			),
 
@@ -496,7 +496,7 @@ final class Settings {
 				'default'  => 'after',
 				'options'  => array(
 					'after'  => __( 'After PPOM Fields', 'woocommerce-product-addon' ),
-					'before' => __( 'Before  PPOM Fields', 'woocommerce-product-addon' ),
+					'before' => __( 'Before PPOM Fields', 'woocommerce-product-addon' ),
 				),
 				'id'       => 'ppom_price_table_location',
 				'desc'     => __( 'Set the location to render Price Table on Front-end', 'woocommerce-product-addon' ),

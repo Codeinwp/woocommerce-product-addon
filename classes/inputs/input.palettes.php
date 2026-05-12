@@ -47,12 +47,12 @@ class NM_Palettes_wooproduct extends PPOM_Inputs {
 			'title'                   => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
-				'desc'  => __( 'It will be shown as field label', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as the field label.', 'woocommerce-product-addon' ),
 			),
 			'data_name'               => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'woocommerce-product-addon' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'             => array(
 				'type'  => 'textarea',
@@ -129,7 +129,7 @@ class NM_Palettes_wooproduct extends PPOM_Inputs {
 			'multiple_allowed'        => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Multiple selections?', 'woocommerce-product-addon' ),
-				'desc'        => __( 'Allow users to select more then one palette?.', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Allow users to select more than one palette?', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'onetime'                 => array(
@@ -141,7 +141,7 @@ class NM_Palettes_wooproduct extends PPOM_Inputs {
 			'circle'                  => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Show as Circle', 'woocommerce-product-addon' ),
-				'desc'        => __( 'It will display color palettes as circle', 'woocommerce-product-addon' ),
+				'desc'        => __( 'It will display color palettes as circles.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'desc_tooltip'            => array(

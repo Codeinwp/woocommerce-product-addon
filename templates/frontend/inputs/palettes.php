@@ -34,7 +34,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 // If options empty
 if ( ! $options ) {
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please Add Some Option', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . __( 'Please add at least one option.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';

@@ -273,7 +273,7 @@ class PPOM_Fields_Meta {
 					'cancelBtn'       => __( 'Cancel', 'woocommerce-product-addon' ),
 					'finishTitle'     => __( 'Done', 'woocommerce-product-addon' ),
 					'errorTitle'      => __( 'Error', 'woocommerce-product-addon' ),
-					'checkFieldTitle' => __( 'Please at least check one field!', 'woocommerce-product-addon' ),
+					'checkFieldTitle' => __( 'Please check at least one field.', 'woocommerce-product-addon' ),
 
 				),
 				'toggle'                         => array(
@@ -290,7 +290,7 @@ class PPOM_Fields_Meta {
 				'upload'                         => __( 'Upload', 'woocommerce-product-addon' ),
 				'stock'                          => __( 'Stock', 'woocommerce-product-addon' ),
 				'metaIds'                        => __( 'Meta IDs', 'woocommerce-product-addon' ),
-				'cannotRemoveMoreOption'         => __( 'Cannot Remove More Option', 'woocommerce-product-addon' ),
+				'cannotRemoveMoreOption'         => __( 'Cannot remove more options', 'woocommerce-product-addon' ),
 				'dataNameRequired'               => __( 'Data Name must be required', 'woocommerce-product-addon' ),
 				'dataNameExists'                 => __( 'Data Name already exists', 'woocommerce-product-addon' ),
 				'previewLoading'                 => __( 'Loading preview...', 'woocommerce-product-addon' ),
@@ -1413,8 +1413,8 @@ class PPOM_Fields_Meta {
 				$html_input .= '</table>';
 				$html_input .= '</div>';
 				$html_input .= '<div class="text-right">';
-				$html_input .= '<button class="btn btn-success ppom-save-bulk-json">' . esc_html__( 'Save Changing', 'woocommerce-product-addon' ) . '</button> ';
-				$html_input .= '<button class="btn btn-info ppom-edit-bulk-json">' . esc_html__( 'Edit Changing', 'woocommerce-product-addon' ) . '</button>';
+				$html_input .= '<button class="btn btn-success ppom-save-bulk-json">' . esc_html__( 'Save Changes', 'woocommerce-product-addon' ) . '</button> ';
+				$html_input .= '<button class="btn btn-info ppom-edit-bulk-json">' . esc_html__( 'Edit Changes', 'woocommerce-product-addon' ) . '</button>';
 
 				if ( ! empty( $bulk_data ) ) {
 					$html_input .= "<input type='hidden' name='ppom[" . esc_attr( strval( $field_index ) ) . "][options]' class='ppom-saved-bulk-data ppom-meta-field' value='" . wp_json_encode( $bulk_data ) . "' data-metatype='options'>";

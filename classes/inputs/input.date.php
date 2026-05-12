@@ -47,7 +47,7 @@ class NM_Date_wooproduct extends PPOM_Inputs {
 			'title'             => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
-				'desc'  => __( 'It will be shown as field label', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as the field label.', 'woocommerce-product-addon' ),
 			),
 			'data_name'         => array(
 				'type'  => 'text',

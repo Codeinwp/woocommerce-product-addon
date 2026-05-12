@@ -62,12 +62,12 @@ class NM_Quantities_wooproduct extends PPOM_Inputs {
 			'title'            => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
-				'desc'  => __( 'It will be shown as field label. See example for usage.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as the field label. See example for usage.', 'woocommerce-product-addon' ),
 			),
 			'data_name'        => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'woocommerce-product-addon' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'      => array(
 				'type'  => 'textarea',

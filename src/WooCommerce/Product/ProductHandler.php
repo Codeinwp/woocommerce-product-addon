@@ -84,7 +84,7 @@ final class ProductHandler {
 
 		if ( ! $ppom->has_unique_datanames() ) {
 
-			echo '<div class="error">' . esc_html__( 'Some of your fields has duplicated datanames, please fix it', 'woocommerce-product-addon' ) . '</div>';
+			echo '<div class="error">' . esc_html__( 'Some of your fields have duplicate data names. Please fix them.', 'woocommerce-product-addon' ) . '</div>';
 
 			return;
 		}

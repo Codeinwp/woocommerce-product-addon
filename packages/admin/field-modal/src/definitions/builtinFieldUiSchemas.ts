@@ -336,7 +336,7 @@ function textareaSettings(): SettingSchema {
 			'text',
 			__( 'Post ID', 'woocommerce-product-addon' ),
 			__(
-				'It will pull content from post. e.g: 22',
+				'It will pull content from the post (e.g., 22).',
 				'woocommerce-product-addon'
 			)
 		),
@@ -951,7 +951,7 @@ function colorSettings(): SettingSchema {
 			'text',
 			__( 'Palettes colors', 'woocommerce-product-addon' ),
 			__(
-				'Color codes seperated by comma e.g: #125, #459, #78b',
+				'Color codes separated by comma, e.g.: #125, #459, #78b',
 				'woocommerce-product-addon'
 			),
 			{ col_classes: HALF_WIDTH }
@@ -1092,7 +1092,7 @@ function fileSettings(): SettingSchema {
 		file_cost: setting(
 			'text',
 			__( 'File cost/price', 'woocommerce-product-addon' ),
-			__( 'This will be added into cart', 'woocommerce-product-addon' ),
+			__( 'This will be added to the cart.', 'woocommerce-product-addon' ),
 			{ col_classes: HALF_WIDTH }
 		),
 		class: classSetting(),
@@ -1936,7 +1936,7 @@ function cropperSettings(): SettingSchema {
 		file_cost: setting(
 			'text',
 			__( 'File cost/price', 'woocommerce-product-addon' ),
-			__( 'This will be added into cart', 'woocommerce-product-addon' ),
+			__( 'This will be added to the cart.', 'woocommerce-product-addon' ),
 			{ col_classes: HALF_WIDTH }
 		),
 		selected: setting(

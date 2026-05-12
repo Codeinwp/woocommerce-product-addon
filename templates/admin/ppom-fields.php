@@ -336,7 +336,7 @@ $fields_groups = function_exists( 'ppom_get_admin_field_type_groups' ) ? ppom_ge
 							</div>
 							<div class="col-md-6 col-sm-12">
 								<div class="form-group">
-									<label><?php _e( 'Custom Javascipt', 'woocommerce-product-addon' ); ?>
+									<label><?php _e( 'Custom JavaScript', 'woocommerce-product-addon' ); ?>
 										<?php if ( $is_legacy_user ) : ?>
 											<span class="ppom-pro-badge">
 												<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ff0000">
@@ -347,7 +347,7 @@ $fields_groups = function_exists( 'ppom_get_admin_field_type_groups' ) ? ppom_ge
 											</span>
 										<?php endif; ?>
 										<span class="ppom-helper-icon" data-ppom-tooltip="ppom_tooltip"
-												title="<?php _e( 'Add your own javascipt script.', 'woocommerce-product-addon' ); ?>"><i
+												title="<?php _e( 'Add your own JavaScript code.', 'woocommerce-product-addon' ); ?>"><i
 													class="dashicons dashicons-editor-help"></i></span>
 									</label>
 									<div class="ppom-editor-wrapper<?php echo $is_legacy_user ? ' ppom-locked' : ''; ?>">
