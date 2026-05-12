@@ -8,6 +8,9 @@ on:
       - development
       - master
 
+permissions:
+  contents: read
+
 jobs:
   translation:
     runs-on: ubuntu-latest
