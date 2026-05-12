@@ -31,3 +31,6 @@ AGENTS.md
 phpcs.baseline.xml
 .eslintrc.json
 .prettierignore
+packages/*/*/src
+packages/*/*/tsconfig.json
+packages/*/*/webpack.config.cjs
