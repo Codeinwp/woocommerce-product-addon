@@ -674,9 +674,11 @@ function createFieldRow(
 		textSpan( 'ppom_meta_field_req', getRequiredText( field ) )
 	);
 
-	const actions = document.createElement( 'span' );
+	const actionsCell = document.createElement( 'td' );
+	actionsCell.className = 'actions column-actions';
+	actionsCell.setAttribute( 'data-colname', 'Actions' );
 	const fieldType = getFieldValue( field, 'type' );
-	actions.appendChild(
+	actionsCell.appendChild(
 		createActionButton(
 			'ppom_copy_field',
 			'dashicons-admin-page',
@@ -685,8 +687,8 @@ function createFieldRow(
 			fieldType
 		)
 	);
-	actions.appendChild( document.createTextNode( ' ' ) );
-	actions.appendChild(
+	actionsCell.appendChild( document.createTextNode( ' ' ) );
+	actionsCell.appendChild(
 		createActionButton(
 			'ppom-edit-field',
 			'dashicons-edit',
@@ -694,8 +696,8 @@ function createFieldRow(
 			'Edit Field'
 		)
 	);
-	actions.appendChild( document.createTextNode( ' ' ) );
-	actions.appendChild(
+	actionsCell.appendChild( document.createTextNode( ' ' ) );
+	actionsCell.appendChild(
 		createActionButton(
 			'ppom-delete-field',
 			'dashicons-trash',
@@ -703,7 +705,7 @@ function createFieldRow(
 			'Delete Field'
 		)
 	);
-	appendCell( row, 'td', 'actions column-actions', actions );
+	row.appendChild( actionsCell );
 
 	return row;
 }
