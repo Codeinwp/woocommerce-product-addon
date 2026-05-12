@@ -142,45 +142,61 @@ export function PairedCropperEditor( {
 								m={ 0 }
 							>
 								{ i18n.pairedOptionsEmptyDescription ||
-									'Options are the choices your customer picks from.' }
+									'Add at least one option for customers to choose from.' }
 							</Text>
+							<Button
+								size="xs"
+								colorPalette="blue"
+								onClick={ addRow }
+								mt={ 0.5 }
+							>
+								<Icon as={ LuPlus } boxSize={ 3 } mr={ 1 } />
+								{ i18n.pairedOptionsAddFirst ||
+									'Add your first option' }
+							</Button>
 						</VStack>
 					) : (
-						rows.map( ( row, index ) => (
-							<CropperViewportRowItem
-								key={ index }
-								row={ row }
-								index={ index }
-								i18n={ i18n }
-								labelPlaceholder={ labelPh }
-								widthPlaceholder={ widthPh }
-								heightPlaceholder={ heightPh }
-								pricePlaceholder={ pricePh }
-								onPatch={ updateRow }
-								onMoveUp={ dragHandlers.onMoveUp }
-								onMoveDown={ dragHandlers.onMoveDown }
-								onRemove={ removeRow }
-								dragIndex={ dragHandlers.dragIndex }
-								onDragStart={ dragHandlers.onDragStart }
-								onDragEnd={ dragHandlers.onDragEnd }
-								onDrop={ dragHandlers.onDrop }
-							/>
-						) )
+						<>
+							{ rows.map( ( row, index ) => (
+								<CropperViewportRowItem
+									key={ index }
+									row={ row }
+									index={ index }
+									i18n={ i18n }
+									labelPlaceholder={ labelPh }
+									widthPlaceholder={ widthPh }
+									heightPlaceholder={ heightPh }
+									pricePlaceholder={ pricePh }
+									onPatch={ updateRow }
+									onMoveUp={ dragHandlers.onMoveUp }
+									onMoveDown={ dragHandlers.onMoveDown }
+									onRemove={ removeRow }
+									dragIndex={ dragHandlers.dragIndex }
+									onDragStart={ dragHandlers.onDragStart }
+									onDragEnd={ dragHandlers.onDragEnd }
+									onDrop={ dragHandlers.onDrop }
+								/>
+							) ) }
+							<Button
+								size="sm"
+								variant="outline"
+								borderStyle="dashed"
+								color="gray.600"
+								width="full"
+								mt={ 1 }
+								onClick={ addRow }
+							>
+								<Icon
+									as={ LuPlus }
+									boxSize={ 3.5 }
+									mr={ 1 }
+								/>
+								{ i18n.cropperViewportAddRow ||
+									i18n.pairedOptionsAddRow ||
+									'Add viewport' }
+							</Button>
+						</>
 					) }
-					<Button
-						size="sm"
-						variant="outline"
-						borderStyle="dashed"
-						color="gray.600"
-						width="full"
-						mt={ 1 }
-						onClick={ addRow }
-					>
-						<Icon as={ LuPlus } boxSize={ 3.5 } mr={ 1 } />
-						{ i18n.cropperViewportAddRow ||
-							i18n.pairedOptionsAddRow ||
-							'Add viewport' }
-					</Button>
 				</VStack>
 			</Box>
 			{ description ? (

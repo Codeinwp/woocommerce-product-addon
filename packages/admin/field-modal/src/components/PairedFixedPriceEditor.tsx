@@ -2,7 +2,7 @@
  * Fixed Price paired rows: quantity + fixed price (number inputs), classic input.fixedprice.php shape.
  */
 import { Box, Button, Icon, Input, Text, VStack } from '@chakra-ui/react';
-import { LuPlus } from 'react-icons/lu';
+import { LuListChecks, LuPlus } from 'react-icons/lu';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FieldRow } from '../types/fieldModal';
 import type { I18nDict } from '../types/fieldModal';
@@ -83,6 +83,7 @@ export function PairedFixedPriceEditor( {
 	};
 
 	const dragHandlers = useDraggableRows( rows, setRows );
+	const isEmpty = rows.length === 0;
 
 	return (
 		<Box
@@ -95,77 +96,129 @@ export function PairedFixedPriceEditor( {
 			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
 				{ title }
 			</Text>
-			<VStack align="stretch" gap={ 2 }>
-				{ rows.map( ( row, index ) => (
-					<DraggableOptionRow
-						key={ index }
-						index={ index }
-						dragIndex={ dragHandlers.dragIndex }
-						onDragStart={ dragHandlers.onDragStart }
-						onDragEnd={ dragHandlers.onDragEnd }
-						onDrop={ dragHandlers.onDrop }
-						onMoveUp={ dragHandlers.onMoveUp }
-						onMoveDown={ dragHandlers.onMoveDown }
-						onRemove={ removeRow }
-						dragLabel={
-							i18n.pairedOptionsDragHandle || 'Drag to reorder'
-						}
-						removeLabel={ i18n.pairedOptionsRemove || 'Remove' }
-						flexWrap="wrap"
-					>
-						<Input
-							size="sm"
-							type={ t0 }
-							flex="1 1 120px"
-							minW={ 0 }
-							placeholder={ p0 }
-							value={ String( row.option ?? '' ) }
-							onChange={ ( e ) =>
-								updateRow( index, {
-									option: e.target.value,
-								} )
-							}
-						/>
-						<Input
-							size="sm"
-							type={ t1 }
-							flex="1 1 120px"
-							minW={ 0 }
-							placeholder={ p1 }
-							value={ String( row.price ?? '' ) }
-							onChange={ ( e ) =>
-								updateRow( index, {
-									price: e.target.value,
-								} )
-							}
-						/>
-						<Input
-							size="sm"
-							flex="1 1 100px"
-							minW={ 0 }
-							placeholder={
-								i18n.pairedMatrixOptionId || 'Unique ID'
-							}
-							value={ String( row.id ?? '' ) }
-							onChange={ ( e ) =>
-								updateRow( index, { id: e.target.value } )
-							}
-						/>
-					</DraggableOptionRow>
-				) ) }
-				<Button
-					size="sm"
-					variant="outline"
+			{ isEmpty ? (
+				<VStack
+					align="center"
+					gap={ 1.5 }
+					py={ 4 }
+					px={ 4 }
+					borderWidth="1px"
 					borderStyle="dashed"
-					color="gray.600"
-					width="full"
-					mt={ 1 }
-					onClick={ addRow }
+					borderColor="gray.300"
+					borderRadius="md"
+					bg="gray.50"
 				>
-					<Icon as={ LuPlus } boxSize={ 3.5 } mr={ 1 } />
-					{ i18n.pairedOptionsAddRow || 'Add option' }
-				</Button>
-			</VStack>
+					<Icon
+						as={ LuListChecks }
+						boxSize={ 5 }
+						color="gray.400"
+						aria-hidden
+					/>
+					<Text
+						fontWeight="semibold"
+						fontSize="sm"
+						color="gray.700"
+						m={ 0 }
+					>
+						{ i18n.pairedOptionsEmptyTitle || 'No options yet' }
+					</Text>
+					<Text
+						fontSize="xs"
+						color="gray.500"
+						textAlign="center"
+						maxW="xs"
+						m={ 0 }
+					>
+						{ i18n.pairedOptionsEmptyDescription ||
+							'Add at least one option for customers to choose from.' }
+					</Text>
+					<Button
+						size="xs"
+						colorPalette="blue"
+						onClick={ addRow }
+						mt={ 0.5 }
+					>
+						<Icon as={ LuPlus } boxSize={ 3 } mr={ 1 } />
+						{ i18n.pairedOptionsAddFirst ||
+							'Add your first option' }
+					</Button>
+				</VStack>
+			) : (
+				<VStack align="stretch" gap={ 2 }>
+					{ rows.map( ( row, index ) => (
+						<DraggableOptionRow
+							key={ index }
+							index={ index }
+							dragIndex={ dragHandlers.dragIndex }
+							onDragStart={ dragHandlers.onDragStart }
+							onDragEnd={ dragHandlers.onDragEnd }
+							onDrop={ dragHandlers.onDrop }
+							onMoveUp={ dragHandlers.onMoveUp }
+							onMoveDown={ dragHandlers.onMoveDown }
+							onRemove={ removeRow }
+							dragLabel={
+								i18n.pairedOptionsDragHandle ||
+								'Drag to reorder'
+							}
+							removeLabel={
+								i18n.pairedOptionsRemove || 'Remove'
+							}
+							flexWrap="wrap"
+						>
+							<Input
+								size="sm"
+								type={ t0 }
+								flex="1 1 120px"
+								minW={ 0 }
+								placeholder={ p0 }
+								value={ String( row.option ?? '' ) }
+								onChange={ ( e ) =>
+									updateRow( index, {
+										option: e.target.value,
+									} )
+								}
+							/>
+							<Input
+								size="sm"
+								type={ t1 }
+								flex="1 1 120px"
+								minW={ 0 }
+								placeholder={ p1 }
+								value={ String( row.price ?? '' ) }
+								onChange={ ( e ) =>
+									updateRow( index, {
+										price: e.target.value,
+									} )
+								}
+							/>
+							<Input
+								size="sm"
+								flex="1 1 100px"
+								minW={ 0 }
+								placeholder={
+									i18n.pairedMatrixOptionId || 'Unique ID'
+								}
+								value={ String( row.id ?? '' ) }
+								onChange={ ( e ) =>
+									updateRow( index, { id: e.target.value } )
+								}
+							/>
+						</DraggableOptionRow>
+					) ) }
+					<Button
+						size="sm"
+						variant="outline"
+						borderStyle="dashed"
+						color="gray.600"
+						width="full"
+						mt={ 1 }
+						onClick={ addRow }
+					>
+						<Icon as={ LuPlus } boxSize={ 3.5 } mr={ 1 } />
+						{ i18n.pairedOptionsAddRow || 'Add option' }
+					</Button>
+				</VStack>
+			) }
 		</Box>
 	);
 }

@@ -2,8 +2,9 @@
  * Bulk quantity matrix: rows keyed by column headers (Quantity Range, Base Price, + variations).
  * Matches classic ppom-bulkquantity.js tableToJSON() shape.
  */
-import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, HStack, Icon, Text, VStack } from '@chakra-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
+import { LuPlus } from 'react-icons/lu';
 import type { FieldRow, I18nDict } from '../types/fieldModal';
 import {
 	type BulkQuantityRow,
@@ -110,22 +111,19 @@ export function BulkQuantityMatrixEditor( {
 			p={ 3 }
 			bg="white"
 		>
-			<Text fontWeight="semibold" fontSize="sm" mb={ 3 }>
-				{ title }
-			</Text>
+			<HStack justify="space-between" align="center" gap={ 2 } mb={ 3 }>
+				<Text fontWeight="semibold" fontSize="sm">
+					{ title }
+				</Text>
+				<Button
+					size="xs"
+					variant="outline"
+					onClick={ addVariationColumn }
+				>
+					{ i18n.bulkQtyAddVariation || 'Add variation column' }
+				</Button>
+			</HStack>
 			<VStack align="stretch" gap={ 3 }>
-				<HStack gap={ 2 } flexWrap="wrap">
-					<Button size="xs" onClick={ addRow }>
-						{ i18n.bulkQtyAddRow || 'Add quantity range' }
-					</Button>
-					<Button
-						size="xs"
-						variant="outline"
-						onClick={ addVariationColumn }
-					>
-						{ i18n.bulkQtyAddVariation || 'Add variation column' }
-					</Button>
-				</HStack>
 				<BulkQuantityTable
 					columns={ columns }
 					rows={ normalizedRows }
@@ -135,10 +133,18 @@ export function BulkQuantityMatrixEditor( {
 					onRemoveRow={ removeRow }
 					onRemoveColumn={ removeColumn }
 				/>
-				<Text fontSize="xs" color="gray.600">
-					{ i18n.bulkQtyRangeHint ||
-						'Quantity range format: start-end (e.g. 1-10).' }
-				</Text>
+				<Button
+					size="sm"
+					variant="outline"
+					borderStyle="dashed"
+					color="gray.600"
+					width="full"
+					mt={ 1 }
+					onClick={ addRow }
+				>
+					<Icon as={ LuPlus } boxSize={ 3.5 } mr={ 1 } />
+					{ i18n.bulkQtyAddRow || 'Add quantity range' }
+				</Button>
 			</VStack>
 		</Box>
 	);

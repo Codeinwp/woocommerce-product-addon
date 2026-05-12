@@ -332,9 +332,8 @@ export const optionEditorStrings: I18nDict = {
 		'Variation column name',
 		'woocommerce-product-addon'
 	),
-	bulkQtyRangePlaceholder: __( '1-10', 'woocommerce-product-addon' ),
-	bulkQtyRangeHint: __(
-		'Quantity range format: start-end (e.g. 1-10).',
+	bulkQtyRangePlaceholder: __(
+		'Start–end (e.g. 1-10)',
 		'woocommerce-product-addon'
 	),
 	bulkQtyActions: __( 'Actions', 'woocommerce-product-addon' ),

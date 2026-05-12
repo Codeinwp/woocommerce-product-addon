@@ -109,7 +109,7 @@ export function BulkQuantityTable( {
 										placeholder={
 											col === rangeKey
 												? i18n.bulkQtyRangePlaceholder ||
-												  '1-10'
+												  'Start–end (e.g. 1-10)'
 												: ''
 										}
 									/>
