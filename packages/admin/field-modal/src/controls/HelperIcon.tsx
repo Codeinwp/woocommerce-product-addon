@@ -17,8 +17,8 @@ export function HelperIcon( {
 	return (
 		<Tooltip.Root
 			openDelay={ 200 }
-			closeDelay={ 100 }
-			positioning={ { placement: 'top' } }
+			closeDelay={ 300 }
+			positioning={ { placement: 'top', offset: { mainAxis: 8 } } }
 		>
 			<Tooltip.Trigger asChild>
 				<span
