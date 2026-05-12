@@ -35,6 +35,7 @@ export interface ConditionsEditorProps {
 	builderFields?: FieldRow[];
 	conditionsProEnabled?: boolean;
 	links?: FieldModalLinks;
+	upsellMode?: boolean;
 }
 
 export function ConditionsEditor( {
@@ -45,6 +46,7 @@ export function ConditionsEditor( {
 	builderFields = [],
 	conditionsProEnabled = false,
 	links = {},
+	upsellMode = false,
 }: ConditionsEditorProps ) {
 	const title =
 		i18n.condEditorTitle ||
@@ -135,6 +137,7 @@ export function ConditionsEditor( {
 				i18n={ i18n }
 				onToggle={ setLogic }
 				withDivider={ logicOn }
+				upsellMode={ upsellMode }
 			/>
 			{ logicOn ? (
 				<VStack align="stretch" gap={ 3 } mt={ 3 }>

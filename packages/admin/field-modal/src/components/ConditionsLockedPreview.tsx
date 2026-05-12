@@ -55,6 +55,7 @@ export function ConditionsLockedPreview( {
 					builderFields={ [] }
 					conditionsProEnabled={ true }
 					links={ links }
+					upsellMode={ true }
 				/>
 			</Box>
 		</VStack>

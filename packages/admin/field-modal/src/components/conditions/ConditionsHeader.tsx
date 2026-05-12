@@ -9,6 +9,7 @@ export interface ConditionsHeaderProps {
 	i18n: I18nDict;
 	onToggle: ( next: boolean ) => void;
 	withDivider?: boolean;
+	upsellMode?: boolean;
 }
 
 export function ConditionsHeader( {
@@ -18,6 +19,7 @@ export function ConditionsHeader( {
 	i18n,
 	onToggle,
 	withDivider = true,
+	upsellMode = false,
 }: ConditionsHeaderProps ) {
 	const switchId = useId();
 	const stateLabel = logicOn
@@ -49,25 +51,55 @@ export function ConditionsHeader( {
 					</Text>
 				) : null }
 			</VStack>
-			<HStack as="label" htmlFor={ switchId } gap={ 2 } cursor="pointer">
+			<HStack
+				as={ upsellMode ? 'div' : 'label' }
+				htmlFor={ upsellMode ? undefined : switchId }
+				gap={ 2 }
+				cursor={ upsellMode ? 'not-allowed' : 'pointer' }
+			>
 				<Switch.Root
 					id={ switchId }
 					colorPalette="green"
 					size="md"
-					checked={ logicOn }
+					checked={ upsellMode ? false : logicOn }
+					disabled={ upsellMode }
 					onCheckedChange={ ( { checked } ) => onToggle( checked ) }
 				>
 					<Switch.HiddenInput />
 					<Switch.Control />
 				</Switch.Root>
-				<Box
-					fontSize="sm"
-					fontWeight="semibold"
-					color={ logicOn ? 'green.600' : 'gray.500' }
-					minW="60px"
-				>
-					{ stateLabel }
-				</Box>
+				{ upsellMode ? (
+					<Box
+						as="span"
+						aria-label={ i18n.proBadge || 'PRO' }
+						css={ {
+							display: 'inline-flex',
+							alignItems: 'center',
+							columnGap: '4px',
+							background: '#28A745',
+							color: 'white',
+							padding: '2px 7px',
+							borderRadius: '3px',
+							fontSize: '10px',
+							fontWeight: 700,
+							lineHeight: 1.4,
+							letterSpacing: '0.02em',
+							textTransform: 'uppercase',
+						} }
+					>
+						<i className="fa fa-lock" aria-hidden="true" />
+						{ i18n.proBadge || 'PRO' }
+					</Box>
+				) : (
+					<Box
+						fontSize="sm"
+						fontWeight="semibold"
+						color={ logicOn ? 'green.600' : 'gray.500' }
+						minW="60px"
+					>
+						{ stateLabel }
+					</Box>
+				) }
 			</HStack>
 		</HStack>
 	);
