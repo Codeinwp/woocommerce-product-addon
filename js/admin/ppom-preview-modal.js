@@ -7,7 +7,9 @@ jQuery( function ( $ ) {
 	const previewSelect = $( '#ppom-preview-product-select' );
 	const previewIframe = $( '#ppom-live-preview-iframe' );
 	const previewWrap = previewModal.find( '.ppom-preview-iframe-wrap' );
-	const previewErrorNotice = previewModal.find( '.ppom-preview-notice-error' );
+	const previewErrorNotice = previewModal.find(
+		'.ppom-preview-notice-error'
+	);
 	const previewWarningNotice = previewModal.find(
 		'.ppom-preview-notice-warning'
 	);
@@ -94,13 +96,16 @@ jQuery( function ( $ ) {
 
 		const message = hintMessage || '';
 		const checkingMsg = ppom_vars.i18n.previewCheckingAvailability || '';
-		const disabledAria = ppom_vars.i18n.previewSavePreviewDisabledAria || '';
+		const disabledAria =
+			ppom_vars.i18n.previewSavePreviewDisabledAria || '';
 
 		savePreviewBtn.prop( 'disabled', ! enabled );
 		savePreviewBtn.attr( 'aria-disabled', ! enabled ? 'true' : 'false' );
 
 		if ( enabled ) {
-			savePreviewTooltipAnchor.removeClass( 'ppom-save-preview-is-disabled' );
+			savePreviewTooltipAnchor.removeClass(
+				'ppom-save-preview-is-disabled'
+			);
 			savePreviewTooltipAnchor.removeAttr( 'title' );
 			savePreviewBtn.removeAttr( 'aria-label' );
 			syncSavePreviewTooltipBody( true, '' );
@@ -167,11 +172,18 @@ jQuery( function ( $ ) {
 			return;
 		}
 
-		if ( previewSelect.find( 'option[value="' + productId + '"]' ).length ) {
+		if (
+			previewSelect.find( 'option[value="' + productId + '"]' ).length
+		) {
 			return;
 		}
 
-		const option = new Option( productText, String( productId ), false, false );
+		const option = new Option(
+			productText,
+			String( productId ),
+			false,
+			false
+		);
 		previewSelect.append( option );
 	}
 
@@ -354,7 +366,9 @@ jQuery( function ( $ ) {
 			attachBtn.scrollIntoView( { behavior: 'smooth', block: 'center' } );
 			attachBtn.classList.add( 'ppom-preview-assignment-highlight' );
 			setTimeout( () => {
-				attachBtn.classList.remove( 'ppom-preview-assignment-highlight' );
+				attachBtn.classList.remove(
+					'ppom-preview-assignment-highlight'
+				);
 			}, 1800 );
 		} );
 

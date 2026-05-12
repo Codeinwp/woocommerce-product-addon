@@ -16,10 +16,16 @@ use WP_REST_Response;
 use WP_REST_Server;
 
 /**
- * REST endpoints for loading and saving field groups from the React modal.
+ * Read-only REST endpoints that bootstrap the React field modal.
+ *
+ * Persistence intentionally stays on the classic admin-ajax handler
+ * (`wp_ajax_ppom_save_form_meta` → `ppom_admin_save_form_meta`) so the React
+ * shell reuses the same legacy validation, filter chain, Pro hooks, and
+ * builder DOM that the classic editor already exercises. The React modal
+ * commits each edited row back into the classic builder's hidden form via
+ * `commitFieldToClassicForm`; the user then triggers the legacy Save.
  *
  * @phpstan-type BootPayload array<string, mixed>
- * @phpstan-type SaveSuccess array{success: bool, message: string, productmeta_id: int, redirect_to: string, fields: array<int, array<string, mixed>>}
  *
  * @internal
  */
@@ -40,33 +46,19 @@ final class FieldModalRestController {
 	private $schema_builder;
 
 	/**
-	 * Persistence handler instance.
-	 *
-	 * @var FieldModalPersistence
-	 */
-	private $persistence;
-
-	/**
 	 * Creates the controller with optional collaborators (for tests).
 	 *
-	 * Parameters are untyped so this stays valid on PHP 7.0 (no nullable object type hints).
+	 * Parameter is untyped so this stays valid on PHP 7.0 (no nullable object type hints).
 	 *
 	 * @param FieldModalSchemaBuilder|null $schema_builder Optional schema builder.
-	 * @param FieldModalPersistence|null   $persistence    Optional persistence handler.
 	 *
 	 * @phpstan-param FieldModalSchemaBuilder|null $schema_builder
-	 * @phpstan-param FieldModalPersistence|null   $persistence
 	 */
-	public function __construct( $schema_builder = null, $persistence = null ) {
+	public function __construct( $schema_builder = null ) {
 		if ( $schema_builder instanceof FieldModalSchemaBuilder ) {
 			$this->schema_builder = $schema_builder;
 		} else {
 			$this->schema_builder = new FieldModalSchemaBuilder();
-		}
-		if ( $persistence instanceof FieldModalPersistence ) {
-			$this->persistence = $persistence;
-		} else {
-			$this->persistence = new FieldModalPersistence();
 		}
 	}
 
@@ -104,32 +96,6 @@ final class FieldModalRestController {
 					'type' => array(
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_key',
-					),
-				),
-			)
-		);
-
-		register_rest_route(
-			self::REST_NAMESPACE,
-			'/admin/field-groups',
-			array(
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => array( $this, 'create_group' ),
-				'permission_callback' => array( $this, 'permission_check' ),
-			)
-		);
-
-		register_rest_route(
-			self::REST_NAMESPACE,
-			'/admin/field-groups/(?P<id>\d+)',
-			array(
-				'methods'             => array( 'PUT', 'PATCH' ),
-				'callback'            => array( $this, 'update_group' ),
-				'permission_callback' => array( $this, 'permission_check' ),
-				'args'                => array(
-					'id' => array(
-						'type'              => 'integer',
-						'sanitize_callback' => 'absint',
 					),
 				),
 			)
@@ -303,72 +269,5 @@ final class FieldModalRestController {
 		$payload = apply_filters( 'ppom_admin_field_modal_boot_payload', $payload, $productmeta_id );
 
 		return rest_ensure_response( $payload );
-	}
-
-	/**
-	 * POST create field group.
-	 *
-	 * @param WP_REST_Request $request Request with JSON body: group, fields.
-	 * @return WP_REST_Response|WP_Error
-	 *
-	 * @phpstan-return WP_REST_Response|WP_Error
-	 */
-	public function create_group( WP_REST_Request $request ) {
-		$params = json_decode( $request->get_body(), true );
-		if ( ! is_array( $params ) ) {
-			return new WP_Error( 'ppom_invalid_json', __( 'Invalid JSON body.', 'woocommerce-product-addon' ), array( 'status' => 400 ) );
-		}
-
-		$group  = isset( $params['group'] ) && is_array( $params['group'] ) ? $params['group'] : array();
-		$fields = isset( $params['fields'] ) && is_array( $params['fields'] ) ? array_values( $params['fields'] ) : array();
-
-		$result = $this->persistence->create_group( $group, $fields );
-		if ( is_wp_error( $result ) ) {
-			return $result;
-		}
-
-		return rest_ensure_response(
-			array(
-				'success'        => true,
-				'message'        => $result['message'],
-				'productmeta_id' => $result['productmeta_id'],
-				'redirect_to'    => $result['redirect_to'],
-				'fields'         => $result['fields'],
-			)
-		);
-	}
-
-	/**
-	 * PUT update field group.
-	 *
-	 * @param WP_REST_Request $request Request with JSON body: group, fields; URL id param.
-	 * @return WP_REST_Response|WP_Error
-	 *
-	 * @phpstan-return WP_REST_Response|WP_Error
-	 */
-	public function update_group( WP_REST_Request $request ) {
-		$id     = (int) $request->get_param( 'id' );
-		$params = json_decode( $request->get_body(), true );
-		if ( ! is_array( $params ) ) {
-			return new WP_Error( 'ppom_invalid_json', __( 'Invalid JSON body.', 'woocommerce-product-addon' ), array( 'status' => 400 ) );
-		}
-
-		$group  = isset( $params['group'] ) && is_array( $params['group'] ) ? $params['group'] : array();
-		$fields = isset( $params['fields'] ) && is_array( $params['fields'] ) ? array_values( $params['fields'] ) : array();
-
-		$result = $this->persistence->update_group( $id, $group, $fields );
-		if ( is_wp_error( $result ) ) {
-			return $result;
-		}
-
-		return rest_ensure_response(
-			array(
-				'success'        => true,
-				'message'        => $result['message'],
-				'productmeta_id' => $result['productmeta_id'],
-				'redirect_to'    => $result['redirect_to'],
-				'fields'         => $result['fields'],
-			)
-		);
 	}
 }

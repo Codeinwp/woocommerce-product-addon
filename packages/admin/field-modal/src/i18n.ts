@@ -141,10 +141,7 @@ export const conditionStrings: I18nDict = {
 		'Enable Conditional Repeat',
 		'woocommerce-product-addon'
 	),
-	cfrEditorTitle: __(
-		'Conditional Repeater',
-		'woocommerce-product-addon'
-	),
+	cfrEditorTitle: __( 'Conditional Repeater', 'woocommerce-product-addon' ),
 	cfrEditorDesc: __(
 		'Repeat this field based on the value of another field.',
 		'woocommerce-product-addon'
@@ -248,10 +245,7 @@ export const conditionStrings: I18nDict = {
 		'woocommerce-product-addon'
 	),
 	condThisFieldWhen: __( 'this field when', 'woocommerce-product-addon' ),
-	condConditionsMatch: __(
-		'conditions match.',
-		'woocommerce-product-addon'
-	),
+	condConditionsMatch: __( 'conditions match.', 'woocommerce-product-addon' ),
 	condConditionsLabel: __( 'Conditions', 'woocommerce-product-addon' ),
 	condFieldHeader: __( 'Field', 'woocommerce-product-addon' ),
 	condOperatorHeader: __( 'Operator', 'woocommerce-product-addon' ),
@@ -276,10 +270,7 @@ export const conditionStrings: I18nDict = {
 		'woocommerce-product-addon'
 	),
 	condDismissSummary: __( 'Dismiss', 'woocommerce-product-addon' ),
-	condEnterValuePlaceholder: __(
-		'Enter value',
-		'woocommerce-product-addon'
-	),
+	condEnterValuePlaceholder: __( 'Enter value', 'woocommerce-product-addon' ),
 };
 
 export const optionEditorStrings: I18nDict = {

@@ -1,10 +1,14 @@
 /**
  * REST transport for the React field modal (admin field groups).
+ *
+ * Only read endpoints are exposed here. Persistence still flows through
+ * the classic builder's hidden form via `commitFieldToClassicForm`, which
+ * the legacy `admin-ajax.php?action=ppom_save_form_meta` handler then
+ * writes to the PPOM meta table — see this folder's AGENTS.md for the
+ * compatibility rationale.
  */
 import apiFetch from '@wordpress/api-fetch';
 import type { FieldModalContextPayload } from '../types/fieldModal';
-import { stripClientIds } from '../utils/clientIds';
-import type { FieldRow } from '../types/fieldModal';
 
 export async function fetchFieldModalContext(
 	productmetaId: number | undefined
@@ -26,30 +30,4 @@ export async function fetchFieldTypeSchema(
 	} ) ) as { schema?: Record< string, unknown > };
 	const schema = res && res.schema ? res.schema : null;
 	return schema;
-}
-
-export async function saveFieldGroup( args: {
-	productmetaId: number | undefined;
-	group: Record< string, unknown >;
-	fields: FieldRow[];
-} ): Promise< { redirect_to?: string } | void > {
-	const { productmetaId, group, fields } = args;
-	const payload = {
-		group,
-		fields: stripClientIds( fields ),
-	};
-	if ( ( productmetaId ?? 0 ) > 0 ) {
-		await apiFetch( {
-			path: `ppom/v1/admin/field-groups/${ productmetaId }`,
-			method: 'PUT',
-			data: payload,
-		} );
-		return;
-	}
-	const res = ( await apiFetch( {
-		path: 'ppom/v1/admin/field-groups',
-		method: 'POST',
-		data: payload,
-	} ) ) as { redirect_to?: string };
-	return res;
 }

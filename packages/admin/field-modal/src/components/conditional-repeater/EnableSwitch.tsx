@@ -38,11 +38,7 @@ export function EnableSwitch( {
 		>
 			<VStack align="stretch" gap={ 0.5 } minW={ 0 } flex="1">
 				<HStack gap={ 2 } align="center" flexWrap="wrap">
-					<Text
-						fontWeight="semibold"
-						fontSize="sm"
-						color="gray.900"
-					>
+					<Text fontWeight="semibold" fontSize="sm" color="gray.900">
 						{ title }
 					</Text>
 					{ docsUrl ? (
@@ -74,7 +70,9 @@ export function EnableSwitch( {
 					colorPalette="green"
 					size="md"
 					checked={ Boolean( enabled ) }
-					onCheckedChange={ ( { checked: next } ) => onToggle( next ) }
+					onCheckedChange={ ( { checked: next } ) =>
+						onToggle( next )
+					}
 				>
 					<Switch.HiddenInput />
 					<Switch.Control />

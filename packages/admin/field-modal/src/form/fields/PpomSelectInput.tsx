@@ -33,9 +33,7 @@ export function PpomSelectInput( { label, options }: PpomSelectInputProps ) {
 					id={ selectId }
 					size="sm"
 					value={ v ?? '' }
-					onChange={ ( e ) =>
-						field.handleChange( e.target.value )
-					}
+					onChange={ ( e ) => field.handleChange( e.target.value ) }
 					onBlur={ field.handleBlur }
 					{ ...ppomControlSurface }
 				>

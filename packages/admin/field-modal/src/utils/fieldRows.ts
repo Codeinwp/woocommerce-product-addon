@@ -2,11 +2,7 @@
  * Canonical field-row helpers for the React field modal.
  */
 import { readSettingSchema } from '../definitions/settingMeta';
-import type {
-	CatalogItem,
-	FieldRow,
-	SchemaObject,
-} from '../types/fieldModal';
+import type { CatalogItem, FieldRow, SchemaObject } from '../types/fieldModal';
 import { newClientId, stripClientIds, withClientIds } from './clientIds';
 import { stableStringifyFieldRow } from './fieldFormSync';
 import { slugifyDataName } from './slugifyDataName';

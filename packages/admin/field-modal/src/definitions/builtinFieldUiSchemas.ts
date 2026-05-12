@@ -2891,14 +2891,8 @@ function fontsSettings(): SettingSchema {
 			{
 				options: {
 					none: __( 'None', 'woocommerce-product-addon' ),
-					above_font: __(
-						'Above font',
-						'woocommerce-product-addon'
-					),
-					below_font: __(
-						'Below font',
-						'woocommerce-product-addon'
-					),
+					above_font: __( 'Above font', 'woocommerce-product-addon' ),
+					below_font: __( 'Below font', 'woocommerce-product-addon' ),
 					by_data_name: __(
 						'Specify field data name',
 						'woocommerce-product-addon'

@@ -52,14 +52,9 @@ export function CheckboxControl( {
 							>
 								<Checkbox.HiddenInput />
 								<Checkbox.Control />
-								<Checkbox.Label
-									{ ...labelProps }
-									mb={ 0 }
-								>
+								<Checkbox.Label { ...labelProps } mb={ 0 }>
 									{ title }
-									<HelperIcon
-										description={ description }
-									/>
+									<HelperIcon description={ description } />
 								</Checkbox.Label>
 							</Checkbox.Root>
 							{ error ? (

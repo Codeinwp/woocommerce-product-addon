@@ -70,12 +70,7 @@ export function ChainedOptionsEditor( {
 			p={ 3 }
 			bg="white"
 		>
-			<HStack
-				justify="space-between"
-				align="center"
-				gap={ 2 }
-				mb={ 3 }
-			>
+			<HStack justify="space-between" align="center" gap={ 2 } mb={ 3 }>
 				<Text fontWeight="semibold" fontSize="sm">
 					{ title }
 				</Text>

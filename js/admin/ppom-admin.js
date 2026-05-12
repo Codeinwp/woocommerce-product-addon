@@ -203,12 +203,14 @@ jQuery( function ( $ ) {
 			.then( ( response ) => response.json() )
 			.then( ( resp ) => {
 				const isSuccess = resp.status === 'success';
-				jQuery( '.ppom-meta-save-notice' ).html( resp.message ).css( {
-					'background-color': isSuccess ? '#4e694859' : '#ee8b94',
-					padding: '8px',
-					'border-left':
-						'5px solid ' + ( isSuccess ? '#008c00' : '#c00' ),
-				} );
+				jQuery( '.ppom-meta-save-notice' )
+					.html( resp.message )
+					.css( {
+						'background-color': isSuccess ? '#4e694859' : '#ee8b94',
+						padding: '8px',
+						'border-left':
+							'5px solid ' + ( isSuccess ? '#008c00' : '#c00' ),
+					} );
 
 				if ( ! isSuccess ) {
 					return;
@@ -325,10 +327,9 @@ jQuery( function ( $ ) {
 		'click',
 		'.ppom_field_table thead .check-column input, .ppom_field_table tfoot .check-column input',
 		function ( event ) {
-			$( '.ppom_field_table tbody .check-column input[type="checkbox"]' ).prop(
-				'checked',
-				$( this ).prop( 'checked' )
-			);
+			$(
+				'.ppom_field_table tbody .check-column input[type="checkbox"]'
+			).prop( 'checked', $( this ).prop( 'checked' ) );
 		}
 	);
 	$( '.ppom-main-field-wrapper' ).on(
@@ -1035,7 +1036,9 @@ jQuery( function ( $ ) {
 			.then( ( response ) => response.json() )
 			.then( ( resp ) => {
 				alert( resp.message );
-				document.dispatchEvent( new CustomEvent( 'ppom:attachments-updated' ) );
+				document.dispatchEvent(
+					new CustomEvent( 'ppom:attachments-updated' )
+				);
 
 				const openModalBtn = document.querySelector(
 					'.ppom-products-modal'
@@ -1724,7 +1727,9 @@ jQuery( function ( $ ) {
 			return ui;
 		},
 		start( evt, ui ) {
-			ui.item.closest( '.ppom_field_table' ).addClass( 'ppom-is-sorting' );
+			ui.item
+				.closest( '.ppom_field_table' )
+				.addClass( 'ppom-is-sorting' );
 		},
 		stop( evt, ui ) {
 			ui.item
@@ -2256,8 +2261,10 @@ jQuery( function ( $ ) {
 
 	$( document ).on( 'click', '.ppom-condition-tab-js', function ( e ) {
 		e.preventDefault();
-		const id = $(this).parents('.ppom-tabs.ppom-fields-actions').data('field-no');
-		populate_conditional_elements(id);
+		const id = $( this )
+			.parents( '.ppom-tabs.ppom-fields-actions' )
+			.data( 'field-no' );
+		populate_conditional_elements( id );
 	} );
 
 	/**
@@ -2332,7 +2339,7 @@ jQuery( function ( $ ) {
 	 * @see ppom_add_condition_set_index
 	 * @see ppom_check_conditions in js/ppom-conditions-v2.js
 	 */
-	function populate_conditional_elements(field_id) {
+	function populate_conditional_elements( field_id ) {
 		// Rebuild the list of condition targets from the current slider state so
 		// newly added, renamed, or cloned fields are immediately available as rule
 		// dependencies without reloading the admin page.
@@ -2363,66 +2370,69 @@ jQuery( function ( $ ) {
 		} );
 
 		// Change the target options for all the rules.
-		$('.ppom-slider#ppom_field_model_' + field_id ).each( ( index, item ) => {
-			const conditionContainers = item
-				.querySelector( 'div[data-meta-id="conditions"]' )
-				?.querySelectorAll( '.webcontact-rules' );
+		$( '.ppom-slider#ppom_field_model_' + field_id ).each(
+			( index, item ) => {
+				const conditionContainers = item
+					.querySelector( 'div[data-meta-id="conditions"]' )
+					?.querySelectorAll( '.webcontact-rules' );
 
-			conditionContainers?.forEach( ( conditionContainer ) => {
-				const conditionTargetsSelect = conditionContainer.querySelector(
-					'[data-metatype="elements"]'
-				);
-				if ( ! conditionTargetsSelect ) {
-					return;
-				}
+				conditionContainers?.forEach( ( conditionContainer ) => {
+					const conditionTargetsSelect =
+						conditionContainer.querySelector(
+							'[data-metatype="elements"]'
+						);
+					if ( ! conditionTargetsSelect ) {
+						return;
+					}
 
-				const conditionOperatorSelect =
-					conditionContainer.querySelector(
-						'[data-metatype="operators"]'
+					const conditionOperatorSelect =
+						conditionContainer.querySelector(
+							'[data-metatype="operators"]'
+						);
+					const fieldId = item
+						.querySelector( 'input[data-metatype="data_name"]' )
+						?.value?.trim();
+
+					populate_condition_target(
+						conditionTargetsSelect,
+						conditionOperatorSelect?.value,
+						[ fieldId ]
 					);
-				const fieldId = item
-					.querySelector( 'input[data-metatype="data_name"]' )
-					?.value?.trim();
 
-				populate_condition_target(
-					conditionTargetsSelect,
-					conditionOperatorSelect?.value,
-					[ fieldId ]
-				);
+					if ( conditionTargetsSelect?.dataset?.existingvalue ) {
+						conditionTargetsSelect.value =
+							conditionTargetsSelect?.dataset?.existingvalue;
+					}
 
-				if ( conditionTargetsSelect?.dataset?.existingvalue ) {
-					conditionTargetsSelect.value =
-						conditionTargetsSelect?.dataset?.existingvalue;
-				}
-
-				// NOTE: Get all the locked operators. Unlock them to be eligible to show the upsell.
-				conditionOperatorSelect
-					?.querySelectorAll( 'option' )
-					.forEach( ( option ) => {
-						if ( ! option.disabled ) {
-							return;
-						}
-
-						proOperatorOptionsToLock.add( option.value );
-						option.disabled = false;
-					} );
-
-				toggleOperatorFieldByTargetType(
-					findFieldTypeById( conditionTargetsSelect?.value ),
+					// NOTE: Get all the locked operators. Unlock them to be eligible to show the upsell.
 					conditionOperatorSelect
-				);
+						?.querySelectorAll( 'option' )
+						.forEach( ( option ) => {
+							if ( ! option.disabled ) {
+								return;
+							}
 
-				const optionsInput = conditionContainer.querySelector(
-					'[data-metatype="element_values"]'
-				);
+							proOperatorOptionsToLock.add( option.value );
+							option.disabled = false;
+						} );
 
-				updateTargetComparisonValueSelect(
-					conditionTargetsSelect,
-					conditionContainer,
-					optionsInput?.dataset?.existingvalue
-				);
-			} );
-		} );
+					toggleOperatorFieldByTargetType(
+						findFieldTypeById( conditionTargetsSelect?.value ),
+						conditionOperatorSelect
+					);
+
+					const optionsInput = conditionContainer.querySelector(
+						'[data-metatype="element_values"]'
+					);
+
+					updateTargetComparisonValueSelect(
+						conditionTargetsSelect,
+						conditionContainer,
+						optionsInput?.dataset?.existingvalue
+					);
+				} );
+			}
+		);
 	}
 
 	/**

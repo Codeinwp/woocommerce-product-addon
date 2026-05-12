@@ -1,4 +1,10 @@
-import { Checkbox, ColorPicker, HStack, Input, parseColor } from '@chakra-ui/react';
+import {
+	Checkbox,
+	ColorPicker,
+	HStack,
+	Input,
+	parseColor,
+} from '@chakra-ui/react';
 import { DraggableOptionRow } from '../draggable-options/DraggableOptionRow';
 import type { I18nDict } from '../../types/fieldModal';
 import {
@@ -66,9 +72,7 @@ export function MatrixOptionRowItem( {
 			minW={ 0 }
 			placeholder={ i18n.pairedMatrixOption || 'Option' }
 			value={ String( row.option ?? '' ) }
-			onChange={ ( e ) =>
-				onPatch( index, { option: e.target.value } )
-			}
+			onChange={ ( e ) => onPatch( index, { option: e.target.value } ) }
 		/>
 	);
 

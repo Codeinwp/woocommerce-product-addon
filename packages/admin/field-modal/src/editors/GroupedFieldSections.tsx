@@ -11,8 +11,7 @@ const BOOLEAN_CONTROL_TYPES = new Set( [ 'checkbox', 'switch' ] );
 function isBooleanEntry( entry: {
 	meta: Record< string, unknown > | undefined;
 } ) {
-	const type =
-		entry.meta && entry.meta.type ? String( entry.meta.type ) : '';
+	const type = entry.meta && entry.meta.type ? String( entry.meta.type ) : '';
 	return BOOLEAN_CONTROL_TYPES.has( type );
 }
 

@@ -194,7 +194,9 @@ export function DefinitionDrivenFieldEditor( {
 		return (
 			<VStack align="stretch" gap={ 3 }>
 				{ primarySectionsCard }
-				{ primaryWidgets.map( ( block ) => renderWidgetBlock( block ) ) }
+				{ primaryWidgets.map( ( block ) =>
+					renderWidgetBlock( block )
+				) }
 				{ advancedBlocks.length > 0 && (
 					<AdvancedSettingsPanel
 						label={ advancedLabel }

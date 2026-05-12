@@ -61,9 +61,7 @@ export function SwitchControl( {
 									mb={ 0 }
 								>
 									{ title }
-									<HelperIcon
-										description={ description }
-									/>
+									<HelperIcon description={ description } />
 								</Field.Label>
 							) : null }
 							{ error ? (

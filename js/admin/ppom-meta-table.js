@@ -35,9 +35,7 @@ jQuery( function ( $ ) {
 			},
 			processResults: function ( data ) {
 				return {
-					results: Array.isArray( data?.results )
-						? data.results
-						: [],
+					results: Array.isArray( data?.results ) ? data.results : [],
 					pagination: {
 						more: Boolean( data?.pagination?.more ),
 					},
@@ -57,8 +55,16 @@ jQuery( function ( $ ) {
 	 * @param {jQuery|undefined} dropdownParent Optional parent for the dropdown.
 	 * @return {void}
 	 */
-	function initSelect2Search( $el, nonce, placeholder, action, fallback, dropdownParent ) {
-		const isLocked = $el.closest( '.ppom-fields-status-disabled' ).length > 0;
+	function initSelect2Search(
+		$el,
+		nonce,
+		placeholder,
+		action,
+		fallback,
+		dropdownParent
+	) {
+		const isLocked =
+			$el.closest( '.ppom-fields-status-disabled' ).length > 0;
 
 		const config = {
 			width: '100%',
@@ -106,8 +112,9 @@ jQuery( function ( $ ) {
 		const variationSelect = $( '#attach-to-variations .ppom-attach' );
 		const categorySelect = $( '#attach-to-categories .ppom-attach' );
 		const tagSelect = $( '#attach-to-tags .ppom-attach' );
-		const attachNonce = $( '#ppom-product-form [name="ppom_attached_nonce"]' )
-			.val();
+		const attachNonce = $(
+			'#ppom-product-form [name="ppom_attached_nonce"]'
+		).val();
 		const parent = $( '#ppom-product-modal' );
 		const vars = window?.ppom_vars?.attach;
 
@@ -115,10 +122,38 @@ jQuery( function ( $ ) {
 			return;
 		}
 
-		initSelect2Search( productSelect, attachNonce, vars?.productsPlaceholder, vars?.searchAction, 'ppom_search_products', parent );
-		initSelect2Search( variationSelect, attachNonce, vars?.variationsPlaceholder, vars?.searchVariationsAction, 'ppom_search_variations', parent );
-		initSelect2Search( categorySelect, attachNonce, vars?.categoriesPlaceholder, vars?.searchCategoriesAction, 'ppom_search_categories', parent );
-		initSelect2Search( tagSelect, attachNonce, vars?.tagsPlaceholder, vars?.searchTagsAction, 'ppom_search_tags', parent );
+		initSelect2Search(
+			productSelect,
+			attachNonce,
+			vars?.productsPlaceholder,
+			vars?.searchAction,
+			'ppom_search_products',
+			parent
+		);
+		initSelect2Search(
+			variationSelect,
+			attachNonce,
+			vars?.variationsPlaceholder,
+			vars?.searchVariationsAction,
+			'ppom_search_variations',
+			parent
+		);
+		initSelect2Search(
+			categorySelect,
+			attachNonce,
+			vars?.categoriesPlaceholder,
+			vars?.searchCategoriesAction,
+			'ppom_search_categories',
+			parent
+		);
+		initSelect2Search(
+			tagSelect,
+			attachNonce,
+			vars?.tagsPlaceholder,
+			vars?.searchTagsAction,
+			'ppom_search_tags',
+			parent
+		);
 	}
 
 	// Initialize Select2 on inline attach selects (field-group editor page).
@@ -128,17 +163,49 @@ jQuery( function ( $ ) {
 			return;
 		}
 
-		const attachNonce = $container.find( '[name="ppom_attached_nonce"]' ).val();
-		const productSelect = $container.find( '#attach-to-products .ppom-attach' );
-		const variationSelect = $container.find( '#attach-to-variations .ppom-attach' );
-		const categorySelect = $container.find( '#attach-to-categories .ppom-attach' );
+		const attachNonce = $container
+			.find( '[name="ppom_attached_nonce"]' )
+			.val();
+		const productSelect = $container.find(
+			'#attach-to-products .ppom-attach'
+		);
+		const variationSelect = $container.find(
+			'#attach-to-variations .ppom-attach'
+		);
+		const categorySelect = $container.find(
+			'#attach-to-categories .ppom-attach'
+		);
 		const tagSelect = $container.find( '#attach-to-tags .ppom-attach' );
 		const vars = window?.ppom_vars?.attach;
 
-		initSelect2Search( productSelect, attachNonce, vars?.productsPlaceholder, vars?.searchAction, 'ppom_search_products' );
-		initSelect2Search( variationSelect, attachNonce, vars?.variationsPlaceholder, vars?.searchVariationsAction, 'ppom_search_variations' );
-		initSelect2Search( categorySelect, attachNonce, vars?.categoriesPlaceholder, vars?.searchCategoriesAction, 'ppom_search_categories' );
-		initSelect2Search( tagSelect, attachNonce, vars?.tagsPlaceholder, vars?.searchTagsAction, 'ppom_search_tags' );
+		initSelect2Search(
+			productSelect,
+			attachNonce,
+			vars?.productsPlaceholder,
+			vars?.searchAction,
+			'ppom_search_products'
+		);
+		initSelect2Search(
+			variationSelect,
+			attachNonce,
+			vars?.variationsPlaceholder,
+			vars?.searchVariationsAction,
+			'ppom_search_variations'
+		);
+		initSelect2Search(
+			categorySelect,
+			attachNonce,
+			vars?.categoriesPlaceholder,
+			vars?.searchCategoriesAction,
+			'ppom_search_categories'
+		);
+		initSelect2Search(
+			tagSelect,
+			attachNonce,
+			vars?.tagsPlaceholder,
+			vars?.searchTagsAction,
+			'ppom_search_tags'
+		);
 	} )();
 
 	const append_overlay_modal =
@@ -217,54 +284,58 @@ jQuery( function ( $ ) {
 	// Per-row enable/disable toggle. Sends an AJAX request to flip
 	// `productmeta_disabled`; product attachments and field schema are
 	// untouched, so this is a pure visibility switch on the frontend.
-	$( 'body' ).on( 'change', '.ppom-existing-meta-wrapper .onoffswitch .onoffswitch-checkbox', function () {
-		const $input = $( this );
-		const $wrap = $input.closest( '.onoffswitch' );
-		const ppomId = $wrap.data( 'ppomId' );
-		const disabled = ! $input.is( ':checked' );
+	$( 'body' ).on(
+		'change',
+		'.ppom-existing-meta-wrapper .onoffswitch .onoffswitch-checkbox',
+		function () {
+			const $input = $( this );
+			const $wrap = $input.closest( '.onoffswitch' );
+			const ppomId = $wrap.data( 'ppomId' );
+			const disabled = ! $input.is( ':checked' );
 
-		$wrap.addClass( 'onoffswitch--busy' );
-		$input.prop( 'disabled', true );
+			$wrap.addClass( 'onoffswitch--busy' );
+			$input.prop( 'disabled', true );
 
-		$.post(
-			ajaxurl,
-			{
-				action: 'ppom_toggle_meta_disabled',
-				productmeta_id: ppomId,
-				disabled: disabled ? '1' : '0',
-				ppom_meta_nonce: $( '#ppom_meta_nonce' ).val(),
-			},
-			function ( resp ) {
+			$.post(
+				ajaxurl,
+				{
+					action: 'ppom_toggle_meta_disabled',
+					productmeta_id: ppomId,
+					disabled: disabled ? '1' : '0',
+					ppom_meta_nonce: $( '#ppom_meta_nonce' ).val(),
+				},
+				function ( resp ) {
+					$wrap.removeClass( 'onoffswitch--busy' );
+					$input.prop( 'disabled', false );
+
+					if ( ! resp || resp.status !== 'success' ) {
+						// Roll back the visual state on error.
+						$input.prop( 'checked', ! $input.is( ':checked' ) );
+						const message =
+							resp && resp.message
+								? resp.message
+								: window?.ppom_vars?.i18n?.popup?.errorTitle ??
+								  'Error';
+						window?.ppomPopup?.open( {
+							title: message,
+							hideCloseBtn: true,
+						} );
+					}
+				}
+			).fail( function () {
 				$wrap.removeClass( 'onoffswitch--busy' );
 				$input.prop( 'disabled', false );
-
-				if ( ! resp || resp.status !== 'success' ) {
-					// Roll back the visual state on error.
-					$input.prop( 'checked', ! $input.is( ':checked' ) );
-					const message =
-						resp && resp.message
-							? resp.message
-							: window?.ppom_vars?.i18n?.popup?.errorTitle ??
-							  'Error';
-					window?.ppomPopup?.open( {
-						title: message,
-						hideCloseBtn: true,
-					} );
-				}
-			}
-		).fail( function () {
-			$wrap.removeClass( 'onoffswitch--busy' );
-			$input.prop( 'disabled', false );
-			$input.prop( 'checked', ! $input.is( ':checked' ) );
-			window?.ppomPopup?.open( {
-				title:
-					window?.ppom_vars?.i18n?.errorOccurred ??
-					window?.ppom_vars?.i18n?.popup?.errorTitle ??
-					'Error',
-				hideCloseBtn: true,
+				$input.prop( 'checked', ! $input.is( ':checked' ) );
+				window?.ppomPopup?.open( {
+					title:
+						window?.ppom_vars?.i18n?.errorOccurred ??
+						window?.ppom_vars?.i18n?.popup?.errorTitle ??
+						'Error',
+					hideCloseBtn: true,
+				} );
 			} );
-		} );
-	} );
+		}
+	);
 
 	// Confirmation popup for the native WP_List_Table "Delete" bulk action.
 	// `WP_List_Table` exposes both top (`action`) and bottom (`action2`)

@@ -4,7 +4,7 @@
 
 This folder owns the opt-in React admin field modal for PPOM field groups. It replaces the classic field editing shell only when `ppom_use_react_field_modal()` is true, usually through `PPOM_USE_REACT_FIELD_MODAL`, `?ppom_react_modal=1`, or the `ppom_use_react_field_modal` filter.
 
-The canonical saved payload is still the legacy PPOM field row array stored in `{prefix}_nm_personalized.the_meta`. React is an editing shell around that payload, not a new storage model.
+The canonical saved payload is still the legacy PPOM field row array, stored as a JSON blob in the `the_meta` column of the PPOM meta table (`{prefix}nm_personalized`, defined as `PPOM_TABLE_META` in `woocommerce-product-addon.php`). All reads and writes go through `PPOM\Meta\MetaRepositoryAccessor` (see `classes/class-ppom-meta-repository.php`). React is an editing shell around that payload, not a new storage model.
 
 ## Entry Points
 
@@ -12,7 +12,7 @@ The canonical saved payload is still the legacy PPOM field row array stored in `
 - `src/App.tsx`: composes the modal frame, body, footer, picker/manage modes, close confirmation, and back behavior.
 - `src/hooks/useFieldModalSession.ts`: owns async orchestration for context loading, schema loading, saving, selection, dirty state, and picker transitions.
 - `src/state/modalReducer.ts`: pure synchronous state transitions only.
-- `src/adapters/wpAdminFieldModalAdapter.ts`: bridges classic admin buttons into React by listening to `.ppom-react-field-modal-open` and capturing `.ppom-edit-field` clicks before legacy jQuery opens the PHP modal.
+- `src/adapters/wpAdminFieldModalAdapter.ts`: bridges classic admin buttons into React by listening to `.ppom-react-field-modal-open` (picker entry), and capturing `.ppom-edit-field` (manage entry) and `.ppom_copy_field` (duplicate-then-manage) clicks before legacy jQuery opens the PHP modal.
 - `src/services/fieldModalApi.ts`: REST transport for context, field type schema, and save calls.
 - PHP support lives in `src/Admin/FieldModal/*`. The root container is rendered from `templates/admin/ppom-fields.php`.
 
@@ -31,9 +31,11 @@ flowchart TD
     G --> H["Bind open triggers"]
     H --> I["Add field button .ppom-react-field-modal-open"]
     H --> J["Edit row button .ppom-edit-field captured before legacy jQuery"]
+    H --> JC["Copy row button .ppom_copy_field captured before legacy jQuery"]
 
     I --> K["OPEN entry=picker"]
     J --> L["OPEN entry=manage with selectFieldIndex"]
+    JC --> L
 
     K --> M["GET ppom/v1/admin/field-groups/context"]
     L --> M
@@ -53,11 +55,12 @@ flowchart TD
     T -->|Yes| U["FieldPickerPanel -> FieldTypePicker"]
     U --> V["addFieldOfType(slug)"]
     V --> W["ADD_FIELD_ROW default row"]
-    W --> X["pickerOpen=false; selectedId=new row"]
+    W --> XN["pickerOpen=false; selectedId=new row"]
 
-    T -->|No| X["Select existing/first field"]
+    T -->|No| XE["Select existing/first field"]
 
-    X --> Y["FieldManagePanel"]
+    XN --> Y["FieldManagePanel"]
+    XE --> Y
     Y --> Z["FieldManageEditorBridge"]
     Z --> AA["TanStack Form owns active row values"]
     AA --> AB["onChange -> PATCH_FIELD_ROW_FROM_FORM"]
@@ -74,30 +77,90 @@ flowchart TD
     AH --> AJ["FieldTabs + widgets + primitive controls"]
     AI --> AJ
 
-    AJ --> AK["Save"]
-    AK --> AL["Validate data_name in React"]
-    AL --> AM["readGroupFromForm legacy group settings"]
-    AM --> AN["stripClientIds(fields)"]
-    AN --> AO{"Existing productmetaId?"}
-    AO -->|Yes| AP["PUT ppom/v1/admin/field-groups/:id"]
-    AO -->|No| AQ["POST ppom/v1/admin/field-groups"]
-
-    AP --> AR["FieldModalPersistence::update_group"]
-    AQ --> AS["FieldModalPersistence::create_group"]
-    AR --> AT["normalize_fields -> legacy filters -> Validator::sanitize_array_data"]
-    AS --> AT
-    AT --> AU["MetaRepositoryAccessor save"]
-    AU --> AV["Reload current page or redirect to new group edit page"]
+    AJ --> AK["Save (modal footer)"]
+    AK --> AL["Validate data_name + duplicate data_name in React"]
+    AL --> AM["COMMIT_ACTIVE_DRAFT + applySchemaDefaultsToRow"]
+    AM --> AN["stripClientKey(activeField)"]
+    AN --> AO["adapters.admin.commitFieldToClassicForm"]
+    AO --> AP["Patch hidden #ppom_field_model_:idx + .ppom_field_table row"]
+    AP --> AQ["markClassicFormDirty() then CLOSE"]
+    AQ --> AR["User clicks legacy Save in classic builder"]
+    AR --> AS["POST admin-ajax.php?action=ppom_save_form_meta"]
+    AS --> AT["ppom_admin_save_form_meta() runs legacy validators + filters"]
+    AT --> AU["MetaRepositoryAccessor writes the_meta JSON"]
 ```
+
+The React modal commits each edited row back into the classic builder's hidden form and DOM; it never calls the REST `POST` / `PUT` save endpoints. The on-disk write happens later, when the legacy classic-builder Save button submits to `admin-ajax.php?action=ppom_save_form_meta`. See the REST Endpoints section below for the precise active-vs-registered split.
+
+## REST Endpoints
+
+`FieldModalRestController::register_routes()` registers two **read-only** routes under the `ppom/v1` namespace, both gated by `permission_check` (`Helpers::security_role()`). The client wrappers live in `src/services/fieldModalApi.ts` and use `apiFetch` with the REST nonce middleware installed from `window.ppomFieldModalBoot`.
+
+**Persistence is intentionally not over REST.** Save flows back through the classic builder's hidden form via `commitFieldToClassicForm`; the legacy `admin-ajax.php?action=ppom_save_form_meta` handler (registered in `classes/plugin.class.php` as `wp_ajax_ppom_save_form_meta` → `ppom_admin_save_form_meta`) is the single write path. This keeps the React shell on the same validators, filters, Pro hooks, and DOM hidden-input contract that the classic editor already exercises, so opt-in vs opt-out users converge on identical saved payloads.
+
+| Method | Path                                      | PHP callback                                | Client wrapper           | When it fires                                                                                |
+| ------ | ----------------------------------------- | ------------------------------------------- | ------------------------ | -------------------------------------------------------------------------------------------- |
+| GET    | `ppom/v1/admin/field-groups/context`      | `FieldModalRestController::get_context`     | `fetchFieldModalContext` | On every modal open (picker or manage entry).                                                |
+| GET    | `ppom/v1/admin/field-groups/schema/:type` | `FieldModalRestController::get_type_schema` | `fetchFieldTypeSchema`   | Lazy — only when the active slug has no local `FieldUiDefinition` (currently `texter`). |
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Admin as Admin click<br/>(.ppom-react-field-modal-open / .ppom-edit-field / .ppom_copy_field)
+    participant React as React modal<br/>(useFieldModalSession)
+    participant API as fieldModalApi.ts<br/>(apiFetch + nonce)
+    participant REST as FieldModalRestController<br/>(permission_check)
+    participant Schema as FieldModalSchemaBuilder
+    participant Classic as Classic builder DOM<br/>(.ppom_field_table + hidden ppom_field_model_:idx)
+    participant Ajax as admin-ajax.php<br/>(action=ppom_save_form_meta)
+    participant Repo as MetaRepositoryAccessor<br/>({prefix}nm_personalized)
+
+    Admin->>React: OPEN entry=picker|manage
+    React->>API: fetchFieldModalContext(productmetaId)
+    API->>REST: GET /ppom/v1/admin/field-groups/context?productmeta_id=:id
+    REST->>Schema: get_catalog + get_catalog_groups_for_rest
+    REST->>Repo: get_row_by_id(productmeta_id) (when editing)
+    REST-->>API: { catalog, catalog_groups, group, fields, type_schemas, license, upsell, links, flags }
+    API-->>React: LOAD_CONTEXT_SUCCESS
+
+    opt Slug has no local FieldUiDefinition (e.g. texter)
+        React->>API: fetchFieldTypeSchema(slug)
+        API->>REST: GET /ppom/v1/admin/field-groups/schema/:type
+        REST->>Schema: get_schema_for_type(type)
+        REST-->>API: { type, schema }
+        API-->>React: hydrate DefinitionDrivenFieldEditor
+    end
+
+    React->>React: validate data_name + duplicate data_name
+    React->>React: COMMIT_ACTIVE_DRAFT + applySchemaDefaultsToRow + stripClientKey
+    React->>Classic: commitFieldToClassicForm(field, { insertAfterFieldIndex? })
+    Classic->>Classic: patch hidden modal + replace/append table row + markClassicFormDirty
+    React-->>Admin: dispatch CLOSE
+
+    Note over Admin,Ajax: Later, the user clicks the legacy "Save" button in the classic builder.
+    Admin->>Ajax: POST admin-ajax.php?action=ppom_save_form_meta (form serialization)
+    Ajax->>Ajax: ppom_admin_save_form_meta runs legacy validators + filters
+    Ajax->>Repo: write the_meta JSON
+    Repo-->>Ajax: row id
+    Ajax-->>Admin: legacy response (reload / redirect)
+```
+
+### Endpoint guardrails
+
+- Do not introduce new routes outside the `ppom/v1/admin/field-groups/*` prefix without updating this section and `FieldModalRestController`.
+- Every new route must reuse `permission_check`. Do not weaken the capability check or shift it to per-request logic.
+- Keep the context response shape additive — the client treats unknown keys as opaque, so adding fields is safe but renaming or removing them is a breaking change for the React shell.
+- Server-schema loads (`/schema/:type`) are lazy and per-type. Do not eagerly prefetch every type; route registration via local `FieldUiDefinition` instances is the default path.
+- Do not reintroduce a REST save endpoint without first migrating the legacy `ppom_save_form_meta` handler. Two parallel write paths would fork the validator and filter chains and break Pro integrations that hook the AJAX action. If you need a REST save, replace the legacy handler and update the classic builder to call REST too, in the same change.
 
 ## Data Flow Rules
 
-- Keep `clientId` client-only. Always strip it with `stripClientIds()` before persistence.
-- Preserve unknown field row keys. Pro features and legacy filters may depend on keys this React modal does not render.
-- Treat `data_name` as required when present. Saving also passes through server validation in `FieldModalPersistence`.
-- Do not treat React field values as sanitized. Server persistence owns final normalization, legacy filters, and `Validator::sanitize_array_data()`.
-- Use `readGroupFromForm()` for legacy group settings until group-level React controls exist.
-- Do not change the saved wire shape unless the PHP persistence layer and legacy builder compatibility are updated together.
+- Keep `clientId` client-only. Always strip it with `stripClientKey()` (single row) before writing back to the classic form via `commitFieldToClassicForm`.
+- Preserve unknown field row keys. Pro features and legacy filters may depend on keys this React modal does not render, so do not whitelist the row shape on the way out.
+- Treat `data_name` as required when present, and reject duplicate `data_name` values inside the active builder before committing. The legacy AJAX save (`ppom_save_form_meta`) re-validates server-side.
+- Do not treat React field values as sanitized. Final normalization, legacy filters, and `Validator::sanitize_array_data()` run on the server through `ppom_admin_save_form_meta` when the user clicks the classic Save button.
+- Group-level settings are read straight from the classic builder DOM by the legacy save handler; the React modal does not own group-level controls today. If you add them, write back into the existing hidden inputs rather than introducing a parallel payload.
+- Do not change the saved wire shape unless the legacy `ppom_save_form_meta` handler and the classic builder's hidden inputs are updated together. The React modal is an editing shell on top of that shape, not a new storage format.
 
 ## Editor Architecture
 
@@ -136,4 +199,4 @@ npm run build:admin-field-modal
 npm run test:e2e -- tests/e2e/specs/react-field-modal.spec.js
 ```
 
-The E2E command requires the Docker/wp-env environment. If it is not available, record that limitation and run the lint/build checks that are available.
+The E2E command runs against `@wordpress/env` (`wp-env`). The bootstrap MU plugin and fixture helpers live in `bin/wp-env/mu-plugins/ppom-e2e-bootstrap.php` and `tests/e2e/fixtures/`; see `tests/e2e/AGENTS.md` for environment setup, fixture conventions, and when to prefer `fixtures/` over `utils.js`. If wp-env is not available, record that limitation and run the lint/build checks instead.

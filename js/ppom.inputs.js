@@ -63,26 +63,30 @@ jQuery( function ( $ ) {
 	const wc_cart_form = jQuery( 'form.cart' );
 
 	// Measure
-	$( '.ppom-measure' ).off( 'change.ppom' ).on( 'change.ppom', '.ppom-measure-unit', function ( e ) {
-		e.preventDefault();
-		// console.log($(this).text());
+	$( '.ppom-measure' )
+		.off( 'change.ppom' )
+		.on( 'change.ppom', '.ppom-measure-unit', function ( e ) {
+			e.preventDefault();
+			// console.log($(this).text());
 
-		$( this )
-			.closest( '.ppom-measure' )
-			.find( '.ppom-measure-input' )
-			.trigger( 'change' );
-	} );
+			$( this )
+				.closest( '.ppom-measure' )
+				.find( '.ppom-measure-input' )
+				.trigger( 'change' );
+		} );
 
 	// Disable ajax add to cart
 	wc_cart_button.removeClass( 'ajax_add_to_cart' );
 
 	// Range slider updated
-	$( document ).off( 'ppom_range_slider_updated.ppom' ).on( 'ppom_range_slider_updated.ppom', function ( e ) {
-		// console.log(wc_product_qty);
-		$( 'form.cart' ).find( 'input[name="quantity"]' ).val( e.qty );
-		// wc_product_qty.val(e.qty);
-		ppom_update_option_prices();
-	} );
+	$( document )
+		.off( 'ppom_range_slider_updated.ppom' )
+		.on( 'ppom_range_slider_updated.ppom', function ( e ) {
+			// console.log(wc_product_qty);
+			$( 'form.cart' ).find( 'input[name="quantity"]' ).val( e.qty );
+			// wc_product_qty.val(e.qty);
+			ppom_update_option_prices();
+		} );
 
 	// move modals to body bottom
 	if ( $( '.ppom-modals' ).length > 0 ) {
@@ -97,7 +101,11 @@ jQuery( function ( $ ) {
 			ppom_input_vars = ppom_get_product_data( product_id );
 		}
 
-		if ( null !== ppom_input_vars && typeof 'undefined' !== ppom_input_vars && ppom_input_vars.ppom_inputs ) {
+		if (
+			null !== ppom_input_vars &&
+			typeof 'undefined' !== ppom_input_vars &&
+			ppom_input_vars.ppom_inputs
+		) {
 			ppom_init_js_for_ppom_fields( ppom_input_vars.ppom_inputs );
 		}
 	} );
@@ -163,16 +171,22 @@ function ppom_init_js_for_ppom_fields( ppom_fields ) {
 					} else {
 						event.preventDefault();
 					}
-				} ).off( 'focus.ppom blur.ppom' ).on( 'focus.ppom blur.ppom', function () {
-					if ( typeof InputSelector.attr( 'max' ) !== 'undefined' ) {
+				} )
+					.off( 'focus.ppom blur.ppom' )
+					.on( 'focus.ppom blur.ppom', function () {
 						if (
-							parseFloat( InputSelector.val() ) >
-							parseFloat( InputSelector.attr( 'max' ) )
+							typeof InputSelector.attr( 'max' ) !== 'undefined'
 						) {
-							InputSelector.val( InputSelector.attr( 'max' ) );
+							if (
+								parseFloat( InputSelector.val() ) >
+								parseFloat( InputSelector.attr( 'max' ) )
+							) {
+								InputSelector.val(
+									InputSelector.attr( 'max' )
+								);
+							}
 						}
-					}
-				} );
+					} );
 				break;
 
 			case 'date':
@@ -375,22 +389,26 @@ function ppom_init_js_for_ppom_fields( ppom_fields ) {
 
 				// Following script is added to close picker
 				// when color is picked
-				jQuery( document ).off( 'click.ppomColor' ).on( 'click.ppomColor', function ( e ) {
-					if (
-						! jQuery( e.target ).is(
-							'.ppom-input.color, .iris-picker, .iris-picker-inner'
-						)
-					) {
-						jQuery( '.ppom-input.color' ).iris( 'hide' );
-						return e;
-					}
-				} );
+				jQuery( document )
+					.off( 'click.ppomColor' )
+					.on( 'click.ppomColor', function ( e ) {
+						if (
+							! jQuery( e.target ).is(
+								'.ppom-input.color, .iris-picker, .iris-picker-inner'
+							)
+						) {
+							jQuery( '.ppom-input.color' ).iris( 'hide' );
+							return e;
+						}
+					} );
 
-				jQuery( '.ppom-input.color' ).off( 'click.ppomColor' ).on( 'click.ppomColor', function ( event ) {
-					jQuery( '.ppom-input.color' ).iris( 'hide' );
-					jQuery( this ).iris( 'show' );
-					return event;
-				} );
+				jQuery( '.ppom-input.color' )
+					.off( 'click.ppomColor' )
+					.on( 'click.ppomColor', function ( event ) {
+						jQuery( '.ppom-input.color' ).iris( 'hide' );
+						jQuery( this ).iris( 'show' );
+						return event;
+					} );
 				break;
 
 			// Palettes
@@ -401,26 +419,28 @@ function ppom_init_js_for_ppom_fields( ppom_fields ) {
 					break;
 				}
 
-				jQuery( document ).off(
-					'click.ppomPalettes' + input.data_name,
-					`.ppom-palettes-${ input.data_name } input.ppom-input`
-				).on(
-					'click.ppomPalettes' + input.data_name,
-					`.ppom-palettes-${ input.data_name } input.ppom-input`,
-					function ( e ) {
-						if (
-							jQuery(
-								`.ppom-palettes-${ input.data_name } input.ppom-input:checked`
-							).length > max_selected
-						) {
-							alert(
-								`You can only select a maximum of ${ max_selected } ${ input.title } colors`
-							);
-							e.preventDefault();
-							//   return false;
+				jQuery( document )
+					.off(
+						'click.ppomPalettes' + input.data_name,
+						`.ppom-palettes-${ input.data_name } input.ppom-input`
+					)
+					.on(
+						'click.ppomPalettes' + input.data_name,
+						`.ppom-palettes-${ input.data_name } input.ppom-input`,
+						function ( e ) {
+							if (
+								jQuery(
+									`.ppom-palettes-${ input.data_name } input.ppom-input:checked`
+								).length > max_selected
+							) {
+								alert(
+									`You can only select a maximum of ${ max_selected } ${ input.title } colors`
+								);
+								e.preventDefault();
+								//   return false;
+							}
 						}
-					}
-				);
+					);
 				break;
 			// Bulk quantity
 			case 'bulkquantity':
@@ -466,13 +486,15 @@ function ppom_init_js_for_ppom_fields( ppom_fields ) {
 					} );
 				}
 
-				jQuery( '.ppom-range-bs-slider' ).off( 'change.ppom' ).on( 'change.ppom', function ( e ) {
-					jQuery.event.trigger( {
-						type: 'ppom_range_slider_updated',
-						qty: jQuery( this ).val(),
-						time: new Date(),
+				jQuery( '.ppom-range-bs-slider' )
+					.off( 'change.ppom' )
+					.on( 'change.ppom', function ( e ) {
+						jQuery.event.trigger( {
+							type: 'ppom_range_slider_updated',
+							qty: jQuery( this ).val(),
+							time: new Date(),
+						} );
 					} );
-				} );
 				break;
 			case 'quantities':
 				var enable_plusminus = input.enable_plusminus;
@@ -616,17 +638,21 @@ String.prototype.ppom_js_stripSlashes = function () {
  * @param {number} productId
  * @returns {object|null}
  */
-function ppom_get_product_data(productId) {
-	if (typeof window['ppom_input_vars_by_product'] !== 'undefined' && 
-		window['ppom_input_vars_by_product'][productId]) {
-		return window['ppom_input_vars_by_product'][productId];
+function ppom_get_product_data( productId ) {
+	if (
+		typeof window[ 'ppom_input_vars_by_product' ] !== 'undefined' &&
+		window[ 'ppom_input_vars_by_product' ][ productId ]
+	) {
+		return window[ 'ppom_input_vars_by_product' ][ productId ];
 	}
 
 	// Fallback to single-product data for backward compatibility
-	if (typeof window['ppom_input_vars'] !== 'undefined' && 
-		window['ppom_input_vars'].product_id == productId) {
-		return window['ppom_input_vars'];
+	if (
+		typeof window[ 'ppom_input_vars' ] !== 'undefined' &&
+		window[ 'ppom_input_vars' ].product_id == productId
+	) {
+		return window[ 'ppom_input_vars' ];
 	}
 
 	return null;
-};
+}

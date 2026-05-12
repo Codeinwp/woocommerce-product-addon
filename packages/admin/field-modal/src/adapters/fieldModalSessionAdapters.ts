@@ -9,7 +9,6 @@ import {
 import {
 	fetchFieldModalContext,
 	fetchFieldTypeSchema,
-	saveFieldGroup,
 } from '../services/fieldModalApi';
 import type { FieldModalContextPayload, FieldRow } from '../types/fieldModal';
 import type { FieldModalOpenPayload } from './wpAdminFieldModalAdapter';
@@ -21,11 +20,6 @@ export interface FieldModalTransportAdapter {
 	fetchSchema: (
 		type: string
 	) => Promise< Record< string, unknown > | null >;
-	saveGroup: ( args: {
-		productmetaId: number | undefined;
-		group: Record< string, unknown >;
-		fields: FieldRow[];
-	} ) => Promise< { redirect_to?: string } | void >;
 }
 
 export interface FieldModalAdminAdapter {
@@ -57,7 +51,6 @@ export const defaultFieldModalSessionAdapters: FieldModalSessionAdapters = {
 			return fetchFieldModalContext( productmetaId );
 		},
 		fetchSchema: fetchFieldTypeSchema,
-		saveGroup: saveFieldGroup,
 	},
 	admin: {
 		bindOpenTriggers: bindPpomReactFieldModalOpenButtons,

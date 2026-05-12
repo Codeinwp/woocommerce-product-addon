@@ -15,8 +15,7 @@ export interface AppProps {
 }
 
 export function App( { productmetaId }: AppProps ) {
-	const { state, derived, commands } =
-		useFieldModalSession( productmetaId );
+	const { state, derived, commands } = useFieldModalSession( productmetaId );
 	const {
 		open,
 		pickerOpen,
