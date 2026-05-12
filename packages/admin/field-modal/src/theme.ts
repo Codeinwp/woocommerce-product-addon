@@ -31,6 +31,22 @@ export const fieldModalTheme = createSystem(
 				{
 					display: 'none',
 				},
+			/**
+			 * Match wp-admin's native input border (`1px solid #8c8f94`) on the
+			 * Chakra Textarea. wp-admin already paints inputs this way through
+			 * `.wp-core-ui input` (specificity 0,1,1), so the Input control inherits
+			 * it for free; the Textarea needs an explicit override at equal
+			 * specificity (tying wp-admin and winning on source order). `!important`
+			 * is defensive against future wp-admin rule changes.
+			 */
+			'textarea.chakra-textarea': {
+				border: '1px solid #8c8f94 !important',
+			},
+			'textarea.chakra-textarea:focus, textarea.chakra-textarea:focus-visible':
+				{
+					borderColor: '#2271b1 !important',
+					boxShadow: '0 0 0 1px #2271b1 !important',
+				},
 			'#ppom-field-modal-root': {
 				fontSize: '13px',
 				lineHeight: '1.4',
