@@ -1493,13 +1493,6 @@ const EMOJIS_BLOCKS = withConditions(
 		SectionLabelKey.FieldSettings,
 		[ 'required', 'onetime', 'emojis_display_type' ]
 	),
-	sectionBlock(
-		'validation',
-		FieldTab.Settings,
-		SectionLabelKey.Validation,
-		[ 'error_message' ],
-		true
-	),
 	widgetBlock(
 		'options',
 		FieldTab.Settings,
@@ -1527,6 +1520,7 @@ const EMOJIS_BLOCKS = withConditions(
 			'search',
 			'visibility',
 			'visibility_role',
+			'error_message',
 		],
 		true
 	),

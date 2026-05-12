@@ -40,11 +40,6 @@ export function EmojisFieldEditor( {
 			keys: [ 'title', 'data_name', 'description' ],
 			advanced: false,
 		},
-		{
-			label: i18n.editorSectionValidation || 'Validation',
-			keys: [ 'error_message' ],
-			advanced: true,
-		},
 	];
 
 	const sectionsAfter: LegacySectionConfig[] = [
@@ -66,6 +61,7 @@ export function EmojisFieldEditor( {
 				'search',
 				'visibility',
 				'visibility_role',
+				'error_message',
 			],
 			advanced: true,
 		},
