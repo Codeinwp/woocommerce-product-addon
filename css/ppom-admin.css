@@ -162,6 +162,11 @@ button.ppom-react-field-modal-open {
     gap: 6px;
 }
 
+/* WP 7.0 bumps the `.button` line-height and breaks the actions column row height — pin it. */
+.ppom_field_table td.column-actions .button {
+    line-height: 2.15384615;
+}
+
 .ppom-delete-field.button {
     color: #b32d2e;
     border-color: #b32d2e;
@@ -1398,7 +1403,7 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
     line-height: 35px;
 }
 
-.ppom-top-nav .dashicons {
+.wp-core-ui .ppom-top-nav .dashicons {
     margin-right: 4px;
     font-size: 16px;
     width: 16px;
