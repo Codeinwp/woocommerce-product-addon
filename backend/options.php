@@ -1,6 +1,11 @@
 <?php
 /**
- * Plugin Admin Settings
+ * Registers PPOM settings-panel tabs, panels, and field definitions.
+ *
+ * @package PPOM
+ * @subpackage Settings
+ *
+ * @see PPOM_SettingsFramework::register_setting()
  */
 
 /* 
@@ -15,11 +20,21 @@ if ( ! class_exists( 'PPOM_SettingsFramework' ) ) {
 	return;
 }
 
-/**
- * Register Settings Panel
- * --------------------------
- */
+// Core settings registration.
 
+/**
+ * Registers the free PPOM settings-panel tabs, panels, and fields.
+ *
+ * Defines the base admin, pricing-label, and permission settings that are
+ * always available once the settings framework has been initialized.
+ *
+ * @return void
+ *
+ * @see PPOMSETTINGS()
+ * @see PPOM_SettingsFramework::register_tabs()
+ * @see PPOM_SettingsFramework::register_panel()
+ * @see PPOM_SettingsFramework::register_setting()
+ */
 function ppom_load_free_options() {
 
 	/**
@@ -50,7 +65,7 @@ function ppom_load_free_options() {
 		'ppom_legacy_price'                   => array(
 			'type'  => 'checkbox',
 			'title' => __( 'Enable Legacy Price Calculations', 'woocommerce-product-addon' ),
-			'desc'	=> __( 'Enable this option to use the legacy method for price calculations.', 'woocommerce-product-addon' ),
+			'desc'  => __( 'Enable this option to use the legacy method for price calculations.', 'woocommerce-product-addon' ),
 		),
 		'ppom_permission_mfields'             => array(
 			'type'        => 'select',
@@ -66,6 +81,12 @@ function ppom_load_free_options() {
 			'title'   => __( 'Restricted File Types', 'woocommerce-product-addon' ),
 			'desc'    => __( 'Specify the file types that are restricted from being uploaded in this section.', 'woocommerce-product-addon' ),
 			'default' => __( 'php,php4,php5,php6,php7,phtml,exe,shtml', 'woocommerce-product-addon' ),
+		),
+		'ppom_allow_data_sharing'             => array(
+			'type'  => 'checkbox',
+			'title' => __( 'Allow data sharing', 'woocommerce-product-addon' ),
+			'desc'  => __( 'Share usage data to help us improve the plugin. Data is not shared with any third-party companies.', 'woocommerce-product-addon' ),
+			'label' => __( 'Yes', 'woocommerce-product-addon' ),
 		),
 		'ppom_general_section2'               => array(
 			'type'  => 'section',
@@ -131,6 +152,21 @@ function ppom_load_free_options() {
 }
 add_action( 'init', 'ppom_load_free_options' );
 
+// Pro and integration settings registration.
+
+/**
+ * Registers the pro, styling, addon, and integration settings definitions.
+ *
+ * Extends the base settings panel with advanced pricing, style output, REST
+ * API, and addon-specific settings that are consumed by the PPOM runtime.
+ *
+ * @return void
+ *
+ * @see PPOMSETTINGS()
+ * @see PPOM_SettingsFramework::register_panel()
+ * @see PPOM_SettingsFramework::register_setting()
+ * @see \PPOM\Rest\Routes::init_api()
+ */
 function ppom_load_pro_options() {
 	$pro_settings = array(
 		'ppom_pro_basics'                    => array(
@@ -213,7 +249,7 @@ function ppom_load_pro_options() {
 			'default' => 'after',
 			'options' => array(
 				'after'  => __( 'After PPOM Fields', 'woocommerce-product-addon' ),
-				'before' => __( 'Before  PPOM Fields', 'woocommerce-product-addon' ),
+				'before' => __( 'Before PPOM Fields', 'woocommerce-product-addon' ),
 			),
 		),
 		'ppom_pro_advanced'                  => array(
@@ -308,7 +344,7 @@ function ppom_load_pro_options() {
 		),
 		'ppom_input_box_border_shadow_focus'  => array(
 			'type'      => 'text',
-			'title'     => __( 'Box Shodow Focus', 'woocommerce-product-addon' ),
+			'title'     => __( 'Box Shadow Focus', 'woocommerce-product-addon' ),
 			'desc'      => __( 'If you don\'t want to apply it, simply set the value to \'none.\'', 'woocommerce-product-addon' ),
 			'hint'      => '0 0 0 0.2rem rgb(0 123 255 / 25%)',
 			'reference' => array(
@@ -447,7 +483,7 @@ function ppom_load_pro_options() {
 		),
 		'ppom_editcart_popup_label'      => array(
 			'type'  => 'text',
-			'title' => __( 'Model Button Label', 'woocommerce-product-addon' ),
+			'title' => __( 'Modal Button Label', 'woocommerce-product-addon' ),
 			'desc'  => __( 'Change the label for the modal button.', 'woocommerce-product-addon' ),
 		),
 	);
@@ -469,14 +505,14 @@ function ppom_load_pro_options() {
 	$settings = array(
 		'ppom-enf-emails-list'    => array(
 			'type'  => 'text',
-			'title' => __( 'Emails Recepients', 'woocommerce-product-addon' ),
+			'title' => __( 'Email Recipients', 'woocommerce-product-addon' ),
 			'desc'  => __( 'Enter the email addresses of the enquiry form recipients, separated by commas.', 'woocommerce-product-addon' ),
 		),
 		'ppom-enf-note'           => array(
 			'type'    => 'textarea',
 			'title'   => __( 'Note', 'woocommerce-product-addon' ),
 			'desc'    => __( 'Set the message to be displayed on the enquiry form.', 'woocommerce-product-addon' ),
-			'default' => 'All selected data will be sent to vendor',
+			'default' => 'The options you selected on this product will be included with your enquiry.',
 		),
 		'ppom-enf-send-msg'       => array(
 			'type'  => 'textarea',
@@ -648,30 +684,30 @@ function ppom_load_pro_options() {
 		'ppom_repeater_clone_mode'     => array(
 			'type'         => 'select',
 			'is_available' => false,
-			'options'      => [
+			'options'      => array(
 				'first_box' => 'Clone from first box only',
 				'each_box'  => 'Clone from each box',
-			],
+			),
 			'title'        => __( 'Clone Mode', 'woocommerce-product-addon' ),
 			'desc'         => __( 'How to clone the fields', 'woocommerce-product-addon' ),
 		),
 		'ppom_repeater_clone_position' => array(
 			'type'         => 'select',
 			'is_available' => false,
-			'options'      => [
+			'options'      => array(
 				'top'    => 'Top',
 				'bottom' => 'Bottom',
-			],
+			),
 			'title'        => __( 'Clone Icons Position', 'woocommerce-product-addon' ),
 			'desc'         => __( 'Set the placement of the clone icons within the repeater fields.', 'woocommerce-product-addon' ),
 		),
 		'ppom_repeater_icon_lib'       => array(
 			'type'         => 'select',
 			'is_available' => false,
-			'options'      => [
+			'options'      => array(
 				'dashicons'   => 'Dashicons',
 				'fontawesome' => 'FontAwesome',
-			],
+			),
 			'title'        => __( 'Icons Library', 'woocommerce-product-addon' ),
 			'desc'         => __( 'Select the icon library to be used for displaying icons.', 'woocommerce-product-addon' ),
 		),
@@ -693,40 +729,55 @@ function ppom_load_pro_options() {
 			'default'      => 'Bulk Quantity Standard',
 			'options'      => array(
 				'bq_standard' => __( 'Bulk Quantity Standard', 'woocommerce-product-addon' ),
-				'bq_packaged' => __( 'Bulk Quantity Packaged', 'woocommerce-product-addon' )
+				'bq_packaged' => __( 'Bulk Quantity Packaged', 'woocommerce-product-addon' ),
 			),
 			'desc'         => __( 'Choose how bulk quantities are displayed. Select \'Bulk Quantity Standard\' for standard bulk orders or \'Bulk Quantity Packaged\' for pre-packaged bulk quantities.', 'woocommerce-product-addon' ),
-		)
+		),
 	);
 
 	PPOMSETTINGS()->register_setting( 'ppom_admin_fields_settings', $settings );
 
 	$integration_settings = array();
 
-	$integration_settings['ppom_integrations_rest'] = array(
+	$integration_settings['ppom_integrations_rest']   = array(
 		'type'  => 'section',
 		'title' => __( 'REST API', 'woocommerce-product-addon' ),
+		'desc'  => __( 'Connect your store with external applications using the REST API.', 'woocommerce-product-addon' ),
 	);
-	$integration_settings['ppom_api_enable']        = array(
+	$integration_settings['ppom_api_enable']          = array(
 		'type'  => 'checkbox',
 		'title' => __( 'PPOM REST API', 'woocommerce-product-addon' ),
-		'desc'  => __( 'Check this option to enable PPOM REST API.', 'woocommerce-product-addon' ),
+		'desc'  => __( 'Enable this option to make PPOM REST API available.', 'woocommerce-product-addon' ),
 	);
-	$integration_settings['ppom_rest_secret_key']   = array(
-		'type'  => 'text',
+	$integration_settings['ppom_rest_base_url']       = array(
+		'type'     => 'text',
+		'title'    => __( 'Base URL', 'woocommerce-product-addon' ),
+		'desc'     => __( 'This is the REST API endpoint for your store.', 'woocommerce-product-addon' ),
+		'disabled' => true,
+		'default'  => rest_url( 'ppom/v1' ),
+		'class'    => 'ppom-rest-url-input',
+	);
+	$integration_settings['ppom_rest_secret_key']     = array(
+		'type'  => 'password',
 		'title' => __( 'Secret Key', 'woocommerce-product-addon' ),
-		'desc'  => __( 'Enter any characters to create a secret key. This key must be provided when making API requests.', 'woocommerce-product-addon' ),
+		'desc'  => __( 'This key will be used to authenticate API requests.', 'woocommerce-product-addon' ),
+	);
+	$integration_settings['ppom_available_endpoints'] = array(
+		'type'  => 'textarea',
+		'title' => __( 'Available Endpoints', 'woocommerce-product-addon' ),
+		'desc'  => __( 'List of available API routes that you can use.', 'woocommerce-product-addon' ),
 	);
 
 	$integration_settings['ppom_integrations_wcfm']  = array(
 		'type'  => 'section',
 		'title' => __( 'WCFM Vendors', 'woocommerce-product-addon' ),
+		'desc'  => __( 'Let vendors manage their own PPOM field groups.', 'woocommerce-product-addon' ),
 	);
 	$integration_settings['ppom_wcfm_allow_vendors'] = array(
 		'type'  => 'checkbox',
 		'title' => __( 'Allow Vendors to Create/Edit PPOM Fields', 'woocommerce-product-addon' ),
 		'desc'  => __( 'Enable this option to allow vendors to create or edit PPOM fields. These fields will be global.', 'woocommerce-product-addon' ),
-		'label' => __( 'Yes', 'woocommerce-product-addon' ),
+		'label' => __( 'Enable', 'woocommerce-product-addon' ),
 	);
 	$integration_settings['ppom_label_wcfm']         = array(
 		'type'    => 'text',
@@ -746,9 +797,8 @@ function ppom_load_pro_options() {
 			'is_available' => false,
 			'title'        => __( 'Integrations', 'woocommerce-product-addon' ),
 			'is_sabpanel'  => true,
-		)
+		),
 	);
 	PPOMSETTINGS()->register_panel( 'ppom_general_tab', $panels )->register_setting( 'ppom_integrations', $integration_settings );
-
 }
-add_action('init', 'ppom_load_pro_options', 99);
+add_action( 'init', 'ppom_load_pro_options', 99 );

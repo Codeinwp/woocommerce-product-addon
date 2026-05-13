@@ -17,21 +17,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 class PPOM_InputManager {
 
 	/**
-	 * Return all ppom inputs meta data
+	 * Current field definition array for the active render context.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	public static $input_meta;
 
 	/**
-	 * Return input type
+	 * PPOM input type slug (e.g. text, select).
 	 *
 	 * @var string
 	 */
 	public $input_type;
 
-	/* ======= Class Construct ======== */
-	function __construct( $input_meta, $input_type ) {
+	/**
+	 * Stores the active field definition and type for accessor methods.
+	 *
+	 * @param array<string, mixed> $input_meta Field definition from the meta group.
+	 * @param string               $input_type Input type slug.
+	 */
+	public function __construct( $input_meta, $input_type ) {
 
 		self::$input_meta = $input_meta;
 
@@ -43,6 +48,8 @@ class PPOM_InputManager {
 	 * Field Title
 	 *
 	 * @hook ppom_{$field_type}_input_meta_title
+	 *
+	 * @return string
 	 */
 	function title() {
 
@@ -59,6 +66,8 @@ class PPOM_InputManager {
 	 *
 	 * @hook ppom_{$field_type}_input_meta_desc
 	 * @hook ppom_description_content
+	 *
+	 * @return string Shortcode-expanded HTML/description.
 	 */
 	function desc() {
 
@@ -70,7 +79,7 @@ class PPOM_InputManager {
 		$desc = apply_filters( 'ppom_description_content', $desc, self::$input_meta );
 		$desc = apply_filters( 'ppom_input_meta_desc', $desc, self::$input_meta );
 
-		return do_shortcode($desc);
+		return do_shortcode( $desc );
 	}
 
 
@@ -78,6 +87,8 @@ class PPOM_InputManager {
 	 * Field Required
 	 *
 	 * @hook ppom_{$field_type}_input_meta_required
+	 *
+	 * @return mixed Truthy when the field is required.
 	 */
 	function required() {
 
@@ -88,7 +99,9 @@ class PPOM_InputManager {
 
 
 	/**
-	 * Field Desc Tooltip
+	 * Whether description should display as a tooltip.
+	 *
+	 * @return mixed
 	 */
 	function enable_tooltip() {
 
@@ -102,6 +115,8 @@ class PPOM_InputManager {
 	 * Field dataname (Field Unique ID)
 	 *
 	 * @hook ppom_{$field_type}_input_meta_data_name
+	 *
+	 * @return string Sanitized `data_name` or derived from title.
 	 */
 	function data_name() {
 
@@ -115,6 +130,8 @@ class PPOM_InputManager {
 	 * Field Placeholder
 	 *
 	 * @hook ppom_{$field_type}_input_meta_placeholder
+	 *
+	 * @return string
 	 */
 	function placeholder() {
 
@@ -130,6 +147,8 @@ class PPOM_InputManager {
 	 * Field Error Message
 	 *
 	 * @hook ppom_{$field_type}_input_meta_error_msg
+	 *
+	 * @return string
 	 */
 	function error_msg() {
 
@@ -150,6 +169,12 @@ class PPOM_InputManager {
 	 *
 	 * @hook ppom_field_description
 	 * @hook ppom_{$field_type}_input_meta_label_html
+	 *
+	 * @param bool $tooltip  Append description next to the label when true.
+	 * @param bool $desc     Apply `ppom_field_description` to the description fragment.
+	 * @param bool $asterisk Append required marker when applicable.
+	 *
+	 * @return string HTML fragment for the label area.
 	 */
 	function field_label( $tooltip = true, $desc = true, $asterisk = true ) {
 
@@ -180,6 +205,8 @@ class PPOM_InputManager {
 	 * Field Desciption With Tooltip
 	 *
 	 * @hook ppom_input_meta_tooltip_desc
+	 *
+	 * @return string HTML fragment.
 	 */
 	function tooltip() {
 
@@ -196,6 +223,8 @@ class PPOM_InputManager {
 	 * Checkbox|Radio|Select|Image|Pallete
 	 *
 	 * @hook ppom_{$field_type}_input_meta_multi_options
+	 *
+	 * @return array<int|string, mixed>
 	 */
 	function options() {
 
@@ -213,6 +242,8 @@ class PPOM_InputManager {
 	 * Images Options
 	 *
 	 * @hook ppom_{$field_type}_input_meta_images
+	 *
+	 * @return array<int|string, mixed>
 	 */
 	function images() {
 
@@ -230,6 +261,8 @@ class PPOM_InputManager {
 	 * Audio/Video Options
 	 *
 	 * @hook ppom_{$field_type}_input_meta_audio
+	 *
+	 * @return array<int|string, mixed>
 	 */
 	function audio_video() {
 
@@ -253,10 +286,12 @@ class PPOM_InputManager {
 	 * Field inner Wrapper Classes
 	 *
 	 * @hook ppom_input_wrapper_class
+	 *
+	 * @return string Space-separated class list.
 	 */
 	function field_inner_wrapper_classes() {
 
-		$classes         = [ 'form-group' ];
+		$classes         = array( 'form-group' );
 		$wrapper_classes = implode( ' ', $classes );
 
 		// return apply_filters_deprecated( 'ppom_input_wrapper_class', array( $wrapper_classes, self::$input_meta ), '21.3', 'ppom_input_wrapper_classes' );
@@ -268,10 +303,12 @@ class PPOM_InputManager {
 	 * Field Label Classes
 	 *
 	 * @hook ppom_{$this->input_type}_input_label_classes
+	 *
+	 * @return string Space-separated class list.
 	 */
 	function label_classes() {
 
-		$classes = [ 'form-control-label' ];
+		$classes = array( 'form-control-label' );
 
 		$label_classes = apply_filters( 'ppom_input_label_classes', $classes, self::$input_meta );
 
@@ -286,6 +323,8 @@ class PPOM_InputManager {
 	 *
 	 * @hook ppom_{$this->input_type}_input_meta_classes
 	 * @hook ppom_input_classes
+	 *
+	 * @return list<string>
 	 */
 	function input_classes_array() {
 
@@ -313,7 +352,7 @@ class PPOM_InputManager {
 		}
 
 		if ( ( $this->input_type == 'radio' && ( $key = array_search( 'form-control', $classes ) ) !== false ) ||
-			 $this->input_type == 'checkbox' && ( $key = array_search( 'form-control', $classes ) ) !== false ) {
+			$this->input_type == 'checkbox' && ( $key = array_search( 'form-control', $classes ) ) !== false ) {
 			unset( $classes[ $key ] );
 			$classes[] = 'ppom-check-input';
 		}
@@ -334,6 +373,8 @@ class PPOM_InputManager {
 	 *
 	 * @hook ppom_{$this->input_type}_input_meta_classes
 	 * @hook ppom_input_classes
+	 *
+	 * @return string Space-separated class list.
 	 */
 	function input_classes() {
 
@@ -352,10 +393,12 @@ class PPOM_InputManager {
 	 * Radio Input label classes
 	 *
 	 * @hook ppom_radio_input_label_classes
+	 *
+	 * @return string
 	 */
 	function radio_label_classes() {
 
-		$classes = [ 'form-check-label' ];
+		$classes = array( 'form-check-label' );
 
 		$label_class = apply_filters( 'ppom_radio_input_label_classes', $classes, self::$input_meta );
 
@@ -369,10 +412,12 @@ class PPOM_InputManager {
 	 * Checkbox Input label classes
 	 *
 	 * @hook ppom_checkbox_input_label_classes
+	 *
+	 * @return string
 	 */
 	function checkbox_label_classes() {
 
-		$classes = [ 'form-check-label' ];
+		$classes = array( 'form-check-label' );
 
 		$label_class = apply_filters( 'ppom_checkbox_input_label_classes', $classes, self::$input_meta );
 
@@ -386,6 +431,8 @@ class PPOM_InputManager {
 	 * Generate Field Attribute Name Key
 	 *
 	 * @hook ppom_{$this->input_type}_input_name_attr
+	 *
+	 * @return string `ppom[fields][...]` name attribute.
 	 */
 	function form_name() {
 
@@ -402,6 +449,11 @@ class PPOM_InputManager {
 	 * Get input meta value by key
 	 *
 	 * @hook ppom_{$this->input_type}_input_meta_value_by_key
+	 *
+	 * @param string     $key     Meta key on the field definition.
+	 * @param mixed|null $default Fallback when missing or empty string.
+	 *
+	 * @return mixed
 	 */
 	function get_meta_value( $key, $default = null ) {
 

@@ -1,10 +1,14 @@
 <?php
-/*
- * Followig class handling date input control and their
-* dependencies. Do not make changes in code
-* Create on: 9 November, 2013
-*/
+/**
+ * Color picker field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * Color picker with optional palette swatches, default color, and conditional logic.
+ */
 class NM_Color_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -17,29 +21,38 @@ class NM_Color_wooproduct extends PPOM_Inputs {
 	*/
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata and loads the field settings schema.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
 
 		$this->title    = __( 'Color picker', 'woocommerce-product-addon' );
-		$this->desc     = __( 'Color pallete input', 'woocommerce-product-addon' );
+		$this->desc     = __( 'Color palette input', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-modx" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 
 		$input_meta = array(
 			'title'           => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
-				'desc'  => __( 'It will be shown as field label', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as the field label.', 'woocommerce-product-addon' ),
 			),
 			'data_name'       => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'woocommerce-product-addon' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'     => array(
 				'type'  => 'textarea',
@@ -52,7 +65,7 @@ class NM_Color_wooproduct extends PPOM_Inputs {
 				'desc'  => __( 'Insert the error message for validation.', 'woocommerce-product-addon' ),
 			),
 			'default_color'   => array(
-				'type'        => 'text',
+				'type'        => 'color',
 				'title'       => __( 'Default color', 'woocommerce-product-addon' ),
 				'desc'        => __( 'Define default color e.g: #effeff', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
@@ -60,7 +73,7 @@ class NM_Color_wooproduct extends PPOM_Inputs {
 			'palettes_colors' => array(
 				'type'        => 'text',
 				'title'       => __( 'Palettes colors', 'woocommerce-product-addon' ),
-				'desc'        => __( 'Color codes seperated by comma e.g: #125, #459, #78b', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Color codes separated by comma, e.g.: #125, #459, #78b', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'palettes_width'  => array(

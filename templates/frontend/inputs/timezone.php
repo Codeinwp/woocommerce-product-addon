@@ -31,7 +31,7 @@ if ( ! empty( $first_option ) ) {
 if ( ! $options ) {
 
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'The timezone not found, please add different regions.', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . esc_html__( 'Timezone not found. Please add different regions.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';
@@ -44,7 +44,7 @@ if ( ! $options ) {
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 

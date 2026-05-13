@@ -1,10 +1,14 @@
 <?php
-/*
- * Followig class handling text input control and their
-* dependencies. Do not make changes in code
-* Create on: 9 November, 2013
-*/
+/**
+ * HTML section field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * Free-form HTML content block for layout and messaging; supports visibility, cart display, and conditions.
+ */
 class NM_Section_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -22,6 +26,11 @@ class NM_Section_wooproduct extends PPOM_Inputs {
 	*/
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata and loads the field settings schema.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -30,17 +39,21 @@ class NM_Section_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'HTML content', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-code" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 
 		$input_meta = array(
 			'data_name'       => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'woocommerce-product-addon' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'width'           => array(
 				'type'    => 'select',

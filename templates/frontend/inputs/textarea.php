@@ -51,7 +51,7 @@ if ( $postid && is_numeric( $postid ) && $rich_editor != 'on' ) {
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 	<?php
@@ -72,12 +72,14 @@ if ( $postid && is_numeric( $postid ) && $rich_editor != 'on' ) {
 			echo $key . '="' . $val . '"';
 		}
 		?>
-		><?php
+		>
+		<?php
 		if ( $textarea_value != '' ) {
 			$textarea_value = str_replace( '<br />', "\n", $textarea_value );
 			echo esc_html( $textarea_value );
 		}
-		?></textarea>
+		?>
+		</textarea>
 
 	<?php } ?>
 

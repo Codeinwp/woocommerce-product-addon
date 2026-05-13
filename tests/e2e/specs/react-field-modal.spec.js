@@ -1,0 +1,738 @@
+/**
+ * WordPress dependencies
+ */
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+
+import { buildImageField, buildPalettesField } from '../fixtures/fields.js';
+import { setPpomLicenseFixture } from '../fixtures/license.js';
+import { createPpomGroup, createSimpleTextGroup } from '../fixtures/ppom.js';
+import { saveFields } from '../utils.js';
+
+async function visitReactModalGroup( admin, ppomId ) {
+	await admin.visitAdminPage(
+		`admin.php?page=ppom&productmeta_id=${ ppomId }&do_meta=edit&ppom_react_modal=1`
+	);
+}
+
+async function openFirstFieldReactModal( page ) {
+	await page.locator( '#ppom_sort_id_1 .ppom-edit-field' ).click();
+	const dialog = page.getByRole( 'dialog' ).first();
+	await expect( dialog ).toBeVisible();
+	return dialog;
+}
+
+async function openAdvancedSettings( dialog ) {
+	const toggle = dialog.getByText( /Show advanced settings/i );
+	if ( ( await toggle.count() ) > 0 ) {
+		await toggle.click();
+	}
+}
+
+async function optionValues( dialog ) {
+	return dialog
+		.locator( 'input[placeholder="Option"]' )
+		.evaluateAll( ( inputs ) => inputs.map( ( input ) => input.value ) );
+}
+
+async function setReloadProbe( page ) {
+	const token = `react-modal-${ Date.now() }`;
+	await page.evaluate( ( value ) => {
+		window.__ppomReactModalReloadProbe = value;
+	}, token );
+	return token;
+}
+
+async function expectNoReloadSinceProbe( page, token ) {
+	await expect
+		.poll( () =>
+			page.evaluate( () => window.__ppomReactModalReloadProbe || '' )
+		)
+		.toBe( token );
+}
+
+async function pickTextField( dialog ) {
+	await dialog.getByRole( 'tab', { name: 'Text' } ).click();
+	await dialog.locator( 'button[aria-label^="Text Input"]' ).last().click();
+}
+
+async function fillTextFieldBasics( dialog, { title, dataName } ) {
+	await dialog.getByLabel( 'Title' ).fill( title );
+	await dialog.getByLabel( 'Data name' ).fill( dataName );
+}
+
+async function fieldDataNames( page ) {
+	return page
+		.locator( '.ppom_field_table td.column-data_name' )
+		.evaluateAll( ( cells ) =>
+			cells.map( ( cell ) => cell.textContent.trim() )
+		);
+}
+
+async function fieldTitles( page ) {
+	return page
+		.locator( '.ppom_field_table td.column-title' )
+		.evaluateAll( ( cells ) =>
+			cells.map( ( cell ) => cell.textContent.trim() )
+		);
+}
+
+async function saveFieldsAndRevisit( page, admin, ppomId ) {
+	page.once( 'dialog', ( browserDialog ) => browserDialog.accept() );
+	const reloaded = page.waitForEvent( 'load' );
+	await saveFields( page );
+	await reloaded;
+	await visitReactModalGroup( admin, ppomId );
+}
+
+test.describe( 'React field modal (opt-in)', () => {
+	test( 'picker entry opens FieldTypePicker (Add field)', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		await expect(
+			page.locator( 'button[data-modal-id="ppom_fields_model_id"]' )
+		).toHaveCount( 0 );
+
+		const addFieldButton = page.getByRole( 'button', {
+			name: 'Add field',
+			exact: true,
+		} );
+		await expect( addFieldButton ).toHaveClass( /button-primary/ );
+		await addFieldButton.click();
+
+		const dialog = page.getByRole( 'dialog' ).first();
+		await expect( dialog ).toBeVisible();
+
+		await expect(
+			dialog.getByRole( 'tab', { name: 'Text' } )
+		).toBeVisible();
+		await dialog.getByRole( 'tab', { name: 'Text' } ).click();
+		await expect(
+			dialog.getByRole( 'button', { name: /Text Input/i } ).first()
+		).toBeVisible();
+	} );
+
+	test( 'per-field edit button opens sidebar without inner Add field CTA', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		const dialog = await openFirstFieldReactModal( page );
+		await expect(
+			dialog.getByRole( 'button', { name: 'Add field', exact: true } )
+		).toHaveCount( 0 );
+	} );
+
+	test( 'per-field edit button shows Settings tab for definition-driven text field', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		const dialog = await openFirstFieldReactModal( page );
+		await expect(
+			dialog.getByRole( 'tab', { name: /Settings/i } )
+		).toBeVisible();
+	} );
+
+	test( 'opening an existing field can close without confirmation when unchanged', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		const dialog = await openFirstFieldReactModal( page );
+		await dialog.getByRole( 'button', { name: 'Cancel' } ).click();
+
+		await expect( dialog ).toBeHidden();
+	} );
+
+	test( 'editing an existing field requires close confirmation', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		const dialog = await openFirstFieldReactModal( page );
+		await dialog.getByLabel( 'Title' ).fill( 'Changed React modal title' );
+		await dialog.getByRole( 'button', { name: 'Cancel' } ).click();
+
+		await expect( dialog ).toBeVisible();
+		await expect(
+			dialog.getByRole( 'button', { name: 'Confirm' } )
+		).toBeVisible();
+	} );
+
+	test( 'selecting a new field type can close without confirmation when unchanged', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		await page
+			.getByRole( 'button', { name: 'Add field', exact: true } )
+			.click();
+		const dialog = page.getByRole( 'dialog' ).first();
+		await expect( dialog ).toBeVisible();
+
+		await dialog.getByRole( 'tab', { name: 'Text' } ).click();
+		await dialog
+			.locator( 'button[aria-label^="Text Input"]' )
+			.last()
+			.click();
+		await dialog.getByRole( 'button', { name: 'Cancel' } ).click();
+
+		await expect( dialog ).toBeHidden();
+	} );
+
+	test( 'editing a newly selected field requires close confirmation', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		await page
+			.getByRole( 'button', { name: 'Add field', exact: true } )
+			.click();
+		const dialog = page.getByRole( 'dialog' ).first();
+		await expect( dialog ).toBeVisible();
+
+		await dialog.getByRole( 'tab', { name: 'Text' } ).click();
+		await dialog
+			.locator( 'button[aria-label^="Text Input"]' )
+			.last()
+			.click();
+		await dialog.getByLabel( 'Title' ).fill( 'New edited field' );
+		await dialog.getByRole( 'button', { name: 'Cancel' } ).click();
+
+		await expect( dialog ).toBeVisible();
+		await expect(
+			dialog.getByRole( 'button', { name: 'Confirm' } )
+		).toBeVisible();
+	} );
+
+	test( 'matrix-style options reorder, add, and remove', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		await setPpomLicenseFixture( requestUtils, {
+			valid: true,
+			plan: 3,
+			proInstalled: true,
+		} );
+
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'React modal matrix options',
+			fields: [
+				buildPalettesField( {
+					title: 'Palette Options',
+					dataName: 'palette_options',
+					options: [
+						{
+							option: 'Small',
+							price: '10',
+							label: 'Small label',
+							id: 'small',
+						},
+						{
+							option: 'Large',
+							price: '20',
+							label: 'Large label',
+							id: 'large',
+						},
+					],
+				} ),
+			],
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		let dialog = await openFirstFieldReactModal( page );
+		await openAdvancedSettings( dialog );
+
+		await expect(
+			dialog.locator( 'input[placeholder="Option"]' )
+		).toHaveCount( 2 );
+		expect( await optionValues( dialog ) ).toEqual( [ 'Small', 'Large' ] );
+
+		const dragHandles = dialog.getByRole( 'button', {
+			name: 'Drag to reorder',
+		} );
+		await dragHandles.nth( 1 ).focus();
+		await page.keyboard.press( 'ArrowUp' );
+		expect( await optionValues( dialog ) ).toEqual( [ 'Large', 'Small' ] );
+
+		await dialog.getByRole( 'button', { name: 'Add option' } ).click();
+		await expect(
+			dialog.locator( 'input[placeholder="Option"]' )
+		).toHaveCount( 3 );
+		await dialog.locator( 'input[placeholder="Option"]' ).nth( 2 ).click();
+		await page.keyboard.type( 'Medium' );
+		await expect(
+			dialog.locator( 'input[placeholder="Option"]' ).nth( 2 )
+		).toHaveValue( 'Medium' );
+
+		await dialog.getByRole( 'button', { name: 'Remove' } ).first().click();
+		expect( await optionValues( dialog ) ).toEqual( [ 'Small', 'Medium' ] );
+	} );
+
+	test( 'new field is created with a legacy-compatible slugified data name', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		await page
+			.getByRole( 'button', { name: 'Add field', exact: true } )
+			.click();
+		const dialog = page.getByRole( 'dialog' ).first();
+		await expect( dialog ).toBeVisible();
+
+		await pickTextField( dialog );
+
+		const titleValue = await dialog.getByLabel( 'Title' ).inputValue();
+		const dataNameValue = await dialog
+			.getByLabel( 'Data name' )
+			.inputValue();
+
+		const expectedSlug = titleValue
+			.toLowerCase()
+			.replace( /[^a-z0-9]+/g, '_' )
+			.replace( /^_+|_+$/g, '' );
+		expect( dataNameValue ).toBe( expectedSlug );
+	} );
+
+	test( 'title edits update data name until data name is manually locked', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		await page
+			.getByRole( 'button', { name: 'Add field', exact: true } )
+			.click();
+		const dialog = page.getByRole( 'dialog' ).first();
+		await expect( dialog ).toBeVisible();
+
+		await pickTextField( dialog );
+		await dialog.getByLabel( 'Title' ).fill( 'Gift Message' );
+		await expect( dialog.getByLabel( 'Data name' ) ).toHaveValue(
+			'gift_message'
+		);
+
+		await dialog.getByLabel( 'Data name' ).fill( 'custom_gift_message' );
+		await dialog.getByLabel( 'Title' ).fill( 'Changed Gift Message' );
+		await expect( dialog.getByLabel( 'Data name' ) ).toHaveValue(
+			'custom_gift_message'
+		);
+
+		await dialog.getByRole( 'button', { name: 'Add Field' } ).click();
+		await expect( dialog ).toBeHidden();
+		expect( await fieldDataNames( page ) ).toContain(
+			'custom_gift_message'
+		);
+	} );
+
+	test( 'loading a blank image data name repairs it before save', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'React modal blank image data name',
+			fields: [
+				buildImageField( {
+					title: 'Hero Image',
+					dataName: '',
+				} ),
+			],
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		const dialog = await openFirstFieldReactModal( page );
+		await expect( dialog.getByLabel( 'Data name' ) ).toHaveValue(
+			'heroimage'
+		);
+		await dialog.getByRole( 'button', { name: 'Update Field' } ).click();
+
+		await expect( dialog ).toBeHidden();
+		expect( await fieldDataNames( page ) ).toContain( 'heroimage' );
+	} );
+
+	test( 'duplicating a field repeatedly creates unique copy data names', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+			titlePrefix: 'Copy Source',
+			dataNamePrefix: 'copy_source',
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		await page.locator( '#ppom_sort_id_1 .ppom_copy_field' ).click();
+		let dialog = page.getByRole( 'dialog' ).first();
+		await expect( dialog ).toBeVisible();
+		await expect( dialog.getByLabel( 'Data name' ) ).toHaveValue(
+			/copy_source_1_.*_copy/
+		);
+		await dialog.getByRole( 'button', { name: 'Add Field' } ).click();
+		await expect( dialog ).toBeHidden();
+
+		await page.locator( '#ppom_sort_id_1 .ppom_copy_field' ).click();
+		dialog = page.getByRole( 'dialog' ).first();
+		await expect( dialog ).toBeVisible();
+		await expect( dialog.getByLabel( 'Data name' ) ).toHaveValue(
+			/copy_source_1_.*_copy_2/
+		);
+		await dialog.getByRole( 'button', { name: 'Add Field' } ).click();
+		await expect( dialog ).toBeHidden();
+
+		const dataNames = await fieldDataNames( page );
+		expect( new Set( dataNames ).size ).toBe( dataNames.length );
+		expect(
+			dataNames.filter( ( dataName ) => /_copy/.test( dataName ) )
+		).toHaveLength( 2 );
+
+		await saveFieldsAndRevisit( page, admin, ppomId );
+		const persistedDataNames = await fieldDataNames( page );
+		expect(
+			persistedDataNames.filter( ( dataName ) =>
+				/_copy/.test( dataName )
+			)
+		).toHaveLength( 2 );
+		expect( persistedDataNames[ 1 ] ).toMatch( /_copy/ );
+	} );
+
+	test( 'debug logging is disabled unless explicitly enabled', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const debugMessages = [];
+		page.on( 'console', ( message ) => {
+			if ( message.text().includes( 'PPOM_FIELD_MODAL_DEBUG' ) ) {
+				debugMessages.push( message.text() );
+			}
+		} );
+
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+		const dialog = await openFirstFieldReactModal( page );
+		await dialog.getByLabel( 'Title' ).fill( 'No debug output' );
+		await dialog.getByRole( 'button', { name: 'Update Field' } ).click();
+		await expect( dialog ).toBeHidden();
+
+		expect( debugMessages ).toEqual( [] );
+	} );
+
+	test( 'clicking save with prefilled data name passes validation without manual entry', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		await page
+			.getByRole( 'button', { name: 'Add field', exact: true } )
+			.click();
+		const dialog = page.getByRole( 'dialog' ).first();
+		await expect( dialog ).toBeVisible();
+
+		await pickTextField( dialog );
+
+		await dialog.getByLabel( 'Title' ).fill( 'Direct Save Title' );
+		await dialog.getByRole( 'button', { name: 'Add Field' } ).click();
+
+		await expect(
+			dialog.getByText( /Data Name must be required/i )
+		).toHaveCount( 0 );
+		await expect( dialog ).toBeHidden();
+		await expect(
+			page.locator( '.ppom_field_table .ppom_meta_field_title', {
+				hasText: 'Direct Save Title',
+			} )
+		).toBeVisible();
+	} );
+
+	test( 'adding a text field stages the row without reloading', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+		const probe = await setReloadProbe( page );
+
+		await page
+			.getByRole( 'button', { name: 'Add field', exact: true } )
+			.click();
+		const dialog = page.getByRole( 'dialog' ).first();
+		await expect( dialog ).toBeVisible();
+
+		await pickTextField( dialog );
+		await fillTextFieldBasics( dialog, {
+			title: 'React staged text',
+			dataName: 'react_staged_text',
+		} );
+		await dialog.getByRole( 'button', { name: 'Add Field' } ).click();
+
+		await expect( dialog ).toBeHidden();
+		await expect(
+			page.locator( '.ppom_field_table .ppom_meta_field_title', {
+				hasText: 'React staged text',
+			} )
+		).toBeVisible();
+		await expectNoReloadSinceProbe( page, probe );
+	} );
+
+	test( 'editing an existing field stages the row without reloading', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+		const probe = await setReloadProbe( page );
+
+		const dialog = await openFirstFieldReactModal( page );
+		await dialog.getByLabel( 'Title' ).fill( 'React staged edit' );
+		await dialog.getByRole( 'button', { name: 'Update Field' } ).click();
+
+		await expect( dialog ).toBeHidden();
+		await expect(
+			page.locator( '#ppom_sort_id_1 .ppom_meta_field_title' )
+		).toHaveText( 'React staged edit' );
+		await expectNoReloadSinceProbe( page, probe );
+	} );
+
+	test( 'Save Fields persists staged modal changes through the classic submit', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		const dialog = await openFirstFieldReactModal( page );
+		await dialog.getByLabel( 'Title' ).fill( 'React persisted edit' );
+		await dialog.getByRole( 'button', { name: 'Update Field' } ).click();
+		await expect( dialog ).toBeHidden();
+
+		page.once( 'dialog', ( browserDialog ) => browserDialog.accept() );
+		const reloaded = page.waitForEvent( 'load' );
+		await saveFields( page );
+		await reloaded;
+
+		await visitReactModalGroup( admin, ppomId );
+		await expect(
+			page.locator( '#ppom_sort_id_1 .ppom_meta_field_title' )
+		).toHaveText( 'React persisted edit' );
+	} );
+
+	test( 'classic delete after a React edit does not resurrect the deleted row', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 2,
+			titlePrefix: 'Delete Drift',
+			dataNamePrefix: 'delete_drift',
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+		const beforeDelete = await fieldTitles( page );
+
+		const dialog = await openFirstFieldReactModal( page );
+		await dialog.getByLabel( 'Title' ).fill( 'React edit before delete' );
+		await dialog.getByRole( 'button', { name: 'Update Field' } ).click();
+		await expect( dialog ).toBeHidden();
+
+		await page.locator( '#ppom_sort_id_2 .ppom-delete-field' ).click();
+		await page.locator( '.ppom-popup-overlay .ppom-btn-confirm' ).click();
+		await expect( page.locator( '#ppom_sort_id_2' ) ).toHaveCount( 0 );
+
+		await saveFieldsAndRevisit( page, admin, ppomId );
+		const afterDelete = await fieldTitles( page );
+		expect( afterDelete ).toEqual( [ 'React edit before delete' ] );
+		expect( afterDelete ).not.toContain( beforeDelete[ 1 ] );
+	} );
+
+	test( 'classic reorder after a React edit persists in the reordered table order', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 2,
+			titlePrefix: 'Reorder Drift',
+			dataNamePrefix: 'reorder_drift',
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+		const originalTitles = await fieldTitles( page );
+
+		const dialog = await openFirstFieldReactModal( page );
+		await dialog.getByLabel( 'Title' ).fill( 'React edit before reorder' );
+		await dialog.getByRole( 'button', { name: 'Update Field' } ).click();
+		await expect( dialog ).toBeHidden();
+
+		await page.evaluate( () => {
+			const row1 = document.getElementById( 'ppom_sort_id_1' );
+			const row2 = document.getElementById( 'ppom_sort_id_2' );
+			row1?.parentElement?.insertBefore( row2, row1 );
+
+			const modal1 = document.getElementById( 'ppom_field_model_1' );
+			const modal2 = document.getElementById( 'ppom_field_model_2' );
+			modal1?.parentElement?.insertBefore( modal2, modal1 );
+		} );
+
+		await saveFieldsAndRevisit( page, admin, ppomId );
+		expect( await fieldTitles( page ) ).toEqual( [
+			originalTitles[ 1 ],
+			'React edit before reorder',
+		] );
+	} );
+
+	test( 'canceling dirty edits does not stage row changes', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		const originalTitle = await page
+			.locator( '#ppom_sort_id_1 .ppom_meta_field_title' )
+			.textContent();
+		const dialog = await openFirstFieldReactModal( page );
+		await dialog.getByLabel( 'Title' ).fill( 'React canceled edit' );
+		await dialog.getByRole( 'button', { name: 'Cancel' } ).click();
+		await expect(
+			dialog.getByRole( 'button', { name: 'Confirm' } )
+		).toBeVisible();
+		await dialog.getByRole( 'button', { name: 'Confirm' } ).click();
+
+		await expect( dialog ).toBeHidden();
+		await expect(
+			page.locator( '#ppom_sort_id_1 .ppom_meta_field_title' )
+		).toHaveText( originalTitle?.trim() || '' );
+	} );
+
+	/**
+	 * Regression: Chakra v3 `<Input>`, `<Textarea>` and `<NativeSelect.Field>`
+	 * do not accept `onValueChange`. Passing it makes React drop the handler
+	 * and warn that the field is read-only — which silently broke fields like
+	 * the Bulk Quantity range cell. Fail fast if either warning resurfaces.
+	 */
+	test( 'react modal interactions emit no onValueChange / value-without-onChange warnings', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const warnings = [];
+		page.on( 'console', ( msg ) => {
+			if ( msg.type() !== 'warning' && msg.type() !== 'error' ) {
+				return;
+			}
+			const text = msg.text();
+			if (
+				text.includes(
+					'Unknown event handler property `onValueChange`'
+				) ||
+				text.includes(
+					'You provided a `value` prop to a form field without an `onChange` handler'
+				)
+			) {
+				warnings.push( text );
+			}
+		} );
+
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		const dialog = await openFirstFieldReactModal( page );
+
+		await dialog.getByLabel( 'Title' ).fill( 'Console gate title' );
+		await dialog.getByLabel( 'Data name' ).fill( 'console_gate_field' );
+
+		await openAdvancedSettings( dialog );
+
+		expect( warnings, warnings.join( '\n' ) ).toEqual( [] );
+	} );
+} );

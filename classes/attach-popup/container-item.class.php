@@ -2,6 +2,9 @@
 
 namespace PPOM\Attach;
 
+/**
+ * Attach UI list item binding an ID to a {@see ContainerView} renderer.
+ */
 class ContainerItem {
 
 	/**
@@ -18,8 +21,14 @@ class ContainerItem {
 	 */
 	public $renderer;
 
+	/**
+	 * Binds a container id to its view renderer.
+	 *
+	 * @param string        $id       Stable DOM / container id.
+	 * @param ContainerView $renderer View responsible for `render()`.
+	 */
 	public function __construct( $id, $renderer ) {
-		$this->id = $id;
+		$this->id       = $id;
 		$this->renderer = $renderer;
 	}
 
@@ -35,7 +44,7 @@ class ContainerItem {
 	/**
 	 * Set the render.
 	 *
-	 * @param ContainerView $renderer
+	 * @param ContainerView $renderer Object implementing `render()`.
 	 *
 	 * @return bool If the operation was successful.
 	 */

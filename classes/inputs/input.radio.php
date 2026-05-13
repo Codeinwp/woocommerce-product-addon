@@ -1,10 +1,14 @@
 <?php
-/*
- * Followig class handling radio input control and their
-* dependencies. Do not make changes in code
-* Create on: 9 November, 2013
-*/
+/**
+ * Radio field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * Radio button group with priced options, default selection, fixed fee option, and conditional logic.
+ */
 class NM_Radio_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -17,6 +21,11 @@ class NM_Radio_wooproduct extends PPOM_Inputs {
 	*/
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata and loads the field settings schema.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -25,26 +34,30 @@ class NM_Radio_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'regular radio input', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-dot-circle-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 
 		$input_meta = array(
 			'title'           => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
-				'desc'  => __( 'It will be shown as field label', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as the field label.', 'woocommerce-product-addon' ),
 			),
 			'data_name'       => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'woocommerce-product-addon' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'     => array(
 				'type'  => 'textarea',
 				'title' => __( 'Description', 'woocommerce-product-addon' ),
-				'desc'  => __( 'Small description, it will be diplay near name title.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Small description; it will be displayed next to the option name.', 'woocommerce-product-addon' ),
 			),
 			'error_message'   => array(
 				'type'  => 'text',

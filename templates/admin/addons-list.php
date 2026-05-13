@@ -34,10 +34,10 @@ $addons_list = ppom_array_get_addons_details();
 	<ul class="ppom_addons_model_cards" id="myUL">
 			<?php
 			foreach ( $addons_list as $meta ) {
-				$types = [
-					'field'=>esc_html__('Field', 'woocommerce-product-addon'),
-					'feature'=>esc_html__('Feature', 'woocommerce-product-addon'),
-				];
+				$types = array(
+					'field'   => esc_html__( 'Field', 'woocommerce-product-addon' ),
+					'feature' => esc_html__( 'Feature', 'woocommerce-product-addon' ),
+				);
 
 				$addon_title = isset( $meta['title'] ) ? $meta['title'] : '';
 				$addon_desc  = isset( $meta['desc'] ) ? $meta['desc'] : '';
@@ -53,7 +53,7 @@ $addons_list = ppom_array_get_addons_details();
 									<span class="badge badge-secondary">
 										<?php
 										// translators: it marks if a feature is locked under a paid plan. 
-										esc_html_e('PRO', 'woocommerce-product-addon');
+										esc_html_e( 'PRO', 'woocommerce-product-addon' );
 										?>
 									</span>
 								<?php endif; ?>
@@ -63,27 +63,27 @@ $addons_list = ppom_array_get_addons_details();
 							<hr>
 							<div class="ppom-admin-addons-actions">
 								<?php if ( ! ppom_pro_is_installed() ) : ?>
-									<a class="ppom_addons_model_card_btn" href="<?php echo tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), sanitize_key( $addon_title ), 'alladdonspage' ); ?>" target="_blank"><?php esc_html_e('Get Started', 'woocommerce-product-addon'); ?></a>
+									<a class="ppom_addons_model_card_btn" href="<?php echo tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), sanitize_key( $addon_title ), 'alladdonspage' ); ?>" target="_blank"><?php esc_html_e( 'Get Started', 'woocommerce-product-addon' ); ?></a>
 								<?php endif; ?>
 
 								<?php
-									foreach ( $actions as $action ) {
-										$btn_title = isset( $action['title'] ) ? $action['title'] : '';
-										$btn_link  = isset( $action['link'] ) ? $action['link'] : '';
-										if ( $btn_link != '' ) {
+								foreach ( $actions as $action ) {
+									$btn_title = isset( $action['title'] ) ? $action['title'] : '';
+									$btn_link  = isset( $action['link'] ) ? $action['link'] : '';
+									if ( $btn_link != '' ) {
 										?>
-											<a class="ppom_addons_model_card_btn" href="<?php echo esc_url( $btn_link ) ?>" target="_blank"><?php echo $btn_title; ?></a>
-											<?php
-										}
+											<a class="ppom_addons_model_card_btn" href="<?php echo esc_url( $btn_link ); ?>" target="_blank"><?php echo $btn_title; ?></a>
+										<?php
 									}
+								}
 								?>
 							</div>
 						</div>
 					</div>
 				</li>
-			<?php
-		}
-		?>
+				<?php
+			}
+			?>
 	</ul>
 </div>
 <script>

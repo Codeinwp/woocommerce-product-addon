@@ -1,0 +1,62 @@
+name: Translations Diff
+
+on:
+  pull_request_review:
+  pull_request:
+    types: [opened, edited, synchronize, ready_for_review]
+    branches:
+      - development
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  translation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Base Branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.base_ref }}
+          path: ppom-base
+      - name: Checkout PR Branch (Head)
+        uses: actions/checkout@v6
+        with:
+          path: ppom-head
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22.x
+          cache: "npm"
+          cache-dependency-path: ppom-head/package-lock.json
+      - name: Build package assets for PR Branch
+        working-directory: ppom-head
+        run: |
+          npm ci
+          npm run build:admin-field-modal --if-present
+      - name: Build package assets for Base Branch
+        working-directory: ppom-base
+        run: |
+          npm ci
+          npm run build:admin-field-modal --if-present
+      - name: Build POT for PR Branch
+        working-directory: ppom-head
+        run: |
+          chmod +x ./bin/makepot.sh
+          ./bin/makepot.sh
+          ls ./languages/
+      - name: Build POT for Base Branch
+        working-directory: ppom-base
+        run: |
+          ../ppom-head/bin/makepot.sh
+          ls ./languages/
+      - name: Compare POT files
+        uses: Codeinwp/action-i18n-string-reviewer@main
+        with:
+          fail-on-changes: "false"
+          openrouter-key: ${{ secrets.OPEN_ROUTER_API_KEY }}
+          openrouter-model: "google/gemini-3.1-flash-lite"
+          base-pot-file: "ppom-base/languages/woocommerce-product-addon.pot"
+          target-pot-file: "ppom-head/languages/woocommerce-product-addon.pot"
+          github-token: ${{ secrets.BOT_TOKEN }}

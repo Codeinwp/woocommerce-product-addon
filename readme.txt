@@ -1,7 +1,7 @@
 === PPOM - Product Addons & Custom Fields for WooCommerce ===
 Contributors: themeisle
-Tags: woocommerce product addons, woocommerce product options, woocommerce product fields, woocommerce product, product addons
-Requires at least: 3.5
+Tags: product addons, woocommerce product addons, woocommerce product options, custom fields, variable products
+Requires at least: 6.2
 Tested up to: 6.9
 Stable tag: 33.0.18
 License: GPLv2
@@ -16,17 +16,17 @@ Are you a WooCommerce store owner looking to offer personalized products? PPOM (
 
 ## Quick Links
 
-- Would you like to see PPOM in action before installing it? [VIEW PPOM FIELDS DEMO](https://demo-ppom-lite.vertisite.cloud/)
-- Need any help with setup? [CHECK DOCUMENTATION](https://docs.themeisle.com/collection/1695-product-option-manager)
-- Interested in PPOM PRO? [LEARN MORE ABOUT PPOM PRO](https://themeisle.com/plugins/ppom-pro/upgrade?utm_source=wordpressorg&utm_medium=readme&utm_campaign=quick-links)
+- Would you like to see PPOM in action before installing it? [See it in action](https://demo-ppom-lite.vertisite.cloud/)
+- Need any help with setup? [View documentation](https://docs.themeisle.com/collection/1695-product-option-manager)
+- Interested in PPOM PRO? [Learn more](https://themeisle.com/plugins/ppom-pro/upgrade?utm_source=wordpressorg&utm_medium=readme&utm_campaign=quick-links)
 
 ## Why Choose PPOM?
 
-- **Customize with Ease**: Add custom fields and product add-ons directly to your product pages, creating flexible, personalized shopping experiences that encourage customers to purchase.
+- **Customize with Ease**: Add custom fields and product add-ons directly to your product pages, creating flexible, personalized shopping experiences.
 
 - **Increase Sales Potential**: With dynamic pricing adjustments and enticing customization options, you empower customers to get exactly what they want, increasing both satisfaction and sales.
 
-Boost your sales and customer satisfaction by offering tailored product options and add-ons. PPOM is the ultimate solution for WooCommerce stores looking to provide unique, customizable products.
+Increase sales and customer satisfaction by offering tailored product options and add-ons. PPOM is built for WooCommerce stores that need unique, customizable products.
 
 ## Input Types in Free Version:
 
@@ -40,13 +40,13 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 📌 **Checkbox Options (with price)**: Checkboxes for selecting multiple options. Supports per-option pricing. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-checkbox-input/)
 
-📌 **Date**: Date picker for selecting dates (e.g., date of birth). [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-date-input/)
+📌 **Date**: Let customers pick a date (e.g., date of birth). [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-date-input/)
 
 📌 **Email**: Email input displays an input box that allows users to add an email address. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-email-input/)
 
 📌 **Number**: Number input for digits only (e.g., phone numbers, IDs). [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-number-input/)
 
-📌 **Hidden**: Hidden input with a default value, visible only after adding to cart. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/hidden-input/)
+📌 **Hidden**: An invisible field that stores a default value (e.g., a product code) — it appears in the cart and order details but not on the product page. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/hidden-input/)
 
 
 ## Features in Free Version:
@@ -144,7 +144,7 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 💎 **Text Counter**: This input is a special text input that can restrict the total number of words or characters. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-text-counter/)
 
-💎 **Timezone**: Select a timezone from a pre-defined list of timezone. Exclude/include time zones. [View Demo](https://demo-ppom-lite.vertisite.cloud/product-category/timezone-input/)
+💎 **Timezone**: Let customers select a timezone from a pre-defined list. Admins can include or exclude specific zones. [View Demo](https://demo-ppom-lite.vertisite.cloud/product-category/timezone-input/)
 
 💎 **Variation Matrix Input**: Allow customers to order different quantities for different options like sizes or colors. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-variation-matrix-input/)
 
@@ -162,11 +162,11 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 💎 **Weight Options**: Weight can be assigned for options.
 
-💎 **Multiple Meta Groups**: Assign multiple metas groups to a single product.
+💎 **Multiple Meta Groups**: Assign multiple meta groups to a single product.
 
-💎 **Import/Export**: You can use PPOM to import or export your meta fields directly from PPOM settings.
+💎 **Import/Export**: You can use PPOM to import or export your custom fields directly from PPOM settings.
 
-💎 **[Client-Side Validation](https://www.youtube.com/watch?v=1IoABjkQ--I)**: Validate data on the client side to prevent page refreshes and speed up error detection.
+💎 **[Instant Validation](https://www.youtube.com/watch?v=1IoABjkQ--I)**: Check required fields in real time without reloading the page.
 
 💎 **PPOM Repeater**: Repeat meta-field groups as needed.
 
@@ -187,7 +187,7 @@ Boost your sales and customer satisfaction by offering tailored product options 
 
 ✅ **Fields Popup**: Display PPOM fields inside a popup on the product page.
 
-✅ **Collapse Settings**: Customize how sections open and display with colors, icons, and navigation options.
+✅ **Collapse Settings**: Control whether grouped fields start expanded or collapsed, and style them with custom colors, icons, and tab-style navigation.
 
 ✅ **Enquiry Form**: Collect custom customer inquiries directly from your product pages.
 
@@ -203,7 +203,7 @@ Interested in PPOM PRO? [Learn more](https://themeisle.com/plugins/ppom-pro/upgr
 
 👕 **Custom Apparel**: Allow fabric, color, and design uploads for personalized clothing.
 
-### See what real users talk about us:
+### See what real users say about us:
 
 - “[Best than Best](https://wordpress.org/support/topic/best-than-best-2/)” - With help of this plugin, I could able to add some extra items to my main product with ability do increase and decrease the price. Thanks guys, keep it going…
 
@@ -228,7 +228,7 @@ PPOM is open-source. Contribute on [GitHub](https://github.com/Codeinwp/woocomme
 ### Useful Resources
 
 - Read more about WordPress on our [blog](https://themeisle.com/blog/).
-- Interested in our other plugins? Take a look [here](https://themeisle.com/wordpress-plugins/?utm_source=wordpressorg&utm_medium=readme&utm_campaign=PPOM).
+- Explore our [other plugins](https://themeisle.com/wordpress-plugins/?utm_source=wordpressorg&utm_medium=readme&utm_campaign=PPOM).
 
 ### How to report a security issue?
  
@@ -239,7 +239,7 @@ Please follow the reporting protocols outlined on our [Security Page](https://th
 == Installation ==
 1. Upload the plugin directory to the `/wp-content/plugins/` directory
 2. Activate the plugin through the `Plugins` menu in WordPress
-3. After activation, you can set options from the `WooCommerce -> PPOM Settings` menu
+3. After activation, you can set options from the `WooCommerce -> PPOM Settings` menu.
 
 == Screenshots ==
 
@@ -271,7 +271,7 @@ Please follow the reporting protocols outlined on our [Security Page](https://th
 = Can I add fields to Variable Products? =
 Yes.
 = Are there any field limits? =
-No, but server limitations may restrict the number of fields you can add.
+No, but your server's PHP memory or POST size limits may affect how many fields load correctly. Check with your host if you experience issues.
 = Can I add prices to options? =
 Yes, prices can be added to Select, Radio, and Checkbox fields.
 = Can I see a demo? =

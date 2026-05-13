@@ -1,132 +1,75 @@
 /**
  * WordPress dependencies
  */
-import { test, expect } from "@wordpress/e2e-test-utils-playwright";
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 import {
-	addNewField,
-	addNewOptionInModal,
-	enableConditionsInModal,
-	fillFieldNameAndId,
-	fillOptionNameAndValue,
-	pickFieldTypeInModal,
-	saveFieldInModal,
-	saveFields,
-	switchToConditionsModalTab,
-} from "../utils";
+	attachPpomGroupToProducts,
+	buildSelectField,
+	buildTextField,
+	createPpomGroup,
+	createSimpleProduct,
+} from '../fixtures/index.js';
 
-test.describe("Conditions", () => {
+test.describe( 'Conditions', () => {
 	/***
 	 * Create two select fields (with two options each) and one text field. Display the text field if the second option of the second select is selected.
 	 */
-	test("conditions with Select input", async ({ page, admin }) => {
-		await admin.visitAdminPage("admin.php?page=ppom");
+	test( 'conditions with Select input', async ( { page, requestUtils } ) => {
+		const optionOne = { label: 'Option 1', value: 'option_1' };
+		const optionTwo = { label: 'Option 2', value: 'option_2' };
+		const randomNumber = Math.floor( Math.random() * 1000 );
+		const firstSelectFieldId = `select_test_${ randomNumber }`;
+		const secondSelectFieldId = `select_test_${ randomNumber + 1 }`;
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'Test Group Field with Select Conditions',
+			fields: [
+				buildSelectField( {
+					title: `Select Input ${ randomNumber }`,
+					dataName: firstSelectFieldId,
+					options: [ optionOne, optionTwo ],
+				} ),
+				buildSelectField( {
+					title: `Select Input ${ randomNumber + 1 }`,
+					dataName: secondSelectFieldId,
+					options: [ optionOne, optionTwo ],
+				} ),
+				buildTextField( {
+					title: 'Output',
+					dataName: 'output_test',
+					logic: 'on',
+					conditions: {
+						visibility: 'Show',
+						bound: 'All',
+						rules: [
+							{
+								elements: secondSelectFieldId,
+								operators: 'is',
+								element_values: optionTwo.label,
+							},
+						],
+					},
+				} ),
+			],
+		} );
 
-		await page.getByRole("link", { name: "Add New Group" }).click();
-		await page
-			.getByRole("textbox")
-			.fill("Test Group Field with Select Conditions");
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
 
-		const randomNumber = Math.floor(Math.random() * 1000);
-		const numOfInputFields = 2;
+		await page.goto( `/?p=${ product.id }` );
 
-		for (let i = 1; i <= numOfInputFields; i++) {
-			await page.getByRole("button", { name: "Add field" }).click();
-			await pickFieldTypeInModal(page, "select");
+		await expect( page.getByLabel( 'Output' ) ).toBeHidden();
 
-			await fillFieldNameAndId(
-				page,
-				i,
-				`Select Input ${randomNumber + i - 1}`,
-				`select_test_${randomNumber + i - 1}`,
-			);
-
-			await page
-				.locator(`#ppom_field_model_${i}`)
-				.getByText("Add Options", { exact: true })
-				.click();
-
-			await fillOptionNameAndValue(page, i, 0, "Option 1", "option_1");
-			await addNewOptionInModal(page, i);
-			await fillOptionNameAndValue(page, i, 1, "Option 2", "option_2");
-
-			await saveFieldInModal(page, i);
-		}
-
-		await addNewField(page);
-		await pickFieldTypeInModal(page, "text");
-		await fillFieldNameAndId(
-			page,
-			numOfInputFields + 1,
-			"Output",
-			"output_test",
+		const controllingSelect = page.locator(
+			`select[name="ppom[fields][${ secondSelectFieldId }]"]`
 		);
 
-		await saveFields(page);
-		await page.waitForLoadState("networkidle");
-		await page.reload();
+		await controllingSelect.selectOption( { label: optionTwo.label } );
+		await expect( controllingSelect ).toHaveValue( optionTwo.label );
 
-		await page
-			.locator(`#ppom_sort_id_${numOfInputFields + 1} .ppom-edit-field`)
-			.click();
-
-		await switchToConditionsModalTab(page, numOfInputFields + 1);
-		await enableConditionsInModal(page, numOfInputFields + 1);
-
-		await page
-			.locator(
-				`select[name="ppom\\[${
-					numOfInputFields + 1
-				}\\]\\[conditions\\]\\[rules\\]\\[0\\]\\[elements\\]"]`,
-			)
-			.selectOption({ index: 1 });
-
-		await page
-			.locator(
-				`select[name="ppom\\[${
-					numOfInputFields + 1
-				}\\]\\[conditions\\]\\[rules\\]\\[0\\]\\[operators\\]"]`,
-			)
-			.selectOption({ index: 0 });
-
-		await page
-			.locator(
-				`select[name="ppom\\[${
-					numOfInputFields + 1
-				}\\]\\[conditions\\]\\[rules\\]\\[0\\]\\[element_values\\]"]`,
-			)
-			.selectOption({ index: 1 });
-
-		await saveFieldInModal(page, numOfInputFields + 1);
-		await saveFields(page);
-
-		await page.waitForLoadState("networkidle");
-
-		await page.reload();
-		await page.getByText("Attach to Products").click({ force: true });
-		await page.waitForLoadState("networkidle");
-
-		const productSelector = page.locator(
-			'select[name="ppom-attach-to-products\\[\\]"]',
-		);
-		await page.waitForLoadState("networkidle");
-
-		await productSelector.selectOption({ index: 0 });
-		const selectedOption = await productSelector.inputValue();
-		console.log("Selected option value:", selectedOption);
-		await page.getByRole("button", { name: "Save", exact: true }).click();
-
-		await page.waitForLoadState("networkidle");
-		await page.goto(`/?p=${selectedOption}`);
-
-		await expect(page.getByLabel("Output")).toBeHidden();
-
-		await page
-			.locator(
-				`select[name="ppom[fields][select_test_${randomNumber + 1}]"]`,
-			)
-			.selectOption({ index: 1 });
-
-		await expect(page.getByLabel("Output")).toBeVisible();
-	});
-});
+		await expect( page.getByLabel( 'Output' ) ).toBeVisible();
+	} );
+} );

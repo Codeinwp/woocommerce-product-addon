@@ -24,13 +24,17 @@ $color_width           = $fm->get_meta_value( 'color_width', 50 );
 $circle                = $fm->get_meta_value( 'circle', 50 );
 $input_classes         = $fm->input_classes();
 $selected_palette_bclr = $fm->get_meta_value( 'selected_palette_bcolor', '#000' );
+$selected_palette_bclr = sanitize_hex_color( $selected_palette_bclr );
+if ( null === $selected_palette_bclr || '' === $selected_palette_bclr ) {
+	$selected_palette_bclr = '#000';
+}
 
 $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $product );
 
 // If options empty
 if ( ! $options ) {
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'Please Add Some Option', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . esc_html__( 'Please add at least one option.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';
@@ -47,7 +51,7 @@ $checked_value = array_map( 'trim', $default_value );
 
 $custom_css  = '';
 $custom_css .= '.ppom-palettes label>input:checked+.ppom-single-palette {
-        border: 2px solid ' . $selected_palette_bclr . ' !important;
+        border: 2px solid ' . esc_attr( $selected_palette_bclr ) . ' !important;
     }';
 
 echo '<style>';
@@ -60,7 +64,7 @@ echo '</style>';
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
 		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			   for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
 	<?php endif ?>
 
 	<!-- Palettes Box -->
@@ -79,13 +83,13 @@ echo '</style>';
 
 			$color_label  = $value['label'];
 			$option_label = $value['label'];
-			$option_price = $value['price'];
+			$option_price = apply_filters( 'ppom_option_price', $value['price'] );
 			$raw_label    = $value['raw'];
 			$without_tax  = $value['without_tax'];
 
-			$option_id = $value['option_id'];
-			$option_classes = sprintf('%s ppom-option-%s', $input_classes, $option_id);
-			$dom_id    = apply_filters( 'ppom_dom_option_id', $option_id, $field_meta );
+			$option_id      = $value['option_id'];
+			$option_classes = sprintf( '%s ppom-option-%s', $input_classes, $option_id );
+			$dom_id         = apply_filters( 'ppom_dom_option_id', $option_id, $field_meta );
 
 			// Checked value selected
 			$checked_option = '';

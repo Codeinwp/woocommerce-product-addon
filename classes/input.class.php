@@ -1,58 +1,76 @@
 <?php
-/*
- * Followig class handling all inputs control and their 
- * dependencies. Do not make changes in code
- * Create on: 9 November, 2013 
+/**
+ * Loads PPOM input classes and optional add-on input classes.
+ *
+ * @package PPOM
+ * @subpackage Inputs
  */
 
+/**
+ * Loads PPOM input classes and related add-on integrations.
+ */
 class PPOM_Inputs {
 
-	/*
-	 * this var is pouplated with current plugin meta 
+	/**
+	 * Plugin meta array from `ppom_get_plugin_meta()` (paths, URLs, shortname).
+	 *
+	 * @var array<string, mixed>
 	 */
-	var $plugin_meta;
-
-
-	/*
-	 * this var contains the scripts info 
-	 * requested by input
-	 */
-	var $input_scripts = array();
+	public $plugin_meta;
 
 	/**
-	 * the static object instace
+	 * Queued script/style handles for `load_input_scripts()` (`shipped`, `custom` keys).
+	 *
+	 * @var array<string, mixed>
+	 */
+	public $input_scripts = array();
+
+	/**
+	 * Singleton instance.
+	 *
+	 * @var self|null
 	 */
 	private static $ins = null;
 
 	/**
-	 * Icon.
+	 * Admin field-type icon HTML for the builder.
 	 *
-	 * @var string $icon
+	 * @var string
 	 */
 	public $icon = '';
 
 
 	/**
-	 * __construct function.
+	 * Loads plugin meta used when resolving input class paths.
 	 *
-	 * @access public
-	 *
-	 * @param
+	 * @return void
 	 */
 	public function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
 	}
 
+	/**
+	 * Accessor for the shared inputs loader instance.
+	 *
+	 * @return self
+	 */
 	public static function get_instance() {
-		// create a new object if it doesn't exist.
-		is_null( self::$ins ) && self::$ins = new self();
+		if ( null === self::$ins ) {
+			self::$ins = new self();
+		}
 
 		return self::$ins;
 	}
 
-	/*
-	 * returning relevant input object
+	/**
+	 * Loads the input class for a field type.
+	 *
+	 * @param string $type Field type.
+	 *
+	 * @return object|null
+	 *
+	 * @see PPOM_Form::render_input_template()
 	 */
 	function get_input( $type ) {
 
@@ -96,7 +114,11 @@ class PPOM_Inputs {
 	}
 
 	/**
-	 * special inputs
+	 * Loads an add-on input class from the Facebook import plugin when present.
+	 *
+	 * @param string $type Input type slug matching `NM_{Type}_wooproduct`.
+	 *
+	 * @return object|null
 	 */
 	function get_addon( $type ) {
 
@@ -113,21 +135,25 @@ class PPOM_Inputs {
 				return null;
 			}       
 		}
+
+		return null;
 	}
 
-	/*
-	 * loading scripts needed by input control
+	/**
+	 * Enqueues scripts and styles previously stored in `$this->input_scripts`.
+	 *
+	 * @return void
 	 */
 	function load_input_scripts() {
 
-		if ( $this->input_scripts['shipped'] ) {
+		if ( ! empty( $this->input_scripts['shipped'] ) && is_array( $this->input_scripts['shipped'] ) ) {
 			foreach ( $this->input_scripts['shipped'] as $handler ) {
 				wp_enqueue_script( $handler );
 			}
 		}
 
-		// front end scripts
-		if ( $this->input_scripts['custom'] ) {
+		// Front-end scripts.
+		if ( ! empty( $this->input_scripts['custom'] ) && is_array( $this->input_scripts['custom'] ) ) {
 			foreach ( $this->input_scripts['custom'] as $scripts => $script ) {
 
 				// checking if it is style
@@ -142,8 +168,10 @@ class PPOM_Inputs {
 	}
 
 
-	/*
-	 * check if browser is ie
+	/**
+	 * Whether the current request user agent looks like Internet Explorer / Trident.
+	 *
+	 * @return bool
 	 */
 	function if_browser_is_ie() {
 		// print_r($_SERVER['HTTP_USER_AGENT']);
@@ -155,8 +183,10 @@ class PPOM_Inputs {
 		}
 	}
 
-	/*
-	 * get current page url with query string
+	/**
+	 * Builds the current request URL including scheme and query string.
+	 *
+	 * @return string
 	 */
 	function current_page_url() {
 		$page_url = 'http';
@@ -176,6 +206,11 @@ class PPOM_Inputs {
 	}
 }
 
+/**
+ * Returns the shared PPOM inputs loader instance.
+ *
+ * @return PPOM_Inputs
+ */
 function PPOM_Inputs() {
 	return PPOM_Inputs::get_instance();
 }

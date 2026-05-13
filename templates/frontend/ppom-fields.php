@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // check if duplicate ppom fields render
 if ( ! $form_obj::$ppom->has_unique_datanames() ) {
-	$duplicate_found = apply_filters( 'ppom_duplicate_datanames_text', __( 'Some of your fields has duplicated datanames, please fix it', 'woocommerce-product-addon' ) );
+	$duplicate_found = apply_filters( 'ppom_duplicate_datanames_text', __( 'Some of your fields have duplicate data names. Please fix them.', 'woocommerce-product-addon' ) );
 
 	echo '<div class="error">' . esc_html( $duplicate_found ) . '</div>';
 
@@ -28,9 +28,9 @@ if ( ! $form_obj::$ppom->has_unique_datanames() ) {
 $ppom_wrapper_id = is_array( $form_obj::$ppom->meta_id ) ? implode( '-', $form_obj::$ppom->meta_id ) : $form_obj::$ppom->meta_id;
 
 if ( isset( $form_obj::$ppom->meta_id ) ) {
-    $ppom_groups = is_array($form_obj::$ppom->meta_id) ? $form_obj::$ppom->meta_id : array($form_obj::$ppom->meta_id);
+	$ppom_groups = is_array( $form_obj::$ppom->meta_id ) ? $form_obj::$ppom->meta_id : array( $form_obj::$ppom->meta_id );
 } else {
-    $ppom_groups = array();
+	$ppom_groups = array();
 }
 
 ?>
@@ -49,11 +49,24 @@ if ( isset( $form_obj::$ppom->meta_id ) ) {
 	<?php $form_obj->form_contents(); ?>
 	<?php
 	foreach ( $ppom_groups as $meta_id ) :
-		$ppom            = new PPOM_Meta();
-		$ppom_settings   = $ppom->get_settings_by_id( $meta_id );
+		$ppom                           = new PPOM_Meta();
+		$ppom_settings                  = $ppom->get_settings_by_id( $meta_id );
 		$form_obj::$ppom->ppom_settings = $ppom_settings;
+		$allowed_variations             = ppom_get_variation_ids_for_group( $form_obj->product_id, $meta_id );
+		$wrapper_classes                = $form_obj->wrapper_inner_classes();
+		if ( ! empty( $allowed_variations ) ) {
+			$wrapper_classes .= ' ppom-variation-rule-group';
+		}
 		?>
-		<div class="<?php echo esc_attr( $form_obj->wrapper_inner_classes() ); ?>">
+		<div
+			class="<?php echo esc_attr( $wrapper_classes ); ?>"
+			data-ppom-group-id="<?php echo esc_attr( (string) $meta_id ); ?>"
+			<?php if ( ! empty( $allowed_variations ) ) : ?>
+				data-ppom-allowed-variations="<?php echo esc_attr( implode( ',', array_map( 'absint', $allowed_variations ) ) ); ?>"
+				style="display:none"
+				aria-hidden="true"
+			<?php endif; ?>
+		>
 
 			<?php
 			/**
@@ -72,7 +85,7 @@ if ( isset( $form_obj::$ppom->meta_id ) ) {
 			?>
 
 		</div>
-	<?php endforeach; ?> <!-- end form-row -->
+		<?php endforeach; ?> <!-- end form-row -->
 
 	<!-- Display price table after fields -->
 	<?php

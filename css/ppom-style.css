@@ -429,6 +429,7 @@ height: 100px;*/
   z-index: 10024;
   padding: 15px;
   overflow: visible;
+  pointer-events: none;
 
 }
 
@@ -614,4 +615,8 @@ span.ppom-tooltip .ppom-tooltip-icon::after {
     color: #fff;
     line-height: 13px;
     font-weight: 700;
+}
+span.ppom-field-notice {
+  display: block;
+  font-size: 14px;
 }

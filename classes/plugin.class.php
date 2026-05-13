@@ -1,16 +1,25 @@
 <?php
-/*
- * The base plugin class.
+/**
+ * Registers PPOM runtime hooks for WooCommerce requests.
+ *
+ * @package PPOM
+ * @subpackage Core
+ *
+ * @see ppom_woocommerce_show_fields_on_product()
+ * @see ppom_price_controller()
+ * @see ppom_woocommerce_order_item_meta()
  */
 
-
+/**
+ * Coordinates PPOM hooks across product, cart, checkout, and order flows.
+ */
 class NM_PersonalizedProduct {
 
 	public const LICENSE_PLAN_FREE = -1;
 	public const LICENSE_PLAN_1    = 1; // Essential.
 	public const LICENSE_PLAN_2    = 2; // Plus.
 	public const LICENSE_PLAN_3    = 3; // VIP.
-	static $tbl_productmeta = 'nm_personalized';
+	static $tbl_productmeta        = PPOM_TABLE_META;
 
 
 	/**
@@ -32,211 +41,31 @@ class NM_PersonalizedProduct {
 	}
 
 
-	function __construct() {
+	/**
+	 * Registers the PPOM runtime hook map.
+	 *
+	 * @return void
+	 *
+	 * @see ppom_woocommerce_show_fields_on_product()
+	 * @see ppom_woocommerce_validate_product()
+	 * @see ppom_woocommerce_add_cart_item_data()
+	 * @see ppom_price_controller()
+	 * @see ppom_woocommerce_order_item_meta()
+	 * @see ppom_woocommerce_rename_files()
+	 */
+	public function __construct() {
 
 
 		// populating $inputs with NM_Inputs object
 		$this->inputs = self::get_all_inputs();
 
 
-		/** ============ NEW Hooks ==================== */
+		/** ============ NEW Hooks (delegated to src modules) ==================== */
 
-		add_action( 'admin_bar_menu', 'ppom_admin_bar_menu', 1000 );
-
-		// Rendering fields on product page
-		if ( ppom_is_legacy_mode() ) {
-			add_action( 'woocommerce_before_add_to_cart_button', 'ppom_woocommerce_show_fields', 15 );
-		} else {
-			add_action( 'woocommerce_before_add_to_cart_button', 'ppom_woocommerce_inputs_template_base', 15 );
-		}
-
-
-		// if( apply_filters('ppom_remove_duplicate_fields', true) ) {
-		// add_action ( 'woocommerce_single_variation', 'ppom_woocommerce_show_fields', 15);
-		// }
-
-		add_filter( 'ppom_input_templates_path', 'ppom_hooks_check_theme_path', 10, 3 );
-
-
-		// Validating before add to cart
-		if ( ! ppom_is_client_validation_enabled() ) {
-			add_filter( 'woocommerce_add_to_cart_validation', 'ppom_woocommerce_validate_product', 10, 3 );
-		}
-
-		// Adding meta to cart form product page
-		add_filter( 'woocommerce_add_cart_item_data', 'ppom_woocommerce_add_cart_item_data', 10, 2 );
-
-		// add_action( 'wp', array($this, 'wp_loaded') );
-
-
-		/*
-		 * 4- now loading all meta on cart/checkout page from session confirmed that it is loading for cart and checkout
-		 */
-
-		// Control price calculations on cart page
-		if ( ppom_get_price_mode() == 'legacy' ) {
-
-			add_filter( 'woocommerce_get_cart_item_from_session', 'ppom_woocommerce_update_cart_fees', 10, 2 );
-			add_action( 'woocommerce_cart_calculate_fees', 'ppom_woocommerce_add_fixed_fee' );
-		} else {
-
-			add_filter( 'woocommerce_get_cart_item_from_session', 'ppom_price_check_price_matrix', 8, 2 );
-
-			/** since 21.3, woocommerce_get_cart_item_from_session replaced with following */
-			// add_action ( 'woocommerce_before_calculate_totals', 'ppom_before_calculate_totals', 999, 1 );
-
-			// Above hook has issue so reverting back to old hook for prices
-			add_filter( 'woocommerce_get_cart_item_from_session', 'ppom_price_controller', 10, 2 );
-
-			add_action( 'woocommerce_cart_calculate_fees', 'ppom_price_cart_fee' );
-			// Calculating weights
-			add_action( 'ppom_before_calculate_cart_total', 'ppom_hooks_update_cart_weight', 10, 3 );
-		}
-
-		// Adding scripts
-		// add_action( 'wp_enqueue_scripts', 'ppom_woocommerce_load_scripts' );
-
-
-		add_action( 'woocommerce_cart_loaded_from_session', 'ppom_calculate_totals_from_session' );
-
-		// Mini/Cart Widget fixed fee
-		add_action( 'woocommerce_widget_shopping_cart_before_buttons', 'ppom_woocommerce_mini_cart_fixed_fee' );
-
-		// Changing price displa on loop for price matrix
-		add_filter( 'woocommerce_get_price_html', 'ppom_woocommerce_alter_price', 10, 2 );
-		// Hiding variation price if dynamic price is enable
-		// add_filter( 'woocommerce_show_variation_price', 'ppom_hide_variation_price_html', 99, 3);
-
-
-		add_filter( 'woocommerce_quantity_input_args', 'ppom_validation_product_limits', 10, 2 );
-		add_filter( 'woocommerce_available_variation', 'ppom_validation_variation_limits', 10, 3 );
-
-		/**
-		 * Following Hooks are deprecated due to following hooks
-		 * woocommerce_quantity_input_args
-		 * woocommerce_available_variation
-		 *
-		 * @Version 24.7
-		 */
-		// Product default quantity
-		// add_filter( 'woocommerce_quantity_input_args', 'ppom_woocommerce_product_default_quantity', 10, 2);
-		// Product Min quantity control for matrix
-		// add_filter( 'woocommerce_quantity_input_min', 'ppom_woocommerce_set_min_quantity', 10, 2);
-		// Product Max quantity control for matrix
-		// add_filter( 'woocommerce_quantity_input_max', 'ppom_woocommerce_set_max_quantity', 10, 2);
-		// Product Step quantity control for matrix
-		// add_filter( 'woocommerce_quantity_input_step', 'ppom_woocommerce_set_quantity_step', 10, 2);
-
-		// Show item meta data on cart/checkout pages.
-		add_filter( 'woocommerce_get_item_data', 'ppom_woocommerce_add_item_meta', 10, 2 );
-
-		// Control quantity on cart when quantities used
-		add_filter( 'woocommerce_add_to_cart_quantity', 'ppom_woocommerce_add_to_cart_quantity', 10, 2 );
-
-		// Control cart redirect, whed used shortcoe
-		add_filter( 'woocommerce_add_to_cart_redirect', 'ppom_hooks_redirect_to_cart_if_shortcode', 10, 1 );
-
-		// Cart quantity control
-		if ( ppom_get_price_mode() == 'legacy' ) {
-			add_filter( 'woocommerce_cart_item_quantity', 'ppom_woocommerce_control_cart_quantity_legacy', 10, 2 );
-		} else {
-			add_filter( 'woocommerce_cart_item_quantity', 'ppom_woocommerce_control_cart_quantity', 99, 2 );
-		}
-
-
-		add_filter( 'woocommerce_cart_item_subtotal', 'ppom_woocommerce_item_subtotal', 10, 3);
-		add_filter( 'woocommerce_checkout_cart_item_quantity', 'ppom_woocommerce_control_checkout_quantity', 10, 3 );
-		add_filter( 'woocommerce_order_item_quantity_html', 'ppom_woocommerce_control_oder_item_quantity', 10, 2 );
-		add_filter( 'woocommerce_email_order_item_quantity', 'ppom_woocommerce_control_email_item_quantity', 10, 2 );
-
-		/**
-		 * it is disabled due to issue in order again WHEN VQ input used
-		 * By Najeeb
-		 * Date: July 30, 2021
-		 * */
-		// add_filter( 'woocommerce_order_item_get_quantity', 'ppom_woocommerce_control_order_item_quantity', 10, 2);
-
-		// Cart update function
-		add_filter( 'woocommerce_update_cart_validation', 'ppom_woocommerce_cart_update_validate', 10, 4 );
-
-		/**
-		 * Adding item_meta to orders 2.0 it is in classes/class-wc-checkout function:
-		 ** create_order()
-		 ** woocommerce_new_order_item is deprecated
-		 */
-		// add_action ( 'woocommerce_new_order_item', 'ppom_woocommerce_order_item_meta', 10, 3);
-		add_action( 'woocommerce_checkout_create_order_line_item', 'ppom_woocommerce_order_item_meta', 99, 4 );
-
-		// Changing display to label in orders
-		add_filter( 'woocommerce_order_item_display_meta_key', 'ppom_woocommerce_order_key', 10, 3 );
-
-		// when email improvements feature enabled in woocommerce.
-		add_filter( 'woocommerce_order_item_display_meta_value', 'ppom_woocommerce_order_value', 10, 3 );
-		if ( ppom_wc_email_improvements_enabled() ) {
-			add_action( 'woocommerce_order_item_meta_end', 'ppom_woocommerce_order_item_meta_html', 10, 2 );
-			add_filter( 'woocommerce_display_item_meta', '__return_empty_string' );
-			add_filter( 'wpo_ips_display_item_meta_html', 'ppom_invoice_packing_slips_html', 10, 3 );
-		}
-		// Hiding some additional field like ppom_has_quantities
-		add_filter( 'woocommerce_order_item_get_formatted_meta_data', 'ppom_woocommerce_hide_order_meta', 10, 2 );
-		// see: https://github.com/woocommerce/woocommerce/issues/23294
-		add_filter( 'woocommerce_is_attribute_in_product_name', '__return_false' );
-
-		/*
-		 * 7- movnig confirmed/paid orders into another directory
-		 * dir_name: confirmed
-		*/
-		add_action( 'woocommerce_checkout_order_processed', 'ppom_woocommerce_rename_files', 10, 3 );
-
-		/** ============ LOCAL Hooks ==================== */
-		add_filter( 'ppom_field_attributes', 'ppom_hooks_set_attributes', 10, 2 );
-		// if jQuery datepicker is selected
-		add_filter( 'ppom_field_setting', 'ppom_hooks_input_args', 10, 3 );
-		// Checkbox validation hook
-		add_filter( 'ppom_has_posted_field_value', 'ppom_hooks_checkbox_valided', 10, 3 );
-		// Change color type to text for rendering
-		add_filter( 'nmform_attribute_value', 'ppom_hooks_color_to_text_type', 10, 3 );
-		// Option show for Pricematrix
-		add_filter( 'ppom_show_option_price', 'ppom_hooks_show_option_price_pricematrix', 10, 2 );
-		/**
-		 ** 1- Translating meta settings being saved via admin
-		 ** 2- Also saving ppom_id in each fiel
-		 */
-		add_filter( 'ppom_meta_data_saving', 'ppom_hooks_register_wpml', 10, 2 );
-
-		if ( ppom_get_conditions_mode() === 'new' ) {
-			add_filter( 'ppom_input_wrapper_class', 'ppom_hooks_input_wrapper_class_new', 10, 2 );
-			add_filter( 'ppom_field_main_wrapper_class', 'ppom_hooks_input_main_wrapper_class', 10, 3 );
-		} else {
-			// add a wrapper class in each input e.g: ppom-input-{data_name}
-			add_filter( 'ppom_input_wrapper_class', 'ppom_hooks_input_wrapper_class', 10, 2 );
-		}
-
-		// Saving cropped image
-		add_filter( 'ppom_add_cart_item_data', 'ppom_hooks_save_cropped_image', 10, 2 );
-		// Formatting the order meta with options price and id
-		add_filter( 'ppom_order_display_value', 'ppom_hooks_format_order_value', 999, 3 );
-		// setting -ve operator for option for negative numbers
-		add_filter( 'ppom_option_price_operator', 'ppom_hooks_set_option_operator', 99, 3 );
-
-
-		// add_filter('ppom_cart_fixed_fee', 'ppom_hooks_convert_price_back');
-
-		// Adding option keys into PPOM options (converted)
-		add_filter( 'ppom_option_meta', 'update_converted_option_keys', 9, 5 );
-
-		// Shortcode
-		add_shortcode( 'ppom', 'ppom_hooks_render_shortcode' );
-
-		/** ============ Ajax callbacks ==================== */
-		add_action( 'wp_ajax_nopriv_ppom_upload_file', 'ppom_upload_file' );
-		add_action( 'wp_ajax_ppom_upload_file', 'ppom_upload_file' );
-		add_action( 'wp_ajax_nopriv_ppom_delete_file', 'ppom_delete_file' );
-		add_action( 'wp_ajax_ppom_delete_file', 'ppom_delete_file' );
-
-		add_action( 'wp_ajax_ppom_ajax_validation', 'ppom_woocommerce_ajax_validate' );
-		add_action( 'wp_ajax_nopriv_ppom_ajax_validation', 'ppom_woocommerce_ajax_validate' );
-
+		\PPOM\Frontend\ProductAndTemplateHooks::register();
+		\PPOM\Cart\WooCommerceCartLifecycleHooks::register();
+		\PPOM\Frontend\PpomFilterHooks::register();
+		\PPOM\Files\PublicUploadAjaxHooks::register();
 
 		/** ============ Admin hooks ===================== */        /*
 		 * adding a panel on product single page in admin
@@ -254,6 +83,8 @@ class NM_PersonalizedProduct {
 		add_action( 'wp_ajax_ppom_update_form_meta', 'ppom_admin_update_form_meta' );
 		add_action( 'wp_ajax_ppom_delete_meta', 'ppom_admin_delete_meta' );
 		add_action( 'wp_ajax_ppom_delete_selected_meta', 'ppom_admin_delete_selected_meta' );
+		add_action( 'wp_ajax_ppom_toggle_meta_disabled', 'ppom_admin_toggle_meta_disabled' );
+		add_action( 'wp_ajax_ppom_import_template', 'ppom_admin_import_template' );
 
 		/*
 		 * saving product meta in admin/product signel page
@@ -333,6 +164,8 @@ class NM_PersonalizedProduct {
 		add_filter( 'woocommerce_order_again_cart_item_data', 'ppom_wc_order_again_compatibility', 10, 3 );
 		// Show description tooltip.
 		add_filter( 'ppom_field_description', array( $this, 'show_tooltip' ), 15, 2 );
+
+		add_filter( 'ppom_option_price', array( $this, 'ppom_convert_price' ), 99, 1 );
 	}
 
 	/*
@@ -350,7 +183,7 @@ class NM_PersonalizedProduct {
 		}
 
 		$product_id = ppom_get_product_id( $product );
-		// $ppom		= new PPOM_Meta( $product_id );
+		// $ppom        = new PPOM_Meta( $product_id );
 		$ppom = new PPOM_Meta( $product_id );
 		if ( ! $ppom->is_exists ) {
 			return $url;
@@ -449,7 +282,8 @@ class NM_PersonalizedProduct {
 	function nm_add_bulk_meta() {
 		global $post_type;
 
-		if ( $post_type == 'product' and $all_meta = $this->get_product_meta_all() ) {
+		$all_meta = $this->get_product_meta_list_for_ui();
+		if ( 'product' === $post_type && ! empty( $all_meta ) ) {
 			foreach ( $all_meta as $meta ) {
 				?>
 				<script type="text/javascript">
@@ -477,7 +311,6 @@ class NM_PersonalizedProduct {
 		}
 
 		$wp_list_table = _get_list_table( 'WP_Posts_List_Table' );
-
 	}
 
 	function nm_meta_bulk_action() {
@@ -528,7 +361,7 @@ class NM_PersonalizedProduct {
 						$meta_id = array( intval( substr( $action, 10 ) ) );
 						update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $meta_id );
 
-						$nm_updated ++;
+						++$nm_updated;
 					}
 					$sendback = add_query_arg(
 						array(
@@ -545,7 +378,7 @@ class NM_PersonalizedProduct {
 
 						delete_post_meta( $post_id, PPOM_PRODUCT_META_KEY );
 
-						$nm_removed ++;
+						++$nm_removed;
 					}
 					$sendback = add_query_arg(
 						array(
@@ -572,28 +405,27 @@ class NM_PersonalizedProduct {
 	function nm_add_meta_notices() {
 		global $post_type, $pagenow;
 
-		if ($pagenow == 'edit.php' && $post_type == 'product' && isset($_REQUEST['nm_updated']) && (int) $_REQUEST['nm_updated']) {
+		if ( $pagenow == 'edit.php' && $post_type == 'product' && isset( $_REQUEST['nm_updated'] ) && (int) $_REQUEST['nm_updated'] ) {
 			$count = (int) $_REQUEST['nm_updated'];
-			if ($count === 1) {
-				$message = __('Product meta updated.', 'woocommerce-product-addon');
+			if ( $count === 1 ) {
+				$message = __( 'Product meta updated.', 'woocommerce-product-addon' );
 			} else {
 				$message = sprintf(
 					/* translators: %s: number of products */
-					__('%s Products meta updated.', 'woocommerce-product-addon'),
-					number_format_i18n($count)
+					__( '%s Products meta updated.', 'woocommerce-product-addon' ),
+					number_format_i18n( $count )
 				);
 			}
 			echo "<div class=\"updated\"><p>{$message}</p></div>";
-		} 
-		elseif ($pagenow == 'edit.php' && $post_type == 'product' && isset($_REQUEST['nm_removed']) && (int) $_REQUEST['nm_removed']) {
+		} elseif ( $pagenow == 'edit.php' && $post_type == 'product' && isset( $_REQUEST['nm_removed'] ) && (int) $_REQUEST['nm_removed'] ) {
 			$count = (int) $_REQUEST['nm_removed'];
-			if ($count === 1) {
-				$message = __('Product meta removed.', 'woocommerce-product-addon');
+			if ( $count === 1 ) {
+				$message = __( 'Product meta removed.', 'woocommerce-product-addon' );
 			} else {
 				$message = sprintf(
 					/* translators: %s: number of products */
-					__('%s Products meta removed.', 'woocommerce-product-addon'),
-					number_format_i18n($count)
+					__( '%s Products meta removed.', 'woocommerce-product-addon' ),
+					number_format_i18n( $count )
 				);
 			}
 			echo "<div class=\"updated\"><p>{$message}</p></div>";
@@ -621,30 +453,29 @@ class NM_PersonalizedProduct {
 
 	function get_product_meta_all() {
 
-		global $wpdb;
+		return ppom_meta_repository()->get_all_rows();
+	}
 
-		$qry = 'SELECT * FROM ' . $wpdb->prefix . PPOM_TABLE_META;
-		$res = $wpdb->get_results( $qry );
+	/**
+	 * Field groups as id + name only (admin metabox, bulk actions, admin bar).
+	 *
+	 * @return list<stdClass> Rows with productmeta_id, productmeta_name.
+	 * @phpstan-return list<stdClass>
+	 */
+	public function get_product_meta_list_for_ui() {
 
-		return $res;
+		return ppom_meta_repository()->get_all_rows_list_ui();
 	}
 
 	/**
 	 * Get the count of all the created PPOM Group fields.
-	 * 
-	 * @param int $limit Optional limit on number of results to count
-	 * @return int - The number of group fields in the database.
+	 *
+	 * @param int|null $limit When set, returns at most this many (capped count for bounded metrics).
+	 * @return int Number of group rows, or capped count when `$limit` is provided.
 	 */
 	public static function get_product_meta_count( $limit = null ) {
-		global $wpdb;
 
-		$qry = 'SELECT COUNT(*) FROM ' . $wpdb->prefix . PPOM_TABLE_META;
-		if ($limit !== null) {
-			$qry .= ' LIMIT ' . intval($limit);
-		}
-		$count = $wpdb->get_var($qry);
-
-		return intval($count);
+		return ppom_meta_repository()->count_rows( $limit );
 	}
 
 	function get_product_meta( $meta_id ) {
@@ -657,45 +488,12 @@ class NM_PersonalizedProduct {
 			return;
 		}
 
-		global $wpdb;
-
-		$table = $wpdb->prefix . PPOM_TABLE_META;
-		$res   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE productmeta_id = %d", $meta_id ) );
-
-		return $res;
+		return ppom_meta_repository()->get_row_by_id( (int) $meta_id );
 	}
 
 	public static function upgrade_database() {
-		global $wpdb;
 
-		/*
-		 * meta_for: this is to make this table to contact more then one metas for NM plugins in future in this plugin it will be populated with: forms
-		 */
-		$forms_table_name = $wpdb->prefix . PPOM_TABLE_META;
-
-		$charset_collate = $wpdb->get_charset_collate();
-
-		$sql = "CREATE TABLE $forms_table_name (
-		productmeta_id INT(5) NOT NULL AUTO_INCREMENT,
-		productmeta_name VARCHAR(50) NOT NULL,
-		productmeta_validation VARCHAR(3),
-        dynamic_price_display VARCHAR(10),
-        send_file_attachment VARCHAR(3) NOT NULL,
-        show_cart_thumb VARCHAR(3),
-		aviary_api_key VARCHAR(40),
-		productmeta_style MEDIUMTEXT,
-		productmeta_js MEDIUMTEXT,
-		productmeta_categories MEDIUMTEXT,
-		productmeta_tags LONGTEXT,
-		the_meta MEDIUMTEXT NOT NULL,
-		productmeta_created DATETIME NOT NULL,
-		PRIMARY KEY  (productmeta_id)
-		) $charset_collate;";
-
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		dbDelta( $sql );
-
-		update_option( 'personalizedproduct_db_version', PPOM_DB_VERSION );
+		PPOM_Meta_Repository::ensure_schema();
 	}
 
 	public static function activate_plugin() {
@@ -720,7 +518,6 @@ class NM_PersonalizedProduct {
 
 		// migration done
 		update_option( 'ppom_settings_migration_done', 1 );
-
 	}
 
 	public static function deactivate_plugin() {
@@ -749,10 +546,8 @@ class NM_PersonalizedProduct {
 						$wp_role->add_cap( 'ppom_options_page' );
 					}
 				}
-			} else {
-				if ( $wp_role->has_cap( 'ppom_options_page' ) ) {
+			} elseif ( $wp_role->has_cap( 'ppom_options_page' ) ) {
 					$wp_role->remove_cap( 'ppom_options_page' );
-				}
 			}
 		}
 	}
@@ -783,33 +578,17 @@ class NM_PersonalizedProduct {
 	function clone_product_meta( $meta_id ) {
 
 		if ( ! isset( $_GET['ppom_clone_nonce'] )
-			 || ! wp_verify_nonce( $_GET['ppom_clone_nonce'], 'ppom_clone_nonce_action' )
+			|| ! wp_verify_nonce( $_GET['ppom_clone_nonce'], 'ppom_clone_nonce_action' )
 		) {
 			_e( 'Sorry, you are not allowed to clone', 'woocommerce-product-addon' );
 
 			return;
 		}
 
-		global $wpdb;
+		$new_id = ppom_meta_repository()->clone_group_from( (int) $meta_id );
 
-		$forms_table_name = $wpdb->prefix . PPOM_TABLE_META;
-
-		$sql = "INSERT INTO $forms_table_name
-		(productmeta_name, aviary_api_key, productmeta_style,productmeta_categories, the_meta, productmeta_created) 
-		SELECT CONCAT(productmeta_name, ' (clone)'), aviary_api_key, productmeta_style,productmeta_categories, the_meta, productmeta_created 
-		FROM $forms_table_name 
-		WHERE productmeta_id = %d;";
-
-		$result = $wpdb->query( $wpdb->prepare( $sql, array( $meta_id ) ) );
-
-		wp_safe_redirect( admin_url( 'admin.php?page=ppom&productmeta_id=' . intval( $wpdb->insert_id ) . '&do_meta=edit' ) );
-        die();
-		/*
-		 var_dump($result);
-		
-		$wpdb->show_errors();
-		$wpdb->print_error(); */
-
+		wp_safe_redirect( admin_url( 'admin.php?page=ppom&productmeta_id=' . intval( $new_id ) . '&do_meta=edit' ) );
+		die();
 	}
 
 	/*
@@ -836,15 +615,15 @@ class NM_PersonalizedProduct {
 	 */
 	public function ppom_free_inputs() {
 		return array(
-			'text' => 'text',
+			'text'     => 'text',
 			'textarea' => 'textarea',
-			'select' => 'select',
-			'radio' => 'radio',
+			'select'   => 'select',
+			'radio'    => 'radio',
 			'checkbox' => 'checkbox',
-			'email' => 'email',
-			'date' => 'date',
-			'number' => 'number',
-			'hidden' => 'hidden',
+			'email'    => 'email',
+			'date'     => 'date',
+			'number'   => 'number',
+			'hidden'   => 'hidden',
 		);
 	}
 
@@ -868,7 +647,6 @@ class NM_PersonalizedProduct {
 			return;
 		}
 
-		global $wpdb;
 		// get the csv file
 		// ppom_pa($_FILES);
 		$demo_file = PPOM_PATH . '/assets/ppom-basic-meta.json';
@@ -888,37 +666,28 @@ class NM_PersonalizedProduct {
 		}
 
 		$ppom_meta = json_decode( $ppom_meta );
+
+		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $ppom_meta ) ) {
+			return;
+		}
+
 		$ppom_meta = self::ppom_decode_entities( $ppom_meta );
-		// ppom_pa( $ppom_meta ); exit;
 
-		$meta_count = 0;
+		if ( empty( $ppom_meta ) ) {
+			return;
+		}
+
+		$repo = ppom_meta_repository();
 		foreach ( $ppom_meta as $meta ) {
-
-			$table = $wpdb->prefix . PPOM_TABLE_META;
-			$qry   = "INSERT INTO {$table} SET ";
-			$meta_count ++;
-
-			foreach ( $meta as $key => $val ) {
-
-				if ( $key == 'productmeta_id' ) {
-					continue;
-				}
-
-				if ( $key == 'productmeta_name' ) {
-					$val = 'PPOM Demo Field';
-				}
-
-				$qry .= "{$key}='{$val}',";
+			$encoded = wp_json_encode( $meta );
+			if ( false === $encoded ) {
+				continue;
 			}
-
-			$qry = substr( $qry, 0, - 1 );
-			// print $qry; exit;
-			$res = $wpdb->query( $qry );
-
-			/*
-			$wpdb->show_errors();
-			$wpdb->print_error();
-			exit;*/
+			$row = json_decode( $encoded, true );
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$repo->insert_demo_row( $row );
 		}
 
 		update_option( 'ppom_demo_meta_installed', 1 );
@@ -960,17 +729,21 @@ class NM_PersonalizedProduct {
 		}
 	}
 
-	// Update to PRO Notice
-	function ppom_export_meta() {
-
-		// if( ppom_pro_is_installed() ) return '';
-		$buy_pro = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'export-import', 'tryexport' );
-		$args    = array(
-			'link_url'  => $buy_pro,
-			'link_text' => 'Buy now',
-			'back_link' => true,
-		);
-		wp_die( 'Update to PRO Version for Export/Import', 'Update to PRO', $args );
+	/**
+	 * Free-version fallback for the Export bulk action.
+	 *
+	 * The list-table form is intercepted client-side (see
+	 * `js/admin/ppom-meta-table.js`) so the upsell modal opens instead of
+	 * hitting this handler — but if JS is disabled or the request arrives
+	 * directly, redirect to the upgrade page rather than rendering a raw
+	 * wp_die upgrade screen.
+	 *
+	 * @return void
+	 */
+	public function ppom_export_meta() {
+		$upgrade_url = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'export-import', 'tryexport' );
+		wp_redirect( $upgrade_url ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- trusted upgrade URL.
+		exit;
 	}
 
 	function add_ppom_meta_tabs( $default_tabs ) {
@@ -996,7 +769,6 @@ class NM_PersonalizedProduct {
 		echo '<div id="ppom_meta_data_tab" class="panel woocommerce_options_panel"	>';
 		ppom_meta_list( $post );
 		echo '</div>';
-
 	}
 
 	/**
@@ -1015,7 +787,7 @@ class NM_PersonalizedProduct {
 		// Check if the tooltip is enabled.
 		if ( isset( $meta['desc_tooltip'] ) && 'on' === $meta['desc_tooltip'] ) {
 			$icon_color  = ppom_get_option( 'ppom_input_tooltip_iconclr', '#000000' );
-			$description = ( ! empty( $meta['description'] ) ) ? ' <span data-ppom-tooltip="ppom_tooltip" class="ppom-tooltip" title="' . esc_attr( $input_desc ) . '"><span class="ppom-tooltip-icon" style="background-color:' . esc_attr( $icon_color ) .'"></span></span>' : '';
+			$description = ( ! empty( $meta['description'] ) ) ? ' <span data-ppom-tooltip="ppom_tooltip" class="ppom-tooltip" title="' . esc_attr( $input_desc ) . '"><span class="ppom-tooltip-icon" style="background-color:' . esc_attr( $icon_color ) . '"></span></span>' : '';
 		}
 		return $description;
 	}
@@ -1064,9 +836,45 @@ class NM_PersonalizedProduct {
 			case 'plus':
 				return self::get_license_category( $plan ) >= self::LICENSE_PLAN_2;
 			case 'pro':
-				return  self::get_license_category( $plan ) >= self::LICENSE_PLAN_1;
+				return self::get_license_category( $plan ) >= self::LICENSE_PLAN_1;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Convert price using active multi-currency plugin's filter or function.
+	 *
+	 * @param float|int|string|null $price The price to convert.
+	 * @return float|int|string|null The converted price.
+	 */
+	public function ppom_convert_price( $price ) {
+		if ( '' === $price || null === $price ) {
+			return $price;
+		}
+		if ( is_string( $price ) && false !== strpos( $price, '%' ) ) {
+			return $price;
+		}
+		if ( ! is_numeric( $price ) ) {
+			return $price;
+		}
+		$numeric_price = (float) $price;
+
+		// WCML.
+		if ( has_filter( 'wcml_raw_price_amount' ) ) {
+			return apply_filters( 'wcml_raw_price_amount', $numeric_price );
+		}
+
+		// FOX - Currency Switcher.
+		if ( has_filter( 'woocs_exchange_value' ) ) {
+			return apply_filters( 'woocs_exchange_value', $numeric_price );
+		}
+
+		// CURCY - WooCommerce Multi Currency.
+		if ( function_exists( 'wmc_get_price' ) ) {
+			return wmc_get_price( $numeric_price );
+		}
+
+		return $price;
 	}
 }

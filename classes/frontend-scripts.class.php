@@ -1,22 +1,32 @@
 <?php
 /**
- * PPOM Frontend Scripts Class
+ * Registers and localizes frontend assets for PPOM fields.
  *
- * It will register/enqueue all ppom scripts to frontent.
+ * @package PPOM
+ * @subpackage Frontend
+ *
+ * @see ppom_hooks_load_input_scripts()
+ * @see ppom_woocommerce_template_base_inputs_rendering()
  */
-
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 
+/**
+ * Coordinates product-scoped asset registration and localization.
+ *
+ * Resolves the scripts and styles required by the current PPOM field set and
+ * localizes the frontend data structures used for pricing, uploads, conditions,
+ * and validation.
+ */
 class PPOM_FRONTEND_SCRIPTS {
 
 	/**
-	 * Return scripts URL.
+	 * Base URL for plugin scripts and styles.
 	 *
-	 * @var URL
+	 * @var string
 	 */
 	private static $scripts_url = '';
 
@@ -29,13 +39,17 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
-	 * Return main scripts framework class.
+	 * Reserved reference to the script helper (legacy; unused in static API).
+	 *
+	 * @var mixed|null
 	 */
 	private static $scripts_class;
 
 
 	/**
-	 * Main Init
+	 * Boots frontend asset loading for product requests.
+	 *
+	 * @return void
 	 */
 	public static function init() {
 
@@ -47,7 +61,9 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
-	 * Register all PPOM Scripts.
+	 * Returns the script registry used by the modern frontend loader.
+	 *
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}>
 	 */
 	private static function get_scripts() {
 
@@ -55,32 +71,32 @@ class PPOM_FRONTEND_SCRIPTS {
 		$dependencies  = ppom_get_price_table_js_dependencies();
 
 		$register_scripts = array(
-			'PPOM-sm-popup'      => array(
+			'PPOM-sm-popup'        => array(
 				'src'     => self::$scripts_url . '/js/ppom-simple-popup.js',
 				'deps'    => array( 'jquery' ),
 				'version' => '1.0',
 			),
-			'ppom-plusminus-lib' => array(
+			'ppom-plusminus-lib'   => array(
 				'src'     => self::$scripts_url . '/js/ppom-plusminus.js',
 				'deps'    => array( 'jquery' ),
 				'version' => '1.0',
 			),
-			'ppom-tooltip'       => array(
+			'ppom-tooltip'         => array(
 				'src'     => self::$scripts_url . '/js/ppom-tooltip.js',
 				'deps'    => array( 'jquery' ),
 				'version' => '1.0',
 			),
-			'ppom-price'         => array(
+			'ppom-price'           => array(
 				'src'     => self::$scripts_url . "/js/price/{$ppom_price_js}",
 				'deps'    => $dependencies,
 				'version' => self::$version,
 			),
-			'ppom-inputmask'     => array(
+			'ppom-inputmask'       => array(
 				'src'     => self::$scripts_url . '/js/inputmask/jquery.inputmask.min.js',
 				'deps'    => array( 'jquery' ),
 				'version' => '5.0.6',
 			),
-			'iris'               => array(
+			'iris'                 => array(
 				'src'     => admin_url( 'js/iris.min.js' ),
 				'deps'    => array(
 					'jquery',
@@ -90,47 +106,52 @@ class PPOM_FRONTEND_SCRIPTS {
 				),
 				'version' => '1.0.7',
 			),
-			'ppom-zoom'          => array(
+			'ppom-zoom'            => array(
 				'src'     => self::$scripts_url . '/js/image-tooltip.js',
 				'deps'    => array( 'jquery' ),
 				'version' => self::$version,
 			),
-			'ppom-bs-slider'     => array(
+			'ppom-bs-slider'       => array(
 				'src'     => self::$scripts_url . '/js/bs-slider/bootstrap-slider.min.js',
 				'deps'    => array( 'jquery' ),
 				'version' => '10.0.0',
 			),
-			'ppom-croppie-lib'   => array(
+			'ppom-croppie-lib'     => array(
 				'src'     => self::$scripts_url . '/js/croppie/croppie.min.js',
 				'deps'    => array( 'jquery' ),
 				'version' => '2.6.4',
 			),
-			'ppom-exif'          => array(
+			'ppom-exif'            => array(
 				'src'     => self::$scripts_url . '/js/exif.js',
 				'deps'    => array( 'jquery' ),
 				'version' => self::$version,
 			),
-			'ppom-modal-lib'     => array(
+			'ppom-modal-lib'       => array(
 				'src'     => self::$scripts_url . '/js/ppom-modal.js',
 				'deps'    => array( 'jquery' ),
 				'version' => '1.1.1',
 			),
-			'ppom-file-upload'   => array(
+			'ppom-file-upload'     => array(
 				'src'     => self::$scripts_url . '/js/file-upload.js',
 				'deps'    => array( 'jquery', 'plupload', 'ppom-price' ),
 				'version' => self::$version,
 			),
-			'ppom-inputs'        => array(
+			'ppom-inputs'          => array(
 				'src'     => self::$scripts_url . '/js/ppom.inputs.js',
 				'deps'    => array( 'jquery', 'jquery-ui-datepicker' ),
 				'version' => self::$version,
 			),
-			'ppom-tooltip-lib'   => array(
+			'ppom-variation-rules' => array(
+				'src'     => self::$scripts_url . '/js/ppom-variation-rules.js',
+				'deps'    => array( 'jquery', 'ppom-price' ),
+				'version' => self::$version,
+			),
+			'ppom-tooltip-lib'     => array(
 				'src'     => self::$scripts_url . '/backend/assets/tooltip/tooltip.js',
 				'deps'    => array( 'jquery' ),
 				'version' => self::$version,
 			),
-			'ppom-validate'      => array(
+			'ppom-validate'        => array(
 				'src'     => self::$scripts_url . '/js/validate.js',
 				'deps'    => array( 'jquery' ),
 				'version' => self::$version,
@@ -142,7 +163,9 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
-	 * Register Styles
+	 * Returns the style registry used by the modern frontend loader.
+	 *
+	 * @return array<string, array{src: string, deps: array<int, string>, version: string}>
 	 */
 	private static function get_styles() {
 
@@ -205,7 +228,9 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
-	 * Load Frontend Scripts.
+	 * Registers PPOM assets on frontend requests and loads product-specific ones.
+	 *
+	 * @return void
 	 */
 	public static function load_scripts() {
 
@@ -238,7 +263,20 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
-	 * Load Frontend Scripts by product ID.
+	 * Loads the asset set required by the resolved PPOM field definitions.
+	 *
+	 * Builds the JS payloads used by the template renderer, upload handlers,
+	 * pricing logic, and conditional fields for a single product context.
+	 *
+	 * @param int      $product_id       Product ID being rendered.
+	 * @param int|null $ppom_id          Optional field-group ID override.
+	 * @param string   $display_location Render location such as shortcode.
+	 *
+	 * @return void|string
+	 *
+	 * @see PPOM_Meta::__construct()
+	 * @see PPOM_Form::ppom_fields_render()
+	 * @see ppom_woocommerce_template_base_inputs_rendering()
 	 */
 	public static function load_scripts_by_product_id( $product_id, $ppom_id = null, $display_location = '' ) {
 
@@ -296,10 +334,10 @@ class PPOM_FRONTEND_SCRIPTS {
 
 				/* Global JS Inputs Vars */
 				$global_js_vars = array(
-					'ajaxurl'    => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
-					'plugin_url' => PPOM_URL,
-					'product_id' => $product_id,
-					'sp_force_display_block'  => apply_filters( 'ppom_sp_ac_force_css_display_block', true ) ? 'on' : 'off' // force display:block instead of display:flex for add to cart form of the single product page
+					'ajaxurl'                => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
+					'plugin_url'             => PPOM_URL,
+					'product_id'             => $product_id,
+					'sp_force_display_block' => apply_filters( 'ppom_sp_ac_force_css_display_block', true ) ? 'on' : 'off', // force display:block instead of display:flex for add to cart form of the single product page
 				);
 
 				$decimal_palces = wc_get_price_decimals();
@@ -464,7 +502,7 @@ class PPOM_FRONTEND_SCRIPTS {
 								}
 
 								$field_conditions['rules'][ $rule_index ]['element_values'] = ppom_wpml_translate( $rule['element_values'], 'PPOM' );
-								$rule_index ++;
+								++$rule_index;
 							}
 
 							$ppom_conditional_fields[ $data_name ] = $field_conditions;
@@ -478,6 +516,7 @@ class PPOM_FRONTEND_SCRIPTS {
 				}
 
 				PPOM_SCRIPTS::enqueue_script( 'ppom-inputs' );
+				PPOM_SCRIPTS::enqueue_script( 'ppom-variation-rules' );
 
 				PPOM_SCRIPTS::inline_script( 'ppom-inputs', htmlspecialchars_decode( $ppom->inline_js ) );
 
@@ -533,11 +572,28 @@ class PPOM_FRONTEND_SCRIPTS {
 	}
 
 
+	/**
+	 * Localizes runtime data onto an enqueued PPOM frontend script handle.
+	 *
+	 * Data is structured by product ID to support multiple products on the same page.
+	 * Each product's data is stored under its product ID key in the global object.
+	 *
+	 * @param string     $handle         Registered script handle.
+	 * @param string     $var_name       JS variable name.
+	 * @param WC_Product $product        Product in the current render context.
+	 * @param array      $js_vars        Handle-specific JS vars.
+	 * @param array      $global_js_vars Shared JS vars.
+	 *
+	 * @return void
+	 */
 	private static function set_localize_data( $handle, $var_name, $product, $js_vars = array(), $global_js_vars = array() ) {
 
 		if ( ! wp_script_is( $handle ) ) {
 			return;
 		}
+
+		$product_id    = $product->get_id();
+		$localize_data = array();
 
 		switch ( $handle ) {
 
@@ -551,6 +607,11 @@ class PPOM_FRONTEND_SCRIPTS {
 					'plupload_runtime'       => ( ppom_if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
 					'ppom_file_upload_nonce' => wp_create_nonce( 'ppom_uploading_file_action' ),
 					'ppom_file_delete_nonce' => wp_create_nonce( 'ppom_deleting_file_action' ),
+					'rest_url'               => rest_url( 'ppom/v1/nonces/file/' ),
+					'invalid_file_type'      => __( 'Invalid file type', 'woocommerce-product-addon' ),
+					// translators: %s is max file size.
+					'max_file_size'          => __( 'File size must be less than %s', 'woocommerce-product-addon' ),
+					'duplicate_file'         => __( 'You have already selected this file', 'woocommerce-product-addon' ),
 				);
 
 				break;
@@ -607,10 +668,34 @@ class PPOM_FRONTEND_SCRIPTS {
 
 		$localize_data = apply_filters( $var_name, $localize_data, $product );
 
+		if ( 'ppom_input_vars' === $var_name ) {
+			// Store data in a product-keyed structure for multi-product support.
+			$multi_product_var = 'ppom_input_vars_by_product';
+
+			$existing_data = array();
+			if ( isset( $GLOBALS[ $multi_product_var ] ) && is_array( $GLOBALS[ $multi_product_var ] ) ) {
+				$existing_data = $GLOBALS[ $multi_product_var ];
+			}
+
+			$existing_data[ $product_id ]  = $localize_data;
+			$GLOBALS[ $multi_product_var ] = $existing_data;
+
+			// Localize the multi-product data structure.
+			PPOM_SCRIPTS::localize_script( $handle, $multi_product_var, $existing_data );
+		}
+
 		PPOM_SCRIPTS::localize_script( $handle, $var_name, $localize_data );
 	}
 
 
+	/**
+	 * Appends inline CSS generated from PPOM field presentation settings.
+	 *
+	 * @param string $type       Inline CSS variant to include.
+	 * @param array  $field_meta Optional field definition for field-specific CSS.
+	 *
+	 * @return void
+	 */
 	public static function add_inline_css( $type, $field_meta = array() ) {
 
 		ob_start();

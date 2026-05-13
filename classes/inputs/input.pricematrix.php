@@ -1,11 +1,14 @@
 <?php
-/*
- * Followig class handling price matrix based on quantity provied in range
- * like 1-25
-* dependencies. Do not make changes in code
-* Create on: 9 November, 2013
-*/
+/**
+ * Price matrix field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * Quantity-tiered pricing matrix with optional slider, discounts, and per-unit display options.
+ */
 class NM_PriceMatrix_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -18,6 +21,11 @@ class NM_PriceMatrix_wooproduct extends PPOM_Inputs {
 	*/
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata and loads the field settings schema.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -26,26 +34,30 @@ class NM_PriceMatrix_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'Price/Quantity', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-usd" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 
 		$input_meta = array(
 			'title'               => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
-				'desc'  => __( 'It will as section heading wrapped in h2', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as a section heading wrapped in h2.', 'woocommerce-product-addon' ),
 			),
 			'data_name'           => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'woocommerce-product-addon' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'         => array(
 				'type'  => 'textarea',
 				'title' => __( 'Description', 'woocommerce-product-addon' ),
-				'desc'  => __( 'Type description, it will be display under section heading.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Type description; it will be displayed under the section heading.', 'woocommerce-product-addon' ),
 			),
 			'discount_type'       => array(
 				'type'        => 'select',
@@ -90,13 +102,13 @@ class NM_PriceMatrix_wooproduct extends PPOM_Inputs {
 			'show_slider'         => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Enable Quantity Slider', 'woocommerce-product-addon' ),
-				'desc'        => __( 'It will display Range slider for quantity under matrix', 'woocommerce-product-addon' ),
+				'desc'        => __( 'It displays a range slider for quantity under the matrix.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'show_price_per_unit' => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Show price per unit?', 'woocommerce-product-addon' ),
-				'desc'        => __( 'It will calculate price against per unit and show along total', 'woocommerce-product-addon' ),
+				'desc'        => __( 'It calculates a per-unit price and shows it alongside the total.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'hide_matrix_table'   => array(

@@ -2,7 +2,11 @@ name: Sync branches
 on:
   push:
     branches:
-      - 'master'
+      - "master"
+
+permissions:
+  contents: read
+
 jobs:
   sync-branch:
     runs-on: ubuntu-latest

@@ -60,11 +60,11 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 
 			<td>
 				<?php
-				$min          = ( ! empty( $opt['min'] ) ? $opt['min'] : 0 );
-				$max          = ( ! empty( $opt['max'] ) ? $opt['max'] : 10000 );
-				$stock        = $opt['stock'] !== '' ? intval( $opt['stock'] ) : '';
-				$max          = $max > $stock && $manage_stock ? $stock : $max;
-				$in_stock     = $manage_stock ? sprintf(
+				$min      = ( ! empty( $opt['min'] ) ? $opt['min'] : 0 );
+				$max      = ( ! empty( $opt['max'] ) ? $opt['max'] : 10000 );
+				$stock    = $opt['stock'] !== '' ? intval( $opt['stock'] ) : '';
+				$max      = $max > $stock && $manage_stock ? $stock : $max;
+				$in_stock = $manage_stock ? sprintf(
 					/* translators: %s: stock quantity */
 					__( '%s in stock', 'woocommerce-product-addon' ),
 					$stock
@@ -76,6 +76,7 @@ $options = ppom_convert_options_to_key_val( $fm->options(), $field_meta, $produc
 
 				// Price need to filter for currency switcher here not in wc_price
 				$the_price = isset( $opt['price'] ) && $opt['price'] != '' ? $opt['price'] : $default_price;
+				$the_price = apply_filters( 'ppom_option_price', $the_price );
 
 				$usebaseprice = isset( $opt['price'] ) ? 'no' : 'yes';
 				$required     = ( $fm->required() == 'on' ? 'required' : '' );

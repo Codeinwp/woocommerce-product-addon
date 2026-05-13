@@ -1,10 +1,14 @@
 <?php
-/*
- * Followig class handling Measuremnts input control and their
-* dependencies. Do not make changes in code
-* Create on: 21 May, 2014
-*/
+/**
+ * Measurement field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * Numeric measurement tied to unit options and price multiplier; registers option label formatting.
+ */
 class NM_Measure_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -17,18 +21,32 @@ class NM_Measure_wooproduct extends PPOM_Inputs {
 	*/
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata, loads settings, and hooks option label formatting for measure fields.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
 
 		$this->title    = __( 'Measure Input', 'woocommerce-product-addon' );
-		$this->desc     = __( 'Measuremnts', 'woocommerce-product-addon' );
+		$this->desc     = __( 'Measurements', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-building-o" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
 
 		add_filter( 'ppom_option_label', array( $this, 'change_option_label' ), 15, 4 );
 	}
 
+	/**
+	 * Appends formatted price per unit to measure option labels on the storefront.
+	 *
+	 * @param string               $label   Current option label.
+	 * @param array<string, mixed> $option  Option row (price, option text, etc.).
+	 * @param array<string, mixed> $meta    Field meta for the PPOM input.
+	 * @param mixed                $product WooCommerce product context.
+	 * @return string
+	 */
 	function change_option_label( $label, $option, $meta, $product ) {
 
 		if ( $meta['type'] != 'measure' ) {
@@ -36,24 +54,30 @@ class NM_Measure_wooproduct extends PPOM_Inputs {
 		}
 
 		$price = isset( $option['price'] ) ? $option['price'] : 0;
+		$price = apply_filters( 'ppom_option_price', $price );
 		$price = wc_price( $price );
 		$label = $price . '/' . $option['option'];
 
 		return $label;
 	}
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 
 		$input_meta = array(
 			'title'            => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
-				'desc'  => __( 'It will be shown as field label', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as the field label.', 'woocommerce-product-addon' ),
 			),
 			'data_name'        => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'woocommerce-product-addon' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'      => array(
 				'type'  => 'textarea',

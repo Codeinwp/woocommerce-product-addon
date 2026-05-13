@@ -17,21 +17,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 class PPOM_Legacy_InputManager {
 
 	/**
-	 * Return all ppom inputs meta data
+	 * Current legacy field definition for the active render context.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	public static $input_meta;
 
 	/**
-	 * Return input type
+	 * Legacy input type slug.
 	 *
 	 * @var string
 	 */
 	public $input_type;
 
-	/* ======= Class Construct ======== */
-	function __construct( $input_meta, $input_type ) {
+	/**
+	 * Stores the active legacy field definition and type.
+	 *
+	 * @param array<string, mixed> $input_meta Field definition.
+	 * @param string               $input_type Input type slug.
+	 */
+	public function __construct( $input_meta, $input_type ) {
 
 		self::$input_meta = $input_meta;
 
@@ -40,6 +45,8 @@ class PPOM_Legacy_InputManager {
 
 	/**
 	 * Field Title
+	 *
+	 * @return string
 	 */
 	function title() {
 
@@ -51,6 +58,8 @@ class PPOM_Legacy_InputManager {
 
 	/**
 	 * Field dataname (Field Unique ID)
+	 *
+	 * @return string
 	 */
 	function data_name() {
 
@@ -62,6 +71,8 @@ class PPOM_Legacy_InputManager {
 
 	/**
 	 * Field Desciption
+	 *
+	 * @return string Shortcode-expanded HTML.
 	 */
 	function desc() {
 
@@ -71,12 +82,14 @@ class PPOM_Legacy_InputManager {
 
 		// old Filter
 		$desc = apply_filters( 'ppom_description_content', $desc, self::$input_meta );
-		return do_shortcode($desc);
+		return do_shortcode( $desc );
 	}
 
 
 	/**
 	 * Field Required
+	 *
+	 * @return mixed
 	 */
 	function required() {
 
@@ -86,6 +99,8 @@ class PPOM_Legacy_InputManager {
 
 	/**
 	 * Field Colunm Width
+	 *
+	 * @return int|string Bootstrap column width (1–12).
 	 */
 	function width() {
 
@@ -109,6 +124,8 @@ class PPOM_Legacy_InputManager {
 	 * Show Asterisk If Require On
 	 *
 	 * Show Description If Not Null
+	 *
+	 * @return string HTML fragment.
 	 */
 	function field_label() {
 
@@ -126,6 +143,8 @@ class PPOM_Legacy_InputManager {
 	 * Field Multiple Options
 	 *
 	 * Checkbox|Radio|Select|Image|Pallete
+	 *
+	 * @return array<int|string, mixed>
 	 */
 	function options() {
 
@@ -141,6 +160,8 @@ class PPOM_Legacy_InputManager {
 
 	/**
 	 * Field Classes Array
+	 *
+	 * @return list<string>
 	 */
 	function input_classes_array() {
 
@@ -158,10 +179,9 @@ class PPOM_Legacy_InputManager {
 		}
 
 		if ( ( $this->input_type == 'radio' && ( $key = array_search( 'form-control', $classes ) ) !== false ) ||
-			 ( $this->input_type == 'checkbox' && ( $key = array_search( 'form-control', $classes ) ) !== false ) ||
-			 ( $this->input_type == 'fixedprice' && self::$input_meta['view_type'] === 'radio' && ( $key = array_search( 'form-control', $classes ) ) !== false )
-		)
-		{
+			( $this->input_type == 'checkbox' && ( $key = array_search( 'form-control', $classes ) ) !== false ) ||
+			( $this->input_type == 'fixedprice' && self::$input_meta['view_type'] === 'radio' && ( $key = array_search( 'form-control', $classes ) ) !== false )
+		) {
 			unset( $classes[ $key ] );
 			$classes[] = 'ppom-check-input';
 		}

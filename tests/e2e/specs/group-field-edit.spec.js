@@ -4,38 +4,39 @@
 import { test, expect } from "@wordpress/e2e-test-utils-playwright";
 
 import {
-    addNewField,
 	addNewOptionInModal,
+	clickAddGroup,
 	createSimpleGroupField,
 	fillFieldNameAndId,
 	fillOptionNameAndValue,
-	openFieldEditModal,
-	pickFieldTypeInModal,
 	saveFieldInModal,
 	saveFields,
     switchToOptionsModalTab,
 } from "../utils";
 
 test.describe("Group Fields Edit", () => {
+	async function optionIdValues(page, modelId) {
+		return page.$$eval(
+			`#ppom_field_model_${modelId} ul.ppom-options-sortable li.ui-sortable-handle input[data-metatype="id"]`,
+			(inputId) => inputId.map((i) => i.value),
+		);
+	}
+
+	async function openLegacyFieldEditModal(page, modelId) {
+		await page.evaluate((id) => {
+			window.jQuery(".ppom-modal-box, .ppom-modal-overlay").hide();
+			window.jQuery(`#ppom_field_model_${id}`).show();
+		}, modelId);
+		await expect(page.locator(`#ppom_field_model_${modelId}`)).toBeVisible();
+	}
 
 	/**
 	 * Create two input fields and change their order then save and check.
 	 */
 	test("change fields order on saving", async ({ page, admin }) => {
 		await createSimpleGroupField(admin, page);
-		await page.waitForTimeout(500);
-		await admin.visitAdminPage("admin.php?page=ppom");
 
-		const firstRow = page
-			.locator("#ppom-groups-export-form tbody tr")
-			.first();
-		const ppomId = await firstRow.locator("td").nth(1).innerText();
-
-		await admin.visitAdminPage(
-			`admin.php?page=ppom&productmeta_id=${ppomId}&do_meta=edit`,
-		);
-
-		const fieldIds = await page.$$eval("td.ppom_meta_field_id", (tds) =>
+		const fieldIds = await page.$$eval("td.column-data_name", (tds) =>
 			tds.map((td) => td.innerText),
 		);
 
@@ -52,7 +53,7 @@ test.describe("Group Fields Edit", () => {
 		await saveFields(page);
 
 		const newOrderFieldIds = await page.$$eval(
-			"td.ppom_meta_field_id",
+			"td.column-data_name",
 			(tds) => tds.map((td) => td.innerText),
 		);
 
@@ -65,13 +66,18 @@ test.describe("Group Fields Edit", () => {
     test("change select option order on saving", async ({ page, admin }) => {
         await admin.visitAdminPage("admin.php?page=ppom");
 
-		await page.getByRole("link", { name: "Add New Group" }).click();
+		await clickAddGroup(page);
+		await page
+			.locator("#ppom-template-wizard-modal .ppom-template-card--scratch")
+			.click();
+		await page.waitForURL(/action=new/);
 		await page
 			.getByRole("textbox")
 			.fill("Change Select Option order");
 
-        await addNewField(page);
-        await pickFieldTypeInModal(page, "select");
+        await page
+            .locator('.ppom-fields-name-model .ppom-field-item[data-field-type="select"]')
+            .dispatchEvent("click");
 
         const modelId = 1;
 
@@ -88,10 +94,7 @@ test.describe("Group Fields Edit", () => {
         await addNewOptionInModal(page, modelId);
         await fillOptionNameAndValue(page, modelId, 1, "Option 2", "option_2");
 
-        const initialOrderOptionsIds = await page.$$eval(
-			`#ppom_field_model_${modelId} ul.ppom-options-sortable li.ui-sortable-handle input[data-metatype="id"]`,
-			(inputId) => inputId.map((i) => i.value),
-		);
+        const initialOrderOptionsIds = await optionIdValues(page, modelId);
 
         await saveFieldInModal(page, modelId);
         await saveFields(page);
@@ -99,19 +102,19 @@ test.describe("Group Fields Edit", () => {
         await page.waitForLoadState("networkidle");
 		await page.reload();
 
-        await openFieldEditModal(page, modelId);
+        await openLegacyFieldEditModal(page, modelId);
         await switchToOptionsModalTab(page, modelId);
 
         // Move the last row into the first position using HTML manipulation.
-		await page.evaluate((modelId) => {
-			const tbody = document.querySelector(`#ppom_field_model_${modelId} ul.ppom-options-sortable`);
+        await page.evaluate((modelId) => {
+            const tbody = document.querySelector(`#ppom_field_model_${modelId} ul.ppom-options-sortable`);
 
-			const rows = Array.from(tbody.querySelectorAll("li.ui-sortable-handle"));
-			if (rows.length > 1) {
-				const lastRow = rows[rows.length - 1];
-				tbody.insertBefore(lastRow, rows[0]);
-			}
-		}, modelId);
+            const rows = Array.from(tbody.querySelectorAll("li.ui-sortable-handle"));
+            if (rows.length > 1) {
+                const lastRow = rows[rows.length - 1];
+                tbody.insertBefore(lastRow, rows[0]);
+            }
+        }, modelId);
 
         await saveFieldInModal(page, modelId);
         await saveFields(page);
@@ -119,13 +122,10 @@ test.describe("Group Fields Edit", () => {
         await page.waitForLoadState("networkidle");
 		await page.reload();
 
-        await openFieldEditModal(page, modelId);
+        await openLegacyFieldEditModal(page, modelId);
         await switchToOptionsModalTab(page, modelId);
 
-        const newOrderOptionsIds = await page.$$eval(
-			`#ppom_field_model_${modelId} ul.ppom-options-sortable li.ui-sortable-handle input[data-metatype="id"]`,
-			(inputId) => inputId.map((i) => i.value),
-		);
+        const newOrderOptionsIds = await optionIdValues(page, modelId);
 
 		expect(newOrderOptionsIds).not.toEqual(initialOrderOptionsIds);
     });

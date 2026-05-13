@@ -104,7 +104,8 @@
 #ppom-all-select-products-head-btn + span {
     color: white;
 }
-button[data-modal-id="ppom_fields_model_id"]{
+button[data-modal-id="ppom_fields_model_id"],
+button.ppom-react-field-modal-open {
     margin-left: -0.75rem;
 }
 #ppom-all-select-products-foot-btn + span {
@@ -113,6 +114,152 @@ button[data-modal-id="ppom_fields_model_id"]{
 
 .ppom_field_table tbody {
     font-size: 12px;
+}
+
+.ppom-fields-list-table-wrapper {
+    overflow-x: auto;
+}
+
+.ppom-fields-list-table-wrapper .tablenav {
+    height: auto;
+    margin: 8px 0;
+}
+
+.ppom-fields-list-table-wrapper .tablenav .actions {
+    padding: 0;
+}
+
+.ppom-fields-list-table-wrapper .ppom-submit-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ppom_field_table .column-order {
+    width: 36px;
+    text-align: center;
+}
+
+.ppom_field_table .column-cb {
+    width: 36px;
+}
+
+.ppom_field_table .column-status,
+.ppom_field_table .column-required {
+    width: 85px;
+}
+
+.ppom_field_table .column-type {
+    width: 110px;
+}
+
+.ppom_field_table .column-actions {
+    white-space: nowrap;
+}
+
+.ppom_field_table td.column-actions {
+    display: flex;
+    gap: 6px;
+}
+
+/* WP 7.0 bumps the `.button` line-height and breaks the actions column row height — pin it. */
+.ppom_field_table td.column-actions .button {
+    line-height: 2.15384615;
+}
+
+.ppom-delete-field.button {
+    color: #b32d2e;
+    border-color: #b32d2e;
+}
+
+.ppom-delete-field.button:hover,
+.ppom-delete-field.button:focus {
+    color: #fff;
+    background: #b32d2e;
+    border-color: #8a1f20;
+}
+
+.ppom-delete-field.button:focus {
+    box-shadow: 0 0 0 1px #8a1f20;
+    outline: 2px solid transparent;
+}
+
+.ppom-fields-tablenav .alignleft.actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ppom_remove_field.button {
+    color: #b32d2e;
+    border-color: #b32d2e;
+}
+
+.ppom_remove_field.button:hover,
+.ppom_remove_field.button:focus {
+    color: #fff;
+    background: #b32d2e;
+    border-color: #8a1f20;
+}
+
+.ppom_remove_field.button:focus {
+    box-shadow: 0 0 0 1px #8a1f20;
+    outline: 2px solid transparent;
+}
+
+.ppom_remove_field.button:disabled,
+.ppom_remove_field.button[disabled] {
+    color: #b32d2e !important;
+    border-color: #b32d2e !important;
+    background: #fff !important;
+    opacity: 0.5;
+}
+
+.ppom_field_table .column-placeholder {
+    width: 18%;
+}
+
+.ppom_field_table .ppom-sortable-handle {
+    display: inline-block;
+    color: #787c82;
+    line-height: 1;
+    vertical-align: middle;
+    cursor: move;
+}
+
+.ppom_field_table tbody tr {
+    cursor: default;
+}
+
+.ppom_field_table.ppom-is-sorting,
+.ppom_field_table.ppom-is-sorting thead,
+.ppom_field_table.ppom-is-sorting tbody,
+.ppom_field_table.ppom-is-sorting tfoot {
+    display: revert;
+}
+
+.ppom_field_table.ppom-is-sorting tr {
+    display: table-row;
+}
+
+.ppom_field_table.ppom-is-sorting tr > th,
+.ppom_field_table.ppom-is-sorting tr > td {
+    display: table-cell;
+}
+
+tr.ui-sortable-helper {
+    display: table-row !important;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba( 0, 0, 0, 0.12 );
+}
+
+tr.ui-sortable-helper > th,
+tr.ui-sortable-helper > td {
+    display: table-cell !important;
+}
+
+.ppom_field_table .button .dashicons {
+    line-height: 1.5;
 }
 
 #ppom_fields_id,
@@ -245,6 +392,7 @@ ul.ppom-options-container li {
     z-index: 10024;
     padding: 15px;
     overflow: visible;
+    pointer-events: none;
 
 }
 
@@ -405,10 +553,6 @@ ul.ppom-options-container li {
     6- Basic Settings Section CSS
 */
 
-.ppom-basic-setting-section select {
-    height: 34px !important;
-}
-
 .ppom-basic-setting-section textarea {
     min-height: 140px;
     max-height: 140px;
@@ -428,7 +572,7 @@ ul.ppom-options-container li {
 }
 
 .ppom-wrapper .CodeMirror {
-    height: 139px !important;
+    height: 200px;
 }
 
 /*.CodeMirror pre {*/
@@ -446,6 +590,62 @@ ul.ppom-options-container li {
     7- Existin Meta Section CSS
 */
 
+
+/* Field Groups list-table toolbar: turn the top tablenav strip into a flex row
+   so our toolbar can stretch and "Add Group" can sit at the right end. */
+.ppom-existing-meta-wrapper .tablenav.top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* WP's `.tablenav .tablenav-pages` ships with `margin: 0 0 9px` and
+   `float: right`. We keep its 9px bottom margin (preserves WP's intended
+   gap above the table) but match it on the toolbar divs so all flex
+   children share the same baseline under cross-axis centering. */
+.ppom-existing-meta-wrapper .tablenav.top > .alignleft {
+    float: none;
+    margin-bottom: 9px;
+}
+
+.ppom-existing-meta-wrapper .tablenav.top .tablenav-pages {
+    float: none;
+}
+
+.ppom-listtable-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.ppom-listtable-actions .button,
+.ppom-listtable-actions .button:hover,
+.ppom-listtable-actions .button:focus {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+}
+
+.ppom-listtable-actions .button-primary {
+    margin-left: auto;
+}
+
+.ppom-listtable-actions .button .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+}
+
+/* "Attach to Products" trigger in the table — keep the WP button look without
+   the inherited admin-area link underline. */
+a.ppom-products-modal,
+a.ppom-products-modal:hover,
+a.ppom-products-modal:focus {
+    text-decoration: none;
+}
 
 #ppom-meta-table .dashicons,
 .dashicons-before:before {
@@ -938,6 +1138,11 @@ ul.ppom-options-container li label {
     -ms-user-select: none;
 }
 
+.onoffswitch--busy {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
 .onoffswitch-checkbox {
     position: absolute;
     opacity: 0;
@@ -1191,7 +1396,47 @@ a[data-modal-id="ppom-nm-plugins-modal"] {
 }
 
 .ppom-top-nav {
-    line-height:35px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    line-height: 35px;
+}
+
+.wp-core-ui .ppom-top-nav .dashicons {
+    margin-right: 4px;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+}
+
+.ppom-top-nav-link {
+    display: inline-flex;
+    align-items: center;
+}
+
+.ppom-top-nav .button {
+    display: inline-flex;
+    align-items: center;
+}
+
+.ppom-manage-fields-topbar .ppom-top-nav a:is(:link, :visited, :hover, :focus, :active) {
+    text-decoration: none;
+}
+
+#ppom-upgrade-to-pro.button {
+    background: #28A745;
+    border-color: #28A745;
+    color: #fff;
+}
+
+#ppom-upgrade-to-pro.button:hover,
+#ppom-upgrade-to-pro.button:focus {
+    background: #218838;
+    border-color: #218838;
+    color: #fff;
+    box-shadow: 0 0 0 1px #218838;
 }
 
 .ppom_addons_model_cards span.badge {
@@ -1360,7 +1605,7 @@ a.ppom-attach-upsell-upgrade {
 }
 
 .ppom-popup-title {
-    font-size: 2.5em;
+    font-size: 1.5em;
     margin: 0;
     line-height: 1.3;
 
@@ -1400,6 +1645,14 @@ a.ppom-attach-upsell-upgrade {
     background-color: #6c757d;
 }
 
+.ppom-popup-actions .ppom-btn-confirm {
+    background-color: #ff0f0f;
+}
+
+.ppom-popup-actions .ppom-btn-confirm:hover {
+    background-color: #ef6060;
+}
+
 .ppom-popup.ppom-error .ppom-popup-title {
     color: #f44336;
 }
@@ -1418,6 +1671,7 @@ a.ppom-attach-upsell-upgrade {
 
 .ppom-wrapper label {
     cursor: auto;
+    font-weight: 600;
 }
 
 .ppom-upsell-modal{
@@ -1511,6 +1765,18 @@ a.ppom-repeater-learn-more:focus {
   right: 0;
   bottom: 0;
   z-index: 10;
+}
+#ppom-lock-fields-upsell {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  overflow: auto;
 }
 #ppom-lock-fields-upsell .ppom-modal-body {
   z-index: 10;
@@ -1876,6 +2142,45 @@ header.ppom-modal-header {
     text-decoration: none;
 }
 
+/* PPOM Field Groups list table column widths — give the Meta summary
+   most of the horizontal real estate, since each row lists every field's
+   label/type/options. */
+.ppom-existing-meta-wrapper .wp-list-table .column-id {
+    width: 80px;
+}
+
+.ppom-existing-meta-wrapper .wp-list-table .column-name {
+    width: 20%;
+}
+
+/* Meta carries the field-by-field summary, so give it ~2x the Name column
+   and let it absorb any leftover space (the other columns are fixed). */
+.ppom-existing-meta-wrapper .wp-list-table .column-meta {
+    width: 40%;
+    min-width: 320px;
+}
+
+.ppom-existing-meta-wrapper .wp-list-table .column-status {
+    width: 85px;
+}
+
+.ppom-existing-meta-wrapper .wp-list-table .column-attach {
+    width: 170px;
+}
+
+.ppom-disabled-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: #f0f0f1;
+    color: #646970;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
 div.ppom-banner .themeisle-sale {
     margin: 0 0 10px 0;
 }
@@ -1886,4 +2191,621 @@ div.ppom-banner .themeisle-sale {
 
 .ppom-banner .themeisle-sale .themeisle-sale-action a {
     text-decoration: none;
+}
+
+/* Save & Preview modal */
+.ppom-live-preview-modal {
+    width: min(1100px, 95vw);
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+.ppom-live-preview-modal .ppom-modal-body {
+    padding: 20px 24px;
+    background: #f6f7f7;
+}
+
+.ppom-live-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.ppom-live-preview-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ppom-live-preview-title-wrap h3 {
+    margin: 0;
+}
+
+.ppom-preview-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #e5f1ff;
+    color: #0550ae;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.ppom-preview-controls {
+    margin-bottom: 12px;
+}
+
+.ppom-preview-product-control {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+}
+
+.ppom-preview-product-control label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.ppom-preview-select-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Explicit row layout for the preview dropdown + Refresh (matches #ppom-live-preview-modal … > .ppom-preview-controls > div > div). */
+#ppom-live-preview-modal .ppom-preview-product-control > .ppom-preview-select-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Select2 uses width:100%; that must be 100% of this cell, not the full row, or Refresh wraps below. */
+.ppom-preview-select-cell {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.ppom-preview-select-cell .select2-container {
+    max-width: 100%;
+}
+
+.ppom-preview-select-row .ppom-preview-refresh {
+    flex-shrink: 0;
+}
+
+.ppom-wrapper .ppom-preview-refresh.btn,
+#ppom-live-preview-modal .ppom-preview-refresh.btn {
+    line-height: 1;
+}
+
+.ppom-preview-iframe-wrap {
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+}
+
+#ppom-live-preview-iframe {
+    width: 100%;
+    min-height: 62vh;
+    border: 0;
+    background: #fff;
+}
+
+.ppom-preview-notice {
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    border-left: 4px solid;
+    background: #fff;
+}
+
+.ppom-preview-notice p {
+    margin: 0 0 8px;
+}
+
+.ppom-preview-notice-error {
+    border-left-color: #d63638;
+}
+
+.ppom-preview-notice-warning {
+    border-left-color: #dba617;
+}
+
+.ppom-preview-assignment-highlight {
+    box-shadow: 0 0 0 3px rgba(2, 123, 255, 0.35);
+}
+
+.ppom-save-preview-tooltip-anchor {
+    display: inline-block;
+    cursor: default;
+}
+
+.ppom-save-preview-tooltip-anchor.ppom-save-preview-is-disabled {
+    cursor: not-allowed;
+}
+
+.ppom-save-preview-inner {
+    position: relative;
+    display: inline-block;
+}
+
+/* Outline secondary next to solid primary “Save Fields”; disabled = flat neutral grey. */
+.ppom-save-preview-tooltip-anchor:not(.ppom-save-preview-is-disabled) .ppom-save-and-preview.btn-outline-secondary {
+    color: #50575e;
+    border-color: #c3c4c7;
+    background-color: #f6f7f7;
+}
+
+.ppom-save-preview-tooltip-anchor:not(.ppom-save-preview-is-disabled) .ppom-save-and-preview.btn-outline-secondary:hover {
+    color: #1d2327;
+    border-color: #8c8f94;
+    background-color: #f0f0f1;
+}
+
+.ppom-save-preview-tooltip-anchor:not(.ppom-save-preview-is-disabled) .ppom-save-and-preview.btn-outline-secondary:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #fff, 0 0 0 2px #2271b1;
+    outline: none;
+}
+
+.ppom-save-preview-tooltip-anchor.ppom-save-preview-is-disabled .ppom-save-and-preview.btn-outline-secondary {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 1;
+    color: #787c82 !important;
+    background-color: #f0f0f1 !important;
+    border-color: #c3c4c7 !important;
+    box-shadow: none;
+}
+
+/* Instant custom tooltip (hover passes through disabled button to .ppom-save-preview-inner). */
+.ppom-save-preview-tooltip {
+    position: absolute;
+    z-index: 100050;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+    margin-bottom: 6px;
+    padding: 8px 10px;
+    min-width: 230px;
+    max-width: 280px;
+    font-size: 12px;
+    line-height: 1.45;
+    font-weight: 400;
+    color: #fff;
+    text-align: left;
+    text-decoration: none;
+    white-space: normal;
+    background: #1d2327;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+}
+
+.ppom-save-preview-tooltip[hidden] {
+    display: none !important;
+}
+
+.ppom-save-preview-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border: 6px solid transparent;
+    border-top-color: #1d2327;
+}
+
+.ppom-admin-tabs-css .ppom-admin-tab-content .ppom-form-control {
+    height: 38px;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.ppom-admin-tabs-css .ppom-admin-tab-content .form-group .row {
+    align-items: center;
+}
+
+.ppom-badge {
+    background: #f0f0f0;
+    color: #333;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+    margin-left: 4px;
+    text-transform: uppercase;
+}
+
+.ppom-pro-badge {
+    background: transparent;
+    border: 1px solid #c45c1a;
+    color: #c45c1a;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.ppom-editor-wrapper {
+    position: relative;
+}
+
+.ppom-editor-wrapper.ppom-locked {
+    position: relative;
+}
+
+.ppom-editor-wrapper.ppom-locked textarea {
+    pointer-events: none;
+    user-select: none;
+    filter: blur(3px);
+}
+
+.ppom-locked-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(16, 29, 48, 0.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.ppom-lock-icon {
+    background: #c45c1a1a;
+    border: 2px solid #ff0000;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ppom-lock-text {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.ppom-lock-subtext {
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.ppom-style-usage-example {
+    margin-top: 10px;
+}
+
+.ppom-style-usage-example.ppom-locked-example {
+    background: #f5f5f5c7;
+    padding: 15px;
+    border: 2px solid #c9c6c6;
+    border-radius: 10px;
+    pointer-events: none;
+    height: 300px;
+}
+
+.ppom-js-example-code {
+    width: 100%;
+    min-height: 120px;
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.ppom-style-usage-example .CodeMirror {
+    height: 90px;
+    border: 1px solid #2c3338;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.ppom-style-usage-example.css-example .CodeMirror {
+    height: 120px;
+}
+
+.ppom-style-usage-example .CodeMirror-scroll {
+    min-height: 120px;
+}
+
+.ppom-style-usage-example .CodeMirror-gutters {
+    display: none;
+}
+
+.ppom-style-usage-example .CodeMirror-cursors {
+    display: none !important;
+}
+
+.ppom-style-usage-example strong {
+    text-transform: uppercase;
+}
+
+.ppom-info-icon {
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* ==========================================================================
+   Quick Setup template-library wizard.
+
+   Used by templates/admin/template-wizard.php — the modal that lets users
+   pick a curated field-group template (or "Start from scratch") when
+   creating a new field group. JS counterpart lives in
+   js/admin/ppom-admin.js (search for "PPOM_Template_Wizard").
+   ========================================================================== */
+.ppom-template-wizard {
+	max-width: 880px;
+	width: 90vw;
+	max-height: 88vh;
+	background: #fff;
+	border-radius: 10px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+.ppom-template-wizard-header {
+	padding: 16px 20px 12px;
+	border-bottom: 1px solid #e2e8f0;
+}
+.ppom-template-wizard-title {
+	margin: 0;
+	font-size: 17px;
+	font-weight: 600;
+	color: #0f172a;
+	line-height: 1.3;
+}
+.ppom-modal-box.ppom-template-wizard .ppom-modal-body.ppom-template-wizard-body {
+	padding: 1em 1.5em;
+	overflow-y: auto;
+	flex: 1 1 auto;
+}
+.ppom-template-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-auto-rows: 1fr;
+	gap: 15px;
+	margin: 0;
+}
+.ppom-template-wizard .ppom-template-card {
+	display: flex;
+	flex-direction: column;
+	background: #fff;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	padding: 0;
+	min-height: 120px;
+	overflow: hidden;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	box-shadow: none;
+}
+.ppom-template-wizard .ppom-template-card:is(:hover, :focus-within) {
+	border-color: #2271b1;
+	box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+}
+.ppom-template-card.is-busy {
+	opacity: 0.6;
+	pointer-events: none;
+}
+.ppom-template-card__inner {
+	display: flex;
+	flex-direction: column;
+	background: transparent;
+	border: 0;
+	border-radius: 0;
+	padding: 12px 14px;
+	text-align: left;
+	cursor: pointer;
+	font: inherit;
+	color: inherit;
+	width: 100%;
+	flex: 1 1 auto;
+	box-shadow: none;
+	-webkit-appearance: none;
+	appearance: none;
+}
+.ppom-template-card__inner:focus {
+	outline: none;
+}
+.ppom-template-card__header {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	margin: 0 0 8px;
+}
+.ppom-template-card__icon {
+	font-size: 18px;
+	color: #2271b1;
+	line-height: 1;
+	flex: 0 0 auto;
+}
+.ppom-template-card__header .ppom-template-card__pro-badge {
+	margin-left: auto;
+	flex: 0 0 auto;
+}
+.ppom-template-wizard :is(h3.ppom-template-card__title, .ppom-template-card__title) {
+	margin: 0 0 6px;
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: #0f172a;
+	line-height: 1.3;
+}
+.ppom-template-wizard .ppom-template-card__description {
+	margin: 0 0 0.5rem;
+	font-size: 12px;
+	line-height: 1.4;
+	color: #475569;
+}
+.ppom-template-card--pro.ppom-template-card--locked .ppom-template-card__icon {
+	color: #94a3b8;
+}
+.ppom-template-wizard .ppom-template-card--scratch {
+	background: #f8fafc;
+	border-color: #cbd5e1;
+}
+.ppom-template-wizard .ppom-template-card--scratch:is(:hover, :focus-within) {
+	background: #f1f5f9;
+	border-color: #2271b1;
+}
+.ppom-template-card--locked {
+	background: #f8fafc;
+}
+.ppom-template-wizard .ppom-template-card--locked .ppom-template-card__inner {
+	cursor: not-allowed;
+}
+.ppom-template-wizard .ppom-template-card--locked:is(:hover, :focus-within) {
+	border-color: #cbd5e1;
+	box-shadow: none;
+}
+.ppom-template-wizard .ppom-template-card--locked .ppom-template-card__title {
+	color: #475569;
+}
+.ppom-template-wizard .ppom-template-card--locked .ppom-template-card__description {
+	color: #64748b;
+}
+.ppom-template-card__pro-badge {
+	display: inline-flex;
+	align-items: center;
+	background: #28A745;
+	color: #fff;
+	font-size: 9px;
+	font-weight: 700;
+	letter-spacing: 0.4px;
+	padding: 1px 6px;
+	border-radius: 3px;
+	text-transform: uppercase;
+	line-height: 1.4;
+}
+.ppom-template-card__upgrade-row {
+	padding: 0 14px 10px;
+}
+.ppom-template-wizard .ppom-template-card__uses {
+	margin: 0 0 6px;
+	font-size: 11px;
+	color: #94a3b8;
+	font-style: italic;
+	line-height: 1.4;
+}
+.ppom-template-card__upgrade {
+	display: inline-block;
+	margin: 0;
+	font-size: 12px;
+	font-weight: 600;
+	color: #2271b1;
+	text-decoration: none;
+}
+.ppom-template-card__upgrade:is(:hover, :focus) {
+	color: #135e96;
+	text-decoration: underline;
+}
+.ppom-template-divider {
+	display: flex;
+	align-items: center;
+	margin: 14px 0 10px;
+	color: #94a3b8;
+}
+.ppom-template-divider::before,
+.ppom-template-divider::after {
+	content: "";
+	flex: 1;
+	height: 1px;
+	background: #e2e8f0;
+}
+.ppom-template-divider__label {
+	padding: 0 10px;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+.ppom-template-wizard .ppom-template-wizard-footer {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 20px;
+	border-top: 1px solid #e2e8f0;
+	background: #fff;
+	text-align: right;
+	box-shadow: none;
+}
+@media (max-width: 720px) {
+	.ppom-template-grid {
+		grid-template-columns: 1fr;
+	}
+	:is(.ppom-template-wizard-header, .ppom-template-wizard-body, .ppom-template-wizard-footer) {
+		padding-left: 14px;
+		padding-right: 14px;
+	}
+}
+
+/* Empty state — rendered by WP_List_Table::display_rows_or_placeholder() */
+/* inside <tr class="no-items"><td colspan="N">…</td></tr>.                */
+.ppom-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 64px 20px 72px;
+}
+
+.ppom-empty-state .ppom-empty-icon {
+    font-size: 52px;
+    width: 52px;
+    height: 52px;
+    color: #313350;
+    opacity: 0.25;
+    margin-bottom: 16px;
+}
+
+.ppom-empty-state .ppom-empty-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #313350;
+    margin: 0 0 10px;
+}
+
+.ppom-empty-state .ppom-empty-desc {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.7;
+    max-width: 420px;
+    margin: 0 0 22px;
+}
+
+.ppom-empty-state .ppom-empty-cta.button-primary {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(34, 113, 177, 0.3);
+    text-decoration: none;
+}
+
+.ppom-empty-state .ppom-empty-cta.button-primary:hover,
+.ppom-empty-state .ppom-empty-cta.button-primary:focus {
+    background: #135e96;
+    border-color: #135e96;
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(34, 113, 177, 0.4);
 }

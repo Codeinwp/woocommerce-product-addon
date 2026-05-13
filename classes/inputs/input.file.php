@@ -1,10 +1,14 @@
 <?php
-/*
- * Followig class handling file input control and their
-* dependencies. Do not make changes in code
-* Create on: 9 November, 2013
-*/
+/**
+ * File upload field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * General file upload with type/size limits, optional image dimension checks, fixed fee, and conditions.
+ */
 class NM_File_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -18,6 +22,11 @@ class NM_File_wooproduct extends PPOM_Inputs {
 	 */
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata and loads the field settings schema.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -26,21 +35,25 @@ class NM_File_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'regular file input', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-file" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 
 		$input_meta = array(
 			'title'               => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
-				'desc'  => __( 'It will be shown as field label', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as the field label.', 'woocommerce-product-addon' ),
 			),
 			'data_name'           => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'woocommerce-product-addon' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'         => array(
 				'type'  => 'textarea',
@@ -55,7 +68,7 @@ class NM_File_wooproduct extends PPOM_Inputs {
 			'file_cost'           => array(
 				'type'        => 'text',
 				'title'       => __( 'File cost/price', 'woocommerce-product-addon' ),
-				'desc'        => __( 'This will be added into cart', 'woocommerce-product-addon' ),
+				'desc'        => __( 'This will be added to the cart.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'class'               => array(

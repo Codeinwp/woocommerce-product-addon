@@ -9,3 +9,5 @@ languages/woocommerce-product-addon.pot
 *.log
 artifacts
 .phpunit.result.cache
+tests/e2e/fixtures/generated/
+packages/admin/field-modal/build/

@@ -1,10 +1,14 @@
 <?php
-/*
- * Followig class handling select input control and their
-* dependencies. Do not make changes in code
-* Create on: 9 November, 2013
-*/
+/**
+ * Variation quantities field type for PPOM product options.
+ *
+ * @package PPOM
+ * @subpackage Inputs
+ */
 
+/**
+ * Per-variation quantity controls with layout options, stock handling, min/max qty, and conditions.
+ */
 class NM_Quantities_wooproduct extends PPOM_Inputs {
 
 	/*
@@ -17,6 +21,11 @@ class NM_Quantities_wooproduct extends PPOM_Inputs {
 	*/
 	var $plugin_meta;
 
+	/**
+	 * Registers metadata and loads the field settings schema.
+	 *
+	 * @return void
+	 */
 	function __construct() {
 
 		$this->plugin_meta = ppom_get_plugin_meta();
@@ -25,9 +34,13 @@ class NM_Quantities_wooproduct extends PPOM_Inputs {
 		$this->desc     = __( 'regular select-box input', 'woocommerce-product-addon' );
 		$this->icon     = '<i class="fa fa-list-ol" aria-hidden="true"></i>';
 		$this->settings = self::get_settings();
-
 	}
 
+	/**
+	 * Layout choices for rendering variation quantity controls (filterable).
+	 *
+	 * @return array<string, string>
+	 */
 	function variation_layout() {
 
 		$layout_options = array(
@@ -39,17 +52,22 @@ class NM_Quantities_wooproduct extends PPOM_Inputs {
 		return apply_filters( 'ppom_variation_layout_options', $layout_options );
 	}
 
+	/**
+	 * Builder setting definitions keyed by field option name (type, title, description, and UI hints).
+	 *
+	 * @return array<string, mixed>
+	 */
 	private function get_settings() {
 		$input_meta = array(
 			'title'            => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
-				'desc'  => __( 'It will be shown as field label. See example for usage.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as the field label. See example for usage.', 'woocommerce-product-addon' ),
 			),
 			'data_name'        => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'woocommerce-product-addon' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'      => array(
 				'type'  => 'textarea',
@@ -130,7 +148,7 @@ class NM_Quantities_wooproduct extends PPOM_Inputs {
 			'enable_plusminus' => array(
 				'type'  => 'checkbox',
 				'title' => __( 'Enhance -/+ controls', 'woocommerce-product-addon' ),
-				'desc'  => __( 'Add the -/+ buttons', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Add clickable -/+ buttons next to the input.', 'woocommerce-product-addon' ),
 			),
 			'manage_stock'     => array(
 				'type'  => 'checkbox',

@@ -7,6 +7,10 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   e2e:
     name: Playwright E2E tests
@@ -14,23 +18,23 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v6
         with:
-          node-version: "18"
-          cache: "yarn"
+          node-version: "22"
+          cache: "npm"
       - name: Install NPM deps
         run: |
-          yarn install --frozen-lockfile
+          npm ci
           npm install -g playwright-cli
           npx playwright install --with-deps chromium
+      - name: Build admin field modal bundle
+        run: npm run build:admin-field-modal
       - name: Install composer deps
         run: composer install --no-dev
       - name: Install environment
         run: |
           npm run wp-env start
-      - name: Prepare Database
-        run: bash ./bin/e2e-after-setup.sh
       - name: Run the tests
         run: |
           npm run test:e2e
