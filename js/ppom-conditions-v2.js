@@ -93,16 +93,6 @@ jQuery( function ( $ ) {
 	 * @return {void}
 	 */
 	function trigger_check_conditions( modifiedElement ) {
-		let value = null;
-		if (
-			modifiedElement.type === 'radio' ||
-			modifiedElement.type === 'checkbox'
-		) {
-			value = modifiedElement.checked ? modifiedElement.value : null;
-		} else {
-			value = modifiedElement.value;
-		}
-
 		const data_name = modifiedElement.dataset?.data_name;
 		ppom_check_conditions( data_name, ( element_dataname, event_type ) => {
 			$.event.trigger( {
