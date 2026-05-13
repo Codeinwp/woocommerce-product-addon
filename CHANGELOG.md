@@ -1,3 +1,61 @@
+#### [Version 34.0.0](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.18...v34.0.0) (2026-05-13)
+
+### New Features
+
+  - Added a curated template library with one-click presets for common use cases such as pizza ordering, t-shirt personalization, made-to-measure, and jewelry engraving.
+  - Added a live product page preview directly inside the field group editor.
+  - Added Cart Edit support for the WooCommerce block-based Cart, bringing parity with the legacy shortcode cart.
+  - Added the ability to build PPOM conditions based on WooCommerce product variations.
+
+### Improvements
+
+  - Improved the CSS/JS editors' layout, so it's easier to read and write code.
+  - Shortened the random suffix added to uploaded file names, keeping them readable in cart, checkout, and order confirmation emails.
+  - Revamped the field builder UI with a modernized modal layout, cleaner input styling, and a dedicated Advanced section for less-used options.
+  - Replaced the modal-based Attach to Products workflow with inline select dropdowns and AJAX search.
+  - Added an enable/disable toggle at the field group level, so admins can temporarily switch a group off without unassigning it.
+  - Added auto-save and an unsaved-changes warning to the field group editor.
+  - Improved the field-type picker with short descriptions and examples to help users tell similar field types apart.
+  - Added a designed empty state to the fields list with clear next-step guidance.
+  - Added a designed empty state to the PPOM Field Groups page and reworked the top navigation placement.
+  - Replaced plain-text color inputs throughout PPOM with a native color picker plus hex input combo.
+  - Improved the Personalization Preview creation screen with clearer purpose, guidance, and next steps.
+  - Improved front-end field layout with baseline input/label/description styling and consistent vertical alignment for side-by-side fields.
+  - Reworked the Integrations Settings tab with card-based layout, in-app API reference, a base URL display, and a masked, copyable secret key.
+  - Improved the file upload field to show accepted file types and the maximum file size before the customer attempts to upload.
+  - Replaced the support icon with a clearer, more accessible support button.
+  - Improved delete UX: trash bin icons and a specific delete confirmation dialog with a red destructive button.
+  - Performance: reduced database queries and PHP overhead on product pages.
+  - Added Esc-to-close on the Add Field modal.
+  - Allowed the field edit popup to float near the clicked field instead of being fixed at the top of the page.
+  - Enhanced security.
+  - Fixed typos and improved placeholder copy in admin settings.
+
+### Fixes
+
+  - Fixed the file upload field from crashing.
+  - Fixed a PHP 8+ deprecation warning and headers already sent error when saving certain WooCommerce settings.
+  - Fixed a separate stripslashes() fatal error where an array was passed instead of a string.
+  - Fixed the Timezone field from crashing with DateInvalidTimeZoneException on servers where the timezone list contained entries unsupported by PHP.
+  - Fixed a fatal TypeError when a text input add-on price was prefixed with $ or otherwise non-numeric.
+  - Fixed a fatal error in the REST API / Quick View context where WC()->cart was null, breaking PPOM fields in product popups.
+  - Fixed an SQL syntax error logged during plugin activation, causing noisy logs.
+  - Fixed multiple Personalization Preview bugs with multiple text boxes — color pickers, settings panels, and duplicate DOM IDs no longer break beyond the first text box.
+  - Fixed an undefined array key warning when adding a new text box to a Personalization Preview that had not been resized.
+  - Fixed multi-group rendering: custom CSS/JS from all attached field groups now renders, not just the first group. Stale group references on products are cleaned up when a group is deleted.
+  - Fixed image-based PPOM fields not appearing in the WooCommerce Cart Block (only the legacy shortcode cart was displaying them).
+  - Fixed detaching a PPOM group from a specific product tag.
+  - Fixed the User Roles option disappearing after saving a PPOM field configured with Visibility → By Role.
+  - Fixed the Images field treating any value in Max Image Select as requiring the field.
+  - Fixed the Stock option disappearing after saving an Image Dropdown field.
+  - Fixed the Pack Size option in the Quantities Pack field — the Add to Cart button no longer requires hitting the exact pack size before enabling.
+  - Fixed the Change Image button on the Image Cropping field so it clears all selections instead of replacing one image.
+  - Fixed conditional logic not saving for Select fields when an Image field was used as the controlling option.
+  - Fixed the file upload field not working on iOS Safari when the file field had conditional logic attached.
+  - Fixed price values not being converted with the WooCommerce Multilingual & Multicurrency (WCML) plugin (currency symbol changed, numeric price stayed the same).
+  - Fixed the Update Cart button and quantity field alignment in the Cart Items pop-up.
+  - Fixed the name of the plugin in the description.
+
 ##### [Version 33.0.18](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.17...v33.0.18) (2025-12-19)
 
 - Fixed image upload in image dropdown field
