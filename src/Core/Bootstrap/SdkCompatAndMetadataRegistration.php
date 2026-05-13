@@ -21,10 +21,64 @@ final class SdkCompatAndMetadataRegistration implements RegisterHooks {
 		add_filter(
 			'ppom_logger_data',
 			function ( $data ) {
+				if ( ! is_array( $data ) ) {
+					$data = array();
+				}
+
 				$usage = get_option( 'ppom_template_usage_counts', array() );
 				if ( is_array( $usage ) && ! empty( $usage ) ) {
-					$data['template_usage'] = $usage;
+					$sanitized_usage = array();
+					foreach ( $usage as $template_key => $template_count ) {
+						$sanitized_usage[ sanitize_text_field( (string) $template_key ) ] = (int) $template_count;
+					}
+					$data['template_usage'] = $sanitized_usage;
 				}
+
+				$groups_count = get_transient( PPOM_GROUPS_COUNT_CACHE_KEY );
+				if ( false === $groups_count && class_exists( 'NM_PersonalizedProduct' ) ) {
+					$groups_count = \NM_PersonalizedProduct::get_product_meta_count( 100 );
+					set_transient( PPOM_GROUPS_COUNT_CACHE_KEY, $groups_count, 12 * HOUR_IN_SECONDS );
+				}
+				if ( false !== $groups_count ) {
+					$data['field_groups_count'] = max( 0, (int) $groups_count );
+				}
+
+				$tracked_general_settings = array(
+					'ppom_disable_bootstrap',
+					'ppom_enable_legacy_inputs_rendering',
+					'ppom_new_conditions',
+					'ppom_legacy_price',
+					'ppom_permission_mfields',
+				);
+				$saved_settings           = get_option( 'ppom-settings_panel', array() );
+				if ( is_array( $saved_settings ) ) {
+					$general_settings = array();
+					foreach ( $tracked_general_settings as $setting_key ) {
+						if ( ! array_key_exists( $setting_key, $saved_settings ) ) {
+							continue;
+						}
+						$value = $saved_settings[ $setting_key ];
+						if ( is_array( $value ) ) {
+							$value = array_values(
+								array_map(
+									static function ( $item ) {
+										return sanitize_text_field( (string) $item );
+									},
+									$value
+								)
+							);
+						} elseif ( is_scalar( $value ) ) {
+							$value = sanitize_text_field( (string) $value );
+						} else {
+							continue;
+						}
+						$general_settings[ $setting_key ] = $value;
+					}
+					if ( ! empty( $general_settings ) ) {
+						$data['general_settings'] = $general_settings;
+					}
+				}
+
 				return $data;
 			}
 		);
