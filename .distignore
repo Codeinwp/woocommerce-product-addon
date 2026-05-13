@@ -28,6 +28,7 @@ phpstan-baseline.neon
 .gitkeep
 .wordpress-org
 AGENTS.md
+architecture.md
 phpcs.baseline.xml
 .eslintrc.json
 .prettierignore

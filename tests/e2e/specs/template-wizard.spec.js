@@ -142,7 +142,7 @@ test.describe( "Template Library Wizard", () => {
 		}
 	} );
 
-	test( "locked Pro tile does not import and exposes the Upgrade link", async ( {
+	test( "locked Pro tile does not import and opens the Upgrade URL in a new tab", async ( {
 		page,
 		admin,
 	} ) => {
@@ -153,16 +153,14 @@ test.describe( "Template Library Wizard", () => {
 		const lockedTile = modal
 			.locator( ".ppom-template-card--locked" )
 			.first();
+		const lockedButton = lockedTile.locator( ".ppom-template-locked" );
 
-		// Inline upgrade link is visible inside the locked card.
-		const upgradeLink = lockedTile.locator(
-			"a.ppom-template-card__upgrade"
+		// Locked tile carries a per-preset upgrade URL on the tile itself.
+		const upgradeUrl = await lockedButton.getAttribute(
+			"data-upgrade-url"
 		);
-		await expect( upgradeLink ).toBeVisible();
-		await expect( upgradeLink ).toHaveAttribute( "target", "_blank" );
-		const href = await upgradeLink.getAttribute( "href" );
-		expect( href ).toBeTruthy();
-		expect( href ).not.toBe( "" );
+		expect( upgradeUrl ).toBeTruthy();
+		expect( upgradeUrl ).not.toBe( "" );
 
 		// Capture any AJAX import attempt so we can assert it does NOT fire.
 		let importRequested = false;
@@ -178,10 +176,16 @@ test.describe( "Template Library Wizard", () => {
 			}
 		} );
 
-		// Click the locked tile itself (not the upgrade link).
-		await lockedTile.locator( ".ppom-template-tile" ).click();
+		// Clicking the locked tile opens the upgrade URL in a new tab.
+		const [ popup ] = await Promise.all( [
+			page.context().waitForEvent( "page" ),
+			lockedButton.click(),
+		] );
 
-		// Give the JS handler a chance to run if it were going to.
+		expect( popup.url() ).toBe( upgradeUrl );
+		await popup.close();
+
+		// Give the JS handler a chance to fire the import if it were going to.
 		await page.waitForTimeout( 250 );
 
 		expect( importRequested ).toBe( false );
