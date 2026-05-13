@@ -89,7 +89,7 @@ final class SdkCompatAndMetadataRegistration implements RegisterHooks {
 				$compatibilities['ppompro'] = array(
 					'basefile'  => defined( 'PPOM_PRO_PATH' ) ? PPOM_PRO_PATH . '/ppom.php' : '',
 					'required'  => '25.0',
-					'tested_up' => '26.0',
+					'tested_up' => '27.0',
 				);
 
 				return $compatibilities;
