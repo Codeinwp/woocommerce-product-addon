@@ -23,22 +23,26 @@ Conceptually, PPOM is a product-configuration layer on top of WooCommerce:
 ```mermaid
 flowchart TD
     A["WordPress loads plugin"] --> B["woocommerce-product-addon.php"]
-    B --> C["Load constants, includes, classes, settings, REST"]
-    C --> D["woocommerce_init"]
-    D --> E["NM_PersonalizedProduct singleton"]
+    B --> C["Load Composer autoload"]
+    C --> D["PPOM Plugin boot"]
+    D --> E["BootstrapKernel"]
+    E --> F["LegacyRuntimeLoader includes legacy runtime"]
+    E --> G["Register REST, admin modal, SDK, HPOS, WC runtime hooks"]
+    G --> H["woocommerce_init"]
+    H --> I["NM_PersonalizedProduct singleton"]
 
-    E --> F["PPOM_Meta resolves field groups"]
-    E --> G["Frontend rendering and assets"]
-    E --> H["Validation and add-to-cart hooks"]
-    E --> I["Cart/session pricing hooks"]
-    E --> J["Order item persistence and file finalization"]
-    E --> K["Admin CRUD and product edit integration"]
+    I --> J["PPOM_Meta resolves field groups"]
+    I --> K["Frontend rendering and assets"]
+    I --> L["Validation and add-to-cart hooks"]
+    I --> M["Cart/session pricing hooks"]
+    I --> N["Order item persistence and file finalization"]
+    I --> O["Admin CRUD and product edit integration"]
 
-    F --> L["Custom table: {prefix}_nm_personalized"]
-    F --> M["Product meta: _product_meta_id"]
-    H --> N["Cart item ppom payload"]
-    I --> O["Adjusted line-item prices and fees"]
-    J --> P["Order meta, _ppom_fields, confirmed uploads"]
+    J --> P["Custom table: {prefix}_nm_personalized"]
+    J --> Q["Product meta: _product_meta_id"]
+    L --> R["Cart item ppom payload"]
+    M --> S["Adjusted line-item prices and fees"]
+    N --> T["Order meta, _ppom_fields, confirmed uploads"]
 ```
 
 ## Runtime Structure
@@ -48,21 +52,30 @@ flowchart TD
 The bootstrap lives in [`woocommerce-product-addon.php`](woocommerce-product-addon.php). It:
 
 - defines plugin constants such as `PPOM_PATH`, `PPOM_URL`, `PPOM_VERSION`, `PPOM_PRODUCT_META_KEY`, `PPOM_TABLE_META`, and `PPOM_UPLOAD_DIR_NAME`
-- loads Composer autoload plus the procedural runtime files under [`inc/`](inc/)
-- loads the class files under [`classes/`](classes/) and the settings framework under [`backend/`](backend/)
-- registers translation loading on `init`
-- declares HPOS compatibility on `before_woocommerce_init`
+- loads Composer autoload
+- calls `\PPOM\Plugin::boot( __FILE__ )`
+- exposes the legacy `PPOM()` accessor for the `NM_PersonalizedProduct` singleton
+
+`PPOM\Plugin::boot()` hands off to `PPOM\Core\BootstrapKernel`, which:
+
+- registers early SDK and i18n hooks
+- loads legacy procedural and class runtime files through `PPOM\Core\Bootstrap\LegacyRuntimeLoader`
+- registers the product/order REST API and the admin field-modal REST routes
+- registers shared services such as the field-group repository
 - instantiates admin-only services when `is_admin()`
+- registers SDK compatibility metadata, WooCommerce runtime startup, and WooCommerce compatibility declarations
 - registers activation and deactivation hooks
 - starts the main runtime on `woocommerce_init` by calling `PPOM()`
 
-The plugin is not PSR-4 for its runtime code. The main file manually includes the plugin PHP files and then hands control to the `NM_PersonalizedProduct` singleton.
+The runtime is hybrid. Namespaced code under [`src/`](src/) is Composer PSR-4 autoloaded through the `PPOM\` namespace. Legacy runtime files under [`inc/`](inc/), [`classes/`](classes/), and [`backend/`](backend/) are still loaded manually by `LegacyRuntimeLoader` in the historical require order.
 
 ### Main Components
 
 | Component | File | Responsibility |
 | --- | --- | --- |
 | Bootstrap | [`woocommerce-product-addon.php`](woocommerce-product-addon.php) | Defines constants, loads the plugin, registers top-level hooks |
+| Bootstrap kernel | [`src/Core/BootstrapKernel.php`](src/Core/BootstrapKernel.php) | Coordinates Composer-loaded services, legacy includes, REST registration, admin wiring, compatibility declarations, and lifecycle hooks |
+| Legacy runtime loader | [`src/Core/Bootstrap/LegacyRuntimeLoader.php`](src/Core/Bootstrap/LegacyRuntimeLoader.php) | Loads legacy `inc/`, `classes/`, and `backend/` files in the historical require order |
 | Main runtime | [`classes/plugin.class.php`](classes/plugin.class.php) | Registers WooCommerce hooks for rendering, validation, pricing, cart, orders, admin AJAX, cron, and loop behavior |
 | Product field resolver | [`classes/ppom.class.php`](classes/ppom.class.php) | Resolves applicable PPOM field groups for a product, merges their fields, and derives the runtime settings row from the custom DB table |
 | Frontend form renderer | [`classes/form.class.php`](classes/form.class.php) | Renders modern template-based product fields and hidden runtime state |
@@ -75,7 +88,8 @@ The plugin is not PSR-4 for its runtime code. The main file manually includes th
 | Pricing engine | [`inc/prices.php`](inc/prices.php) | Server-side option pricing, matrix pricing, cart fee calculation, line-item price updates |
 | Upload subsystem | [`inc/files.php`](inc/files.php) | AJAX upload and delete handlers, thumbnails, cropped files, confirmed-file storage, cleanup cron |
 | Admin CRUD | [`inc/admin.php`](inc/admin.php) | Field-group create/update/delete handlers and product-attachment UI |
-| REST API | [`src/Rest/`](src/Rest/) (`Routes`, controllers, services) | Optional product and order PPOM API surface under `/wp-json/ppom/v1/` |
+| Product/order REST API | [`src/Rest/`](src/Rest/) (`Routes`, controllers, services) | Optional product and order PPOM API surface under `/wp-json/ppom/v1/` |
+| Admin field-modal REST API | [`src/Admin/FieldModal/`](src/Admin/FieldModal/) | Admin-only schema/context endpoints for the React field modal under `/wp-json/ppom/v1/admin/field-groups/` |
 
 ### Data and Resolution Model
 
@@ -426,7 +440,7 @@ flowchart TD
 
 ### REST API
 
-If API access is enabled, `PPOM\Rest\Routes` (legacy alias `PPOM_Rest`) registers routes under:
+If API access is enabled, `PPOM\Rest\Routes` (legacy alias `PPOM_Rest`) registers product and order integration routes under:
 
 - `/wp-json/ppom/v1/`
 
@@ -439,7 +453,14 @@ The API supports:
 - updating order PPOM metadata
 - deleting order PPOM metadata
 
-The important implementation detail is that the routes use open permission callbacks, while write operations validate a PPOM secret key inside the handler. That makes the API optional and configuration-gated, but still part of the plugin's public integration surface.
+Product/order routes use explicit REST permission callbacks. Product reads require `edit_products`; product writes and order routes require `manage_woocommerce`. Write callbacks still validate the configured PPOM secret key before mutating field groups or order item metadata. The file nonce refresh endpoint at `/wp-json/ppom/v1/nonces/file/` is always registered and public because it only returns fresh upload/delete nonces.
+
+The admin field modal has a separate REST surface under:
+
+- `/wp-json/ppom/v1/admin/field-groups/context`
+- `/wp-json/ppom/v1/admin/field-groups/schema/{type}`
+
+Those endpoints are registered by `PPOM\Admin\FieldModal\FieldModalRegistrar` and guarded by the PPOM admin permission check.
 
 ## Extension and Compatibility Model
 
@@ -458,6 +479,7 @@ The plugin also has explicit compatibility seams for:
 
 - PPOM Pro feature gating through `defined( 'PPOM_PRO_PATH' )`
 - Themeisle SDK and freemium UI
+- WooCommerce HPOS support through `custom_order_tables` compatibility, while `cart_checkout_blocks` compatibility is explicitly declared false
 - WPML and Polylang translation support
 - Elementor shortcode rendering
 - wholesale-pricing and currency-switcher integrations
