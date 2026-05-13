@@ -27,7 +27,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 20.x
+          node-version: 22.x
           cache: "npm"
           cache-dependency-path: ppom-head/package-lock.json
       - name: Build package assets for PR Branch

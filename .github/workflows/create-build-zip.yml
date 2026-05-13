@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@master
       - uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
       - name: Install composer deps
         run: composer install --no-dev --prefer-dist --no-progress --no-suggest
