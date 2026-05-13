@@ -7,6 +7,10 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   e2e:
     name: Playwright E2E tests

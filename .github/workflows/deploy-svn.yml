@@ -3,6 +3,10 @@ on:
   push:
     tags:
       - "*"
+
+permissions:
+  contents: read
+
 jobs:
   tag:
     name: New version

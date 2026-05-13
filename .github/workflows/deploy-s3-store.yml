@@ -4,6 +4,10 @@ on:
   push:
     tags:
       - "*"
+
+permissions:
+  contents: read
+
 jobs:
   deploy:
     name: Deploy to server
