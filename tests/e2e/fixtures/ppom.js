@@ -39,6 +39,34 @@ async function createPpomGroup(
 	};
 }
 
+async function createLegacyPpomGroup(
+	requestUtils,
+	{ groupName, fields }
+) {
+	const payload = await postBootstrapAction(
+		requestUtils,
+		'ppom_e2e_create_legacy_ppom_group',
+		{
+			group_name: groupName,
+			fields,
+		}
+	);
+	const ppomId = Number( payload.ppom_id ?? payload.productmeta_id );
+
+	if ( ! Number.isInteger( ppomId ) || ppomId <= 0 ) {
+		throw new Error(
+			`Legacy PPOM bootstrap did not return a valid productmeta_id: ${ JSON.stringify(
+				payload
+			) }`
+		);
+	}
+
+	return {
+		...payload,
+		ppomId,
+	};
+}
+
 async function createSimpleTextGroup(
 	requestUtils,
 	{
@@ -111,6 +139,7 @@ export {
 	attachPpomGroupToCategories,
 	attachPpomGroupToProducts,
 	attachPpomGroupToVariations,
+	createLegacyPpomGroup,
 	createPpomGroup,
 	createSimpleTextGroup,
 	getPpomAttachRowMeta,

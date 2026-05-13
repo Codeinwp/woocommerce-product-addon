@@ -864,11 +864,11 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 				}
 			}
 
-			$attributes[] = sprintf(
-				'%1$s: %2$s',
-				wc_attribute_label( $attribute_key, $parent ? $parent : null ),
-				$value_label
-			);
+			$attribute_label = $parent instanceof \WC_Product
+				? wc_attribute_label( $attribute_key, $parent )
+				: wc_attribute_label( $attribute_key );
+
+			$attributes[] = sprintf( '%1$s: %2$s', $attribute_label, $value_label );
 		}
 
 		if ( ! empty( $attributes ) ) {
@@ -1090,9 +1090,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @phpstan-return PPOM_Meta_Group_Categories_Tags_Columns
 	 */
 	public function get_db_field( $ppom_field_id ) {
-		$rows = ppom_meta_repository()->get_categories_and_tags_columns( (int) $ppom_field_id );
-
-		return ! empty( $rows ) ? $rows : array();
+		return \PPOM\Data\FieldGroupRepository::instance()->get_categories_tags_columns_by_id( absint( $ppom_field_id ) );
 	}
 
 	/**
@@ -1647,14 +1645,19 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	/**
 	 * Whether the current request contains inline attach selectors.
 	 *
+	 * Only checks key presence; nonce verification is performed by the caller
+	 * (see ppom_save_attached_data() and the product save metabox flow).
+	 *
 	 * @return bool
 	 */
 	public static function has_attach_selections_in_request() {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		return isset( $_POST['ppom_attached_nonce'] )
 			|| isset( $_POST['ppom-attach-to-products-initial'] )
 			|| isset( $_POST['ppom-attach-to-categories-initial'] )
 			|| isset( $_POST['ppom-attach-to-tags-initial'] )
 			|| isset( $_POST['ppom-attach-to-variations-initial'] );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	/**
@@ -1873,25 +1876,33 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	/**
 	 * Reads an absint array from $_POST.
 	 *
+	 * Nonce verification is performed by the caller before invoking this helper.
+	 *
 	 * @param string $key Request key.
 	 * @return int[]
 	 */
 	private static function posted_absint_list( $key ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		if ( ! isset( $_POST[ $key ] ) || ! is_array( $_POST[ $key ] ) ) {
 			return array();
 		}
 
 		return array_values( array_unique( array_filter( array_map( 'absint', wp_unslash( $_POST[ $key ] ) ) ) ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	/**
 	 * Reads a comma-separated absint list from $_POST.
 	 *
+	 * Nonce verification is performed by the caller before invoking this helper.
+	 *
 	 * @param string $key Request key.
 	 * @return int[]
 	 */
 	private static function posted_initial_absint_list( $key ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		$value = isset( $_POST[ $key ] ) && is_string( $_POST[ $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $key ] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		if ( '' === $value ) {
 			return array();
 		}
@@ -1902,15 +1913,19 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	/**
 	 * Reads a sanitize_key array from $_POST.
 	 *
+	 * Nonce verification is performed by the caller before invoking this helper.
+	 *
 	 * @param string $key Request key.
 	 * @return string[]
 	 */
 	private static function posted_slug_list( $key ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		if ( ! isset( $_POST[ $key ] ) || ! is_array( $_POST[ $key ] ) ) {
 			return array();
 		}
 
 		return array_values( array_unique( array_filter( array_map( 'sanitize_key', wp_unslash( $_POST[ $key ] ) ) ) ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	/**
@@ -1969,7 +1984,24 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 	 * @return void
 	 */
 	public static function save_categories_and_tags( $ppom_id, $categories, $tags ) {
-		ppom_meta_repository()->save_categories_and_tags( (int) $ppom_id, $categories, $tags );
+		$data_to_update = array(
+			'productmeta_categories' => implode( "\r\n", $categories ), // NOTE: Keep the backward compatible format.
+		);
+
+		$format = array( '%s' );
+
+		// false = caller chose not to change tags (e.g. E2E partial update); omit column from UPDATE.
+		if ( is_array( $tags ) ) {
+			$data_to_update['productmeta_tags'] = empty( $tags ) ? '' : serialize( $tags );
+			$format[]                           = '%s';
+		}
+
+		\PPOM\Data\FieldGroupRepository::instance()->update_row(
+			$data_to_update,
+			array( 'productmeta_id' => $ppom_id ),
+			$format,
+			array( '%d' )
+		);
 	}
 
 	// Legacy settings bridge and setup.
@@ -2218,7 +2250,7 @@ class NM_PersonalizedProduct_Admin extends NM_PersonalizedProduct {
 			return;
 		}
 
-		$res = ppom_meta_repository()->get_rows_with_non_empty_style_or_js();
+		$res = \PPOM\Data\FieldGroupRepository::instance()->find_rows_with_inline_js_or_style();
 		update_option( 'ppom_legacy_user', ! empty( $res ) ? 'yes' : 'no' );
 	}
 

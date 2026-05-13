@@ -47,17 +47,17 @@ class NM_Radio_wooproduct extends PPOM_Inputs {
 			'title'           => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
-				'desc'  => __( 'It will be shown as field label', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as the field label.', 'woocommerce-product-addon' ),
 			),
 			'data_name'       => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'woocommerce-product-addon' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'     => array(
 				'type'  => 'textarea',
 				'title' => __( 'Description', 'woocommerce-product-addon' ),
-				'desc'  => __( 'Small description, it will be diplay near name title.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Small description; it will be displayed next to the option name.', 'woocommerce-product-addon' ),
 			),
 			'error_message'   => array(
 				'type'  => 'text',

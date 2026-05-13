@@ -104,7 +104,9 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 							data-template="<?php echo esc_attr( $template['slug'] ); ?>">
 							<div class="ppom-template-card__header">
 								<i class="fa <?php echo esc_attr( $template['icon'] ); ?> ppom-template-card__icon" aria-hidden="true"></i>
-								<span class="ppom-template-card__pro-badge"><?php esc_html_e( 'PRO', 'woocommerce-product-addon' ); ?></span>
+								<?php if ( $is_locked ) : ?>
+									<span class="ppom-template-card__pro-badge"><?php esc_html_e( 'PRO', 'woocommerce-product-addon' ); ?></span>
+								<?php endif; ?>
 							</div>
 							<h3 class="ppom-template-card__title"><?php echo esc_html( $template['title'] ); ?></h3>
 							<p class="ppom-template-card__description">

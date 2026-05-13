@@ -27,12 +27,46 @@ function buildTextField( args ) {
 	return buildField( 'text', args );
 }
 
+function buildImageField( args ) {
+	return buildField( 'image', {
+		images: [],
+		...args,
+	} );
+}
+
 function buildSelectField( { options = [], ...args } ) {
 	return buildField( 'select', {
 		...args,
 		options: options.map( ( option ) =>
 			buildOption( option.label, option.value, option.overrides )
 		),
+	} );
+}
+
+function buildPriceMatrixField( { options = [], ...args } ) {
+	return buildField( 'pricematrix', {
+		...args,
+		discount_type: 'base',
+		options: options.map( ( option ) => ( {
+			option: option.option,
+			price: option.price ?? '',
+			label: option.label ?? '',
+			id: option.id ?? '',
+			isfixed: option.isfixed ?? '',
+		} ) ),
+	} );
+}
+
+function buildPalettesField( { options = [], ...args } ) {
+	return buildField( 'palettes', {
+		...args,
+		options: options.map( ( option ) => ( {
+			option: option.option,
+			price: option.price ?? '',
+			label: option.label ?? '',
+			id: option.id ?? '',
+			isfixed: option.isfixed ?? '',
+		} ) ),
 	} );
 }
 
@@ -55,4 +89,20 @@ function buildFileField( args ) {
 	} );
 }
 
-export { buildCheckboxField, buildSelectField, buildTextField, buildFileField };
+function buildHtmlField( { html = '', ...args } ) {
+	return buildField( 'section', {
+		html,
+		...args,
+	} );
+}
+
+export {
+	buildCheckboxField,
+	buildImageField,
+	buildPalettesField,
+	buildPriceMatrixField,
+	buildSelectField,
+	buildTextField,
+	buildFileField,
+	buildHtmlField,
+};

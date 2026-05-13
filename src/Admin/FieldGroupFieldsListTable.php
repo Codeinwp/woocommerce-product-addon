@@ -129,10 +129,17 @@ final class FieldGroupFieldsListTable extends WP_List_Table {
 		if ( 'top' === $which ) {
 			echo '<div class="tablenav top ppom-fields-tablenav">';
 			echo '<div class="alignleft actions">';
-			printf(
-				'<button type="button" class="button button-primary" data-modal-id="ppom_fields_model_id">%s</button>',
-				esc_html__( 'Add field', 'woocommerce-product-addon' )
-			);
+			if ( function_exists( 'ppom_use_react_field_modal' ) && ppom_use_react_field_modal() ) {
+				printf(
+					'<button type="button" class="button button-primary ppom-react-field-modal-open" data-ppom-react-mode="picker">%s</button>',
+					esc_html__( 'Add field', 'woocommerce-product-addon' )
+				);
+			} else {
+				printf(
+					'<button type="button" class="button button-primary" data-modal-id="ppom_fields_model_id">%s</button>',
+					esc_html__( 'Add field', 'woocommerce-product-addon' )
+				);
+			}
 			printf(
 				'<button type="button" class="button ppom_remove_field">%s</button>',
 				esc_html__( 'Remove', 'woocommerce-product-addon' )
@@ -176,6 +183,7 @@ final class FieldGroupFieldsListTable extends WP_List_Table {
 	 * @return void
 	 */
 	public function no_items() {
+		$use_react_modal = function_exists( 'ppom_use_react_field_modal' ) && ppom_use_react_field_modal();
 		?>
 		<div class="ppom-empty-state">
 			<span class="dashicons dashicons-forms ppom-empty-icon" aria-hidden="true"></span>
@@ -183,9 +191,15 @@ final class FieldGroupFieldsListTable extends WP_List_Table {
 			<p class="ppom-empty-desc">
 				<?php esc_html_e( 'Add fields like text boxes, dropdowns, checkboxes, file uploads, and more to collect input from your customers.', 'woocommerce-product-addon' ); ?>
 			</p>
-			<button type="button" class="button button-primary button-hero ppom-empty-cta" data-modal-id="ppom_fields_model_id">
-				<?php esc_html_e( 'Add your first field', 'woocommerce-product-addon' ); ?>
-			</button>
+			<?php if ( $use_react_modal ) : ?>
+				<button type="button" class="button button-primary button-hero ppom-empty-cta ppom-react-field-modal-open" data-ppom-react-mode="picker">
+					<?php esc_html_e( 'Add your first field', 'woocommerce-product-addon' ); ?>
+				</button>
+			<?php else : ?>
+				<button type="button" class="button button-primary button-hero ppom-empty-cta" data-modal-id="ppom_fields_model_id">
+					<?php esc_html_e( 'Add your first field', 'woocommerce-product-addon' ); ?>
+				</button>
+			<?php endif; ?>
 		</div>
 		<?php
 	}

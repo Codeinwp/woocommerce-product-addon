@@ -98,7 +98,7 @@ class PPOM_Fields_Meta {
 						'invalid_pattern'                => esc_html__( 'Range format is invalid. (range: {range})', 'woocommerce-product-addon' ),
 					),
 				),
-			) 
+			)
 		);
 
 		wp_enqueue_script( 'ppom-inputmask', PPOM_URL . '/js/inputmask/jquery.inputmask.min.js', array( 'jquery' ), '5.0.6', true );
@@ -215,7 +215,7 @@ class PPOM_Fields_Meta {
 				'wp-color-picker',
 			),
 			PPOM_VERSION,
-			true 
+			true
 		);
 		wp_enqueue_script(
 			'ppom-preview-modal',
@@ -273,7 +273,7 @@ class PPOM_Fields_Meta {
 					'cancelBtn'       => __( 'Cancel', 'woocommerce-product-addon' ),
 					'finishTitle'     => __( 'Done', 'woocommerce-product-addon' ),
 					'errorTitle'      => __( 'Error', 'woocommerce-product-addon' ),
-					'checkFieldTitle' => __( 'Please at least check one field!', 'woocommerce-product-addon' ),
+					'checkFieldTitle' => __( 'Please check at least one field.', 'woocommerce-product-addon' ),
 
 				),
 				'toggle'                         => array(
@@ -290,7 +290,7 @@ class PPOM_Fields_Meta {
 				'upload'                         => __( 'Upload', 'woocommerce-product-addon' ),
 				'stock'                          => __( 'Stock', 'woocommerce-product-addon' ),
 				'metaIds'                        => __( 'Meta IDs', 'woocommerce-product-addon' ),
-				'cannotRemoveMoreOption'         => __( 'Cannot Remove More Option', 'woocommerce-product-addon' ),
+				'cannotRemoveMoreOption'         => __( 'Cannot remove more options', 'woocommerce-product-addon' ),
 				'dataNameRequired'               => __( 'Data Name must be required', 'woocommerce-product-addon' ),
 				'dataNameExists'                 => __( 'Data Name already exists', 'woocommerce-product-addon' ),
 				'previewLoading'                 => __( 'Loading preview...', 'woocommerce-product-addon' ),
@@ -306,6 +306,35 @@ class PPOM_Fields_Meta {
 		// localize ppom_vars
 		wp_localize_script( 'ppom-field', 'ppom_vars', $ppom_admin_meta );
 		wp_localize_script( 'ppom-meta-table', 'ppom_vars', $ppom_admin_meta );
+
+		$is_field_editor_screen = ( isset( $_GET['do_meta'] ) && 'edit' === $_GET['do_meta'] )
+			|| ( isset( $_GET['action'] ) && 'new' === $_GET['action'] );
+		if ( $is_field_editor_screen && function_exists( 'ppom_use_react_field_modal' ) && ppom_use_react_field_modal() ) {
+			$field_modal_asset = PPOM_PATH . '/packages/admin/field-modal/build/index.asset.php';
+			if ( file_exists( $field_modal_asset ) ) {
+				$field_modal = require $field_modal_asset;
+				wp_enqueue_script(
+					'ppom-admin-field-modal',
+					PPOM_URL . '/packages/admin/field-modal/build/index.js',
+					$field_modal['dependencies'],
+					$field_modal['version'],
+					true
+				);
+					wp_set_script_translations(
+						'ppom-admin-field-modal',
+						'woocommerce-product-addon'
+					);
+				$productmeta_id = isset( $_GET['productmeta_id'] ) ? absint( $_GET['productmeta_id'] ) : 0;
+				wp_localize_script(
+					'ppom-admin-field-modal',
+					'ppomFieldModalBoot',
+					array(
+						'productmetaId' => $productmeta_id,
+						'nonce'         => wp_create_nonce( 'wp_rest' ),
+					)
+				);
+			}
+		}
 
 		$action    = isset( $_GET['action'] ) ? sanitize_text_field( $_GET['action'] ) : '';
 		$page_slug = 'fields';
@@ -1384,8 +1413,8 @@ class PPOM_Fields_Meta {
 				$html_input .= '</table>';
 				$html_input .= '</div>';
 				$html_input .= '<div class="text-right">';
-				$html_input .= '<button class="btn btn-success ppom-save-bulk-json">' . esc_html__( 'Save Changing', 'woocommerce-product-addon' ) . '</button> ';
-				$html_input .= '<button class="btn btn-info ppom-edit-bulk-json">' . esc_html__( 'Edit Changing', 'woocommerce-product-addon' ) . '</button>';
+				$html_input .= '<button class="btn btn-success ppom-save-bulk-json">' . esc_html__( 'Save Changes', 'woocommerce-product-addon' ) . '</button> ';
+				$html_input .= '<button class="btn btn-info ppom-edit-bulk-json">' . esc_html__( 'Edit Changes', 'woocommerce-product-addon' ) . '</button>';
 
 				if ( ! empty( $bulk_data ) ) {
 					$html_input .= "<input type='hidden' name='ppom[" . esc_attr( strval( $field_index ) ) . "][options]' class='ppom-saved-bulk-data ppom-meta-field' value='" . wp_json_encode( $bulk_data ) . "' data-metatype='options'>";
@@ -1528,7 +1557,7 @@ class PPOM_Fields_Meta {
 				$settings['min_img_w']['tabs_class']           = array( 'ppom_handle_image_dimension_tab', 'col-md-6' );
 				$settings['max_img_w']['tabs_class']           = array( 'ppom_handle_image_dimension_tab', 'col-md-6' );
 				$settings['img_dimension_error']['tabs_class'] = array( 'ppom_handle_image_dimension_tab', 'col-md-6' );
-			}       
+			}
 		}
 
 		// ppom_pa

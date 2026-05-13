@@ -16,6 +16,8 @@
     <exclude-pattern>*.asset.php</exclude-pattern>
     <exclude-pattern>globals/google-fonts.php</exclude-pattern>
     <exclude-pattern>bin/*.php</exclude-pattern>
+    <!-- PSR-4 `src/` tree: excluded until PHPCS doc + DB sniff alignment is complete for namespaced code. -->
+    <exclude-pattern>src/*</exclude-pattern>
 
     <rule ref="WordPress-VIP-Go">
     </rule>

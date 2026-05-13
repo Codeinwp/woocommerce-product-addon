@@ -19,12 +19,9 @@ $fm = new PPOM_InputManager( $field_meta, 'section' );
 $content = $fm->get_meta_value( 'html' );
 $content = ppom_wpml_translate( $content, 'PPOM' );
 
-$field_html = '';
-if ( $fm->field_label() ) {
-	$field_html = $content . $fm->field_label();
-} else {
-	$field_html = $content;
-}
+// The Section/HTML field renders the admin-supplied markup verbatim. The
+// field type intentionally has no `title` setting.
+$field_html = $content;
 
 $html_content = apply_filters( 'the_content', $field_html );
 $html_content = apply_filters( 'ppom_section_content', $html_content );

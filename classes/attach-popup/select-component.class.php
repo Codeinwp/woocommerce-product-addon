@@ -145,7 +145,11 @@ class SelectComponent extends ContainerView {
 			</div>
 		</div>
 		<?php
-		/** @var string $html */
+		/**
+		 * Captured HTML output.
+		 *
+		 * @var string $html
+		 */
 		$html = ob_get_clean();
 
 		return $html;
@@ -210,7 +214,11 @@ class SelectComponent extends ContainerView {
 			/>
 		</div>
 		<?php
-		/** @var string $html */
+		/**
+		 * Captured HTML output.
+		 *
+		 * @var string $html
+		 */
 		$html = ob_get_clean();
 
 		return $html;

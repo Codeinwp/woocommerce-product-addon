@@ -51,12 +51,12 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 			'title'               => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
-				'desc'  => __( 'It will be shown as field label', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as the field label.', 'woocommerce-product-addon' ),
 			),
 			'data_name'           => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'woocommerce-product-addon' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'         => array(
 				'type'  => 'textarea',
@@ -71,7 +71,7 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 			'file_cost'           => array(
 				'type'        => 'text',
 				'title'       => __( 'File cost/price', 'woocommerce-product-addon' ),
-				'desc'        => __( 'This will be added into cart', 'woocommerce-product-addon' ),
+				'desc'        => __( 'This will be added to the cart.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'class'               => array(
@@ -110,7 +110,7 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 			'file_types'          => array(
 				'type'        => 'text',
 				'title'       => __( 'Image types', 'woocommerce-product-addon' ),
-				'desc'        => __( 'Image types allowed seperated by comma, e.g: jpg,png', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Image types allowed, separated by comma, e.g.: jpg,png', 'woocommerce-product-addon' ),
 				'default'     => 'jpg,png',
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
@@ -141,7 +141,7 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 			'viewport_type'       => array(
 				'type'        => 'select',
 				'title'       => __( 'Viewport type', 'woocommerce-product-addon' ),
-				'desc'        => __( 'Select Squar or circle, see help', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Select Square or circle, see help', 'woocommerce-product-addon' ),
 				'options'     => array(
 					'square' => 'Square',
 					'circle' => 'Circle',
@@ -151,7 +151,7 @@ class NM_Cropper_wooproduct extends PPOM_Inputs {
 			'boundary'            => array(
 				'type'        => 'text',
 				'title'       => __( 'Boundary height,width', 'woocommerce-product-addon' ),
-				'desc'        => __( 'Separated by command h,w e.g: 200,200, see help', 'woocommerce-product-addon' ),
+				'desc'        => __( 'Separated by comma h,w e.g.: 200,200, see help', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'visibility'          => array(

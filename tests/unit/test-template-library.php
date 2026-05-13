@@ -43,11 +43,26 @@ class Test_Template_Library extends PPOM_Test_Case {
 	 * @return array<string, mixed>
 	 */
 	private function invoke_import() {
+		// wp_send_json calls `die;` unless wp_doing_ajax() is true. Once we flip
+		// it to true, wp_send_json instead invokes wp_die() — but the default
+		// _ajax_wp_die_handler still calls die() unless we replace it. We mirror
+		// the WP_Ajax_UnitTestCase pattern: throw on wp_die so the test catches it.
+		$throw_handler = static function () {
+			return static function () {
+				throw new \WPDieException( 'wp_send_json terminated' );
+			};
+		};
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		add_filter( 'wp_die_ajax_handler', $throw_handler, 1 );
+
 		ob_start();
 		try {
 			\PPOM\Admin\Manager::import_template();
 		} catch ( \WPDieException $e ) {
 			// Expected: wp_send_json terminates via wp_die.
+		} finally {
+			remove_filter( 'wp_doing_ajax', '__return_true' );
+			remove_filter( 'wp_die_ajax_handler', $throw_handler, 1 );
 		}
 
 		$output  = ob_get_clean();

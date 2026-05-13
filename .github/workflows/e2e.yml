@@ -24,6 +24,8 @@ jobs:
           npm ci
           npm install -g playwright-cli
           npx playwright install --with-deps chromium
+      - name: Build admin field modal bundle
+        run: npm run build:admin-field-modal
       - name: Install composer deps
         run: composer install --no-dev
       - name: Install environment

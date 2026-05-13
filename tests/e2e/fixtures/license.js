@@ -17,11 +17,16 @@ export async function getPpomLicenseFixture( requestUtils ) {
  * @param {object} options
  * @param {boolean} options.valid When true, filters report a valid license.
  * @param {number} [options.plan=1] Plan tier 1 (Essential) through 3 (VIP) when valid.
+ * @param {boolean} [options.proInstalled=false] Whether to expose the wp-env PPOM_PRO test double.
  * @return {Promise<{ status: string, plan: number }>} Resolved fixture from the server.
  */
-export async function setPpomLicenseFixture( requestUtils, { valid, plan = 1 } ) {
+export async function setPpomLicenseFixture(
+	requestUtils,
+	{ valid, plan = 1, proInstalled = false }
+) {
 	return postBootstrapAction( requestUtils, 'ppom_e2e_set_license_fixture', {
 		status: valid ? 'valid' : 'invalid',
 		plan: String( plan ),
+		pro_installed: proInstalled ? '1' : '0',
 	} );
 }

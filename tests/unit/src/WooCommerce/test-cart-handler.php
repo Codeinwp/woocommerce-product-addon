@@ -449,4 +449,392 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 
 		$this->assertSame( $before, $next );
 	}
+
+	/**
+	 * Regression: `Helpers::generate_cart_meta()` writes `ppom_has_quantities`
+	 * as a scalar int alongside the regular meta arrays. The conversion helper
+	 * must treat that sentinel as a hidden row instead of dereferencing it like
+	 * an array (which previously raised "Trying to access array offset on int"
+	 * via `$meta['type']` in CartHandler::add_item_meta).
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_handles_scalar_quantities_sentinel() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row( 'ppom_has_quantities', 5 );
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'ppom_has_quantities', $row['name'] );
+		$this->assertSame( 5, $row['value'] );
+		$this->assertTrue( $row['hidden'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_skips_empty_display_for_text_field() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'engraving',
+			array(
+				'name'    => 'Engraving',
+				'value'   => '',
+				'display' => '',
+				'type'    => 'text',
+			)
+		);
+
+		$this->assertNull( $row );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_keeps_named_value_row() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'engraving',
+			array(
+				'name'    => 'Engraving',
+				'value'   => 'Hello',
+				'display' => 'Hello',
+				'type'    => 'text',
+			)
+		);
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'Engraving', $row['name'] );
+		$this->assertSame( 'Hello', $row['value'] );
+		$this->assertFalse( $row['hidden'] );
+	}
+
+	/**
+	 * Defensive: `make_meta_data()` doesn't set `type` on every branch
+	 * (e.g. cropper variants). Missing `type` must not crash the loop.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_tolerates_missing_type_key() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'cropper_field',
+			array(
+				'name'  => 'Cropper',
+				'value' => 'somefile.jpg',
+			)
+		);
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'Cropper', $row['name'] );
+	}
+
+	/**
+	 * Edge case: when nothing is filled, `$total_qty` is 0. We still want a
+	 * hidden row keyed by `ppom_has_quantities`, not a crash and not a null
+	 * skip — downstream code reads this sentinel via `$cart_item meta`.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_handles_scalar_zero_sentinel() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row( 'ppom_has_quantities', 0 );
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'ppom_has_quantities', $row['name'] );
+		$this->assertSame( 0, $row['value'] );
+		$this->assertTrue( $row['hidden'] );
+	}
+
+	/**
+	 * Filters / extensions may push string scalars (e.g. an addon flag) into
+	 * the meta map. They must be handled the same way as int scalars rather
+	 * than dereferenced like arrays.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_handles_string_scalar() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row( 'ppom_addon_flag', 'on' );
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'ppom_addon_flag', $row['name'] );
+		$this->assertSame( 'on', $row['value'] );
+		$this->assertTrue( $row['hidden'] );
+	}
+
+	/**
+	 * Boolean / null scalars must also fall through the scalar-sentinel
+	 * branch instead of attempting array access.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_handles_boolean_and_null_scalars() {
+		$bool_row = CartHandler::convert_ppom_meta_entry_to_item_meta_row( 'ppom_flag', true );
+		$null_row = CartHandler::convert_ppom_meta_entry_to_item_meta_row( 'ppom_flag', null );
+
+		$this->assertIsArray( $bool_row );
+		$this->assertSame( true, $bool_row['value'] );
+		$this->assertTrue( $bool_row['hidden'] );
+
+		$this->assertIsArray( $null_row );
+		$this->assertNull( $null_row['value'] );
+		$this->assertTrue( $null_row['hidden'] );
+	}
+
+	/**
+	 * "0"-as-string in a text field is a valid customer entry (e.g. quantity
+	 * of zero rendered as text) and must NOT be skipped, even though plain
+	 * `empty('0')` is true. That contract belongs to the `text` / `textarea`
+	 * / `number` types via `should_skip_cart_meta_for_empty_display()`.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_keeps_text_zero_value() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'engraving',
+			array(
+				'name'    => 'Engraving',
+				'value'   => '0',
+				'display' => '0',
+				'type'    => 'text',
+			)
+		);
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'Engraving', $row['name'] );
+		$this->assertSame( '0', $row['value'] );
+	}
+
+	/**
+	 * Non-text types (e.g. `select`) treat an empty `display` as "no choice
+	 * made" and skip the row entirely.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_skips_select_with_empty_display() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'size',
+			array(
+				'name'    => 'Size',
+				'value'   => '',
+				'display' => '',
+				'type'    => 'select',
+			)
+		);
+
+		$this->assertNull( $row );
+	}
+
+	/**
+	 * Non-scalar values must be serialised so WooCommerce can persist them
+	 * onto the cart line — this matches the legacy behavior the cart pipeline
+	 * has always produced.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_json_encodes_non_scalar_value() {
+		$nested = array(
+			'a' => 1,
+			'b' => array( 'c' => 2 ),
+		);
+
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'matrix_field',
+			array(
+				'name'    => 'Matrix',
+				'value'   => $nested,
+				'display' => 'Matrix display',
+				'type'    => 'select',
+			)
+		);
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'Matrix', $row['name'] );
+		$this->assertSame( wp_json_encode( $nested ), $row['value'] );
+		$this->assertSame( 'Matrix display', $row['display'] );
+	}
+
+	/**
+	 * Upstream-set `hidden => true` on the entry must survive through the
+	 * conversion (used by quantity-bearing fields and the `hidden` field
+	 * type to keep their rows out of the visible cart line).
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_preserves_hidden_flag_from_entry() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'secret',
+			array(
+				'name'    => 'Secret',
+				'value'   => 'shh',
+				'display' => 'shh',
+				'type'    => 'hidden',
+				'hidden'  => true,
+			)
+		);
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'Secret', $row['name'] );
+		$this->assertTrue( $row['hidden'] );
+	}
+
+	/**
+	 * When `display` is omitted, it falls back to `value`. That fallback
+	 * also drives the empty-display skip check, so we assert the fallback
+	 * keeps a non-empty entry visible.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_display_falls_back_to_value() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'note',
+			array(
+				'name'  => 'Note',
+				'value' => 'Hello world',
+				'type'  => 'text',
+			)
+		);
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'Hello world', $row['display'] );
+	}
+
+	/**
+	 * Empty array entries (`make_meta_data()` produces these for cropper /
+	 * image rows whose value is empty in cart context) must not crash and
+	 * must produce a fall-through row keyed by the cart key — preserving
+	 * legacy behavior of the original `else` branch.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_handles_empty_array_entry() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'cropper_field',
+			array()
+		);
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'cropper_field', $row['name'] );
+	}
+
+	/**
+	 * HTML in the meta `name` would be unsafe to render as a cart-line
+	 * label. The conversion helper must strip tags via `wp_strip_all_tags`,
+	 * matching the prior add_item_meta() behavior.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_strips_html_from_name() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'engraving',
+			array(
+				'name'    => '<b onclick="x">Engraving</b>',
+				'value'   => 'Hi',
+				'display' => 'Hi',
+				'type'    => 'text',
+			)
+		);
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'Engraving', $row['name'] );
+	}
+
+	/**
+	 * Slashes added by WordPress' magic-quotes-style escaping should be
+	 * stripped from the rendered name (legacy `stripslashes` step).
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_unescapes_slashes_in_name() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'engraving',
+			array(
+				'name'    => "Customer\\'s note",
+				'value'   => 'Hi',
+				'display' => 'Hi',
+				'type'    => 'text',
+			)
+		);
+
+		$this->assertIsArray( $row );
+		$this->assertSame( "Customer's note", $row['name'] );
+	}
+
+	/**
+	 * The `ppom_show_option_price_cart` filter, when truthy, appends a
+	 * formatted price to the meta value. This proves the conversion helper
+	 * still honors the legacy filter contract through the new code path.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_appends_price_when_filter_enabled() {
+		add_filter( 'ppom_show_option_price_cart', '__return_true' );
+
+		try {
+			$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+				'engraving',
+				array(
+					'name'    => 'Engraving',
+					'value'   => 'Hello',
+					'display' => 'Hello',
+					'type'    => 'text',
+					'price'   => 5,
+				)
+			);
+		} finally {
+			remove_filter( 'ppom_show_option_price_cart', '__return_true' );
+		}
+
+		$this->assertIsArray( $row );
+		$this->assertStringContainsString( 'Hello', $row['value'] );
+		// Format-agnostic: only assert the numeric part survived in the suffix.
+		$this->assertStringContainsString( '5', $row['value'] );
+		$this->assertNotSame( 'Hello', $row['value'] );
+	}
+
+	/**
+	 * Without a `name` key, the entry falls through to the second branch and
+	 * uses the cart key itself as the row name — preserving the original
+	 * `else` branch of the legacy loop.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_uses_key_when_name_missing() {
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'fallback_key',
+			array(
+				'value'   => 'something',
+				'display' => 'something',
+				'type'    => 'text',
+			)
+		);
+
+		$this->assertIsArray( $row );
+		$this->assertSame( 'fallback_key', $row['name'] );
+		$this->assertFalse( $row['hidden'] );
+	}
+
+	/**
+	 * Regression: PHPUnit upgrades scalar→array access into a real failure,
+	 * so calling the helper with the documented sentinel shape must not
+	 * raise any PHP warnings/notices. This asserts the bug we fixed (the
+	 * "Trying to access array offset on int" notice from CartHandler.php:632)
+	 * stays fixed even if the conversion logic is later refactored.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_does_not_warn_on_scalar() {
+		$caught = null;
+		set_error_handler( function ( $errno, $errstr ) use ( &$caught ) {
+			$caught = compact( 'errno', 'errstr' );
+			return true;
+		} );
+
+		try {
+			CartHandler::convert_ppom_meta_entry_to_item_meta_row( 'ppom_has_quantities', 5 );
+		} finally {
+			restore_error_handler();
+		}
+
+		$this->assertNull(
+			$caught,
+			$caught
+				? sprintf( 'Got unexpected PHP notice: [%d] %s', $caught['errno'], $caught['errstr'] )
+				: ''
+		);
+	}
 }

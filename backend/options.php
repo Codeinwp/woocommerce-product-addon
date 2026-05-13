@@ -249,7 +249,7 @@ function ppom_load_pro_options() {
 			'default' => 'after',
 			'options' => array(
 				'after'  => __( 'After PPOM Fields', 'woocommerce-product-addon' ),
-				'before' => __( 'Before  PPOM Fields', 'woocommerce-product-addon' ),
+				'before' => __( 'Before PPOM Fields', 'woocommerce-product-addon' ),
 			),
 		),
 		'ppom_pro_advanced'                  => array(
@@ -344,7 +344,7 @@ function ppom_load_pro_options() {
 		),
 		'ppom_input_box_border_shadow_focus'  => array(
 			'type'      => 'text',
-			'title'     => __( 'Box Shodow Focus', 'woocommerce-product-addon' ),
+			'title'     => __( 'Box Shadow Focus', 'woocommerce-product-addon' ),
 			'desc'      => __( 'If you don\'t want to apply it, simply set the value to \'none.\'', 'woocommerce-product-addon' ),
 			'hint'      => '0 0 0 0.2rem rgb(0 123 255 / 25%)',
 			'reference' => array(
@@ -483,7 +483,7 @@ function ppom_load_pro_options() {
 		),
 		'ppom_editcart_popup_label'      => array(
 			'type'  => 'text',
-			'title' => __( 'Model Button Label', 'woocommerce-product-addon' ),
+			'title' => __( 'Modal Button Label', 'woocommerce-product-addon' ),
 			'desc'  => __( 'Change the label for the modal button.', 'woocommerce-product-addon' ),
 		),
 	);
@@ -505,14 +505,14 @@ function ppom_load_pro_options() {
 	$settings = array(
 		'ppom-enf-emails-list'    => array(
 			'type'  => 'text',
-			'title' => __( 'Emails Recepients', 'woocommerce-product-addon' ),
+			'title' => __( 'Email Recipients', 'woocommerce-product-addon' ),
 			'desc'  => __( 'Enter the email addresses of the enquiry form recipients, separated by commas.', 'woocommerce-product-addon' ),
 		),
 		'ppom-enf-note'           => array(
 			'type'    => 'textarea',
 			'title'   => __( 'Note', 'woocommerce-product-addon' ),
 			'desc'    => __( 'Set the message to be displayed on the enquiry form.', 'woocommerce-product-addon' ),
-			'default' => 'All selected data will be sent to vendor',
+			'default' => 'The options you selected on this product will be included with your enquiry.',
 		),
 		'ppom-enf-send-msg'       => array(
 			'type'  => 'textarea',

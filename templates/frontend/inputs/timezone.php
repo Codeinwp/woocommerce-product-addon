@@ -31,7 +31,7 @@ if ( ! empty( $first_option ) ) {
 if ( ! $options ) {
 
 	echo '<div class="ppom-option-notice">';
-	echo '<p>' . __( 'The timezone not found, please add different regions.', 'woocommerce-product-addon' ) . '</p>';
+	echo '<p>' . esc_html__( 'Timezone not found. Please add different regions.', 'woocommerce-product-addon' ) . '</p>';
 	echo '</div>';
 
 	return '';

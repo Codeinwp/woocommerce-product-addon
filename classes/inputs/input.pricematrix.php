@@ -47,17 +47,17 @@ class NM_PriceMatrix_wooproduct extends PPOM_Inputs {
 			'title'               => array(
 				'type'  => 'text',
 				'title' => __( 'Title', 'woocommerce-product-addon' ),
-				'desc'  => __( 'It will as section heading wrapped in h2', 'woocommerce-product-addon' ),
+				'desc'  => __( 'It will be shown as a section heading wrapped in h2.', 'woocommerce-product-addon' ),
 			),
 			'data_name'           => array(
 				'type'  => 'text',
 				'title' => __( 'Data name', 'woocommerce-product-addon' ),
-				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note:Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'REQUIRED: The identification name of this field, that you can insert into body email configuration. Note: Use only lowercase characters and underscores.', 'woocommerce-product-addon' ),
 			),
 			'description'         => array(
 				'type'  => 'textarea',
 				'title' => __( 'Description', 'woocommerce-product-addon' ),
-				'desc'  => __( 'Type description, it will be display under section heading.', 'woocommerce-product-addon' ),
+				'desc'  => __( 'Type description; it will be displayed under the section heading.', 'woocommerce-product-addon' ),
 			),
 			'discount_type'       => array(
 				'type'        => 'select',
@@ -102,13 +102,13 @@ class NM_PriceMatrix_wooproduct extends PPOM_Inputs {
 			'show_slider'         => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Enable Quantity Slider', 'woocommerce-product-addon' ),
-				'desc'        => __( 'It will display Range slider for quantity under matrix', 'woocommerce-product-addon' ),
+				'desc'        => __( 'It displays a range slider for quantity under the matrix.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'show_price_per_unit' => array(
 				'type'        => 'checkbox',
 				'title'       => __( 'Show price per unit?', 'woocommerce-product-addon' ),
-				'desc'        => __( 'It will calculate price against per unit and show along total', 'woocommerce-product-addon' ),
+				'desc'        => __( 'It calculates a per-unit price and shows it alongside the total.', 'woocommerce-product-addon' ),
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'hide_matrix_table'   => array(

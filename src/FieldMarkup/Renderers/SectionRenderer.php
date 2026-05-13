@@ -23,6 +23,10 @@ final class SectionRenderer extends AbstractInputRenderer {
 		$label      = $this->context->getAttributeValue( 'label', $args );
 		$field_html = $this->context->getAttributeValue( 'html', $args );
 
+		if ( function_exists( 'ppom_wpml_translate' ) ) {
+			$field_html = ppom_wpml_translate( $field_html, 'PPOM' );
+		}
+
 		$input_wrapper_class = FieldChrome::inputWrapperClass( $this->context, $id, $args );
 		$html                = '<div class="' . $input_wrapper_class . '">';
 
@@ -30,7 +34,8 @@ final class SectionRenderer extends AbstractInputRenderer {
 			$field_html = $field_html . $label;
 		}
 
-		$html_content = apply_filters( 'ppom_section_content', $field_html );
+		$html_content = apply_filters( 'the_content', $field_html );
+		$html_content = apply_filters( 'ppom_section_content', $html_content );
 
 		$html .= stripslashes( $html_content );
 

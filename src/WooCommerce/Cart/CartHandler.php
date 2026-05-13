@@ -620,51 +620,78 @@ final class CartHandler {
 		// ppom_pa($ppom_meta);
 
 		foreach ( $ppom_meta as $key => $meta ) {
-
-			$hidden     = isset( $meta['hidden'] ) ? $meta['hidden'] : false;
-			$meta_name  = isset( $meta['name'] ) ? $meta['name'] : '';
-			$meta_value = isset( $meta['value'] ) ? $meta['value'] : '';
-			$display    = isset( $meta['display'] ) ? $meta['display'] : $meta_value;
-			if ( $key == 'ppom_has_quantities' ) {
-				$hidden = true;
-			}
-
-			if ( self::should_skip_cart_meta_for_empty_display( $meta['type'], $display ) ) {
+			$row = self::convert_ppom_meta_entry_to_item_meta_row( $key, $meta );
+			if ( null === $row ) {
 				continue;
 			}
-
-			if ( ! empty( $meta_name ) ) {
-
-				if ( ! is_scalar( $meta_value ) ) {
-					$meta_value = wp_json_encode( $meta_value );
-				}
-
-				if ( apply_filters( 'ppom_show_option_price_cart', false ) && isset( $meta['price'] ) ) {
-					$meta_value .= ' (' . wc_price( $meta['price'] ) . ')';
-				}
-
-				$meta_key = stripslashes( $meta_name );
-
-				// WPML
-				$meta_key = Helpers::wpml_translate( $meta_key, 'PPOM' );
-
-				$item_meta[] = array(
-					'name'    => wp_strip_all_tags( $meta_key ),
-					'value'   => $meta_value,
-					'hidden'  => $hidden,
-					'display' => $display,
-				);
-			} else {
-				$item_meta[] = array(
-					'name'    => ( $key ),
-					'value'   => $meta,
-					'hidden'  => $hidden,
-					'display' => $display,
-				);
-			}
+			$item_meta[] = $row;
 		}
 
 		return $item_meta;
+	}
+
+	/**
+	 * Builds a single WooCommerce cart-item meta row from one `make_meta_data()` entry,
+	 * or `null` when the entry should be skipped.
+	 *
+	 * Some entries (e.g. `ppom_has_quantities`) are stored as a scalar tracker rather than
+	 * a meta array; those become a hidden row keyed by `$key`. Array entries respect
+	 * `should_skip_cart_meta_for_empty_display()` and the legacy name/value/hidden shape.
+	 *
+	 * @param string $key  Cart meta key from `make_meta_data()`.
+	 * @param mixed  $meta Cart meta entry (array shape or scalar sentinel).
+	 *
+	 * @return array{name: string, value: mixed, hidden: bool, display: mixed}|null
+	 */
+	public static function convert_ppom_meta_entry_to_item_meta_row( $key, $meta ) {
+		if ( ! is_array( $meta ) ) {
+			return array(
+				'name'    => $key,
+				'value'   => $meta,
+				'hidden'  => true,
+				'display' => $meta,
+			);
+		}
+
+		$hidden     = isset( $meta['hidden'] ) ? $meta['hidden'] : false;
+		$meta_name  = isset( $meta['name'] ) ? $meta['name'] : '';
+		$meta_value = isset( $meta['value'] ) ? $meta['value'] : '';
+		$display    = isset( $meta['display'] ) ? $meta['display'] : $meta_value;
+		$meta_type  = isset( $meta['type'] ) ? $meta['type'] : '';
+
+		// Empty / unnamed entries (e.g. cropper rows with no cart value) must fall
+		// through to the bottom legacy branch; only skip when the entry actually
+		// names a field whose display value is empty.
+		if ( ! empty( $meta_name ) && self::should_skip_cart_meta_for_empty_display( $meta_type, $display ) ) {
+			return null;
+		}
+
+		if ( ! empty( $meta_name ) ) {
+			if ( ! is_scalar( $meta_value ) ) {
+				$meta_value = wp_json_encode( $meta_value );
+			}
+
+			if ( apply_filters( 'ppom_show_option_price_cart', false ) && isset( $meta['price'] ) ) {
+				$meta_value .= ' (' . wc_price( $meta['price'] ) . ')';
+			}
+
+			$meta_key = stripslashes( $meta_name );
+			$meta_key = Helpers::wpml_translate( $meta_key, 'PPOM' );
+
+			return array(
+				'name'    => wp_strip_all_tags( $meta_key ),
+				'value'   => $meta_value,
+				'hidden'  => $hidden,
+				'display' => $display,
+			);
+		}
+
+		return array(
+			'name'    => $key,
+			'value'   => $meta,
+			'hidden'  => $hidden,
+			'display' => $display,
+		);
 	}
 
 	// When quantities is used then reset quantity to 1

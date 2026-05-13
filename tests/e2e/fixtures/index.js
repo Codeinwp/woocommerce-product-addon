@@ -2,6 +2,7 @@ export {
 	attachPpomGroupToCategories,
 	attachPpomGroupToProducts,
 	attachPpomGroupToVariations,
+	createLegacyPpomGroup,
 	createPpomGroup,
 	createSimpleTextGroup,
 	getPpomAttachRowMeta,
@@ -9,6 +10,7 @@ export {
 export {
 	buildCheckboxField,
 	buildFileField,
+	buildHtmlField,
 	buildSelectField,
 	buildTextField,
 } from './fields.js';

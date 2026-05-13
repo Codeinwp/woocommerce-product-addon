@@ -720,7 +720,7 @@ final class Engine {
 
 				case 'bulkquantity':
 					// THIS SHOULD BE CHECK ON TOP AFTER FOREACH LOOP
-					$conditionally_hidden = $item['ppom']['conditionally_hidden'];
+					$conditionally_hidden = isset( $item['ppom']['conditionally_hidden'] ) ? $item['ppom']['conditionally_hidden'] : array();
 					if ( Helpers::is_field_hidden_by_condition( $data_name, $conditionally_hidden ) ) {
 						continue 2;
 					}

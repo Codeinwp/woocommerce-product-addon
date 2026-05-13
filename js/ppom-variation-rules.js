@@ -12,7 +12,9 @@ jQuery( function ( $ ) {
 	 * @return {number[]} Parsed variation IDs.
 	 */
 	function parseAllowedVariations( $group ) {
-		const raw = String( $group.attr( 'data-ppom-allowed-variations' ) || '' );
+		const raw = String(
+			$group.attr( 'data-ppom-allowed-variations' ) || ''
+		);
 		return raw
 			.split( ',' )
 			.map( ( id ) => parseInt( id, 10 ) )
@@ -155,13 +157,19 @@ jQuery( function ( $ ) {
 	}
 
 	$( document.body )
-		.on( 'show_variation', 'form.variations_form', function ( event, variation ) {
-			refreshVariationGroups( variation?.variation_id );
-		} )
+		.on(
+			'show_variation',
+			'form.variations_form',
+			function ( event, variation ) {
+				refreshVariationGroups( variation?.variation_id );
+			}
+		)
 		.on( 'hide_variation reset_data', 'form.variations_form', function () {
 			refreshVariationGroups( 0 );
 		} );
 
-	const currentVariationId = $( 'form.variations_form input[name="variation_id"]' ).val();
+	const currentVariationId = $(
+		'form.variations_form input[name="variation_id"]'
+	).val();
 	refreshVariationGroups( currentVariationId );
 } );
