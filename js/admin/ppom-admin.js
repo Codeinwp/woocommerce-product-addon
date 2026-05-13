@@ -2736,8 +2736,9 @@ document
  *   - "Start from scratch" card → navigate to data-href on the wrapper.
  *   - Free / unlocked Pro template tile → POST ppom_import_template,
  *     redirect to the new field-group editor on success.
- *   - Locked Pro template tile → no-op (the inline upgrade link handles
- *     the upsell on its own).
+ *   - Locked Pro template tile → open the tile's per-preset upgrade URL
+ *     (data-upgrade-url, UTM-tagged via tsdk_utmify with the preset slug)
+ *     in a new tab.
  *
  * Styles for the modal live in css/ppom-admin.css under the
  * "Quick Setup template-library wizard" section.
@@ -2762,6 +2763,14 @@ document
 		var href = $( this ).data( 'href' );
 		if ( href ) {
 			window.location.href = href;
+		}
+	} );
+
+	$modal.on( 'click', '.ppom-template-locked', function ( e ) {
+		e.preventDefault();
+		var upgradeUrl = $( this ).attr( 'data-upgrade-url' );
+		if ( upgradeUrl ) {
+			window.open( upgradeUrl, '_blank', 'noopener,noreferrer' );
 		}
 	} );
 

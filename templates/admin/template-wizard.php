@@ -43,7 +43,6 @@ foreach ( $templates as $template ) {
 }
 
 $start_from_scratch_url = add_query_arg( array( 'action' => 'new' ) );
-$upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'template-library', 'ppompage' );
 ?>
 
 <div id="ppom-template-wizard-modal" class="ppom-modal-box ppom-template-wizard" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="ppom-template-wizard-title">
@@ -97,11 +96,19 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 
 			<div class="ppom-template-grid">
 				<?php foreach ( $pro_templates as $template ) : ?>
-					<?php $is_locked = ! $user_has_pro; ?>
+					<?php
+					$is_locked            = ! $user_has_pro;
+					$template_upgrade_url = tsdk_utmify(
+						tsdk_translate_link( PPOM_UPGRADE_URL ),
+						'template-presets-' . sanitize_key( $template['slug'] ),
+						'ppompage'
+					);
+					?>
 					<div class="ppom-template-card ppom-template-card--pro <?php echo $is_locked ? 'ppom-template-card--locked' : ''; ?>">
 						<button type="button"
 							class="ppom-template-card__inner ppom-template-tile <?php echo $is_locked ? 'ppom-template-locked' : ''; ?>"
-							data-template="<?php echo esc_attr( $template['slug'] ); ?>">
+							data-template="<?php echo esc_attr( $template['slug'] ); ?>"
+							<?php echo $is_locked ? 'data-upgrade-url="' . esc_url( $template_upgrade_url ) . '"' : ''; ?>>
 							<div class="ppom-template-card__header">
 								<i class="fa <?php echo esc_attr( $template['icon'] ); ?> ppom-template-card__icon" aria-hidden="true"></i>
 								<?php if ( $is_locked ) : ?>
@@ -113,16 +120,11 @@ $upgrade_url            = tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 
 								<?php echo esc_html( $template['description'] ); ?>
 							</p>
 						</button>
-						<?php if ( $is_locked ) : ?>
+						<?php if ( $is_locked && ! empty( $template['uses_feature'] ) ) : ?>
 							<div class="ppom-template-card__upgrade-row">
-								<?php if ( ! empty( $template['uses_feature'] ) ) : ?>
-									<p class="ppom-template-card__uses">
-										<?php echo esc_html( $template['uses_feature'] ); ?>
-									</p>
-								<?php endif; ?>
-								<a class="ppom-template-card__upgrade" target="_blank" rel="noopener" href="<?php echo esc_url( $upgrade_url ); ?>">
-									<?php esc_html_e( 'Upgrade to Pro', 'woocommerce-product-addon' ); ?> <span aria-hidden="true">&rarr;</span>
-								</a>
+								<p class="ppom-template-card__uses">
+									<?php echo esc_html( $template['uses_feature'] ); ?>
+								</p>
 							</div>
 						<?php endif; ?>
 					</div>

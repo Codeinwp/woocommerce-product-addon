@@ -2652,7 +2652,7 @@ div.ppom-banner .themeisle-sale {
 	line-height: 1.4;
 	color: #475569;
 }
-.ppom-template-card--pro .ppom-template-card__icon {
+.ppom-template-card--pro.ppom-template-card--locked .ppom-template-card__icon {
 	color: #94a3b8;
 }
 .ppom-template-wizard .ppom-template-card--scratch {
