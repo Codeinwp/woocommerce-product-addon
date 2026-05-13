@@ -429,6 +429,7 @@ height: 100px;*/
   z-index: 10024;
   padding: 15px;
   overflow: visible;
+  pointer-events: none;
 
 }
 

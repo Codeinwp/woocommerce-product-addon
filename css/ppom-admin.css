@@ -387,6 +387,7 @@ ul.ppom-options-container li {
     z-index: 10024;
     padding: 15px;
     overflow: visible;
+    pointer-events: none;
 
 }
 
