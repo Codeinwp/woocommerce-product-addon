@@ -260,6 +260,7 @@
     color: #32373c;
     font-size: 10px;
     font-weight: 700 !important;
+    min-height: unset;
 }
 
 .nmsf-css-editor-wrapper .pd-0 {
