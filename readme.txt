@@ -2,7 +2,7 @@
 Contributors: themeisle
 Tags: product addons, woocommerce product addons, woocommerce product options, custom fields, variable products
 Requires at least: 6.2
-Tested up to: 6.9
+Tested up to: 7.0
 Stable tag: 34.0.0
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
