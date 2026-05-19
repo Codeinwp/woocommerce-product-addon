@@ -77,15 +77,15 @@ async function saveFieldsAndRevisit( page, admin, ppomId ) {
 }
 
 test.describe( 'React modal — Conditions tab', () => {
-	test( 'renders the locked upsell preview when conditions Pro is unavailable', async ( {
+	test( 'free tier can enable conditional logic and use basic operators', async ( {
 		page,
 		admin,
 		requestUtils,
 	} ) => {
 		await lockConditions( requestUtils );
 
-		const { ppomId } = await createSimpleTextGroup( requestUtils, {
-			fieldsNumber: 1,
+		const { ppomId } = await createTwoFieldGroup( requestUtils, {
+			titlePrefix: 'cond_free',
 		} );
 
 		await visitReactModalGroup( admin, ppomId );
@@ -94,12 +94,45 @@ test.describe( 'React modal — Conditions tab', () => {
 
 		await expect(
 			dialog.getByRole( 'link', { name: 'Upgrade to Pro' } )
+		).toHaveCount( 0 );
+
+		const enableLogic = dialog.getByRole( 'button', {
+			name: 'Enable conditional logic',
+		} );
+		await expect( enableLogic ).toBeVisible();
+		await enableLogic.click();
+
+		await expect(
+			dialog.getByLabel( 'Visibility', { exact: true } )
 		).toBeVisible();
 		await expect(
-			dialog.getByRole( 'button', {
-				name: 'Enable conditional logic',
-			} )
-		).toHaveCount( 0 );
+			dialog.getByLabel( 'Match mode', { exact: true } )
+		).toBeVisible();
+		await expect(
+			dialog.getByRole( 'button', { name: 'Add condition' } )
+		).toBeVisible();
+
+		const operatorSelect = dialog
+			.getByLabel( 'Operator', { exact: true } )
+			.first();
+		const operatorOptions = await operatorSelect.evaluate( ( node ) =>
+			Array.from( node.querySelectorAll( 'option' ) ).map( ( option ) => ( {
+				value: option.value,
+				label: option.textContent?.trim() || '',
+				disabled: option.disabled,
+			} ) )
+		);
+
+		const isOption = operatorOptions.find( ( o ) => o.value === 'is' );
+		expect( isOption ).toBeTruthy();
+		expect( isOption.disabled ).toBe( false );
+
+		const containsOption = operatorOptions.find(
+			( o ) => o.value === 'contains'
+		);
+		expect( containsOption ).toBeTruthy();
+		expect( containsOption.label ).toMatch( /\(PRO\)/i );
+		expect( containsOption.disabled ).toBe( true );
 	} );
 
 	test( 'shows the disabled empty state when Pro is enabled and logic is off', async ( {
