@@ -194,7 +194,13 @@ final class Validator {
 			$data['min_value'] = $limits['step'];
 		}
 
-		$data['input_value'] = $data['min_value'];
+		$current_input_value = isset( $data['input_value'] ) ? wc_stock_amount( $data['input_value'] ) : 0;
+
+		if ( $limits['input_value'] > 0 ) {
+			$data['input_value'] = wc_stock_amount( $limits['input_value'] );
+		} elseif ( $current_input_value < $data['min_value'] ) {
+			$data['input_value'] = $data['min_value'];
+		}
 
 		return $data;
 	}
