@@ -221,10 +221,6 @@ export const conditionStrings: I18nDict = {
 		'woocommerce-product-addon'
 	),
 	conditionUpgradeCta: __( 'Upgrade to Unlock', 'woocommerce-product-addon' ),
-	condLockedBody: __(
-		'Show or hide this field based on the values of other fields in the form. Build rules using simple comparisons or advanced operators.',
-		'woocommerce-product-addon'
-	),
 	condEditorTitle: __( 'Conditional logic', 'woocommerce-product-addon' ),
 	condEditorDesc: __(
 		'Show or hide this field based on other product options.',
