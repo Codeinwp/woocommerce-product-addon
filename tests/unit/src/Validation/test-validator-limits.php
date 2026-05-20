@@ -214,6 +214,25 @@ class Test_Validator_Limits extends PPOM_Test_Case {
 	/**
 	 * @return void
 	 */
+	public function test_validation_product_limits_defaults_min_value_when_missing() {
+		$product = $this->create_simple_product();
+
+		$validated = Validator::validation_product_limits(
+			array(
+				'max_value'   => 0,
+				'step'        => 1,
+				'input_value' => 4,
+			),
+			$product
+		);
+
+		$this->assertSame( 1, $validated['min_value'] );
+		$this->assertSame( 4, $validated['input_value'] );
+	}
+
+	/**
+	 * @return void
+	 */
 	public function test_validation_variation_limits_clamps_max_to_variation_stock() {
 		$pair = $this->create_variable_product_with_variation(
 			array(),

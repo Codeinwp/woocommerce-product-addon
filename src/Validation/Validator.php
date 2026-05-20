@@ -146,6 +146,10 @@ final class Validator {
 			return $data;
 		}
 
+		if ( ! isset( $data['min_value'] ) ) {
+			$data['min_value'] = 1;
+		}
+
 		$product_id   = $product->get_id();
 		$variation_id = 0;
 
