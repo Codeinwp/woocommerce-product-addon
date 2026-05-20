@@ -194,8 +194,6 @@ final class Validator {
 			$data['min_value'] = $limits['step'];
 		}
 
-		$data['input_value'] = $data['min_value'];
-
 		return $data;
 	}
 
