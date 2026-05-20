@@ -194,6 +194,14 @@ final class Validator {
 			$data['min_value'] = $limits['step'];
 		}
 
+		if ( empty( $data['input_value'] ) ) {
+ 			if ( ! empty( $data['min_value'] ) ) {
+ 				$data['input_value'] = $data['min_value'];
+ 			} else {
+ 				$data['input_value'] = 1;
+ 			}
+ 		}
+
 		return $data;
 	}
 
