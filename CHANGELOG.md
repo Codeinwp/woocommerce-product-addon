@@ -1,3 +1,9 @@
+##### [Version 34.0.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.0...v34.0.1) (2026-05-21)
+
+- Updated dependencies.
+- Fixed the product quantity update on WooCommerce Cart.
+- Fixed the lock that prevented non-premium users from using the field conditions feature.
+
 #### [Version 34.0.0](https://github.com/Codeinwp/woocommerce-product-addon/compare/v33.0.18...v34.0.0) (2026-05-13)
 
 ### New Features
