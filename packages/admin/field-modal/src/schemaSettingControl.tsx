@@ -3,7 +3,6 @@
  */
 import { renderPrimitiveSettingControl } from './controls';
 import { ConditionsEditor } from './ConditionsEditor';
-import { ConditionsLockedPreview } from './components/ConditionsLockedPreview';
 import { PairedCropperEditor } from './components/PairedCropperEditor';
 import { PairedQuantityEditor } from './components/PairedQuantityEditor';
 import type { SettingRowContext } from './types/fieldModal';
@@ -43,17 +42,6 @@ export function renderSettingRow(
 		const builderFields = ctx.builderFields || [];
 		const conditionsProEnabled = !! ctx.conditionsProEnabled;
 		const links = ctx.links || {};
-
-		if ( ! conditionsProEnabled ) {
-			return (
-				<ConditionsLockedPreview
-					key={ key }
-					meta={ meta }
-					i18n={ i18n }
-					links={ links }
-				/>
-			);
-		}
 
 		return (
 			<ConditionsEditor
