@@ -413,12 +413,21 @@ function ppom_check_conditions( data_name, callback ) {
 					: 'ppom_field_shown';
 			// console.log(`${t} ***** ${element_data_name} total_cond ${total_cond} == matched ${matched} ==> ${matched_conditions[element_data_name]} ==> visibility ${event_type}`);
 
-			if (
-				( matched_conditions[ element_data_name ] > 0 &&
-					binding === 'Any' ) ||
-				( matched_conditions[ element_data_name ] == total_cond &&
-					binding === 'All' )
-			) {
+			if ( matched_conditions[ element_data_name ] > 0 && binding === 'Any' ) {
+				jQuery( `[data-data_name="${ element_data_name }"]` ).removeClass( function( index, className ) {
+					return ( className.match(/\bppom-locked-\S+/g) || []).join(' ');
+				});
+
+				if ( visibility === 'hide' ) {
+					jQuery( this ).addClass( 'ppom-c-hide' ).removeClass( 'ppom-c-show' );
+				} else {
+					jQuery( this ).removeClass( 'ppom-c-hide' );
+				}
+
+				if ( typeof callback === 'function' ) {
+					callback( element_data_name, event_type );
+				}
+			} else if ( matched_conditions[ element_data_name ] == total_cond && binding === 'All') {
 				// remove/add locked classes for all dependent fields
 				cond_elements.forEach( ( cond_dataname ) => {
 					if ( visibility === 'hide' ) {

@@ -495,12 +495,12 @@ class PPOM_Meta {
 		$inline_js = '';
 
 		if ( ! $this->is_exists() ) {
-			return null;
+			return '';
 		}
 
 		// Meta created without any fields
 		if ( ! $this->ppom_settings ) {
-			return null;
+			return '';
 		}
 
 		if ( $this->has_multiple_meta() ) {
