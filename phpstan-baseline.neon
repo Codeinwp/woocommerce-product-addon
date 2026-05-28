@@ -5701,19 +5701,19 @@ parameters:
 			path: src/Support/Helpers.php
 
 		-
-			message: '#^Call to static method getInstance\(\) on an unknown class PPOM\\Support\\WWP_Wholesale_Roles\.$#'
+			message: '#^Call to static method getInstance\(\) on an unknown class WWP_Wholesale_Roles\.$#'
 			identifier: class.notFound
 			count: 1
 			path: src/Support/Helpers.php
 
 		-
-			message: '#^Call to static method getUserRoles\(\) on an unknown class PPOM\\Support\\WWP_Wholesale_Roles\.$#'
+			message: '#^Call to static method getUserRoles\(\) on an unknown class WWP_Wholesale_Roles\.$#'
 			identifier: class.notFound
 			count: 1
 			path: src/Support/Helpers.php
 
 		-
-			message: '#^Call to static method get_product_wholesale_price_on_shop_v3\(\) on an unknown class PPOM\\Support\\WWP_Wholesale_Prices\.$#'
+			message: '#^Call to static method get_product_wholesale_price_on_shop_v3\(\) on an unknown class WWP_Wholesale_Prices\.$#'
 			identifier: class.notFound
 			count: 1
 			path: src/Support/Helpers.php
@@ -5731,7 +5731,7 @@ parameters:
 			path: src/Support/Helpers.php
 
 		-
-			message: '#^Call to static method wwp_get_product_id\(\) on an unknown class PPOM\\Support\\WWP_Helper_Functions\.$#'
+			message: '#^Call to static method wwp_get_product_id\(\) on an unknown class WWP_Helper_Functions\.$#'
 			identifier: class.notFound
 			count: 1
 			path: src/Support/Helpers.php
