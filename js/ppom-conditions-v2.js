@@ -414,15 +414,20 @@ function ppom_check_conditions( data_name, callback ) {
 			// console.log(`${t} ***** ${element_data_name} total_cond ${total_cond} == matched ${matched} ==> ${matched_conditions[element_data_name]} ==> visibility ${event_type}`);
 
 			if ( matched_conditions[ element_data_name ] > 0 && binding === 'Any' ) {
-				jQuery( `[data-data_name="${ element_data_name }"]` ).removeClass( function( index, className ) {
-					return ( className.match(/\bppom-locked-\S+/g) || []).join(' ');
-				});
+				const $wrapper = jQuery( this );
+				if ( visibility !== 'hide' ) {
+					$wrapper.removeClass( function ( _index, className ) {
+						return ( className.match(/\bppom-locked-\S+/g) || [] ).join( ' ' );
+					} );
+				} else {
+ 					$wrapper.addClass( `ppom-locked-${ data_name }` );
+ 				}
 
 				if ( visibility === 'hide' ) {
-					jQuery( this ).addClass( 'ppom-c-hide' ).removeClass( 'ppom-c-show' );
-				} else {
-					jQuery( this ).removeClass( 'ppom-c-hide' );
-				}
+ 					$wrapper.addClass( 'ppom-c-hide' ).removeClass( 'ppom-c-show' );
+ 				} else {
+ 					$wrapper.removeClass( 'ppom-c-hide' );
+ 				}
 
 				if ( typeof callback === 'function' ) {
 					callback( element_data_name, event_type );
@@ -450,16 +455,33 @@ function ppom_check_conditions( data_name, callback ) {
 				! is_matched ||
 				matched_conditions[ element_data_name ] !== total_cond
 			) {
-				if ( visibility === 'hide' ) {
-					event_type = 'ppom_field_shown';
-					jQuery( this ).removeClass(
-						`ppom-locked-${ data_name } ppom-c-hide`
-					);
-				} else {
-					event_type = 'ppom_field_hidden';
-					jQuery( this ).addClass(
-						`ppom-locked-${ data_name } ppom-c-hide`
-					);
+				if ( binding === 'Any' ) {
+					const classes = ((jQuery(this).attr("class") || "").match(/\bppom-cond-[^\s]+/g,) || [])
+								.map((cls) => cls.replace("ppom-cond-", "ppom-locked-"))
+								.join(" ");
+					console.log(classes);
+
+					if ( visibility === 'hide' ) {
+						jQuery( this ).removeClass(
+							`${ classes } ppom-c-hide`
+						);
+					} else {
+						jQuery( this ).addClass(
+							`${ classes } ppom-c-hide`
+						);
+					}
+				} else if ( binding === 'All' ) {
+					if ( visibility === 'hide' ) {
+						event_type = 'ppom_field_shown';
+						jQuery( this ).removeClass(
+							`ppom-locked-${ data_name } ppom-c-hide`
+						);
+					} else {
+						event_type = 'ppom_field_hidden';
+						jQuery( this ).addClass(
+							`ppom-locked-${ data_name } ppom-c-hide`
+						);
+					}
 				}
 
 				if ( typeof callback === 'function' ) {
