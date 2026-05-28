@@ -191,7 +191,7 @@ final class Engine {
 
 			// var_dump($data_name);
 
-			$value = ! is_array( $value ) ? stripcslashes( $value ) : $value;
+			$value = wp_unslash( $value );
 
 			$field_meta = Helpers::get_field_meta_by_dataname( $product_id, $data_name, $ppom_meta_ids );
 			$product    = wc_get_product( $product_id );
@@ -215,7 +215,7 @@ final class Engine {
 			switch ( $field_type ) {
 
 				case 'bulkquantity':
-					$options = isset( $field_meta['options'] ) ? json_decode( stripcslashes( $field_meta['options'] ), true ) : array();
+					$options = isset( $field_meta['options'] ) ? json_decode( wp_unslash( $field_meta['options'] ), true ) : array();
 					break;
 				case 'image':
 					$options = isset( $field_meta['images'] ) ? Helpers::convert_options_to_key_val( $field_meta['images'], $field_meta, $product ) : array();
@@ -326,7 +326,7 @@ final class Engine {
 					foreach ( $options as $option ) {
 
 						$option_raw = Helpers::wpml_translate( $option['raw'], 'PPOM' );
-						if ( $option_raw == stripcslashes( $value ) ) {
+						if ( $option_raw == wp_unslash( $value ) ) {
 
 							$option_price   = isset( $option['raw_price'] ) ? $option['raw_price'] : '';
 							$option_percent = isset( $option['percent'] ) ? $option['percent'] : '';
@@ -356,7 +356,7 @@ final class Engine {
 							foreach ( $value as $val ) {
 
 								$option_raw = Helpers::wpml_translate( $option['raw'], 'PPOM' );
-								if ( $option_raw == stripcslashes( $val ) ) {
+								if ( $option_raw == wp_unslash( $val ) ) {
 
 									$option_price = isset( $option['raw_price'] ) ? $option['raw_price'] : '';
 
