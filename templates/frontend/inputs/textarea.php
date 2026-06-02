@@ -58,6 +58,9 @@ if ( $postid && is_numeric( $postid ) && $rich_editor != 'on' ) {
 	if ( $rich_editor == 'on' ) {
 		wp_editor( $textarea_value, $fm->data_name(), $wp_editor_setting );
 	} else {
+		if ( $textarea_value != '' ) {
+			$textarea_value = str_replace( '<br />', "\n", $textarea_value );
+		}
 		?>
 		<textarea
 				name="<?php echo esc_attr( $fm->form_name() ); ?>"
@@ -72,14 +75,7 @@ if ( $postid && is_numeric( $postid ) && $rich_editor != 'on' ) {
 			echo $key . '="' . $val . '"';
 		}
 		?>
-		>
-		<?php
-		if ( $textarea_value != '' ) {
-			$textarea_value = str_replace( '<br />', "\n", $textarea_value );
-			echo esc_html( $textarea_value );
-		}
-		?>
-		</textarea>
+		><?php echo esc_html( $textarea_value ); ?></textarea>
 
 	<?php } ?>
 

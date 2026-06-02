@@ -13,6 +13,7 @@ export {
 	buildHtmlField,
 	buildSelectField,
 	buildTextField,
+	buildTextareaField,
 } from './fields.js';
 export { getPpomLicenseFixture, setPpomLicenseFixture } from './license.js';
 export {
