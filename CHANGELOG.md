@@ -1,3 +1,8 @@
+##### [Version 34.0.2](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.1...v34.0.2) (2026-06-02)
+
+- Fixed textarea placeholder not displaying
+- Fixed error with Wholesale Prices integration during frontend script loading
+
 ##### [Version 34.0.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.0...v34.0.1) (2026-05-21)
 
 - Updated dependencies.
