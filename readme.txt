@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: product addons, woocommerce product addons, woocommerce product options, custom fields, variable products
 Requires at least: 6.2
 Tested up to: 7.0
-Stable tag: 34.0.1
+Stable tag: 34.0.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -253,11 +253,10 @@ Please follow the reporting protocols outlined on our [Security Page](https://th
 
 == Changelog ==
 
-##### [Version 34.0.1](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.0...v34.0.1) (2026-05-21)
+##### [Version 34.0.2](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.1...v34.0.2) (2026-06-02)
 
-- Updated dependencies.
-- Fixed the product quantity update on WooCommerce Cart.
-- Fixed the lock that prevented non-premium users from using the field conditions feature.
+- Fixed textarea placeholder not displaying
+- Fixed error with Wholesale Prices integration during frontend script loading
 
 
 
