@@ -27,6 +27,10 @@ function buildTextField( args ) {
 	return buildField( 'text', args );
 }
 
+function buildTextareaField( args ) {
+	return buildField( 'textarea', args );
+}
+
 function buildImageField( args ) {
 	return buildField( 'image', {
 		images: [],
@@ -103,6 +107,7 @@ export {
 	buildPriceMatrixField,
 	buildSelectField,
 	buildTextField,
+	buildTextareaField,
 	buildFileField,
 	buildHtmlField,
 };
