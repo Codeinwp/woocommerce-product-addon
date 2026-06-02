@@ -163,9 +163,9 @@ final class Helpers {
 
 		if ( method_exists( 'WWP_Wholesale_Prices', 'get_product_wholesale_price_on_shop_v3' ) ) {
 
-			$wwp_roles           = WWP_Wholesale_Roles::getInstance();
+			$wwp_roles           = \WWP_Wholesale_Roles::getInstance();
 			$user_wholesale_role = $wwp_roles->getUserRoles();
-			$price_arr           = WWP_Wholesale_Prices::get_product_wholesale_price_on_shop_v3( WWP_Helper_Functions::wwp_get_product_id( $product ), $user_wholesale_role );
+			$price_arr           = \WWP_Wholesale_Prices::get_product_wholesale_price_on_shop_v3( \WWP_Helper_Functions::wwp_get_product_id( $product ), $user_wholesale_role );
 			// self::pa($price_arr);
 			if ( ! empty( $price_arr['wholesale_price'] ) ) {
 				$product_price = $price_arr['wholesale_price'];
@@ -207,7 +207,7 @@ final class Helpers {
 		// Well, this also need to be confirm, PRODUCT->get_price should include this filter as well.
 		if ( has_filter( 'wwp_filter_wholesale_price' ) ) {
 
-			$user_wholesale_role = WWP_Wholesale_Roles::getUserRoles();
+			$user_wholesale_role = \WWP_Wholesale_Roles::getUserRoles();
 			$quantity            = 1;
 			$product_price       = apply_filters( 'wwp_filter_wholesale_price', $product_price, self::get_product_id( $product ), $user_wholesale_role, $quantity );
 		}
