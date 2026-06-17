@@ -251,6 +251,10 @@ class Test_Pricing_ModernCartFeeApplicator extends PPOM_Test_Case {
 
 		$fees = WC()->cart->get_fees();
 		$this->assertCount( 1, $fees );
-		$this->assertEqualsWithDelta( 7.0, (float) reset( $fees )->amount, 0.0001 );
+
+		$tax_class    = $product->get_tax_class( 'unfiltered' );
+		$expected_tax = \WC_Tax::calc_tax( 7.0, \WC_Tax::get_rates( $tax_class ), true );
+		$expected_fee = 7.0 - array_sum( $expected_tax );
+		$this->assertEqualsWithDelta( $expected_fee, (float) reset( $fees )->amount, 0.0001 );
 	}
 }
