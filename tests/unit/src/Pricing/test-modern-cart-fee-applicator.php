@@ -208,6 +208,8 @@ class Test_Pricing_ModernCartFeeApplicator extends PPOM_Test_Case {
 	 * Regression for #630: Engine::price_cart_fee must not fatally resolve
 	 * WooCommerce tax classes inside PPOM\Pricing namespace.
 	 *
+	 * @covers \PPOM\Pricing\Engine::price_cart_fee
+	 *
 	 * @return void
 	 */
 	public function test_engine_cart_fee_with_tax_inclusive_prices_does_not_fatal() {
