@@ -11,6 +11,14 @@ if ( ! $_tests_dir ) {
 	$_tests_dir = rtrim( sys_get_temp_dir(), '/\\' ) . '/wordpress-tests-lib';
 }
 
+// PHPUnit Polyfills — required by WP test bootstrap (WP 5.9+).
+if ( ! defined( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH' ) ) {
+	$_polyfills_path = getenv( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH' );
+	if ( $_polyfills_path ) {
+		define( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH', $_polyfills_path );
+	}
+}
+
 if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
 	echo "Could not find $_tests_dir/includes/functions.php, have you run bin/install-wp-tests.sh ?" . PHP_EOL;
 	exit( 1 );
