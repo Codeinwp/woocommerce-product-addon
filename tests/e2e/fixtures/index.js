@@ -14,6 +14,7 @@ export {
 	buildSelectField,
 	buildTextField,
 	buildTextareaField,
+	buildTextCounterField,
 } from './fields.js';
 export { getPpomLicenseFixture, setPpomLicenseFixture } from './license.js';
 export {

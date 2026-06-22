@@ -100,6 +100,28 @@ function buildHtmlField( { html = '', ...args } ) {
 	} );
 }
 
+function buildTextCounterField( {
+	countType = 'character',
+	maxlength = '50',
+	enableTextInput = '',
+	textareaRow = '3',
+	countPrice = '',
+	countSpace = '',
+	...args
+} ) {
+	return buildField( 'textcounter', {
+		...args,
+		count_type: countType,
+		maxlength,
+		enable_textinput: enableTextInput,
+		textarea_row: textareaRow,
+		count_price: countPrice,
+		enabled_space: countSpace,
+		counter_color: '',
+		counter_bg_color: '',
+	} );
+}
+
 export {
 	buildCheckboxField,
 	buildImageField,
@@ -110,4 +132,5 @@ export {
 	buildTextareaField,
 	buildFileField,
 	buildHtmlField,
+	buildTextCounterField,
 };

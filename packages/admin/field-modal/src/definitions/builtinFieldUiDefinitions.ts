@@ -98,6 +98,76 @@ export function textLikeDefinition( slug: string ): FieldUiDefinition {
 	return definition( slug, TEXT_BLOCKS );
 }
 
+const TEXTCOUNTER_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
+	{
+		kind: 'section',
+		id: 'basic',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Basic,
+		keys: [ 'title', 'data_name', 'description' ],
+	},
+	{
+		kind: 'section',
+		id: 'field-settings',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.FieldSettings,
+		keys: [
+			'count_type',
+			'maxlength',
+			'textarea_row',
+			'enable_textinput',
+			'enabled_space',
+			'required',
+		],
+	},
+	{
+		kind: 'section',
+		id: 'pricing',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.DefaultPrice,
+		keys: [ 'count_price' ],
+	},
+	{
+		kind: 'section',
+		id: 'counter-display',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
+		keys: [ 'counter_color', 'counter_bg_color' ],
+		advanced: true,
+	},
+	{
+		kind: 'section',
+		id: 'validation',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Validation,
+		keys: [ 'error_message' ],
+		advanced: true,
+	},
+	{
+		kind: 'section',
+		id: 'display',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Display,
+		keys: [ 'width', 'visibility', 'visibility_role' ],
+		advanced: true,
+	},
+	{
+		kind: 'section',
+		id: 'behavior',
+		tab: FieldTab.Settings,
+		labelKey: SectionLabelKey.Behavior,
+		keys: [ 'desc_tooltip' ],
+		advanced: true,
+	},
+	{
+		kind: 'section',
+		id: 'conditions',
+		tab: FieldTab.Conditions,
+		labelKey: 'conditionsTab',
+		keys: [ 'logic', 'conditions' ],
+	},
+];
+
 const TEXTAREA_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	{
 		kind: 'section',
@@ -1867,7 +1937,7 @@ export function registerBuiltinFieldUiDefinitions(): void {
 		definition( BuiltinFieldType.Text, TEXT_BLOCKS )
 	);
 	registerFieldUiDefinition(
-		definition( BuiltinFieldType.Textcounter, TEXT_BLOCKS )
+		definition( BuiltinFieldType.Textcounter, TEXTCOUNTER_BLOCKS )
 	);
 	registerFieldUiDefinition(
 		definition( BuiltinFieldType.Textarea, TEXTAREA_BLOCKS )
