@@ -213,7 +213,7 @@ export function FieldTypePicker( {
 				pt={ { base: 2, lg: 0 } }
 				h={ { lg: 'full' } }
 				minH={ 0 }
-				overflow={ { lg: 'hidden' } }
+				overflow={ { lg: 'auto' } }
 				css={ {
 					overflowWrap: 'anywhere',
 					wordBreak: 'break-word',
