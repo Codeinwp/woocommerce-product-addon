@@ -44,6 +44,9 @@ function _register_module() {
 	include_once PPOM_PATH . '/classes/admin.class.php';
 
 	$ppom_admin = new NM_PersonalizedProduct_Admin();
+
+	// Ensure PPOM's custom DB table exists in the test database.
+	PPOM_Meta_Repository::ensure_schema();
 }
 
 tests_add_filter( 'pre_option_active_plugins', '_activate_woocommerce' );

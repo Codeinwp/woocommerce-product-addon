@@ -200,7 +200,7 @@ final class Validator {
 
 		$current_input_value = isset( $data['input_value'] ) ? wc_stock_amount( $data['input_value'] ) : 0;
 
-		if ( $limits['input_value'] > 0 ) {
+		if ( $limits['input_value'] > 0 && $current_input_value < $limits['input_value'] ) {
 			$data['input_value'] = wc_stock_amount( $limits['input_value'] );
 		} elseif ( $current_input_value < $data['min_value'] ) {
 			$data['input_value'] = $data['min_value'];
