@@ -12,6 +12,7 @@
 require_once dirname( __DIR__, 2 ) . '/class-ppom-test-case.php';
 
 use PPOM\Pricing\ModernCartFeeApplicator;
+use PPOM\Pricing\Engine;
 
 /**
  * @covers \PPOM\Pricing\ModernCartFeeApplicator
@@ -201,5 +202,59 @@ class Test_Pricing_ModernCartFeeApplicator extends PPOM_Test_Case {
 		$fees = WC()->cart->get_fees();
 		$this->assertCount( 1, $fees );
 		$this->assertEqualsWithDelta( 99.0, (float) reset( $fees )->amount, 0.0001 );
+	}
+
+	/**
+	 * Regression for #630: Engine::price_cart_fee must not fatally resolve
+	 * WooCommerce tax classes inside PPOM\Pricing namespace.
+	 *
+	 * @covers \PPOM\Pricing\Engine::price_cart_fee
+	 *
+	 * @return void
+	 */
+	public function test_engine_cart_fee_with_tax_inclusive_prices_does_not_fatal() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10', 'virtual' => true ) );
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_select_field(
+					'gift_wrap',
+					'Gift Wrap',
+					array( array( 'option' => 'Premium box', 'price' => '7' ) ),
+					array( 'onetime' => 'on' )
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+		$cart_key = $this->add_product_to_real_cart(
+			$product->get_id(),
+			array( 'fields' => array( 'gift_wrap' => 'Premium box' ) )
+		);
+		$this->assertNotFalse( $cart_key );
+
+		$original_prices_include_tax = get_option( 'woocommerce_prices_include_tax' );
+		$original_calc_taxes         = get_option( 'woocommerce_calc_taxes' );
+		update_option( 'woocommerce_calc_taxes', 'yes' );
+		update_option( 'woocommerce_prices_include_tax', 'yes' );
+
+		try {
+			$this->reload_real_cart_from_session();
+			WC()->cart->fees_api()->remove_all_fees();
+
+			Engine::price_cart_fee( WC()->cart );
+		} finally {
+			update_option( 'woocommerce_prices_include_tax', $original_prices_include_tax );
+			update_option( 'woocommerce_calc_taxes', $original_calc_taxes );
+		}
+
+		$fees = WC()->cart->get_fees();
+		$this->assertCount( 1, $fees );
+
+		$tax_class    = $product->get_tax_class( 'unfiltered' );
+		$expected_tax = \WC_Tax::calc_tax( 7.0, \WC_Tax::get_rates( $tax_class ), true );
+		$expected_fee = 7.0 - array_sum( $expected_tax );
+		$this->assertEqualsWithDelta( $expected_fee, (float) reset( $fees )->amount, 0.0001 );
 	}
 }
