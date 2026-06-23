@@ -1,3 +1,11 @@
+##### [Version 34.0.3](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.2...v34.0.3) (2026-06-23)
+
+- Prevent fatal WC_Tax lookup in tax-inclusive cart-fee recalculation
+- Fixed field picker sidebar responsiveness
+- Fixed issue with PHP 8.1 when PPOM cart item display receives an array causing error
+- Fixed issue to prevent double currency conversion when PPOM Pro is active
+- Fixed issue when Cart quantity input resets to price matrix minimum after higher quantity is selected
+
 ##### [Version 34.0.2](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.1...v34.0.2) (2026-06-02)
 
 - Fixed textarea placeholder not displaying
