@@ -165,7 +165,7 @@ class NM_PersonalizedProduct {
 		// Show description tooltip.
 		add_filter( 'ppom_field_description', array( $this, 'show_tooltip' ), 15, 2 );
 
-		add_filter( 'ppom_option_price', array( $this, 'ppom_convert_price' ), 99, 1 );
+		$this->maybe_register_option_price_hook();
 	}
 
 	/*
@@ -840,6 +840,23 @@ class NM_PersonalizedProduct {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Register the core ppom_option_price conversion hook only when PPOM Pro
+	 * has not already registered ppom_hooks_convert_price on the same filter.
+	 *
+	 * Called from __construct() on woocommerce_init — after every plugin has
+	 * loaded — so has_filter() reflects the final registration state. Exposed
+	 * as a public method to allow tests to invoke it with a controlled filter
+	 * state without relying on singleton construction timing.
+	 *
+	 * @return void
+	 */
+	public function maybe_register_option_price_hook() {
+		if ( ! has_filter( 'ppom_option_price', 'ppom_hooks_convert_price' ) ) {
+			add_filter( 'ppom_option_price', array( $this, 'ppom_convert_price' ), 99, 1 );
+		}
 	}
 
 	/**
