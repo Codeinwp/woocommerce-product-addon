@@ -325,6 +325,97 @@ function textSettings(): SettingSchema {
 	};
 }
 
+function textCounterSettings(): SettingSchema {
+	return {
+		title: titleSetting(),
+		data_name: dataNameSetting(),
+		description: descriptionSetting(),
+		error_message: errorMessageSetting(),
+		count_type: setting(
+			'select',
+			__( 'Count Type', 'woocommerce-product-addon' ),
+			__( 'Select text count type.', 'woocommerce-product-addon' ),
+			{
+				options: {
+					word: __( 'Word', 'woocommerce-product-addon' ),
+					character: __( 'Character', 'woocommerce-product-addon' ),
+				},
+				col_classes: HALF_WIDTH,
+			}
+		),
+		maxlength: setting(
+			'text',
+			__( 'Max. Character/Word', 'woocommerce-product-addon' ),
+			__(
+				'Add Max. character or word limit',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
+		),
+		textarea_row: setting(
+			'number',
+			__( 'Textarea Row', 'woocommerce-product-addon' ),
+			__(
+				'Control height of textarea e.g: 3',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
+		),
+		count_price: setting(
+			'text',
+			__( 'Character/Word Price', 'woocommerce-product-addon' ),
+			__(
+				'Add per character/word price',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
+		),
+		counter_color: setting(
+			'color',
+			__( 'Counter text Color', 'woocommerce-product-addon' ),
+			__(
+				'Add counter box text color',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
+		),
+		counter_bg_color: setting(
+			'color',
+			__( 'Counter Background Color', 'woocommerce-product-addon' ),
+			__(
+				'Add counter box background color',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
+		),
+		width: widthSetting(),
+		visibility: visibilitySetting(),
+		visibility_role: visibilityRoleSetting(),
+		desc_tooltip: descTooltipSetting(),
+		required: requiredSetting(),
+		enable_textinput: setting(
+			'checkbox',
+			__( 'Enable Text Input', 'woocommerce-product-addon' ),
+			__(
+				'Show text input instead textarea.',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
+		),
+		enabled_space: setting(
+			'checkbox',
+			__( 'Include Space', 'woocommerce-product-addon' ),
+			__(
+				'Space count only character type.',
+				'woocommerce-product-addon'
+			),
+			{ col_classes: HALF_WIDTH }
+		),
+		logic: logicSetting(),
+		conditions: conditionsSetting(),
+	};
+}
+
 function textareaSettings(): SettingSchema {
 	return {
 		title: titleSetting(),
@@ -3060,7 +3151,7 @@ function vqmatrixSettings(): SettingSchema {
 
 export const builtinFieldUiSchemas: Record< string, SettingSchema > = {
 	text: textSettings(),
-	textcounter: textSettings(),
+	textcounter: textCounterSettings(),
 	textarea: textareaSettings(),
 	email: emailSettings(),
 	number: numberSettings(),
