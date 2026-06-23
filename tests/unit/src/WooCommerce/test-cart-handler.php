@@ -694,6 +694,31 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Non-scalar fallback display values must be serialised so WooCommerce cart
+	 * rendering receives a string-safe `display` value on PHP 8.1+.
+	 *
+	 * @return void
+	 */
+	public function test_convert_ppom_meta_entry_to_item_meta_row_display_fallback_json_encodes_non_scalar_value() {
+		$nested = array(
+			'first'  => 'One',
+			'second' => array( 'Two' ),
+		);
+
+		$row = CartHandler::convert_ppom_meta_entry_to_item_meta_row(
+			'matrix_field',
+			array(
+				'name'  => 'Matrix',
+				'value' => $nested,
+				'type'  => 'text',
+			)
+		);
+
+		$this->assertIsArray( $row );
+		$this->assertSame( wp_json_encode( $nested ), $row['display'] );
+	}
+
+	/**
 	 * Empty array entries (`make_meta_data()` produces these for cropper /
 	 * image rows whose value is empty in cart context) must not crash and
 	 * must produce a fall-through row keyed by the cart key — preserving

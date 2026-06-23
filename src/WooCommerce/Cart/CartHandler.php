@@ -671,6 +671,10 @@ final class CartHandler {
 				$meta_value = wp_json_encode( $meta_value );
 			}
 
+			if ( ! is_scalar( $display ) ) {
+				$display = wp_json_encode( $display );
+			}
+
 			if ( apply_filters( 'ppom_show_option_price_cart', false ) && isset( $meta['price'] ) ) {
 				$meta_value .= ' (' . wc_price( $meta['price'] ) . ')';
 			}
