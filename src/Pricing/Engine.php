@@ -1397,7 +1397,7 @@ final class Engine {
 
 					// if wc prices include tax: substract the tax from additional fixed fee since already WC will add tax.
 					if ( wc_prices_include_tax() ) {
-						$tax = WC_Tax::calc_tax( $fee_price, \WC_Tax::get_rates( $tax_class ), true );
+						$tax = \WC_Tax::calc_tax( $fee_price, \WC_Tax::get_rates( $tax_class ), true );
 
 						$total_tax = array_sum( $tax );
 						$fee_price = $fee_price - $total_tax;
