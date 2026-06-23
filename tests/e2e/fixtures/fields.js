@@ -107,6 +107,8 @@ function buildTextCounterField( {
 	textareaRow = '3',
 	countPrice = '',
 	countSpace = '',
+	counterColor = '',
+	counterBgColor = '',
 	...args
 } ) {
 	return buildField( 'textcounter', {
@@ -117,8 +119,8 @@ function buildTextCounterField( {
 		textarea_row: textareaRow,
 		count_price: countPrice,
 		enabled_space: countSpace,
-		counter_color: '',
-		counter_bg_color: '',
+		counter_color: counterColor,
+		counter_bg_color: counterBgColor,
 	} );
 }
 

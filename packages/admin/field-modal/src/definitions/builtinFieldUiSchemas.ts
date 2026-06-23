@@ -371,7 +371,7 @@ function textCounterSettings(): SettingSchema {
 			{ col_classes: HALF_WIDTH }
 		),
 		counter_color: setting(
-			'text',
+			'color',
 			__( 'Counter text Color', 'woocommerce-product-addon' ),
 			__(
 				'Add counter box text color',
@@ -380,7 +380,7 @@ function textCounterSettings(): SettingSchema {
 			{ col_classes: HALF_WIDTH }
 		),
 		counter_bg_color: setting(
-			'text',
+			'color',
 			__( 'Counter Background Color', 'woocommerce-product-addon' ),
 			__(
 				'Add counter box background color',

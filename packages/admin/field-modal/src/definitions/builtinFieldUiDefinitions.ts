@@ -129,14 +129,6 @@ const TEXTCOUNTER_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 	},
 	{
 		kind: 'section',
-		id: 'counter-display',
-		tab: FieldTab.Settings,
-		labelKey: SectionLabelKey.Display,
-		keys: [ 'counter_color', 'counter_bg_color' ],
-		advanced: true,
-	},
-	{
-		kind: 'section',
 		id: 'validation',
 		tab: FieldTab.Settings,
 		labelKey: SectionLabelKey.Validation,
@@ -148,7 +140,13 @@ const TEXTCOUNTER_BLOCKS: FieldUiDefinition[ 'blocks' ] = [
 		id: 'display',
 		tab: FieldTab.Settings,
 		labelKey: SectionLabelKey.Display,
-		keys: [ 'width', 'visibility', 'visibility_role' ],
+		keys: [
+			'counter_color',
+			'counter_bg_color',
+			'width',
+			'visibility',
+			'visibility_role',
+		],
 		advanced: true,
 	},
 	{
