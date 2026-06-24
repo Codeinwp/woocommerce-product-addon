@@ -350,40 +350,65 @@ class NM_PersonalizedProduct {
 			$pagenum  = $wp_list_table->get_pagenum();
 			$sendback = add_query_arg( 'paged', $pagenum, $sendback );
 
+			if ( empty( $action ) ) {
+				return;
+			}
 
-			$nm_do_action = ( $action == 'nm_delete_meta' ) ? $action : substr( $action, 0, 10 );
+			$nm_do_action = ( 'nm_delete_meta' === $action ) ? $action : substr( $action, 0, 10 );
+
+			if ( 'nm_action_' !== $nm_do_action && 'nm_delete_meta' !== $nm_do_action ) {
+				return;
+			}
+
+			check_admin_referer( 'bulk-posts' );
 
 			switch ( $nm_do_action ) {
 				case 'nm_action_':
-					$nm_updated = 0;
+					$nm_updated  = 0;
+					$updated_ids = array();
 					foreach ( $post_ids as $post_id ) {
 
-						$meta_id = array( intval( substr( $action, 10 ) ) );
-						update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $meta_id );
+						if ( ! current_user_can( 'edit_post', $post_id ) ) {
+							continue;
+						}
 
+						$meta_id_value = (int) substr( $action, 10 );
+						if ( $meta_id_value <= 0 ) {
+							continue;
+						}
+
+						update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, array( $meta_id_value ) );
+
+						$updated_ids[] = $post_id;
 						++$nm_updated;
 					}
 					$sendback = add_query_arg(
 						array(
 							'nm_updated' => $nm_updated,
-							'ids'        => join( ',', $post_ids ),
+							'ids'        => join( ',', $updated_ids ),
 						),
 						$sendback 
 					);
 					break;
 
 				case 'nm_delete_meta':
-					$nm_removed = 0;
+					$nm_removed  = 0;
+					$removed_ids = array();
 					foreach ( $post_ids as $post_id ) {
+
+						if ( ! current_user_can( 'edit_post', $post_id ) ) {
+							continue;
+						}
 
 						delete_post_meta( $post_id, PPOM_PRODUCT_META_KEY );
 
+						$removed_ids[] = $post_id;
 						++$nm_removed;
 					}
 					$sendback = add_query_arg(
 						array(
 							'nm_removed' => $nm_removed,
-							'ids'        => join( ',', $post_ids ),
+							'ids'        => join( ',', $removed_ids ),
 						),
 						$sendback 
 					);
