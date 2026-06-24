@@ -1,3 +1,7 @@
+##### [Version 34.0.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.3...v34.0.4) (2026-06-24)
+
+- Enhanced security
+
 ##### [Version 34.0.3](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.2...v34.0.3) (2026-06-23)
 
 - Prevent fatal WC_Tax lookup in tax-inclusive cart-fee recalculation

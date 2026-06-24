@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: product addons, woocommerce product addons, woocommerce product options, custom fields, variable products
 Requires at least: 6.2
 Tested up to: 7.0
-Stable tag: 34.0.3
+Stable tag: 34.0.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -253,13 +253,9 @@ Please follow the reporting protocols outlined on our [Security Page](https://th
 
 == Changelog ==
 
-##### [Version 34.0.3](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.2...v34.0.3) (2026-06-23)
+##### [Version 34.0.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.3...v34.0.4) (2026-06-24)
 
-- Prevent fatal WC_Tax lookup in tax-inclusive cart-fee recalculation
-- Fixed field picker sidebar responsiveness
-- Fixed issue with PHP 8.1 when PPOM cart item display receives an array causing error
-- Fixed issue to prevent double currency conversion when PPOM Pro is active
-- Fixed issue when Cart quantity input resets to price matrix minimum after higher quantity is selected
+- Enhanced security
 
 
 
