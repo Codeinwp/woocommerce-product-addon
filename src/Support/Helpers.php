@@ -738,7 +738,7 @@ final class Helpers {
 
 				case 'select':
 				case 'radio':
-					$posted_value = stripslashes( $value );
+					$posted_value = wp_unslash( $value );
 
 					$option_price = '';
 					$option_data  = array();

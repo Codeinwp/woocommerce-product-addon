@@ -352,7 +352,7 @@ final class Engine {
 				case 'checkbox':
 					foreach ( $options as $option ) {
 
-						if ( $value ) {
+						if ( is_array( $value ) ) {
 							foreach ( $value as $val ) {
 
 								$option_raw = Helpers::wpml_translate( $option['raw'], 'PPOM' );
@@ -454,7 +454,7 @@ final class Engine {
 				case 'palettes':
 					foreach ( $options as $option ) {
 
-						if ( $value ) {
+						if ( is_array( $value ) ) {
 							foreach ( $value as $color ) {
 
 								if ( $option['raw'] == $color ) {
@@ -494,7 +494,7 @@ final class Engine {
 
 				case 'image':
 					foreach ( $options as $option ) {
-						if ( $value ) {
+						if ( is_array( $value ) ) {
 							foreach ( $value as $images_meta ) {
 
 								$images_meta     = json_decode( stripslashes( $images_meta ), true );
@@ -525,7 +525,7 @@ final class Engine {
 				case 'audio':
 					foreach ( $options as $option ) {
 
-						if ( $value ) {
+						if ( is_array( $value ) ) {
 							foreach ( $value as $images_meta ) {
 
 								$images_meta = json_decode( stripslashes( $images_meta ), true );
