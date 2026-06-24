@@ -5119,12 +5119,6 @@ parameters:
 			path: src/Pricing/Engine.php
 
 		-
-			message: '#^Call to static method calc_tax\(\) on an unknown class PPOM\\Pricing\\WC_Tax\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Pricing/Engine.php
-
-		-
 			message: '#^Function PPOM_FPP not found\.$#'
 			identifier: function.notFound
 			count: 1
