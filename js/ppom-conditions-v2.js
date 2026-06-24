@@ -459,7 +459,6 @@ function ppom_check_conditions( data_name, callback ) {
 					const classes = ((jQuery(this).attr("class") || "").match(/\bppom-cond-[^\s]+/g,) || [])
 								.map((cls) => cls.replace("ppom-cond-", "ppom-locked-"))
 								.join(" ");
-					console.log(classes);
 
 					if ( visibility === 'hide' ) {
 						jQuery( this ).removeClass(
@@ -742,7 +741,7 @@ function ppom_set_default_option( field_id ) {
 				const opt_id =
 					product_id + '-' + field.data_name + '-' + options.id;
 
-				const default_checked = field.checked.split( '\r\n' );
+				const default_checked = field.checked?.split( '\r\n' );
 				if ( jQuery.inArray( options.option, default_checked ) > -1 ) {
 					jQuery( '#' + opt_id ).prop( 'checked', true );
 				}
