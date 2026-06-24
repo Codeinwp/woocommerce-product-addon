@@ -183,9 +183,13 @@ jQuery( function ( $ ) {
 					const croppie_container = jQuery(
 						'.ppom-croppie-preview-' + image_id
 					);
-					const image_url = jQuery( croppie_dom )
-						.find( 'img' )
-						.attr( 'src' );
+					// Destroy the current Croppie instance before re-initialising.
+					// Do NOT read image src from the DOM here: Croppie can replace
+					// it with a blob/data URL or remove the element entirely during
+					// destroy(), producing an invalid URL. The canonical upload URL
+					// is already stored in
+					// file_list_preview_containers[data_name].image_url (set by
+					// ppom_show_cropped_preview) and must not be overwritten.
 					$( croppie_dom ).croppie( 'destroy' );
 					const viewport = { width: v_width, height: v_height };
 
@@ -194,8 +198,6 @@ jQuery( function ( $ ) {
 					] = croppie_container;
 					file_list_preview_containers[ data_name ].image_id =
 						image_id;
-					file_list_preview_containers[ data_name ].image_url =
-						image_url;
 
 					ppom_set_croppie_options( data_name, viewport, image_id );
 				} );
@@ -472,20 +474,25 @@ function ppom_set_croppie_options( file_name, viewport, image_id ) {
 	const croppie_options = ppom_file_vars.croppie_options;
 	jQuery.each( croppie_options, function ( field_name, option ) {
 		if ( file_name === field_name ) {
-			option.url = file_list_preview_containers[ file_name ].image_url;
+			// Deep-copy the shared options object so we never mutate the
+			// original — repeated size changes would otherwise accumulate stale
+			// url / viewport values from a previous call.
+			const workingOption = jQuery.extend( true, {}, option );
+			workingOption.url =
+				file_list_preview_containers[ file_name ].image_url;
 			if ( viewport !== undefined ) {
-				viewport.type = option.viewport.type;
-				option.viewport = viewport;
+				viewport.type = workingOption.viewport.type;
+				workingOption.viewport = viewport;
 			}
 
 			const preview = file_list_preview_containers[ file_name ];
-			let applied = option;
+			let applied = workingOption;
 			if (
 				preview.container_width !== undefined &&
 				preview.container_width !== null
 			) {
 				applied = get_responsive_croppie_options(
-					option,
+					workingOption,
 					preview.container_width
 				);
 			}
