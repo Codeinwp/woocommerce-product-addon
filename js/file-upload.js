@@ -41,7 +41,7 @@ const Cropped_Data_Captured = false;
 
 // Track nonce refresh state to avoid duplicate requests
 let nonceRefreshPromise = null;
-let lastNonceRefreshTime = 0;
+let lastNonceRefreshTime = Date.now();
 const NONCE_CACHE_DURATION = 300000; // 5 minutes in milliseconds
 
 /**
@@ -72,6 +72,7 @@ async function ppom_refresh_file_nonces() {
 		credentials: 'same-origin',
 		headers: {
 			'Content-Type': 'application/json',
+			'X-WP-Nonce': ppom_file_vars.wp_rest_nonce,
 		},
 	} )
 		.then( ( response ) => {
