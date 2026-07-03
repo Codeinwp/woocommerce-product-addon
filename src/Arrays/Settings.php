@@ -602,6 +602,18 @@ final class Settings {
 
 					$fields_meta['options'] = json_encode( $bulkquantities_new_options );
 					break;
+
+				case 'file':
+				case 'cropper':
+					// Ensure defaults so the frontend uploader never receives an empty
+					// file_types value, which crashes plupload during init.
+					if ( empty( $fields_meta['file_types'] ) ) {
+						$fields_meta['file_types'] = 'jpg,pdf,zip';
+					}
+					if ( empty( $fields_meta['file_size'] ) ) {
+						$fields_meta['file_size'] = '1mb';
+					}
+					break;
 			}
 
 			$ppom_meta_fields_updated[] = $fields_meta;
