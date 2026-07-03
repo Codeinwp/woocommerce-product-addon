@@ -568,7 +568,7 @@ function ppom_setup_file_upload_input( file_input ) {
 
 		filters: {
 			mime_types: [
-				{ title: 'Filetypes', extensions: file_input.file_types },
+				{ title: 'Filetypes', extensions: file_input.file_types || 'jpg,png,gif' },
 			],
 		},
 
