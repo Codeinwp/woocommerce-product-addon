@@ -421,6 +421,15 @@ class PPOM_FRONTEND_SCRIPTS {
 								break;
 
 							case 'cropper':
+								// Cropper is image-only; default to its builder value (jpg,png) so the
+								// uploader never receives an empty file_types (which crashes plupload).
+								if ( empty( $fields_meta['file_types'] ) ) {
+									$fields_meta['file_types'] = 'jpg,png';
+								}
+								if ( empty( $fields_meta['file_size'] ) ) {
+									$fields_meta['file_size'] = '1mb';
+								}
+
 								PPOM_SCRIPTS::enqueue_style( 'ppom-croppie-lib' );
 								PPOM_SCRIPTS::enqueue_script( 'ppom-croppie-lib' );
 								PPOM_SCRIPTS::enqueue_script( 'ppom-exif' );
@@ -436,6 +445,15 @@ class PPOM_FRONTEND_SCRIPTS {
 								break;
 
 							case 'file':
+								// Default so the uploader never receives an empty file_types,
+								// which crashes plupload during init.
+								if ( empty( $fields_meta['file_types'] ) ) {
+									$fields_meta['file_types'] = 'jpg,pdf,zip';
+								}
+								if ( empty( $fields_meta['file_size'] ) ) {
+									$fields_meta['file_size'] = '1mb';
+								}
+
 								$ppom_file_inputs[] = $field;
 
 								PPOM_SCRIPTS::enqueue_script( 'ppom-file-upload' );

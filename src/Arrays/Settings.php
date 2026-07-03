@@ -604,11 +604,21 @@ final class Settings {
 					break;
 
 				case 'file':
-				case 'cropper':
 					// Ensure defaults so the frontend uploader never receives an empty
 					// file_types value, which crashes plupload during init.
 					if ( empty( $fields_meta['file_types'] ) ) {
 						$fields_meta['file_types'] = 'jpg,pdf,zip';
+					}
+					if ( empty( $fields_meta['file_size'] ) ) {
+						$fields_meta['file_size'] = '1mb';
+					}
+					break;
+
+				case 'cropper':
+					// Same guard as 'file', but cropper is image-only — match its
+					// builder default (jpg,png) instead of allowing pdf/zip.
+					if ( empty( $fields_meta['file_types'] ) ) {
+						$fields_meta['file_types'] = 'jpg,png';
 					}
 					if ( empty( $fields_meta['file_size'] ) ) {
 						$fields_meta['file_size'] = '1mb';
