@@ -679,7 +679,7 @@ class PPOM_FRONTEND_SCRIPTS {
 			if ( isset( $GLOBALS[ $multi_product_var ] ) && is_array( $GLOBALS[ $multi_product_var ] ) ) {
 				$existing_data = $GLOBALS[ $multi_product_var ];
 			}
-			
+
 			$existing_data[ $product_id ]  = $localize_data;
 			$GLOBALS[ $multi_product_var ] = $existing_data;
 			// Localize the multi-product data structure.
