@@ -360,8 +360,9 @@ final class Manager {
 
 		if ( is_string( $_REQUEST['ppom'] ) ) {
 			$ppom_encoded = $_REQUEST['ppom'];
-			parse_str( $ppom_encoded, $ppom_decoded );
-			$ppom = $ppom_decoded['ppom'];
+			// parse_str() truncates at max_input_vars, silently dropping fields on large groups.
+			$ppom_decoded = Helpers::parse_str_unlimited( $ppom_encoded );
+			$ppom         = isset( $ppom_decoded['ppom'] ) ? $ppom_decoded['ppom'] : array();
 		}
 
 		$ppom_meta = isset( $_REQUEST['ppom_meta'] ) ? $_REQUEST['ppom_meta'] : $ppom;
@@ -716,8 +717,9 @@ final class Manager {
 
 		if ( is_string( $_REQUEST['ppom'] ) ) {
 			$ppom_encoded = $_REQUEST['ppom'];
-			parse_str( $ppom_encoded, $ppom_decoded );
-			$_REQUEST['ppom'] = $ppom_decoded['ppom'];
+			// parse_str() truncates at max_input_vars, silently dropping fields on large groups.
+			$ppom_decoded     = Helpers::parse_str_unlimited( $ppom_encoded );
+			$_REQUEST['ppom'] = isset( $ppom_decoded['ppom'] ) ? $ppom_decoded['ppom'] : array();
 		}
 
 		$ppom_meta = array();

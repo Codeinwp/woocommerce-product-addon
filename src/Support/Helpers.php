@@ -909,6 +909,47 @@ final class Helpers {
 		}
 	}
 
+	/**
+	 * Decode a URL-encoded query string without PHP's `max_input_vars` limit.
+	 *
+	 * The admin builder bundles every `ppom[...]` input into a single encoded
+	 * string to bypass `max_input_vars` on the request, but `parse_str()` is
+	 * subject to the same limit and silently truncates large field groups
+	 * before saving. Decoding pair-by-pair keeps every field.
+	 *
+	 * @param string $query Raw query string.
+	 * @return array<int|string, mixed> Decoded nested array, shaped like `parse_str()` output.
+	 */
+	public static function parse_str_unlimited( $query ) {
+		/** @var array<int|string, mixed> $result */
+		$result   = array();
+		$counters = array();
+
+		foreach ( explode( '&', (string) $query ) as $pair ) {
+			if ( '' === $pair ) {
+				continue;
+			}
+
+			// One pair is one input variable, so per-pair parse_str() never
+			// hits max_input_vars. Auto-index `[]` must become an explicit
+			// index first, or every pair would restart at 0.
+			$eq   = strpos( $pair, '=' );
+			$name = str_ireplace( '%5B%5D', '[]', false === $eq ? $pair : substr( $pair, 0, $eq ) );
+
+			// ponytail: counter assumes `[]` arrays never mix with explicit indexes, which the builder never does.
+			if ( false !== strpos( $name, '[]' ) ) {
+				$prefix              = strstr( $name, '[]', true );
+				$counters[ $prefix ] = isset( $counters[ $prefix ] ) ? $counters[ $prefix ] + 1 : 0;
+				$name                = substr_replace( $name, '[' . $counters[ $prefix ] . ']', strpos( $name, '[]' ), 2 );
+			}
+
+			parse_str( $name . ( false === $eq ? '' : substr( $pair, $eq ) ), $decoded_pair );
+			$result = array_replace_recursive( $result, $decoded_pair );
+		}
+
+		return $result;
+	}
+
 	// parsing viary tools to array notation
 	public static function get_editing_tools( $editing_tools ) {
 
