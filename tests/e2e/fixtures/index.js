@@ -11,6 +11,7 @@ export {
 	buildCheckboxField,
 	buildFileField,
 	buildHtmlField,
+	buildQuantitiesField,
 	buildSelectField,
 	buildTextField,
 	buildTextareaField,
