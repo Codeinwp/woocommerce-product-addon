@@ -105,6 +105,9 @@ test.describe( 'Select option price with quantities field', () => {
 		page,
 		requestUtils,
 	} ) => {
+		// Room for the slow add-to-cart navigation plus the cart poll below.
+		test.setTimeout( 240000 );
+
 		const product = await setupProduct( requestUtils );
 
 		await page.goto( `/?p=${ product.id }` );
@@ -117,22 +120,25 @@ test.describe( 'Select option price with quantities field', () => {
 
 		// Base 10 + quantities 100 x 2 + select 1200 = 1410.00 (minor units).
 		// Polled with a short per-request timeout: the wp-env Store API
-		// occasionally hangs on a single request.
+		// occasionally hangs on a single request. Sentinel return values keep
+		// env failures distinguishable from a wrong total in the report.
 		await expect
 			.poll(
 				async () => {
-					try {
-						const response = await page.request.get(
-							'/?rest_route=/wc/store/v1/cart',
-							{ timeout: 15000 }
-						);
-						const cart = await response.json();
-						return cart.totals?.total_items;
-					} catch {
-						return null;
+					const response = await page.request
+						.get( '/?rest_route=/wc/store/v1/cart', {
+							timeout: 15000,
+						} )
+						.catch( () => null );
+
+					if ( ! response || ! response.ok() ) {
+						return 'cart-request-failed';
 					}
+
+					const cart = await response.json();
+					return cart.totals?.total_items ?? 'totals-missing';
 				},
-				{ timeout: 90000 }
+				{ timeout: 120000, intervals: [ 3000 ] }
 			)
 			.toBe( '141000' );
 	} );
