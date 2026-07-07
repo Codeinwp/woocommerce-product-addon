@@ -190,11 +190,11 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	/**
 	 * @return void
 	 */
-	public function test_apply_legacy_quantities_exclude_base_adjustment_zeros_base_and_scales_options() {
+	public function test_apply_legacy_quantities_exclude_base_adjustment_zeros_base_keeps_options() {
 		$adj = CartHandler::apply_legacy_quantities_exclude_base_adjustment( 10, false, 50, 3, 4 );
 
 		$this->assertSame( 0, $adj['ppom_item_org_price'] );
-		$this->assertSame( 12, $adj['total_option_price'] );
+		$this->assertSame( 3, $adj['total_option_price'] );
 	}
 
 	/**
