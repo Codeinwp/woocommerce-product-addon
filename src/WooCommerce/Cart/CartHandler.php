@@ -386,7 +386,7 @@ final class CartHandler {
 		$wc_product = $cart_items['data'];
 		$product_id = Helpers::get_product_id( $wc_product );
 
-		if ( empty( $values['ppom']['ppom_option_price'] ) ) {
+		if ( empty( $values['ppom']['ppom_option_price'] ) && ! empty( $values['ppom']['fields'] ) ) {
 			$computed = Helpers::compute_option_price_from_fields( $values['ppom']['fields'], $product_id );
 			if ( ! empty( $computed ) ) {
 				$values['ppom']['ppom_option_price'] = wp_json_encode( $computed );
