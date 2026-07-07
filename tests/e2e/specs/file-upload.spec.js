@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import path from 'path';
+
+/**
  * WordPress dependencies
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
@@ -80,6 +85,65 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 			return typeof window.ppom_refresh_file_nonces === 'function';
 		} );
 		expect( hasRefreshFunction ).toBe( true );
+	} );
+
+	/**
+	 * HEIC can't be thumbnailed under its own name (WP converts HEIC thumbs to
+	 * JPEG), so the upload must succeed with the generic file-icon preview
+	 * instead of erroring out. Regression test for Codeinwp/ppom-pro#546.
+	 */
+	test( 'user can upload a HEIC file and sees the file-icon preview', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const fieldId = 'file_heic_upload_test';
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'File HEIC Upload Test',
+			fields: [
+				buildFileField( {
+					title: 'Upload Your HEIC File',
+					dataName: fieldId,
+					// plupload reads this raw: '5' would mean 5 *bytes*.
+					file_size: '5mb',
+					files_allowed: '1',
+					file_types: 'heic,jpg,png',
+				} ),
+			],
+		} );
+
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
+
+		await page.goto( `/?p=${ product.id }` );
+
+		// plupload injects its file input inside the field container once ready.
+		const fileInput = page.locator(
+			`#ppom-file-container-${ fieldId } input[type=file]`
+		);
+		await fileInput.waitFor( { state: 'attached', timeout: 10000 } );
+
+		// The bug surfaced as an alert() from the upload error path.
+		const dialogs = [];
+		page.on( 'dialog', ( dialog ) => {
+			dialogs.push( dialog.message() );
+			dialog.dismiss().catch( () => {} );
+		} );
+
+		await fileInput.setInputFiles(
+			path.join( __dirname, '../../unit/fixtures/sample.heic' )
+		);
+
+		// Upload succeeds: preview appears with the generic file icon.
+		await expect(
+			page.locator(
+				`#filelist-${ fieldId } img[src*="images/file.png"]`
+			)
+		).toBeVisible( { timeout: 10000 } );
+
+		expect( dialogs ).toEqual( [] );
 	} );
 
 	test( 'should refresh nonce via REST endpoint', async ( {

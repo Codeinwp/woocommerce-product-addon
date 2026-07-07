@@ -77,6 +77,46 @@ class Test_File_Upload extends WP_UnitTestCase {
         unlink($ppom_chunk_file_path);
     }
 
+    /**
+     * HEIC uploads are valid but not thumbable (getimagesize/GD can't read them,
+     * and WP converts them to JPEG on save) — the preview must fall back to the
+     * generic file icon instead of failing. Regression test for Codeinwp/ppom-pro#546.
+     */
+    public function test_uploaded_file_preview_heic_falls_back_to_file_icon() {
+        $dir = ppom_get_dir_path();
+        wp_mkdir_p( $dir );
+        $file_name = 'photo.heic';
+        // Real (tiny) HEIC: on hosts whose Imagick decodes HEIC, wp_getimagesize()
+        // succeeds, so a magic-bytes-only fake would miss the bug.
+        copy( __DIR__ . '/fixtures/sample.heic', $dir . $file_name );
+
+        // Sanity: WP itself identifies the fixture as a HEIC image.
+        $this->assertSame( 'image/heic', wp_get_image_mime( $dir . $file_name ) );
+
+        $html = \PPOM\Files\Handler::uploaded_file_preview( $file_name, array( 'type' => 'file', 'data_name' => 'upload' ) );
+
+        $this->assertStringContainsString( 'images/file.png', $html );
+
+        unlink( $dir . $file_name );
+    }
+
+    /**
+     * Real images must keep getting a thumbnail preview, not the file icon.
+     */
+    public function test_uploaded_file_preview_png_still_uses_thumb() {
+        $dir = ppom_get_dir_path();
+        wp_mkdir_p( $dir );
+        $file_name = 'pixel.png';
+        file_put_contents( $dir . $file_name, base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' ) );
+
+        $html = \PPOM\Files\Handler::uploaded_file_preview( $file_name, array( 'type' => 'file', 'data_name' => 'upload' ) );
+
+        $this->assertStringContainsString( '/thumbs/', $html );
+        $this->assertStringNotContainsString( 'images/file.png', $html );
+
+        unlink( $dir . $file_name );
+    }
+
     public function test_ppom_create_chunk_file_output_error() {
         $file_path_to_read = tempnam(sys_get_temp_dir(), 'read');
         $ppom_chunk_file_path = '/invalid/path/chunk';

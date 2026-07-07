@@ -64,7 +64,21 @@ final class Handler {
 	 * @return bool
 	 */
 	public static function is_file_image( $file_path ) {
-		return wp_get_image_mime( $file_path );
+		if ( ! file_exists( $file_path ) ) {
+			return false;
+		}
+
+		$mime = wp_get_image_mime( $file_path );
+
+		// ponytail: HEIC/HEIF never count as images here — WP converts their thumbs
+		// to JPEG on save, so every thumbs/<same-filename> assumption (preview,
+		// delete, order HTML) breaks (pro#546). They take the plain-file flow; real
+		// HEIC thumbs need the converted .jpg name threaded through preview/delete/JS.
+		if ( ! $mime || 0 === strpos( $mime, 'image/hei' ) ) {
+			return false;
+		}
+
+		return false !== wp_getimagesize( $file_path );
 	}
 
 	// return html for file thumb
