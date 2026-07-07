@@ -144,6 +144,88 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		expect( dialogs ).toEqual( [] );
 	} );
 
+	/**
+	 * Regression: logged-in deletes failed with "Verification failed" when the
+	 * refreshed nonce was minted for user 0. Page-load nonces are cached for
+	 * 5 minutes, so the clock is advanced past the cache window to force the
+	 * delete to go through a real REST refresh.
+	 */
+	test( 'logged-in user can delete an uploaded file after nonce refresh', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const fieldId = 'file_delete_test';
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'File Delete Test',
+			fields: [
+				buildFileField( {
+					title: 'Upload Your File',
+					dataName: fieldId,
+					// plupload reads this raw: '5' would mean 5 *bytes*.
+					file_size: '5mb',
+					files_allowed: '1',
+					file_types: 'png,jpg',
+				} ),
+			],
+		} );
+
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
+
+		await page.clock.install();
+		await page.goto( `/?p=${ product.id }` );
+
+		const fileInput = page.locator(
+			`#ppom-file-container-${ fieldId } input[type=file]`
+		);
+		await fileInput.waitFor( { state: 'attached', timeout: 10000 } );
+
+		// Accept the "Are you sure?" confirmation.
+		page.on( 'dialog', ( dialog ) => dialog.accept().catch( () => {} ) );
+
+		await fileInput.setInputFiles( {
+			name: 'pixel.png',
+			mimeType: 'image/png',
+			buffer: Buffer.from(
+				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+				'base64'
+			),
+		} );
+
+		const deleteButton = page.locator(
+			`#filelist-${ fieldId } .u_i_c_tools_del`
+		);
+		await deleteButton.waitFor( { state: 'visible', timeout: 10000 } );
+
+		// Expire the 5-minute nonce cache so the delete must refresh first.
+		await page.clock.fastForward( '06:00' );
+
+		const [ refreshResponse, deleteResponse ] = await Promise.all( [
+			page.waitForResponse( ( response ) =>
+				response.url().includes( '/ppom/v1/nonces/file' )
+			),
+			page.waitForResponse(
+				( response ) =>
+					response.url().includes( 'admin-ajax.php' ) &&
+					!! response
+						.request()
+						.postData()
+						?.includes( 'ppom_delete_file' )
+			),
+			deleteButton.click(),
+		] );
+
+		// The refresh must authenticate, or it mints user-0 nonces.
+		expect(
+			refreshResponse.request().headers()[ 'x-wp-nonce' ]
+		).toBeTruthy();
+		expect( refreshResponse.ok() ).toBe( true );
+		expect( await deleteResponse.text() ).toContain( 'File removed' );
+	} );
+
 	test( 'should refresh nonce via REST endpoint', async ( {
 		page,
 		requestUtils,
