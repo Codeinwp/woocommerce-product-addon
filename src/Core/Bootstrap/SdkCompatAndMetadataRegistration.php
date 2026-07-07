@@ -109,8 +109,6 @@ final class SdkCompatAndMetadataRegistration implements RegisterHooks {
 		add_filter(
 			'woocommerce_product_addon_float_widget_metadata',
 			function () {
-				// `tsdk_support_link()` returns false without a valid license;
-				// translating that spews warnings on translated locales (#543).
 				$support_link = defined( 'PPOM_PRO_PATH' ) ? tsdk_support_link( PPOM_PRO_PATH . '/ppom.php' ) : false;
 
 				return array(
