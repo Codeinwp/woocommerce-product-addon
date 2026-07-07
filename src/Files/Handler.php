@@ -70,10 +70,8 @@ final class Handler {
 
 		$mime = wp_get_image_mime( $file_path );
 
-		// ponytail: HEIC/HEIF never count as images here — WP converts their thumbs
-		// to JPEG on save, so every thumbs/<same-filename> assumption (preview,
-		// delete, order HTML) breaks (pro#546). They take the plain-file flow; real
-		// HEIC thumbs need the converted .jpg name threaded through preview/delete/JS.
+		// HEIC/HEIF thumbnails are converted to JPEG on save, so a thumb under the
+		// original file name can never exist — treat them as plain files.
 		if ( ! $mime || 0 === strpos( $mime, 'image/hei' ) ) {
 			return false;
 		}

@@ -78,19 +78,16 @@ class Test_File_Upload extends WP_UnitTestCase {
     }
 
     /**
-     * HEIC uploads are valid but not thumbable (getimagesize/GD can't read them,
-     * and WP converts them to JPEG on save) — the preview must fall back to the
-     * generic file icon instead of failing. Regression test for Codeinwp/ppom-pro#546.
+     * HEIC uploads can't be thumbnailed under their own name, so the preview must
+     * fall back to the generic file icon. Regression test for Codeinwp/ppom-pro#546.
      */
     public function test_uploaded_file_preview_heic_falls_back_to_file_icon() {
         $dir = ppom_get_dir_path();
         wp_mkdir_p( $dir );
         $file_name = 'photo.heic';
-        // Real (tiny) HEIC: on hosts whose Imagick decodes HEIC, wp_getimagesize()
-        // succeeds, so a magic-bytes-only fake would miss the bug.
+        // Must be a real HEIC: a magic-bytes fake misses the bug on hosts whose Imagick decodes HEIC.
         copy( __DIR__ . '/fixtures/sample.heic', $dir . $file_name );
 
-        // Sanity: WP itself identifies the fixture as a HEIC image.
         $this->assertSame( 'image/heic', wp_get_image_mime( $dir . $file_name ) );
 
         $html = \PPOM\Files\Handler::uploaded_file_preview( $file_name, array( 'type' => 'file', 'data_name' => 'upload' ) );

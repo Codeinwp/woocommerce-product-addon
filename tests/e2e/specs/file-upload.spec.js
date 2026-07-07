@@ -88,9 +88,8 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 	} );
 
 	/**
-	 * HEIC can't be thumbnailed under its own name (WP converts HEIC thumbs to
-	 * JPEG), so the upload must succeed with the generic file-icon preview
-	 * instead of erroring out. Regression test for Codeinwp/ppom-pro#546.
+	 * HEIC uploads must succeed with the generic file-icon preview instead of
+	 * erroring out. Regression test for Codeinwp/ppom-pro#546.
 	 */
 	test( 'user can upload a HEIC file and sees the file-icon preview', async ( {
 		page,
@@ -136,7 +135,6 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 			path.join( __dirname, '../../unit/fixtures/sample.heic' )
 		);
 
-		// Upload succeeds: preview appears with the generic file icon.
 		await expect(
 			page.locator(
 				`#filelist-${ fieldId } img[src*="images/file.png"]`
