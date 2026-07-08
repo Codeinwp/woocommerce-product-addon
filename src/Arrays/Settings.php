@@ -602,6 +602,11 @@ final class Settings {
 
 					$fields_meta['options'] = json_encode( $bulkquantities_new_options );
 					break;
+				
+				case 'file':
+				case 'cropper':
+					$fields_meta['chunk_size'] = apply_filters( 'ppom_file_upload_chunk_size', '1mb' );
+					break;
 			}
 
 			$ppom_meta_fields_updated[] = $fields_meta;

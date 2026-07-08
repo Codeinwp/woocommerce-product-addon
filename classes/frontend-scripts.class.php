@@ -433,12 +433,15 @@ class PPOM_FRONTEND_SCRIPTS {
 								$croppie_options[ $data_name ] = ppom_get_croppie_options( $field );
 
 								$file_js_vars['croppie_options'] = $croppie_options;
+								$fields_meta['chunk_size']       = apply_filters( 'ppom_file_upload_chunk_size', '1mb' );
 								break;
 
 							case 'file':
 								$ppom_file_inputs[] = $field;
 
 								PPOM_SCRIPTS::enqueue_script( 'ppom-file-upload' );
+
+								$fields_meta['chunk_size'] = apply_filters( 'ppom_file_upload_chunk_size', '1mb' );
 
 								break;
 
@@ -679,7 +682,6 @@ class PPOM_FRONTEND_SCRIPTS {
 
 			$existing_data[ $product_id ]  = $localize_data;
 			$GLOBALS[ $multi_product_var ] = $existing_data;
-
 			// Localize the multi-product data structure.
 			PPOM_SCRIPTS::localize_script( $handle, $multi_product_var, $existing_data );
 		}
