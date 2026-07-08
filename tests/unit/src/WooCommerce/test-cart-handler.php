@@ -864,12 +864,8 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	}
 
 	/**
-	 * Regression: undercharge when a session-restored cart line arrives with
-	 * `fields` but no `ppom_option_price` (e.g. dropped by a caching layer or a
-	 * client that never attached it). `update_cart_fees()` must recompute the
-	 * addon price server-side from `fields` via `Helpers::compute_option_price_from_fields()`,
-	 * mirroring `ProductHandler::validate_product()`'s equivalent legacy-mode
-	 * fallback, instead of silently pricing the line at the bare product price.
+	 * Computes the price from the selected field when the option price is missing,
+	 * ensuring that the cart fee is updated correctly.
 	 *
 	 * @return void
 	 */
