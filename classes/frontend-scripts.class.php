@@ -610,6 +610,7 @@ class PPOM_FRONTEND_SCRIPTS {
 					'plupload_runtime'       => ( ppom_if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
 					'ppom_file_upload_nonce' => wp_create_nonce( 'ppom_uploading_file_action' ),
 					'ppom_file_delete_nonce' => wp_create_nonce( 'ppom_deleting_file_action' ),
+					'wp_rest_nonce'          => wp_create_nonce( 'wp_rest' ),
 					'rest_url'               => rest_url( 'ppom/v1/nonces/file/' ),
 					'invalid_file_type'      => __( 'Invalid file type', 'woocommerce-product-addon' ),
 					// translators: %s is max file size.
