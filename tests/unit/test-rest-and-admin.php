@@ -571,6 +571,84 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Test that the refreshed nonces are valid for the authenticated user.
+	 *
+	 * @return void
+	 */
+	public function testGetFileNoncesRefreshedNonceIsValidForAuthenticatedUser() {
+		// Simulate page load: user is logged in and the page-load nonce is created for them.
+		$user_id = $this->create_shop_manager_user();
+		wp_set_current_user( $user_id );
+
+		$response = $this->dispatch_ppom_rest_request(
+			'GET',
+			'/ppom/v1/nonces/file/',
+			array(),
+			'secret-key',
+			false
+		);
+		$data     = $response->get_data();
+
+		$this->assertSame( 'success', $data['status'] );
+
+		$upload_nonce_valid = wp_verify_nonce(
+			$data['ppom_file_upload_nonce'],
+			'ppom_uploading_file_action'
+		);
+		$this->assertNotFalse(
+			$upload_nonce_valid,
+			'Refreshed upload nonce must be valid for the logged-in user'
+		);
+
+		$delete_nonce_valid = wp_verify_nonce(
+			$data['ppom_file_delete_nonce'],
+			'ppom_deleting_file_action'
+		);
+		$this->assertNotFalse(
+			$delete_nonce_valid,
+			'Refreshed delete nonce must be valid for the logged-in user'
+		);
+	}
+
+	/**
+	 * Test that an unauthenticated request returns a nonce that does not verify for a logged-in user.
+	 *
+	 * @return void
+	 */
+	public function testGetFileNoncesUnauthenticatedRequestFailsVerificationForLoggedInUser() {
+		$user_id = $this->create_shop_manager_user();
+		wp_set_current_user( $user_id );
+		$page_load_nonce = wp_create_nonce( 'ppom_uploading_file_action' );
+
+		wp_set_current_user( 0 );
+		$response = $this->dispatch_ppom_rest_request(
+			'GET',
+			'/ppom/v1/nonces/file/',
+			array(),
+			'secret-key',
+			false
+		);
+		$data     = $response->get_data();
+		$this->assertSame( 'success', $data['status'] );
+
+		$anonymous_nonce = $data['ppom_file_upload_nonce'];
+
+		wp_set_current_user( $user_id );
+
+		$valid = wp_verify_nonce( $anonymous_nonce, 'ppom_uploading_file_action' );
+		$this->assertFalse(
+			(bool) $valid,
+			'A nonce generated for user 0 must not verify as valid for a logged-in user'
+		);
+
+		$page_load_valid = wp_verify_nonce( $page_load_nonce, 'ppom_uploading_file_action' );
+		$this->assertNotFalse(
+			$page_load_valid,
+			'Page-load nonce must remain valid for the same logged-in user'
+		);
+	}
+
+	/**
 	 * Ensure unauthenticated GET requests are rejected with rest_forbidden.
 	 *
 	 * @return void

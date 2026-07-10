@@ -49,6 +49,68 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Ensure section/HTML fields with "Show in Cart" disabled produce no cart meta entry.
+	 *
+	 * @return void
+	 */
+	public function testMakeMetaDataSkipsSectionFieldWhenCartDisplayIsOff() {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_section_field( 'terms_notice', 'Terms Notice', array( 'cart_display' => 'off' ) ),
+			),
+			$product->get_id()
+		);
+
+		$meta = ppom_make_meta_data(
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields' => array(
+						'id'           => (string) $meta_id,
+						'terms_notice' => '<p>Static content</p>',
+					),
+				),
+			),
+			'cart'
+		);
+
+		$this->assertArrayNotHasKey( 'terms_notice', $meta );
+	}
+
+	/**
+	 * Ensure section/HTML fields with "Show in Cart" enabled still render in cart meta.
+	 *
+	 * @return void
+	 */
+	public function testMakeMetaDataRendersSectionFieldWhenCartDisplayIsOn() {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_section_field( 'terms_notice', 'Terms Notice', array( 'cart_display' => 'on' ) ),
+			),
+			$product->get_id()
+		);
+
+		$meta = ppom_make_meta_data(
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields' => array(
+						'id'           => (string) $meta_id,
+						'terms_notice' => '<p>Static content</p>',
+					),
+				),
+			),
+			'cart'
+		);
+
+		$this->assertArrayHasKey( 'terms_notice', $meta );
+		$this->assertSame( 'Terms Notice', $meta['terms_notice']['name'] );
+		$this->assertSame( 'Static content', $meta['terms_notice']['value'] );
+	}
+
+	/**
 	 * Ensure checkbox arrays are rendered as a readable comma-separated value.
 	 *
 	 * @return void
