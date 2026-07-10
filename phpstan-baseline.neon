@@ -4711,12 +4711,6 @@ parameters:
 			path: src/Hooks/Callbacks.php
 
 		-
-			message: '#^Call to static method load_scripts_by_product_id\(\) on an unknown class PPOM\\Hooks\\PPOM_FRONTEND_SCRIPTS\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Hooks/Callbacks.php
-
-		-
 			message: '#^Constant PPOM_URL not found\.$#'
 			identifier: constant.notFound
 			count: 23

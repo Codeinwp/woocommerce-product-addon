@@ -1027,7 +1027,7 @@ final class Callbacks {
 				return ob_get_clean();
 			}
 
-			\PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id( $params['product_id'], '', 'shortcode' );
+			\PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id( (int) $params['product_id'], null, 'shortcode' );
 			?>
 		<form class="cart"
 				action="<?php echo esc_url( apply_filters( 'woocommerce_add_to_cart_form_action', $product->get_permalink() ) ); ?>"
