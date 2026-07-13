@@ -64,6 +64,12 @@ final class Handler {
 	 * @return bool
 	 */
 	public static function is_file_image( $file_path ) {
+		// Local paths only: probing a missing file (or a URL) with
+		// wp_get_image_mime() raises PHP warnings on every render.
+		if ( ! file_exists( $file_path ) ) {
+			return false;
+		}
+
 		return wp_get_image_mime( $file_path );
 	}
 
