@@ -24,4 +24,6 @@ export {
 	createSimpleProduct,
 	createSimpleProducts,
 	createVariableProduct,
+	setOrderStatus,
+	setupCheckout,
 } from './woocommerce.js';
