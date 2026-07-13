@@ -107,6 +107,38 @@ class Test_File_Helpers extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Ensure a confirmed file wins over a base pool file, without moving the pool file.
+	 *
+	 * The base file may belong to another order (e.g. an Order Again cart
+	 * awaiting checkout), so resolving an already-confirmed order's URL must
+	 * not consume it.
+	 *
+	 * @return void
+	 */
+	public function testGetFileDownloadUrlPrefersConfirmedFileAndLeavesBaseFileAlone() {
+		$order_id   = 789;
+		$product_id = 66;
+		$file_name  = 'shared.txt';
+		$base_path  = ppom_get_dir_path() . $file_name;
+		$confirmed  = ppom_get_dir_path( 'confirmed/' . $order_id ) . $product_id . '-' . $file_name;
+
+		file_put_contents( $base_path, 'pending re-order upload' );
+		file_put_contents( $confirmed, 'already confirmed' );
+
+		$url = ppom_get_file_download_url( $file_name, $order_id, $product_id );
+
+		$this->assertFileExists( $base_path );
+		$this->assertFileExists( $confirmed );
+		$this->assertSame(
+			ppom_get_dir_url() . 'confirmed/' . $order_id . '/' . $product_id . '-' . $file_name,
+			$url
+		);
+
+		unlink( $base_path );
+		unlink( $confirmed );
+	}
+
+	/**
 	 * Ensure croppie settings normalize circle boundaries and boolean flags.
 	 *
 	 * @return void
