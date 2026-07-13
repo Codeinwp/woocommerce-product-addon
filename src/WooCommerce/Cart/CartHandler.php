@@ -692,9 +692,9 @@ final class CartHandler {
 
 		return array(
 			'name'    => $key,
-			'value'   => $meta,
+			'value'   => wp_json_encode( $meta ),
 			'hidden'  => $hidden,
-			'display' => $display,
+			'display' => is_scalar( $display ) ? $display : wp_json_encode( $display ),
 		);
 	}
 

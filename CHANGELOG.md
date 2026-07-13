@@ -1,3 +1,11 @@
+##### [Version 34.0.5](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.4...v34.0.5) (2026-07-10)
+
+- Updated file upload chunk size handling and fixed file uploads
+- Fixed argument type causing errors in edge cases
+- Improved condition handling
+- Preserve uploaded image when changing crop size
+- Fixed issue where HTML fields with Show in Cart off still appears in cart item data
+
 ##### [Version 34.0.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.3...v34.0.4) (2026-06-24)
 
 - Enhanced security
