@@ -34,6 +34,9 @@ final class WooCommerceCartLifecycleHooks {
 
 			add_filter( 'woocommerce_get_cart_item_from_session', 'ppom_price_controller', 10, 2 );
 
+			// Late priority: re-assert the line price after third-party set_price() calls. See #680.
+			add_action( 'woocommerce_before_calculate_totals', 'ppom_before_calculate_totals', 1000 );
+
 			add_action( 'woocommerce_cart_calculate_fees', 'ppom_price_cart_fee' );
 			add_action( 'ppom_before_calculate_cart_total', 'ppom_hooks_update_cart_weight', 10, 3 );
 		}
