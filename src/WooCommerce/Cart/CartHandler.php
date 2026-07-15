@@ -383,12 +383,20 @@ final class CartHandler {
 			return $cart_items;
 		}
 
+		$wc_product = $cart_items['data'];
+		$product_id = Helpers::get_product_id( $wc_product );
+
+		if ( empty( $values['ppom']['ppom_option_price'] ) && ! empty( $values['ppom']['fields'] ) ) {
+			$computed = Helpers::compute_option_price_from_fields( $values['ppom']['fields'], $product_id );
+			if ( ! empty( $computed ) ) {
+				$values['ppom']['ppom_option_price'] = wp_json_encode( $computed );
+			}
+		}
+
 		if ( ! isset( $values['ppom']['ppom_option_price'] ) ) {
 			return $cart_items;
 		}
 
-		$wc_product     = $cart_items['data'];
-		$product_id     = Helpers::get_product_id( $wc_product );
 		$variation_id   = isset( $cart_items['variation_id'] ) ? absint( $cart_items['variation_id'] ) : 0;
 		$values['ppom'] = Helpers::filter_ppom_payload_by_active_variation( (array) $values['ppom'], $product_id, $variation_id );
 

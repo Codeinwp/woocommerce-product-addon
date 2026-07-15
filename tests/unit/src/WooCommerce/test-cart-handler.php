@@ -862,4 +862,48 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 				: ''
 		);
 	}
+
+	/**
+	 * Computes the price from the selected field when the option price is missing,
+	 * ensuring that the cart fee is updated correctly.
+	 *
+	 * @return void
+	 */
+	public function test_update_cart_fees_computes_price_from_fields_when_option_price_missing() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_select_field(
+					'size',
+					'Size',
+					array(
+						array( 'option' => 'Small', 'price' => '' ),
+						array( 'option' => 'Large', 'price' => '5.00' ),
+					)
+				),
+			),
+			$product_id
+		);
+
+		$cart_items = array(
+			'data'         => $product,
+			'variation_id' => 0,
+			'quantity'     => 1,
+		);
+
+		$values = array(
+			'ppom' => array(
+				'fields' => array(
+					'id'   => (string) $meta_id,
+					'size' => 'Large',
+				),
+			),
+		);
+
+		$result = CartHandler::update_cart_fees( $cart_items, $values );
+
+		$this->assertSame( 15.0, (float) $result['data']->get_price() );
+	}
 }
