@@ -180,4 +180,58 @@ class Test_Helpers_Src extends PPOM_Test_Case {
 
 		$this->assertSame( '20', (string) $price );
 	}
+
+	/**
+	 * parse_str_unlimited() must match parse_str() for the shapes the admin
+	 * builder submits, including auto-index `[]` options and encoded values.
+	 *
+	 * @return void
+	 */
+	public function test_parse_str_unlimited_matches_parse_str_for_builder_payloads() {
+		$query = http_build_query(
+			array(
+				'ppom' => array(
+					0 => array(
+						'type'          => 'text',
+						'title'         => 'Engraving & more',
+						'description'   => "line one\r\nline two",
+						'editing_tools' => array( 'crop', 'rotate' ),
+					),
+					1 => array(
+						'type'    => 'select',
+						'options' => array(
+							array(
+								'option' => 'Red 100%',
+								'price'  => '1.50',
+							),
+						),
+					),
+				),
+			)
+		) . '&ppom[2][editing_tools][]=draw&ppom[2][editing_tools][]=text';
+
+		parse_str( $query, $expected );
+
+		$this->assertSame( $expected, Helpers::parse_str_unlimited( $query ) );
+	}
+
+	/**
+	 * Regression for issue #606: parse_str() truncates at max_input_vars and
+	 * large field groups lose fields on save. The unlimited parser must keep
+	 * every field well past the default 1000-variable limit.
+	 *
+	 * @return void
+	 */
+	public function test_parse_str_unlimited_keeps_fields_past_max_input_vars() {
+		$pairs = array();
+		for ( $i = 0; $i < 1200; $i++ ) {
+			$pairs[] = "ppom[{$i}][type]=text";
+			$pairs[] = "ppom[{$i}][title]=Field+{$i}";
+		}
+
+		$decoded = Helpers::parse_str_unlimited( implode( '&', $pairs ) );
+
+		$this->assertCount( 1200, $decoded['ppom'] );
+		$this->assertSame( 'Field 1199', $decoded['ppom'][1199]['title'] );
+	}
 }
