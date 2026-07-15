@@ -64,6 +64,8 @@ final class Handler {
 	 * @return bool
 	 */
 	public static function is_file_image( $file_path ) {
+		// Local paths only: probing a missing file (or a URL) with
+		// wp_get_image_mime() raises PHP warnings on every render.
 		if ( ! file_exists( $file_path ) ) {
 			return false;
 		}
@@ -525,13 +527,14 @@ final class Handler {
 
 		$file_name = $product_id . '-' . $file_name;
 
-		// Check if file not yet moved to confirm then move it.
-		if ( file_exists( $base_dir_path ) ) {
+		// Confirmed first: once this order owns its file, never touch the shared
+		// pool again — the base file may belong to another (re-)order (#655).
+		if ( file_exists( $confirmed_dir_path . $file_name ) ) {
+			$file_download_url_found = $ppom_dir_url . 'confirmed/' . $order_id . '/' . $file_name;
+		} elseif ( file_exists( $base_dir_path ) ) {
 			if ( rename( $base_dir_path, $confirmed_dir_path . $file_name ) ) {
 				$file_download_url_found = $ppom_dir_url . 'confirmed/' . $order_id . '/' . $file_name;
 			}
-		} elseif ( file_exists( $confirmed_dir_path . $file_name ) ) {
-			$file_download_url_found = $ppom_dir_url . 'confirmed/' . $order_id . '/' . $file_name;
 		} elseif ( file_exists( $edits_dir_path ) ) {
 			$file_download_url_found = $ppom_dir_url . 'edits/' . $file_name;
 		}

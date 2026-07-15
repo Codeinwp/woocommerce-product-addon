@@ -1818,9 +1818,8 @@ final class Helpers {
 			// Making file thumb download with new path
 			$ppom_file_url = Handler::get_file_download_url( $file_name, $item->get_order_id(), $item->get_product_id() );
 
-			$file_path           = Handler::get_dir_url( true ) . $file_name;
-			$is_image_file       = Handler::is_file_image( $file_path );
-			$ppom_file_thumb_url = $is_image_file ? $file_path : PPOM_URL . '/images/file.png';
+			$is_image_file       = Handler::is_file_image( Handler::get_dir_path( 'thumbs' ) . $file_name );
+			$ppom_file_thumb_url = $is_image_file ? Handler::get_dir_url( true ) . $file_name : PPOM_URL . '/images/file.png';
 			$order_html         .= '<tr><td class="ppom-files-display">';
 			$order_html         .= '<a target="_blank" href="' . esc_url( $ppom_file_url ) . '">';
 			$order_html         .= '<img class="img-thumbnail" style="width:' . esc_attr( self::get_thumbs_size() ) . '" src="' . esc_url( $ppom_file_thumb_url ) . '">';
@@ -2571,8 +2570,8 @@ final class Helpers {
 
 		$file = '';
 		if ( $thumb ) {
-			$file_path = Handler::get_dir_url() . $confirm_dir . '/' . $file_name;
-			$file      = Handler::is_file_image( $file_path ) ? $file_path : PPOM_URL . '/images/file.png';
+			$file_url = Handler::get_dir_url() . $confirm_dir . '/' . $file_name;
+			$file     = Handler::is_file_image( Handler::get_dir_path( $confirm_dir ) . $file_name ) ? $file_url : PPOM_URL . '/images/file.png';
 		} else {
 			$file = Handler::get_dir_path( $confirm_dir ) . $file_name;
 		}

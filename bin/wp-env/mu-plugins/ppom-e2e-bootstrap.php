@@ -956,6 +956,10 @@ function ppom_e2e_create_simple_product() {
 	$product->set_price( $regular_price );
 	$product->set_category_ids( ppom_e2e_normalize_category_ids( $category_ids ) );
 
+	if ( isset( $_POST['virtual'] ) && 'true' === $_POST['virtual'] ) {
+		$product->set_virtual( true );
+	}
+
 	$product_id = $product->save();
 
 	if ( ! $product_id ) {
@@ -1490,3 +1494,79 @@ function ppom_e2e_reset_state() {
 }
 add_action( 'wp_ajax_ppom_e2e_reset_state', 'ppom_e2e_reset_state' );
 add_action( 'wp_ajax_nopriv_ppom_e2e_reset_state', 'ppom_e2e_reset_state' );
+
+/**
+ * Prepare the store for storefront checkout flows: enable Cash on Delivery
+ * and make sure the storefront is not in coming-soon mode.
+ *
+ * @return void
+ */
+function ppom_e2e_setup_checkout() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	if ( ! function_exists( 'WC' ) ) {
+		wp_send_json_error(
+			array(
+				'message' => 'WooCommerce is unavailable.',
+			),
+			500
+		);
+	}
+
+	$cod            = get_option( 'woocommerce_cod_settings', array() );
+	$cod['enabled'] = 'yes';
+	update_option( 'woocommerce_cod_settings', $cod );
+	update_option( 'woocommerce_coming_soon', 'no' );
+
+	// A fresh wp-env install has no WooCommerce pages; My Account is needed
+	// for view-order screens and the Order Again button.
+	if ( ! get_post( wc_get_page_id( 'myaccount' ) ) && class_exists( 'WC_Install' ) ) {
+		WC_Install::create_pages();
+	}
+
+	wp_send_json_success(
+		array(
+			'cod_enabled'   => true,
+			'myaccount_url' => wc_get_page_permalink( 'myaccount' ),
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_setup_checkout', 'ppom_e2e_setup_checkout' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_setup_checkout', 'ppom_e2e_setup_checkout' );
+
+/**
+ * Update a WooCommerce order status for fixtures (e.g. mark completed so the
+ * Order Again button renders in My Account).
+ *
+ * @return void
+ */
+function ppom_e2e_set_order_status() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$order_id = isset( $_POST['order_id'] ) ? absint( $_POST['order_id'] ) : 0;
+	$status   = isset( $_POST['status'] ) ? sanitize_key( wp_unslash( $_POST['status'] ) ) : '';
+
+	$order = function_exists( 'wc_get_order' ) ? wc_get_order( $order_id ) : false;
+
+	if ( ! $order || '' === $status ) {
+		wp_send_json_error(
+			array(
+				'message' => 'A valid order_id and status are required.',
+			),
+			400
+		);
+	}
+
+	$order->update_status( $status, 'PPOM E2E fixture status change.' );
+
+	wp_send_json_success(
+		array(
+			'order_id' => $order_id,
+			'status'   => $order->get_status(),
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_set_order_status', 'ppom_e2e_set_order_status' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_set_order_status', 'ppom_e2e_set_order_status' );
