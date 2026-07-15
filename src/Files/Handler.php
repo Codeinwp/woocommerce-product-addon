@@ -70,7 +70,15 @@ final class Handler {
 			return false;
 		}
 
-		return wp_get_image_mime( $file_path );
+		$mime = wp_get_image_mime( $file_path );
+
+		// HEIC/HEIF thumbnails are converted to JPEG on save, so a thumb under the
+		// original file name can never exist — treat them as plain files.
+		if ( ! $mime || 0 === strpos( $mime, 'image/hei' ) ) {
+			return false;
+		}
+
+		return false !== wp_getimagesize( $file_path );
 	}
 
 	// return html for file thumb

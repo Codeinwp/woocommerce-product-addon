@@ -121,11 +121,11 @@ class Test_Files_Handler extends PPOM_Test_Case {
 	}
 
 	/**
-	 * is_file_image returns the mime type for a real PNG and false for non-image content.
+	 * is_file_image returns true for a real PNG and false for non-image content.
 	 *
 	 * @return void
 	 */
-	public function test_is_file_image_returns_mime_for_real_png_and_false_otherwise() {
+	public function test_is_file_image_returns_true_for_real_png_and_false_otherwise() {
 		$dir = Handler::get_dir_path();
 
 		$png_path = $dir . 'ppom-test-' . wp_generate_password( 6, false ) . '.png';
@@ -140,7 +140,7 @@ class Test_Files_Handler extends PPOM_Test_Case {
 
 		file_put_contents( $txt_path, 'not an image, just text' );
 
-		$this->assertSame( 'image/png', Handler::is_file_image( $png_path ) );
+		$this->assertTrue( Handler::is_file_image( $png_path ) );
 		$this->assertFalse( Handler::is_file_image( $txt_path ) );
 	}
 
@@ -169,7 +169,7 @@ class Test_Files_Handler extends PPOM_Test_Case {
 
 		$this->assertFileExists( $dest );
 		$this->assertSame( $binary, file_get_contents( $dest ) );
-		$this->assertSame( 'image/png', Handler::is_file_image( $dest ) );
+		$this->assertTrue( Handler::is_file_image( $dest ) );
 	}
 
 	/**
