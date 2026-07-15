@@ -5,7 +5,10 @@ export {
 	createLegacyPpomGroup,
 	createPpomGroup,
 	createSimpleTextGroup,
+	deletePpomGroupRows,
 	getPpomAttachRowMeta,
+	getProductPpomAssignment,
+	setPpomGroupReadFailure,
 } from './ppom.js';
 export {
 	buildCheckboxField,

@@ -169,6 +169,73 @@ class Test_PPOM_Meta_Multi_Group extends PPOM_Test_Case {
 	}
 
 	/**
+	 * get_fields() must NOT delete the product's assignment when the field-group
+	 * read fails transiently (DB under load, lock/timeout, dropped connection).
+	 * A failed read returns the same empty result as "rows deleted", and the
+	 * cleanup used to treat both as "group gone" and permanently drop the
+	 * product↔group link on a single front-end page load.
+	 *
+	 * @see https://github.com/Codeinwp/woocommerce-product-addon/issues/679
+	 *
+	 * @return void
+	 */
+	public function test_get_fields_keeps_assignment_when_group_read_fails_transiently() {
+		global $wpdb;
+
+		$product = $this->create_simple_product();
+
+		$meta_a = $this->insert_ppom_meta(
+			array( $this->build_text_field( 'a_field', 'A' ) )
+		);
+		$meta_b = $this->insert_ppom_meta(
+			array( $this->build_text_field( 'b_field', 'B' ) )
+		);
+
+		update_post_meta(
+			$product->get_id(),
+			PPOM_PRODUCT_META_KEY,
+			array( $meta_a, $meta_b )
+		);
+
+		$ppom_table  = \PPOM\Data\FieldGroupRepository::instance()->table_name();
+		$break_reads = static function ( $query ) use ( $ppom_table ) {
+			// Point SELECTs on the PPOM table at a table that does not exist so
+			// they error out, mimicking a transient read failure.
+			if ( 0 === stripos( ltrim( $query ), 'SELECT' ) && false !== strpos( $query, $ppom_table ) ) {
+				return str_replace( $ppom_table, $ppom_table . '_missing_for_test', $query );
+			}
+
+			return $query;
+		};
+
+		add_filter( 'query', $break_reads );
+		$suppress = $wpdb->suppress_errors( true );
+
+		try {
+			$ppom = new PPOM_Meta( $product->get_id() );
+			// The form cannot render this request…
+			$this->assertSame( array(), (array) $ppom->fields );
+		} finally {
+			remove_filter( 'query', $break_reads );
+			$wpdb->suppress_errors( $suppress );
+		}
+
+		// …but the assignment must survive the failed read.
+		$stored = get_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, true );
+		$this->assertIsArray( $stored );
+		$this->assertSame(
+			array( $meta_a, $meta_b ),
+			array_values( array_map( 'intval', $stored ) )
+		);
+
+		// Once reads recover, the form comes back on its own.
+		$ppom       = new PPOM_Meta( $product->get_id() );
+		$data_names = array_column( (array) $ppom->fields, 'data_name' );
+		$this->assertContains( 'a_field', $data_names );
+		$this->assertContains( 'b_field', $data_names );
+	}
+
+	/**
 	 * single_meta_id() must not crash when meta_id ends up as an associative
 	 * array (e.g. preserved keys from a Pro filter on `ppom_product_meta_id`).
 	 * The legacy `$arr[0]` access raised a PHP notice / fatal under strict
