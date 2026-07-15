@@ -74,6 +74,27 @@ function buildPalettesField( { options = [], ...args } ) {
 	} );
 }
 
+function buildQuantitiesField( { options = [], ...args } ) {
+	return buildField( 'quantities', {
+		view_control: 'simple_view',
+		default_price: '',
+		min_qty: '',
+		max_qty: '',
+		required: '',
+		...args,
+		options: options.map( ( option ) =>
+			buildOption( option.label, option.value, {
+				min: '',
+				max: '',
+				stock: '',
+				default: '',
+				weight: '',
+				...option.overrides,
+			} )
+		),
+	} );
+}
+
 function buildCheckboxField( { options = [], checked = [], ...args } ) {
 	return buildField( 'checkbox', {
 		...args,
@@ -129,6 +150,7 @@ export {
 	buildImageField,
 	buildPalettesField,
 	buildPriceMatrixField,
+	buildQuantitiesField,
 	buildSelectField,
 	buildTextField,
 	buildTextareaField,

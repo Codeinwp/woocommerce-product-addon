@@ -187,7 +187,7 @@ final class CartHandler {
 		if ( $ppom_quantities_price > 0 && ! $ppom_quantities_include_base ) {
 			return array(
 				'ppom_item_org_price' => 0,
-				'total_option_price'  => $total_option_price * $ppom_total_quantities,
+				'total_option_price'  => $total_option_price,
 			);
 		}
 
