@@ -4585,12 +4585,6 @@ parameters:
 			path: src/Files/Handler.php
 
 		-
-			message: '#^Method PPOM\\Files\\Handler\:\:is_file_image\(\) should return bool but returns string\|false\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Files/Handler.php
-
-		-
 			message: '#^Method PPOM\\Files\\Handler\:\:save_data_url_to_image\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
