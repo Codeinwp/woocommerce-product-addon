@@ -790,9 +790,9 @@ function ppom_fields_hidden_conditionally() {
 	// Use the actual visual state: per-source `ppom-locked-*` classes go
 	// stale when rules span multiple source fields, but `ppom-c-hide` always
 	// reflects what the customer sees.
-	const datanames = jQuery( `.ppom-field-wrapper.ppom-c-hide` ).map(
-		( i, h ) => ppom_hidden_fields.push( jQuery( h ).data( 'data_name' ) )
-	);
+	jQuery( `.ppom-field-wrapper.ppom-c-hide` ).each( function ( i, h ) {
+		ppom_hidden_fields.push( jQuery( h ).data( 'data_name' ) );
+	} );
 	jQuery( '#conditionally_hidden' ).val( ppom_hidden_fields );
 	// console.log(ppom_hidden_fields);
 }
