@@ -301,12 +301,10 @@ final class Engine {
 			// ppom_pa($options);
 
 
-			$field_price     = '';
+			$field_price = '';
+			// Option prices are one-off charges per line item; quantity fields
+			// must not multiply other fields' option prices.
 			$option_quantity = 1;
-
-			if ( Helpers::reset_cart_quantity_to_one( $product_id ) ) {
-				$option_quantity = self::price_get_total_quantities( $ppom_fields_post, $product_id );
-			}
 
 			switch ( $field_type ) {
 

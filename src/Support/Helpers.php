@@ -915,6 +915,55 @@ final class Helpers {
 		}
 	}
 
+	/**
+	 * Decode a URL-encoded query string without PHP's `max_input_vars` limit.
+	 *
+	 * The admin builder bundles every `ppom[...]` input into a single encoded
+	 * string to bypass `max_input_vars` on the request, but `parse_str()` is
+	 * subject to the same limit and silently truncates large field groups
+	 * before saving. Parsing in chunks below the limit keeps every field.
+	 *
+	 * @param string $query Raw query string.
+	 * @return array<int|string, mixed> Decoded nested array, shaped like `parse_str()` output.
+	 */
+	public static function parse_str_unlimited( $query ) {
+		$counters = array();
+		$pairs    = array();
+
+		foreach ( explode( '&', (string) $query ) as $pair ) {
+			if ( '' === $pair ) {
+				continue;
+			}
+
+			// Auto-index `[]` must become an explicit index, or each chunk's
+			// parse_str() would restart pushing at 0.
+			$eq   = strpos( $pair, '=' );
+			$name = str_ireplace( '%5B%5D', '[]', false === $eq ? $pair : substr( $pair, 0, $eq ) );
+
+			// ponytail: counter assumes `[]` arrays never mix with explicit indexes, which the builder never does.
+			if ( false !== strpos( $name, '[]' ) ) {
+				$prefix              = strstr( $name, '[]', true );
+				$counters[ $prefix ] = isset( $counters[ $prefix ] ) ? $counters[ $prefix ] + 1 : 0;
+				$name                = substr_replace( $name, '[' . $counters[ $prefix ] . ']', strpos( $name, '[]' ), 2 );
+			}
+
+			$pairs[] = $name . ( false === $eq ? '' : substr( $pair, $eq ) );
+		}
+
+		// One pair is one input variable, so chunks below max_input_vars never
+		// trip the limit inside parse_str().
+		$max_vars = (int) ini_get( 'max_input_vars' );
+
+		/** @var array<int|string, mixed> $result */
+		$result = array();
+		foreach ( array_chunk( $pairs, $max_vars > 1 ? $max_vars - 1 : 1000 ) as $chunk ) {
+			parse_str( implode( '&', $chunk ), $decoded_chunk );
+			$result = array_replace_recursive( $result, $decoded_chunk );
+		}
+
+		return $result;
+	}
+
 	// parsing viary tools to array notation
 	public static function get_editing_tools( $editing_tools ) {
 
@@ -1818,9 +1867,8 @@ final class Helpers {
 			// Making file thumb download with new path
 			$ppom_file_url = Handler::get_file_download_url( $file_name, $item->get_order_id(), $item->get_product_id() );
 
-			$file_path           = Handler::get_dir_url( true ) . $file_name;
-			$is_image_file       = Handler::is_file_image( $file_path );
-			$ppom_file_thumb_url = $is_image_file ? $file_path : PPOM_URL . '/images/file.png';
+			$is_image_file       = Handler::is_file_image( Handler::get_dir_path( 'thumbs' ) . $file_name );
+			$ppom_file_thumb_url = $is_image_file ? Handler::get_dir_url( true ) . $file_name : PPOM_URL . '/images/file.png';
 			$order_html         .= '<tr><td class="ppom-files-display">';
 			$order_html         .= '<a target="_blank" href="' . esc_url( $ppom_file_url ) . '">';
 			$order_html         .= '<img class="img-thumbnail" style="width:' . esc_attr( self::get_thumbs_size() ) . '" src="' . esc_url( $ppom_file_thumb_url ) . '">';
@@ -2571,8 +2619,8 @@ final class Helpers {
 
 		$file = '';
 		if ( $thumb ) {
-			$file_path = Handler::get_dir_url() . $confirm_dir . '/' . $file_name;
-			$file      = Handler::is_file_image( $file_path ) ? $file_path : PPOM_URL . '/images/file.png';
+			$file_url = Handler::get_dir_url() . $confirm_dir . '/' . $file_name;
+			$file     = Handler::is_file_image( Handler::get_dir_path( $confirm_dir ) . $file_name ) ? $file_url : PPOM_URL . '/images/file.png';
 		} else {
 			$file = Handler::get_dir_path( $confirm_dir ) . $file_name;
 		}

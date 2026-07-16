@@ -741,7 +741,8 @@ function ppom_set_default_option( field_id ) {
 				const opt_id =
 					product_id + '-' + field.data_name + '-' + options.id;
 
-				const default_checked = field.checked?.split( '\r\n' );
+				// Imported metas can lack the `checked` key entirely.
+				const default_checked = ( field.checked || '' ).split( '\r\n' );
 				if ( jQuery.inArray( options.option, default_checked ) > -1 ) {
 					jQuery( '#' + opt_id ).prop( 'checked', true );
 				}
@@ -786,11 +787,12 @@ function ppom_fields_hidden_conditionally() {
 	// console.log("Condionally Hidden", ppom_hidden_fields);
 	// jQuery("#conditionally_hidden").val(ppom_hidden_fields);
 
-	const datanames = jQuery(
-		`.ppom-field-wrapper[class*="ppom-locked-"]`
-	).map( ( i, h ) =>
-		ppom_hidden_fields.push( jQuery( h ).data( 'data_name' ) )
-	);
+	// Use the actual visual state: per-source `ppom-locked-*` classes go
+	// stale when rules span multiple source fields, but `ppom-c-hide` always
+	// reflects what the customer sees.
+	jQuery( `.ppom-field-wrapper.ppom-c-hide` ).each( function ( i, h ) {
+		ppom_hidden_fields.push( jQuery( h ).data( 'data_name' ) );
+	} );
 	jQuery( '#conditionally_hidden' ).val( ppom_hidden_fields );
 	// console.log(ppom_hidden_fields);
 }

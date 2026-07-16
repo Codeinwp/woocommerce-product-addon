@@ -11,6 +11,7 @@ export {
 	buildCheckboxField,
 	buildFileField,
 	buildHtmlField,
+	buildQuantitiesField,
 	buildSelectField,
 	buildTextField,
 	buildTextareaField,
@@ -24,4 +25,6 @@ export {
 	createSimpleProduct,
 	createSimpleProducts,
 	createVariableProduct,
+	setOrderStatus,
+	setupCheckout,
 } from './woocommerce.js';
