@@ -87,6 +87,39 @@ final class FieldGroupRepository {
 	}
 
 	/**
+	 * Definitive existence check for a set of field-group IDs.
+	 *
+	 * Unlike {@see get_rows_by_productmeta_ids()}, a failed query is reported
+	 * as `null` instead of an empty result, so callers can tell "rows are
+	 * confirmed absent" apart from "the read failed this request".
+	 *
+	 * @param array<int> $productmeta_ids Numeric IDs.
+	 * @return int|null Number of matching rows, or null when the query failed.
+	 */
+	public function count_rows_by_productmeta_ids( array $productmeta_ids ): ?int {
+		$productmeta_ids = array_values(
+			array_filter(
+				array_map( 'absint', $productmeta_ids )
+			)
+		);
+
+		if ( array() === $productmeta_ids ) {
+			return 0;
+		}
+
+		global $wpdb;
+		$table        = $this->table_name();
+		$placeholders = implode( ', ', array_fill( 0, count( $productmeta_ids ), '%d' ) );
+		$count        = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE productmeta_id IN ({$placeholders})", $productmeta_ids ) );
+
+		if ( null === $count || '' !== $wpdb->last_error ) {
+			return null;
+		}
+
+		return (int) $count;
+	}
+
+	/**
 	 * @param int $productmeta_id Field-group ID.
 	 * @return string|null JSON `the_meta` column.
 	 */
