@@ -433,12 +433,15 @@ class PPOM_FRONTEND_SCRIPTS {
 								$croppie_options[ $data_name ] = ppom_get_croppie_options( $field );
 
 								$file_js_vars['croppie_options'] = $croppie_options;
+								$fields_meta['chunk_size']       = apply_filters( 'ppom_file_upload_chunk_size', '1mb' );
 								break;
 
 							case 'file':
 								$ppom_file_inputs[] = $field;
 
 								PPOM_SCRIPTS::enqueue_script( 'ppom-file-upload' );
+
+								$fields_meta['chunk_size'] = apply_filters( 'ppom_file_upload_chunk_size', '1mb' );
 
 								break;
 
@@ -607,6 +610,7 @@ class PPOM_FRONTEND_SCRIPTS {
 					'plupload_runtime'       => ( ppom_if_browser_is_ie() ) ? 'html5,html4' : 'html5,silverlight,html4,browserplus,gear',
 					'ppom_file_upload_nonce' => wp_create_nonce( 'ppom_uploading_file_action' ),
 					'ppom_file_delete_nonce' => wp_create_nonce( 'ppom_deleting_file_action' ),
+					'wp_rest_nonce'          => wp_create_nonce( 'wp_rest' ),
 					'rest_url'               => rest_url( 'ppom/v1/nonces/file/' ),
 					'invalid_file_type'      => __( 'Invalid file type', 'woocommerce-product-addon' ),
 					// translators: %s is max file size.
@@ -679,7 +683,6 @@ class PPOM_FRONTEND_SCRIPTS {
 
 			$existing_data[ $product_id ]  = $localize_data;
 			$GLOBALS[ $multi_product_var ] = $existing_data;
-
 			// Localize the multi-product data structure.
 			PPOM_SCRIPTS::localize_script( $handle, $multi_product_var, $existing_data );
 		}

@@ -294,6 +294,99 @@ test.describe( 'Conditions', () => {
 		await expect( output ).toBeVisible();
 	} );
 
+	test( 'free: bound=Any + visibility=Hide removes the target when any rule matches', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await ensureFreeTier( requestUtils );
+
+		const x1 = { label: 'X1', value: 'x1' };
+		const x2 = { label: 'X2', value: 'x2' };
+		const y1 = { label: 'Y1', value: 'y1' };
+		const y2 = { label: 'Y2', value: 'y2' };
+		const token = uniqueToken();
+		const firstId = `ctrl_a_${ token }`;
+		const secondId = `ctrl_b_${ token }`;
+		const targetId = `target_${ token }`;
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: `Conditions Hide+Any ${ token }`,
+			fields: [
+				buildSelectField( {
+					title: `Control A ${ token }`,
+					dataName: firstId,
+					options: [ x1, x2 ],
+				} ),
+				buildSelectField( {
+					title: `Control B ${ token }`,
+					dataName: secondId,
+					options: [ y1, y2 ],
+				} ),
+				buildTextField( {
+					title: 'Target field',
+					dataName: targetId,
+					logic: 'on',
+					conditions: {
+						visibility: 'Hide',
+						bound: 'Any',
+						rules: [
+							{
+								elements: firstId,
+								operators: 'is',
+								element_values: x2.label,
+							},
+							{
+								elements: secondId,
+								operators: 'is',
+								element_values: y2.label,
+							},
+						],
+					},
+				} ),
+			],
+		} );
+
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
+
+		await page.goto( `/?p=${ product.id }` );
+
+		const target = page.getByLabel( 'Target field' );
+		const hiddenField = page.locator( '#conditionally_hidden' );
+
+		// Both controls default to first option → no rules match → target visible.
+		await expect( target ).toBeVisible();
+		await expect( hiddenField ).toHaveValue( '' );
+
+		// Match first rule: Control A = X2 → target should hide.
+		await selectByName( page, firstId ).selectOption( { label: x2.label } );
+		await expect( target ).toBeHidden();
+		await expect( hiddenField ).toHaveValue( targetId );
+
+		// Reset Control A → no rules match → target visible again.
+		await selectByName( page, firstId ).selectOption( { label: x1.label } );
+		await expect( target ).toBeVisible();
+		await expect( hiddenField ).toHaveValue( '' );
+
+		// Match second rule: Control B = Y2 → target should hide.
+		await selectByName( page, secondId ).selectOption( { label: y2.label } );
+		await expect( target ).toBeHidden();
+		await expect( hiddenField ).toHaveValue( targetId );
+
+		// Match both rules: ensure target stays hidden and #conditionally_hidden doesn't duplicate.
+		await selectByName( page, firstId ).selectOption( { label: x2.label } );
+		await expect( target ).toBeHidden();
+		await expect( hiddenField ).toHaveValue( targetId );
+
+		// Reset both → target visible.
+		await selectByName( page, firstId ).selectOption( { label: x1.label } );
+		await selectByName( page, secondId ).selectOption( { label: y1.label } );
+		await expect( target ).toBeVisible();
+		await expect( hiddenField ).toHaveValue( '' );
+	} );
+
 	test( 'free: bound=All only shows when every rule matches', async ( {
 		page,
 		requestUtils,

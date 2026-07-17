@@ -190,11 +190,11 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	/**
 	 * @return void
 	 */
-	public function test_apply_legacy_quantities_exclude_base_adjustment_zeros_base_and_scales_options() {
+	public function test_apply_legacy_quantities_exclude_base_adjustment_zeros_base_keeps_options() {
 		$adj = CartHandler::apply_legacy_quantities_exclude_base_adjustment( 10, false, 50, 3, 4 );
 
 		$this->assertSame( 0, $adj['ppom_item_org_price'] );
-		$this->assertSame( 12, $adj['total_option_price'] );
+		$this->assertSame( 3, $adj['total_option_price'] );
 	}
 
 	/**
@@ -861,5 +861,49 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 				? sprintf( 'Got unexpected PHP notice: [%d] %s', $caught['errno'], $caught['errstr'] )
 				: ''
 		);
+	}
+
+	/**
+	 * Computes the price from the selected field when the option price is missing,
+	 * ensuring that the cart fee is updated correctly.
+	 *
+	 * @return void
+	 */
+	public function test_update_cart_fees_computes_price_from_fields_when_option_price_missing() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_select_field(
+					'size',
+					'Size',
+					array(
+						array( 'option' => 'Small', 'price' => '' ),
+						array( 'option' => 'Large', 'price' => '5.00' ),
+					)
+				),
+			),
+			$product_id
+		);
+
+		$cart_items = array(
+			'data'         => $product,
+			'variation_id' => 0,
+			'quantity'     => 1,
+		);
+
+		$values = array(
+			'ppom' => array(
+				'fields' => array(
+					'id'   => (string) $meta_id,
+					'size' => 'Large',
+				),
+			),
+		);
+
+		$result = CartHandler::update_cart_fees( $cart_items, $values );
+
+		$this->assertSame( 15.0, (float) $result['data']->get_price() );
 	}
 }

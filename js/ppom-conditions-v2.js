@@ -413,12 +413,26 @@ function ppom_check_conditions( data_name, callback ) {
 					: 'ppom_field_shown';
 			// console.log(`${t} ***** ${element_data_name} total_cond ${total_cond} == matched ${matched} ==> ${matched_conditions[element_data_name]} ==> visibility ${event_type}`);
 
-			if (
-				( matched_conditions[ element_data_name ] > 0 &&
-					binding === 'Any' ) ||
-				( matched_conditions[ element_data_name ] == total_cond &&
-					binding === 'All' )
-			) {
+			if ( matched_conditions[ element_data_name ] > 0 && binding === 'Any' ) {
+				const $wrapper = jQuery( this );
+				if ( visibility !== 'hide' ) {
+					$wrapper.removeClass( function ( _index, className ) {
+						return ( className.match(/\bppom-locked-\S+/g) || [] ).join( ' ' );
+					} );
+				} else {
+ 					$wrapper.addClass( `ppom-locked-${ data_name }` );
+ 				}
+
+				if ( visibility === 'hide' ) {
+ 					$wrapper.addClass( 'ppom-c-hide' ).removeClass( 'ppom-c-show' );
+ 				} else {
+ 					$wrapper.removeClass( 'ppom-c-hide' );
+ 				}
+
+				if ( typeof callback === 'function' ) {
+					callback( element_data_name, event_type );
+				}
+			} else if ( matched_conditions[ element_data_name ] == total_cond && binding === 'All') {
 				// remove/add locked classes for all dependent fields
 				cond_elements.forEach( ( cond_dataname ) => {
 					if ( visibility === 'hide' ) {
@@ -441,16 +455,32 @@ function ppom_check_conditions( data_name, callback ) {
 				! is_matched ||
 				matched_conditions[ element_data_name ] !== total_cond
 			) {
-				if ( visibility === 'hide' ) {
-					event_type = 'ppom_field_shown';
-					jQuery( this ).removeClass(
-						`ppom-locked-${ data_name } ppom-c-hide`
-					);
-				} else {
-					event_type = 'ppom_field_hidden';
-					jQuery( this ).addClass(
-						`ppom-locked-${ data_name } ppom-c-hide`
-					);
+				if ( binding === 'Any' ) {
+					const classes = ((jQuery(this).attr("class") || "").match(/\bppom-cond-[^\s]+/g,) || [])
+								.map((cls) => cls.replace("ppom-cond-", "ppom-locked-"))
+								.join(" ");
+
+					if ( visibility === 'hide' ) {
+						jQuery( this ).removeClass(
+							`${ classes } ppom-c-hide`
+						);
+					} else {
+						jQuery( this ).addClass(
+							`${ classes } ppom-c-hide`
+						);
+					}
+				} else if ( binding === 'All' ) {
+					if ( visibility === 'hide' ) {
+						event_type = 'ppom_field_shown';
+						jQuery( this ).removeClass(
+							`ppom-locked-${ data_name } ppom-c-hide`
+						);
+					} else {
+						event_type = 'ppom_field_hidden';
+						jQuery( this ).addClass(
+							`ppom-locked-${ data_name } ppom-c-hide`
+						);
+					}
 				}
 
 				if ( typeof callback === 'function' ) {
@@ -711,7 +741,8 @@ function ppom_set_default_option( field_id ) {
 				const opt_id =
 					product_id + '-' + field.data_name + '-' + options.id;
 
-				const default_checked = field.checked.split( '\r\n' );
+				// Imported metas can lack the `checked` key entirely.
+				const default_checked = ( field.checked || '' ).split( '\r\n' );
 				if ( jQuery.inArray( options.option, default_checked ) > -1 ) {
 					jQuery( '#' + opt_id ).prop( 'checked', true );
 				}
@@ -756,11 +787,12 @@ function ppom_fields_hidden_conditionally() {
 	// console.log("Condionally Hidden", ppom_hidden_fields);
 	// jQuery("#conditionally_hidden").val(ppom_hidden_fields);
 
-	const datanames = jQuery(
-		`.ppom-field-wrapper[class*="ppom-locked-"]`
-	).map( ( i, h ) =>
-		ppom_hidden_fields.push( jQuery( h ).data( 'data_name' ) )
-	);
+	// Use the actual visual state: per-source `ppom-locked-*` classes go
+	// stale when rules span multiple source fields, but `ppom-c-hide` always
+	// reflects what the customer sees.
+	jQuery( `.ppom-field-wrapper.ppom-c-hide` ).each( function ( i, h ) {
+		ppom_hidden_fields.push( jQuery( h ).data( 'data_name' ) );
+	} );
 	jQuery( '#conditionally_hidden' ).val( ppom_hidden_fields );
 	// console.log(ppom_hidden_fields);
 }

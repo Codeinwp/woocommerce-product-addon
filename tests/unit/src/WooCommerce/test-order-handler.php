@@ -154,6 +154,102 @@ class Test_Order_Handler extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Order Again must restore the confirmed upload into the shared pool so the
+	 * rehydrated file reference points at an existing file (issue #655).
+	 *
+	 * @return void
+	 */
+	public function test_wc_order_again_compatibility_restores_confirmed_file_to_upload_pool() {
+		$order_id   = 901;
+		$product_id = 44;
+		$file_name  = 'reordered.txt';
+		$base_path  = ppom_get_dir_path() . $file_name;
+		$confirmed  = ppom_get_dir_path( 'confirmed/' . $order_id ) . $product_id . '-' . $file_name;
+
+		file_put_contents( $confirmed, 'moved at first checkout' );
+		$this->assertFileDoesNotExist( $base_path );
+
+		$item = new class( $file_name, $product_id ) {
+			/**
+			 * @var string
+			 */
+			private $file_name;
+
+			/**
+			 * @var int
+			 */
+			private $product_id;
+
+			/**
+			 * @param string $file_name  Uploaded file name.
+			 * @param int    $product_id Product ID.
+			 */
+			public function __construct( $file_name, $product_id ) {
+				$this->file_name  = $file_name;
+				$this->product_id = $product_id;
+			}
+
+			/**
+			 * @param string $key Meta key.
+			 *
+			 * @return array<string, mixed>|string
+			 */
+			public function get_meta( $key = '' ) {
+				if ( '_ppom_fields' !== $key ) {
+					return '';
+				}
+
+				return array(
+					'fields' => array(
+						'id'          => '2',
+						'design_file' => array(
+							'file_0' => array( 'org' => $this->file_name ),
+						),
+					),
+				);
+			}
+
+			/**
+			 * @return int
+			 */
+			public function get_product_id() {
+				return $this->product_id;
+			}
+		};
+
+		$order = new class( $order_id ) {
+			/**
+			 * @var int
+			 */
+			private $id;
+
+			/**
+			 * @param int $id Order ID.
+			 */
+			public function __construct( $id ) {
+				$this->id = $id;
+			}
+
+			/**
+			 * @return int
+			 */
+			public function get_id() {
+				return $this->id;
+			}
+		};
+
+		$out = OrderHandler::wc_order_again_compatibility( array(), $item, $order );
+
+		$this->assertFileExists( $base_path );
+		$this->assertSame( 'moved at first checkout', file_get_contents( $base_path ) );
+		$this->assertFileExists( $confirmed );
+		$this->assertSame( $file_name, $out['ppom']['fields']['design_file']['file_0']['org'] );
+
+		unlink( $base_path );
+		unlink( $confirmed );
+	}
+
+	/**
 	 * @return void
 	 */
 	public function test_wc_email_improvements_enabled_reads_option() {

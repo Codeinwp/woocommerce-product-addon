@@ -1,3 +1,22 @@
+##### [Version 34.0.6](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.5...v34.0.6) (2026-07-16)
+
+- Fixed uploaded files being lost when customers use **Order Again** — files now stay accessible across orders ([#662](https://github.com/Codeinwp/woocommerce-product-addon/issues/662))
+- Fixed the add-ons admin menu running off-screen on stores with many field groups; it now scrolls ([#666](https://github.com/Codeinwp/woocommerce-product-addon/issues/666))
+- Removed incorrect PHP warnings and a broken support link that appeared when no valid license was active ([#667](https://github.com/Codeinwp/woocommerce-product-addon/issues/667))
+- Fixed uploading HEIC/HEIF (iPhone) photos in the file upload field ([#668](https://github.com/Codeinwp/woocommerce-product-addon/issues/668))
+- Fixed option prices not always showing correctly on the product page ([#669](https://github.com/Codeinwp/woocommerce-product-addon/issues/669))
+- Fixed option prices being wrongly multiplied by another field's quantity, which could overcharge customers ([#670](https://github.com/Codeinwp/woocommerce-product-addon/issues/670))
+- Fixed conditional logic breaking on checkbox fields after exporting and re-importing a field group ([#672](https://github.com/Codeinwp/woocommerce-product-addon/issues/672))
+- Fixed conditional fields not appearing in the cart when their rules spanned multiple fields ([#673](https://github.com/Codeinwp/woocommerce-product-addon/issues/673))
+
+##### [Version 34.0.5](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.4...v34.0.5) (2026-07-10)
+
+- Updated file upload chunk size handling and fixed file uploads
+- Fixed argument type causing errors in edge cases
+- Improved condition handling
+- Preserve uploaded image when changing crop size
+- Fixed issue where HTML fields with Show in Cart off still appears in cart item data
+
 ##### [Version 34.0.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.3...v34.0.4) (2026-06-24)
 
 - Enhanced security
