@@ -107,12 +107,15 @@ class Test_PPOM_Meta_Multi_Group extends PPOM_Test_Case {
 	}
 
 	/**
-	 * get_fields() removes stale meta_id entries from the product's post meta
-	 * when the underlying row is gone, while preserving the surviving group.
+	 * get_fields() skips stale meta_id entries for the current request while
+	 * preserving the surviving group — and never rewrites the stored
+	 * assignment, because $this->meta_id is the display-time resolution
+	 * (direct + category + ppom_product_meta_id filter), not the stored
+	 * value (#686).
 	 *
 	 * @return void
 	 */
-	public function test_get_fields_cleans_up_stale_meta_id_reference() {
+	public function test_get_fields_skips_stale_reference_without_persisting() {
 		$product = $this->create_simple_product();
 
 		$valid_meta_id  = $this->insert_ppom_meta(
@@ -129,7 +132,6 @@ class Test_PPOM_Meta_Multi_Group extends PPOM_Test_Case {
 		$ppom = new PPOM_Meta( $product->get_id() );
 		$this->assertTrue( $ppom->has_multiple_meta() );
 
-		// Triggering the field resolver runs the cleanup.
 		$fields = (array) $ppom->get_fields();
 		$data_names = array_map(
 			static function ( $field ) {
@@ -139,18 +141,94 @@ class Test_PPOM_Meta_Multi_Group extends PPOM_Test_Case {
 		);
 		$this->assertContains( 'keep_field', $data_names );
 
+		// The stale id is dropped from the in-memory resolution only.
+		$this->assertSame( array( $valid_meta_id ), array_values( (array) $ppom->meta_id ) );
+
+		// The stored assignment is untouched — front-end reads must not write.
 		$stored = get_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, true );
-		$this->assertIsArray( $stored );
-		$this->assertSame( array( $valid_meta_id ), array_values( array_map( 'intval', $stored ) ) );
+		$this->assertSame(
+			array( $valid_meta_id, $stale_meta_id ),
+			array_values( array_map( 'intval', (array) $stored ) )
+		);
 	}
 
 	/**
-	 * get_fields() deletes the product's post meta entirely when every
-	 * attached meta_id references a row that no longer exists.
+	 * A display-time override may replace the product's stored assignment.
+	 * Resolving its fields must not persist that temporary set.
 	 *
 	 * @return void
 	 */
-	public function test_get_fields_deletes_post_meta_when_all_references_are_stale() {
+	public function test_get_fields_does_not_persist_runtime_override() {
+		$product          = $this->create_simple_product();
+		$stored_meta_id   = $this->insert_ppom_meta(
+			array( $this->build_text_field( 'stored_field', 'Stored' ) )
+		);
+		$override_meta_id = $this->insert_ppom_meta(
+			array( $this->build_text_field( 'override_field', 'Override' ) )
+		);
+
+		update_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, array( $stored_meta_id ) );
+
+		$filter = static function () use ( $override_meta_id ) {
+			return array( $override_meta_id, 0 );
+		};
+		add_filter( 'ppom_product_meta_id', $filter, 99 );
+
+		try {
+			$ppom = new PPOM_Meta( $product->get_id() );
+		} finally {
+			remove_filter( 'ppom_product_meta_id', $filter, 99 );
+		}
+
+		$this->assertSame( array( $override_meta_id ), array_values( (array) $ppom->meta_id ) );
+		$this->assertSame(
+			array( $stored_meta_id ),
+			array_values( array_map( 'intval', (array) get_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, true ) ) )
+		);
+		$this->assertContains( 'override_field', array_column( (array) $ppom->fields, 'data_name' ) );
+	}
+
+	/**
+	 * A category group merged with a stale direct assignment remains
+	 * display-only and must not become the product's direct assignment.
+	 *
+	 * @return void
+	 */
+	public function test_get_fields_does_not_persist_category_group_over_stale_assignment() {
+		$term = wp_insert_term( 'PPOM Category ' . wp_generate_password( 6, false ), 'product_cat' );
+		$this->assertIsArray( $term );
+
+		$product   = $this->create_simple_product();
+		$term_slug = get_term( $term['term_id'], 'product_cat' )->slug;
+		wp_set_object_terms( $product->get_id(), array( (int) $term['term_id'] ), 'product_cat' );
+
+		$category_meta_id = $this->insert_ppom_meta(
+			array( $this->build_text_field( 'category_field', 'Category' ) ),
+			0,
+			array( 'productmeta_categories' => $term_slug )
+		);
+		$stale_meta_id = 999999;
+		update_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, array( $stale_meta_id ) );
+
+		$ppom = new PPOM_Meta( $product->get_id() );
+
+		$this->assertSame( array( $category_meta_id ), array_values( (array) $ppom->meta_id ) );
+		$this->assertContains( 'category_field', array_column( (array) $ppom->fields, 'data_name' ) );
+		$this->assertSame(
+			array( $stale_meta_id ),
+			array_values( array_map( 'intval', (array) get_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, true ) ) )
+		);
+	}
+
+	/**
+	 * get_fields() must not delete the product's post meta when every attached
+	 * meta_id fails to resolve: an empty read is indistinguishable from a
+	 * transient DB failure (#679), and the resolved set may not be the stored
+	 * assignment at all (#686). It renders nothing for the request instead.
+	 *
+	 * @return void
+	 */
+	public function test_get_fields_keeps_post_meta_when_all_references_are_stale() {
 		$product = $this->create_simple_product();
 
 		update_post_meta(
@@ -159,12 +237,17 @@ class Test_PPOM_Meta_Multi_Group extends PPOM_Test_Case {
 			array( 9999991, 9999992 )
 		);
 
-		$ppom = new PPOM_Meta( $product->get_id() );
-		$ppom->get_fields();
+		$ppom   = new PPOM_Meta( $product->get_id() );
+		$fields = $ppom->get_fields();
 
+		$this->assertSame( array(), (array) $fields );
+
+		$this->assertTrue(
+			metadata_exists( 'post', $product->get_id(), PPOM_PRODUCT_META_KEY )
+		);
 		$this->assertSame(
-			'',
-			(string) get_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, true )
+			array( 9999991, 9999992 ),
+			array_values( array_map( 'intval', (array) get_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, true ) ) )
 		);
 	}
 

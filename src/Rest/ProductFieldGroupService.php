@@ -187,13 +187,8 @@ final class ProductFieldGroupService {
 
 		// Check if all fields request exist.
 		if ( in_array( '__all_keys', $delete_fields ) ) {
-
-			// Unset product meta key.
-			delete_post_meta( $product_id, PPOM_PRODUCT_META_KEY );
-
 			// Deleting all fields.
-			$res                = ppom_meta_repository()->delete_by_id( (int) $ppom_meta->productmeta_id );
-			$delete_fields_resp = array( 'ppom_id' => $ppom_meta->productmeta_id );
+			ppom_meta_repository()->delete_by_id( (int) $ppom_meta->productmeta_id );
 
 			$resp = array(
 				'status'     => 'success',

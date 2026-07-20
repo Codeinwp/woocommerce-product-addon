@@ -66,7 +66,7 @@ test.describe("PPOM assignment vs transient field-group read failures", () => {
 		await expect(page.locator(`.ppom-id-${ppomId}`).first()).toBeVisible();
 	});
 
-	test("confirmed-deleted group still cleans up the stale assignment", async ({
+	test("deleting a group cleans its product assignment at deletion time", async ({
 		page,
 		requestUtils,
 	}) => {
@@ -86,17 +86,16 @@ test.describe("PPOM assignment vs transient field-group read failures", () => {
 		await page.goto(`/?p=${product.id}`);
 		await expect(page.locator(`.ppom-id-${ppomId}`).first()).toBeVisible();
 
-		// Hard-delete the group row while the assignment stays behind, then
-		// load the product page so get_fields() reconciles the stored ids.
+		// Deleting the group row cleans the direct assignment immediately.
 		await deletePpomGroupRows(requestUtils, { ppomIds: [ppomId] });
-		await page.goto(`/?p=${product.id}`);
-		await expect(page.locator(`.ppom-id-${ppomId}`)).toHaveCount(0);
-
-		// Confirmed absence must still remove the stale assignment.
 		const assignment = await getProductPpomAssignment(requestUtils, {
 			productId: product.id,
 		});
 		expect(assignment.exists).toBe(false);
 		expect(assignment.meta_ids).toEqual([]);
+
+		// Storefront resolution stays read-only and simply renders no fields.
+		await page.goto(`/?p=${product.id}`);
+		await expect(page.locator(`.ppom-id-${ppomId}`)).toHaveCount(0);
 	});
 });
