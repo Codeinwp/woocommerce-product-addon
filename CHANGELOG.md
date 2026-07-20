@@ -1,3 +1,7 @@
+##### [Version 34.0.7](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.6...v34.0.7) (2026-07-20)
+
+- Fixed product form assignments regression
+
 ##### [Version 34.0.6](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.5...v34.0.6) (2026-07-16)
 
 - Fixed uploaded files being lost when customers use **Order Again** — files now stay accessible across orders ([#662](https://github.com/Codeinwp/woocommerce-product-addon/issues/662))
