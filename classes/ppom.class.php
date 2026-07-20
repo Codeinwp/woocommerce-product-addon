@@ -345,15 +345,14 @@ class PPOM_Meta {
 			}
 		}
 
-		// Cleanup meta_id if there are any invalid entries.
+		// Ignore invalid resolved IDs for this request without rewriting the
+		// product's stored assignment.
 		$valid_ids = array_filter( $valid_ids );
 		if ( count( $valid_ids ) !== count( (array) $this->meta_id ) ) {
 			if ( ! empty( $valid_ids ) ) {
 				$this->meta_id = $this->has_multiple_meta() ? $valid_ids : (int) reset( $valid_ids );
-				update_post_meta( self::$product_id, PPOM_PRODUCT_META_KEY, $valid_ids );
 			} else {
 				$this->meta_id = null;
-				delete_post_meta( self::$product_id, PPOM_PRODUCT_META_KEY );
 			}
 		}
 

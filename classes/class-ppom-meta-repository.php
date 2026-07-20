@@ -775,7 +775,7 @@ class PPOM_Meta_Repository {
 	}
 
 	/**
-	 * Delete one row.
+	 * Delete one row and clean its direct product assignments after success.
 	 *
 	 * @param int $id Row id.
 	 * @return int|false Rows deleted or false.
@@ -793,12 +793,15 @@ class PPOM_Meta_Repository {
 		);
 		$this->invalidate_row_cache( $id );
 		$this->invalidate_aggregate_list_caches();
+		if ( $result > 0 ) {
+			$this->remove_product_assignments( array( $id ) );
+		}
 
 		return $result;
 	}
 
 	/**
-	 * Delete many rows in one prepared statement.
+	 * Delete many rows and clean their direct product assignments after success.
 	 *
 	 * @param array<int> $ids Row ids.
 	 * @return int|false
@@ -836,8 +839,56 @@ class PPOM_Meta_Repository {
 		if ( false === $result ) {
 			return false;
 		}
+		if ( $result > 0 ) {
+			$this->remove_product_assignments( $ids );
+		}
 
 		return (int) $result;
+	}
+
+	/**
+	 * Removes deleted field-group IDs from direct product assignments.
+	 *
+	 * @param array<int> $deleted_ids Deleted field-group IDs.
+	 * @return void
+	 */
+	private function remove_product_assignments( array $deleted_ids ) {
+		$deleted_ids = array_values( array_unique( array_filter( array_map( 'absint', $deleted_ids ) ) ) );
+		if ( empty( $deleted_ids ) ) {
+			return;
+		}
+
+		$query = $this->wpdb->prepare(
+			'SELECT post_id, meta_value FROM %i WHERE meta_key = %s',
+			$this->wpdb->postmeta,
+			PPOM_PRODUCT_META_KEY
+		);
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared immediately above with identifier and value placeholders.
+		$assignments = $this->wpdb->get_results( $query, ARRAY_A );
+
+		foreach ( (array) $assignments as $assignment ) {
+			$post_id      = absint( $assignment['post_id'] ?? 0 );
+			$stored_value = maybe_unserialize( (string) ( $assignment['meta_value'] ?? '' ) );
+			$stored_ids   = (array) $stored_value;
+			$kept_ids     = array_values(
+				array_filter(
+					$stored_ids,
+					static function ( $stored_id ) use ( $deleted_ids ) {
+						return ! in_array( absint( $stored_id ), $deleted_ids, true );
+					}
+				)
+			);
+
+			if ( 0 === $post_id || count( $kept_ids ) === count( $stored_ids ) ) {
+				continue;
+			}
+
+			if ( empty( $kept_ids ) ) {
+				delete_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $stored_value );
+			} else {
+				update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $kept_ids, $stored_value );
+			}
+		}
 	}
 
 	/**

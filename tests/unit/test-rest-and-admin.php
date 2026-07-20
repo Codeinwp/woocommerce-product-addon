@@ -199,6 +199,92 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Deleting a shared group removes only that group from every direct product
+	 * assignment while preserving other attached groups.
+	 *
+	 * @return void
+	 */
+	public function testDeletePPOMFieldsProductCleansSharedAssignmentsAndPreservesOtherGroups() {
+		$product_a = $this->create_simple_product();
+		$product_b = $this->create_simple_product();
+		$deleted   = $this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'deleted_field', 'Deleted' ),
+			)
+		);
+		$kept      = $this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'kept_field', 'Kept' ),
+			)
+		);
+
+		update_post_meta( $product_a->get_id(), PPOM_PRODUCT_META_KEY, array( $deleted, $kept ) );
+		update_post_meta( $product_b->get_id(), PPOM_PRODUCT_META_KEY, array( $deleted, $kept ) );
+
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/delete/product/',
+			array(
+				'product_id' => $product_a->get_id(),
+				'secret_key' => 'expected-secret',
+				'fields'     => wp_json_encode( array( '__all_keys' ) ),
+			),
+			'expected-secret'
+		);
+
+		$this->assertSame( 'success', $response->get_data()['status'] );
+		$this->assertNull( $this->get_ppom_meta_row( $deleted ) );
+		$this->assertNotNull( $this->get_ppom_meta_row( $kept ) );
+		$this->assertSame( array( $kept ), array_values( (array) get_post_meta( $product_a->get_id(), PPOM_PRODUCT_META_KEY, true ) ) );
+		$this->assertSame( array( $kept ), array_values( (array) get_post_meta( $product_b->get_id(), PPOM_PRODUCT_META_KEY, true ) ) );
+	}
+
+	/**
+	 * Bulk group deletion cleans both multi-group and legacy scalar assignments.
+	 * Stored ids may be legacy strings; surviving entries keep their original
+	 * type instead of being rewritten.
+	 *
+	 * @return void
+	 */
+	public function testBulkGroupDeletionCleansMultiGroupAndLegacyScalarAssignments() {
+		$multi_product  = $this->create_simple_product();
+		$scalar_product = $this->create_simple_product();
+		$deleted_a      = $this->insert_ppom_meta( array( $this->build_text_field( 'deleted_a', 'Deleted A' ) ) );
+		$deleted_b      = $this->insert_ppom_meta( array( $this->build_text_field( 'deleted_b', 'Deleted B' ) ) );
+		$kept           = $this->insert_ppom_meta( array( $this->build_text_field( 'kept', 'Kept' ) ) );
+
+		update_post_meta( $multi_product->get_id(), PPOM_PRODUCT_META_KEY, array( (string) $deleted_a, (string) $kept, $deleted_b ) );
+		update_post_meta( $scalar_product->get_id(), PPOM_PRODUCT_META_KEY, $deleted_b );
+
+		$deleted_count = ppom_meta_repository()->delete_by_ids( array( $deleted_a, $deleted_b ) );
+
+		$this->assertSame( 2, $deleted_count );
+		$this->assertSame( array( (string) $kept ), array_values( (array) get_post_meta( $multi_product->get_id(), PPOM_PRODUCT_META_KEY, true ) ) );
+		$this->assertFalse( metadata_exists( 'post', $scalar_product->get_id(), PPOM_PRODUCT_META_KEY ) );
+		$this->assertNotNull( $this->get_ppom_meta_row( $kept ) );
+	}
+
+	/**
+	 * A delete that removes no rows (id already gone) must not touch product
+	 * assignments: an empty result is indistinguishable from a transient DB
+	 * failure, so cleanup only runs after a confirmed deletion (#679).
+	 *
+	 * @return void
+	 */
+	public function testNoOpGroupDeletionLeavesAssignmentsUntouched() {
+		$product  = $this->create_simple_product();
+		$stale_id = 999999;
+		update_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, array( $stale_id ) );
+
+		$this->assertSame( 0, ppom_meta_repository()->delete_by_id( $stale_id ) );
+		$this->assertSame( 0, ppom_meta_repository()->delete_by_ids( array( $stale_id ) ) );
+		$this->assertSame(
+			array( $stale_id ),
+			array_values( array_map( 'intval', (array) get_post_meta( $product->get_id(), PPOM_PRODUCT_META_KEY, true ) ) )
+		);
+	}
+
+	/**
 	 * Ensure the order read route returns the formatted PPOM item metadata.
 	 *
 	 * @return void
