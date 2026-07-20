@@ -26,9 +26,13 @@ Are you a WooCommerce store owner looking to offer personalized products? PPOM (
 
 - **Increase Sales Potential**: With dynamic pricing adjustments and enticing customization options, you empower customers to get exactly what they want, increasing both satisfaction and sales.
 
+- **Simple Setup**: Get woo custom fields running on any product page in minutes, no coding required.
+
 Increase sales and customer satisfaction by offering tailored product options and add-ons. PPOM is built for WooCommerce stores that need unique, customizable products.
 
 ## Input Types in Free Version:
+
+Browse the woo product fields below, from simple text boxes to file uploads.
 
 📌 **Text**: Displays an input box for text personalization like 'Name on Mug'. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-text-input/)
 
