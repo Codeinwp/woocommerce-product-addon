@@ -7665,13 +7665,13 @@ parameters:
 		-
 			message: '#^Variable \$field_meta might not be defined\.$#'
 			identifier: variable.undefined
-			count: 3
+			count: 2
 			path: templates/frontend/inputs/quantities.php
 
 		-
 			message: '#^Variable \$product might not be defined\.$#'
 			identifier: variable.undefined
-			count: 2
+			count: 1
 			path: templates/frontend/inputs/quantities.php
 
 		-

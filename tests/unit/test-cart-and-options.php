@@ -482,4 +482,80 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 		$this->assertSame( 'Large', $has_stock[0]['option'] );
 		$this->assertSame( 3, (int) $has_stock[0]['stock'] );
 	}
+
+	/**
+	 * When a price matrix is attached to the product, quantities option prices
+	 * are blanked so the matrix drives pricing from the total quantity.
+	 *
+	 * @return void
+	 */
+	public function testQuantitiesOptionPricesBlankedWhenPriceMatrixAttached() {
+		$product = $this->create_simple_product();
+
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_quantities_field(
+					'kits',
+					'Kits',
+					array(
+						array(
+							'option' => 'Kit A',
+							'price'  => '999',
+							'id'     => '_kit_a',
+						),
+					)
+				),
+				array(
+					'type'      => 'pricematrix',
+					'title'     => 'Sets',
+					'data_name' => 'sets',
+					'options'   => array(
+						array(
+							'option' => '1-10',
+							'price'  => '80',
+							'id'     => 'r1',
+						),
+					),
+				),
+			),
+			$product->get_id()
+		);
+
+		$field_meta = ppom_get_field_meta_by_dataname( null, 'kits', $meta_id );
+		$options    = ppom_convert_options_to_key_val( $field_meta['options'], $field_meta, $product );
+
+		$this->assertSame( '', $options['Kit A']['price'] );
+		$this->assertSame( '', $options['Kit A']['raw_price'] );
+	}
+
+	/**
+	 * Without a price matrix, quantities option prices are kept as-is.
+	 *
+	 * @return void
+	 */
+	public function testQuantitiesOptionPricesKeptWithoutPriceMatrix() {
+		$product = $this->create_simple_product();
+
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_quantities_field(
+					'kits',
+					'Kits',
+					array(
+						array(
+							'option' => 'Kit A',
+							'price'  => '999',
+							'id'     => '_kit_a',
+						),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$field_meta = ppom_get_field_meta_by_dataname( null, 'kits', $meta_id );
+		$options    = ppom_convert_options_to_key_val( $field_meta['options'], $field_meta, $product );
+
+		$this->assertSame( 999.0, (float) $options['Kit A']['price'] );
+	}
 }

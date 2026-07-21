@@ -1285,6 +1285,14 @@ final class Helpers {
 					}
 
 					$option_price = isset( $option['price'] ) && $option['price'] != '' ? $option['price'] : $quantities_dp;
+
+					// When a price matrix is attached, the matrix drives
+					// pricing from the total quantity — quantities own
+					// option prices are ignored everywhere (display, price
+					// table and cart).
+					if ( $product && self::has_field_by_type( self::get_product_id( $product ), 'pricematrix' ) ) {
+						$option_price = '';
+					}
 				}
 
 				$option_raw_price = $option_price;
