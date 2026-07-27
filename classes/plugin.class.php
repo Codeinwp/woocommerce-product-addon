@@ -839,6 +839,27 @@ class NM_PersonalizedProduct {
 
 		return self::LICENSE_PLAN_FREE;
 	}
+
+	/**
+	 * Get the translated label for a license category.
+	 *
+	 * @param int $category The license category constant.
+	 *
+	 * @return string Translated plan name, or '' when the category isn't a paid tier.
+	 */
+	public static function get_license_category_label( $category ) {
+		switch ( (int) $category ) {
+			case self::LICENSE_PLAN_1:
+				return __( 'Essential', 'woocommerce-product-addon' );
+			case self::LICENSE_PLAN_2:
+				return __( 'Plus', 'woocommerce-product-addon' );
+			case self::LICENSE_PLAN_3:
+				return __( 'VIP', 'woocommerce-product-addon' );
+		}
+
+		return '';
+	}
+
 	/**
 	 * Method to return the type of licence.
 	 *

@@ -101,7 +101,9 @@ function FieldTypeGridComponent( {
 							{ f.title }
 						</Text>
 						{ locked ? (
-							<FieldTypeProBadge label={ i18n.proBadge } />
+							<FieldTypeProBadge
+								label={ f.min_plan_label || i18n.proBadge }
+							/>
 						) : null }
 					</Button>
 				);

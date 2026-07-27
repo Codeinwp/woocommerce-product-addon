@@ -141,7 +141,7 @@ $fields_groups = function_exists( 'ppom_get_admin_field_type_groups' ) ? ppom_ge
 										<span class="upsell-btn-wrapper">
 											<a target="_blank" href="#">
 												<i class="fa fa-lock" aria-hidden="true"></i>
-												<?php _e( 'PRO', 'woocommerce-product-addon' ); ?>
+												<?php echo esc_html( NM_PersonalizedProduct::get_license_category_label( $field['plan'] ) ); ?>
 											</a>
 										</span>
 											<?php
@@ -172,7 +172,7 @@ $fields_groups = function_exists( 'ppom_get_admin_field_type_groups' ) ? ppom_ge
 					<h2><?php _e( 'Unlock all Features!', 'woocommerce-product-addon' ); ?></h2>
 				</div>
 				<div class="ppom-sidebar-upsell-content">
-					<p><?php _e( 'Upgrade to the Pro plan to unlock all features and enhance your product fields management capabilities:', 'woocommerce-product-addon' ); ?></p>
+					<p><?php _e( 'Locked fields are marked with the plan that unlocks them — Essential, Plus, or VIP. Upgrade to the plan that includes the fields and features you need:', 'woocommerce-product-addon' ); ?></p>
 					<div class="ppom-sidebar-upsell-features-grid">
 						<div><?php _e( 'Unlock 30+ input fields', 'woocommerce-product-addon' ); ?></div>
 						<div><?php _e( 'Meta Fields Repeater', 'woocommerce-product-addon' ); ?></div>
