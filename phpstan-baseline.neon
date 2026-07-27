@@ -1111,12 +1111,6 @@ parameters:
 			path: classes/plugin.class.php
 
 		-
-			message: '#^Method NM_PersonalizedProduct\:\:activate_plugin\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/plugin.class.php
-
-		-
 			message: '#^Method NM_PersonalizedProduct\:\:add_ppom_meta_panel\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
