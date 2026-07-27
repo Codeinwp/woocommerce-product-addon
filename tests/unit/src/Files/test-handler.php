@@ -260,4 +260,224 @@ class Test_Files_Handler extends PPOM_Test_Case {
 			remove_filter( 'ppom_dir_url', $filter );
 		}
 	}
+
+	/**
+	 * Replaces WC()->session with a brand new guest session, i.e. simulates a
+	 * different anonymous visitor arriving with no session cookie.
+	 *
+	 * @return void
+	 */
+	private function start_fresh_guest_session() {
+		WC()->session = new WC_Session_Handler();
+		WC()->session->init();
+	}
+
+	/**
+	 * The uploader may delete their own in-progress upload, but a different
+	 * anonymous visitor must not be able to claim it.
+	 *
+	 * Regression test for the missing-authorization report on ppom_delete_file:
+	 * knowing the file name was previously enough to delete anybody's upload.
+	 *
+	 * @return void
+	 */
+	public function test_only_the_uploading_visitor_owns_an_uploaded_file() {
+		$file_name = 'victim-artwork.abc123.png';
+
+		$this->start_fresh_guest_session();
+		Handler::remember_uploaded_file( $file_name );
+
+		$this->assertTrue(
+			Handler::owns_uploaded_file( $file_name ),
+			'The visitor who uploaded the file must be able to delete it.'
+		);
+
+		$this->start_fresh_guest_session();
+
+		$this->assertFalse(
+			Handler::owns_uploaded_file( $file_name ),
+			'A different anonymous visitor must not be able to delete an upload they did not make.'
+		);
+	}
+
+	/**
+	 * Upload and delete are two separate requests, so the ownership record is only
+	 * useful if it is persisted against the visitor's session cookie rather than
+	 * held in memory. A guest has no WooCommerce session cookie until something
+	 * forces one, which is the most likely way this fix could silently stop
+	 * legitimate shoppers from removing their own uploads.
+	 *
+	 * @return void
+	 */
+	public function test_remembered_upload_survives_into_the_next_request() {
+		$file_name = 'persisted-artwork.abc123.png';
+
+		$cookie = $this->capture_session_cookie(
+			function () use ( $file_name ) {
+				$this->start_fresh_guest_session();
+				Handler::remember_uploaded_file( $file_name );
+				WC()->session->save_data();
+			}
+		);
+
+		$this->assertNotEmpty(
+			$cookie,
+			'Uploading must issue a session cookie, otherwise the record is discarded on shutdown.'
+		);
+
+		$this->with_session_cookie(
+			$cookie,
+			function () use ( $file_name ) {
+				$this->assertTrue(
+					Handler::owns_uploaded_file( $file_name ),
+					'The uploader must still own the file on the follow-up delete request.'
+				);
+			}
+		);
+	}
+
+	/**
+	 * A shopper filling in several file fields owns every one of their uploads,
+	 * and removing one must not revoke the others.
+	 *
+	 * @return void
+	 */
+	public function test_visitor_owns_each_of_their_uploads() {
+		$this->start_fresh_guest_session();
+
+		Handler::remember_uploaded_file( 'front.aaa111.png' );
+		Handler::remember_uploaded_file( 'back.bbb222.png' );
+		Handler::remember_uploaded_file( 'notes.ccc333.pdf' );
+
+		$this->assertTrue( Handler::owns_uploaded_file( 'front.aaa111.png' ) );
+		$this->assertTrue( Handler::owns_uploaded_file( 'back.bbb222.png' ) );
+		$this->assertTrue( Handler::owns_uploaded_file( 'notes.ccc333.pdf' ) );
+		$this->assertFalse( Handler::owns_uploaded_file( 'someone-else.ddd444.png' ) );
+	}
+
+	/**
+	 * Logged-in customers get their session keyed by user ID rather than a guest
+	 * hash, so the same ownership rule has to hold for them — including the fact
+	 * that a second signed-in customer must not inherit the first one's uploads.
+	 *
+	 * @return void
+	 */
+	public function test_signed_in_customer_owns_only_their_own_upload() {
+		$file_name = 'members-artwork.eee555.png';
+
+		$first  = $this->factory->user->create( array( 'role' => 'customer' ) );
+		$second = $this->factory->user->create( array( 'role' => 'customer' ) );
+
+		wp_set_current_user( $first );
+		$this->start_fresh_guest_session();
+		Handler::remember_uploaded_file( $file_name );
+
+		$this->assertTrue(
+			Handler::owns_uploaded_file( $file_name ),
+			'A signed-in customer must be able to remove their own upload.'
+		);
+
+		wp_set_current_user( $second );
+		$this->start_fresh_guest_session();
+
+		$this->assertFalse(
+			Handler::owns_uploaded_file( $file_name ),
+			'A different signed-in customer must not inherit that upload.'
+		);
+	}
+
+	/**
+	 * Shoppers routinely upload as a guest and only sign in later at checkout.
+	 * WooCommerce migrates the guest session onto the user account at that point,
+	 * and the ownership record has to come with it or the shopper loses the
+	 * ability to remove a file they uploaded minutes earlier.
+	 *
+	 * @return void
+	 */
+	public function test_ownership_survives_signing_in_after_uploading_as_a_guest() {
+		$file_name = 'guest-then-login.fff666.png';
+
+		$cookie = $this->capture_session_cookie(
+			function () use ( $file_name ) {
+				$this->start_fresh_guest_session();
+				Handler::remember_uploaded_file( $file_name );
+				WC()->session->save_data();
+			}
+		);
+
+		$this->assertNotEmpty( $cookie );
+
+		$customer = $this->factory->user->create( array( 'role' => 'customer' ) );
+		wp_set_current_user( $customer );
+
+		$this->with_session_cookie(
+			$cookie,
+			function () use ( $file_name, $customer ) {
+				// Guards against a vacuous pass: prove WooCommerce really did move the
+				// guest session onto the account rather than leaving it untouched.
+				$this->assertSame(
+					(string) $customer,
+					(string) WC()->session->get_customer_id(),
+					'Expected the guest session to be migrated onto the signed-in customer.'
+				);
+
+				$this->assertTrue(
+					Handler::owns_uploaded_file( $file_name ),
+					'Signing in at checkout must not orphan an upload made as a guest.'
+				);
+			}
+		);
+	}
+
+	/**
+	 * Runs $callback with WooCommerce's set-cookie call intercepted, returning the
+	 * [name, value] pair it would have sent to the browser. Returning false from
+	 * the filter keeps wc_setcookie from touching real headers.
+	 *
+	 * @param callable $callback Code that should trigger the session cookie.
+	 *
+	 * @return array
+	 */
+	private function capture_session_cookie( callable $callback ) {
+		$captured = array();
+
+		$capture = static function ( $enabled, $name, $value ) use ( &$captured ) {
+			$captured = array( $name, $value );
+
+			return false;
+		};
+
+		add_filter( 'woocommerce_set_cookie_enabled', $capture, 10, 3 );
+
+		try {
+			$callback();
+		} finally {
+			remove_filter( 'woocommerce_set_cookie_enabled', $capture, 10 );
+		}
+
+		return $captured;
+	}
+
+	/**
+	 * Rebuilds WC()->session as if a fresh request arrived carrying $cookie, which
+	 * is what makes the follow-up delete request find the earlier upload.
+	 *
+	 * @param array    $cookie   [name, value] pair from capture_session_cookie().
+	 * @param callable $callback Assertions to run against the restored session.
+	 *
+	 * @return void
+	 */
+	private function with_session_cookie( array $cookie, callable $callback ) {
+		$_COOKIE[ $cookie[0] ] = $cookie[1];
+
+		try {
+			WC()->session = new WC_Session_Handler();
+			WC()->session->init();
+
+			$callback();
+		} finally {
+			unset( $_COOKIE[ $cookie[0] ] );
+		}
+	}
+
 }

@@ -14,6 +14,11 @@ use PPOM\Support\Helpers;
  */
 final class Handler {
 
+	/**
+	 * WooCommerce session key listing the uploads made by the current visitor.
+	 */
+	private const OWNED_FILES_KEY = 'ppom_uploaded_files';
+
 	public static function files_setup_get_directory( $sub_dir = false ) {
 
 		$upload_dir = wp_upload_dir();
@@ -389,6 +394,8 @@ final class Handler {
 			rename( $chunk_file_path, $unique_file_path );
 			$file_path = $unique_file_path;
 
+			self::remember_uploaded_file( $file_name );
+
 			$product_id = intval( $_REQUEST['product_id'] );
 			$data_name  = sanitize_key( $_REQUEST['data_name'] );
 			$file_meta  = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
@@ -428,6 +435,59 @@ final class Handler {
 	}
 
 	/**
+	 * Records an upload against the current visitor's WooCommerce session.
+	 *
+	 * The uploads directory is shared site-wide, so this is the only thing that
+	 * ties a temporary file to the shopper who uploaded it.
+	 *
+	 * @param string $file_name Name of the stored file.
+	 *
+	 * @return void
+	 *
+	 * @see self::owns_uploaded_file()
+	 */
+	public static function remember_uploaded_file( $file_name ) {
+
+		$session = function_exists( 'WC' ) ? WC()->session : null;
+
+		if ( ! $session instanceof \WC_Session ) {
+			return;
+		}
+
+		// Guests have no session cookie until something forces one, and without it
+		// WooCommerce discards the session on shutdown. Only the stock handler
+		// exposes this; a replacement handler is left to its own persistence.
+		if ( $session instanceof \WC_Session_Handler ) {
+			$session->set_customer_session_cookie( true );
+		}
+
+		$owned   = (array) $session->get( self::OWNED_FILES_KEY, array() );
+		$owned[] = $file_name;
+
+		$session->set( self::OWNED_FILES_KEY, array_values( array_unique( $owned ) ) );
+	}
+
+	/**
+	 * Whether the current visitor uploaded the given file in this session.
+	 *
+	 * @param string $file_name Name of the stored file.
+	 *
+	 * @return bool
+	 *
+	 * @see self::remember_uploaded_file()
+	 */
+	public static function owns_uploaded_file( $file_name ) {
+
+		$session = function_exists( 'WC' ) ? WC()->session : null;
+
+		if ( ! $session instanceof \WC_Session ) {
+			return false;
+		}
+
+		return in_array( $file_name, (array) $session->get( self::OWNED_FILES_KEY, array() ), true );
+	}
+
+	/**
 	 * Deletes a temporary PPOM upload.
 	 *
 	 * @return void
@@ -446,6 +506,15 @@ final class Handler {
 		$ppom_nonce        = sanitize_key( $_REQUEST['ppom_nonce'] );
 		$file_nonce_action = 'ppom_deleting_file_action';
 		if ( ! wp_verify_nonce( $ppom_nonce, $file_nonce_action ) ) {
+			// translators: %s: the name of file
+			printf( __( 'Verification failed for file: %s', 'woocommerce-product-addon' ), $file_name );
+			die( 0 );
+		}
+
+		// The uploads directory is shared site-wide and the nonce above is identical
+		// for every logged-out visitor, so ownership is what actually authorises this.
+		// Same message as above on purpose: do not leak whether the file exists.
+		if ( ! self::owns_uploaded_file( $file_name ) ) {
 			// translators: %s: the name of file
 			printf( __( 'Verification failed for file: %s', 'woocommerce-product-addon' ), $file_name );
 			die( 0 );
