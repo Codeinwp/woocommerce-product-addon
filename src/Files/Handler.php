@@ -614,9 +614,6 @@ final class Handler {
 	// Generate uploaded file preview
 	public static function uploaded_file_preview( $file_name, $settings ) {
 
-		$field_type = $settings['type'];
-		$data_name  = isset( $settings['data_name'] ) ? $settings['data_name'] : '';
-
 		$file_dir_path = self::get_dir_path();
 		$file_path     = $file_dir_path . $file_name;
 

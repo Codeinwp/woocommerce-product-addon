@@ -480,4 +480,28 @@ class Test_Files_Handler extends PPOM_Test_Case {
 		}
 	}
 
+	/**
+	 * get_field_meta_by_dataname() returns an empty string when a product has no
+	 * matching field, and the AJAX upload handler hands that straight to the
+	 * preview renderer. Indexing it used to raise a TypeError on PHP 8, turning
+	 * an upload with an unknown product_id/data_name into a 500.
+	 *
+	 * @return void
+	 */
+	public function test_uploaded_file_preview_tolerates_missing_field_meta() {
+		$dir  = Handler::get_dir_path();
+		$name = 'preview-' . wp_generate_password( 6, false ) . '.png';
+		$path = $dir . $name;
+
+		$this->artifacts[] = $path;
+
+		$gd = imagecreatetruecolor( 8, 8 );
+		imagepng( $gd, $path );
+		imagedestroy( $gd );
+
+		$html = Handler::uploaded_file_preview( $name, '' );
+
+		$this->assertIsString( $html );
+		$this->assertStringContainsString( $name, $html );
+	}
 }
