@@ -8,6 +8,11 @@ import path from 'path';
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
+/**
+ * External dependencies
+ */
+import { request as playwrightRequest } from '@playwright/test';
+
 import {
 	attachPpomGroupToProducts,
 	buildFileField,
@@ -223,6 +228,128 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 			refreshResponse.request().headers()[ 'x-wp-nonce' ]
 		).toBeTruthy();
 		expect( refreshResponse.ok() ).toBe( true );
+		expect( await deleteResponse.text() ).toContain( 'File removed' );
+	} );
+
+	/**
+	 * Regression for the reported missing-authorization issue: a visitor who
+	 * knows another shopper's in-progress file name must not be able to delete
+	 * it, even holding a perfectly valid delete nonce.
+	 *
+	 * This drives the real ajax endpoint. The unit tests exercise the ownership
+	 * helpers directly and would stay green if the guard inside delete_file()
+	 * were removed, so the authorization branch itself is only covered here.
+	 */
+	test( 'a different visitor cannot delete an uploaded file', async ( {
+		page,
+		requestUtils,
+	}, testInfo ) => {
+		const fieldId = 'file_owner_test';
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'File Ownership Test',
+			fields: [
+				buildFileField( {
+					title: 'Upload Your File',
+					dataName: fieldId,
+					file_size: '5mb',
+					files_allowed: '1',
+					file_types: 'png,jpg',
+				} ),
+			],
+		} );
+
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
+
+		await page.goto( `/?p=${ product.id }` );
+
+		const fileInput = page.locator(
+			`#ppom-file-container-${ fieldId } input[type=file]`
+		);
+		await fileInput.waitFor( { state: 'attached', timeout: 10000 } );
+
+		page.on( 'dialog', ( dialog ) => dialog.accept().catch( () => {} ) );
+
+		await fileInput.setInputFiles( {
+			name: 'pixel.png',
+			mimeType: 'image/png',
+			buffer: Buffer.from(
+				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+				'base64'
+			),
+		} );
+
+		// The stored name lands in the hidden `[org]` input — the same value the
+		// plugin's own delete button sends, so read it from there.
+		const storedName = page.locator(
+			`input[name^="ppom[fields][${ fieldId }]"][name$="[org]"]`
+		);
+		await storedName.waitFor( { state: 'attached', timeout: 15000 } );
+
+		const uploadedName = await storedName.inputValue();
+		expect( uploadedName ).toBeTruthy();
+
+		const baseURL =
+			typeof testInfo.project.use.baseURL === 'string'
+				? testInfo.project.use.baseURL
+				: process.env.WP_BASE_URL;
+
+		if ( ! baseURL ) {
+			throw new Error( 'Playwright baseURL is required for this check.' );
+		}
+
+		// A separate visitor: no cookies, so no relation to the upload above.
+		const attacker = await playwrightRequest.newContext( {
+			baseURL,
+			storageState: { cookies: [], origins: [] },
+		} );
+
+		try {
+			const nonceResponse = await attacker.get(
+				'?rest_route=/ppom/v1/nonces/file/'
+			);
+			const { ppom_file_delete_nonce: attackerNonce } =
+				await nonceResponse.json();
+			expect( attackerNonce ).toBeTruthy();
+
+			const attempt = await attacker.post(
+				'wp-admin/admin-ajax.php',
+				{
+					form: {
+						action: 'ppom_delete_file',
+						file_name: uploadedName,
+						ppom_nonce: attackerNonce,
+					},
+					failOnStatusCode: false,
+				}
+			);
+
+			expect( await attempt.text() ).toContain( 'Verification failed' );
+		} finally {
+			await attacker.dispose();
+		}
+
+		// The owner can still remove it, which also proves it survived above.
+		const deleteButton = page.locator(
+			`#filelist-${ fieldId } .u_i_c_tools_del`
+		);
+		await deleteButton.waitFor( { state: 'visible', timeout: 10000 } );
+
+		const [ deleteResponse ] = await Promise.all( [
+			page.waitForResponse(
+				( response ) =>
+					response.url().includes( 'admin-ajax.php' ) &&
+					!! response
+						.request()
+						.postData()
+						?.includes( 'ppom_delete_file' )
+			),
+			deleteButton.click(),
+		] );
+
 		expect( await deleteResponse.text() ).toContain( 'File removed' );
 	} );
 
