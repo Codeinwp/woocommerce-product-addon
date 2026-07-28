@@ -109,7 +109,7 @@ final class Engine {
 			$wc_product        = $cart_item['data'];
 			$ppom_fields_post  = $cart_item['ppom']['fields'];
 			$product_quantity  = floatval( $cart_item['quantity'] );
-			$ppom_field_prices = self::get_field_prices( $ppom_fields_post, $product_id, $product_quantity, $variation_id );
+			$ppom_field_prices = self::get_field_prices( $ppom_fields_post, $product_id, $product_quantity, $variation_id, $cart_item );
 			$ppom_discount     = 0;
 			$ppom_pricematrix  = isset( $cart_item['ppom']['price_matrix_found'] ) ? $cart_item['ppom']['price_matrix_found'] : null;
 			// ppom_pa($product_quantity);
@@ -119,7 +119,10 @@ final class Engine {
 			$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
 			$total_cart_fee_price = self::price_get_cart_fee_total( $ppom_field_prices );
 
-			$product_price = apply_filters( 'ppom_product_price_on_cart', $wc_product->get_price(), $cart_item );
+			// Base on the pristine catalog price, not the mutated in-cart price, so repeated passes never double-count.
+			$pristine      = wc_get_product( $variation_id ? $variation_id : $product_id );
+			$product_price = $pristine ? $pristine->get_price() : $wc_product->get_price();
+			$product_price = apply_filters( 'ppom_product_price_on_cart', $product_price, $cart_item );
 
 			// $context     = 'cart';
 			// $product_price   = Helpers::get_product_price( $product, $variation_id, $context);
@@ -145,8 +148,8 @@ final class Engine {
 
 			$ppom_total_price = $total_addon_price + $product_base_price - $ppom_discount;
 
-			do_action( 'ppom_before_calculate_cart_total', $ppom_field_prices, $ppom_fields_post, $cart_item );
-			$ppom_total_price = apply_filters( 'ppom_cart_line_total', $ppom_total_price, $cart_items, $cart_item );
+			// No ppom_before_calculate_cart_total here: its weight listener is not idempotent and would stack weight each pass.
+			$ppom_total_price = apply_filters( 'ppom_cart_line_total', $ppom_total_price, $cart_item, $cart_item );
 			$cart_item['data']->set_price( $ppom_total_price );
 		}
 	}
