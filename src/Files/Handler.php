@@ -468,6 +468,35 @@ final class Handler {
 	}
 
 	/**
+	 * Drops an upload from the current visitor's ownership record.
+	 *
+	 * Called once the file is gone, so the list does not grow on every
+	 * upload-then-remove cycle — each upload has a unique name, so nothing in it
+	 * would ever be reused.
+	 *
+	 * @param string $file_name Name of the stored file.
+	 *
+	 * @return void
+	 *
+	 * @see self::remember_uploaded_file()
+	 */
+	public static function forget_uploaded_file( $file_name ) {
+
+		$session = function_exists( 'WC' ) ? WC()->session : null;
+
+		if ( ! $session instanceof \WC_Session ) {
+			return;
+		}
+
+		$owned     = (array) $session->get( self::OWNED_FILES_KEY, array() );
+		$remaining = array_values( array_diff( $owned, array( $file_name ) ) );
+
+		if ( $remaining !== $owned ) {
+			$session->set( self::OWNED_FILES_KEY, $remaining );
+		}
+	}
+
+	/**
 	 * Whether the current visitor uploaded the given file in this session.
 	 *
 	 * @param string $file_name Name of the stored file.
@@ -539,6 +568,7 @@ final class Handler {
 
 			// make sure file is removed
 			if ( ! file_exists( $file_path ) ) {
+				self::forget_uploaded_file( $file_name );
 				_e( 'File removed', 'woocommerce-product-addon' );
 			} else {
 				// translators: %s: the name of file

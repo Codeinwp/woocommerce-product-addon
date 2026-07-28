@@ -301,6 +301,31 @@ class Test_Files_Handler extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Removing a file must drop its ownership record too. Every upload gets a
+	 * unique name, so a list that only ever grows would let this public flow
+	 * inflate the visitor's serialized session row upload after upload.
+	 *
+	 * @return void
+	 */
+	public function test_forgetting_a_file_leaves_other_uploads_owned() {
+		$this->start_fresh_guest_session();
+
+		Handler::remember_uploaded_file( 'kept.aaa111.png' );
+		Handler::remember_uploaded_file( 'removed.bbb222.png' );
+
+		Handler::forget_uploaded_file( 'removed.bbb222.png' );
+
+		$this->assertFalse(
+			Handler::owns_uploaded_file( 'removed.bbb222.png' ),
+			'A deleted upload must not stay in the ownership list.'
+		);
+		$this->assertTrue(
+			Handler::owns_uploaded_file( 'kept.aaa111.png' ),
+			'Forgetting one upload must not affect the others.'
+		);
+	}
+
+	/**
 	 * Upload and delete are two separate requests, so the ownership record is only
 	 * useful if it is persisted against the visitor's session cookie rather than
 	 * held in memory. A guest has no WooCommerce session cookie until something
