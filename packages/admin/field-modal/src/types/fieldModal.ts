@@ -21,6 +21,8 @@ export interface CatalogItem {
 	locked?: boolean;
 	description?: string;
 	icon?: string;
+	min_plan?: number | null;
+	min_plan_label?: string;
 	[ key: string ]: unknown;
 }
 

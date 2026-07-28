@@ -8,6 +8,7 @@
 
 namespace PPOM\Admin\FieldModal;
 
+use NM_PersonalizedProduct;
 use PPOM_Fields_Meta;
 
 /**
@@ -39,12 +40,13 @@ final class FieldModalSchemaBuilder {
 				$min_plan     = isset( $field['plan'] ) ? (int) $field['plan'] : null;
 				$locked       = null !== $min_plan && $ctx['plan_category'] < $min_plan;
 				$fields_out[] = array(
-					'slug'        => isset( $field['slug'] ) ? (string) $field['slug'] : '',
-					'title'       => isset( $field['title'] ) ? (string) $field['title'] : '',
-					'description' => isset( $field['description'] ) ? (string) $field['description'] : '',
-					'icon'        => isset( $field['icon'] ) ? (string) $field['icon'] : '',
-					'locked'      => $locked,
-					'min_plan'    => $min_plan,
+					'slug'           => isset( $field['slug'] ) ? (string) $field['slug'] : '',
+					'title'          => isset( $field['title'] ) ? (string) $field['title'] : '',
+					'description'    => isset( $field['description'] ) ? (string) $field['description'] : '',
+					'icon'           => isset( $field['icon'] ) ? (string) $field['icon'] : '',
+					'locked'         => $locked,
+					'min_plan'       => $min_plan,
+					'min_plan_label' => null !== $min_plan ? NM_PersonalizedProduct::get_license_category_label( $min_plan ) : '',
 				);
 			}
 			$out[] = array(
@@ -75,12 +77,13 @@ final class FieldModalSchemaBuilder {
 			}
 			foreach ( $group['fields'] as $field ) {
 				$catalog[] = array(
-					'slug'     => $field['slug'],
-					'title'    => $field['title'],
-					'desc'     => isset( $field['description'] ) ? $field['description'] : '',
-					'icon'     => isset( $field['icon'] ) ? $field['icon'] : '',
-					'locked'   => ! empty( $field['locked'] ),
-					'min_plan' => isset( $field['min_plan'] ) ? $field['min_plan'] : null,
+					'slug'           => $field['slug'],
+					'title'          => $field['title'],
+					'desc'           => isset( $field['description'] ) ? $field['description'] : '',
+					'icon'           => isset( $field['icon'] ) ? $field['icon'] : '',
+					'locked'         => ! empty( $field['locked'] ),
+					'min_plan'       => isset( $field['min_plan'] ) ? $field['min_plan'] : null,
+					'min_plan_label' => isset( $field['min_plan_label'] ) ? $field['min_plan_label'] : '',
 				);
 			}
 		}

@@ -51,10 +51,10 @@ export function ConditionalRepeaterSection( {
 			title={ title }
 			description={ i18n.cfrLockedBody }
 			primaryUrl={ upgradeUrl }
-			primaryLabel={ i18n.cfrUpgradeCta || 'Upgrade to Pro' }
+			primaryLabel={ i18n.cfrUpgradeCta || 'Upgrade to Plus' }
 			secondaryUrl={ demoUrl }
 			secondaryLabel={ i18n.cfrViewDemoLabel || 'View Demo' }
-			badgeLabel={ i18n.proBadge || 'PRO' }
+			badgeLabel={ i18n.cfrPlanBadge || 'Plus' }
 		/>
 	);
 }
