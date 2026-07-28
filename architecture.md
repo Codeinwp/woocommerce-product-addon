@@ -368,7 +368,7 @@ The upload subsystem handles:
 - cropper support
 - cleanup of stale temporary uploads
 
-On activation, PPOM schedules the cleanup hook `do_action_remove_images`, which removes temporary uploads older than 7 days.
+PPOM schedules the cleanup hook `do_action_remove_images` on `init`, which removes temporary uploads older than 7 days. Scheduling sits behind a `wp_next_scheduled()` guard rather than in the activation hook, so installs that are missing the event pick it up on the next request instead of needing a reactivation.
 
 ### Admin and Settings
 
