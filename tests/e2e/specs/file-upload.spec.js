@@ -573,6 +573,98 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		expect( await deleteResponse.text() ).toContain( 'File removed' );
 	} );
 
+	/**
+	 * A form rendered again from the cart carries no token — the server must not
+	 * sign a file name it was handed, or it becomes a delete-token oracle. So the
+	 * browser has to keep its own proof and present it when the markup has none,
+	 * otherwise uploads the surviving session never recorded (parallel or
+	 * cookieless ones) can never be removed after navigation.
+	 */
+	test( 'the browser keeps its token when the restored markup has none', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const fieldId = 'file_token_persist_test';
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'Token Persistence Test',
+			fields: [
+				buildFileField( {
+					title: 'Upload Your File',
+					dataName: fieldId,
+					file_size: '5mb',
+					files_allowed: '1',
+					file_types: 'png,jpg',
+				} ),
+			],
+		} );
+
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
+
+		await page.goto( `/?p=${ product.id }` );
+
+		const fileInput = page.locator(
+			`#ppom-file-container-${ fieldId } input[type=file]`
+		);
+		await fileInput.waitFor( { state: 'attached', timeout: 10000 } );
+
+		page.on( 'dialog', ( dialog ) => dialog.accept().catch( () => {} ) );
+
+		await fileInput.setInputFiles( {
+			name: 'pixel.png',
+			mimeType: 'image/png',
+			buffer: Buffer.from(
+				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+				'base64'
+			),
+		} );
+
+		const storedInput = page.locator(
+			`input[name^="ppom[fields][${ fieldId }]"][name$="[org]"]`
+		);
+		await storedInput.waitFor( { state: 'attached', timeout: 15000 } );
+
+		const fileName = await storedInput.inputValue();
+		const issuedToken = await storedInput.getAttribute(
+			'data-delete-token'
+		);
+		expect( issuedToken ).toBeTruthy();
+
+		// Stand in for a form rendered again from the cart: the value is restored,
+		// the token attribute is not.
+		await storedInput.evaluate( ( node ) =>
+			node.removeAttribute( 'data-delete-token' )
+		);
+
+		const deleteButton = page.locator(
+			`#filelist-${ fieldId } .u_i_c_tools_del`
+		);
+		await deleteButton.waitFor( { state: 'visible', timeout: 10000 } );
+
+		const [ deleteResponse ] = await Promise.all( [
+			page.waitForResponse(
+				( response ) =>
+					response.url().includes( 'admin-ajax.php' ) &&
+					!! response
+						.request()
+						.postData()
+						?.includes( 'ppom_delete_file' )
+			),
+			deleteButton.click(),
+		] );
+
+		const sentBody = deleteResponse.request().postData() || '';
+
+		expect(
+			sentBody,
+			`the token for ${ fileName } must survive the markup losing it`
+		).toContain( issuedToken );
+		expect( await deleteResponse.text() ).toContain( 'File removed' );
+	} );
+
 	test( 'should refresh nonce via REST endpoint', async ( {
 		page,
 		requestUtils,

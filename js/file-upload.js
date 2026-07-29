@@ -45,6 +45,79 @@ let lastNonceRefreshTime = Date.now();
 const NONCE_CACHE_DURATION = 300000; // 5 minutes in milliseconds
 
 /**
+ * Storage key holding this browser's proof that it uploaded a given file.
+ *
+ * @param {string} fileName Stored file name.
+ * @return {string} Key under which the token is kept.
+ */
+function ppom_delete_token_key( fileName ) {
+	return 'ppom_delete_token_' + fileName;
+}
+
+/**
+ * Keeps the delete token for an upload so it survives leaving the page.
+ *
+ * A form rendered again from the cart carries no token: the server must never
+ * sign a file name it was handed, or it becomes a delete-token oracle. Holding
+ * the proof in the browser keeps it available without asking the server to
+ * vouch for a name it did not just store.
+ *
+ * @param {string} fileName Stored file name.
+ * @param {string} token    Token issued with the upload.
+ * @return {void}
+ */
+function ppom_remember_delete_token( fileName, token ) {
+	if ( ! fileName || ! token ) {
+		return;
+	}
+
+	try {
+		window.sessionStorage.setItem(
+			ppom_delete_token_key( fileName ),
+			token
+		);
+	} catch ( error ) {
+		// Private browsing or a full quota: the session check still applies.
+	}
+}
+
+/**
+ * Returns the kept token for an upload, if this browser still has one.
+ *
+ * @param {string} fileName Stored file name.
+ * @return {string} Token, or an empty string.
+ */
+function ppom_read_delete_token( fileName ) {
+	if ( ! fileName ) {
+		return '';
+	}
+
+	try {
+		return (
+			window.sessionStorage.getItem(
+				ppom_delete_token_key( fileName )
+			) || ''
+		);
+	} catch ( error ) {
+		return '';
+	}
+}
+
+/**
+ * Drops a kept token once its file is gone.
+ *
+ * @param {string} fileName Stored file name.
+ * @return {void}
+ */
+function ppom_forget_delete_token( fileName ) {
+	try {
+		window.sessionStorage.removeItem( ppom_delete_token_key( fileName ) );
+	} catch ( error ) {
+		// Nothing to clean up.
+	}
+}
+
+/**
  * Fetches fresh nonces from the REST API endpoint.
  *
  * This function is called before file operations to ensure nonces are valid,
@@ -276,9 +349,14 @@ jQuery( function ( $ ) {
 				ppom_nonce: ppom_file_vars.ppom_file_delete_nonce,
 			} );
 
-			// Present when this page performed the upload. Files restored into the
-			// form on a later page load have none, and fall back to the session.
-			const deleteToken = checkbox?.dataset?.deleteToken;
+			// On the page that performed the upload the token is on the input. A form
+			// rendered again from the cart has no token in its markup -- the server
+			// must not sign a file name it is handed, or it becomes an oracle -- so
+			// fall back to the copy this browser kept.
+			const deleteToken =
+				checkbox?.dataset?.deleteToken ||
+				ppom_read_delete_token( fileName );
+
 			if ( deleteToken ) {
 				data.append( 'ppom_delete_token', deleteToken );
 			}
@@ -298,6 +376,8 @@ jQuery( function ( $ ) {
 					confirm( `Error: ${ responseText }` );
 					return;
 				}
+
+				ppom_forget_delete_token( fileName );
 
 				// Update UI
 				const fileContainer = document.querySelector(
@@ -878,6 +958,11 @@ function ppom_setup_file_upload_input( file_input ) {
 				input_class +=
 					file_input.required === 'on' ? ' ppom-required' : '';
 
+				ppom_remember_delete_token(
+					obj_resp.file_name,
+					obj_resp.delete_token
+				);
+
 				// Add file check
 				jQuery(
 					'<input checked="checked" name="ppom[fields][' +
@@ -888,7 +973,8 @@ function ppom_setup_file_upload_input( file_input ) {
 				)
 					.attr( 'data-price', file_input.file_cost )
 					.attr( 'data-label', obj_resp.file_name )
-					// Proof this visitor uploaded the file, replayed on delete.
+					// Proof this visitor uploaded the file, replayed on delete. Also
+					// kept in the browser so it survives leaving this page.
 					.attr( 'data-delete-token', obj_resp.delete_token || '' )
 					.attr( 'data-data_name', file_input.data_name )
 					.attr( 'data-title', file_input.title )
