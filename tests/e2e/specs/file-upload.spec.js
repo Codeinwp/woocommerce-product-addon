@@ -353,6 +353,67 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		expect( await deleteResponse.text() ).toContain( 'File removed' );
 	} );
 
+	/**
+	 * The upload nonce is public, so anything can post to the endpoint. An upload
+	 * naming a field that does not exist on the product used to be finalized,
+	 * recorded as owned and answered with a preview, leaving a stored file behind
+	 * that no form would ever reference.
+	 */
+	test( 'an upload naming an unknown field is rejected', async ( {
+		requestUtils,
+	}, testInfo ) => {
+		// No PPOM group attached, so no data_name can resolve.
+		const product = await createSimpleProduct( requestUtils );
+
+		const baseURL =
+			typeof testInfo.project.use.baseURL === 'string'
+				? testInfo.project.use.baseURL
+				: process.env.WP_BASE_URL;
+
+		if ( ! baseURL ) {
+			throw new Error( 'Playwright baseURL is required for this check.' );
+		}
+
+		const anonymous = await playwrightRequest.newContext( {
+			baseURL,
+			storageState: { cookies: [], origins: [] },
+		} );
+
+		try {
+			const nonceResponse = await anonymous.get(
+				'?rest_route=/ppom/v1/nonces/file/'
+			);
+			const { ppom_file_upload_nonce: uploadNonce } =
+				await nonceResponse.json();
+			expect( uploadNonce ).toBeTruthy();
+
+			const response = await anonymous.post( 'wp-admin/admin-ajax.php', {
+				multipart: {
+					action: 'ppom_upload_file',
+					ppom_nonce: uploadNonce,
+					name: 'reject-me.txt',
+					product_id: String( product.id ),
+					data_name: 'field_that_does_not_exist',
+					chunk: '0',
+					chunks: '1',
+					file: {
+						name: 'reject-me.txt',
+						mimeType: 'text/plain',
+						buffer: Buffer.from( 'payload' ),
+					},
+				},
+				failOnStatusCode: false,
+			} );
+
+			const body = await response.text();
+
+			expect( body ).not.toContain( 'file_name' );
+			expect( body ).toContain( 'error' );
+		} finally {
+			await anonymous.dispose();
+		}
+	} );
+
 	test( 'should refresh nonce via REST endpoint', async ( {
 		page,
 		requestUtils,
