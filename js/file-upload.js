@@ -276,6 +276,13 @@ jQuery( function ( $ ) {
 				ppom_nonce: ppom_file_vars.ppom_file_delete_nonce,
 			} );
 
+			// Present when this page performed the upload. Files restored into the
+			// form on a later page load have none, and fall back to the session.
+			const deleteToken = checkbox?.dataset?.deleteToken;
+			if ( deleteToken ) {
+				data.append( 'ppom_delete_token', deleteToken );
+			}
+
 			try {
 				const response = await fetch( ppom_file_vars.ajaxurl, {
 					method: 'POST',
@@ -881,6 +888,8 @@ function ppom_setup_file_upload_input( file_input ) {
 				)
 					.attr( 'data-price', file_input.file_cost )
 					.attr( 'data-label', obj_resp.file_name )
+					// Proof this visitor uploaded the file, replayed on delete.
+					.attr( 'data-delete-token', obj_resp.delete_token || '' )
 					.attr( 'data-data_name', file_input.data_name )
 					.attr( 'data-title', file_input.title )
 					.attr( 'data-onetime', file_input.onetime )

@@ -584,4 +584,32 @@ class Test_Files_Handler extends PPOM_Test_Case {
 		);
 		$this->assertTrue( Handler::owns_uploaded_file( $file_a ) );
 	}
+
+	/**
+	 * The delete token is what lets overlapping uploads each prove themselves, so
+	 * it has to be reproducible for the file it names, useless for any other file,
+	 * and not derivable from the name a caller already knows.
+	 *
+	 * @return void
+	 */
+	public function test_delete_token_is_reproducible_per_file_and_opaque() {
+		$token = Handler::file_delete_token( 'artwork.aaa111.png' );
+
+		$this->assertSame(
+			$token,
+			Handler::file_delete_token( 'artwork.aaa111.png' ),
+			'The uploader must be able to present the same token later.'
+		);
+		$this->assertNotSame(
+			$token,
+			Handler::file_delete_token( 'artwork.bbb222.png' ),
+			'A token must not carry over to another file.'
+		);
+		$this->assertStringNotContainsString(
+			'artwork',
+			$token,
+			'Knowing the file name must not be enough to produce the token.'
+		);
+		$this->assertMatchesRegularExpression( '/^[a-f0-9]{32}$/', $token );
+	}
 }

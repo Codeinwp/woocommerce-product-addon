@@ -440,9 +440,37 @@ final class Handler {
 				);
 			}
 		}
+		// Hand the uploader a capability for this one file. Session-based ownership
+		// cannot survive uploads that overlap, because WooCommerce rewrites the
+		// whole session row per request; a token belongs to the response that
+		// created the file, so parallel uploads cannot cost each other anything.
+		if ( isset( $response['file_name'] ) && $file_name === $response['file_name'] ) {
+			$response['delete_token'] = self::file_delete_token( $file_name );
+		}
+
 		// Return JSON-RPC response
 		// die ( '{"jsonrpc" : "2.0", "result" : '. json_encode($response) .', "id" : "id"}' );
 		die( json_encode( apply_filters( 'ppom_file_upload', $response, $file_type, $file_dir_path, $file_name ) ) );
+	}
+
+	/**
+	 * Capability proving the holder uploaded this file.
+	 *
+	 * Derived from the stored name and the site's salt, so a caller who knows
+	 * another shopper's file name still cannot produce its token. It is only ever
+	 * returned in the response to the upload that created the file, and it does
+	 * not expire: the file it names is removed on use, and abandoned files are
+	 * swept after 7 days.
+	 *
+	 * @param string $file_name Name of the stored file.
+	 *
+	 * @return string
+	 *
+	 * @see self::delete_file()
+	 */
+	public static function file_delete_token( $file_name ) {
+
+		return wp_hash( 'ppom_delete_' . $file_name );
 	}
 
 	/**
@@ -609,7 +637,13 @@ final class Handler {
 		// The uploads directory is shared site-wide and the nonce above is identical
 		// for every logged-out visitor, so ownership is what actually authorises this.
 		// Same message as above on purpose: do not leak whether the file exists.
-		if ( ! self::owns_uploaded_file( $file_name ) ) {
+		//
+		// Either proof will do. The token covers uploads that overlapped, which the
+		// session list cannot; the session covers callers that never received a
+		// token, such as a page cached before this shipped.
+		$delete_token = isset( $_REQUEST['ppom_delete_token'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['ppom_delete_token'] ) ) : '';
+
+		if ( ! self::owns_uploaded_file( $file_name ) && ! hash_equals( self::file_delete_token( $file_name ), $delete_token ) ) {
 			// translators: %s: the name of file
 			printf( __( 'Verification failed for file: %s', 'woocommerce-product-addon' ), $file_name );
 			die( 0 );
