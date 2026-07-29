@@ -529,4 +529,59 @@ class Test_Files_Handler extends PPOM_Test_Case {
 		$this->assertIsString( $html );
 		$this->assertStringContainsString( $name, $html );
 	}
+
+	/**
+	 * A product can have several file fields, each with its own uploader, so two
+	 * uploads can be in flight at once. Each request loads the session once at
+	 * the start and writes the whole row back on shutdown, so appending to that
+	 * stale snapshot let the later request drop the earlier name.
+	 *
+	 * Merging against stored state covers the case where one upload finishes
+	 * before another records. It does not make the update atomic: uploads that
+	 * read at the same instant still overwrite each other, which needs ownership
+	 * to stop living in a shared session row.
+	 *
+	 * @return void
+	 */
+	public function test_recording_merges_with_names_stored_by_a_parallel_request() {
+		$file_a = 'first.aaa111.png';
+		$file_b = 'second.bbb222.png';
+		$file_c = 'third.ccc333.png';
+
+		$cookie = $this->capture_session_cookie(
+			function () use ( $file_a ) {
+				$this->start_fresh_guest_session();
+				Handler::remember_uploaded_file( $file_a );
+				WC()->session->save_data();
+			}
+		);
+
+		$this->assertNotEmpty( $cookie );
+
+		// Our request keeps the snapshot it loaded, holding only $file_a.
+		$mine = WC()->session;
+
+		// A second upload from the same visitor finishes and persists its list.
+		$_COOKIE[ $cookie[0] ] = $cookie[1];
+
+		try {
+			$parallel = new WC_Session_Handler();
+			$parallel->init();
+			$parallel->set( 'ppom_uploaded_files', array( $file_a, $file_b ) );
+			$parallel->save_data();
+		} finally {
+			unset( $_COOKIE[ $cookie[0] ] );
+		}
+
+		// Now our request records its own upload against that stale snapshot.
+		WC()->session = $mine;
+		Handler::remember_uploaded_file( $file_c );
+
+		$this->assertTrue( Handler::owns_uploaded_file( $file_c ) );
+		$this->assertTrue(
+			Handler::owns_uploaded_file( $file_b ),
+			'A name persisted by a parallel upload must not be dropped.'
+		);
+		$this->assertTrue( Handler::owns_uploaded_file( $file_a ) );
+	}
 }

@@ -394,11 +394,22 @@ final class Handler {
 			rename( $chunk_file_path, $unique_file_path );
 			$file_path = $unique_file_path;
 
-			self::remember_uploaded_file( $file_name );
-
 			$product_id = intval( $_REQUEST['product_id'] );
 			$data_name  = sanitize_key( $_REQUEST['data_name'] );
 			$file_meta  = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
+
+			// The upload nonce is public, so the posted product and field are not
+			// necessarily a pair the form could have produced. Keeping a file no
+			// form references only leaves something to clean up later.
+			if ( ! is_array( $file_meta ) ) {
+				@unlink( $file_path );
+
+				$response ['status']  = 'error';
+				$response ['message'] = __( 'This field is no longer available, please refresh the page and try again.', 'woocommerce-product-addon' );
+				wp_send_json( $response );
+			}
+
+			self::remember_uploaded_file( $file_name );
 
 			// making thumb if images
 			if ( self::is_file_image( $file_path ) ) {
@@ -461,10 +472,42 @@ final class Handler {
 			$session->set_customer_session_cookie( true );
 		}
 
-		$owned   = (array) $session->get( self::OWNED_FILES_KEY, array() );
+		$owned   = self::stored_owned_files( $session );
 		$owned[] = $file_name;
 
 		$session->set( self::OWNED_FILES_KEY, array_values( array_unique( $owned ) ) );
+	}
+
+	/**
+	 * Reads the ownership list as it is currently stored, not as it looked when
+	 * this request started.
+	 *
+	 * A product can carry several file fields, each with its own uploader, so two
+	 * uploads can be in flight at once. WooCommerce loads the session once per
+	 * request and writes the whole row back on shutdown, so appending to the
+	 * request-start snapshot let whichever request saved last drop the other
+	 * name.
+	 *
+	 * @param \WC_Session $session Current session.
+	 *
+	 * @return array<int, string>
+	 */
+	private static function stored_owned_files( $session ) {
+
+		$owned = (array) $session->get( self::OWNED_FILES_KEY, array() );
+
+		if ( ! $session instanceof \WC_Session_Handler ) {
+			return $owned;
+		}
+
+		$stored = $session->get_session( $session->get_customer_id(), array() );
+
+		if ( ! is_array( $stored ) || ! isset( $stored[ self::OWNED_FILES_KEY ] ) ) {
+			return $owned;
+		}
+
+		// Values inside a stored session row are serialised individually.
+		return array_merge( (array) maybe_unserialize( $stored[ self::OWNED_FILES_KEY ] ), $owned );
 	}
 
 	/**
