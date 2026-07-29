@@ -861,26 +861,39 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 
 		page.on( 'dialog', ( dialog ) => dialog.accept().catch( () => {} ) );
 
-		let requested = false;
-		const seen = page
-			.waitForRequest(
-				( request ) =>
-					request.url().includes( 'admin-ajax.php' ) &&
-					!! request.postData()?.includes( 'ppom_delete_file' ),
+		// Caught rather than awaited directly, so a click that sends nothing fails
+		// on the message below instead of an opaque timeout.
+		const answered = page
+			.waitForResponse(
+				( response ) =>
+					response.url().includes( 'admin-ajax.php' ) &&
+					!! response
+						.request()
+						.postData()
+						?.includes( 'ppom_delete_file' ),
 				{ timeout: 5000 }
 			)
-			.then( () => {
-				requested = true;
-			} )
-			.catch( () => {} );
+			.catch( () => null );
 
 		await deleteButton.click();
-		await seen;
+		const response = await answered;
 
 		expect(
-			requested,
+			response,
 			'delete on a restored file must reach the endpoint'
-		).toBe( true );
+		).not.toBeNull();
+
+		// The endpoint answers 200 even when it refuses, so reaching it proves
+		// nothing on its own.
+		expect(
+			await response.text(),
+			'and the endpoint must report the file removed'
+		).toContain( 'File removed' );
+
+		await expect(
+			restoredBox,
+			'and the file must leave the form'
+		).toHaveCount( 0 );
 	} );
 
 	/**
@@ -987,7 +1000,7 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 			.first();
 		await backDelete.waitFor( { state: 'visible', timeout: 10000 } );
 
-		await Promise.all( [
+		const [ deleteResponse ] = await Promise.all( [
 			page.waitForResponse(
 				( response ) =>
 					response.url().includes( 'admin-ajax.php' ) &&
@@ -998,6 +1011,12 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 			),
 			backDelete.click(),
 		] );
+
+		// 200 alone means nothing here: the endpoint answers 200 when it refuses.
+		expect(
+			await deleteResponse.text(),
+			'the deleted file must actually be removed server-side'
+		).toContain( 'File removed' );
 
 		await expect( backBox ).toHaveCount( 0 );
 
