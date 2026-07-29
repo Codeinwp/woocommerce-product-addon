@@ -16,6 +16,7 @@ import { request as playwrightRequest } from '@playwright/test';
 import {
 	attachPpomGroupToProducts,
 	buildFileField,
+	buildTextField,
 	createPpomGroup,
 	createSimpleProduct,
 } from '../fixtures/index.js';
@@ -398,6 +399,79 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 					chunks: '1',
 					file: {
 						name: 'reject-me.txt',
+						mimeType: 'text/plain',
+						buffer: Buffer.from( 'payload' ),
+					},
+				},
+				failOnStatusCode: false,
+			} );
+
+			const body = await response.text();
+
+			expect( body ).not.toContain( 'file_name' );
+			expect( body ).toContain( 'error' );
+		} finally {
+			await anonymous.dispose();
+		}
+	} );
+
+	/**
+	 * Only file and cropper fields get an uploader (`js/file-upload.js:338`), so a
+	 * text field's data_name is not something the form could have posted here.
+	 * Checking only that the field exists let such a request through and stored a
+	 * file no form can reference.
+	 */
+	test( 'an upload naming a field that cannot upload is rejected', async ( {
+		requestUtils,
+	}, testInfo ) => {
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'Non Upload Field Test',
+			fields: [
+				buildTextField( {
+					title: 'Engraving',
+					dataName: 'engraving_text',
+				} ),
+			],
+		} );
+
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
+
+		const baseURL =
+			typeof testInfo.project.use.baseURL === 'string'
+				? testInfo.project.use.baseURL
+				: process.env.WP_BASE_URL;
+
+		if ( ! baseURL ) {
+			throw new Error( 'Playwright baseURL is required for this check.' );
+		}
+
+		const anonymous = await playwrightRequest.newContext( {
+			baseURL,
+			storageState: { cookies: [], origins: [] },
+		} );
+
+		try {
+			const nonceResponse = await anonymous.get(
+				'?rest_route=/ppom/v1/nonces/file/'
+			);
+			const { ppom_file_upload_nonce: uploadNonce } =
+				await nonceResponse.json();
+
+			const response = await anonymous.post( 'wp-admin/admin-ajax.php', {
+				multipart: {
+					action: 'ppom_upload_file',
+					ppom_nonce: uploadNonce,
+					name: 'not-for-a-text-field.txt',
+					product_id: String( product.id ),
+					data_name: 'engraving_text',
+					chunk: '0',
+					chunks: '1',
+					file: {
+						name: 'not-for-a-text-field.txt',
 						mimeType: 'text/plain',
 						buffer: Buffer.from( 'payload' ),
 					},

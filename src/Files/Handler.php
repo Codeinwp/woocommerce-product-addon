@@ -401,7 +401,7 @@ final class Handler {
 			// The upload nonce is public, so the posted product and field are not
 			// necessarily a pair the form could have produced. Keeping a file no
 			// form references only leaves something to clean up later.
-			if ( ! is_array( $file_meta ) ) {
+			if ( ! self::field_accepts_uploads( $file_meta ) ) {
 				@unlink( $file_path );
 
 				$response ['status']  = 'error';
@@ -443,6 +443,29 @@ final class Handler {
 		// Return JSON-RPC response
 		// die ( '{"jsonrpc" : "2.0", "result" : '. json_encode($response) .', "id" : "id"}' );
 		die( json_encode( apply_filters( 'ppom_file_upload', $response, $file_type, $file_dir_path, $file_name ) ) );
+	}
+
+	/**
+	 * Whether a resolved field definition is one this endpoint uploads for.
+	 *
+	 * Only file and cropper fields are given an uploader on the frontend, so a
+	 * request naming any other field — a text or select field, say — is not
+	 * something the form could have sent. Addons that drive this endpoint with a
+	 * type of their own can join the list through the filter.
+	 *
+	 * @param mixed $file_meta Field definition resolved from the posted data name.
+	 *
+	 * @return bool
+	 */
+	private static function field_accepts_uploads( $file_meta ) {
+
+		if ( ! is_array( $file_meta ) || ! isset( $file_meta['type'] ) ) {
+			return false;
+		}
+
+		$upload_types = apply_filters( 'ppom_upload_capable_field_types', array( 'file', 'cropper' ) );
+
+		return in_array( $file_meta['type'], (array) $upload_types, true );
 	}
 
 	/**
