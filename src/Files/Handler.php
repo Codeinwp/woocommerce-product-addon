@@ -401,11 +401,15 @@ final class Handler {
 			// The upload nonce is public, so the posted product and field are not
 			// necessarily a pair the form could have produced. Keeping a file no
 			// form references only leaves something to clean up later.
+			//
+			// Same wording as the nonce failure above on purpose: saying which
+			// field names exist, and which of them accept uploads, would let the
+			// endpoint be probed to map a product's fields.
 			if ( ! self::field_accepts_uploads( $file_meta ) ) {
 				@unlink( $file_path );
 
 				$response ['status']  = 'error';
-				$response ['message'] = __( 'This field is no longer available, please refresh the page and try again.', 'woocommerce-product-addon' );
+				$response ['message'] = __( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', 'woocommerce-product-addon' );
 				wp_send_json( $response );
 			}
 
