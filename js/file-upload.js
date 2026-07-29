@@ -104,20 +104,6 @@ function ppom_read_delete_token( fileName ) {
 }
 
 /**
- * Drops a kept token once its file is gone.
- *
- * @param {string} fileName Stored file name.
- * @return {void}
- */
-function ppom_forget_delete_token( fileName ) {
-	try {
-		window.sessionStorage.removeItem( ppom_delete_token_key( fileName ) );
-	} catch ( error ) {
-		// Nothing to clean up.
-	}
-}
-
-/**
  * Fetches fresh nonces from the REST API endpoint.
  *
  * This function is called before file operations to ensure nonces are valid,
@@ -377,7 +363,11 @@ jQuery( function ( $ ) {
 					return;
 				}
 
-				ppom_forget_delete_token( fileName );
+				// The token is deliberately kept. delete_file() ends in die( 0 ), so a
+				// refusal also answers 200 and there is no signal here that survives
+				// translation; discarding on this path threw away the shopper's only
+				// proof and made the file impossible to remove. Entries are per tab
+				// and go when it closes.
 
 				// Update UI
 				const fileContainer = document.querySelector(

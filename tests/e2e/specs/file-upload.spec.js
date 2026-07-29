@@ -574,13 +574,15 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 	} );
 
 	/**
-	 * A form rendered again from the cart carries no token — the server must not
-	 * sign a file name it was handed, or it becomes a delete-token oracle. So the
-	 * browser has to keep its own proof and present it when the markup has none,
-	 * otherwise uploads the surviving session never recorded (parallel or
-	 * cookieless ones) can never be removed after navigation.
+	 * Covers the storage fallback only: when the input carries no token attribute,
+	 * the delete still presents the copy this browser kept.
+	 *
+	 * This does not stand in for a form restored by the server. That markup is
+	 * wrapped in `.u_i_c_box` rather than `.ppom-file-wrapper`, and the delete
+	 * handler reads the file id only from the latter, so the click never reaches
+	 * the endpoint at all — see the parked test below.
 	 */
-	test( 'the browser keeps its token when the restored markup has none', async ( {
+	test( 'the delete falls back to the token kept by the browser', async ( {
 		page,
 		requestUtils,
 	} ) => {
@@ -663,6 +665,185 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 			`the token for ${ fileName } must survive the markup losing it`
 		).toContain( issuedToken );
 		expect( await deleteResponse.text() ).toContain( 'File removed' );
+	} );
+
+	/**
+	 * Sets up a product with one file field and uploads a pixel to it.
+	 *
+	 * @param {Object} page         Playwright page.
+	 * @param {Object} requestUtils WP request utils.
+	 * @param {string} fieldId      Field data name.
+	 * @param {string} groupName    PPOM group name.
+	 * @return {Promise<Object>} Locators and the stored file name.
+	 */
+	async function uploadOneFile( page, requestUtils, fieldId, groupName ) {
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName,
+			fields: [
+				buildFileField( {
+					title: 'Upload Your File',
+					dataName: fieldId,
+					file_size: '5mb',
+					files_allowed: '1',
+					file_types: 'png,jpg',
+				} ),
+			],
+		} );
+
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
+
+		await page.goto( `/?p=${ product.id }` );
+
+		const fileInput = page.locator(
+			`#ppom-file-container-${ fieldId } input[type=file]`
+		);
+		await fileInput.waitFor( { state: 'attached', timeout: 10000 } );
+
+		page.on( 'dialog', ( dialog ) => dialog.accept().catch( () => {} ) );
+
+		await fileInput.setInputFiles( {
+			name: 'pixel.png',
+			mimeType: 'image/png',
+			buffer: Buffer.from(
+				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+				'base64'
+			),
+		} );
+
+		const storedInput = page.locator(
+			`input[name^="ppom[fields][${ fieldId }]"][name$="[org]"]`
+		);
+		await storedInput.waitFor( { state: 'attached', timeout: 15000 } );
+
+		return { fileName: await storedInput.inputValue() };
+	}
+
+	/**
+	 * Parked, not a regression from this branch.
+	 *
+	 * Files restored by the server are wrapped in `.u_i_c_box`
+	 * (`src/FieldMarkup/Renderers/FileRenderer.php:59`,
+	 * `templates/frontend/inputs/file.php:79`), while the uploader wraps fresh ones
+	 * in `.ppom-file-wrapper` (`js/file-upload.js:356`). The delete handler reads
+	 * the file id only from the latter and returns when it is absent, so clicking
+	 * delete on a restored file sends nothing at all. That mismatch is present on
+	 * `development` and predates the ownership work, so fixing it changes the
+	 * widget's element contract and belongs to its own change.
+	 *
+	 * Kept as the reproduction: unskip it when that is picked up.
+	 */
+	test.fixme( 'delete reaches the endpoint for server-restored markup', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const fieldId = 'file_restored_shape_test';
+
+		await uploadOneFile(
+			page,
+			requestUtils,
+			fieldId,
+			'Restored Shape Test'
+		);
+
+		// Match the shape the server renders: `.u_i_c_box`, no client wrapper.
+		await page.evaluate( () => {
+			document
+				.querySelectorAll( '.ppom-file-wrapper' )
+				.forEach( ( node ) => {
+					node.classList.remove( 'ppom-file-wrapper' );
+					node.classList.add( 'u_i_c_box' );
+				} );
+		} );
+
+		const deleteButton = page.locator(
+			`#filelist-${ fieldId } .u_i_c_tools_del`
+		);
+		await deleteButton.waitFor( { state: 'visible', timeout: 10000 } );
+
+		let requested = false;
+		const seen = page
+			.waitForRequest(
+				( request ) =>
+					request.url().includes( 'admin-ajax.php' ) &&
+					!! request.postData()?.includes( 'ppom_delete_file' ),
+				{ timeout: 5000 }
+			)
+			.then( () => {
+				requested = true;
+			} )
+			.catch( () => {} );
+
+		await deleteButton.click();
+		await seen;
+
+		expect(
+			requested,
+			'clicking delete on restored markup must send a delete request'
+		).toBe( true );
+	} );
+
+	/**
+	 * `delete_file()` ends in `die( 0 )`, so a refusal is still HTTP 200. Clearing
+	 * the kept token on such a response throws away what may be the shopper's only
+	 * proof, turning a retryable refusal into a file that can never be removed.
+	 */
+	test( 'a refused delete keeps the token for a retry', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const fieldId = 'file_refused_delete_test';
+
+		const { fileName } = await uploadOneFile(
+			page,
+			requestUtils,
+			fieldId,
+			'Refused Delete Test'
+		);
+
+		const tokenBefore = await page.evaluate(
+			( name ) =>
+				window.sessionStorage.getItem( 'ppom_delete_token_' + name ),
+			fileName
+		);
+		expect( tokenBefore ).toBeTruthy();
+
+		// Answer the delete the way the endpoint answers a refusal: 200, no removal.
+		await page.route( '**/admin-ajax.php', async ( route ) => {
+			const body = route.request().postData() || '';
+
+			if ( body.includes( 'ppom_delete_file' ) ) {
+				await route.fulfill( {
+					status: 200,
+					body: `Verification failed for file: ${ fileName }`,
+				} );
+				return;
+			}
+
+			await route.continue();
+		} );
+
+		const deleteButton = page.locator(
+			`#filelist-${ fieldId } .u_i_c_tools_del`
+		);
+		await deleteButton.waitFor( { state: 'visible', timeout: 10000 } );
+		await deleteButton.click();
+
+		await page.waitForTimeout( 1000 );
+
+		const tokenAfter = await page.evaluate(
+			( name ) =>
+				window.sessionStorage.getItem( 'ppom_delete_token_' + name ),
+			fileName
+		);
+
+		expect(
+			tokenAfter,
+			'a refusal must not discard the proof needed to retry'
+		).toBe( tokenBefore );
 	} );
 
 	test( 'should refresh nonce via REST endpoint', async ( {
