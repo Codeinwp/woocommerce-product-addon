@@ -416,7 +416,9 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 	} );
 
 	/**
-	 * Only file and cropper fields get an uploader (`js/file-upload.js:338`), so a
+	 * Only file and cropper fields are given an uploader -- the loop over
+	 * `ppom_input_vars.ppom_inputs` calls `ppom_setup_file_upload_input()` for
+	 * those two types only -- so a
 	 * text field's data_name is not something the form could have posted here.
 	 * Checking only that the field exists let such a request through and stored a
 	 * file no form can reference.
@@ -790,13 +792,13 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 
 	/**
 	 * Server-restored files are wrapped in `.u_i_c_box`
-	 * (`src/FieldMarkup/Renderers/FileRenderer.php:59`,
-	 * `templates/frontend/inputs/file.php:79`) while the uploader wraps fresh ones
-	 * in `.ppom-file-wrapper` (`js/file-upload.js:356`). The delete handler used to
+	 * (`FileRenderer` and `templates/frontend/inputs/file.php`) while the
+	 * uploader wraps fresh ones
+	 * in `.ppom-file-wrapper` (`add_thumb_box()`). The delete handler used to
 	 * read the file id only from the latter and return without it, so the click on
 	 * a restored file sent nothing at all.
 	 *
-	 * `templates/render-fields.php:41` repopulates the form from
+	 * `templates/render-fields.php` repopulates the form from
 	 * `$_POST['ppom']['fields']`, which is what happens when add-to-cart fails
 	 * validation. Posting the product page with a stored file name reaches the same
 	 * code, so the markup here is exactly what a shopper sees after such a reload.
@@ -1010,6 +1012,13 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 			),
 			'and keep it in the form submission'
 		).toHaveCount( 1 );
+
+		// The delete also swaps the thumbnail for a spinner while it runs, which is
+		// another id lookup that can land on the wrong field.
+		await expect(
+			frontBox.locator( 'img' ).first(),
+			'and keep its preview rather than a stuck spinner'
+		).not.toHaveAttribute( 'src', /loading\.gif/ );
 	} );
 
 	test( 'should refresh nonce via REST endpoint', async ( {

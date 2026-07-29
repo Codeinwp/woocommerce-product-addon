@@ -317,9 +317,11 @@ jQuery( function ( $ ) {
 			}
 
 			// Delete animation.
-			const imageElement = document.querySelector(
-				`#u_i_c_${ fileId } img`
-			);
+			// Scoped to this click's wrapper, not looked up by id: restored ids come
+			// from each field's own array key, so the first file of every field is
+			// `u_i_c_0` and a document lookup would leave another field's thumbnail
+			// showing the spinner for good.
+			const imageElement = ppomFileWrapper?.querySelector( 'img' );
 			if ( imageElement ) {
 				imageElement.src = `${ ppom_file_vars.plugin_url }/images/loading.gif`;
 			}
