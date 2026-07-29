@@ -881,6 +881,137 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		).toBe( true );
 	} );
 
+	/**
+	 * Restored file ids come from each field's own array key, so the first file of
+	 * every field is `u_i_c_0`. Looking the wrapper up by that id reaches whichever
+	 * one comes first in the document, so deleting the second field's file used to
+	 * strip the first field's value out of the form while leaving its file on the
+	 * server.
+	 */
+	test( 'deleting one restored file leaves the other field alone', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const frontField = 'dup_front_field';
+		const backField = 'dup_back_field';
+
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'Two File Fields Test',
+			fields: [
+				buildFileField( {
+					title: 'Front',
+					dataName: frontField,
+					file_size: '5mb',
+					files_allowed: '1',
+					file_types: 'png,jpg',
+				} ),
+				buildFileField( {
+					title: 'Back',
+					dataName: backField,
+					file_size: '5mb',
+					files_allowed: '1',
+					file_types: 'png,jpg',
+				} ),
+			],
+		} );
+
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
+
+		await page.goto( `/?p=${ product.id }` );
+		const permalink = page.url();
+
+		page.on( 'dialog', ( dialog ) => dialog.accept().catch( () => {} ) );
+
+		const pixel = {
+			name: 'pixel.png',
+			mimeType: 'image/png',
+			buffer: Buffer.from(
+				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+				'base64'
+			),
+		};
+
+		const uploaded = {};
+
+		for ( const field of [ frontField, backField ] ) {
+			const input = page.locator(
+				`#ppom-file-container-${ field } input[type=file]`
+			);
+			await input.waitFor( { state: 'attached', timeout: 10000 } );
+			await input.setInputFiles( pixel );
+
+			const stored = page.locator(
+				`input[name^="ppom[fields][${ field }]"][name$="[org]"]`
+			);
+			await stored.waitFor( { state: 'attached', timeout: 15000 } );
+			uploaded[ field ] = await stored.inputValue();
+		}
+
+		// Restore both, the way a failed add-to-cart does.
+		await page.evaluate(
+			( { action, values } ) => {
+				const form = document.createElement( 'form' );
+				form.method = 'POST';
+				form.action = action;
+
+				Object.entries( values ).forEach( ( [ field, name ] ) => {
+					const input = document.createElement( 'input' );
+					input.type = 'hidden';
+					input.name = `ppom[fields][${ field }][0][org]`;
+					input.value = name;
+					form.appendChild( input );
+				} );
+
+				document.body.appendChild( form );
+				form.submit();
+			},
+			{ action: permalink, values: uploaded }
+		);
+
+		await page.waitForLoadState( 'load' );
+
+		const frontBox = page.locator( `#filelist-${ frontField } .u_i_c_box` );
+		const backBox = page.locator( `#filelist-${ backField } .u_i_c_box` );
+		await frontBox.waitFor( { state: 'attached', timeout: 10000 } );
+		await backBox.waitFor( { state: 'attached', timeout: 10000 } );
+
+		// Remove the second field's file.
+		const backDelete = page
+			.locator( `#filelist-${ backField } .u_i_c_tools_del` )
+			.first();
+		await backDelete.waitFor( { state: 'visible', timeout: 10000 } );
+
+		await Promise.all( [
+			page.waitForResponse(
+				( response ) =>
+					response.url().includes( 'admin-ajax.php' ) &&
+					!! response
+						.request()
+						.postData()
+						?.includes( 'ppom_delete_file' )
+			),
+			backDelete.click(),
+		] );
+
+		await expect( backBox ).toHaveCount( 0 );
+
+		await expect(
+			frontBox,
+			'the other field must keep its restored file'
+		).toHaveCount( 1 );
+
+		await expect(
+			page.locator(
+				`input[name^="ppom[fields][${ frontField }]"][name$="[org]"]`
+			),
+			'and keep it in the form submission'
+		).toHaveCount( 1 );
+	} );
+
 	test( 'should refresh nonce via REST endpoint', async ( {
 		page,
 		requestUtils,

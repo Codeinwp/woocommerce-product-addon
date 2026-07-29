@@ -375,21 +375,17 @@ jQuery( function ( $ ) {
 				// proof and made the file impossible to remove. Entries are per tab
 				// and go when it closes.
 
-				// Update UI
-				const fileContainer = document.querySelector(
-					`#u_i_c_${ fileId }`
-				);
-				if ( fileContainer ) {
-					fileContainer.remove();
+				// Update UI. Remove the wrapper this click resolved rather than
+				// looking one up by id: restored ids come from each field's own array
+				// key, so the first file of every field is `u_i_c_0` and a document
+				// lookup would take whichever comes first, stripping another field's
+				// value out of the form.
+				if ( ppomFileWrapper ) {
+					ppomFileWrapper.remove();
 				}
 
 				if ( checkbox ) {
 					checkbox.remove();
-				}
-
-				const parentBox = e.target.closest( '.u_i_c_box' );
-				if ( parentBox ) {
-					parentBox.remove();
 				}
 
 				const croppiePreview = document.querySelector(
