@@ -282,7 +282,13 @@ jQuery( function ( $ ) {
 				return;
 			}
 
-			const ppomFileWrapper = e.target.closest( '.ppom-file-wrapper' );
+			// Fresh uploads are wrapped by the uploader in `.ppom-file-wrapper`;
+			// files the server renders back into the form get `.u_i_c_box` instead.
+			// Both carry data-fileid, so accept either or delete does nothing on a
+			// restored file.
+			const ppomFileWrapper = e.target.closest(
+				'.ppom-file-wrapper, .u_i_c_box'
+			);
 			const fileId = ppomFileWrapper?.getAttribute( 'data-fileid' );
 			const ppomFieldWrapper = e.target.closest(
 				'div.ppom-field-wrapper'
