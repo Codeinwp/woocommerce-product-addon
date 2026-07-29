@@ -67,6 +67,8 @@ final class FileRenderer extends AbstractInputRenderer {
 				$html .= '<input checked="checked" name="' . esc_attr( $data_name ) . '" ';
 				$html .= 'data-price="' . esc_attr( $args['file_cost'] ) . '" ';
 				$html .= 'data-label="' . esc_attr( $file_name ) . '" ';
+				// Only proof left for an upload the current session never recorded.
+				$html .= 'data-delete-token="' . esc_attr( \PPOM\Files\Handler::file_delete_token( $file_name ) ) . '" ';
 				$html .= 'data-title="' . esc_attr( $label ) . '" ';
 				$html .= 'value="' . esc_attr( $file_name ) . '" ';
 				$html .= 'class="' . esc_attr( $file_class ) . '" ';

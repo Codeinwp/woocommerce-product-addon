@@ -488,6 +488,91 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		}
 	} );
 
+	/**
+	 * The concurrency specs post tokens themselves, and the browser delete above
+	 * would still succeed through session ownership, so neither notices if the
+	 * client stops forwarding the token. That forwarding is what carries the fix
+	 * to real shoppers, so assert the request actually contains it.
+	 */
+	test( 'the browser forwards the upload token on delete', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const fieldId = 'file_token_forward_test';
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'Token Forwarding Test',
+			fields: [
+				buildFileField( {
+					title: 'Upload Your File',
+					dataName: fieldId,
+					file_size: '5mb',
+					files_allowed: '1',
+					file_types: 'png,jpg',
+				} ),
+			],
+		} );
+
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
+
+		await page.goto( `/?p=${ product.id }` );
+
+		const fileInput = page.locator(
+			`#ppom-file-container-${ fieldId } input[type=file]`
+		);
+		await fileInput.waitFor( { state: 'attached', timeout: 10000 } );
+
+		page.on( 'dialog', ( dialog ) => dialog.accept().catch( () => {} ) );
+
+		await fileInput.setInputFiles( {
+			name: 'pixel.png',
+			mimeType: 'image/png',
+			buffer: Buffer.from(
+				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+				'base64'
+			),
+		} );
+
+		// The token the server issued for this upload, read from the markup the
+		// upload produced rather than from the response, so this also covers the
+		// value surviving into the form.
+		const storedInput = page.locator(
+			`input[name^="ppom[fields][${ fieldId }]"][name$="[org]"]`
+		);
+		await storedInput.waitFor( { state: 'attached', timeout: 15000 } );
+
+		const issuedToken = await storedInput.getAttribute(
+			'data-delete-token'
+		);
+		expect( issuedToken ).toBeTruthy();
+
+		const deleteButton = page.locator(
+			`#filelist-${ fieldId } .u_i_c_tools_del`
+		);
+		await deleteButton.waitFor( { state: 'visible', timeout: 10000 } );
+
+		const [ deleteResponse ] = await Promise.all( [
+			page.waitForResponse(
+				( response ) =>
+					response.url().includes( 'admin-ajax.php' ) &&
+					!! response
+						.request()
+						.postData()
+						?.includes( 'ppom_delete_file' )
+			),
+			deleteButton.click(),
+		] );
+
+		const sentBody = deleteResponse.request().postData() || '';
+
+		expect( sentBody ).toContain( 'ppom_delete_token' );
+		expect( sentBody ).toContain( issuedToken );
+		expect( await deleteResponse.text() ).toContain( 'File removed' );
+	} );
+
 	test( 'should refresh nonce via REST endpoint', async ( {
 		page,
 		requestUtils,

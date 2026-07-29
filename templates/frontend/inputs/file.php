@@ -88,6 +88,8 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 							class="<?php echo esc_attr( $file_form_class ); ?>"
 							data-price="<?php echo esc_attr( $file_cost ); ?>"
 							data-label="<?php echo esc_attr( $file_name ); ?>"
+							<?php // Only proof left for an upload the current session never recorded. ?>
+							data-delete-token="<?php echo esc_attr( \PPOM\Files\Handler::file_delete_token( $file_name ) ); ?>"
 							data-title="<?php echo esc_attr( $fm->title() ); ?>"
 							value="<?php echo esc_attr( $file_name ); ?>"
 							<?php echo apply_filters( 'ppom_fe_form_element_custom_attr', '', $fm ); ?>
