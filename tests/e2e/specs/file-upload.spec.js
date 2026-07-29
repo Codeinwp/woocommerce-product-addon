@@ -719,72 +719,14 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		);
 		await storedInput.waitFor( { state: 'attached', timeout: 15000 } );
 
-		return { fileName: await storedInput.inputValue() };
+		return {
+			fileName: await storedInput.inputValue(),
+			productId: product.id,
+			// WordPress canonical-redirects `/?p=<id>` on GET, so this is now the
+			// pretty permalink -- which a POST needs, as `/?p=<id>` answers 404.
+			permalink: page.url(),
+		};
 	}
-
-	/**
-	 * Parked, not a regression from this branch.
-	 *
-	 * Files restored by the server are wrapped in `.u_i_c_box`
-	 * (`src/FieldMarkup/Renderers/FileRenderer.php:59`,
-	 * `templates/frontend/inputs/file.php:79`), while the uploader wraps fresh ones
-	 * in `.ppom-file-wrapper` (`js/file-upload.js:356`). The delete handler reads
-	 * the file id only from the latter and returns when it is absent, so clicking
-	 * delete on a restored file sends nothing at all. That mismatch is present on
-	 * `development` and predates the ownership work, so fixing it changes the
-	 * widget's element contract and belongs to its own change.
-	 *
-	 * Kept as the reproduction: unskip it when that is picked up.
-	 */
-	test.fixme( 'delete reaches the endpoint for server-restored markup', async ( {
-		page,
-		requestUtils,
-	} ) => {
-		const fieldId = 'file_restored_shape_test';
-
-		await uploadOneFile(
-			page,
-			requestUtils,
-			fieldId,
-			'Restored Shape Test'
-		);
-
-		// Match the shape the server renders: `.u_i_c_box`, no client wrapper.
-		await page.evaluate( () => {
-			document
-				.querySelectorAll( '.ppom-file-wrapper' )
-				.forEach( ( node ) => {
-					node.classList.remove( 'ppom-file-wrapper' );
-					node.classList.add( 'u_i_c_box' );
-				} );
-		} );
-
-		const deleteButton = page.locator(
-			`#filelist-${ fieldId } .u_i_c_tools_del`
-		);
-		await deleteButton.waitFor( { state: 'visible', timeout: 10000 } );
-
-		let requested = false;
-		const seen = page
-			.waitForRequest(
-				( request ) =>
-					request.url().includes( 'admin-ajax.php' ) &&
-					!! request.postData()?.includes( 'ppom_delete_file' ),
-				{ timeout: 5000 }
-			)
-			.then( () => {
-				requested = true;
-			} )
-			.catch( () => {} );
-
-		await deleteButton.click();
-		await seen;
-
-		expect(
-			requested,
-			'clicking delete on restored markup must send a delete request'
-		).toBe( true );
-	} );
 
 	/**
 	 * `delete_file()` ends in `die( 0 )`, so a refusal is still HTTP 200. Clearing
@@ -844,6 +786,102 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 			tokenAfter,
 			'a refusal must not discard the proof needed to retry'
 		).toBe( tokenBefore );
+	} );
+
+	/**
+	 * Parked: reproduction of a bug that predates this branch.
+	 *
+	 * Server-restored files are wrapped in `.u_i_c_box`
+	 * (`src/FieldMarkup/Renderers/FileRenderer.php:59`,
+	 * `templates/frontend/inputs/file.php:79`) while the uploader wraps fresh ones
+	 * in `.ppom-file-wrapper` (`js/file-upload.js:356`). The delete handler reads
+	 * the file id only from the latter and returns when it is absent, so the click
+	 * sends nothing. Present on `development`; fixing it changes the widget's
+	 * element contract, so it belongs to its own change. Unskip it then.
+	 *
+	 * `templates/render-fields.php:41` repopulates the form from
+	 * `$_POST['ppom']['fields']`, which is what happens when add-to-cart fails
+	 * validation. Posting the product page with a stored file name reaches the same
+	 * code, so the markup here is exactly what a shopper sees after such a reload.
+	 */
+	test.fixme( 'a genuinely restored file can be deleted', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const fieldId = 'file_real_restore_test';
+
+		const { fileName, permalink } = await uploadOneFile(
+			page,
+			requestUtils,
+			fieldId,
+			'Real Restore Test'
+		);
+
+		// Canonical form, whatever the permalink setting: `/?p=<id>` answers 404
+		// to a POST, the canonical URL does not.
+		expect( permalink ).toBeTruthy();
+		expect( permalink ).not.toContain( '?p=' );
+
+		// Re-render the product page through POST, the way a failed add-to-cart
+		// does, with this upload as the field's existing value.
+		await page.evaluate(
+			( { action, field, name } ) => {
+				const form = document.createElement( 'form' );
+				form.method = 'POST';
+				form.action = action;
+
+				const input = document.createElement( 'input' );
+				input.type = 'hidden';
+				input.name = `ppom[fields][${ field }][0][org]`;
+				input.value = name;
+
+				form.appendChild( input );
+				document.body.appendChild( form );
+				form.submit();
+			},
+			{ action: permalink, field: fieldId, name: fileName }
+		);
+
+		await page.waitForLoadState( 'load' );
+
+		// Confirm this really is server-rendered markup before judging the click.
+		const restoredBox = page.locator(
+			`#filelist-${ fieldId } .u_i_c_box`
+		);
+		await restoredBox.waitFor( { state: 'attached', timeout: 10000 } );
+
+		expect(
+			await page.locator( '.ppom-file-wrapper' ).count(),
+			'server-restored markup should not carry the uploader wrapper'
+		).toBe( 0 );
+
+		const deleteButton = page
+			.locator( `#filelist-${ fieldId } .u_i_c_tools_del` )
+			.first();
+		await deleteButton.waitFor( { state: 'visible', timeout: 10000 } );
+
+		page.on( 'dialog', ( dialog ) => dialog.accept().catch( () => {} ) );
+
+		let requested = false;
+		const seen = page
+			.waitForRequest(
+				( request ) =>
+					request.url().includes( 'admin-ajax.php' ) &&
+					!! request.postData()?.includes( 'ppom_delete_file' ),
+				{ timeout: 5000 }
+			)
+			.then( () => {
+				requested = true;
+			} )
+			.catch( () => {} );
+
+		await deleteButton.click();
+		await seen;
+
+		expect(
+			requested,
+			'delete on a restored file must reach the endpoint'
+		).toBe( true );
 	} );
 
 	test( 'should refresh nonce via REST endpoint', async ( {
