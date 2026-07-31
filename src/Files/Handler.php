@@ -14,6 +14,11 @@ use PPOM\Support\Helpers;
  */
 final class Handler {
 
+	/**
+	 * WooCommerce session key listing the uploads made by the current visitor.
+	 */
+	private const OWNED_FILES_KEY = 'ppom_uploaded_files';
+
 	public static function files_setup_get_directory( $sub_dir = false ) {
 
 		$upload_dir = wp_upload_dir();
@@ -393,6 +398,23 @@ final class Handler {
 			$data_name  = sanitize_key( $_REQUEST['data_name'] );
 			$file_meta  = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
 
+			// The upload nonce is public, so the posted product and field are not
+			// necessarily a pair the form could have produced. Keeping a file no
+			// form references only leaves something to clean up later.
+			//
+			// Same wording as the nonce failure above on purpose: saying which
+			// field names exist, and which of them accept uploads, would let the
+			// endpoint be probed to map a product's fields.
+			if ( ! self::field_accepts_uploads( $file_meta ) ) {
+				@unlink( $file_path );
+
+				$response ['status']  = 'error';
+				$response ['message'] = __( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', 'woocommerce-product-addon' );
+				wp_send_json( $response );
+			}
+
+			self::remember_uploaded_file( $file_name );
+
 			// making thumb if images
 			if ( self::is_file_image( $file_path ) ) {
 
@@ -422,9 +444,174 @@ final class Handler {
 				);
 			}
 		}
+		// Hand the uploader a capability for this one file. Session-based ownership
+		// cannot survive uploads that overlap, because WooCommerce rewrites the
+		// whole session row per request; a token belongs to the response that
+		// created the file, so parallel uploads cannot cost each other anything.
+		if ( isset( $response['file_name'] ) && $file_name === $response['file_name'] ) {
+			$response['delete_token'] = self::file_delete_token( $file_name );
+		}
+
 		// Return JSON-RPC response
 		// die ( '{"jsonrpc" : "2.0", "result" : '. json_encode($response) .', "id" : "id"}' );
 		die( json_encode( apply_filters( 'ppom_file_upload', $response, $file_type, $file_dir_path, $file_name ) ) );
+	}
+
+	/**
+	 * Capability proving the holder uploaded this file.
+	 *
+	 * Derived from the stored name and the site's salt, so a caller who knows
+	 * another shopper's file name still cannot produce its token. It is only ever
+	 * returned in the response to the upload that created the file, and it does
+	 * not expire: the file it names is removed on use, and abandoned files are
+	 * swept after 7 days.
+	 *
+	 * @param string $file_name Name of the stored file.
+	 *
+	 * @return string
+	 *
+	 * @see self::delete_file()
+	 */
+	public static function file_delete_token( $file_name ) {
+
+		return wp_hash( 'ppom_delete_' . $file_name );
+	}
+
+	/**
+	 * Whether a resolved field definition is one this endpoint uploads for.
+	 *
+	 * Only file and cropper fields are given an uploader on the frontend, so a
+	 * request naming any other field — a text or select field, say — is not
+	 * something the form could have sent. Addons that drive this endpoint with a
+	 * type of their own can join the list through the filter.
+	 *
+	 * @param mixed $file_meta Field definition resolved from the posted data name.
+	 *
+	 * @return bool
+	 */
+	private static function field_accepts_uploads( $file_meta ) {
+
+		if ( ! is_array( $file_meta ) || ! isset( $file_meta['type'] ) ) {
+			return false;
+		}
+
+		$upload_types = apply_filters( 'ppom_upload_capable_field_types', array( 'file', 'cropper' ) );
+
+		return in_array( $file_meta['type'], (array) $upload_types, true );
+	}
+
+	/**
+	 * Records an upload against the current visitor's WooCommerce session.
+	 *
+	 * The uploads directory is shared site-wide, so this is the only thing that
+	 * ties a temporary file to the shopper who uploaded it.
+	 *
+	 * @param string $file_name Name of the stored file.
+	 *
+	 * @return void
+	 *
+	 * @see self::owns_uploaded_file()
+	 */
+	public static function remember_uploaded_file( $file_name ) {
+
+		$session = function_exists( 'WC' ) ? WC()->session : null;
+
+		if ( ! $session instanceof \WC_Session ) {
+			return;
+		}
+
+		// Guests have no session cookie until something forces one, and without it
+		// WooCommerce discards the session on shutdown. Only the stock handler
+		// exposes this; a replacement handler is left to its own persistence.
+		if ( $session instanceof \WC_Session_Handler ) {
+			$session->set_customer_session_cookie( true );
+		}
+
+		$owned   = self::stored_owned_files( $session );
+		$owned[] = $file_name;
+
+		$session->set( self::OWNED_FILES_KEY, array_values( array_unique( $owned ) ) );
+	}
+
+	/**
+	 * Reads the ownership list as it is currently stored, not as it looked when
+	 * this request started.
+	 *
+	 * A product can carry several file fields, each with its own uploader, so two
+	 * uploads can be in flight at once. WooCommerce loads the session once per
+	 * request and writes the whole row back on shutdown, so appending to the
+	 * request-start snapshot let whichever request saved last drop the other
+	 * name.
+	 *
+	 * @param \WC_Session $session Current session.
+	 *
+	 * @return array<int, string>
+	 */
+	private static function stored_owned_files( $session ) {
+
+		$owned = (array) $session->get( self::OWNED_FILES_KEY, array() );
+
+		if ( ! $session instanceof \WC_Session_Handler ) {
+			return $owned;
+		}
+
+		$stored = $session->get_session( $session->get_customer_id(), array() );
+
+		if ( ! is_array( $stored ) || ! isset( $stored[ self::OWNED_FILES_KEY ] ) ) {
+			return $owned;
+		}
+
+		// Values inside a stored session row are serialised individually.
+		return array_merge( (array) maybe_unserialize( $stored[ self::OWNED_FILES_KEY ] ), $owned );
+	}
+
+	/**
+	 * Drops an upload from the current visitor's ownership record.
+	 *
+	 * Called once the file is gone, so the list does not grow on every
+	 * upload-then-remove cycle — each upload has a unique name, so nothing in it
+	 * would ever be reused.
+	 *
+	 * @param string $file_name Name of the stored file.
+	 *
+	 * @return void
+	 *
+	 * @see self::remember_uploaded_file()
+	 */
+	public static function forget_uploaded_file( $file_name ) {
+
+		$session = function_exists( 'WC' ) ? WC()->session : null;
+
+		if ( ! $session instanceof \WC_Session ) {
+			return;
+		}
+
+		$owned     = (array) $session->get( self::OWNED_FILES_KEY, array() );
+		$remaining = array_values( array_diff( $owned, array( $file_name ) ) );
+
+		if ( $remaining !== $owned ) {
+			$session->set( self::OWNED_FILES_KEY, $remaining );
+		}
+	}
+
+	/**
+	 * Whether the current visitor uploaded the given file in this session.
+	 *
+	 * @param string $file_name Name of the stored file.
+	 *
+	 * @return bool
+	 *
+	 * @see self::remember_uploaded_file()
+	 */
+	public static function owns_uploaded_file( $file_name ) {
+
+		$session = function_exists( 'WC' ) ? WC()->session : null;
+
+		if ( ! $session instanceof \WC_Session ) {
+			return false;
+		}
+
+		return in_array( $file_name, (array) $session->get( self::OWNED_FILES_KEY, array() ), true );
 	}
 
 	/**
@@ -451,6 +638,21 @@ final class Handler {
 			die( 0 );
 		}
 
+		// The uploads directory is shared site-wide and the nonce above is identical
+		// for every logged-out visitor, so ownership is what actually authorises this.
+		// Same message as above on purpose: do not leak whether the file exists.
+		//
+		// Either proof will do. The token covers uploads that overlapped, which the
+		// session list cannot; the session covers callers that never received a
+		// token, such as a page cached before this shipped.
+		$delete_token = isset( $_REQUEST['ppom_delete_token'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['ppom_delete_token'] ) ) : '';
+
+		if ( ! self::owns_uploaded_file( $file_name ) && ! hash_equals( self::file_delete_token( $file_name ), $delete_token ) ) {
+			// translators: %s: the name of file
+			printf( __( 'Verification failed for file: %s', 'woocommerce-product-addon' ), $file_name );
+			die( 0 );
+		}
+
 		$dir_path  = self::get_dir_path();
 		$file_path = $dir_path . $file_name;
 		$is_image  = self::is_file_image( $file_path );
@@ -470,6 +672,7 @@ final class Handler {
 
 			// make sure file is removed
 			if ( ! file_exists( $file_path ) ) {
+				self::forget_uploaded_file( $file_name );
 				_e( 'File removed', 'woocommerce-product-addon' );
 			} else {
 				// translators: %s: the name of file
@@ -544,9 +747,6 @@ final class Handler {
 
 	// Generate uploaded file preview
 	public static function uploaded_file_preview( $file_name, $settings ) {
-
-		$field_type = $settings['type'];
-		$data_name  = isset( $settings['data_name'] ) ? $settings['data_name'] : '';
 
 		$file_dir_path = self::get_dir_path();
 		$file_path     = $file_dir_path . $file_name;
