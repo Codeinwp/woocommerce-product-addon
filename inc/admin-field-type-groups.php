@@ -53,7 +53,7 @@ function ppom_get_admin_field_modal_upsell_for_rest() {
 
 	return array(
 		'title'     => __( 'Unlock all Features!', 'woocommerce-product-addon' ),
-		'intro'     => __( 'Upgrade to the Pro plan to unlock all features and enhance your product fields management capabilities:', 'woocommerce-product-addon' ),
+		'intro'     => __( 'Locked fields are marked with the plan that unlocks them — Essential, Plus, or VIP. Upgrade to the plan that includes the fields and features you need:', 'woocommerce-product-addon' ),
 		'features'  => array(
 			__( 'Unlock 30+ input fields', 'woocommerce-product-addon' ),
 			__( 'Meta Fields Repeater', 'woocommerce-product-addon' ),

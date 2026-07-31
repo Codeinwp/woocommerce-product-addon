@@ -119,6 +119,68 @@ test.describe( 'React field modal (opt-in)', () => {
 		).toBeVisible();
 	} );
 
+	test( 'locked field tiles show the specific plan required', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		await page
+			.getByRole( 'button', { name: 'Add field', exact: true } )
+			.click();
+		const dialog = page.getByRole( 'dialog' ).first();
+		await expect( dialog ).toBeVisible();
+
+		// 'phone' => LICENSE_PLAN_1, 'quantities' => LICENSE_PLAN_2,
+		// 'domain' => LICENSE_PLAN_3 (see inc/admin-field-type-groups.php).
+		const essentialField = dialog
+			.locator( 'button[aria-label^="Phone Input"]' )
+			.last();
+		const plusField = dialog
+			.locator( 'button[aria-label^="Variation Quantity"]' )
+			.last();
+		const vipField = dialog
+			.locator( 'button[aria-label^="Domain"]' )
+			.last();
+		const freeField = dialog
+			.locator( 'button[aria-label^="Text Input"]' )
+			.last();
+
+		await expect( essentialField ).toContainText( 'Essential' );
+		await expect( plusField ).toContainText( 'Plus' );
+		await expect( vipField ).toContainText( 'VIP' );
+
+		// A field type available on every plan gets no lock badge at all.
+		await expect( freeField.locator( '.fa-lock' ) ).toHaveCount( 0 );
+	} );
+
+	test( 'sidebar upgrade message references the actual subscription plans', async ( {
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		const { ppomId } = await createSimpleTextGroup( requestUtils, {
+			fieldsNumber: 1,
+		} );
+
+		await visitReactModalGroup( admin, ppomId );
+
+		await page
+			.getByRole( 'button', { name: 'Add field', exact: true } )
+			.click();
+		const dialog = page.getByRole( 'dialog' ).first();
+		await expect( dialog ).toBeVisible();
+
+		await expect(
+			dialog.getByText( /Essential, Plus, or VIP/i )
+		).toBeVisible();
+	} );
+
 	test( 'per-field edit button opens sidebar without inner Add field CTA', async ( {
 		page,
 		admin,

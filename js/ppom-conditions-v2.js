@@ -719,11 +719,25 @@ function ppom_set_default_option( field_id ) {
 			} );
 			break;
 
-		case 'select':
-			if ( '' === jQuery( '#' + field.data_name ).val() ) {
-				jQuery( '#' + field.data_name ).val( field.selected );
+		case 'select': {
+			// The hidden-field reset calls val('') on a select with no ''
+			// option, which leaves selectedIndex at -1 and makes val()
+			// return null — so a cleared select must be detected via both.
+			const $select = jQuery( '#' + field.data_name );
+			const current_value = $select.val();
+
+			if ( null === current_value || '' === current_value ) {
+				$select.val( field.selected );
+
+				// No configured default (or it no longer matches an option):
+				// fall back to the first option, matching the state the PHP
+				// renderer produces on initial page load.
+				if ( null === $select.val() ) {
+					$select.prop( 'selectedIndex', 0 );
+				}
 			}
 			break;
+		}
 
 		case 'image':
 			jQuery.each( field.images, function ( index, img ) {

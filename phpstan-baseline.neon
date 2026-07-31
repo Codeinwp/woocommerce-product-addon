@@ -1111,12 +1111,6 @@ parameters:
 			path: classes/plugin.class.php
 
 		-
-			message: '#^Method NM_PersonalizedProduct\:\:activate_plugin\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/plugin.class.php
-
-		-
 			message: '#^Method NM_PersonalizedProduct\:\:add_ppom_meta_panel\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -4705,12 +4699,6 @@ parameters:
 			path: src/Hooks/Callbacks.php
 
 		-
-			message: '#^Call to static method load_scripts_by_product_id\(\) on an unknown class PPOM\\Hooks\\PPOM_FRONTEND_SCRIPTS\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Hooks/Callbacks.php
-
-		-
 			message: '#^Constant PPOM_URL not found\.$#'
 			identifier: constant.notFound
 			count: 23
@@ -7665,13 +7653,13 @@ parameters:
 		-
 			message: '#^Variable \$field_meta might not be defined\.$#'
 			identifier: variable.undefined
-			count: 3
+			count: 2
 			path: templates/frontend/inputs/quantities.php
 
 		-
 			message: '#^Variable \$product might not be defined\.$#'
 			identifier: variable.undefined
-			count: 2
+			count: 1
 			path: templates/frontend/inputs/quantities.php
 
 		-

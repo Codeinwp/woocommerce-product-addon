@@ -110,6 +110,8 @@ class NM_PersonalizedProduct {
 		// adding scheduale weekly
 		add_filter( 'cron_schedules', 'ppom_hooks_weekly_cron_schedule' );
 
+		add_action( 'init', array( __CLASS__, 'schedule_unused_images_cleanup' ) );
+
 		add_action( 'admin_footer-edit.php', array( $this, 'nm_add_bulk_meta' ) );
 
 		add_action( 'load-edit.php', array( &$this, 'nm_meta_bulk_action' ) );
@@ -521,15 +523,41 @@ class NM_PersonalizedProduct {
 		PPOM_Meta_Repository::ensure_schema();
 	}
 
-	public static function activate_plugin() {
-		
-		self::upgrade_database();
-		// this is to remove un-confirmed files daily
+	/**
+	 * Makes sure the sweep that removes un-confirmed uploads is scheduled.
+	 *
+	 * Hooked to `init` rather than only to activation so that sites which
+	 * activated while the recurrence was invalid — and therefore never got the
+	 * event at all — pick it up without having to reactivate the plugin.
+	 *
+	 * @return void
+	 *
+	 * @see ppom_files_removed_unused_images()
+	 */
+	public static function schedule_unused_images_cleanup() {
 
-		$delete_frequency = ppom_get_option( 'ppom_remove_unused_images_schedule' );
-		if ( ! wp_next_scheduled( 'do_action_remove_images' ) ) {
-			wp_schedule_event( time(), $delete_frequency, 'do_action_remove_images' );
+		if ( wp_next_scheduled( 'do_action_remove_images' ) ) {
+			return;
 		}
+
+		$delete_frequency = ppom_get_option( 'ppom_remove_unused_images_schedule', 'daily' );
+
+		wp_schedule_event( time(), $delete_frequency, 'do_action_remove_images' );
+	}
+
+	/**
+	 * Runs on plugin activation.
+	 *
+	 * The un-confirmed upload sweep is not scheduled here; it is scheduled on
+	 * `init` so that existing installs recover it too.
+	 *
+	 * @return void
+	 *
+	 * @see self::schedule_unused_images_cleanup()
+	 */
+	public static function activate_plugin() {
+
+		self::upgrade_database();
 
 		if ( ! wp_next_scheduled( 'setup_styles_and_scripts_wooproduct' ) ) {
 			wp_schedule_event( time(), 'daily', 'setup_styles_and_scripts_wooproduct' );
@@ -839,6 +867,27 @@ class NM_PersonalizedProduct {
 
 		return self::LICENSE_PLAN_FREE;
 	}
+
+	/**
+	 * Get the translated label for a license category.
+	 *
+	 * @param int $category The license category constant.
+	 *
+	 * @return string Translated plan name, or '' when the category isn't a paid tier.
+	 */
+	public static function get_license_category_label( $category ) {
+		switch ( (int) $category ) {
+			case self::LICENSE_PLAN_1:
+				return __( 'Essential', 'woocommerce-product-addon' );
+			case self::LICENSE_PLAN_2:
+				return __( 'Plus', 'woocommerce-product-addon' );
+			case self::LICENSE_PLAN_3:
+				return __( 'VIP', 'woocommerce-product-addon' );
+		}
+
+		return '';
+	}
+
 	/**
 	 * Method to return the type of licence.
 	 *
