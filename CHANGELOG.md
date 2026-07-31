@@ -1,3 +1,15 @@
+##### [Version 34.0.8](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.7...v34.0.8) (2026-07-31)
+
+- Fixed an issue where quantity fields with prices would not appear on the product page when a price matrix was attached to the same product.
+- Fixed a fatal error that occurred when displaying product fields on pages using the PPOM shortcode.
+- Fixed an issue where a dropdown field revealed by conditional logic would appear empty instead of showing its default option.
+- Fixed an issue where prices from selected product options could disappear from the cart total when another plugin also adjusted product prices.
+- Fixed an issue where prices from selected product options were not counted in the cart total right after adding a product to the cart.
+- Fixed an issue where the scheduled cleanup of abandoned file uploads never ran, leaving unused files on the server indefinitely.
+- Locked fields in the field picker now show which plan unlocks them — Essential, Plus or VIP — instead of a generic “PRO” badge.
+- Updated dependencies
+- Enhanced Security
+
 ##### [Version 34.0.7](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.6...v34.0.7) (2026-07-20)
 
 - Fixed product form assignments regression
