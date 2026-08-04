@@ -612,6 +612,7 @@ final class Settings {
 					if ( empty( $fields_meta['file_size'] ) ) {
 						$fields_meta['file_size'] = '1mb';
 					}
+					$fields_meta['chunk_size'] = apply_filters( 'ppom_file_upload_chunk_size', '1mb' );
 					break;
 
 				case 'cropper':
@@ -623,6 +624,7 @@ final class Settings {
 					if ( empty( $fields_meta['file_size'] ) ) {
 						$fields_meta['file_size'] = '1mb';
 					}
+					$fields_meta['chunk_size'] = apply_filters( 'ppom_file_upload_chunk_size', '1mb' );
 					break;
 			}
 

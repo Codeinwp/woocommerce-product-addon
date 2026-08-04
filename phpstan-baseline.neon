@@ -1111,12 +1111,6 @@ parameters:
 			path: classes/plugin.class.php
 
 		-
-			message: '#^Method NM_PersonalizedProduct\:\:activate_plugin\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: classes/plugin.class.php
-
-		-
 			message: '#^Method NM_PersonalizedProduct\:\:add_ppom_meta_panel\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -4585,12 +4579,6 @@ parameters:
 			path: src/Files/Handler.php
 
 		-
-			message: '#^Method PPOM\\Files\\Handler\:\:is_file_image\(\) should return bool but returns string\|false\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Files/Handler.php
-
-		-
 			message: '#^Method PPOM\\Files\\Handler\:\:save_data_url_to_image\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -4707,12 +4695,6 @@ parameters:
 		-
 			message: '#^Call to function is_array\(\) with non\-empty\-array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/Hooks/Callbacks.php
-
-		-
-			message: '#^Call to static method load_scripts_by_product_id\(\) on an unknown class PPOM\\Hooks\\PPOM_FRONTEND_SCRIPTS\.$#'
-			identifier: class.notFound
 			count: 1
 			path: src/Hooks/Callbacks.php
 
@@ -5093,12 +5075,6 @@ parameters:
 			identifier: isset.variable
 			count: 1
 			path: src/Hooks/Callbacks.php
-
-		-
-			message: '#^Argument of an invalid type array\<mixed, mixed\>\|string supplied for foreach, only iterables are supported\.$#'
-			identifier: foreach.nonIterable
-			count: 10
-			path: src/Pricing/Engine.php
 
 		-
 			message: '#^Call to an undefined method object\:\:get_price\(\)\.$#'
@@ -5563,42 +5539,6 @@ parameters:
 			path: src/Pricing/Engine.php
 
 		-
-			message: '#^Offset ''option'' might not exist on non\-empty\-array\<mixed, mixed\>\|string\.$#'
-			identifier: offsetAccess.notFound
-			count: 2
-			path: src/Pricing/Engine.php
-
-		-
-			message: '#^Offset ''qty'' might not exist on non\-empty\-array\<mixed, mixed\>\|string\.$#'
-			identifier: offsetAccess.notFound
-			count: 2
-			path: src/Pricing/Engine.php
-
-		-
-			message: '#^Parameter \#1 \$str of function stripcslashes expects string, array\<mixed, mixed\>\|string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Pricing/Engine.php
-
-		-
-			message: '#^Parameter \#1 \$string of function str_word_count expects string, array\<mixed, mixed\>\|string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Pricing/Engine.php
-
-		-
-			message: '#^Parameter \#1 \$var of function count expects array\|Countable, array\<mixed, mixed\>\|string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Pricing/Engine.php
-
-		-
-			message: '#^Parameter \#2 \$subject of function preg_match_all expects string, array\<mixed, mixed\>\|string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: src/Pricing/Engine.php
-
-		-
 			message: '#^Parameter \$cart of method PPOM\\Pricing\\Engine\:\:price_cart_fee\(\) has invalid type PPOM\\Pricing\\WC_Cart\.$#'
 			identifier: class.notFound
 			count: 1
@@ -5607,12 +5547,6 @@ parameters:
 		-
 			message: '#^Parameter \$product of method PPOM\\Pricing\\Engine\:\:price_get_product_base\(\) has invalid type PPOM\\Pricing\\WC_Product\.$#'
 			identifier: class.notFound
-			count: 1
-			path: src/Pricing/Engine.php
-
-		-
-			message: '#^Parameter &\$product_quantity by\-ref type of method PPOM\\Pricing\\Engine\:\:get_field_prices\(\) expects float\|int, array\<mixed, mixed\>\|string given\.$#'
-			identifier: parameterByRef.type
 			count: 1
 			path: src/Pricing/Engine.php
 
@@ -5655,7 +5589,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property object\:\:\$productmeta_id\.$#'
 			identifier: property.notFound
-			count: 10
+			count: 9
 			path: src/Rest/ProductFieldGroupService.php
 
 		-
@@ -7719,13 +7653,13 @@ parameters:
 		-
 			message: '#^Variable \$field_meta might not be defined\.$#'
 			identifier: variable.undefined
-			count: 3
+			count: 2
 			path: templates/frontend/inputs/quantities.php
 
 		-
 			message: '#^Variable \$product might not be defined\.$#'
 			identifier: variable.undefined
-			count: 2
+			count: 1
 			path: templates/frontend/inputs/quantities.php
 
 		-

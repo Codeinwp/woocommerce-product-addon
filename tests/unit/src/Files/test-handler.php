@@ -121,11 +121,11 @@ class Test_Files_Handler extends PPOM_Test_Case {
 	}
 
 	/**
-	 * is_file_image returns the mime type for a real PNG and false for non-image content.
+	 * is_file_image returns true for a real PNG and false for non-image content.
 	 *
 	 * @return void
 	 */
-	public function test_is_file_image_returns_mime_for_real_png_and_false_otherwise() {
+	public function test_is_file_image_returns_true_for_real_png_and_false_otherwise() {
 		$dir = Handler::get_dir_path();
 
 		$png_path = $dir . 'ppom-test-' . wp_generate_password( 6, false ) . '.png';
@@ -140,7 +140,7 @@ class Test_Files_Handler extends PPOM_Test_Case {
 
 		file_put_contents( $txt_path, 'not an image, just text' );
 
-		$this->assertSame( 'image/png', Handler::is_file_image( $png_path ) );
+		$this->assertTrue( Handler::is_file_image( $png_path ) );
 		$this->assertFalse( Handler::is_file_image( $txt_path ) );
 	}
 
@@ -169,7 +169,7 @@ class Test_Files_Handler extends PPOM_Test_Case {
 
 		$this->assertFileExists( $dest );
 		$this->assertSame( $binary, file_get_contents( $dest ) );
-		$this->assertSame( 'image/png', Handler::is_file_image( $dest ) );
+		$this->assertTrue( Handler::is_file_image( $dest ) );
 	}
 
 	/**
@@ -259,5 +259,357 @@ class Test_Files_Handler extends PPOM_Test_Case {
 		} finally {
 			remove_filter( 'ppom_dir_url', $filter );
 		}
+	}
+
+	/**
+	 * Replaces WC()->session with a brand new guest session, i.e. simulates a
+	 * different anonymous visitor arriving with no session cookie.
+	 *
+	 * @return void
+	 */
+	private function start_fresh_guest_session() {
+		WC()->session = new WC_Session_Handler();
+		WC()->session->init();
+	}
+
+	/**
+	 * The uploader may delete their own in-progress upload, but a different
+	 * anonymous visitor must not be able to claim it.
+	 *
+	 * Regression test for the missing-authorization report on ppom_delete_file:
+	 * knowing the file name was previously enough to delete anybody's upload.
+	 *
+	 * @return void
+	 */
+	public function test_only_the_uploading_visitor_owns_an_uploaded_file() {
+		$file_name = 'victim-artwork.abc123.png';
+
+		$this->start_fresh_guest_session();
+		Handler::remember_uploaded_file( $file_name );
+
+		$this->assertTrue(
+			Handler::owns_uploaded_file( $file_name ),
+			'The visitor who uploaded the file must be able to delete it.'
+		);
+
+		$this->start_fresh_guest_session();
+
+		$this->assertFalse(
+			Handler::owns_uploaded_file( $file_name ),
+			'A different anonymous visitor must not be able to delete an upload they did not make.'
+		);
+	}
+
+	/**
+	 * Removing a file must drop its ownership record too. Every upload gets a
+	 * unique name, so a list that only ever grows would let this public flow
+	 * inflate the visitor's serialized session row upload after upload.
+	 *
+	 * @return void
+	 */
+	public function test_forgetting_a_file_leaves_other_uploads_owned() {
+		$this->start_fresh_guest_session();
+
+		Handler::remember_uploaded_file( 'kept.aaa111.png' );
+		Handler::remember_uploaded_file( 'removed.bbb222.png' );
+
+		Handler::forget_uploaded_file( 'removed.bbb222.png' );
+
+		$this->assertFalse(
+			Handler::owns_uploaded_file( 'removed.bbb222.png' ),
+			'A deleted upload must not stay in the ownership list.'
+		);
+		$this->assertTrue(
+			Handler::owns_uploaded_file( 'kept.aaa111.png' ),
+			'Forgetting one upload must not affect the others.'
+		);
+	}
+
+	/**
+	 * Upload and delete are two separate requests, so the ownership record is only
+	 * useful if it is persisted against the visitor's session cookie rather than
+	 * held in memory. A guest has no WooCommerce session cookie until something
+	 * forces one, which is the most likely way this fix could silently stop
+	 * legitimate shoppers from removing their own uploads.
+	 *
+	 * @return void
+	 */
+	public function test_remembered_upload_survives_into_the_next_request() {
+		$file_name = 'persisted-artwork.abc123.png';
+
+		$cookie = $this->capture_session_cookie(
+			function () use ( $file_name ) {
+				$this->start_fresh_guest_session();
+				Handler::remember_uploaded_file( $file_name );
+				WC()->session->save_data();
+			}
+		);
+
+		$this->assertNotEmpty(
+			$cookie,
+			'Uploading must issue a session cookie, otherwise the record is discarded on shutdown.'
+		);
+
+		$this->with_session_cookie(
+			$cookie,
+			function () use ( $file_name ) {
+				$this->assertTrue(
+					Handler::owns_uploaded_file( $file_name ),
+					'The uploader must still own the file on the follow-up delete request.'
+				);
+			}
+		);
+	}
+
+	/**
+	 * A shopper filling in several file fields owns every one of their uploads,
+	 * and removing one must not revoke the others.
+	 *
+	 * @return void
+	 */
+	public function test_visitor_owns_each_of_their_uploads() {
+		$this->start_fresh_guest_session();
+
+		Handler::remember_uploaded_file( 'front.aaa111.png' );
+		Handler::remember_uploaded_file( 'back.bbb222.png' );
+		Handler::remember_uploaded_file( 'notes.ccc333.pdf' );
+
+		$this->assertTrue( Handler::owns_uploaded_file( 'front.aaa111.png' ) );
+		$this->assertTrue( Handler::owns_uploaded_file( 'back.bbb222.png' ) );
+		$this->assertTrue( Handler::owns_uploaded_file( 'notes.ccc333.pdf' ) );
+		$this->assertFalse( Handler::owns_uploaded_file( 'someone-else.ddd444.png' ) );
+	}
+
+	/**
+	 * Logged-in customers get their session keyed by user ID rather than a guest
+	 * hash, so the same ownership rule has to hold for them — including the fact
+	 * that a second signed-in customer must not inherit the first one's uploads.
+	 *
+	 * @return void
+	 */
+	public function test_signed_in_customer_owns_only_their_own_upload() {
+		$file_name = 'members-artwork.eee555.png';
+
+		$first  = $this->factory->user->create( array( 'role' => 'customer' ) );
+		$second = $this->factory->user->create( array( 'role' => 'customer' ) );
+
+		wp_set_current_user( $first );
+		$this->start_fresh_guest_session();
+		Handler::remember_uploaded_file( $file_name );
+
+		$this->assertTrue(
+			Handler::owns_uploaded_file( $file_name ),
+			'A signed-in customer must be able to remove their own upload.'
+		);
+
+		wp_set_current_user( $second );
+		$this->start_fresh_guest_session();
+
+		$this->assertFalse(
+			Handler::owns_uploaded_file( $file_name ),
+			'A different signed-in customer must not inherit that upload.'
+		);
+	}
+
+	/**
+	 * Shoppers routinely upload as a guest and only sign in later at checkout.
+	 * WooCommerce migrates the guest session onto the user account at that point,
+	 * and the ownership record has to come with it or the shopper loses the
+	 * ability to remove a file they uploaded minutes earlier.
+	 *
+	 * @return void
+	 */
+	public function test_ownership_survives_signing_in_after_uploading_as_a_guest() {
+		$file_name = 'guest-then-login.fff666.png';
+
+		$cookie = $this->capture_session_cookie(
+			function () use ( $file_name ) {
+				$this->start_fresh_guest_session();
+				Handler::remember_uploaded_file( $file_name );
+				WC()->session->save_data();
+			}
+		);
+
+		$this->assertNotEmpty( $cookie );
+
+		$customer = $this->factory->user->create( array( 'role' => 'customer' ) );
+		wp_set_current_user( $customer );
+
+		$this->with_session_cookie(
+			$cookie,
+			function () use ( $file_name, $customer ) {
+				// Guards against a vacuous pass: prove WooCommerce really did move the
+				// guest session onto the account rather than leaving it untouched.
+				$this->assertSame(
+					(string) $customer,
+					(string) WC()->session->get_customer_id(),
+					'Expected the guest session to be migrated onto the signed-in customer.'
+				);
+
+				$this->assertTrue(
+					Handler::owns_uploaded_file( $file_name ),
+					'Signing in at checkout must not orphan an upload made as a guest.'
+				);
+			}
+		);
+	}
+
+	/**
+	 * Runs $callback with WooCommerce's set-cookie call intercepted, returning the
+	 * [name, value] pair it would have sent to the browser. Returning false from
+	 * the filter keeps wc_setcookie from touching real headers.
+	 *
+	 * @param callable $callback Code that should trigger the session cookie.
+	 *
+	 * @return array
+	 */
+	private function capture_session_cookie( callable $callback ) {
+		$captured = array();
+
+		$capture = static function ( $enabled, $name, $value ) use ( &$captured ) {
+			$captured = array( $name, $value );
+
+			return false;
+		};
+
+		add_filter( 'woocommerce_set_cookie_enabled', $capture, 10, 3 );
+
+		try {
+			$callback();
+		} finally {
+			remove_filter( 'woocommerce_set_cookie_enabled', $capture, 10 );
+		}
+
+		return $captured;
+	}
+
+	/**
+	 * Rebuilds WC()->session as if a fresh request arrived carrying $cookie, which
+	 * is what makes the follow-up delete request find the earlier upload.
+	 *
+	 * @param array    $cookie   [name, value] pair from capture_session_cookie().
+	 * @param callable $callback Assertions to run against the restored session.
+	 *
+	 * @return void
+	 */
+	private function with_session_cookie( array $cookie, callable $callback ) {
+		$_COOKIE[ $cookie[0] ] = $cookie[1];
+
+		try {
+			WC()->session = new WC_Session_Handler();
+			WC()->session->init();
+
+			$callback();
+		} finally {
+			unset( $_COOKIE[ $cookie[0] ] );
+		}
+	}
+
+	/**
+	 * get_field_meta_by_dataname() returns an empty string when a product has no
+	 * matching field, and the AJAX upload handler hands that straight to the
+	 * preview renderer. Indexing it used to raise a TypeError on PHP 8, turning
+	 * an upload with an unknown product_id/data_name into a 500.
+	 *
+	 * @return void
+	 */
+	public function test_uploaded_file_preview_tolerates_missing_field_meta() {
+		$dir  = Handler::get_dir_path();
+		$name = 'preview-' . wp_generate_password( 6, false ) . '.png';
+		$path = $dir . $name;
+
+		$this->artifacts[] = $path;
+
+		$gd = imagecreatetruecolor( 8, 8 );
+		imagepng( $gd, $path );
+		imagedestroy( $gd );
+
+		$html = Handler::uploaded_file_preview( $name, '' );
+
+		$this->assertIsString( $html );
+		$this->assertStringContainsString( $name, $html );
+	}
+
+	/**
+	 * A product can have several file fields, each with its own uploader, so two
+	 * uploads can be in flight at once. Each request loads the session once at
+	 * the start and writes the whole row back on shutdown, so appending to that
+	 * stale snapshot let the later request drop the earlier name.
+	 *
+	 * Merging against stored state covers the case where one upload finishes
+	 * before another records. It does not make the update atomic: uploads that
+	 * read at the same instant still overwrite each other, which needs ownership
+	 * to stop living in a shared session row.
+	 *
+	 * @return void
+	 */
+	public function test_recording_merges_with_names_stored_by_a_parallel_request() {
+		$file_a = 'first.aaa111.png';
+		$file_b = 'second.bbb222.png';
+		$file_c = 'third.ccc333.png';
+
+		$cookie = $this->capture_session_cookie(
+			function () use ( $file_a ) {
+				$this->start_fresh_guest_session();
+				Handler::remember_uploaded_file( $file_a );
+				WC()->session->save_data();
+			}
+		);
+
+		$this->assertNotEmpty( $cookie );
+
+		// Our request keeps the snapshot it loaded, holding only $file_a.
+		$mine = WC()->session;
+
+		// A second upload from the same visitor finishes and persists its list.
+		$_COOKIE[ $cookie[0] ] = $cookie[1];
+
+		try {
+			$parallel = new WC_Session_Handler();
+			$parallel->init();
+			$parallel->set( 'ppom_uploaded_files', array( $file_a, $file_b ) );
+			$parallel->save_data();
+		} finally {
+			unset( $_COOKIE[ $cookie[0] ] );
+		}
+
+		// Now our request records its own upload against that stale snapshot.
+		WC()->session = $mine;
+		Handler::remember_uploaded_file( $file_c );
+
+		$this->assertTrue( Handler::owns_uploaded_file( $file_c ) );
+		$this->assertTrue(
+			Handler::owns_uploaded_file( $file_b ),
+			'A name persisted by a parallel upload must not be dropped.'
+		);
+		$this->assertTrue( Handler::owns_uploaded_file( $file_a ) );
+	}
+
+	/**
+	 * The delete token is what lets overlapping uploads each prove themselves, so
+	 * it has to be reproducible for the file it names, useless for any other file,
+	 * and not derivable from the name a caller already knows.
+	 *
+	 * @return void
+	 */
+	public function test_delete_token_is_reproducible_per_file_and_opaque() {
+		$token = Handler::file_delete_token( 'artwork.aaa111.png' );
+
+		$this->assertSame(
+			$token,
+			Handler::file_delete_token( 'artwork.aaa111.png' ),
+			'The uploader must be able to present the same token later.'
+		);
+		$this->assertNotSame(
+			$token,
+			Handler::file_delete_token( 'artwork.bbb222.png' ),
+			'A token must not carry over to another file.'
+		);
+		$this->assertStringNotContainsString(
+			'artwork',
+			$token,
+			'Knowing the file name must not be enough to produce the token.'
+		);
+		$this->assertMatchesRegularExpression( '/^[a-f0-9]{32}$/', $token );
 	}
 }

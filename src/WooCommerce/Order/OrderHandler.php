@@ -339,10 +339,56 @@ final class OrderHandler {
 		$ppom_data = $item->get_meta( '_ppom_fields' );
 
 		if ( is_array( $ppom_data ) && array_key_exists( 'fields', $ppom_data ) ) {
+			self::restore_order_files_to_upload_dir( $ppom_data['fields'], $item, $order );
 			$cart_item_data['ppom'] = $ppom_data;
 		}
 
 		return $cart_item_data;
+	}
+
+	/**
+	 * Copies an order's confirmed uploads back into the shared upload pool.
+	 *
+	 * Checkout moves uploads out of the pool into confirmed/{order_id}
+	 * (see self::rename_files()), so a cart item rehydrated by Order Again
+	 * references a pool file that no longer exists and the new order ends up
+	 * with a dead file link. Restoring a copy under the original name keeps
+	 * the reused reference valid without mutating the cart item data, so a
+	 * later rehydration hook (e.g. PPOM Pro's) cannot undo it.
+	 *
+	 * @param mixed $fields PPOM fields from the order item meta.
+	 * @param mixed $item   Order item being re-ordered (duck-typed: needs get_product_id()).
+	 * @param mixed $order  Original order (duck-typed: needs get_id()).
+	 *
+	 * @return void
+	 */
+	private static function restore_order_files_to_upload_dir( $fields, $item, $order ) {
+		if ( ! is_array( $fields ) || ! is_object( $item ) || ! is_object( $order ) || ! method_exists( $order, 'get_id' ) || ! method_exists( $item, 'get_product_id' ) ) {
+			return;
+		}
+
+		$product_id    = $item->get_product_id();
+		$base_dir      = Handler::get_dir_path();
+		$confirmed_dir = Handler::get_dir_path( 'confirmed/' . $order->get_id() );
+
+		foreach ( $fields as $values ) {
+			if ( ! is_array( $values ) ) {
+				continue;
+			}
+
+			foreach ( $values as $file_data ) {
+				if ( ! is_array( $file_data ) || empty( $file_data['org'] ) ) {
+					continue;
+				}
+
+				$file_name = $file_data['org'];
+				$confirmed = $confirmed_dir . Handler::file_get_name( $file_name, $product_id );
+
+				if ( ! file_exists( $base_dir . $file_name ) && file_exists( $confirmed ) ) {
+					copy( $confirmed, $base_dir . $file_name );
+				}
+			}
+		}
 	}
 
 	/**

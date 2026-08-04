@@ -98,3 +98,4 @@ Use `/tdd` for every non-trivial bug fix — red-green-refactor keeps fixes anch
 When writing the failing test, consider the surfaces in the Security section above (lifecycle hooks, pricing idempotency, legacy vs modern mode, Pro gating, REST/AJAX auth paths).
 
 Skip `/tdd` for: typo/copy/doc fixes, dependency bumps with no behavioral change, and hotfixes where reproduction needs production data the test env can't reach — document manual repro in the PR and add the regression test as a follow-up.
+

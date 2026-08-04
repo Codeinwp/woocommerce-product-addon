@@ -48,6 +48,35 @@ async function createSimpleProduct( requestUtils, overrides = {} ) {
 		status: overrides.status ?? 'publish',
 		regular_price: overrides.regular_price ?? '9.99',
 		category_ids: normalizeCategoryIds( overrides ),
+		virtual: overrides.virtual === true ? 'true' : undefined,
+	} );
+}
+
+/**
+ * Enable Cash on Delivery and disable coming-soon mode so storefront
+ * checkout flows can complete.
+ *
+ * @param {import('@wordpress/e2e-test-utils-playwright').RequestUtils} requestUtils Request utility.
+ *
+ * @return {Promise<object>}
+ */
+async function setupCheckout( requestUtils ) {
+	return postBootstrapAction( requestUtils, 'ppom_e2e_setup_checkout', {} );
+}
+
+/**
+ * Update a WooCommerce order status (e.g. 'completed' so Order Again renders).
+ *
+ * @param {import('@wordpress/e2e-test-utils-playwright').RequestUtils} requestUtils Request utility.
+ * @param {number} orderId Order ID.
+ * @param {string} status  Target status without the wc- prefix.
+ *
+ * @return {Promise<object>}
+ */
+async function setOrderStatus( requestUtils, orderId, status ) {
+	return postBootstrapAction( requestUtils, 'ppom_e2e_set_order_status', {
+		order_id: orderId,
+		status,
 	} );
 }
 
@@ -125,4 +154,6 @@ export {
 	createSimpleProduct,
 	createSimpleProducts,
 	createVariableProduct,
+	setOrderStatus,
+	setupCheckout,
 };

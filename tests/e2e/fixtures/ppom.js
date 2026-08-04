@@ -135,6 +135,36 @@ async function getPpomAttachRowMeta( requestUtils, { ppomId } ) {
 	} );
 }
 
+async function setPpomGroupReadFailure( requestUtils, { enabled } ) {
+	return postBootstrapAction(
+		requestUtils,
+		'ppom_e2e_set_group_read_failure',
+		{
+			enabled: enabled ? '1' : '0',
+		}
+	);
+}
+
+async function getProductPpomAssignment( requestUtils, { productId } ) {
+	return postBootstrapAction(
+		requestUtils,
+		'ppom_e2e_get_product_ppom_assignment',
+		{
+			product_id: productId,
+		}
+	);
+}
+
+async function deletePpomGroupRows( requestUtils, { ppomIds } ) {
+	return postBootstrapAction(
+		requestUtils,
+		'ppom_e2e_delete_ppom_group_rows',
+		{
+			ppom_ids: ppomIds,
+		}
+	);
+}
+
 export {
 	attachPpomGroupToCategories,
 	attachPpomGroupToProducts,
@@ -142,5 +172,8 @@ export {
 	createLegacyPpomGroup,
 	createPpomGroup,
 	createSimpleTextGroup,
+	deletePpomGroupRows,
 	getPpomAttachRowMeta,
+	getProductPpomAssignment,
+	setPpomGroupReadFailure,
 };

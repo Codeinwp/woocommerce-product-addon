@@ -109,6 +109,8 @@ final class SdkCompatAndMetadataRegistration implements RegisterHooks {
 		add_filter(
 			'woocommerce_product_addon_float_widget_metadata',
 			function () {
+				$support_link = defined( 'PPOM_PRO_PATH' ) ? tsdk_support_link( PPOM_PRO_PATH . '/ppom.php' ) : false;
+
 				return array(
 					'logo'                 => PPOM_URL . '/images/help.svg',
 					'nice_name'            => 'PPOM',
@@ -117,7 +119,7 @@ final class SdkCompatAndMetadataRegistration implements RegisterHooks {
 					'has_upgrade_menu'     => ! defined( 'PPOM_PRO_PATH' ),
 					'upgrade_link'         => tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'float_widget' ),
 					'documentation_link'   => 'https://rviv.ly/C1cmSQ',
-					'premium_support_link' => defined( 'PPOM_PRO_PATH' ) ? tsdk_translate_link( (string) tsdk_support_link( PPOM_PRO_PATH . '/ppom.php' ) ) : '',
+					'premium_support_link' => $support_link ? tsdk_translate_link( $support_link ) : '',
 					'feature_request_link' => tsdk_translate_link( 'https://store.themeisle.com/suggest-a-feature/' ),
 				);
 			}

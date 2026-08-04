@@ -28,18 +28,11 @@ if ( isset( $fm->options()[0]['option'] ) && $fm->options()[0]['option'] == '' )
 
 $view_control = $fm->get_meta_value( 'view_control' );
 
-/* 
-**========= IMPORTANT ========= 
-* 1- if price matrix is used and quantities has price set or default price
-* 2- it will conflict. So to use with price matrix prices should not be set
-*/
-$product_id   = ppom_get_product_id( $product );
-$matrix_found = ppom_has_field_by_type( $product_id, 'pricematrix' );
-if ( ! empty( $matrix_found ) && ppom_is_field_has_price( $field_meta ) ) {
-	$error_msg = __( 'Quantities cannot be used with Price Matrix, Remove prices from quantities input.', 'woocommerce-product-addon' );
-
-	return sprintf( '<div class="woocommerce-error">%s</div>', $error_msg );
-}
+/*
+ * When a price matrix is attached, quantities render but their own option
+ * prices are ignored (blanked in ppom_convert_options_to_key_val) — the
+ * matrix drives pricing based on the total quantity.
+ */
 
 ?>
 

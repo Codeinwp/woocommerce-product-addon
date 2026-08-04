@@ -234,9 +234,6 @@ final class LegacyCartLinePricing {
 			if ( ! $ppom_quantities_include_base ) {
 				// $ppom_item_org_price = ($ppom_item_org_price * $ppom_total_quantities);
 				$ppom_item_org_price = 0;
-
-				// when base price is NOT included the quantity is updated so it must be multiplied by options
-				$total_option_price = ( $total_option_price * $ppom_total_quantities );
 			}
 		}
 

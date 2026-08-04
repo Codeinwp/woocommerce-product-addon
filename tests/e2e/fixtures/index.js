@@ -5,12 +5,17 @@ export {
 	createLegacyPpomGroup,
 	createPpomGroup,
 	createSimpleTextGroup,
+	deletePpomGroupRows,
 	getPpomAttachRowMeta,
+	getProductPpomAssignment,
+	setPpomGroupReadFailure,
 } from './ppom.js';
 export {
 	buildCheckboxField,
 	buildFileField,
 	buildHtmlField,
+	buildPriceMatrixField,
+	buildQuantitiesField,
 	buildSelectField,
 	buildTextField,
 	buildTextareaField,
@@ -24,4 +29,6 @@ export {
 	createSimpleProduct,
 	createSimpleProducts,
 	createVariableProduct,
+	setOrderStatus,
+	setupCheckout,
 } from './woocommerce.js';

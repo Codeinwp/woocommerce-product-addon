@@ -1,3 +1,38 @@
+##### [Version 34.0.8](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.7...v34.0.8) (2026-07-31)
+
+- Fixed an issue where quantity fields with prices would not appear on the product page when a price matrix was attached to the same product.
+- Fixed a fatal error that occurred when displaying product fields on pages using the PPOM shortcode.
+- Fixed an issue where a dropdown field revealed by conditional logic would appear empty instead of showing its default option.
+- Fixed an issue where prices from selected product options could disappear from the cart total when another plugin also adjusted product prices.
+- Fixed an issue where prices from selected product options were not counted in the cart total right after adding a product to the cart.
+- Fixed an issue where the scheduled cleanup of abandoned file uploads never ran, leaving unused files on the server indefinitely.
+- Locked fields in the field picker now show which plan unlocks them — Essential, Plus or VIP — instead of a generic “PRO” badge.
+- Updated dependencies
+- Enhanced Security
+
+##### [Version 34.0.7](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.6...v34.0.7) (2026-07-20)
+
+- Fixed product form assignments regression
+
+##### [Version 34.0.6](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.5...v34.0.6) (2026-07-16)
+
+- Fixed uploaded files being lost when customers use **Order Again** — files now stay accessible across orders ([#662](https://github.com/Codeinwp/woocommerce-product-addon/issues/662))
+- Fixed the add-ons admin menu running off-screen on stores with many field groups; it now scrolls ([#666](https://github.com/Codeinwp/woocommerce-product-addon/issues/666))
+- Removed incorrect PHP warnings and a broken support link that appeared when no valid license was active ([#667](https://github.com/Codeinwp/woocommerce-product-addon/issues/667))
+- Fixed uploading HEIC/HEIF (iPhone) photos in the file upload field ([#668](https://github.com/Codeinwp/woocommerce-product-addon/issues/668))
+- Fixed option prices not always showing correctly on the product page ([#669](https://github.com/Codeinwp/woocommerce-product-addon/issues/669))
+- Fixed option prices being wrongly multiplied by another field's quantity, which could overcharge customers ([#670](https://github.com/Codeinwp/woocommerce-product-addon/issues/670))
+- Fixed conditional logic breaking on checkbox fields after exporting and re-importing a field group ([#672](https://github.com/Codeinwp/woocommerce-product-addon/issues/672))
+- Fixed conditional fields not appearing in the cart when their rules spanned multiple fields ([#673](https://github.com/Codeinwp/woocommerce-product-addon/issues/673))
+
+##### [Version 34.0.5](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.4...v34.0.5) (2026-07-10)
+
+- Updated file upload chunk size handling and fixed file uploads
+- Fixed argument type causing errors in edge cases
+- Improved condition handling
+- Preserve uploaded image when changing crop size
+- Fixed issue where HTML fields with Show in Cart off still appears in cart item data
+
 ##### [Version 34.0.4](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.3...v34.0.4) (2026-06-24)
 
 - Enhanced security

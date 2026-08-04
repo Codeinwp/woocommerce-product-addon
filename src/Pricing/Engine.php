@@ -109,7 +109,7 @@ final class Engine {
 			$wc_product        = $cart_item['data'];
 			$ppom_fields_post  = $cart_item['ppom']['fields'];
 			$product_quantity  = floatval( $cart_item['quantity'] );
-			$ppom_field_prices = self::get_field_prices( $ppom_fields_post, $product_id, $product_quantity, $variation_id );
+			$ppom_field_prices = self::get_field_prices( $ppom_fields_post, $product_id, $product_quantity, $variation_id, $cart_item );
 			$ppom_discount     = 0;
 			$ppom_pricematrix  = isset( $cart_item['ppom']['price_matrix_found'] ) ? $cart_item['ppom']['price_matrix_found'] : null;
 			// ppom_pa($product_quantity);
@@ -119,7 +119,10 @@ final class Engine {
 			$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
 			$total_cart_fee_price = self::price_get_cart_fee_total( $ppom_field_prices );
 
-			$product_price = apply_filters( 'ppom_product_price_on_cart', $wc_product->get_price(), $cart_item );
+			// Base on the pristine catalog price, not the mutated in-cart price, so repeated passes never double-count.
+			$pristine      = wc_get_product( $variation_id ? $variation_id : $product_id );
+			$product_price = $pristine ? $pristine->get_price() : $wc_product->get_price();
+			$product_price = apply_filters( 'ppom_product_price_on_cart', $product_price, $cart_item );
 
 			// $context     = 'cart';
 			// $product_price   = Helpers::get_product_price( $product, $variation_id, $context);
@@ -145,8 +148,8 @@ final class Engine {
 
 			$ppom_total_price = $total_addon_price + $product_base_price - $ppom_discount;
 
-			do_action( 'ppom_before_calculate_cart_total', $ppom_field_prices, $ppom_fields_post, $cart_item );
-			$ppom_total_price = apply_filters( 'ppom_cart_line_total', $ppom_total_price, $cart_items, $cart_item );
+			// No ppom_before_calculate_cart_total here: its weight listener is not idempotent and would stack weight each pass.
+			$ppom_total_price = apply_filters( 'ppom_cart_line_total', $ppom_total_price, $cart_item, $cart_item );
 			$cart_item['data']->set_price( $ppom_total_price );
 		}
 	}
@@ -191,7 +194,7 @@ final class Engine {
 
 			// var_dump($data_name);
 
-			$value = ! is_array( $value ) ? stripcslashes( $value ) : $value;
+			$value = wp_unslash( $value );
 
 			$field_meta = Helpers::get_field_meta_by_dataname( $product_id, $data_name, $ppom_meta_ids );
 			$product    = wc_get_product( $product_id );
@@ -215,7 +218,7 @@ final class Engine {
 			switch ( $field_type ) {
 
 				case 'bulkquantity':
-					$options = isset( $field_meta['options'] ) ? json_decode( stripcslashes( $field_meta['options'] ), true ) : array();
+					$options = isset( $field_meta['options'] ) ? json_decode( wp_unslash( $field_meta['options'] ), true ) : array();
 					break;
 				case 'image':
 					$options = isset( $field_meta['images'] ) ? Helpers::convert_options_to_key_val( $field_meta['images'], $field_meta, $product ) : array();
@@ -301,12 +304,10 @@ final class Engine {
 			// ppom_pa($options);
 
 
-			$field_price     = '';
+			$field_price = '';
+			// Option prices are one-off charges per line item; quantity fields
+			// must not multiply other fields' option prices.
 			$option_quantity = 1;
-
-			if ( Helpers::reset_cart_quantity_to_one( $product_id ) ) {
-				$option_quantity = self::price_get_total_quantities( $ppom_fields_post, $product_id );
-			}
 
 			switch ( $field_type ) {
 
@@ -326,7 +327,7 @@ final class Engine {
 					foreach ( $options as $option ) {
 
 						$option_raw = Helpers::wpml_translate( $option['raw'], 'PPOM' );
-						if ( $option_raw == stripcslashes( $value ) ) {
+						if ( $option_raw == wp_unslash( $value ) ) {
 
 							$option_price   = isset( $option['raw_price'] ) ? $option['raw_price'] : '';
 							$option_percent = isset( $option['percent'] ) ? $option['percent'] : '';
@@ -352,11 +353,11 @@ final class Engine {
 				case 'checkbox':
 					foreach ( $options as $option ) {
 
-						if ( $value ) {
+						if ( is_array( $value ) ) {
 							foreach ( $value as $val ) {
 
 								$option_raw = Helpers::wpml_translate( $option['raw'], 'PPOM' );
-								if ( $option_raw == stripcslashes( $val ) ) {
+								if ( $option_raw == wp_unslash( $val ) ) {
 
 									$option_price = isset( $option['raw_price'] ) ? $option['raw_price'] : '';
 
@@ -454,7 +455,7 @@ final class Engine {
 				case 'palettes':
 					foreach ( $options as $option ) {
 
-						if ( $value ) {
+						if ( is_array( $value ) ) {
 							foreach ( $value as $color ) {
 
 								if ( $option['raw'] == $color ) {
@@ -494,7 +495,7 @@ final class Engine {
 
 				case 'image':
 					foreach ( $options as $option ) {
-						if ( $value ) {
+						if ( is_array( $value ) ) {
 							foreach ( $value as $images_meta ) {
 
 								$images_meta     = json_decode( stripslashes( $images_meta ), true );
@@ -525,7 +526,7 @@ final class Engine {
 				case 'audio':
 					foreach ( $options as $option ) {
 
-						if ( $value ) {
+						if ( is_array( $value ) ) {
 							foreach ( $value as $images_meta ) {
 
 								$images_meta = json_decode( stripslashes( $images_meta ), true );

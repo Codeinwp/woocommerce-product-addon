@@ -41,8 +41,67 @@ const Cropped_Data_Captured = false;
 
 // Track nonce refresh state to avoid duplicate requests
 let nonceRefreshPromise = null;
-let lastNonceRefreshTime = 0;
+let lastNonceRefreshTime = Date.now();
 const NONCE_CACHE_DURATION = 300000; // 5 minutes in milliseconds
+
+/**
+ * Storage key holding this browser's proof that it uploaded a given file.
+ *
+ * @param {string} fileName Stored file name.
+ * @return {string} Key under which the token is kept.
+ */
+function ppom_delete_token_key( fileName ) {
+	return 'ppom_delete_token_' + fileName;
+}
+
+/**
+ * Keeps the delete token for an upload so it survives leaving the page.
+ *
+ * A form rendered again from the cart carries no token: the server must never
+ * sign a file name it was handed, or it becomes a delete-token oracle. Holding
+ * the proof in the browser keeps it available without asking the server to
+ * vouch for a name it did not just store.
+ *
+ * @param {string} fileName Stored file name.
+ * @param {string} token    Token issued with the upload.
+ * @return {void}
+ */
+function ppom_remember_delete_token( fileName, token ) {
+	if ( ! fileName || ! token ) {
+		return;
+	}
+
+	try {
+		window.sessionStorage.setItem(
+			ppom_delete_token_key( fileName ),
+			token
+		);
+	} catch ( error ) {
+		// Private browsing or a full quota: the session check still applies.
+	}
+}
+
+/**
+ * Returns the kept token for an upload, if this browser still has one.
+ *
+ * @param {string} fileName Stored file name.
+ * @return {string} Token, or an empty string.
+ */
+function ppom_read_delete_token( fileName ) {
+	if ( ! fileName ) {
+		return '';
+	}
+
+	try {
+		return (
+			window.sessionStorage.getItem(
+				ppom_delete_token_key( fileName )
+			) || ''
+		);
+	} catch ( error ) {
+		return '';
+	}
+}
 
 /**
  * Fetches fresh nonces from the REST API endpoint.
@@ -72,6 +131,7 @@ async function ppom_refresh_file_nonces() {
 		credentials: 'same-origin',
 		headers: {
 			'Content-Type': 'application/json',
+			'X-WP-Nonce': ppom_file_vars.wp_rest_nonce,
 		},
 	} )
 		.then( ( response ) => {
@@ -183,9 +243,13 @@ jQuery( function ( $ ) {
 					const croppie_container = jQuery(
 						'.ppom-croppie-preview-' + image_id
 					);
-					const image_url = jQuery( croppie_dom )
-						.find( 'img' )
-						.attr( 'src' );
+					// Destroy the current Croppie instance before re-initialising.
+					// Do NOT read image src from the DOM here: Croppie can replace
+					// it with a blob/data URL or remove the element entirely during
+					// destroy(), producing an invalid URL. The canonical upload URL
+					// is already stored in
+					// file_list_preview_containers[data_name].image_url (set by
+					// ppom_show_cropped_preview) and must not be overwritten.
 					$( croppie_dom ).croppie( 'destroy' );
 					const viewport = { width: v_width, height: v_height };
 
@@ -194,8 +258,6 @@ jQuery( function ( $ ) {
 					] = croppie_container;
 					file_list_preview_containers[ data_name ].image_id =
 						image_id;
-					file_list_preview_containers[ data_name ].image_url =
-						image_url;
 
 					ppom_set_croppie_options( data_name, viewport, image_id );
 				} );
@@ -220,7 +282,13 @@ jQuery( function ( $ ) {
 				return;
 			}
 
-			const ppomFileWrapper = e.target.closest( '.ppom-file-wrapper' );
+			// Fresh uploads are wrapped by the uploader in `.ppom-file-wrapper`;
+			// files the server renders back into the form get `.u_i_c_box` instead.
+			// Both carry data-fileid, so accept either or delete does nothing on a
+			// restored file.
+			const ppomFileWrapper = e.target.closest(
+				'.ppom-file-wrapper, .u_i_c_box'
+			);
 			const fileId = ppomFileWrapper?.getAttribute( 'data-fileid' );
 			const ppomFieldWrapper = e.target.closest(
 				'div.ppom-field-wrapper'
@@ -249,9 +317,11 @@ jQuery( function ( $ ) {
 			}
 
 			// Delete animation.
-			const imageElement = document.querySelector(
-				`#u_i_c_${ fileId } img`
-			);
+			// Scoped to this click's wrapper, not looked up by id: restored ids come
+			// from each field's own array key, so the first file of every field is
+			// `u_i_c_0` and a document lookup would leave another field's thumbnail
+			// showing the spinner for good.
+			const imageElement = ppomFileWrapper?.querySelector( 'img' );
 			if ( imageElement ) {
 				imageElement.src = `${ ppom_file_vars.plugin_url }/images/loading.gif`;
 			}
@@ -273,6 +343,18 @@ jQuery( function ( $ ) {
 				ppom_nonce: ppom_file_vars.ppom_file_delete_nonce,
 			} );
 
+			// On the page that performed the upload the token is on the input. A form
+			// rendered again from the cart has no token in its markup -- the server
+			// must not sign a file name it is handed, or it becomes an oracle -- so
+			// fall back to the copy this browser kept.
+			const deleteToken =
+				checkbox?.dataset?.deleteToken ||
+				ppom_read_delete_token( fileName );
+
+			if ( deleteToken ) {
+				data.append( 'ppom_delete_token', deleteToken );
+			}
+
 			try {
 				const response = await fetch( ppom_file_vars.ajaxurl, {
 					method: 'POST',
@@ -289,21 +371,23 @@ jQuery( function ( $ ) {
 					return;
 				}
 
-				// Update UI
-				const fileContainer = document.querySelector(
-					`#u_i_c_${ fileId }`
-				);
-				if ( fileContainer ) {
-					fileContainer.remove();
+				// The token is deliberately kept. delete_file() ends in die( 0 ), so a
+				// refusal also answers 200 and there is no signal here that survives
+				// translation; discarding on this path threw away the shopper's only
+				// proof and made the file impossible to remove. Entries are per tab
+				// and go when it closes.
+
+				// Update UI. Remove the wrapper this click resolved rather than
+				// looking one up by id: restored ids come from each field's own array
+				// key, so the first file of every field is `u_i_c_0` and a document
+				// lookup would take whichever comes first, stripping another field's
+				// value out of the form.
+				if ( ppomFileWrapper ) {
+					ppomFileWrapper.remove();
 				}
 
 				if ( checkbox ) {
 					checkbox.remove();
-				}
-
-				const parentBox = e.target.closest( '.u_i_c_box' );
-				if ( parentBox ) {
-					parentBox.remove();
 				}
 
 				const croppiePreview = document.querySelector(
@@ -472,20 +556,25 @@ function ppom_set_croppie_options( file_name, viewport, image_id ) {
 	const croppie_options = ppom_file_vars.croppie_options;
 	jQuery.each( croppie_options, function ( field_name, option ) {
 		if ( file_name === field_name ) {
-			option.url = file_list_preview_containers[ file_name ].image_url;
+			// Deep-copy the shared options object so we never mutate the
+			// original — repeated size changes would otherwise accumulate stale
+			// url / viewport values from a previous call.
+			const workingOption = jQuery.extend( true, {}, option );
+			workingOption.url =
+				file_list_preview_containers[ file_name ].image_url;
 			if ( viewport !== undefined ) {
-				viewport.type = option.viewport.type;
-				option.viewport = viewport;
+				viewport.type = workingOption.viewport.type;
+				workingOption.viewport = viewport;
 			}
 
 			const preview = file_list_preview_containers[ file_name ];
-			let applied = option;
+			let applied = workingOption;
 			if (
 				preview.container_width !== undefined &&
 				preview.container_width !== null
 			) {
 				applied = get_responsive_croppie_options(
-					option,
+					workingOption,
 					preview.container_width
 				);
 			}
@@ -564,7 +653,7 @@ function ppom_setup_file_upload_input( file_input ) {
 		max_file_size: file_input.file_size,
 		max_file_count: parseInt( file_input.files_allowed ),
 		unique_names: ppom_file_vars.enable_file_rename,
-		chunk_size: '2mb',
+		chunk_size: file_input.chunk_size || '1mb',
 
 		filters: {
 			mime_types: [
@@ -863,6 +952,11 @@ function ppom_setup_file_upload_input( file_input ) {
 				input_class +=
 					file_input.required === 'on' ? ' ppom-required' : '';
 
+				ppom_remember_delete_token(
+					obj_resp.file_name,
+					obj_resp.delete_token
+				);
+
 				// Add file check
 				jQuery(
 					'<input checked="checked" name="ppom[fields][' +
@@ -873,6 +967,9 @@ function ppom_setup_file_upload_input( file_input ) {
 				)
 					.attr( 'data-price', file_input.file_cost )
 					.attr( 'data-label', obj_resp.file_name )
+					// Proof this visitor uploaded the file, replayed on delete. Also
+					// kept in the browser so it survives leaving this page.
+					.attr( 'data-delete-token', obj_resp.delete_token || '' )
 					.attr( 'data-data_name', file_input.data_name )
 					.attr( 'data-title', file_input.title )
 					.attr( 'data-onetime', file_input.onetime )

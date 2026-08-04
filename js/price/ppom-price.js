@@ -175,6 +175,9 @@ function ppom_update_option_prices() {
 	let show_per_unit_price = false;
 	// unlink order quantity controlled by variation quantities
 	let unlink_order_qty = false;
+	// order quantity is driven by priced quantity fields, so other options
+	// are one-off charges and must not scale with it
+	let qty_set_by_priced_quantities = false;
 
 	// console.log(ppom_all_option_prices);
 
@@ -279,6 +282,10 @@ function ppom_update_option_prices() {
 		// since v18.0 if no price set, no need to use base price
 		if ( option.price == '' || option.price == 0 ) {
 			return;
+		}
+
+		if ( option.unlink_qty !== 'on' ) {
+			qty_set_by_priced_quantities = true;
 		}
 
 		const variation_price = option.price;
@@ -455,8 +462,10 @@ function ppom_update_option_prices() {
 			return;
 		}
 
-		const option_price_with_qty =
-			ppom_get_order_quantity() * parseFloat( option.price );
+		const option_qty = qty_set_by_priced_quantities
+			? 1
+			: ppom_get_order_quantity();
+		const option_price_with_qty = option_qty * parseFloat( option.price );
 		// Totals the options
 		ppom_option_total += option_price_with_qty;
 
@@ -471,7 +480,7 @@ function ppom_update_option_prices() {
 			' ' +
 			jQuery( price_tag ).html() +
 			' x ' +
-			ppom_get_order_quantity();
+			option_qty;
 
 		ppom_add_price_item_in_table(
 			option_label_with_qty,

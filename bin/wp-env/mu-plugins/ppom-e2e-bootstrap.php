@@ -31,6 +31,49 @@ if ( ! defined( 'PPOM_E2E_LICENSE_FILTER_PRIORITY' ) ) {
 	define( 'PPOM_E2E_LICENSE_FILTER_PRIORITY', PHP_INT_MAX - 10 );
 }
 
+if ( ! defined( 'PPOM_E2E_BREAK_GROUP_READS_OPTION' ) ) {
+	define( 'PPOM_E2E_BREAK_GROUP_READS_OPTION', 'ppom_e2e_break_group_reads' );
+}
+
+/**
+ * Rewrite SELECTs on the PPOM field-group table to a nonexistent table so they
+ * error out, simulating a transient DB read failure (lock/timeout/dropped
+ * connection) for E2E coverage of issue #679.
+ *
+ * @param string $query SQL query.
+ * @return string
+ */
+function ppom_e2e_break_group_reads_query( $query ) {
+	global $wpdb;
+
+	if ( ! defined( 'PPOM_TABLE_META' ) ) {
+		return $query;
+	}
+
+	$table = $wpdb->prefix . PPOM_TABLE_META;
+
+	if ( 0 === stripos( ltrim( $query ), 'SELECT' ) && false !== strpos( $query, $table ) ) {
+		return str_replace( $table, $table . '_e2e_missing', $query );
+	}
+
+	return $query;
+}
+
+/**
+ * Arm the group-read failure simulation when the fixture option is on.
+ *
+ * Registered at plugins_loaded so PPOM_TABLE_META exists and every later
+ * front-end read (wp_enqueue_scripts → PPOM_Meta) goes through the filter.
+ *
+ * @return void
+ */
+function ppom_e2e_maybe_arm_group_read_failure() {
+	if ( get_option( PPOM_E2E_BREAK_GROUP_READS_OPTION ) ) {
+		add_filter( 'query', 'ppom_e2e_break_group_reads_query' );
+	}
+}
+add_action( 'plugins_loaded', 'ppom_e2e_maybe_arm_group_read_failure', 20 );
+
 /**
  * Ensure product fixture pages render through WooCommerce's product template.
  *
@@ -956,6 +999,10 @@ function ppom_e2e_create_simple_product() {
 	$product->set_price( $regular_price );
 	$product->set_category_ids( ppom_e2e_normalize_category_ids( $category_ids ) );
 
+	if ( isset( $_POST['virtual'] ) && 'true' === $_POST['virtual'] ) {
+		$product->set_virtual( true );
+	}
+
 	$product_id = $product->save();
 
 	if ( ! $product_id ) {
@@ -1392,6 +1439,116 @@ add_action( 'wp_ajax_ppom_e2e_read_license_fixture', 'ppom_e2e_read_license_fixt
 add_action( 'wp_ajax_nopriv_ppom_e2e_read_license_fixture', 'ppom_e2e_read_license_fixture' );
 
 /**
+ * Toggle the simulated transient failure of PPOM field-group reads.
+ *
+ * @return void
+ */
+function ppom_e2e_set_group_read_failure() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$enabled_raw = isset( $_POST['enabled'] ) ? sanitize_text_field( wp_unslash( $_POST['enabled'] ) ) : '';
+	$enabled     = in_array( $enabled_raw, array( '1', 'true', 'yes' ), true );
+
+	if ( $enabled ) {
+		update_option( PPOM_E2E_BREAK_GROUP_READS_OPTION, '1', false );
+	} else {
+		delete_option( PPOM_E2E_BREAK_GROUP_READS_OPTION );
+	}
+
+	wp_send_json_success(
+		array(
+			'enabled' => $enabled,
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_set_group_read_failure', 'ppom_e2e_set_group_read_failure' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_set_group_read_failure', 'ppom_e2e_set_group_read_failure' );
+
+/**
+ * Read a product's raw PPOM assignment post meta (for E2E assertions).
+ *
+ * @return void
+ */
+function ppom_e2e_get_product_ppom_assignment() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$product_id = isset( $_POST['product_id'] ) ? absint( wp_unslash( $_POST['product_id'] ) ) : 0;
+
+	if ( $product_id <= 0 ) {
+		wp_send_json_error(
+			array(
+				'message' => 'A valid product_id is required.',
+			),
+			400
+		);
+	}
+
+	if ( ! defined( 'PPOM_PRODUCT_META_KEY' ) ) {
+		wp_send_json_error(
+			array(
+				'message' => 'PPOM product meta key constant is unavailable.',
+			),
+			500
+		);
+	}
+
+	$raw = get_post_meta( $product_id, PPOM_PRODUCT_META_KEY, true );
+
+	wp_send_json_success(
+		array(
+			'exists'   => metadata_exists( 'post', $product_id, PPOM_PRODUCT_META_KEY ),
+			'meta_ids' => array_values( array_filter( array_map( 'absint', (array) $raw ) ) ),
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_get_product_ppom_assignment', 'ppom_e2e_get_product_ppom_assignment' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_get_product_ppom_assignment', 'ppom_e2e_get_product_ppom_assignment' );
+
+/**
+ * Hard-delete PPOM field-group rows, leaving product assignments untouched.
+ *
+ * Simulates a genuinely deleted group so E2E can assert the stale-assignment
+ * cleanup in PPOM_Meta::get_fields() still runs on confirmed absence.
+ *
+ * @return void
+ */
+function ppom_e2e_delete_ppom_group_rows() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$ppom_ids = ppom_e2e_decode_json_request( 'ppom_ids', array() );
+
+	if ( is_wp_error( $ppom_ids ) ) {
+		ppom_e2e_send_wp_error( $ppom_ids );
+	}
+
+	$ppom_ids = is_array( $ppom_ids )
+		? array_values( array_unique( array_filter( array_map( 'absint', $ppom_ids ) ) ) )
+		: array();
+
+	if ( empty( $ppom_ids ) ) {
+		wp_send_json_error(
+			array(
+				'message' => 'At least one valid ppom_id is required.',
+			),
+			400
+		);
+	}
+
+	$deleted = ppom_meta_repository()->delete_by_ids( $ppom_ids );
+
+	wp_send_json_success(
+		array(
+			'deleted_rows' => false !== $deleted ? (int) $deleted : 0,
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_delete_ppom_group_rows', 'ppom_e2e_delete_ppom_group_rows' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_delete_ppom_group_rows', 'ppom_e2e_delete_ppom_group_rows' );
+
+/**
  * Reset PPOM E2E fixture state.
  *
  * @return void
@@ -1419,6 +1576,7 @@ function ppom_e2e_reset_state() {
 
 	delete_option( PPOM_E2E_META_IDS_OPTION );
 	delete_option( PPOM_E2E_LICENSE_FIXTURE_OPTION );
+	delete_option( PPOM_E2E_BREAK_GROUP_READS_OPTION );
 	update_option( 'woocommerce_coming_soon', 'no', false );
 	update_option( 'woocommerce_store_pages_only', 'no', false );
 
@@ -1490,3 +1648,79 @@ function ppom_e2e_reset_state() {
 }
 add_action( 'wp_ajax_ppom_e2e_reset_state', 'ppom_e2e_reset_state' );
 add_action( 'wp_ajax_nopriv_ppom_e2e_reset_state', 'ppom_e2e_reset_state' );
+
+/**
+ * Prepare the store for storefront checkout flows: enable Cash on Delivery
+ * and make sure the storefront is not in coming-soon mode.
+ *
+ * @return void
+ */
+function ppom_e2e_setup_checkout() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	if ( ! function_exists( 'WC' ) ) {
+		wp_send_json_error(
+			array(
+				'message' => 'WooCommerce is unavailable.',
+			),
+			500
+		);
+	}
+
+	$cod            = get_option( 'woocommerce_cod_settings', array() );
+	$cod['enabled'] = 'yes';
+	update_option( 'woocommerce_cod_settings', $cod );
+	update_option( 'woocommerce_coming_soon', 'no' );
+
+	// A fresh wp-env install has no WooCommerce pages; My Account is needed
+	// for view-order screens and the Order Again button.
+	if ( ! get_post( wc_get_page_id( 'myaccount' ) ) && class_exists( 'WC_Install' ) ) {
+		WC_Install::create_pages();
+	}
+
+	wp_send_json_success(
+		array(
+			'cod_enabled'   => true,
+			'myaccount_url' => wc_get_page_permalink( 'myaccount' ),
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_setup_checkout', 'ppom_e2e_setup_checkout' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_setup_checkout', 'ppom_e2e_setup_checkout' );
+
+/**
+ * Update a WooCommerce order status for fixtures (e.g. mark completed so the
+ * Order Again button renders in My Account).
+ *
+ * @return void
+ */
+function ppom_e2e_set_order_status() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$order_id = isset( $_POST['order_id'] ) ? absint( $_POST['order_id'] ) : 0;
+	$status   = isset( $_POST['status'] ) ? sanitize_key( wp_unslash( $_POST['status'] ) ) : '';
+
+	$order = function_exists( 'wc_get_order' ) ? wc_get_order( $order_id ) : false;
+
+	if ( ! $order || '' === $status ) {
+		wp_send_json_error(
+			array(
+				'message' => 'A valid order_id and status are required.',
+			),
+			400
+		);
+	}
+
+	$order->update_status( $status, 'PPOM E2E fixture status change.' );
+
+	wp_send_json_success(
+		array(
+			'order_id' => $order_id,
+			'status'   => $order->get_status(),
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_set_order_status', 'ppom_e2e_set_order_status' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_set_order_status', 'ppom_e2e_set_order_status' );

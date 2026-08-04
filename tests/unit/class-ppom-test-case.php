@@ -660,6 +660,27 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Build a section/HTML field definition.
+	 *
+	 * @param string $data_name Field data name.
+	 * @param string $title     Field title.
+	 * @param array  $overrides Field overrides.
+	 *
+	 * @return array
+	 */
+	protected function build_section_field( $data_name, $title = 'Section', $overrides = array() ) {
+		return array_merge(
+			array(
+				'type'      => 'section',
+				'title'     => $title,
+				'data_name' => $data_name,
+				'html'      => '<p>Static content</p>',
+			),
+			$overrides
+		);
+	}
+
+	/**
 	 * Count PPOM field-group rows.
 	 *
 	 * @return int
