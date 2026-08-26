@@ -49,13 +49,6 @@ $ppom_field_counter    = 0;
 $ppom_collapse_counter = 0;
 $allow_nextprev        = ppom_get_option( 'ppom-collapse-nextprev' );
 
-$collapse_fields = array_filter(
-	$ppom_fields_meta,
-	function ( $collapse_field ) {
-		return isset( $collapse_field['type'] ) && 'collapse' === $collapse_field['type'];
-	}
-);
-
 foreach ( $ppom_fields_meta as $meta ) {
 
 	$type          = ( isset( $meta['type'] ) ? $meta ['type'] : '' );
@@ -216,12 +209,12 @@ foreach ( $ppom_fields_meta as $meta ) {
 		}
 
 		if ( $collapse_type == 'end' ) {
-			echo '<div class="ppom-collapsed-child-end"></div>';
+			echo '<div class="ppom-collapsed-child-end">';
 		}
 
 		if ( $collapse_type != 'end' ) {
-			echo '<h4 data-collapse-id="' . esc_attr( $data_name ) . '" class="ppom-collapsed-title">' . $title . '</h4>';
-			echo '<div class="collapsed-child"></div>';
+			echo '<h4 data-collapse-id="' . esc_attr( $data_name ) . '" class="ppom-collapsed-title">' . esc_html( $title ) . '</h4>';
+			echo '<div class="collapsed-child">';
 		}
 
 		$section_started = true;
@@ -747,12 +740,13 @@ foreach ( $ppom_fields_meta as $meta ) {
 	 */
 	do_action( 'ppom_rendering_inputs', $meta, $data_name, $classes, $field_label, $options );
 
-	echo '</div>';  // col-lg-*
+	echo '</div>';  // col-lg-*.
+}
 
-	if ( count( $collapse_fields ) === $ppom_collapse_counter && $section_started ) {
-		echo '</div>';
-		$section_started = false;
-	}
+// Closes the last open collapse section.
+if ( $section_started ) {
+	echo '</div>';
+	$section_started = false;
 }
 
 echo '</div>'; // Ends form-row
