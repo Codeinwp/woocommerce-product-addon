@@ -564,7 +564,7 @@ class PPOM_FRONTEND_SCRIPTS {
 
 				// Conditional fields
 				if ( ! empty( $ppom_conditional_fields ) || apply_filters( 'ppom_enqueue_conditions_js', false ) ) {
-					$input_js_vars['conditions'] = $ppom_conditional_fields;
+					$input_js_vars['conditions']             = $ppom_conditional_fields;
 					$input_js_vars['conditions_pro_enabled'] = $conditions_pro_enabled ? 'yes' : 'no';
 
 					$ppom_conditions_script = ppom_get_conditions_mode() === 'new' ? 'ppom-conditions-v2' : 'ppom-conditions';
