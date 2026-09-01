@@ -300,34 +300,52 @@ function ppom_toggle_condition_visibility( $fields, visible ) {
 		.addClass( 'ppom-c-hide' );
 }
 
+const ppom_field_visibility = {};
+
 // Showing/hiding a field also needs to broadcast the same lifecycle events
 // used by uploads, pricing, and validation to keep their state consistent.
-function ppom_unlock_field_from_condition( field, unlock ) {
-	const classname = '.ppom-input-' + field;
-	const visible = unlock === 'Show';
+function ppom_apply_field_visibility(
+	field,
+	visible,
+	remove_class,
+	add_class
+) {
+	const $fields = jQuery( '.ppom-input-' + field );
 
-	ppom_toggle_condition_visibility( jQuery( classname ), visible )
-		.removeClass( 'ppom-locked' )
-		.addClass( 'ppom-unlocked' )
-		.trigger( {
-			type: visible ? 'ppom_field_shown' : 'ppom_field_hidden',
-			field,
-			time: new Date(),
-		} );
+	// Classes are idempotent, so they stay in sync on every recalculation.
+	ppom_toggle_condition_visibility( $fields, visible )
+		.removeClass( remove_class )
+		.addClass( add_class );
+
+	if ( ppom_field_visibility[ field ] === visible ) {
+		return;
+	}
+
+	ppom_field_visibility[ field ] = visible;
+
+	$fields.trigger( {
+		type: visible ? 'ppom_field_shown' : 'ppom_field_hidden',
+		field,
+		time: new Date(),
+	} );
+}
+
+function ppom_unlock_field_from_condition( field, unlock ) {
+	ppom_apply_field_visibility(
+		field,
+		unlock === 'Show',
+		'ppom-locked',
+		'ppom-unlocked'
+	);
 }
 
 function ppom_lock_field_from_condition( field, lock ) {
-	const classname = '.ppom-input-' + field;
-	const visible = lock !== 'Show';
-
-	ppom_toggle_condition_visibility( jQuery( classname ), visible )
-		.removeClass( 'ppom-unlocked' )
-		.addClass( 'ppom-locked' )
-		.trigger( {
-			type: visible ? 'ppom_field_shown' : 'ppom_field_hidden',
-			field,
-			time: new Date(),
-		} );
+	ppom_apply_field_visibility(
+		field,
+		lock !== 'Show',
+		'ppom-unlocked',
+		'ppom-locked'
+	);
 
 	jQuery.event.trigger( {
 		type: 'ppom_field_locked',
@@ -389,8 +407,8 @@ function ppom_rule_matches( rule ) {
 			: ! ppom_element_value_is_empty( element_value );
 	}
 
-	// Multi-value sources (checkbox, image) compare against the whole selection
-	// for equality and against each selected value for everything else.
+	// Multi-value sources (checkbox, palettes, image) compare against the whole
+	// selection for equality and against each selected value for the rest.
 	if ( Array.isArray( element_value ) ) {
 		if ( operator === 'is' ) {
 			return jQuery.inArray( rule.element_values, element_value ) > -1;
@@ -400,11 +418,15 @@ function ppom_rule_matches( rule ) {
 			return jQuery.inArray( rule.element_values, element_value ) === -1;
 		}
 
-		return (
-			jQuery.grep( element_value, function ( item ) {
-				return ppom_compare_rule_value( item, rule );
-			} ).length > 0
-		);
+		const matched = jQuery.grep( element_value, function ( item ) {
+			return ppom_compare_rule_value( item, rule );
+		} );
+
+		if ( operator === 'not-contains' ) {
+			return matched.length === element_value.length;
+		}
+
+		return matched.length > 0;
 	}
 
 	return ppom_compare_rule_value( element_value, rule );

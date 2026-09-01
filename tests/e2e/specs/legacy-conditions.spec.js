@@ -265,7 +265,7 @@ test.describe( 'Legacy conditions script', () => {
 		await controllingSelect.selectOption( { label: noOpt.label } );
 		await expect( output ).toBeVisible();
 	} );
-	test( 'legacy: has any value / is empty operators evaluate instead of being ignored', async ( {
+	test( 'legacy: has any value operator evaluates instead of being ignored', async ( {
 		page,
 		requestUtils,
 	} ) => {
@@ -306,6 +306,50 @@ test.describe( 'Legacy conditions script', () => {
 		await source.fill( '' );
 		await source.dispatchEvent( 'change' );
 		await expect( output ).toBeHidden();
+	} );
+
+	test( 'legacy: is empty operator evaluates instead of being ignored', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const token = uniqueToken();
+		const sourceId = `legacy_empty_src_${ token }`;
+
+		await openConditionalProduct( {
+			page,
+			requestUtils,
+			groupName: `LC Empty ${ token }`,
+			targetDataName: `legacy_empty_out_${ token }`,
+			sourceFields: [
+				buildTextField( {
+					title: `Engraving ${ token }`,
+					dataName: sourceId,
+				} ),
+			],
+			rules: [
+				{
+					elements: sourceId,
+					operators: 'empty',
+					element_values: '',
+				},
+			],
+		} );
+
+		const output = page.getByLabel( 'Output' );
+		const source = page.locator(
+			`input[name="ppom[fields][${ sourceId }]"]`
+		);
+
+		// An untouched source is empty, so the target starts out revealed.
+		await expect( output ).toBeVisible();
+
+		await source.fill( 'Happy birthday' );
+		await source.dispatchEvent( 'change' );
+		await expect( output ).toBeHidden();
+
+		await source.fill( '' );
+		await source.dispatchEvent( 'change' );
+		await expect( output ).toBeVisible();
 	} );
 
 	test( 'legacy: greater than compares the real value of a Number source', async ( {
@@ -661,6 +705,168 @@ test.describe( 'Legacy conditions script', () => {
 
 		await source.fill( 'ABC' );
 		await source.dispatchEvent( 'change' );
+		await expect( output ).toBeVisible();
+	} );
+
+	test( 'legacy: typing keeps its own value in a revealed conditional field', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const token = uniqueToken();
+		const sourceId = `legacy_keep_src_${ token }`;
+		const targetId = `legacy_keep_out_${ token }`;
+
+		await openConditionalProduct( {
+			page,
+			requestUtils,
+			groupName: `LC Keep ${ token }`,
+			targetDataName: targetId,
+			sourceFields: [
+				buildTextField( {
+					title: `Engraving ${ token }`,
+					dataName: sourceId,
+				} ),
+			],
+			rules: [
+				{
+					elements: sourceId,
+					operators: 'any',
+					element_values: '',
+				},
+			],
+		} );
+
+		const output = page.getByLabel( 'Output' );
+		const source = page.locator(
+			`input[name="ppom[fields][${ sourceId }]"]`
+		);
+
+		await source.pressSequentially( 'Ana' );
+		await expect( output ).toBeVisible();
+
+		await output.pressSequentially( 'Keep me' );
+		await expect( output ).toHaveValue( 'Keep me' );
+
+		// Recalculation runs on every keystroke; the revealed target must not be
+		// reset by the lifecycle events those recalculations would emit.
+		await source.press( 'End' );
+		await source.pressSequentially( 'stasia' );
+		await expect( output ).toHaveValue( 'Keep me' );
+		await expect( source ).toHaveValue( 'Anastasia' );
+	} );
+
+	test( 'legacy: lifecycle events fire only when visibility actually flips', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const token = uniqueToken();
+		const sourceId = `legacy_events_src_${ token }`;
+
+		await openConditionalProduct( {
+			page,
+			requestUtils,
+			groupName: `LC Events ${ token }`,
+			targetDataName: `legacy_events_out_${ token }`,
+			sourceFields: [
+				buildTextField( {
+					title: `Engraving ${ token }`,
+					dataName: sourceId,
+				} ),
+			],
+			rules: [
+				{
+					elements: sourceId,
+					operators: 'any',
+					element_values: '',
+				},
+			],
+		} );
+
+		const output = page.getByLabel( 'Output' );
+		const source = page.locator(
+			`input[name="ppom[fields][${ sourceId }]"]`
+		);
+
+		await page.evaluate( () => {
+			window.ppomLifecycleEvents = [];
+			window.jQuery( document ).on(
+				'ppom_field_shown ppom_field_hidden',
+				( event ) => window.ppomLifecycleEvents.push( event.type )
+			);
+		} );
+
+		await source.pressSequentially( 'A' );
+		await expect( output ).toBeVisible();
+		expect(
+			await page.evaluate( () => window.ppomLifecycleEvents )
+		).toEqual( [ 'ppom_field_shown' ] );
+
+		// Six more keystrokes, same visibility: no further events.
+		await source.pressSequentially( 'nastas' );
+		expect(
+			await page.evaluate( () => window.ppomLifecycleEvents )
+		).toEqual( [ 'ppom_field_shown' ] );
+
+		await source.fill( '' );
+		await source.dispatchEvent( 'change' );
+		await expect( output ).toBeHidden();
+		expect(
+			await page.evaluate( () => window.ppomLifecycleEvents )
+		).toEqual( [ 'ppom_field_shown', 'ppom_field_hidden' ] );
+	} );
+
+	test( 'legacy: not-contains requires every selected value to satisfy the rule', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await setPpomLicenseFixture( requestUtils, {
+			valid: true,
+			plan: 3,
+			proInstalled: true,
+		} );
+
+		const token = uniqueToken();
+		const sourceId = `legacy_ncontains_${ token }`;
+
+		await openConditionalProduct( {
+			page,
+			requestUtils,
+			groupName: `LC Not Contains ${ token }`,
+			targetDataName: `legacy_ncontains_out_${ token }`,
+			sourceFields: [
+				buildCheckboxField( {
+					title: `Extras ${ token }`,
+					dataName: sourceId,
+					options: [
+						{ label: 'foo', value: 'foo' },
+						{ label: 'bar', value: 'bar' },
+					],
+				} ),
+			],
+			rules: [
+				{
+					elements: sourceId,
+					operators: 'not-contains',
+					element_values: '',
+					element_constant: 'foo',
+				},
+			],
+		} );
+
+		const output = page.getByLabel( 'Output' );
+		const boxes = page.locator(
+			`input[name="ppom[fields][${ sourceId }][]"]`
+		);
+
+		await boxes.nth( 1 ).check();
+		await expect( output ).toBeVisible();
+
+		// `foo` is now part of the selection, so "does not contain foo" is false
+		// even though `bar` on its own would satisfy it.
+		await boxes.nth( 0 ).check();
+		await expect( output ).toBeHidden();
+
+		await boxes.nth( 0 ).uncheck();
 		await expect( output ).toBeVisible();
 	} );
 } );
