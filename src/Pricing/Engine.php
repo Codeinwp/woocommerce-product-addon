@@ -21,6 +21,15 @@ use PPOM\Support\Helpers;
  */
 final class Engine {
 
+	/**
+	 * Stores the last base price and last written price for each cart line,
+	 * so repeated totals passes can detect whether a third party has changed
+	 * the line's price since PPOM last priced it.
+	 *
+	 * @var array<string, array<string, float>>
+	 */
+	private static $line_price_state = array();
+
 	// Cart line pricing.
 
 	/**
@@ -98,6 +107,9 @@ final class Engine {
 			return $cart_items;
 		}
 
+		// Drop state for lines no longer in the cart.
+		self::$line_price_state = array_intersect_key( self::$line_price_state, $cart_items->cart_contents );
+
 		foreach ( $cart_items->cart_contents as $cart_item_key => $cart_item ) {
 
 
@@ -119,9 +131,11 @@ final class Engine {
 			$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
 			$total_cart_fee_price = self::price_get_cart_fee_total( $ppom_field_prices );
 
-			// Base on the pristine catalog price, not the mutated in-cart price, so repeated passes never double-count.
+			// Prefer a price a third party calculated for this line; fall back to the
+			// catalog price, so repeated passes never double-count.
 			$pristine      = wc_get_product( $variation_id ? $variation_id : $product_id );
-			$product_price = $pristine ? $pristine->get_price() : $wc_product->get_price();
+			$catalog_price = $pristine ? $pristine->get_price() : $wc_product->get_price();
+			$product_price = self::resolve_line_base_price( $cart_item_key, $wc_product->get_price(), $catalog_price );
 			$product_price = apply_filters( 'ppom_product_price_on_cart', $product_price, $cart_item );
 
 			// $context     = 'cart';
@@ -151,7 +165,54 @@ final class Engine {
 			// No ppom_before_calculate_cart_total here: its weight listener is not idempotent and would stack weight each pass.
 			$ppom_total_price = apply_filters( 'ppom_cart_line_total', $ppom_total_price, $cart_item, $cart_item );
 			$cart_item['data']->set_price( $ppom_total_price );
+
+			self::$line_price_state[ $cart_item_key ] = array(
+				'written' => (float) $ppom_total_price,
+				'base'    => (float) $product_price,
+			);
 		}
+	}
+
+	/**
+	 * Resolves the base price for a cart line, given the current in-cart price and the pristine catalog price.
+	 *
+	 * @param string       $cart_item_key Cart item key.
+	 * @param float|string $in_cart_price Price currently set on the cart line product object.
+	 * @param float|string $catalog_price Pristine catalog price for the product or variation.
+	 *
+	 * @return float
+	 */
+	private static function resolve_line_base_price( $cart_item_key, $in_cart_price, $catalog_price ) {
+		$in_cart_price = (float) $in_cart_price;
+		$catalog_price = (float) $catalog_price;
+
+		// Untouched line, or a third party that reset it to the catalog price.
+		if ( self::prices_match( $in_cart_price, $catalog_price ) ) {
+			return $catalog_price;
+		}
+
+		if ( isset( self::$line_price_state[ $cart_item_key ] ) ) {
+			$state = self::$line_price_state[ $cart_item_key ];
+
+			// Nothing changed the line since PPOM priced it: reuse that same base.
+			if ( self::prices_match( $in_cart_price, $state['written'] ) ) {
+				return $state['base'];
+			}
+		}
+
+		return $in_cart_price;
+	}
+
+	/**
+	 * Compares two prices at cart precision.
+	 *
+	 * @param float $left  First price.
+	 * @param float $right Second price.
+	 *
+	 * @return bool
+	 */
+	private static function prices_match( $left, $right ) {
+		return abs( $left - $right ) < 0.00001;
 	}
 
 
