@@ -340,6 +340,63 @@ class Test_Third_Party_Price_Mutation extends PPOM_Test_Case {
 	}
 
 	/**
+	 * A third-party base price is honoured even when it happens to equal the total
+	 * PPOM wrote on an earlier pass — the amount alone cannot tell the two apart.
+	 *
+	 * @return void
+	 */
+	public function testThirdPartyBaseEqualToPreviousPpomTotalIsStillTreatedAsABase() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+
+		$this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'radio',
+					'title'     => 'Gift wrap',
+					'data_name' => 'giftwrap',
+					'options'   => array(
+						array( 'option' => 'Premium wrap', 'price' => '5' ),
+					),
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+
+		$cart_key = $this->add_product_to_real_cart(
+			$product->get_id(),
+			array(
+				'fields' => array(
+					'giftwrap' => 'Premium wrap',
+				),
+			)
+		);
+
+		$this->assertNotFalse( $cart_key );
+
+		$reloaded = $this->reload_real_cart_from_session();
+
+		// PPOM's own total for this line, which the third party is about to match.
+		$this->assertSame( 15.0, (float) $reloaded[ $cart_key ]['data']->get_price() );
+
+		add_action(
+			'woocommerce_before_calculate_totals',
+			function ( $cart ) {
+				foreach ( $cart->get_cart() as $cart_item ) {
+					$cart_item['data']->set_price( 15.0 );
+				}
+			},
+			20
+		);
+
+		WC()->cart->calculate_totals();
+		WC()->cart->calculate_totals();
+
+		$this->assertSame( 20.0, (float) WC()->cart->get_total( 'edit' ) );
+	}
+
+	/**
 	 * Forget the per-request line pricing state, as a new PHP request would.
 	 *
 	 * @return void

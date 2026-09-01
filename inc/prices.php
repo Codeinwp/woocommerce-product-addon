@@ -12,6 +12,17 @@ function ppom_before_calculate_totals( ...$args ) {
 	return \PPOM\Pricing\Engine::before_calculate_totals( ...$args );
 }
 
+/**
+ * Restores PPOM-priced cart lines to their catalog price before third parties price them.
+ *
+ * @param mixed ...$args Cart instance.
+ *
+ * @return void
+ */
+function ppom_restore_line_base_prices( ...$args ) {
+	\PPOM\Pricing\Engine::restore_line_base_prices( ...$args );
+}
+
 function ppom_get_field_prices( $ppom_fields_post, $product_id, &$product_quantity, $variation_id, $item = null ) {
 	return \PPOM\Pricing\Engine::get_field_prices( $ppom_fields_post, $product_id, $product_quantity, $variation_id, $item );
 }
