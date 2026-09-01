@@ -291,6 +291,66 @@ class Test_Third_Party_Price_Mutation extends PPOM_Test_Case {
 	}
 
 	/**
+	 * On a fresh request the session-restored PPOM price must not be mistaken for
+	 * a third-party dynamic price and used as a base for the addons again.
+	 *
+	 * @return void
+	 */
+	public function testSessionRestoredPriceIsNotReusedAsBaseInANewRequest() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+
+		$this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'radio',
+					'title'     => 'Gift wrap',
+					'data_name' => 'giftwrap',
+					'options'   => array(
+						array( 'option' => 'Premium wrap', 'price' => '5' ),
+					),
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+
+		$cart_key = $this->add_product_to_real_cart(
+			$product->get_id(),
+			array(
+				'fields' => array(
+					'giftwrap' => 'Premium wrap',
+				),
+			)
+		);
+
+		$this->assertNotFalse( $cart_key );
+
+		// The cart page is a separate request: nothing survives from add-to-cart.
+		$this->reset_ppom_line_price_state();
+
+		$reloaded = $this->reload_real_cart_from_session();
+
+		$this->assertSame( 15.0, (float) $reloaded[ $cart_key ]['data']->get_price() );
+
+		WC()->cart->calculate_totals();
+		WC()->cart->calculate_totals();
+
+		$this->assertSame( 15.0, (float) WC()->cart->get_total( 'edit' ) );
+	}
+
+	/**
+	 * Forget the per-request line pricing state, as a new PHP request would.
+	 *
+	 * @return void
+	 */
+	private function reset_ppom_line_price_state() {
+		$state = new ReflectionProperty( \PPOM\Pricing\Engine::class, 'line_price_state' );
+		$state->setAccessible( true );
+		$state->setValue( null, array() );
+	}
+
+	/**
 	 * The addon price is included in totals within the same request as add-to-cart,
 	 * before any session restore — the wc-ajax=add_to_cart flow (issue #623).
 	 *

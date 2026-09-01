@@ -35,8 +35,9 @@ final class Engine {
 	/**
 	 * Recalculates the cart line price for a PPOM cart item.
 	 *
-	 * @param array $cart_item Cart item restored from the session.
-	 * @param array $values    Raw cart item values.
+	 * @param array  $cart_item     Cart item restored from the session.
+	 * @param array  $values        Raw cart item values.
+	 * @param string $cart_item_key Cart item key, when the session filter supplies it.
 	 *
 	 * @return array
 	 *
@@ -44,7 +45,7 @@ final class Engine {
 	 * @see self::price_get_product_base()
 	 * @see self::price_cart_fee()
 	 */
-	public static function price_controller( $cart_item, $values ) {
+	public static function price_controller( $cart_item, $values, $cart_item_key = '' ) {
 
 		// ppom_pa($cart_item);
 		if ( empty( $cart_item ) ) {
@@ -96,6 +97,15 @@ final class Engine {
 
 		$ppom_total_price = apply_filters( 'ppom_cart_line_total', $ppom_total_price, $cart_item, $values );
 		$wc_product->set_price( $ppom_total_price );
+
+		// Totals run later in this same request and must recognise this price as
+		// PPOM's own, not as a price a third party calculated for the line.
+		if ( '' !== $cart_item_key ) {
+			self::$line_price_state[ $cart_item_key ] = array(
+				'written' => (float) $ppom_total_price,
+				'base'    => (float) $product_price,
+			);
+		}
 
 		return $cart_item;
 	}
