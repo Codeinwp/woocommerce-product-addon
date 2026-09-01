@@ -533,8 +533,8 @@ final class Callbacks {
 
 		// Conditional fields
 		if ( ! empty( $ppom_conditional_fields ) || apply_filters( 'ppom_enqueue_conditions_js', false ) ) {
-			$ppom_input_vars['conditions']             = $ppom_conditional_fields;
-			$ppom_input_vars['conditions_pro_enabled'] = Helpers::conditions_pro_enabled() ? 'yes' : 'no';
+			$ppom_input_vars['conditions']           = $ppom_conditional_fields;
+			$input_js_vars['conditions_pro_enabled'] = $conditions_pro_enabled ? 'yes' : 'no';
 
 			$ppom_conditions_script = Helpers::get_conditions_mode() === 'new' ? 'ppom-conditions-v2' : 'ppom-conditions';
 			$ppom_conditions_script = apply_filters( 'ppom_conditional_script_file', $ppom_conditions_script, $product );
