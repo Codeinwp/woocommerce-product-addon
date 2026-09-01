@@ -80,7 +80,8 @@ final class Engine {
 		$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
 		$total_cart_fee_price = self::price_get_cart_fee_total( $ppom_field_prices );
 
-		$product_price = apply_filters( 'ppom_product_price_on_cart', $wc_product->get_price(), $cart_item );
+		$base_price    = $wc_product->get_price();
+		$product_price = apply_filters( 'ppom_product_price_on_cart', $base_price, $cart_item );
 
 		// return array with: price, source
 		$price_info         = self::price_get_product_base(
@@ -112,7 +113,7 @@ final class Engine {
 		if ( '' !== $cart_item_key ) {
 			self::$line_price_state[ $cart_item_key ] = array(
 				'written' => (float) $ppom_total_price,
-				'base'    => (float) $product_price,
+				'base'    => (float) $base_price,
 			);
 		}
 
@@ -120,7 +121,7 @@ final class Engine {
 	}
 
 	/**
-	 * Restores PPOM-priced cart lines to their catalog price before third parties price them.
+	 * Restores PPOM-priced cart lines to their base price before third parties price them.
 	 *
 	 * @param mixed $cart_items Cart instance.
 	 *
@@ -153,13 +154,7 @@ final class Engine {
 				continue;
 			}
 
-			$product_id   = isset( $cart_item['product_id'] ) ? $cart_item['product_id'] : '';
-			$variation_id = isset( $cart_item['variation_id'] ) ? $cart_item['variation_id'] : '';
-			$pristine     = wc_get_product( $variation_id ? $variation_id : $product_id );
-
-			if ( $pristine ) {
-				$wc_product->set_price( $pristine->get_price() );
-			}
+			$wc_product->set_price( $state['base'] );
 		}
 	}
 
@@ -194,18 +189,20 @@ final class Engine {
 			$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
 			$total_cart_fee_price = self::price_get_cart_fee_total( $ppom_field_prices );
 
-			// Early pass restores catalog price; use current value as base.
+			// Early pass restores the line's base price; use current value as base.
 			// If it did not run, infer base to avoid double-counting on repeats.
 			$pristine      = wc_get_product( $variation_id ? $variation_id : $product_id );
 			$catalog_price = $pristine ? $pristine->get_price() : $wc_product->get_price();
 
 			if ( isset( self::$line_base_restored[ $cart_item_key ] ) ) {
 				unset( self::$line_base_restored[ $cart_item_key ] );
-				$product_price = (float) $wc_product->get_price();
+				$base_price = (float) $wc_product->get_price();
 			} else {
-				$product_price = self::resolve_line_base_price( $cart_item_key, $wc_product->get_price(), $catalog_price );
+				$base_price = self::resolve_line_base_price( $cart_item_key, $wc_product->get_price(), $catalog_price );
 			}
-			$product_price = apply_filters( 'ppom_product_price_on_cart', $product_price, $cart_item );
+
+			// Recorded pre-filter, so restoring it never applies the filter twice.
+			$product_price = apply_filters( 'ppom_product_price_on_cart', $base_price, $cart_item );
 
 			// $context     = 'cart';
 			// $product_price   = Helpers::get_product_price( $product, $variation_id, $context);
@@ -237,7 +234,7 @@ final class Engine {
 
 			self::$line_price_state[ $cart_item_key ] = array(
 				'written' => (float) $ppom_total_price,
-				'base'    => (float) $product_price,
+				'base'    => (float) $base_price,
 			);
 		}
 	}
