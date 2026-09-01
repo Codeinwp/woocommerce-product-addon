@@ -524,6 +524,10 @@ class PPOM_FRONTEND_SCRIPTS {
 									$field_conditions['rules'][ $rule_index ]['element_values'] = ppom_wpml_translate( $rule['element_values'], 'PPOM' );
 								}
 
+								if ( isset( $rule['element_constant'] ) ) {
+									$field_conditions['rules'][ $rule_index ]['element_constant'] = ppom_wpml_translate( $rule['element_constant'], 'PPOM' );
+								}
+
 								if (
 									! $conditions_pro_enabled &&
 									isset( $rule['operators'] ) &&
