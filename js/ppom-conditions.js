@@ -300,7 +300,10 @@ function ppom_toggle_condition_visibility( $fields, visible ) {
 		.addClass( 'ppom-c-hide' );
 }
 
-const ppom_field_visibility = {};
+// Fields whose condition has been evaluated at least once. The first pass always
+// emits, so listeners that set widgets up still run for fields that are already
+// visible on page load.
+const ppom_evaluated_fields = {};
 
 // Showing/hiding a field also needs to broadcast the same lifecycle events
 // used by uploads, pricing, and validation to keep their state consistent.
@@ -317,11 +320,13 @@ function ppom_apply_field_visibility(
 		.removeClass( remove_class )
 		.addClass( add_class );
 
-	if ( ppom_field_visibility[ field ] === visible ) {
+	const tracked_visible = jQuery.inArray( field, ppom_hidden_fields ) === -1;
+
+	if ( ppom_evaluated_fields[ field ] && tracked_visible === visible ) {
 		return;
 	}
 
-	ppom_field_visibility[ field ] = visible;
+	ppom_evaluated_fields[ field ] = true;
 
 	$fields.trigger( {
 		type: visible ? 'ppom_field_shown' : 'ppom_field_hidden',

@@ -524,7 +524,11 @@ class PPOM_FRONTEND_SCRIPTS {
 									$field_conditions['rules'][ $rule_index ]['element_values'] = ppom_wpml_translate( $rule['element_values'], 'PPOM' );
 								}
 
-								if ( ! $conditions_pro_enabled ) {
+								if (
+									! $conditions_pro_enabled &&
+									isset( $rule['operators'] ) &&
+									in_array( $rule['operators'], array( 'contains', 'not-contains', 'regex', 'between', 'number-multiplier', 'even-number', 'odd-number' ), true )
+								) {
 									unset( $field_conditions['rules'][ $rule_index ]['element_constant'] );
 									unset( $field_conditions['rules'][ $rule_index ]['cond-between-interval'] );
 								}
