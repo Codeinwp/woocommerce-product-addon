@@ -306,7 +306,6 @@ function ppom_unlock_field_from_condition( field, unlock ) {
 	const classname = '.ppom-input-' + field;
 	const visible = unlock === 'Show';
 
-	console.log(classname, visible);
 	ppom_toggle_condition_visibility( jQuery( classname ), visible )
 		.removeClass( 'ppom-locked' )
 		.addClass( 'ppom-unlocked' )
@@ -353,10 +352,36 @@ function ppom_get_field_rule_status( condition ) {
 	return ppom_rules_matched;
 }
 
+// Operators the conditions UI marks as Pro. Some of them ('even-number',
+// 'odd-number') need no rule data at all, so the payload cannot gate them and
+// the server has to state whether Pro is active.
+const ppom_pro_only_operators = [
+	'contains',
+	'not-contains',
+	'regex',
+	'between',
+	'number-multiplier',
+	'even-number',
+	'odd-number',
+];
+
+function ppom_operator_is_available( operator ) {
+	if ( jQuery.inArray( operator, ppom_pro_only_operators ) === -1 ) {
+		return true;
+	}
+
+	return ppom_input_vars.conditions_pro_enabled === 'yes';
+}
+
 // Evaluate one rule against the current value of its source field.
 function ppom_rule_matches( rule ) {
-	const element_value = ppom_get_element_value( rule.elements );
 	const operator = rule.operators;
+
+	if ( ! ppom_operator_is_available( operator ) ) {
+		return false;
+	}
+
+	const element_value = ppom_get_element_value( rule.elements );
 
 	if ( operator === 'any' || operator === 'empty' ) {
 		return operator === 'empty'
@@ -412,8 +437,8 @@ function ppom_rule_comparison_value( rule ) {
 
 // Compare a single source value against one rule.
 function ppom_compare_rule_value( element_value, rule ) {
-	// Pro-only operators are unusable without their constant, which PHP strips
-	// for installs without an active Pro license.
+	// PHP also withholds this value from installs without an active Pro
+	// license, so the constant-driven operators have nothing to match against.
 	const constant = rule.element_constant;
 
 	switch ( rule.operators ) {
@@ -505,12 +530,14 @@ function ppom_regex_matches( element_value, pattern ) {
 		return false;
 	}
 
-	const parts = pattern.split( '/' );
+	const delimited = pattern.match( /^\/(.*)\/([a-z]*)$/ );
 
 	try {
-		return new RegExp( parts[ 1 ] || pattern, parts[ 2 ] ).test(
-			element_value
-		);
+		const regex = delimited
+			? new RegExp( delimited[ 1 ], delimited[ 2 ] )
+			: new RegExp( pattern );
+
+		return regex.test( element_value );
 	} catch ( error ) {
 		return false;
 	}
@@ -557,6 +584,12 @@ function ppom_get_element_value( field_name ) {
 			value_found = jQuery(
 				'input[name="ppom[fields][' + field_name + ']"]:checked'
 			).attr( 'data-title' );
+			break;
+
+		case 'switcher':
+			value_found = jQuery(
+				'.ppom-input[data-data_name="' + field_name + '"]:checked'
+			).val();
 			break;
 
 		default:

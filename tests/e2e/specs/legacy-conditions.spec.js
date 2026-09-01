@@ -192,17 +192,21 @@ test.describe( 'Legacy conditions script', () => {
 		await page.goto( `/?p=${ product.id }` );
 
 		const output = page.getByLabel( 'Output' );
+		const hiddenFields = page.locator( '#conditionally_hidden' );
 		await expect( output ).toBeHidden();
+		await expect( hiddenFields ).toHaveValue( outputId );
 
 		const controllingSelect = selectByName( page, controllingId );
 		await controllingSelect.selectOption( { label: optionTwo.label } );
 		await expect( controllingSelect ).toHaveValue( optionTwo.label );
 
 		await expect( output ).toBeVisible();
+		await expect( hiddenFields ).toHaveValue( '' );
 
 		// Reverting the controller must put the target back out of view.
 		await controllingSelect.selectOption( { label: optionOne.label } );
 		await expect( output ).toBeHidden();
+		await expect( hiddenFields ).toHaveValue( outputId );
 	} );
 
 	test( 'legacy: Hide + is removes and restores the target as the controlling Select changes', async ( {
@@ -432,5 +436,231 @@ test.describe( 'Legacy conditions script', () => {
 		await source.fill( 'anything' );
 		await source.dispatchEvent( 'change' );
 		await expect( output ).toBeHidden();
+	} );
+	test( 'legacy: PRO-only contains operator stays inert without a Pro license', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const token = uniqueToken();
+		const sourceId = `legacy_contains_free_${ token }`;
+
+		await openConditionalProduct( {
+			page,
+			requestUtils,
+			groupName: `LC Contains Free ${ token }`,
+			targetDataName: `legacy_contains_free_out_${ token }`,
+			sourceFields: [
+				buildTextField( {
+					title: `Message ${ token }`,
+					dataName: sourceId,
+				} ),
+			],
+			rules: [
+				{
+					elements: sourceId,
+					operators: 'contains',
+					element_values: '',
+					element_constant: 'urgent',
+				},
+			],
+		} );
+
+		const output = page.getByLabel( 'Output' );
+		const source = page.locator(
+			`input[name="ppom[fields][${ sourceId }]"]`
+		);
+
+		await expect( output ).toBeHidden();
+
+		await source.fill( 'this is urgent' );
+		await source.dispatchEvent( 'change' );
+		await expect( output ).toBeHidden();
+	} );
+
+	test( 'legacy: PRO-only odd-number operator stays inert without a Pro license', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const token = uniqueToken();
+		const sourceId = `legacy_odd_free_${ token }`;
+
+		await openConditionalProduct( {
+			page,
+			requestUtils,
+			groupName: `LC Odd Free ${ token }`,
+			targetDataName: `legacy_odd_free_out_${ token }`,
+			sourceFields: [
+				buildNumberField( {
+					title: `Copies ${ token }`,
+					dataName: sourceId,
+				} ),
+			],
+			rules: [
+				{
+					elements: sourceId,
+					operators: 'odd-number',
+					element_values: '',
+				},
+			],
+		} );
+
+		const output = page.getByLabel( 'Output' );
+		const source = page.locator(
+			`input[name="ppom[fields][${ sourceId }]"]`
+		);
+
+		await expect( output ).toBeHidden();
+
+		// This operator carries no rule payload, so only the server-side Pro
+		// flag can keep it from running on a free install.
+		await source.fill( '7' );
+		await source.dispatchEvent( 'change' );
+		await expect( output ).toBeHidden();
+	} );
+
+	test( 'legacy: PRO odd-number operator evaluates with Pro installed and licensed', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await setPpomLicenseFixture( requestUtils, {
+			valid: true,
+			plan: 3,
+			proInstalled: true,
+		} );
+
+		const token = uniqueToken();
+		const sourceId = `legacy_odd_pro_${ token }`;
+
+		await openConditionalProduct( {
+			page,
+			requestUtils,
+			groupName: `LC Odd Pro ${ token }`,
+			targetDataName: `legacy_odd_pro_out_${ token }`,
+			sourceFields: [
+				buildNumberField( {
+					title: `Copies ${ token }`,
+					dataName: sourceId,
+				} ),
+			],
+			rules: [
+				{
+					elements: sourceId,
+					operators: 'odd-number',
+					element_values: '',
+				},
+			],
+		} );
+
+		const output = page.getByLabel( 'Output' );
+		const source = page.locator(
+			`input[name="ppom[fields][${ sourceId }]"]`
+		);
+
+		await expect( output ).toBeHidden();
+
+		await source.fill( '7' );
+		await source.dispatchEvent( 'change' );
+		await expect( output ).toBeVisible();
+
+		await source.fill( '8' );
+		await source.dispatchEvent( 'change' );
+		await expect( output ).toBeHidden();
+	} );
+
+	test( 'legacy: a bare RegEx pattern keeps its slash instead of being read as delimiters', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await setPpomLicenseFixture( requestUtils, {
+			valid: true,
+			plan: 3,
+			proInstalled: true,
+		} );
+
+		const token = uniqueToken();
+		const sourceId = `legacy_regex_bare_${ token }`;
+
+		await openConditionalProduct( {
+			page,
+			requestUtils,
+			groupName: `LC Regex Bare ${ token }`,
+			targetDataName: `legacy_regex_bare_out_${ token }`,
+			sourceFields: [
+				buildTextField( {
+					title: `Path ${ token }`,
+					dataName: sourceId,
+				} ),
+			],
+			rules: [
+				{
+					elements: sourceId,
+					operators: 'regex',
+					element_values: '',
+					element_constant: 'foo/bar',
+				},
+			],
+		} );
+
+		const output = page.getByLabel( 'Output' );
+		const source = page.locator(
+			`input[name="ppom[fields][${ sourceId }]"]`
+		);
+
+		// `bar` alone must not match: the pattern is `foo/bar`, not `/bar/`.
+		await source.fill( 'bar' );
+		await source.dispatchEvent( 'change' );
+		await expect( output ).toBeHidden();
+
+		await source.fill( 'foo/bar' );
+		await source.dispatchEvent( 'change' );
+		await expect( output ).toBeVisible();
+	} );
+
+	test( 'legacy: a slash-delimited RegEx pattern still applies its flags', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		await setPpomLicenseFixture( requestUtils, {
+			valid: true,
+			plan: 3,
+			proInstalled: true,
+		} );
+
+		const token = uniqueToken();
+		const sourceId = `legacy_regex_flags_${ token }`;
+
+		await openConditionalProduct( {
+			page,
+			requestUtils,
+			groupName: `LC Regex Flags ${ token }`,
+			targetDataName: `legacy_regex_flags_out_${ token }`,
+			sourceFields: [
+				buildTextField( {
+					title: `Code ${ token }`,
+					dataName: sourceId,
+				} ),
+			],
+			rules: [
+				{
+					elements: sourceId,
+					operators: 'regex',
+					element_values: '',
+					element_constant: '/^abc$/i',
+				},
+			],
+		} );
+
+		const output = page.getByLabel( 'Output' );
+		const source = page.locator(
+			`input[name="ppom[fields][${ sourceId }]"]`
+		);
+
+		await source.fill( 'xabc' );
+		await source.dispatchEvent( 'change' );
+		await expect( output ).toBeHidden();
+
+		await source.fill( 'ABC' );
+		await source.dispatchEvent( 'change' );
+		await expect( output ).toBeVisible();
 	} );
 } );
