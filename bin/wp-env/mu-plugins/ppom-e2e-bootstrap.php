@@ -35,6 +35,14 @@ if ( ! defined( 'PPOM_E2E_BREAK_GROUP_READS_OPTION' ) ) {
 	define( 'PPOM_E2E_BREAK_GROUP_READS_OPTION', 'ppom_e2e_break_group_reads' );
 }
 
+if ( ! defined( 'PPOM_E2E_SETTINGS_PANEL_OPTION' ) ) {
+	define( 'PPOM_E2E_SETTINGS_PANEL_OPTION', 'ppom-settings_panel' );
+}
+
+if ( ! defined( 'PPOM_E2E_SETTINGS_TOUCHED_OPTION' ) ) {
+	define( 'PPOM_E2E_SETTINGS_TOUCHED_OPTION', 'ppom_e2e_touched_settings' );
+}
+
 /**
  * Rewrite SELECTs on the PPOM field-group table to a nonexistent table so they
  * error out, simulating a transient DB read failure (lock/timeout/dropped
@@ -1439,6 +1447,94 @@ add_action( 'wp_ajax_ppom_e2e_read_license_fixture', 'ppom_e2e_read_license_fixt
 add_action( 'wp_ajax_nopriv_ppom_e2e_read_license_fixture', 'ppom_e2e_read_license_fixture' );
 
 /**
+ * Allowlist of PPOM settings E2E fixtures may flip.
+ *
+ * @return string[]
+ */
+function ppom_e2e_settable_settings() {
+	return array(
+		'ppom_new_conditions',
+		'ppom_price_table_v2',
+		'ppom_enable_legacy_inputs_rendering',
+		'ppom_legacy_price',
+	);
+}
+
+/**
+ * Write one PPOM setting through whichever store the plugin currently reads.
+ *
+ * Mirrors Helpers::get_option(): migrated installs read the settings-panel
+ * array, older ones read a standalone option.
+ *
+ * @param string $key   Setting id.
+ * @param string $value Setting value; empty string removes it.
+ * @return void
+ */
+function ppom_e2e_write_ppom_setting( $key, $value ) {
+
+	if ( function_exists( 'ppom_settings_migrated' ) && ppom_settings_migrated() ) {
+		$saved = get_option( PPOM_E2E_SETTINGS_PANEL_OPTION );
+		$saved = is_array( $saved ) ? $saved : array();
+
+		if ( '' === $value ) {
+			unset( $saved[ $key ] );
+		} else {
+			$saved[ $key ] = $value;
+		}
+
+		update_option( PPOM_E2E_SETTINGS_PANEL_OPTION, $saved, false );
+	} elseif ( '' === $value ) {
+		delete_option( $key );
+	} else {
+		update_option( $key, $value, false );
+	}
+
+	$touched = get_option( PPOM_E2E_SETTINGS_TOUCHED_OPTION );
+	$touched = is_array( $touched ) ? $touched : array();
+
+	if ( ! in_array( $key, $touched, true ) ) {
+		$touched[] = $key;
+		update_option( PPOM_E2E_SETTINGS_TOUCHED_OPTION, $touched, false );
+	}
+}
+
+/**
+ * Set allowlisted PPOM settings, e.g. the "Legacy Conditions Script" toggle.
+ *
+ * @return void
+ */
+function ppom_e2e_set_ppom_settings() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$requested = ppom_e2e_decode_json_request( 'settings' );
+	$allowed   = ppom_e2e_settable_settings();
+	$applied   = array();
+
+	foreach ( $requested as $key => $value ) {
+		$key = sanitize_key( $key );
+
+		if ( ! in_array( $key, $allowed, true ) ) {
+			continue;
+		}
+
+		$value = is_scalar( $value ) ? sanitize_text_field( (string) $value ) : '';
+
+		ppom_e2e_write_ppom_setting( $key, $value );
+		$applied[ $key ] = $value;
+	}
+
+	wp_send_json_success(
+		array(
+			'applied'         => $applied,
+			'conditions_mode' => function_exists( 'ppom_get_conditions_mode' ) ? ppom_get_conditions_mode() : '',
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_set_ppom_settings', 'ppom_e2e_set_ppom_settings' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_set_ppom_settings', 'ppom_e2e_set_ppom_settings' );
+
+/**
  * Toggle the simulated transient failure of PPOM field-group reads.
  *
  * @return void
@@ -1454,6 +1550,11 @@ function ppom_e2e_set_group_read_failure() {
 		update_option( PPOM_E2E_BREAK_GROUP_READS_OPTION, '1', false );
 	} else {
 		delete_option( PPOM_E2E_BREAK_GROUP_READS_OPTION );
+
+	foreach ( (array) get_option( PPOM_E2E_SETTINGS_TOUCHED_OPTION, array() ) as $touched_setting ) {
+		ppom_e2e_write_ppom_setting( $touched_setting, '' );
+	}
+	delete_option( PPOM_E2E_SETTINGS_TOUCHED_OPTION );
 	}
 
 	wp_send_json_success(

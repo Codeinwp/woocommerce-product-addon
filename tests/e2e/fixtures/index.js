@@ -14,6 +14,7 @@ export {
 	buildCheckboxField,
 	buildFileField,
 	buildHtmlField,
+	buildNumberField,
 	buildPriceMatrixField,
 	buildQuantitiesField,
 	buildSelectField,
@@ -22,6 +23,7 @@ export {
 	buildTextCounterField,
 } from './fields.js';
 export { getPpomLicenseFixture, setPpomLicenseFixture } from './license.js';
+export { setLegacyConditionsScript, setPpomSettings } from './settings.js';
 export {
 	createProductCategory,
 	createProductTag,
