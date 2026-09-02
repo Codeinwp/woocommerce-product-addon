@@ -774,6 +774,148 @@ final class CartHandler {
 		return $quantity;
 	}
 
+	/**
+	 * Narrows payload-supplied PPOM group ids to those actually attached to the product.
+	 *
+	 * @param int                     $product_id    Product the cart line refers to.
+	 * @param string|array<int, mixed> $ppom_meta_ids Group ids carried by the cart payload.
+	 *
+	 * @return int[] Attached group ids; empty when none of the requested ids belong to the product.
+	 */
+	private static function attached_meta_ids( $product_id, $ppom_meta_ids ) {
+		$requested = is_array( $ppom_meta_ids ) ? $ppom_meta_ids : explode( ',', (string) $ppom_meta_ids );
+		$requested = array_filter( array_map( 'absint', $requested ) );
+
+		if ( empty( $requested ) ) {
+			return array();
+		}
+
+		$ppom    = new \PPOM_Meta( $product_id );
+		$allowed = $ppom->get_meta_id( $product_id );
+		$allowed = array_filter( array_map( 'absint', is_array( $allowed ) ? $allowed : array( $allowed ) ) );
+
+		return array_values( array_intersect( $requested, $allowed ) );
+	}
+
+	/**
+	 * Server-resolved fixed-fee amount for one `ppom_option_price` row.
+	 *
+	 * @param array<string, mixed> $option          Single decoded option row.
+	 * @param \WC_Product          $product         Product of the cart line; percentage prices need it.
+	 * @param int[]                $attached_ids    Group ids confirmed attached to the product.
+	 * @param array<string, mixed> $selected_fields Field values submitted for the line.
+	 *
+	 * @return float
+	 */
+	private static function resolved_onetime_option_price( array $option, $product, array $attached_ids, array $selected_fields ) {
+		if ( empty( $attached_ids ) ) {
+			return 0.0;
+		}
+
+		$meta_ids   = implode( ',', $attached_ids );
+		$field_meta = Helpers::get_field_meta_by_dataname( 0, sanitize_key( (string) $option['data_name'] ), $meta_ids );
+
+		if ( empty( $field_meta ) || ! is_array( $field_meta ) ) {
+			return 0.0;
+		}
+
+		if ( ! isset( $field_meta['onetime'] ) || 'on' !== $field_meta['onetime'] ) {
+			return 0.0;
+		}
+
+		if ( ! self::option_is_selected( $field_meta, $option['option_id'], $selected_fields ) ) {
+			return 0.0;
+		}
+
+		$discount = self::saved_option_discount( $field_meta, $option['option_id'] );
+		if ( null !== $discount ) {
+			return false !== strpos( $discount, '%' )
+				? (float) Engine::get_amount_after_percentage( $product->get_price(), $discount )
+				: (float) $discount;
+		}
+
+		return (float) Helpers::get_field_option_price_by_id( $option, $product, $meta_ids );
+	}
+
+	/**
+	 * Saved discounted amount for an option, when the admin configured one.
+	 *
+	 * @param array<string, mixed> $field_meta Saved field definition.
+	 * @param string               $option_id  Option id carried by the cart row.
+	 *
+	 * @return string|null Discounted amount, or null when the option has no discount.
+	 */
+	private static function saved_option_discount( array $field_meta, $option_id ) {
+		if ( empty( $field_meta['options'] ) || ! is_array( $field_meta['options'] ) ) {
+			return null;
+		}
+
+		foreach ( $field_meta['options'] as $saved_option ) {
+			if ( ! is_array( $saved_option ) || ! isset( $saved_option['discount'] ) || ! is_scalar( $saved_option['discount'] ) ) {
+				continue;
+			}
+
+			$ids = array( (string) Helpers::get_option_id( $saved_option, $field_meta ) );
+			if ( isset( $saved_option['id'] ) && is_scalar( $saved_option['id'] ) ) {
+				$ids[] = (string) $saved_option['id'];
+			}
+
+			if ( ! in_array( (string) $option_id, $ids, true ) ) {
+				continue;
+			}
+
+			$discount = (string) $saved_option['discount'];
+
+			return (float) $discount > 0 ? $discount : null;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Whether an option id belongs to the values submitted for its field.
+	 *
+	 * @param array<string, mixed> $field_meta      Saved field definition.
+	 * @param string               $option_id       Option id carried by the cart row.
+	 * @param array<string, mixed> $selected_fields Field values submitted for the line.
+	 *
+	 * @return bool
+	 */
+	private static function option_is_selected( array $field_meta, $option_id, array $selected_fields ) {
+		$data_name  = isset( $field_meta['data_name'] ) ? $field_meta['data_name'] : '';
+		$field_type = isset( $field_meta['type'] ) ? $field_meta['type'] : '';
+
+		if ( '' === $data_name || ! isset( $selected_fields[ $data_name ] ) ) {
+			return true;
+		}
+
+		if ( 'image' === $field_type || empty( $field_meta['options'] ) || ! is_array( $field_meta['options'] ) ) {
+			return true;
+		}
+
+		$selected = array_map( 'strval', array_filter( (array) $selected_fields[ $data_name ], 'is_scalar' ) );
+		$ids      = array();
+
+		foreach ( $field_meta['options'] as $saved_option ) {
+			if ( ! is_array( $saved_option ) ) {
+				continue;
+			}
+
+			$label = isset( $saved_option['option'] ) ? $saved_option['option'] : '';
+			if ( ! is_scalar( $label ) || ! in_array( (string) $label, $selected, true ) ) {
+				continue;
+			}
+
+			$ids[] = (string) Helpers::get_option_id( $saved_option, $field_meta );
+		}
+
+		if ( empty( $ids ) ) {
+			return true;
+		}
+
+		return in_array( (string) $option_id, $ids, true );
+	}
+
 	// Control subtotal when quantities input used.
 	public static function item_subtotal( $item_subtotal, $cart_item, $cart_item_key ) {
 
@@ -793,8 +935,10 @@ final class CartHandler {
 		$product_data = new \WC_Product( $product_id );
 
 		// Resolve amounts against saved field meta, like the authoritative pricing path.
-		$line_product  = isset( $cart_item['data'] ) && $cart_item['data'] instanceof \WC_Product ? $cart_item['data'] : $product_data;
-		$ppom_meta_ids = isset( $cart_item['ppom']['fields']['id'] ) ? $cart_item['ppom']['fields']['id'] : '';
+		$line_product    = isset( $cart_item['data'] ) && $cart_item['data'] instanceof \WC_Product ? $cart_item['data'] : $product_data;
+		$ppom_meta_ids   = isset( $cart_item['ppom']['fields']['id'] ) ? $cart_item['ppom']['fields']['id'] : '';
+		$selected_fields = isset( $cart_item['ppom']['fields'] ) && is_array( $cart_item['ppom']['fields'] ) ? $cart_item['ppom']['fields'] : array();
+		$attached_ids    = null;
 
 		$price = 0.0;
 		foreach ( $option_prices as $option ) {
@@ -802,14 +946,19 @@ final class CartHandler {
 				continue;
 			}
 
-			$option       = Helpers::translation_options( $option );
-			$option_price = isset( $option['price'] ) ? (float) $option['price'] : 0.0;
-			if ( 0.0 === $option_price || ( ! isset( $option['apply'] ) || 'onetime' !== $option['apply'] ) ) {
+			$option = Helpers::translation_options( $option );
+			if ( ! isset( $option['apply'] ) || 'onetime' !== $option['apply'] ) {
 				continue;
 			}
 
+			$option_price = isset( $option['price'] ) ? (float) $option['price'] : 0.0;
+
 			if ( ! empty( $ppom_meta_ids ) && isset( $option['data_name'], $option['option_id'] ) ) {
-				$option_price = (float) Helpers::get_field_option_price_by_id( $option, $line_product, $ppom_meta_ids );
+				if ( null === $attached_ids ) {
+					$attached_ids = self::attached_meta_ids( $product_id, $ppom_meta_ids );
+				}
+
+				$option_price = self::resolved_onetime_option_price( $option, $line_product, $attached_ids, $selected_fields );
 			} elseif ( isset( $option['discount'] ) && $option['discount'] > 0 ) {
 				$option_price = (float) $option['discount'];
 			}
