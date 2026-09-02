@@ -1177,12 +1177,11 @@ final class CartHandler {
 
 		$product_id   = $cart_item['product_id'];
 		$quantity     = $cart_item['quantity'];
-		$product_data = new \WC_Product( $product_id );
+		$variation_id = isset( $cart_item['variation_id'] ) ? absint( $cart_item['variation_id'] ) : 0;
 
-		// Resolve amounts against saved field meta, like the authoritative pricing path.
-		$variation_id    = isset( $cart_item['variation_id'] ) ? absint( $cart_item['variation_id'] ) : 0;
+		// The selected variation prices the line, and its pristine copy resolves addons.
 		$pristine        = wc_get_product( $variation_id ? $variation_id : $product_id );
-		$line_product    = $pristine instanceof \WC_Product ? $pristine : $product_data;
+		$line_product    = $pristine instanceof \WC_Product ? $pristine : new \WC_Product( $product_id );
 		$ppom_meta_ids   = isset( $cart_item['ppom']['fields']['id'] ) ? $cart_item['ppom']['fields']['id'] : '';
 		$selected_fields = isset( $cart_item['ppom']['fields'] ) && is_array( $cart_item['ppom']['fields'] ) ? $cart_item['ppom']['fields'] : array();
 		$attached_ids    = null;
@@ -1242,7 +1241,7 @@ final class CartHandler {
 		if ( 0.0 === $price ) {
 			return $item_subtotal;
 		}
-		$product_price = floatval( $product_data->get_price() ) * $quantity;
+		$product_price = floatval( $line_product->get_price() ) * $quantity;
 		$item_subtotal = $product_price + $price;
 		return Helpers::price( $item_subtotal );
 	}
