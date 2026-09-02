@@ -257,15 +257,23 @@ class PPOM_Meta {
 
 		$repo = \PPOM\Data\FieldGroupRepository::instance();
 
-		if ( is_array( $meta_id ) ) {
-			$meta_ids = $meta_id;
-		} else {
-			$meta_ids = array( $meta_id );
+		$meta_ids = is_array( $this->meta_id ) ? $this->meta_id : array( $meta_id );
+		$meta_ids = array_values( array_filter( array_map( 'absint', $meta_ids ) ) );
+
+		$rows = array();
+		foreach ( $repo->get_rows_by_productmeta_ids( $meta_ids ) as $row ) {
+			$rows[ isset( $row->productmeta_id ) ? (int) $row->productmeta_id : 0 ] = $row;
 		}
 
-		$meta_settings = $repo->get_rows_by_productmeta_ids( $meta_ids );
-		$active_meta   = array();
-		$filter_meta   = array();
+		$meta_settings = array();
+		foreach ( $meta_ids as $id ) {
+			if ( isset( $rows[ $id ] ) ) {
+				$meta_settings[] = $rows[ $id ];
+			}
+		}
+
+		$active_meta = array();
+		$filter_meta = array();
 		foreach ( $meta_settings as $meta ) {
 			// Skip groups admins have toggled off; configuration and product
 			// attachments are preserved so re-enabling restores the form.
