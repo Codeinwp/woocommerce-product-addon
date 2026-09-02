@@ -552,9 +552,17 @@ final class CartHandler {
 			$option_prices = json_decode( wp_unslash( $item['ppom']['ppom_option_price'] ), true );
 
 			if ( $option_prices ) {
+				$product_id      = isset( $item['product_id'] ) ? absint( $item['product_id'] ) : 0;
+				$variation_id    = isset( $item['variation_id'] ) ? absint( $item['variation_id'] ) : 0;
+				$pristine        = wc_get_product( $variation_id ? $variation_id : $product_id );
+				$selected_fields = isset( $item['ppom']['fields'] ) && is_array( $item['ppom']['fields'] ) ? $item['ppom']['fields'] : array();
+				$ppom_meta_ids   = isset( $selected_fields['id'] ) ? $selected_fields['id'] : '';
+				$attached_ids    = empty( $ppom_meta_ids ) ? array() : self::attached_meta_ids( $product_id, $ppom_meta_ids );
+				$counted_fields  = array();
+
 				foreach ( $option_prices as $fee ) {
 
-					if ( $fee['apply'] != 'onetime' ) {
+					if ( ! is_array( $fee ) || ! isset( $fee['apply'] ) || $fee['apply'] != 'onetime' ) {
 						continue;
 					}
 
@@ -567,6 +575,15 @@ final class CartHandler {
 
 					if ( ! empty( $fee['without_tax'] ) ) {
 						$fee_price = $fee['without_tax'];
+					}
+
+					// Charge the saved amount, never the payload's, so the line subtotal agrees.
+					if ( $pristine instanceof \WC_Product && ! empty( $ppom_meta_ids ) ) {
+						$resolved = self::canonical_onetime_price( $fee, $pristine, $attached_ids, $selected_fields, $counted_fields );
+
+						if ( null !== $resolved ) {
+							$fee_price = $resolved;
+						}
 					}
 
 					// if(  'incl' === get_option( 'woocommerce_tax_display_shop' ) ) {
@@ -775,6 +792,30 @@ final class CartHandler {
 	}
 
 	/**
+	 * Canonical fixed-fee amount for one `ppom_option_price` row, or null when the row
+	 * cannot be resolved from saved meta at all.
+	 *
+	 * @param array<string, mixed> $option          Single decoded option row.
+	 * @param \WC_Product          $product         Pristine product of the cart line.
+	 * @param int[]                $attached_ids    Group ids confirmed attached to the product.
+	 * @param array<string, mixed> $selected_fields Field values submitted for the line.
+	 * @param array<string, bool>  $counted_fields  Fields already totalled for this line.
+	 *
+	 * @return float|null
+	 */
+	public static function canonical_onetime_price( array $option, $product, array $attached_ids, array $selected_fields, array &$counted_fields ) {
+		if ( ! isset( $option['data_name'] ) ) {
+			return null;
+		}
+
+		if ( isset( $option['option_id'] ) ) {
+			return self::resolved_onetime_option_price( $option, $product, $attached_ids, $selected_fields );
+		}
+
+		return self::resolved_onetime_field_total( $option['data_name'], $product, $attached_ids, $selected_fields, $counted_fields );
+	}
+
+	/**
 	 * Narrows payload-supplied PPOM group ids to those actually attached to the product.
 	 *
 	 * @param int                     $product_id    Product the cart line refers to.
@@ -827,49 +868,15 @@ final class CartHandler {
 			return 0.0;
 		}
 
-		$discount = self::saved_option_discount( $field_meta, $option['option_id'] );
-		if ( null !== $discount ) {
-			return false !== strpos( $discount, '%' )
-				? (float) Engine::get_amount_after_percentage( Helpers::get_product_price( $product, null, 'cart' ), $discount )
-				: (float) $discount;
+		$option_id = (string) $option['option_id'];
+
+		foreach ( self::saved_option_rows( $field_meta ) as $saved_option ) {
+			if ( in_array( $option_id, self::saved_option_ids( $saved_option, $field_meta ), true ) ) {
+				return self::saved_option_amount( $field_meta, $saved_option, $product );
+			}
 		}
 
-		return (float) Helpers::get_field_option_price_by_id( $option, $product, $meta_ids );
-	}
-
-	/**
-	 * Saved discounted amount for an option, when the admin configured one.
-	 *
-	 * @param array<string, mixed> $field_meta Saved field definition.
-	 * @param string               $option_id  Option id carried by the cart row.
-	 *
-	 * @return string|null Discounted amount, or null when the option has no discount.
-	 */
-	private static function saved_option_discount( array $field_meta, $option_id ) {
-		if ( empty( $field_meta['options'] ) || ! is_array( $field_meta['options'] ) ) {
-			return null;
-		}
-
-		foreach ( $field_meta['options'] as $saved_option ) {
-			if ( ! is_array( $saved_option ) || ! isset( $saved_option['discount'] ) || ! is_scalar( $saved_option['discount'] ) ) {
-				continue;
-			}
-
-			$ids = array( (string) Helpers::get_option_id( $saved_option, $field_meta ) );
-			if ( isset( $saved_option['id'] ) && is_scalar( $saved_option['id'] ) ) {
-				$ids[] = (string) $saved_option['id'];
-			}
-
-			if ( ! in_array( (string) $option_id, $ids, true ) ) {
-				continue;
-			}
-
-			$discount = (string) $saved_option['discount'];
-
-			return (float) $discount > 0 ? $discount : null;
-		}
-
-		return null;
+		return self::canonical_amount( Helpers::get_field_option_price_by_id( $option, $product, $meta_ids ), $product );
 	}
 
 	/**
@@ -901,7 +908,22 @@ final class CartHandler {
 		$saved_rows = self::saved_option_rows( $field_meta );
 
 		if ( empty( $saved_rows ) ) {
-			return null;
+			// Text-like fields price the field itself; anything else prices outside saved meta.
+			if ( ! isset( $field_meta['price'] ) || ! is_scalar( $field_meta['price'] ) || '' === (string) $field_meta['price'] ) {
+				return null;
+			}
+
+			$key = isset( $field_meta['data_name'] ) ? (string) $field_meta['data_name'] : (string) $data_name;
+
+			if ( isset( $counted_fields[ $key ] ) ) {
+				return 0.0;
+			}
+
+			$counted_fields[ $key ] = true;
+
+			return empty( self::submitted_option_tokens( isset( $selected_fields[ $key ] ) ? $selected_fields[ $key ] : '' ) )
+				? 0.0
+				: self::canonical_amount( $field_meta['price'], $product );
 		}
 
 		$key = isset( $field_meta['data_name'] ) ? (string) $field_meta['data_name'] : (string) $data_name;
@@ -951,13 +973,55 @@ final class CartHandler {
 			$amount = (string) $saved_option['price'];
 		}
 
-		if ( '' === $amount ) {
+		return self::canonical_amount( $amount, $product );
+	}
+
+	/**
+	 * Turns a saved amount into the figure the cart shows.
+	 *
+	 * Mirrors `Helpers::get_ppom_options()`: percentages resolve against the product base
+	 * price, then `ppom_option_price_vat` adjusts for the store's tax display.
+	 *
+	 * @param mixed       $amount  Saved amount, possibly a percentage.
+	 * @param \WC_Product $product Pristine product of the cart line.
+	 *
+	 * @return float
+	 */
+	private static function canonical_amount( $amount, $product ) {
+		if ( ! is_scalar( $amount ) || '' === (string) $amount ) {
 			return 0.0;
 		}
 
-		return false !== strpos( $amount, '%' )
-			? (float) Engine::get_amount_after_percentage( Helpers::get_product_price( $product, null, 'cart' ), $amount )
-			: (float) $amount;
+		$amount = (string) $amount;
+
+		if ( false !== strpos( $amount, '%' ) ) {
+			$amount = Engine::get_amount_after_percentage( Helpers::get_product_price( $product, null, 'cart' ), $amount );
+		}
+
+		return (float) apply_filters( 'ppom_option_price_vat', $amount, $product );
+	}
+
+	/**
+	 * Every id shape a saved option row can be referenced by.
+	 *
+	 * Image rows are addressed as `<data_name>-<id>`, while other types use the id
+	 * `Helpers::get_option_id()` generates.
+	 *
+	 * @param array<string, mixed> $saved_option Saved option row.
+	 * @param array<string, mixed> $field_meta   Saved field definition.
+	 *
+	 * @return string[]
+	 */
+	private static function saved_option_ids( array $saved_option, array $field_meta ) {
+		$data_name = isset( $field_meta['data_name'] ) ? (string) $field_meta['data_name'] : '';
+		$ids       = array( (string) Helpers::get_option_id( $saved_option, $field_meta ) );
+
+		if ( isset( $saved_option['id'] ) && is_scalar( $saved_option['id'] ) ) {
+			$ids[] = (string) $saved_option['id'];
+			$ids[] = $data_name . '-' . $saved_option['id'];
+		}
+
+		return array_values( array_unique( $ids ) );
 	}
 
 	/**
@@ -999,12 +1063,7 @@ final class CartHandler {
 				continue;
 			}
 
-			$candidates[] = (string) Helpers::get_option_id( $saved_option, $field_meta );
-
-			if ( isset( $saved_option['id'] ) && is_scalar( $saved_option['id'] ) ) {
-				$candidates[] = (string) $saved_option['id'];
-				$candidates[] = $data_name . '-' . $saved_option['id'];
-			}
+			$candidates = array_merge( $candidates, self::saved_option_ids( $saved_option, $field_meta ) );
 		}
 
 		return in_array( $option_id, $candidates, true );
@@ -1142,22 +1201,18 @@ final class CartHandler {
 
 			$option_price = isset( $option['price'] ) ? (float) $option['price'] : 0.0;
 
-			if ( ! empty( $ppom_meta_ids ) && isset( $option['data_name'] ) ) {
+			$resolved = null;
+
+			if ( ! empty( $ppom_meta_ids ) ) {
 				if ( null === $attached_ids ) {
 					$attached_ids = self::attached_meta_ids( $product_id, $ppom_meta_ids );
 				}
 
-				if ( isset( $option['option_id'] ) ) {
-					$option_price = self::resolved_onetime_option_price( $option, $line_product, $attached_ids, $selected_fields );
-				} else {
-					$field_total = self::resolved_onetime_field_total( $option['data_name'], $line_product, $attached_ids, $selected_fields, $counted_fields );
+				$resolved = self::canonical_onetime_price( $option, $line_product, $attached_ids, $selected_fields, $counted_fields );
+			}
 
-					if ( null !== $field_total ) {
-						$option_price = $field_total;
-					} elseif ( isset( $option['discount'] ) && $option['discount'] > 0 ) {
-						$option_price = (float) $option['discount'];
-					}
-				}
+			if ( null !== $resolved ) {
+				$option_price = $resolved;
 			} elseif ( isset( $option['discount'] ) && $option['discount'] > 0 ) {
 				$option_price = (float) $option['discount'];
 			}
