@@ -584,7 +584,16 @@ final class CartHandler {
 						$resolved = self::canonical_onetime_price( $fee, $pristine, $attached_ids, $selected_fields, $counted_fields );
 					}
 
-					$fee_price = null !== $resolved ? $resolved : (float) $fee_price;
+					if ( null !== $resolved ) {
+						$fee_price        = apply_filters( 'ppom_option_price', $resolved );
+						$resolved_taxable = self::resolved_onetime_taxable( $fee, $attached_ids );
+
+						if ( null !== $resolved_taxable ) {
+							$taxable = $resolved_taxable;
+						}
+					} else {
+						$fee_price = self::unresolved_payload_amount( $fee_price );
+					}
 
 					// if(  'incl' === get_option( 'woocommerce_tax_display_shop' ) ) {
 					// $taxable = false;
@@ -792,6 +801,41 @@ final class CartHandler {
 	}
 
 	/**
+	 * Amount to use for a row that cannot be resolved from saved meta.
+	 *
+	 * @param mixed $amount Amount carried by the payload row.
+	 *
+	 * @return float
+	 */
+	private static function unresolved_payload_amount( $amount ) {
+		$amount = is_scalar( $amount ) ? (float) $amount : 0.0;
+
+		return $amount < 0 ? 0.0 : $amount;
+	}
+
+	/**
+	 * Whether a resolved fixed fee is taxable according to its saved field.
+	 *
+	 * @param array<string, mixed> $option       Single decoded option row.
+	 * @param int[]                $attached_ids Group ids confirmed attached to the product.
+	 *
+	 * @return bool|null Null when the field cannot be resolved.
+	 */
+	private static function resolved_onetime_taxable( array $option, array $attached_ids ) {
+		if ( empty( $attached_ids ) || ! isset( $option['data_name'] ) ) {
+			return null;
+		}
+
+		$field_meta = Helpers::get_field_meta_by_dataname( 0, sanitize_key( (string) $option['data_name'] ), implode( ',', $attached_ids ) );
+
+		if ( empty( $field_meta ) || ! is_array( $field_meta ) ) {
+			return null;
+		}
+
+		return isset( $field_meta['onetime_taxable'] ) && 'on' === $field_meta['onetime_taxable'];
+	}
+
+	/**
 	 * Canonical fixed-fee amount for one `ppom_option_price` row, or null when the row
 	 * cannot be resolved from saved meta at all.
 	 *
@@ -995,7 +1039,8 @@ final class CartHandler {
 		$amount = (string) $amount;
 
 		if ( false !== strpos( $amount, '%' ) ) {
-			$amount = Engine::get_amount_after_percentage( Helpers::get_product_price( $product, null, 'cart' ), $amount );
+			$base   = Callbacks::convert_price_back( Helpers::get_product_price( $product, null, 'cart' ) );
+			$amount = Engine::get_amount_after_percentage( $base, $amount );
 		}
 
 		return (float) $amount;
@@ -1218,6 +1263,8 @@ final class CartHandler {
 				if ( isset( $option['discount'] ) && $option['discount'] > 0 ) {
 					$option_price = (float) $option['discount'];
 				}
+
+				$option_price = self::unresolved_payload_amount( $option_price );
 			}
 
 			$option_price = apply_filters( 'ppom_option_price', $option_price );
