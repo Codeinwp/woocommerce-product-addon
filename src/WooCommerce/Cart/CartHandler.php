@@ -578,13 +578,13 @@ final class CartHandler {
 					}
 
 					// Charge the saved amount, never the payload's, so the line subtotal agrees.
+					$resolved = null;
+
 					if ( $pristine instanceof \WC_Product && ! empty( $ppom_meta_ids ) ) {
 						$resolved = self::canonical_onetime_price( $fee, $pristine, $attached_ids, $selected_fields, $counted_fields );
-
-						if ( null !== $resolved ) {
-							$fee_price = $resolved;
-						}
 					}
+
+					$fee_price = null !== $resolved ? $resolved : (float) $fee_price;
 
 					// if(  'incl' === get_option( 'woocommerce_tax_display_shop' ) ) {
 					// $taxable = false;
@@ -979,8 +979,8 @@ final class CartHandler {
 	/**
 	 * Turns a saved amount into the figure the cart shows.
 	 *
-	 * Mirrors `Helpers::get_ppom_options()`: percentages resolve against the product base
-	 * price, then `ppom_option_price_vat` adjusts for the store's tax display.
+	 * Percentages resolve against the product base price. The amount stays net, because
+	 * the tax display transformation belongs to the display path alone.
 	 *
 	 * @param mixed       $amount  Saved amount, possibly a percentage.
 	 * @param \WC_Product $product Pristine product of the cart line.
@@ -998,7 +998,7 @@ final class CartHandler {
 			$amount = Engine::get_amount_after_percentage( Helpers::get_product_price( $product, null, 'cart' ), $amount );
 		}
 
-		return (float) apply_filters( 'ppom_option_price_vat', $amount, $product );
+		return (float) $amount;
 	}
 
 	/**
@@ -1188,7 +1188,9 @@ final class CartHandler {
 		$attached_ids    = null;
 		$counted_fields  = array();
 
-		$price = 0.0;
+		$price          = 0.0;
+		$resolved_price = 0.0;
+
 		foreach ( $option_prices as $option ) {
 			if ( ! is_array( $option ) ) {
 				continue;
@@ -1213,15 +1215,29 @@ final class CartHandler {
 
 			if ( null !== $resolved ) {
 				$option_price = $resolved;
-			} elseif ( isset( $option['discount'] ) && $option['discount'] > 0 ) {
-				$option_price = (float) $option['discount'];
+			} else {
+				if ( isset( $option['discount'] ) && $option['discount'] > 0 ) {
+					$option_price = (float) $option['discount'];
+				}
 			}
 
 			$option_price = apply_filters( 'ppom_option_price', $option_price );
+			$option_price = floatval( wp_strip_all_tags( (string) $option_price ) );
 
 			// Accumulate every fixed-fee option on the line, not just the last one.
-			$price += floatval( wp_strip_all_tags( (string) $option_price ) );
+			if ( null !== $resolved ) {
+				$resolved_price += $option_price;
+			} else {
+				$price += $option_price;
+			}
 		}
+
+		// Saved amounts are net, so only they take the store's tax display treatment.
+		if ( $resolved_price > 0 ) {
+			$resolved_price = (float) apply_filters( 'ppom_option_price_vat', $resolved_price, $line_product );
+		}
+
+		$price += $resolved_price;
 
 		if ( 0.0 === $price ) {
 			return $item_subtotal;
