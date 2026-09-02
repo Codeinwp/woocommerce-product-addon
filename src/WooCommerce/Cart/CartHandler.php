@@ -788,25 +788,41 @@ final class CartHandler {
 			return $item_subtotal;
 		}
 
+		$product_id   = $cart_item['product_id'];
+		$quantity     = $cart_item['quantity'];
+		$product_data = new \WC_Product( $product_id );
+
+		// Resolve amounts against saved field meta, like the authoritative pricing path.
+		$line_product  = isset( $cart_item['data'] ) && $cart_item['data'] instanceof \WC_Product ? $cart_item['data'] : $product_data;
+		$ppom_meta_ids = isset( $cart_item['ppom']['fields']['id'] ) ? $cart_item['ppom']['fields']['id'] : '';
+
 		$price = 0.0;
 		foreach ( $option_prices as $option ) {
+			if ( ! is_array( $option ) ) {
+				continue;
+			}
+
 			$option       = Helpers::translation_options( $option );
 			$option_price = isset( $option['price'] ) ? (float) $option['price'] : 0.0;
 			if ( 0.0 === $option_price || ( ! isset( $option['apply'] ) || 'onetime' !== $option['apply'] ) ) {
 				continue;
 			}
-			$option_price = isset( $option['discount'] ) && $option['discount'] > 0 ? (float) $option['discount'] : $option_price;
+
+			if ( ! empty( $ppom_meta_ids ) && isset( $option['data_name'], $option['option_id'] ) ) {
+				$option_price = (float) Helpers::get_field_option_price_by_id( $option, $line_product, $ppom_meta_ids );
+			} elseif ( isset( $option['discount'] ) && $option['discount'] > 0 ) {
+				$option_price = (float) $option['discount'];
+			}
+
 			$option_price = apply_filters( 'ppom_option_price', $option_price );
 
+			// Accumulate every fixed-fee option on the line, not just the last one.
 			$price += floatval( wp_strip_all_tags( (string) $option_price ) );
 		}
 
 		if ( 0.0 === $price ) {
 			return $item_subtotal;
 		}
-		$product_id    = $cart_item['product_id'];
-		$quantity      = $cart_item['quantity'];
-		$product_data  = new \WC_Product( $product_id );
 		$product_price = floatval( $product_data->get_price() ) * $quantity;
 		$item_subtotal = $product_price + $price;
 		return Helpers::price( $item_subtotal );

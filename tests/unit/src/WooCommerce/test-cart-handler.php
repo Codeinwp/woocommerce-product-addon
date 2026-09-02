@@ -952,9 +952,12 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Rows with no `data_name`/`option_id` cannot be resolved server-side, so they
+	 * keep the legacy behaviour of trusting the payload amount.
+	 *
 	 * @return void
 	 */
-	public function test_item_subtotal_prefers_discount_over_price_per_onetime_option() {
+	public function test_item_subtotal_prefers_discount_over_price_for_unresolvable_option() {
 		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
 		$product_id = $product->get_id();
 
@@ -1008,5 +1011,45 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 		);
 
 		$this->assertSame( 'original', CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' ) );
+	}
+
+	/**
+	 * Regression: a tampered cart payload must not inflate the displayed subtotal —
+	 * fixed-fee amounts are re-read from the saved field meta.
+	 *
+	 * @return void
+	 */
+	public function test_item_subtotal_ignores_payload_amount_when_option_resolves_from_field_meta() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field(
+					'extras',
+					'Extras',
+					array(
+						array( 'option' => 'Gift wrap', 'price' => '3', 'id' => 'gift_wrap' ),
+						array( 'option' => 'Candles', 'price' => '5', 'id' => 'candles' ),
+					),
+					array( 'onetime' => 'on' )
+				),
+			),
+			$product_id
+		);
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '9999', 'apply' => 'onetime', 'data_name' => 'extras', 'option_id' => 'gift_wrap' ),
+				array( 'price' => '9999', 'apply' => 'onetime', 'data_name' => 'extras', 'option_id' => 'candles' ),
+			)
+		);
+
+		$cart_item['ppom']['fields'] = array( 'id' => (string) $meta_id );
+
+		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
+
+		$this->assertSame( Helpers::price( 18 ), $subtotal );
 	}
 }
