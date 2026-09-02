@@ -5,6 +5,7 @@
  * @package ppom-pro
  */
 
+use PPOM\Support\Helpers;
 use PPOM\WooCommerce\Cart\CartHandler;
 
 /**
@@ -905,5 +906,107 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 		$result = CartHandler::update_cart_fees( $cart_items, $values );
 
 		$this->assertSame( 15.0, (float) $result['data']->get_price() );
+	}
+
+	/**
+	 * Builds a cart item carrying legacy `ppom_option_price` rows.
+	 *
+	 * @param int   $product_id Product the line refers to.
+	 * @param array $options    Option price rows.
+	 * @param int   $quantity   Cart line quantity.
+	 *
+	 * @return array
+	 */
+	private function option_price_cart_item( $product_id, array $options, $quantity = 1 ) {
+		return array(
+			'product_id' => $product_id,
+			'quantity'   => $quantity,
+			'ppom'       => array(
+				'ppom_option_price' => wp_json_encode( $options ),
+			),
+		);
+	}
+
+	/**
+	 * Regression: every selected fixed-fee option must be added to the cart line
+	 * subtotal, not just the last one.
+	 *
+	 * @return void
+	 */
+	public function test_item_subtotal_sums_every_onetime_option_price() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '3', 'apply' => 'onetime' ),
+				array( 'price' => '5', 'apply' => 'onetime' ),
+				array( 'price' => '9', 'apply' => 'onetime' ),
+			)
+		);
+
+		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
+
+		$this->assertSame( Helpers::price( 27 ), $subtotal );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_item_subtotal_prefers_discount_over_price_per_onetime_option() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '5', 'discount' => '2', 'apply' => 'onetime' ),
+				array( 'price' => '3', 'apply' => 'onetime' ),
+			)
+		);
+
+		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
+
+		$this->assertSame( Helpers::price( 15 ), $subtotal );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_item_subtotal_multiplies_only_the_base_price_by_quantity() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '3', 'apply' => 'onetime' ),
+				array( 'price' => '5', 'apply' => 'onetime' ),
+			),
+			2
+		);
+
+		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
+
+		$this->assertSame( Helpers::price( 28 ), $subtotal );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_item_subtotal_left_untouched_when_no_onetime_option_selected() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '3', 'apply' => 'variable' ),
+				array( 'price' => '5', 'apply' => 'quantities' ),
+			)
+		);
+
+		$this->assertSame( 'original', CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' ) );
 	}
 }

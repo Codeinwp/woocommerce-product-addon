@@ -788,21 +788,20 @@ final class CartHandler {
 			return $item_subtotal;
 		}
 
-		$price = 0;
+		$price = 0.0;
 		foreach ( $option_prices as $option ) {
 			$option       = Helpers::translation_options( $option );
-			$option_price = isset( $option['price'] ) ? $option['price'] : 0;
-			if ( 0 === $option_price || ( ! isset( $option['apply'] ) || 'onetime' !== $option['apply'] ) ) {
+			$option_price = isset( $option['price'] ) ? (float) $option['price'] : 0.0;
+			if ( 0.0 === $option_price || ( ! isset( $option['apply'] ) || 'onetime' !== $option['apply'] ) ) {
 				continue;
 			}
-			$price = isset( $option['discount'] ) && $option['discount'] > 0 ? $option['discount'] : $option_price;
-			if ( ! empty( $price ) ) {
-				$price = apply_filters( 'ppom_option_price', $price );
-				$price = floatval( wp_strip_all_tags( $price ) );
-			}
+			$option_price = isset( $option['discount'] ) && $option['discount'] > 0 ? (float) $option['discount'] : $option_price;
+			$option_price = apply_filters( 'ppom_option_price', $option_price );
+
+			$price += floatval( wp_strip_all_tags( (string) $option_price ) );
 		}
 
-		if ( 0 === $price ) {
+		if ( 0.0 === $price ) {
 			return $item_subtotal;
 		}
 		$product_id    = $cart_item['product_id'];
