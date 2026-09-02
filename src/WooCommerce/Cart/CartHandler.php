@@ -853,6 +853,14 @@ final class CartHandler {
 		}
 
 		if ( isset( $option['option_id'] ) ) {
+			$key = sanitize_key( (string) $option['data_name'] ) . '|' . (string) $option['option_id'];
+
+			if ( isset( $counted_fields[ $key ] ) ) {
+				return 0.0;
+			}
+
+			$counted_fields[ $key ] = true;
+
 			return self::resolved_onetime_option_price( $option, $product, $attached_ids, $selected_fields );
 		}
 
@@ -1227,6 +1235,7 @@ final class CartHandler {
 		// The selected variation prices the line, and its pristine copy resolves addons.
 		$pristine        = wc_get_product( $variation_id ? $variation_id : $product_id );
 		$line_product    = $pristine instanceof \WC_Product ? $pristine : new \WC_Product( $product_id );
+		$base_product    = isset( $cart_item['data'] ) && $cart_item['data'] instanceof \WC_Product ? $cart_item['data'] : $line_product;
 		$ppom_meta_ids   = isset( $cart_item['ppom']['fields']['id'] ) ? $cart_item['ppom']['fields']['id'] : '';
 		$selected_fields = isset( $cart_item['ppom']['fields'] ) && is_array( $cart_item['ppom']['fields'] ) ? $cart_item['ppom']['fields'] : array();
 		$attached_ids    = null;
@@ -1288,7 +1297,7 @@ final class CartHandler {
 		if ( 0.0 === $price ) {
 			return $item_subtotal;
 		}
-		$product_price = floatval( $line_product->get_price() ) * $quantity;
+		$product_price = floatval( $base_product->get_price() ) * $quantity;
 		$item_subtotal = $product_price + $price;
 		return Helpers::price( $item_subtotal );
 	}
