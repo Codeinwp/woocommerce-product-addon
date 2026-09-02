@@ -215,7 +215,9 @@ class Test_Field_Group_Toggle extends PPOM_Test_Case {
 
 		$ppom = new PPOM_Meta( $product->get_id() );
 
-		$settings = $ppom->settings();
+		// ppom_settings is the property the cart handler reads, resolved during
+		// construction before get_fields() prunes $meta_id.
+		$settings = $ppom->ppom_settings;
 		$this->assertNotNull( $settings, 'A later enabled group must still provide settings' );
 		$this->assertSame( (int) $meta_on, (int) $settings->productmeta_id );
 
@@ -260,5 +262,60 @@ class Test_Field_Group_Toggle extends PPOM_Test_Case {
 
 		$this->assertArrayHasKey( 'ppom', $cart_item, 'Selections must not be dropped from the cart item' );
 		$this->assertSame( 'Hello world', $cart_item['ppom']['fields']['engraving'] );
+	}
+
+	/**
+	 * Frontend: an unusable ID resolved ahead of a real group (the
+	 * `ppom_product_meta_id` filter can produce this, and get_fields() already
+	 * tolerates it) must not null out the primary settings row.
+	 *
+	 * @return void
+	 */
+	public function test_invalid_id_resolved_first_still_resolves_settings() {
+		$product = $this->create_simple_product();
+
+		$meta_on = $this->insert_ppom_meta( array( $this->build_text_field( 'on_field', 'On' ) ) );
+
+		update_post_meta(
+			$product->get_id(),
+			PPOM_PRODUCT_META_KEY,
+			array( 0, $meta_on )
+		);
+
+		$ppom = new PPOM_Meta( $product->get_id() );
+
+		$settings = $ppom->ppom_settings;
+		$this->assertNotNull( $settings, 'A leading unusable ID must not hide the real group' );
+		$this->assertSame( (int) $meta_on, (int) $settings->productmeta_id );
+
+		$data_names = array_map(
+			static function ( $field ) {
+				return isset( $field['data_name'] ) ? (string) $field['data_name'] : '';
+			},
+			(array) $ppom->get_fields()
+		);
+
+		$this->assertContains( 'on_field', $data_names );
+	}
+
+	/**
+	 * Frontend: a product whose resolution yields nothing usable still has no
+	 * settings row — the normalization must not invent one.
+	 *
+	 * @return void
+	 */
+	public function test_only_invalid_ids_resolve_to_no_settings() {
+		$product = $this->create_simple_product();
+
+		update_post_meta(
+			$product->get_id(),
+			PPOM_PRODUCT_META_KEY,
+			array( 0, 'None' )
+		);
+
+		$ppom = new PPOM_Meta( $product->get_id() );
+
+		$this->assertNull( $ppom->ppom_settings );
+		$this->assertEmpty( $ppom->get_fields() );
 	}
 }

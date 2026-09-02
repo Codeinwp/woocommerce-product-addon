@@ -249,16 +249,14 @@ class PPOM_Meta {
 	 */
 	public function settings() {
 
-		$meta_id = $this->single_meta_id();
+		$meta_ids = is_array( $this->meta_id ) ? $this->meta_id : array( $this->single_meta_id() );
+		$meta_ids = array_values( array_filter( array_map( 'absint', $meta_ids ) ) );
 
-		if ( ! $meta_id || $meta_id == __( 'None', 'woocommerce-product-addon' ) ) {
+		if ( empty( $meta_ids ) ) {
 			return null;
 		}
 
 		$repo = \PPOM\Data\FieldGroupRepository::instance();
-
-		$meta_ids = is_array( $this->meta_id ) ? $this->meta_id : array( $meta_id );
-		$meta_ids = array_values( array_filter( array_map( 'absint', $meta_ids ) ) );
 
 		$rows = array();
 		foreach ( $repo->get_rows_by_productmeta_ids( $meta_ids ) as $row ) {
