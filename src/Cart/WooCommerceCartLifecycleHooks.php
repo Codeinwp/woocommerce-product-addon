@@ -32,7 +32,11 @@ final class WooCommerceCartLifecycleHooks {
 
 			add_filter( 'woocommerce_get_cart_item_from_session', 'ppom_price_check_price_matrix', 8, 2 );
 
-			add_filter( 'woocommerce_get_cart_item_from_session', 'ppom_price_controller', 10, 2 );
+			add_filter( 'woocommerce_get_cart_item_from_session', 'ppom_price_controller', 10, 3 );
+
+			// Early priority: put PPOM-priced lines back to their catalog price, so a
+			// set_price() later in this pass is recognisable as a third party's base.
+			add_action( 'woocommerce_before_calculate_totals', 'ppom_restore_line_base_prices', 0 );
 
 			// Late priority: re-assert the line price after third-party set_price() calls. See #680.
 			add_action( 'woocommerce_before_calculate_totals', 'ppom_before_calculate_totals', 1000 );
