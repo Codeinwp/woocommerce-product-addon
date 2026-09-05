@@ -190,4 +190,132 @@ class Test_Field_Group_Toggle extends PPOM_Test_Case {
 		$this->assertContains( 'keep_field', $data_names, 'Enabled group must still render' );
 		$this->assertNotContains( 'drop_field', $data_names, 'Disabled group must be filtered out' );
 	}
+
+	/**
+	 * Frontend: with two attached groups where the disabled one is resolved
+	 * first, settings() must fall through to the later enabled group instead of
+	 * returning null — otherwise the form renders but the cart handler bails.
+	 *
+	 * @return void
+	 */
+	public function test_disabled_group_resolved_first_falls_through_to_active_group() {
+		$product = $this->create_simple_product();
+
+		$meta_off = $this->insert_ppom_meta( array( $this->build_text_field( 'off_field', 'Off' ) ) );
+		$meta_on  = $this->insert_ppom_meta( array( $this->build_text_field( 'on_field', 'On' ) ) );
+
+		// Disabled group first, mirroring the default category-first merge order.
+		update_post_meta(
+			$product->get_id(),
+			PPOM_PRODUCT_META_KEY,
+			array( $meta_off, $meta_on )
+		);
+
+		ppom_meta_repository()->set_disabled( $meta_off, true );
+
+		$ppom = new PPOM_Meta( $product->get_id() );
+
+		// ppom_settings is the property the cart handler reads, resolved during
+		// construction before get_fields() prunes $meta_id.
+		$settings = $ppom->ppom_settings;
+		$this->assertNotNull( $settings, 'A later enabled group must still provide settings' );
+		$this->assertSame( (int) $meta_on, (int) $settings->productmeta_id );
+
+		$data_names = array_map(
+			static function ( $field ) {
+				return isset( $field['data_name'] ) ? (string) $field['data_name'] : '';
+			},
+			(array) $ppom->get_fields()
+		);
+
+		$this->assertContains( 'on_field', $data_names );
+		$this->assertNotContains( 'off_field', $data_names );
+	}
+
+	/**
+	 * Cart: selections made in the enabled group must reach the cart item even
+	 * when a disabled group is resolved ahead of it.
+	 *
+	 * @return void
+	 */
+	public function test_disabled_group_resolved_first_keeps_cart_payload() {
+		$product = $this->create_simple_product();
+
+		$meta_off = $this->insert_ppom_meta( array( $this->build_text_field( 'off_field', 'Off' ) ) );
+		$meta_on  = $this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving' ) ) );
+
+		update_post_meta(
+			$product->get_id(),
+			PPOM_PRODUCT_META_KEY,
+			array( $meta_off, $meta_on )
+		);
+
+		ppom_meta_repository()->set_disabled( $meta_off, true );
+
+		WC()->cart = null;
+
+		$_POST['ppom'] = array(
+			'fields' => array( 'engraving' => 'Hello world' ),
+		);
+
+		$cart_item = ppom_woocommerce_add_cart_item_data( array(), $product->get_id() );
+
+		$this->assertArrayHasKey( 'ppom', $cart_item, 'Selections must not be dropped from the cart item' );
+		$this->assertSame( 'Hello world', $cart_item['ppom']['fields']['engraving'] );
+	}
+
+	/**
+	 * Frontend: an unusable ID resolved ahead of a real group (the
+	 * `ppom_product_meta_id` filter can produce this, and get_fields() already
+	 * tolerates it) must not null out the primary settings row.
+	 *
+	 * @return void
+	 */
+	public function test_invalid_id_resolved_first_still_resolves_settings() {
+		$product = $this->create_simple_product();
+
+		$meta_on = $this->insert_ppom_meta( array( $this->build_text_field( 'on_field', 'On' ) ) );
+
+		update_post_meta(
+			$product->get_id(),
+			PPOM_PRODUCT_META_KEY,
+			array( 0, $meta_on )
+		);
+
+		$ppom = new PPOM_Meta( $product->get_id() );
+
+		$settings = $ppom->ppom_settings;
+		$this->assertNotNull( $settings, 'A leading unusable ID must not hide the real group' );
+		$this->assertSame( (int) $meta_on, (int) $settings->productmeta_id );
+
+		$data_names = array_map(
+			static function ( $field ) {
+				return isset( $field['data_name'] ) ? (string) $field['data_name'] : '';
+			},
+			(array) $ppom->get_fields()
+		);
+
+		$this->assertContains( 'on_field', $data_names );
+	}
+
+	/**
+	 * Frontend: a product whose resolution yields nothing usable still has no
+	 * settings row — the normalization must not invent one.
+	 *
+	 * @return void
+	 */
+	public function test_only_invalid_ids_resolve_to_no_settings() {
+		$product = $this->create_simple_product();
+
+		update_post_meta(
+			$product->get_id(),
+			PPOM_PRODUCT_META_KEY,
+			array( 0, 'None' )
+		);
+
+		$ppom = new PPOM_Meta( $product->get_id() );
+
+		$this->assertNull( $ppom->ppom_settings );
+		$this->assertEmpty( $ppom->get_fields() );
+	}
 }
