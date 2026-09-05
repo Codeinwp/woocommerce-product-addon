@@ -12,8 +12,9 @@ const ppom_hidden_fields = [];
 jQuery( function ( $ ) {
 	// Legacy mode recalculates all conditions after each relevant field change.
 	$( '.ppom-wrapper' ).on(
-		'change',
-		'select,input:radio,input:checkbox',
+		'change keyup',
+		'select, textarea, input:radio, input:checkbox, input:text,' +
+			' input[type="number"], input[type="email"], input[type="date"]',
 		function ( e ) {
 			ppom_check_conditions();
 		}
@@ -185,7 +186,12 @@ jQuery( function ( $ ) {
 				break;
 		}
 
-		ppom_hidden_fields.push( e.field );
+		// The event fires on every recalculation, not only on a change, so the
+		// submitted `conditionally_hidden` list must not collect duplicates.
+		if ( $.inArray( e.field, ppom_hidden_fields ) === -1 ) {
+			ppom_hidden_fields.push( e.field );
+		}
+
 		$.event.trigger( {
 			type: 'ppom_hidden_fields_updated',
 			field: e.field,
@@ -280,56 +286,71 @@ function ppom_check_conditions() {
 	} );
 }
 
+function ppom_toggle_condition_visibility( $fields, visible ) {
+	if ( visible ) {
+		return $fields
+			.removeClass( 'ppom-c-hide' )
+			.addClass( 'ppom-c-show' )
+			.show();
+	}
+
+	return $fields
+		.hide()
+		.removeClass( 'ppom-c-show' )
+		.addClass( 'ppom-c-hide' );
+}
+
+// Fields whose condition has been evaluated at least once. The first pass always
+// emits, so listeners that set widgets up still run for fields that are already
+// visible on page load.
+const ppom_evaluated_fields = {};
+
 // Showing/hiding a field also needs to broadcast the same lifecycle events
 // used by uploads, pricing, and validation to keep their state consistent.
-function ppom_unlock_field_from_condition( field, unlock ) {
-	const classname = '.ppom-input-' + field;
-	if ( unlock === 'Show' ) {
-		jQuery( classname )
-			.show()
-			.removeClass( 'ppom-locked' )
-			.addClass( 'ppom-unlocked' )
-			.trigger( {
-				type: 'ppom_field_shown',
-				field,
-				time: new Date(),
-			} );
-	} else {
-		jQuery( classname )
-			.hide()
-			.removeClass( 'ppom-locked' )
-			.addClass( 'ppom-unlocked' )
-			.trigger( {
-				type: 'ppom_field_hidden',
-				field,
-				time: new Date(),
-			} );
+function ppom_apply_field_visibility(
+	field,
+	visible,
+	remove_class,
+	add_class
+) {
+	const $fields = jQuery( '.ppom-input-' + field );
+
+	// Classes are idempotent, so they stay in sync on every recalculation.
+	ppom_toggle_condition_visibility( $fields, visible )
+		.removeClass( remove_class )
+		.addClass( add_class );
+
+	const tracked_visible = jQuery.inArray( field, ppom_hidden_fields ) === -1;
+
+	if ( ppom_evaluated_fields[ field ] && tracked_visible === visible ) {
+		return;
 	}
+
+	ppom_evaluated_fields[ field ] = true;
+
+	$fields.trigger( {
+		type: visible ? 'ppom_field_shown' : 'ppom_field_hidden',
+		field,
+		time: new Date(),
+	} );
+}
+
+function ppom_unlock_field_from_condition( field, unlock ) {
+	ppom_apply_field_visibility(
+		field,
+		unlock === 'Show',
+		'ppom-locked',
+		'ppom-unlocked'
+	);
 }
 
 function ppom_lock_field_from_condition( field, lock ) {
-	const classname = '.ppom-input-' + field;
-	if ( lock === 'Show' ) {
-		jQuery( classname )
-			.hide()
-			.removeClass( 'ppom-unlocked' )
-			.addClass( 'ppom-locked' )
-			.trigger( {
-				type: 'ppom_field_hidden',
-				field,
-				time: new Date(),
-			} );
-	} else {
-		jQuery( classname )
-			.show()
-			.removeClass( 'ppom-unlocked' )
-			.addClass( 'ppom-locked' )
-			.trigger( {
-				type: 'ppom_field_shown',
-				field,
-				time: new Date(),
-			} );
-	}
+	ppom_apply_field_visibility(
+		field,
+		lock !== 'Show',
+		'ppom-unlocked',
+		'ppom-locked'
+	);
 
 	jQuery.event.trigger( {
 		type: 'ppom_field_locked',
@@ -342,91 +363,211 @@ function ppom_lock_field_from_condition( field, lock ) {
 // Count how many rules match for a target field in the legacy condition format.
 function ppom_get_field_rule_status( condition ) {
 	let ppom_rules_matched = 0;
+
 	jQuery.each( condition.rules, function ( i, rule ) {
-		const element_type = ppom_get_field_type_by_id( rule.elements );
-
-		// console.log(element_type);
-		switch ( rule.operators ) {
-			case 'is':
-				if ( element_type === 'checkbox' ) {
-					var element_value = ppom_get_element_value( rule.elements );
-					jQuery( element_value ).each( function ( i, item ) {
-						if ( item === rule.element_values ) {
-							ppom_rules_matched++;
-						}
-					} );
-				} else if ( element_type === 'image' ) {
-					var element_value = ppom_get_element_value( rule.elements );
-					jQuery( element_value ).each( function ( i, item ) {
-						if ( item === rule.element_values ) {
-							ppom_rules_matched++;
-						}
-					} );
-				} else if (
-					ppom_get_element_value( rule.elements ) ===
-					rule.element_values
-				) {
-					ppom_rules_matched++;
-				}
-				break;
-
-			case 'not':
-				if ( element_type === 'checkbox' ) {
-					var element_value = ppom_get_element_value( rule.elements );
-					jQuery( element_value ).each( function ( i, item ) {
-						if ( item !== rule.element_values ) {
-							ppom_rules_matched++;
-						}
-					} );
-				} else if (
-					ppom_get_element_value( rule.elements ) !==
-					rule.element_values
-				) {
-					ppom_rules_matched++;
-				}
-				break;
-
-			case 'greater than':
-				if ( element_type === 'checkbox' ) {
-					var element_value = ppom_get_element_value( rule.elements );
-					jQuery( element_value ).each( function ( i, item ) {
-						if (
-							parseFloat( item ) >
-							parseFloat( rule.element_values )
-						) {
-							ppom_rules_matched++;
-						}
-					} );
-				} else if (
-					parseFloat( ppom_get_element_value( rule.elements ) ) >
-					parseFloat( rule.element_values )
-				) {
-					ppom_rules_matched++;
-				}
-				break;
-
-			case 'less than':
-				if ( element_type === 'checkbox' ) {
-					var element_value = ppom_get_element_value( rule.elements );
-					jQuery( element_value ).each( function ( i, item ) {
-						if (
-							parseFloat( item ) <
-							parseFloat( rule.element_values )
-						) {
-							ppom_rules_matched++;
-						}
-					} );
-				} else if (
-					parseFloat( ppom_get_element_value( rule.elements ) ) <
-					parseFloat( rule.element_values )
-				) {
-					ppom_rules_matched++;
-				}
-				break;
+		// A rule contributes at most one match so `All` can compare the match
+		// count against the rule count.
+		if ( ppom_rule_matches( rule ) ) {
+			ppom_rules_matched++;
 		}
 	} );
 
 	return ppom_rules_matched;
+}
+
+// Operators the conditions UI marks as Pro. Some of them ('even-number',
+// 'odd-number') need no rule data at all, so the payload cannot gate them and
+// the server has to state whether Pro is active.
+const ppom_pro_only_operators = [
+	'contains',
+	'not-contains',
+	'regex',
+	'between',
+	'number-multiplier',
+	'even-number',
+	'odd-number',
+];
+
+function ppom_operator_is_available( operator ) {
+	if ( jQuery.inArray( operator, ppom_pro_only_operators ) === -1 ) {
+		return true;
+	}
+
+	return ppom_input_vars.conditions_pro_enabled === 'yes';
+}
+
+// Evaluate one rule against the current value of its source field.
+function ppom_rule_matches( rule ) {
+	const operator = rule.operators;
+
+	if ( ! ppom_operator_is_available( operator ) ) {
+		return false;
+	}
+
+	const element_value = ppom_get_element_value( rule.elements );
+
+	if ( operator === 'any' || operator === 'empty' ) {
+		return operator === 'empty'
+			? ppom_element_value_is_empty( element_value )
+			: ! ppom_element_value_is_empty( element_value );
+	}
+
+	// Multi-value sources (checkbox, palettes, image) compare against the whole
+	// selection for equality and against each selected value for the rest.
+	if ( Array.isArray( element_value ) ) {
+		if ( operator === 'is' ) {
+			return jQuery.inArray( rule.element_values, element_value ) > -1;
+		}
+
+		if ( operator === 'not' ) {
+			return jQuery.inArray( rule.element_values, element_value ) === -1;
+		}
+
+		const matched = jQuery.grep( element_value, function ( item ) {
+			return ppom_compare_rule_value( item, rule );
+		} );
+
+		if ( operator === 'not-contains' ) {
+			return matched.length === element_value.length;
+		}
+
+		return matched.length > 0;
+	}
+
+	return ppom_compare_rule_value( element_value, rule );
+}
+
+function ppom_element_value_is_empty( element_value ) {
+	if ( Array.isArray( element_value ) ) {
+		return element_value.length === 0;
+	}
+
+	return (
+		element_value === undefined ||
+		element_value === null ||
+		element_value === ''
+	);
+}
+
+// Numeric operators must not treat a blank or non-numeric field as a number,
+// otherwise an untouched field reads as "odd" or "not a multiple of".
+function ppom_to_number( value ) {
+	const number = parseFloat( value );
+
+	return isNaN( number ) ? null : number;
+}
+
+// The option dropdown wins; the Pro-only constant input is the fallback.
+function ppom_rule_comparison_value( rule ) {
+	return rule.element_values || rule.element_constant;
+}
+
+// Compare a single source value against one rule.
+function ppom_compare_rule_value( element_value, rule ) {
+	// PHP also withholds this value from installs without an active Pro
+	// license, so the constant-driven operators have nothing to match against.
+	const constant = rule.element_constant;
+
+	switch ( rule.operators ) {
+		case 'is':
+			return element_value === ppom_rule_comparison_value( rule );
+
+		case 'not':
+			return element_value !== ppom_rule_comparison_value( rule );
+
+		case 'contains':
+			return (
+				!! constant && String( element_value ).indexOf( constant ) > -1
+			);
+
+		case 'not-contains':
+			return (
+				!! constant &&
+				String( element_value ).indexOf( constant ) === -1
+			);
+
+		case 'regex':
+			return ppom_regex_matches( element_value, constant );
+
+		case 'greater than':
+		case 'less than':
+		case 'between':
+		case 'number-multiplier':
+		case 'even-number':
+		case 'odd-number':
+			return ppom_compare_numeric_rule_value(
+				ppom_to_number( element_value ),
+				rule
+			);
+
+		default:
+			// An operator this build does not know about never matches, the
+			// same as the v2 engine.
+			return false;
+	}
+}
+
+// Numeric operators, split out so a blank or non-numeric source value can be
+// rejected once instead of per operator.
+function ppom_compare_numeric_rule_value( number, rule ) {
+	if ( number === null ) {
+		return false;
+	}
+
+	switch ( rule.operators ) {
+		case 'greater than':
+			return number > parseFloat( ppom_rule_comparison_value( rule ) );
+
+		case 'less than':
+			return number < parseFloat( ppom_rule_comparison_value( rule ) );
+
+		case 'between': {
+			const interval = rule[ 'cond-between-interval' ] || {};
+
+			return (
+				number >= parseFloat( interval.from ) &&
+				number <= parseFloat( interval.to )
+			);
+		}
+
+		case 'number-multiplier': {
+			const multiplier = ppom_to_number( rule.element_constant );
+
+			return (
+				multiplier !== null &&
+				multiplier !== 0 &&
+				number % multiplier === 0
+			);
+		}
+
+		case 'even-number':
+			return number % 2 === 0;
+
+		case 'odd-number':
+			return number % 2 !== 0;
+	}
+
+	return false;
+}
+
+// Accepts both `/pattern/flags` and a bare pattern, and never lets a malformed
+// pattern throw out of the condition loop.
+function ppom_regex_matches( element_value, pattern ) {
+	if ( typeof pattern !== 'string' || pattern === '' ) {
+		return false;
+	}
+
+	const delimited = pattern.match( /^\/(.*)\/([a-z]*)$/ );
+
+	try {
+		const regex = delimited
+			? new RegExp( delimited[ 1 ], delimited[ 2 ] )
+			: new RegExp( pattern );
+
+		return regex.test( element_value );
+	} catch ( error ) {
+		return false;
+	}
 }
 
 // Normalize legacy field values before comparing them against rule operators.
@@ -448,6 +589,7 @@ function ppom_get_element_value( field_name ) {
 			).val();
 			break;
 
+		case 'palettes':
 		case 'checkbox':
 			jQuery(
 				'input[name="ppom[fields][' + field_name + '][]"]:checked'
@@ -470,9 +612,25 @@ function ppom_get_element_value( field_name ) {
 				'input[name="ppom[fields][' + field_name + ']"]:checked'
 			).attr( 'data-title' );
 			break;
+
+		case 'switcher':
+			value_found = jQuery(
+				'.ppom-input[data-data_name="' + field_name + '"]:checked'
+			).val();
+			break;
+
+		default:
+			value_found = jQuery(
+				'.ppom-input[data-data_name="' + field_name + '"]'
+			).val();
+			break;
 	}
 
-	if ( element_type === 'checkbox' || element_type === 'image' ) {
+	if (
+		element_type === 'checkbox' ||
+		element_type === 'palettes' ||
+		element_type === 'image'
+	) {
 		return value_found_cb;
 	}
 
