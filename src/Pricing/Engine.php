@@ -1380,9 +1380,13 @@ final class Engine {
 
 			foreach ( $bulkquantity_options as $bq ) {
 
-				// ppom_pa($bq);
-				$range       = $bq['Quantity Range'];
-				$range_array = explode( '-', $range );
+				$range       = isset( $bq['Quantity Range'] ) ? $bq['Quantity Range'] : '';
+				$range_array = explode( '-', (string) $range );
+
+				if ( ! isset( $range_array[1] ) || ! is_numeric( trim( $range_array[0] ) ) || ! is_numeric( trim( $range_array[1] ) ) ) {
+					continue;
+				}
+
 				$range_start = intval( $range_array[0] );
 				$range_end   = intval( $range_array[1] );
 

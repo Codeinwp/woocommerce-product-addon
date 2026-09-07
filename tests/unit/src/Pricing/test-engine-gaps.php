@@ -241,6 +241,52 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 	}
 
 	/**
+	 * A bulk-quantity row whose `Quantity Range` has no second endpoint cannot
+	 * be matched against a quantity.
+	 *
+	 * @return void
+	 */
+	public function test_price_bulkquantity_chunk_skips_rows_missing_an_endpoint() {
+		$product = $this->create_simple_product();
+
+		$rows = array(
+			array(
+				'Quantity Range' => '1-9',
+				'Base Price'     => '10',
+				'ID'             => 'a',
+			),
+			array(
+				'Quantity Range' => '10+',
+				'Base Price'     => '20',
+				'ID'             => 'b',
+			),
+		);
+
+		$errors = array();
+		set_error_handler(
+			function ( $errno, $errstr ) use ( &$errors ) {
+				$errors[] = $errstr;
+				return true;
+			},
+			E_ALL
+		);
+
+		try {
+			$this->assertSame( $rows[0], Engine::price_bulkquantity_chunk( $product, $rows, 5 ) );
+			$this->assertSame( array(), Engine::price_bulkquantity_chunk( $product, $rows, 10 ) );
+		} finally {
+			restore_error_handler();
+		}
+
+		foreach ( $errors as $error ) {
+			$this->assertStringNotContainsString(
+				'Undefined array key',
+				$error,
+				'A row missing an endpoint must be skipped, not read.'
+			);
+		}
+	}
+	/**
 	 * price_has_discount_matrix returns false when the product has no pricematrix field.
 	 *
 	 * @return void

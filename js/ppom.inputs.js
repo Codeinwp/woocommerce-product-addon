@@ -594,14 +594,19 @@ function ppom_bulkquantity_price_manager( quantity, data_name ) {
 	jQuery.each(
 		JSON.parse( ppom_bulkquantity_meta[ data_name ] ),
 		function ( idx, obj ) {
-			const qty_range = obj[ 'Quantity Range' ].split( '-' );
-			const qty_range_from = qty_range[ 0 ];
-			const qty_range_to = qty_range[ 1 ];
+			const qty_range = String( obj[ 'Quantity Range' ] || '' ).split(
+				'-'
+			);
+			const qty_range_from = parseInt( qty_range[ 0 ], 10 );
+			const qty_range_to = parseInt( qty_range[ 1 ], 10 );
 
-			if (
-				quantity >= parseInt( qty_range_from ) &&
-				quantity <= parseInt( qty_range_to )
-			) {
+			// A tier missing an endpoint can never be priced. Skip it explicitly
+			// rather than leaning on a NaN comparison to fall through.
+			if ( isNaN( qty_range_from ) || isNaN( qty_range_to ) ) {
+				return;
+			}
+
+			if ( quantity >= qty_range_from && quantity <= qty_range_to ) {
 				// Setting Initial Price to 0 and taking base price
 				ppom_base_price =
 					obj[ 'Base Price' ] == undefined ||
