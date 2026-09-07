@@ -273,6 +273,8 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 				'Base Price'     => '40',
 				'ID'             => 'd',
 			),
+			// A row can decode to null outright.
+			null,
 		);
 
 		$errors = array();

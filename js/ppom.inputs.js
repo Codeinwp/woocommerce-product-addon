@@ -623,9 +623,21 @@ function ppom_bulkquantity_price_manager( quantity, data_name ) {
 	jQuery.each(
 		JSON.parse( ppom_bulkquantity_meta[ data_name ] ),
 		function ( idx, obj ) {
-			const qty_range = String( obj[ 'Quantity Range' ] || '' ).split(
-				'-'
-			);
+			if ( typeof obj !== 'object' || obj === null ) {
+				return;
+			}
+
+			const raw_range = obj[ 'Quantity Range' ];
+
+			if (
+				typeof raw_range !== 'string' &&
+				typeof raw_range !== 'number' &&
+				typeof raw_range !== 'boolean'
+			) {
+				return;
+			}
+
+			const qty_range = String( raw_range ).split( '-' );
 			const qty_range_from = ppom_bq_parse_range_endpoint(
 				qty_range[ 0 ]
 			);

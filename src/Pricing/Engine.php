@@ -1376,7 +1376,7 @@ final class Engine {
 
 		$bq_found = array();
 
-		if ( count( $bulkquantity_options ) > 0 ) {
+		if ( is_array( $bulkquantity_options ) ) {
 
 			foreach ( $bulkquantity_options as $bq ) {
 
