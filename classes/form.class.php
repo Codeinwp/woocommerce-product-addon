@@ -87,21 +87,15 @@ class PPOM_Form {
 		$allow_nextprev        = ppom_get_option( 'ppom-collapse-nextprev' );
 
 		// posted value being
-		// used ppom-pro
-		$posted_values   = apply_filters( 'ppom_default_values', $posted_values, $_POST, $this->product_id, self::$args );
-		$fields          = array_filter(
+		// used ppom-pro.
+		$posted_values = apply_filters( 'ppom_default_values', $posted_values, $_POST, $this->product_id, self::$args ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$fields        = array_filter(
 			self::$ppom->fields,
 			function ( $field ) use ( $meta_id ) {
 				if ( ! is_array( $field ) || ! isset( $field['ppom_id'] ) ) {
 					return false;
 				}
 				return (int) $meta_id === (int) $field['ppom_id'];
-			}
-		);
-		$collapse_fields = array_filter(
-			$fields,
-			function ( $collapse_field ) {
-				return isset( $collapse_field['type'] ) && 'collapse' === $collapse_field['type'];
 			}
 		);
 
@@ -178,10 +172,6 @@ class PPOM_Form {
 
 				$section_started = true;
 				++$ppom_collapse_counter;
-
-				if ( count( $fields ) === $ppom_field_counter ) {
-					echo '</div>';
-				}
 			}
 
 			// skip collapse div
@@ -219,13 +209,14 @@ class PPOM_Form {
 			$field_html .= '</div>';
 
 			// Filter: nmforms_input_htmls
-			// @TODO need to change with relevant name
-			echo apply_filters( 'nmforms_input_html', $field_html, $meta, $default_value );
+			// @TODO need to change with relevant name.
+			echo apply_filters( 'nmforms_input_html', $field_html, $meta, $default_value ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
 
-			if ( count( $fields ) === $ppom_field_counter && $section_started ) {
-				echo '</div>';
-				$section_started = false;
-			}
+		// Closes the last open collapse section.
+		if ( $section_started ) {
+			echo '</div>';
+			$section_started = false;
 		}
 	}
 
