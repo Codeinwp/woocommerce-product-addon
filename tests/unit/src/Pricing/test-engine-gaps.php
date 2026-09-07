@@ -260,6 +260,19 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 				'Base Price'     => '20',
 				'ID'             => 'b',
 			),
+			// Stored JSON can decode a range into an array; casting one would
+			// raise a conversion notice before any endpoint check ran.
+			array(
+				'Quantity Range' => array( '10', '20' ),
+				'Base Price'     => '30',
+				'ID'             => 'c',
+			),
+			// A numeric prefix is not numeric to PHP, so this row is skipped too.
+			array(
+				'Quantity Range' => '10-20x',
+				'Base Price'     => '40',
+				'ID'             => 'd',
+			),
 		);
 
 		$errors = array();
@@ -274,17 +287,16 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 		try {
 			$this->assertSame( $rows[0], Engine::price_bulkquantity_chunk( $product, $rows, 5 ) );
 			$this->assertSame( array(), Engine::price_bulkquantity_chunk( $product, $rows, 10 ) );
+			$this->assertSame( array(), Engine::price_bulkquantity_chunk( $product, $rows, 15 ) );
 		} finally {
 			restore_error_handler();
 		}
 
-		foreach ( $errors as $error ) {
-			$this->assertStringNotContainsString(
-				'Undefined array key',
-				$error,
-				'A row missing an endpoint must be skipped, not read.'
-			);
-		}
+		$this->assertSame(
+			array(),
+			$errors,
+			'A row missing an endpoint must be skipped, not read. Raised: ' . implode( ' | ', $errors )
+		);
 	}
 	/**
 	 * price_has_discount_matrix returns false when the product has no pricematrix field.

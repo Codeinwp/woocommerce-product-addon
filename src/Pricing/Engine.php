@@ -1380,8 +1380,12 @@ final class Engine {
 
 			foreach ( $bulkquantity_options as $bq ) {
 
-				$range       = isset( $bq['Quantity Range'] ) ? $bq['Quantity Range'] : '';
-				$range_array = explode( '-', (string) $range );
+				if ( ! is_array( $bq ) ) {
+					continue;
+				}
+
+				$range       = isset( $bq['Quantity Range'] ) && is_scalar( $bq['Quantity Range'] ) ? (string) $bq['Quantity Range'] : '';
+				$range_array = explode( '-', $range );
 
 				if ( ! isset( $range_array[1] ) || ! is_numeric( trim( $range_array[0] ) ) || ! is_numeric( trim( $range_array[1] ) ) ) {
 					continue;

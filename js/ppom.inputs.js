@@ -587,22 +587,53 @@ function ppom_bq_qty_changed( qty, data_name, context ) {
 	ppom_bulkquantity_price_manager( qty, data_name );
 }
 
+/**
+ * Parse one endpoint of a `Quantity Range` the way the server does.
+ *
+ * @param {*} value Raw endpoint from the stored matrix.
+ * @return {number|null} Integer value, or null when the server would skip it.
+ */
+function ppom_bq_parse_range_endpoint( value ) {
+	if ( typeof value !== 'string' && typeof value !== 'number' ) {
+		return null;
+	}
+
+	const trimmed = String( value ).trim();
+
+	// PHP's numeric-string grammar: optional sign, digits with an optional
+	// fraction, optional exponent. Hex and trailing garbage are not numeric.
+	if ( ! /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/.test( trimmed ) ) {
+		return null;
+	}
+
+	// Matches PHP's intval(): truncate toward zero.
+	return Math.trunc( Number( trimmed ) );
+}
+
 // Resolve the active bulkquantity row into price/base-price attributes expected
 // by the legacy and modern price preview engines.
 function ppom_bulkquantity_price_manager( quantity, data_name ) {
 	let ppom_base_price = 0;
+	const selected_option = jQuery(
+		`.ppom-bulkquantity-options.${ data_name } option:selected`
+	);
+	selected_option.attr( 'data-baseprice', 0 );
+	selected_option.attr( 'data-price', 0 );
+
 	jQuery.each(
 		JSON.parse( ppom_bulkquantity_meta[ data_name ] ),
 		function ( idx, obj ) {
 			const qty_range = String( obj[ 'Quantity Range' ] || '' ).split(
 				'-'
 			);
-			const qty_range_from = parseInt( qty_range[ 0 ], 10 );
-			const qty_range_to = parseInt( qty_range[ 1 ], 10 );
+			const qty_range_from = ppom_bq_parse_range_endpoint(
+				qty_range[ 0 ]
+			);
+			const qty_range_to = ppom_bq_parse_range_endpoint( qty_range[ 1 ] );
 
-			// A tier missing an endpoint can never be priced. Skip it explicitly
-			// rather than leaning on a NaN comparison to fall through.
-			if ( isNaN( qty_range_from ) || isNaN( qty_range_to ) ) {
+			// A tier the server would skip must be skipped here too, or the
+			// preview prices a row checkout ignores.
+			if ( qty_range_from === null || qty_range_to === null ) {
 				return;
 			}
 
@@ -613,16 +644,12 @@ function ppom_bulkquantity_price_manager( quantity, data_name ) {
 					obj[ 'Base Price' ] == ''
 						? 0
 						: obj[ 'Base Price' ];
-				jQuery(
-					`.ppom-bulkquantity-options.${ data_name } option:selected`
-				).attr( 'data-baseprice', ppom_base_price );
+				selected_option.attr( 'data-baseprice', ppom_base_price );
 
 				// Taking selected variation price
 				const variation = jQuery( '.ppom-bulkquantity-options' ).val();
 				const var_price = obj[ variation ];
-				jQuery(
-					`.ppom-bulkquantity-options.${ data_name } option:selected`
-				).attr( 'data-price', var_price );
+				selected_option.attr( 'data-price', var_price );
 
 				return false;
 			}
