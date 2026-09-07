@@ -1550,11 +1550,6 @@ function ppom_e2e_set_group_read_failure() {
 		update_option( PPOM_E2E_BREAK_GROUP_READS_OPTION, '1', false );
 	} else {
 		delete_option( PPOM_E2E_BREAK_GROUP_READS_OPTION );
-
-	foreach ( (array) get_option( PPOM_E2E_SETTINGS_TOUCHED_OPTION, array() ) as $touched_setting ) {
-		ppom_e2e_write_ppom_setting( $touched_setting, '' );
-	}
-	delete_option( PPOM_E2E_SETTINGS_TOUCHED_OPTION );
 	}
 
 	wp_send_json_success(
@@ -1680,6 +1675,11 @@ function ppom_e2e_reset_state() {
 	delete_option( PPOM_E2E_BREAK_GROUP_READS_OPTION );
 	update_option( 'woocommerce_coming_soon', 'no', false );
 	update_option( 'woocommerce_store_pages_only', 'no', false );
+
+	foreach ( (array) get_option( PPOM_E2E_SETTINGS_TOUCHED_OPTION, array() ) as $touched_setting ) {
+		ppom_e2e_write_ppom_setting( $touched_setting, '' );
+	}
+	delete_option( PPOM_E2E_SETTINGS_TOUCHED_OPTION );
 
 	if ( defined( 'PPOM_PRODUCT_META_KEY' ) ) {
 		delete_post_meta_by_key( PPOM_PRODUCT_META_KEY );
