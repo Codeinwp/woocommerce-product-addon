@@ -1,3 +1,11 @@
+##### [Version 34.0.9](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.8...v34.0.9) (2026-09-07)
+
+- Fixed the file upload button not working when a file or image field had no allowed file types configured.
+- Fixed intermittent file upload failures on cached product pages and pages left open for a long time.
+- Fixed Collapse fields that broke product page layouts.
+- Fixed cart prices being reset by third-party pricing plugins.
+- Updated dependencies
+
 ##### [Version 34.0.8](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.7...v34.0.8) (2026-07-31)
 
 - Fixed an issue where quantity fields with prices would not appear on the product page when a price matrix was attached to the same product.
