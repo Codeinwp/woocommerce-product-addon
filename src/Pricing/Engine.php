@@ -1371,6 +1371,27 @@ final class Engine {
 		return apply_filters( 'ppom_price_matrix_chunk_cart', $matrix_found, $product, $pm_applied );
 	}
 
+	/**
+	 * Parse one endpoint of a bulk-quantity `Quantity Range`.
+	 *
+	 * @param mixed $value Raw endpoint from the stored matrix.
+	 * @return int|null Integer value, or null when the endpoint is unusable.
+	 */
+	private static function parse_range_endpoint( $value ) {
+
+		if ( ! is_scalar( $value ) ) {
+			return null;
+		}
+
+		$trimmed = trim( (string) $value );
+
+		if ( ! preg_match( '/^[0-9]{1,15}$/', $trimmed ) ) {
+			return null;
+		}
+
+		return intval( $trimmed );
+	}
+
 	// If Bulkquantity add-on is used, get it's chunk
 	public static function price_bulkquantity_chunk( $product, $bulkquantity_options, $product_quantity ) {
 
@@ -1387,12 +1408,12 @@ final class Engine {
 				$range       = isset( $bq['Quantity Range'] ) && is_scalar( $bq['Quantity Range'] ) ? (string) $bq['Quantity Range'] : '';
 				$range_array = explode( '-', $range );
 
-				if ( ! isset( $range_array[1] ) || ! is_numeric( trim( $range_array[0] ) ) || ! is_numeric( trim( $range_array[1] ) ) ) {
+				$range_start = self::parse_range_endpoint( $range_array[0] );
+				$range_end   = isset( $range_array[1] ) ? self::parse_range_endpoint( $range_array[1] ) : null;
+
+				if ( null === $range_start || null === $range_end ) {
 					continue;
 				}
-
-				$range_start = intval( $range_array[0] );
-				$range_end   = intval( $range_array[1] );
 
 				// var_dump($bq);
 				$quantity = intval( $product_quantity );

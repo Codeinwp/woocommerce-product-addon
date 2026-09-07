@@ -275,6 +275,16 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 			),
 			// A row can decode to null outright.
 			null,
+			array(
+				'Quantity Range' => '1-1e309',
+				'Base Price'     => '50',
+				'ID'             => 'e',
+			),
+			array(
+				'Quantity Range' => '1-99999999999999999999',
+				'Base Price'     => '60',
+				'ID'             => 'f',
+			),
 		);
 
 		$errors = array();
@@ -290,6 +300,7 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 			$this->assertSame( $rows[0], Engine::price_bulkquantity_chunk( $product, $rows, 5 ) );
 			$this->assertSame( array(), Engine::price_bulkquantity_chunk( $product, $rows, 10 ) );
 			$this->assertSame( array(), Engine::price_bulkquantity_chunk( $product, $rows, 15 ) );
+			$this->assertSame( array(), Engine::price_bulkquantity_chunk( $product, $rows, 1000 ) );
 		} finally {
 			restore_error_handler();
 		}

@@ -600,14 +600,11 @@ function ppom_bq_parse_range_endpoint( value ) {
 
 	const trimmed = String( value ).trim();
 
-	// PHP's numeric-string grammar: optional sign, digits with an optional
-	// fraction, optional exponent. Hex and trailing garbage are not numeric.
-	if ( ! /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/.test( trimmed ) ) {
+	if ( ! /^[0-9]{1,15}$/.test( trimmed ) ) {
 		return null;
 	}
 
-	// Matches PHP's intval(): truncate toward zero.
-	return Math.trunc( Number( trimmed ) );
+	return Number( trimmed );
 }
 
 // Resolve the active bulkquantity row into price/base-price attributes expected
