@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: product addons, woocommerce product addons, woocommerce product options, custom fields, variable products
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 34.0.8
+Stable tag: 34.0.9
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -257,17 +257,13 @@ Please follow the reporting protocols outlined on our [Security Page](https://th
 
 == Changelog ==
 
-##### [Version 34.0.8](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.7...v34.0.8) (2026-07-31)
+##### [Version 34.0.9](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.8...v34.0.9) (2026-09-07)
 
-- Fixed an issue where quantity fields with prices would not appear on the product page when a price matrix was attached to the same product.
-- Fixed a fatal error that occurred when displaying product fields on pages using the PPOM shortcode.
-- Fixed an issue where a dropdown field revealed by conditional logic would appear empty instead of showing its default option.
-- Fixed an issue where prices from selected product options could disappear from the cart total when another plugin also adjusted product prices.
-- Fixed an issue where prices from selected product options were not counted in the cart total right after adding a product to the cart.
-- Fixed an issue where the scheduled cleanup of abandoned file uploads never ran, leaving unused files on the server indefinitely.
-- Locked fields in the field picker now show which plan unlocks them — Essential, Plus or VIP — instead of a generic “PRO” badge.
+- Fixed the file upload button not working when a file or image field had no allowed file types configured.
+- Fixed intermittent file upload failures on cached product pages and pages left open for a long time.
+- Fixed Collapse fields that broke product page layouts.
+- Fixed cart prices being reset by third-party pricing plugins.
 - Updated dependencies
-- Enhanced Security
 
 
 
