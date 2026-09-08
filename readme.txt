@@ -32,7 +32,7 @@ Increase sales and customer satisfaction by offering tailored product options an
 
 ## Input Types in Free Version:
 
-Browse the woo product fields below, from simple text boxes to file uploads.
+Browse the woo product fields below, from simple text boxes to date and number inputs.
 
 📌 **Text**: Displays an input box for text personalization like 'Name on Mug'. [View Demo](https://demo-ppom-lite.vertisite.cloud/product/basic-text-input/)
 
@@ -55,13 +55,15 @@ Browse the woo product fields below, from simple text boxes to file uploads.
 
 ## Features in Free Version:
 
+Set up conditional fields, dynamic pricing, and validation rules on any product without touching code.
+
 📌 **Prices with Options**: Enable dynamic pricing for custom features, ensuring each choice reflects its value.
 
 📌 **Conditional Logic**: Show or hide fields based on user inputs or specific criteria.
 
 📌 **Tooltip**: Displays helpful descriptions on hover without cluttering the interface.
 
-📌 CSS Classes: Assign CSS classes to each input for enhanced styling.
+📌 **CSS Classes**: Assign CSS classes to each input for enhanced styling.
 
 📌 **Fields Width**: Easily control the layout by adjusting the width of each field.
 
