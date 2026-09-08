@@ -121,6 +121,30 @@ function buildHtmlField( { html = '', ...args } ) {
 	} );
 }
 
+function buildDateField( {
+	jqueryDp = 'on',
+	dateFormats = 'mm/dd/yy',
+	yearRange = 'c-10:c+10',
+	minDate = '',
+	maxDate = '',
+	pastDates = '',
+	noWeekends = '',
+	firstDayOfWeek = '0',
+	...args
+} ) {
+	return buildField( 'date', {
+		...args,
+		jquery_dp: jqueryDp,
+		date_formats: dateFormats,
+		year_range: yearRange,
+		min_date: minDate,
+		max_date: maxDate,
+		past_dates: pastDates,
+		no_weekends: noWeekends,
+		first_day_of_week: firstDayOfWeek,
+	} );
+}
+
 function buildTextCounterField( {
 	countType = 'character',
 	maxlength = '50',
@@ -147,6 +171,7 @@ function buildTextCounterField( {
 
 export {
 	buildCheckboxField,
+	buildDateField,
 	buildImageField,
 	buildPalettesField,
 	buildPriceMatrixField,

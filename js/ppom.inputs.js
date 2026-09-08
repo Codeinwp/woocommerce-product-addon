@@ -112,6 +112,45 @@ jQuery( function ( $ ) {
 } );
 
 /**
+ * Whether the datepicker's current minDate resolves to a date before today.
+ *
+ * @param {Object} input_selector jQuery object wrapping the datepicker input.
+ * @return {boolean} True when there is no minDate or it resolves to a past date.
+ */
+function ppom_datepicker_min_date_is_past( input_selector ) {
+	const picker = jQuery.datepicker;
+
+	if (
+		! picker ||
+		typeof picker._getInst !== 'function' ||
+		typeof picker._getMinMaxDate !== 'function'
+	) {
+		return true;
+	}
+
+	let min_date = null;
+
+	try {
+		min_date = picker._getMinMaxDate(
+			picker._getInst( input_selector.get( 0 ) ),
+			'min'
+		);
+	} catch ( e ) {
+		return true;
+	}
+
+	if ( ! min_date ) {
+		return true;
+	}
+
+	const today = new Date();
+	today.setHours( 0, 0, 0, 0 );
+	min_date.setHours( 0, 0, 0, 0 );
+
+	return min_date < today;
+}
+
+/**
  * Hydrate each localized field definition with the JS behavior its type needs.
  *
  * @param {PPOMLocalizedFieldMeta[]} ppom_fields
@@ -211,10 +250,13 @@ function ppom_init_js_for_ppom_fields( ppom_fields ) {
 						);
 					}
 
-					if ( typeof input.past_dates !== 'undefined' ) {
-						if ( input.past_dates === 'on' ) {
-							InputSelector.datepicker( 'option', 'minDate', 0 );
-						}
+					if (
+						typeof input.past_dates !== 'undefined' &&
+						input.past_dates === 'on' &&
+						ppom_datepicker_min_date_is_past( InputSelector )
+					) {
+						// Only clamp to today when min_date is unset or already in the past.
+						InputSelector.datepicker( 'option', 'minDate', 0 );
 					}
 
 					if ( typeof input.max_date !== 'undefined' ) {
