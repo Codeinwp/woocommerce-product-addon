@@ -789,10 +789,11 @@ test.describe( 'Legacy conditions script', () => {
 
 		await page.evaluate( () => {
 			window.ppomLifecycleEvents = [];
-			window.jQuery( document ).on(
-				'ppom_field_shown ppom_field_hidden',
-				( event ) => window.ppomLifecycleEvents.push( event.type )
-			);
+			window
+				.jQuery( document )
+				.on( 'ppom_field_shown ppom_field_hidden', ( event ) =>
+					window.ppomLifecycleEvents.push( event.type )
+				);
 		} );
 
 		await source.pressSequentially( 'A' );

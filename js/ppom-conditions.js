@@ -300,10 +300,10 @@ function ppom_toggle_condition_visibility( $fields, visible ) {
 		.addClass( 'ppom-c-hide' );
 }
 
-// Fields whose condition has been evaluated at least once. The first pass always
-// emits, so listeners that set widgets up still run for fields that are already
-// visible on page load.
-const ppom_evaluated_fields = {};
+// Visibility this engine last announced per field. Undefined until the first
+// evaluation, which therefore always emits so listeners that set widgets up run
+// for fields already visible on page load.
+const ppom_field_visibility = {};
 
 // Showing/hiding a field also needs to broadcast the same lifecycle events
 // used by uploads, pricing, and validation to keep their state consistent.
@@ -320,13 +320,21 @@ function ppom_apply_field_visibility(
 		.removeClass( remove_class )
 		.addClass( add_class );
 
+	// Two states have to agree before an event can be skipped, because both can
+	// be moved by something other than this recalculation:
+	// - what this engine last announced, which a real condition flip changes;
+	// - `ppom_hidden_fields`, the submitted payload, which the lifecycle events
+	//   maintain and which js/ppom-variation-rules.js also emits into.
+	// Skipping on either alone drops a genuine transition or leaves the payload
+	// disagreeing with what the customer can see.
+	const announced_visible = ppom_field_visibility[ field ];
 	const tracked_visible = jQuery.inArray( field, ppom_hidden_fields ) === -1;
 
-	if ( ppom_evaluated_fields[ field ] && tracked_visible === visible ) {
+	if ( announced_visible === visible && tracked_visible === visible ) {
 		return;
 	}
 
-	ppom_evaluated_fields[ field ] = true;
+	ppom_field_visibility[ field ] = visible;
 
 	$fields.trigger( {
 		type: visible ? 'ppom_field_shown' : 'ppom_field_hidden',
