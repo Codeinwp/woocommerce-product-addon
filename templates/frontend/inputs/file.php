@@ -30,17 +30,14 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 ?>
 
 
-<div id="ppom-file-container-<?php echo esc_attr( $fm->data_name() ); ?>"
+<fieldset id="ppom-file-container-<?php echo esc_attr( $fm->data_name() ); ?>"
 	class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
 
 	<!-- if title of field exist -->
 	<?php if ( $field_label ) : ?>
-		<label
-			class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			for="<?php echo esc_attr( $fm->data_name() ); ?>"
-		>
+		<legend class="<?php echo esc_attr( $fm->label_classes() ); ?>">
 			<?php echo ppom_esc_html( $field_label ); ?>
-		</label>
+		</legend>
 	<?php endif ?>
 
 
@@ -100,4 +97,4 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 		}
 		?>
 	</div> <!-- filelist -->
-</div>
+</fieldset>
