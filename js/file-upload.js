@@ -666,15 +666,26 @@ function ppom_setup_file_upload_input( file_input ) {
 				// Plupload's HTML5 runtime injects a real <input type="file">
 				// (invisible, stacked over the "Select files" button) into our
 				// `container` element with no accessible name of its own.
-				// Give it one now that it exists.
+				// Give it one now that it exists. Read the name from what's
+				// actually rendered (the field legend, then the chooser
+				// button) rather than `file_input.title`: that's the raw
+				// stored metadata, not the translated/filtered/escaped text
+				// a sighted shopper sees.
 				const nativeFileInput = document.querySelector(
 					`#ppom-file-container-${ file_data_name } input[type="file"]`
 				);
 				if ( nativeFileInput ) {
-					nativeFileInput.setAttribute(
-						'aria-label',
-						file_input.title || file_inputs.button_label_select || 'Select files'
+					const legend = document.querySelector(
+						`#ppom-file-container-${ file_data_name } > legend`
 					);
+					const chooserButton = document.getElementById(
+						'selectfiles-' + data_name
+					);
+					const accessibleName =
+						legend?.textContent.trim() ||
+						chooserButton?.textContent.trim() ||
+						'Select files';
+					nativeFileInput.setAttribute( 'aria-label', accessibleName );
 				}
 
 				// file_list_preview_containers[file_data_name].html('');
