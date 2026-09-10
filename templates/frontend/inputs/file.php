@@ -36,7 +36,10 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 	<!-- if title of field exist -->
 	<?php if ( $field_label ) : ?>
 		<legend class="<?php echo esc_attr( $fm->label_classes() ); ?>">
-			<?php echo ppom_esc_html( $field_label ); ?>
+			<?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ppom_esc_html() sanitizes via wp_kses(), same pattern used for this value across the template set (quantities.php, cropper.php, divider.php, text.php).
+			echo ppom_esc_html( $field_label );
+			?>
 		</legend>
 	<?php endif ?>
 

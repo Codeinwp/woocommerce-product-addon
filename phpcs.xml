@@ -61,7 +61,6 @@
         <properties>
             <property name="customAutoEscapedFunctions" type="array">
                 <element value="neve_kses_svg" />
-                <element value="ppom_esc_html" />
             </property>
         </properties>
     </rule>

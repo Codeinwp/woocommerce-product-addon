@@ -666,24 +666,36 @@ function ppom_setup_file_upload_input( file_input ) {
 				// Plupload's HTML5 runtime injects a real <input type="file">
 				// (invisible, stacked over the "Select files" button) into our
 				// `container` element with no accessible name of its own.
-				// Give it one now that it exists. Read the name from what's
-				// actually rendered (the field legend, then the chooser
-				// button) rather than `file_input.title`: that's the raw
-				// stored metadata, not the translated/filtered/escaped text
-				// a sighted shopper sees.
-				const nativeFileInput = document.querySelector(
+				// Give it one now that it exists. Cropper's "Change image"
+				// flow runs this same setup a second time against the same
+				// container (see ppom_show_cropped_preview), so a plain
+				// querySelector here would keep re-labelling the first
+				// (original) input and leave the second one unnamed --
+				// each PostInit only ever runs after the shim it belongs to
+				// has just been appended, so the *last* match in the
+				// container is always this instance's own input.
+				const containerFileInputs = document.querySelectorAll(
 					`#ppom-file-container-${ file_data_name } input[type="file"]`
 				);
+				const nativeFileInput =
+					containerFileInputs[ containerFileInputs.length - 1 ];
 				if ( nativeFileInput ) {
-					const legend = document.querySelector(
-						`#ppom-file-container-${ file_data_name } > legend`
-					);
+					// Prefer the chooser button's own text (e.g. "Change
+					// image" for the cropper's second uploader) over the
+					// shared field legend, since it's the more specific,
+					// per-instance name. Read from what's actually rendered
+					// rather than `file_input.title`: that's the raw stored
+					// metadata, not the translated/filtered/escaped text a
+					// sighted shopper sees.
 					const chooserButton = document.getElementById(
 						'selectfiles-' + data_name
 					);
+					const legend = document.querySelector(
+						`#ppom-file-container-${ file_data_name } > legend`
+					);
 					const accessibleName =
-						legend?.textContent.trim() ||
 						chooserButton?.textContent.trim() ||
+						legend?.textContent.trim() ||
 						'Select files';
 					nativeFileInput.setAttribute( 'aria-label', accessibleName );
 				}
