@@ -170,8 +170,11 @@ height: 100px;*/
 
 /* Theme .btn-primary rules (e.g. Neve, Hestia) can win the cascade over our
    bundled bootstrap.css and repaint this button with a lighter accent color
-   that fails WCAG AA contrast against white text. Force a compliant blue. */
-.ppom-wrapper .btn-primary {
+   that fails WCAG AA contrast against white text. Force a compliant blue.
+   Scoped to the file/cropper chooser only -- a bare ".ppom-wrapper .btn-primary"
+   also recolors the uploaded-file Delete/View buttons and blocks their hover
+   states from ever showing through the !important. */
+.ppom-wrapper .ppom-file-container .btn-primary {
   background-color: #0056b3 !important;
   border-color: #0056b3 !important;
   color: #fff !important;
