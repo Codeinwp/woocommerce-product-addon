@@ -44,7 +44,7 @@ $custom_attr = array();
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<legend class="<?php echo esc_attr( $fm->label_classes() ); ?>"><?php echo $fm->field_label(); ?></legend>
+		<legend class="<?php echo esc_attr( $fm->label_classes() ); ?>"><?php echo ppom_esc_html( $fm->field_label() ); ?></legend>
 	<?php endif ?>
 
 	<!-- Legacy View -->
