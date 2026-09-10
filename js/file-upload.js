@@ -663,6 +663,20 @@ function ppom_setup_file_upload_input( file_input ) {
 
 		init: {
 			PostInit() {
+				// Plupload's HTML5 runtime injects a real <input type="file">
+				// (invisible, stacked over the "Select files" button) into our
+				// `container` element with no accessible name of its own.
+				// Give it one now that it exists.
+				const nativeFileInput = document.querySelector(
+					`#ppom-file-container-${ file_data_name } input[type="file"]`
+				);
+				if ( nativeFileInput ) {
+					nativeFileInput.setAttribute(
+						'aria-label',
+						file_input.title || file_inputs.button_label_select || 'Select files'
+					);
+				}
+
 				// file_list_preview_containers[file_data_name].html('');
 				if (
 					! file_list_preview_containers[ file_data_name ].is(

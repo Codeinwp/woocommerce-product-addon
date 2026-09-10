@@ -40,12 +40,11 @@ $custom_attr = array();
 ?>
 
 
-<div class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
+<fieldset class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+		<legend class="<?php echo esc_attr( $fm->label_classes() ); ?>"><?php echo $fm->field_label(); ?></legend>
 	<?php endif ?>
 
 	<!-- Legacy View -->
@@ -214,6 +213,7 @@ $custom_attr = array();
 					?>
 
 					<label class="ppom-palette-item">
+						<span class="screen-reader-text"><?php echo esc_html( $image_label ? $image_label : $image_title ); ?></span>
 						<span class="pre_upload_image <?php echo esc_attr( $fm->input_classes() ); ?>">
 							<input
 									type="checkbox"
@@ -314,4 +314,4 @@ $custom_attr = array();
 		<?php
 	}
 	?>
-</div>
+</fieldset>
