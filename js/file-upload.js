@@ -680,23 +680,30 @@ function ppom_setup_file_upload_input( file_input ) {
 				const nativeFileInput =
 					containerFileInputs[ containerFileInputs.length - 1 ];
 				if ( nativeFileInput ) {
-					// Prefer the chooser button's own text (e.g. "Change
-					// image" for the cropper's second uploader) over the
-					// shared field legend, since it's the more specific,
-					// per-instance name. Read from what's actually rendered
-					// rather than `file_input.title`: that's the raw stored
-					// metadata, not the translated/filtered/escaped text a
-					// sighted shopper sees.
+					// Read from what's actually rendered rather than
+					// `file_input.title`: that's the raw stored metadata,
+					// not the translated/filtered/escaped text a sighted
+					// shopper sees. For the normal case the field legend
+					// (e.g. "Upload Your Design") is the useful name --
+					// the chooser button's own text is just the generic
+					// default "Select files". For cropper's "Change image"
+					// uploader (is_change_image) it's the other way round:
+					// the button text is the specific name and the legend
+					// is the shared, less-useful field title.
 					const chooserButton = document.getElementById(
 						'selectfiles-' + data_name
 					);
 					const legend = document.querySelector(
 						`#ppom-file-container-${ file_data_name } > legend`
 					);
+					const primaryName = file_input.is_change_image
+						? chooserButton?.textContent.trim()
+						: legend?.textContent.trim();
+					const fallbackName = file_input.is_change_image
+						? legend?.textContent.trim()
+						: chooserButton?.textContent.trim();
 					const accessibleName =
-						chooserButton?.textContent.trim() ||
-						legend?.textContent.trim() ||
-						'Select files';
+						primaryName || fallbackName || 'Select files';
 					nativeFileInput.setAttribute( 'aria-label', accessibleName );
 				}
 
