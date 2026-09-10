@@ -30,17 +30,17 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 ?>
 
 
-<div id="ppom-file-container-<?php echo esc_attr( $fm->data_name() ); ?>"
+<fieldset id="ppom-file-container-<?php echo esc_attr( $fm->data_name() ); ?>"
 	class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
 
 	<!-- if title of field exist -->
 	<?php if ( $field_label ) : ?>
-		<label
-			class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-			for="<?php echo esc_attr( $fm->data_name() ); ?>"
-		>
-			<?php echo ppom_esc_html( $field_label ); ?>
-		</label>
+		<legend class="<?php echo esc_attr( $fm->label_classes() ); ?>">
+			<?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ppom_esc_html() sanitizes via wp_kses(), same pattern used for this value across the template set (quantities.php, cropper.php, divider.php, text.php).
+			echo ppom_esc_html( $field_label );
+			?>
+		</legend>
 	<?php endif ?>
 
 
@@ -100,4 +100,4 @@ $btn_label   = ( $btn_label == '' ? __( 'Select files', 'woocommerce-product-add
 		}
 		?>
 	</div> <!-- filelist -->
-</div>
+</fieldset>
