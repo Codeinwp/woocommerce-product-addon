@@ -266,7 +266,8 @@ final class Handler {
 			array(
 				'ai'  => 'application/postscript',
 				'eps' => 'application/postscript',
-			) 
+				'svg' => 'image/svg+xml',
+			)
 		);
 
 		$allowed_mime_types = array_merge( get_allowed_mime_types(), $additional_mime_types );
@@ -394,6 +395,22 @@ final class Handler {
 			rename( $chunk_file_path, $unique_file_path );
 			$file_path = $unique_file_path;
 
+			// The type check above only compared the declared extension against the
+			// allow-list, because the destination didn't exist yet to sniff — that's
+			// harmless for jpg/pdf/zip, but SVG is markup a browser will execute, so
+			// its actual content has to be checked now that the bytes are on disk.
+			if ( 'svg' === $file_ext && ! self::sanitize_svg_file( $file_path ) ) {
+				@unlink( $file_path );
+
+				$response ['status']  = 'error';
+				$response ['message'] = sprintf(
+				// translators: %s: the name of the extension.
+					__( 'File type not valid - %s', 'woocommerce-product-addon' ),
+					$file_ext
+				);
+				wp_send_json( $response );
+			}
+
 			$product_id = intval( $_REQUEST['product_id'] );
 			$data_name  = sanitize_key( $_REQUEST['data_name'] );
 			$file_meta  = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
@@ -455,6 +472,62 @@ final class Handler {
 		// Return JSON-RPC response
 		// die ( '{"jsonrpc" : "2.0", "result" : '. json_encode($response) .', "id" : "id"}' );
 		die( json_encode( apply_filters( 'ppom_file_upload', $response, $file_type, $file_dir_path, $file_name ) ) );
+	}
+
+	/**
+	 * Strips script-capable content from an uploaded SVG, in place.
+	 *
+	 * SVG is XML the browser will execute inline, so — unlike the other types
+	 * this endpoint accepts — its content has to be checked, not just its
+	 * extension. Rejects anything that isn't parseable XML rooted at <svg>;
+	 * otherwise strips <script>/<foreignObject>/event-driven tags, "on*"
+	 * attributes, and javascript: URIs, then rewrites the file.
+	 *
+	 * ponytail: denylist of the well-known SVG XSS vectors via DOMDocument,
+	 * not a full allowlist sanitizer. Swap for enshrined/svg-sanitize if this
+	 * endpoint ever needs to withstand adversarial (not just careless) input.
+	 *
+	 * @param string $file_path Path to the file to sanitize.
+	 *
+	 * @return bool True if the file is safe to keep, false if it was rejected.
+	 */
+	private static function sanitize_svg_file( $file_path ) {
+
+		$content = file_get_contents( $file_path );
+		if ( false === $content ) {
+			return false;
+		}
+
+		$previous_setting = libxml_use_internal_errors( true );
+		$doc              = new \DOMDocument();
+		// No DTD flags: external entities are not resolved.
+		$loaded = $doc->loadXML( $content, LIBXML_NONET | LIBXML_NOBLANKS );
+		libxml_clear_errors();
+		libxml_use_internal_errors( $previous_setting );
+
+		if ( ! $loaded || ! $doc->documentElement || 'svg' !== strtolower( $doc->documentElement->localName ) ) {
+			return false;
+		}
+
+		$dangerous_tags = array( 'script', 'foreignobject', 'iframe', 'embed', 'object', 'animate', 'animatetransform', 'set' );
+		foreach ( $dangerous_tags as $tag ) {
+			foreach ( iterator_to_array( $doc->getElementsByTagName( $tag ) ) as $node ) {
+				$node->parentNode->removeChild( $node );
+			}
+		}
+
+		foreach ( iterator_to_array( ( new \DOMXPath( $doc ) )->query( '//*' ) ) as $element ) {
+			foreach ( iterator_to_array( $element->attributes ) as $attr ) {
+				$is_event_handler = 0 === stripos( $attr->nodeName, 'on' );
+				$is_script_uri    = preg_match( '/^\s*javascript:/i', $attr->nodeValue );
+
+				if ( $is_event_handler || $is_script_uri ) {
+					$element->removeAttribute( $attr->nodeName );
+				}
+			}
+		}
+
+		return false !== file_put_contents( $file_path, $doc->saveXML() );
 	}
 
 	/**
