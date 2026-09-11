@@ -505,21 +505,33 @@ final class Handler {
 		libxml_clear_errors();
 		libxml_use_internal_errors( $previous_setting );
 
-		if ( ! $loaded || ! $doc->documentElement || 'svg' !== strtolower( $doc->documentElement->localName ) ) {
+		$root_name = $loaded && $doc->documentElement ? $doc->documentElement->localName : null;
+
+		if ( null === $root_name || 'svg' !== strtolower( $root_name ) ) {
 			return false;
 		}
 
 		$dangerous_tags = array( 'script', 'foreignobject', 'iframe', 'embed', 'object', 'animate', 'animatetransform', 'set' );
 		foreach ( $dangerous_tags as $tag ) {
 			foreach ( iterator_to_array( $doc->getElementsByTagName( $tag ) ) as $node ) {
-				$node->parentNode->removeChild( $node );
+				if ( $node->parentNode ) {
+					$node->parentNode->removeChild( $node );
+				}
 			}
 		}
 
-		foreach ( iterator_to_array( ( new \DOMXPath( $doc ) )->query( '//*' ) ) as $element ) {
+		$elements = ( new \DOMXPath( $doc ) )->query( '//*' );
+		foreach ( $elements ? iterator_to_array( $elements ) : array() as $element ) {
+			// The '//*' xpath only ever matches element nodes, but DOMXPath::query()
+			// is typed to allow namespace nodes too — narrow it before using
+			// element-only members like ->attributes and ->removeAttribute().
+			if ( ! $element instanceof \DOMElement ) {
+				continue;
+			}
+
 			foreach ( iterator_to_array( $element->attributes ) as $attr ) {
 				$is_event_handler = 0 === stripos( $attr->nodeName, 'on' );
-				$is_script_uri    = preg_match( '/^\s*javascript:/i', $attr->nodeValue );
+				$is_script_uri    = null !== $attr->nodeValue && preg_match( '/^\s*javascript:/i', $attr->nodeValue );
 
 				if ( $is_event_handler || $is_script_uri ) {
 					$element->removeAttribute( $attr->nodeName );
