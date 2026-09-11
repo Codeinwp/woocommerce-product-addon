@@ -196,4 +196,36 @@ class Test_Svg_Upload_Sanitization extends WP_UnitTestCase {
 
 		unlink( $file );
 	}
+
+	/**
+	 * A DOCTYPE can declare an internal entity whose expansion is never an
+	 * inspectable element node without LIBXML_NOENT, so the <script> denylist
+	 * above never sees it — yet saveXML() writes the declaration and
+	 * reference back unchanged, and a browser rendering the file expands and
+	 * runs it. The whole file has to be rejected, not sanitized around.
+	 */
+	public function test_rejects_svg_with_doctype_entity_smuggling_script() {
+
+		$file = tempnam( sys_get_temp_dir(), 'svg' );
+		file_put_contents( $file, '<?xml version="1.0"?><!DOCTYPE svg [ <!ENTITY xss "<script>alert(1)</script>"> ]><svg xmlns="http://www.w3.org/2000/svg">&xss;<rect width="10" height="10"/></svg>' );
+
+		$this->assertFalse( $this->sanitize( $file ) );
+
+		unlink( $file );
+	}
+
+	/**
+	 * Even a DOCTYPE with no custom entity is rejected — SVGs have no
+	 * legitimate need for one, so there's no reason to parse further to
+	 * check whether a given DOCTYPE happens to be harmless.
+	 */
+	public function test_rejects_svg_with_benign_doctype() {
+
+		$file = tempnam( sys_get_temp_dir(), 'svg' );
+		file_put_contents( $file, '<?xml version="1.0"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg"><rect width="10" height="10"/></svg>' );
+
+		$this->assertFalse( $this->sanitize( $file ) );
+
+		unlink( $file );
+	}
 }
