@@ -548,6 +548,16 @@ final class Handler {
 		libxml_clear_errors();
 		libxml_use_internal_errors( $previous_setting );
 
+		// A DOCTYPE can declare an internal entity whose expansion never becomes
+		// an inspectable element node without LIBXML_NOENT, so the tag/attribute
+		// removal below never sees it — yet saveXML() below writes the
+		// declaration and reference back unchanged, and a browser rendering the
+		// file expands and runs it. SVGs have no legitimate use for a DOCTYPE;
+		// reject the file outright rather than try to sanitize around one.
+		if ( $loaded && null !== $doc->doctype ) {
+			return false;
+		}
+
 		$root_name = $loaded && $doc->documentElement ? $doc->documentElement->localName : null;
 
 		if ( null === $root_name || 'svg' !== strtolower( $root_name ) ) {
