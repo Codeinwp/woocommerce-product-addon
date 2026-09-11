@@ -251,6 +251,29 @@ final class Handler {
 			wp_send_json( $response );
 		}
 
+		// multipart_params sends product_id/data_name with every chunk (not just
+		// the last), so the field can — and should — be resolved up front: the
+		// mime allow-list below is shared by every upload-capable field, and
+		// without this, a field left at its default "jpg,pdf,zip" (or a cropper,
+		// which only ever wants images) would accept any type the *broadest*
+		// field on the site allows, like the svg entry that list now carries.
+		$product_id = intval( $_REQUEST['product_id'] );
+		$data_name  = sanitize_key( $_REQUEST['data_name'] );
+		$file_meta  = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
+
+		// The upload nonce is public, so the posted product and field are not
+		// necessarily a pair the form could have produced. Keeping a file no
+		// form references only leaves something to clean up later.
+		//
+		// Same wording as the nonce failure above on purpose: saying which
+		// field names exist, and which of them accept uploads, would let the
+		// endpoint be probed to map a product's fields.
+		if ( ! self::field_accepts_uploads( $file_meta ) ) {
+			$response ['status']  = 'error';
+			$response ['message'] = __( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', 'woocommerce-product-addon' );
+			wp_send_json( $response );
+		}
+
 		$file_name = '';
 
 		if ( isset( $_REQUEST['name'] ) && $_REQUEST['name'] != '' ) {
@@ -281,7 +304,7 @@ final class Handler {
 		$restricted_type    = Helpers::get_option( 'ppom_restricted_file_type', $default_restricted );
 		$restricted_type    = explode( ',', $restricted_type );
 
-		if ( empty( $extension ) || in_array( strtolower( $extension ), $restricted_type ) ) {
+		if ( empty( $extension ) || in_array( strtolower( $extension ), $restricted_type ) || ! self::field_allows_extension( $file_meta, $extension ) ) {
 			$response ['status']  = 'error';
 			$response ['message'] = sprintf(
 			// translators: %s: the name of the extension.
@@ -411,25 +434,8 @@ final class Handler {
 				wp_send_json( $response );
 			}
 
-			$product_id = intval( $_REQUEST['product_id'] );
-			$data_name  = sanitize_key( $_REQUEST['data_name'] );
-			$file_meta  = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
-
-			// The upload nonce is public, so the posted product and field are not
-			// necessarily a pair the form could have produced. Keeping a file no
-			// form references only leaves something to clean up later.
-			//
-			// Same wording as the nonce failure above on purpose: saying which
-			// field names exist, and which of them accept uploads, would let the
-			// endpoint be probed to map a product's fields.
-			if ( ! self::field_accepts_uploads( $file_meta ) ) {
-				@unlink( $file_path );
-
-				$response ['status']  = 'error';
-				$response ['message'] = __( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', 'woocommerce-product-addon' );
-				wp_send_json( $response );
-			}
-
+			// $file_meta was already resolved and validated up front, since the
+			// mime/extension gate above needs it too.
 			self::remember_uploaded_file( $file_name );
 
 			// making thumb if images
@@ -475,6 +481,35 @@ final class Handler {
 	}
 
 	/**
+	 * Whether a field's own "File types" setting allows the given extension.
+	 *
+	 * The mime/extension allow-list earlier in upload_file() is shared by every
+	 * upload-capable field on the site, so on its own it would let a field
+	 * accept anything any other field's setting allows — including a cropper
+	 * (images only) or a file field a store owner left at its default
+	 * "jpg,pdf,zip". Each field's own list is the actual authorization.
+	 *
+	 * @param mixed  $file_meta Field definition resolved from the posted data name.
+	 * @param string $extension Extension resolved from the upload request.
+	 *
+	 * @return bool
+	 */
+	private static function field_allows_extension( $file_meta, $extension ) {
+
+		$type = is_array( $file_meta ) && isset( $file_meta['type'] ) ? $file_meta['type'] : '';
+
+		$default_types = 'cropper' === $type ? 'jpg,png' : 'jpg,pdf,zip';
+
+		$configured = is_array( $file_meta ) && ! empty( $file_meta['file_types'] )
+			? $file_meta['file_types']
+			: $default_types;
+
+		$allowed = array_map( 'strtolower', array_map( 'trim', explode( ',', $configured ) ) );
+
+		return in_array( strtolower( $extension ), $allowed, true );
+	}
+
+	/**
 	 * Strips script-capable content from an uploaded SVG, in place.
 	 *
 	 * SVG is XML the browser will execute inline, so — unlike the other types
@@ -493,8 +528,16 @@ final class Handler {
 	 */
 	private static function sanitize_svg_file( $file_path ) {
 
+		// The dom extension is bundled by default but is still optional; without
+		// it, `new DOMDocument()` below is a fatal error, not a catchable one.
+		if ( ! class_exists( '\\DOMDocument' ) || ! class_exists( '\\DOMXPath' ) ) {
+			return false;
+		}
+
 		$content = file_get_contents( $file_path );
-		if ( false === $content ) {
+		// On PHP 8+, DOMDocument::loadXML('') throws instead of returning false,
+		// so an empty upload has to be rejected before it ever reaches loadXML.
+		if ( empty( $content ) ) {
 			return false;
 		}
 
@@ -511,7 +554,10 @@ final class Handler {
 			return false;
 		}
 
-		$dangerous_tags = array( 'script', 'foreignobject', 'iframe', 'embed', 'object', 'animate', 'animatetransform', 'set' );
+		// XML tag names are case-sensitive — a real <foreignObject> or
+		// <animateTransform> only matches this exact casing, and a renderer
+		// treating the file as SVG would honor it the same way.
+		$dangerous_tags = array( 'script', 'foreignObject', 'iframe', 'embed', 'object', 'animate', 'animateTransform', 'set' );
 		foreach ( $dangerous_tags as $tag ) {
 			foreach ( iterator_to_array( $doc->getElementsByTagName( $tag ) ) as $node ) {
 				if ( $node->parentNode ) {
@@ -530,8 +576,15 @@ final class Handler {
 			}
 
 			foreach ( iterator_to_array( $element->attributes ) as $attr ) {
+				// A URL's scheme is matched after stripping tab/newline/CR
+				// wherever they occur, not just at the ends — that's how a
+				// browser reads the same value, so java&#x09;script: has to be
+				// normalized the same way before the javascript: check below,
+				// or the literal tab hides the scheme from a naive prefix match.
+				$normalized_value = null !== $attr->nodeValue ? preg_replace( '/[\t\r\n]/', '', $attr->nodeValue ) : null;
+
 				$is_event_handler = 0 === stripos( $attr->nodeName, 'on' );
-				$is_script_uri    = null !== $attr->nodeValue && preg_match( '/^\s*javascript:/i', $attr->nodeValue );
+				$is_script_uri    = null !== $normalized_value && preg_match( '/^\s*javascript:/i', $normalized_value );
 
 				if ( $is_event_handler || $is_script_uri ) {
 					$element->removeAttribute( $attr->nodeName );
