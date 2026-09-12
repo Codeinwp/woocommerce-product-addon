@@ -342,6 +342,9 @@ class PPOM_FRONTEND_SCRIPTS {
 
 				$decimal_palces = wc_get_price_decimals();
 
+				// Pro-only condition operators are driven by these rule keys.
+				$conditions_pro_enabled = ppom_pro_is_valid_license();
+
 				if ( $ppom_meta_fields ) {
 
 					foreach ( $ppom_meta_fields as $field ) {
@@ -514,16 +517,25 @@ class PPOM_FRONTEND_SCRIPTS {
 
 							$field_conditions = $field['conditions'];
 
-							// WPML Translation
-							$condition_rules = $field_conditions['rules'];
-							$rule_index      = 0;
-							foreach ( $condition_rules as $rule ) {
-								if ( ! isset( $field_conditions['rules'][ $rule_index ]['element_values'] ) ) {
-									continue;
+							foreach ( $field_conditions['rules'] as $rule_index => $rule ) {
+
+								// WPML Translation.
+								if ( isset( $rule['element_values'] ) ) {
+									$field_conditions['rules'][ $rule_index ]['element_values'] = ppom_wpml_translate( $rule['element_values'], 'PPOM' );
 								}
 
-								$field_conditions['rules'][ $rule_index ]['element_values'] = ppom_wpml_translate( $rule['element_values'], 'PPOM' );
-								++$rule_index;
+								if ( isset( $rule['element_constant'] ) ) {
+									$field_conditions['rules'][ $rule_index ]['element_constant'] = ppom_wpml_translate( $rule['element_constant'], 'PPOM' );
+								}
+
+								if (
+									! $conditions_pro_enabled &&
+									isset( $rule['operators'] ) &&
+									in_array( $rule['operators'], array( 'contains', 'not-contains', 'regex', 'between', 'number-multiplier', 'even-number', 'odd-number' ), true )
+								) {
+									unset( $field_conditions['rules'][ $rule_index ]['element_constant'] );
+									unset( $field_conditions['rules'][ $rule_index ]['cond-between-interval'] );
+								}
 							}
 
 							$ppom_conditional_fields[ $data_name ] = $field_conditions;
@@ -560,7 +572,8 @@ class PPOM_FRONTEND_SCRIPTS {
 
 				// Conditional fields
 				if ( ! empty( $ppom_conditional_fields ) || apply_filters( 'ppom_enqueue_conditions_js', false ) ) {
-					$input_js_vars['conditions'] = $ppom_conditional_fields;
+					$input_js_vars['conditions']             = $ppom_conditional_fields;
+					$input_js_vars['conditions_pro_enabled'] = $conditions_pro_enabled ? 'yes' : 'no';
 
 					$ppom_conditions_script = ppom_get_conditions_mode() === 'new' ? 'ppom-conditions-v2' : 'ppom-conditions';
 					$ppom_conditions_script = apply_filters( 'ppom_conditional_script_file', $ppom_conditions_script, $product );
