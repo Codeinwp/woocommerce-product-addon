@@ -629,37 +629,78 @@ function ppom_bq_qty_changed( qty, data_name, context ) {
 	ppom_bulkquantity_price_manager( qty, data_name );
 }
 
+/**
+ * Parse one endpoint of a `Quantity Range` the way the server does.
+ *
+ * @param {*} value Raw endpoint from the stored matrix.
+ * @return {number|null} Integer value, or null when the server would skip it.
+ */
+function ppom_bq_parse_range_endpoint( value ) {
+	if ( typeof value !== 'string' && typeof value !== 'number' ) {
+		return null;
+	}
+
+	const trimmed = String( value ).trim();
+
+	if ( ! /^[0-9]{1,15}$/.test( trimmed ) ) {
+		return null;
+	}
+
+	return Number( trimmed );
+}
+
 // Resolve the active bulkquantity row into price/base-price attributes expected
 // by the legacy and modern price preview engines.
 function ppom_bulkquantity_price_manager( quantity, data_name ) {
 	let ppom_base_price = 0;
+	const selected_option = jQuery(
+		`.ppom-bulkquantity-options.${ data_name } option:selected`
+	);
+	selected_option.attr( 'data-baseprice', 0 );
+	selected_option.attr( 'data-price', 0 );
+
 	jQuery.each(
 		JSON.parse( ppom_bulkquantity_meta[ data_name ] ),
 		function ( idx, obj ) {
-			const qty_range = obj[ 'Quantity Range' ].split( '-' );
-			const qty_range_from = qty_range[ 0 ];
-			const qty_range_to = qty_range[ 1 ];
+			if ( typeof obj !== 'object' || obj === null ) {
+				return;
+			}
+
+			const raw_range = obj[ 'Quantity Range' ];
 
 			if (
-				quantity >= parseInt( qty_range_from ) &&
-				quantity <= parseInt( qty_range_to )
+				typeof raw_range !== 'string' &&
+				typeof raw_range !== 'number' &&
+				typeof raw_range !== 'boolean'
 			) {
+				return;
+			}
+
+			const qty_range = String( raw_range ).split( '-' );
+			const qty_range_from = ppom_bq_parse_range_endpoint(
+				qty_range[ 0 ]
+			);
+			const qty_range_to = ppom_bq_parse_range_endpoint( qty_range[ 1 ] );
+
+			// A tier the server would skip must be skipped here too, or the
+			// preview prices a row checkout ignores.
+			if ( qty_range_from === null || qty_range_to === null ) {
+				return;
+			}
+
+			if ( quantity >= qty_range_from && quantity <= qty_range_to ) {
 				// Setting Initial Price to 0 and taking base price
 				ppom_base_price =
 					obj[ 'Base Price' ] == undefined ||
 					obj[ 'Base Price' ] == ''
 						? 0
 						: obj[ 'Base Price' ];
-				jQuery(
-					`.ppom-bulkquantity-options.${ data_name } option:selected`
-				).attr( 'data-baseprice', ppom_base_price );
+				selected_option.attr( 'data-baseprice', ppom_base_price );
 
 				// Taking selected variation price
 				const variation = jQuery( '.ppom-bulkquantity-options' ).val();
 				const var_price = obj[ variation ];
-				jQuery(
-					`.ppom-bulkquantity-options.${ data_name } option:selected`
-				).attr( 'data-price', var_price );
+				selected_option.attr( 'data-price', var_price );
 
 				return false;
 			}
