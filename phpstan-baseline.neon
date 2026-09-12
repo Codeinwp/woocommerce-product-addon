@@ -6643,12 +6643,6 @@ parameters:
 			path: src/Validation/Validator.php
 
 		-
-			message: '#^Binary operation "\+" between float and ''''\|''0''\|array\{\}\|float\|false results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: src/WooCommerce/Cart/CartHandler.php
-
-		-
 			message: '#^Binary operation "\+\=" between 0 and float\|int\|string results in an error\.$#'
 			identifier: assignOp.invalid
 			count: 1

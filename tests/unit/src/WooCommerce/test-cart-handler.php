@@ -5,6 +5,7 @@
  * @package ppom-pro
  */
 
+use PPOM\Support\Helpers;
 use PPOM\WooCommerce\Cart\CartHandler;
 
 /**
@@ -905,5 +906,344 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 		$result = CartHandler::update_cart_fees( $cart_items, $values );
 
 		$this->assertSame( 15.0, (float) $result['data']->get_price() );
+	}
+
+	/**
+	 * Builds a cart item carrying legacy `ppom_option_price` rows.
+	 *
+	 * @param int   $product_id Product the line refers to.
+	 * @param array $options    Option price rows.
+	 * @param int   $quantity   Cart line quantity.
+	 *
+	 * @return array
+	 */
+	private function option_price_cart_item( $product_id, array $options, $quantity = 1 ) {
+		return array(
+			'product_id' => $product_id,
+			'quantity'   => $quantity,
+			'ppom'       => array(
+				'ppom_option_price' => wp_json_encode( $options ),
+			),
+		);
+	}
+
+	/**
+	 * Regression: every selected fixed-fee option must be added to the cart line
+	 * subtotal, not just the last one.
+	 *
+	 * @return void
+	 */
+	public function test_item_subtotal_sums_every_onetime_option_price() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '3', 'apply' => 'onetime' ),
+				array( 'price' => '5', 'apply' => 'onetime' ),
+				array( 'price' => '9', 'apply' => 'onetime' ),
+			)
+		);
+
+		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
+
+		$this->assertSame( Helpers::price( 27 ), $subtotal );
+	}
+
+	/**
+	 * Rows with no `data_name`/`option_id` cannot be resolved server-side, so they
+	 * keep the legacy behaviour of trusting the payload amount.
+	 *
+	 * @return void
+	 */
+	public function test_item_subtotal_prefers_discount_over_price_for_unresolvable_option() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '5', 'discount' => '2', 'apply' => 'onetime' ),
+				array( 'price' => '3', 'apply' => 'onetime' ),
+			)
+		);
+
+		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
+
+		$this->assertSame( Helpers::price( 15 ), $subtotal );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_item_subtotal_multiplies_only_the_base_price_by_quantity() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '3', 'apply' => 'onetime' ),
+				array( 'price' => '5', 'apply' => 'onetime' ),
+			),
+			2
+		);
+
+		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
+
+		$this->assertSame( Helpers::price( 28 ), $subtotal );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_item_subtotal_left_untouched_when_no_onetime_option_selected() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '3', 'apply' => 'variable' ),
+				array( 'price' => '5', 'apply' => 'quantities' ),
+			)
+		);
+
+		$this->assertSame( 'original', CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' ) );
+	}
+
+	/**
+	 * Regression: a tampered cart payload must not inflate the displayed subtotal —
+	 * fixed-fee amounts are re-read from the saved field meta.
+	 *
+	 * @return void
+	 */
+	public function test_item_subtotal_ignores_payload_amount_when_option_resolves_from_field_meta() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field(
+					'extras',
+					'Extras',
+					array(
+						array( 'option' => 'Gift wrap', 'price' => '3', 'id' => 'gift_wrap' ),
+						array( 'option' => 'Candles', 'price' => '5', 'id' => 'candles' ),
+					),
+					array( 'onetime' => 'on' )
+				),
+			),
+			$product_id
+		);
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '9999', 'apply' => 'onetime', 'data_name' => 'extras', 'option_id' => 'gift_wrap' ),
+				array( 'price' => '9999', 'apply' => 'onetime', 'data_name' => 'extras', 'option_id' => 'candles' ),
+			)
+		);
+
+		$cart_item['ppom']['fields'] = array(
+			'id'     => (string) $meta_id,
+			'extras' => array( 'Gift wrap', 'Candles' ),
+		);
+
+		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
+
+		$this->assertSame( Helpers::price( 18 ), $subtotal );
+	}
+
+	/**
+	 * Regression: a group that is not attached to this product must not price its line,
+	 * even though the group id travels in the cart payload.
+	 *
+	 * @return void
+	 */
+	public function test_item_subtotal_ignores_field_group_not_attached_to_the_product() {
+		$product     = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$other_group = $this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field(
+					'extras',
+					'Extras',
+					array( array( 'option' => 'Gold leaf', 'price' => '500', 'id' => 'gold_leaf' ) ),
+					array( 'onetime' => 'on' )
+				),
+			)
+		);
+
+		$cart_item = $this->option_price_cart_item(
+			$product->get_id(),
+			array(
+				array( 'price' => '500', 'apply' => 'onetime', 'data_name' => 'extras', 'option_id' => 'gold_leaf' ),
+			)
+		);
+
+		$cart_item['ppom']['fields'] = array(
+			'id'     => (string) $other_group,
+			'extras' => array( 'Gold leaf' ),
+		);
+
+		$this->assertSame( 'original', CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' ) );
+	}
+
+	/**
+	 * Regression: `apply` on the row cannot promote a field the admin never configured
+	 * as a fixed fee.
+	 *
+	 * @return void
+	 */
+	public function test_item_subtotal_ignores_option_whose_field_is_not_a_fixed_fee() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field(
+					'extras',
+					'Extras',
+					array( array( 'option' => 'Gift wrap', 'price' => '3', 'id' => 'gift_wrap' ) )
+				),
+			),
+			$product_id
+		);
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '3', 'apply' => 'onetime', 'data_name' => 'extras', 'option_id' => 'gift_wrap' ),
+			)
+		);
+
+		$cart_item['ppom']['fields'] = array(
+			'id'     => (string) $meta_id,
+			'extras' => array( 'Gift wrap' ),
+		);
+
+		$this->assertSame( 'original', CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' ) );
+	}
+
+	/**
+	 * Regression: only options the shopper actually selected may be charged into the
+	 * displayed subtotal.
+	 *
+	 * @return void
+	 */
+	public function test_item_subtotal_ignores_option_the_shopper_did_not_select() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field(
+					'extras',
+					'Extras',
+					array(
+						array( 'option' => 'Gift wrap', 'price' => '3', 'id' => 'gift_wrap' ),
+						array( 'option' => 'Gold leaf', 'price' => '500', 'id' => 'gold_leaf' ),
+					),
+					array( 'onetime' => 'on' )
+				),
+			),
+			$product_id
+		);
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '3', 'apply' => 'onetime', 'data_name' => 'extras', 'option_id' => 'gift_wrap' ),
+				array( 'price' => '3', 'apply' => 'onetime', 'data_name' => 'extras', 'option_id' => 'gold_leaf' ),
+			)
+		);
+
+		$cart_item['ppom']['fields'] = array(
+			'id'     => (string) $meta_id,
+			'extras' => array( 'Gift wrap' ),
+		);
+
+		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
+
+		$this->assertSame( Helpers::price( 13 ), $subtotal );
+	}
+
+	/**
+	 * Regression: a configured per-option discount is the amount the product page
+	 * charges, so the cart line has to show it too.
+	 *
+	 * @return void
+	 */
+	public function test_item_subtotal_uses_saved_discount_for_resolved_option() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field(
+					'extras',
+					'Extras',
+					array( array( 'option' => 'Gift wrap', 'price' => '5', 'discount' => '2', 'id' => 'gift_wrap' ) ),
+					array( 'onetime' => 'on' )
+				),
+			),
+			$product_id
+		);
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '2', 'apply' => 'onetime', 'data_name' => 'extras', 'option_id' => 'gift_wrap' ),
+			)
+		);
+
+		$cart_item['ppom']['fields'] = array(
+			'id'     => (string) $meta_id,
+			'extras' => array( 'Gift wrap' ),
+		);
+
+		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
+
+		$this->assertSame( Helpers::price( 12 ), $subtotal );
+	}
+
+	/**
+	 * Regression: zeroing the payload amount must not hide a configured fixed fee from
+	 * the displayed subtotal.
+	 *
+	 * @return void
+	 */
+	public function test_item_subtotal_resolves_fee_even_when_payload_amount_is_zero() {
+		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$product_id = $product->get_id();
+
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field(
+					'extras',
+					'Extras',
+					array( array( 'option' => 'Gift wrap', 'price' => '3', 'id' => 'gift_wrap' ) ),
+					array( 'onetime' => 'on' )
+				),
+			),
+			$product_id
+		);
+
+		$cart_item = $this->option_price_cart_item(
+			$product_id,
+			array(
+				array( 'price' => '0', 'apply' => 'onetime', 'data_name' => 'extras', 'option_id' => 'gift_wrap' ),
+			)
+		);
+
+		$cart_item['ppom']['fields'] = array(
+			'id'     => (string) $meta_id,
+			'extras' => array( 'Gift wrap' ),
+		);
+
+		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
+
+		$this->assertSame( Helpers::price( 13 ), $subtotal );
 	}
 }
