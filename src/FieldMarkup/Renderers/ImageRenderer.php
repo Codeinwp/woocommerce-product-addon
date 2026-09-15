@@ -33,10 +33,10 @@ final class ImageRenderer extends AbstractInputRenderer {
 		}
 
 		$input_wrapper_class = FieldChrome::inputWrapperClass( $this->context, $id, $args );
-		$html                = '<div class="' . $input_wrapper_class . '">';
+		$html                = '<fieldset class="' . $input_wrapper_class . '">';
 		if ( $label ) {
-			$html .= '<label class="' . $this->context->getDefaultSettingValue( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= $label . '</label>';
+			$html .= '<legend class="' . $this->context->getDefaultSettingValue( 'global', 'label_class', $id ) . '">';
+			$html .= $label . '</legend>';
 		}
 
 		$selected_img_bordercolor = isset( $args['selected_img_bordercolor'] ) ? $args['selected_img_bordercolor'] : '';
@@ -95,6 +95,7 @@ final class ImageRenderer extends AbstractInputRenderer {
 				if ( isset( $args['multiple_allowed'] ) && 'on' === $args['multiple_allowed'] ) {
 					$html .= '<input type="checkbox" ';
 					$html .= 'id="' . esc_attr( $option_id ) . '" ';
+					$html .= 'aria-label="' . esc_attr( $image_label ? $image_label : $image_title ) . '" ';
 					$html .= 'data-price="' . esc_attr( $image_price ) . '" ';
 					$html .= 'class="ppom-input" ';
 					$html .= 'data-label="' . esc_attr( $image_title ) . '" ';
@@ -106,6 +107,7 @@ final class ImageRenderer extends AbstractInputRenderer {
 				} else {
 					$html .= '<input type="radio" ';
 					$html .= 'id="' . esc_attr( $option_id ) . '" ';
+					$html .= 'aria-label="' . esc_attr( $image_label ? $image_label : $image_title ) . '" ';
 					$html .= 'data-price="' . esc_attr( $image_price ) . '" ';
 					$html .= 'class="ppom-input" ';
 					$html .= 'data-label="' . esc_attr( $image_title ) . '" ';
@@ -155,6 +157,7 @@ final class ImageRenderer extends AbstractInputRenderer {
 				}
 
 				$html .= '<label>';
+				$html .= '<span class="screen-reader-text">' . esc_html( $image_label ? $image_label : $image_title ) . '</span>';
 				$html .= '<div class="pre_upload_image ' . esc_attr( $classes ) . '" ';
 				$html .= 'title="' . esc_attr( $image_label ) . '" data-ppom-tooltip="ppom_tooltip">';
 				if ( isset( $args['multiple_allowed'] ) && 'on' === $args['multiple_allowed'] ) {
@@ -201,7 +204,7 @@ final class ImageRenderer extends AbstractInputRenderer {
 
 			$html .= '</div>';
 		}
-		$html .= '</div>';
+		$html .= '</fieldset>';
 
 		return $this->applyOutputFilter( $html, $args, $default_value );
 	}

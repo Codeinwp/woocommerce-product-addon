@@ -9,7 +9,7 @@
 
 .ppom-wrapper span.show_description {
   font-size: 11px;
-  color: #999;
+  color: #666; /* #999 on white is 2.84:1, fails WCAG AA (needs 4.5:1); #666 gives ~5.7:1 */
   padding-left: 5px;
 }
 
@@ -166,6 +166,35 @@ height: 100px;*/
 .ppom-file-container {
   background-color: #ccc;
   padding: 25px;
+}
+
+/* Theme .btn-primary rules (e.g. Neve, Hestia) can win the cascade over our
+   bundled bootstrap.css and repaint this button with a lighter accent color
+   that fails WCAG AA contrast against white text. Force a compliant blue.
+   Scoped to the file/cropper chooser only -- a bare ".ppom-wrapper .btn-primary"
+   also recolors the uploaded-file Delete/View buttons and blocks their hover
+   states from ever showing through the !important. */
+.ppom-wrapper .ppom-file-container .btn-primary {
+  background-color: #0056b3 !important;
+  border-color: #0056b3 !important;
+  color: #fff !important;
+}
+
+/* image.php and file.php use fieldset/legend instead of label[for] to caption
+   grouped/composite controls (fixes WAVE "Orphaned form label"). Strip the
+   browser's default fieldset/legend chrome so it still looks like the old div. */
+.ppom-wrapper fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.ppom-wrapper legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
 }
 
 .modal-body {

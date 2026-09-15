@@ -1190,3 +1190,54 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		expect( nonceResponse.data.ppom_file_delete_nonce ).toBeTruthy();
 	} );
 } );
+
+test.describe( 'File Upload Accessibility', () => {
+	/**
+	 * Regression test for Codeinwp/ppom-pro#284: WAVE flagged the native
+	 * input Plupload injects over the "Select files" button ("Missing form
+	 * label"), and the field's own caption as an orphaned label[for] pointing
+	 * at an id no control in the field carries ("Orphaned form label").
+	 */
+	test( 'file field caption is a fieldset/legend and the native file input has an accessible name', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const fieldId = 'file_a11y_test';
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'File Upload Accessibility Test',
+			fields: [
+				buildFileField( {
+					title: 'Upload Your Design',
+					dataName: fieldId,
+					file_size: '5mb',
+					files_allowed: '1',
+					file_types: 'jpg,png',
+				} ),
+			],
+		} );
+
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
+
+		await page.goto( `/?p=${ product.id }` );
+
+		const fieldset = page.locator( `#ppom-file-container-${ fieldId }` );
+		await expect( fieldset ).toHaveJSProperty( 'tagName', 'FIELDSET' );
+		await expect(
+			fieldset.locator( '> legend' )
+		).toHaveText( 'Upload Your Design' );
+
+		// plupload injects its file input inside the field container once ready.
+		const fileInput = page.locator(
+			`#ppom-file-container-${ fieldId } input[type=file]`
+		);
+		await fileInput.waitFor( { state: 'attached', timeout: 10000 } );
+		await expect( fileInput ).toHaveAttribute(
+			'aria-label',
+			'Upload Your Design'
+		);
+	} );
+} );
