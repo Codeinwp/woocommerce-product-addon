@@ -1119,16 +1119,17 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 	} );
 
 	/**
-	 * Regression for #729: a page-load nonce cached for longer than its
-	 * server-side lifetime was reused as-is for 5 minutes, so an upload
-	 * attempted in that window was rejected. This drives a real plupload
-	 * upload (not a direct call to the refresh helper, which does not catch
-	 * the ordering race), so it also guards against the refresh firing but
-	 * the file still going out with the stale multipart_params set at
-	 * plupload Init time - the actual bug, since plupload does not await
-	 * async event handlers.
+	 * Regression for #729: `lastNonceRefreshTime` used to start at
+	 * `Date.now()`, so the page-load nonce was trusted as fresh for 5
+	 * minutes even when a cached page served it already expired. The fix
+	 * makes the very first upload attempt always re-validate via REST
+	 * regardless of elapsed time, so this drives a real plupload upload
+	 * immediately after page load (not a direct call to the refresh
+	 * helper, which does not catch the ordering race) and checks a refresh
+	 * still happens - and that the upload actually waits for it, since
+	 * plupload does not await async event handlers on its own.
 	 */
-	test( 'upload after the nonce cache expires uses the refreshed nonce, not the stale page-load one', async ( {
+	test( 'the first upload on a page always uses a freshly-refreshed nonce', async ( {
 		page,
 		requestUtils,
 	} ) => {
@@ -1153,7 +1154,6 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 			productIds: [ product.id ],
 		} );
 
-		await page.clock.install();
 		await page.goto( `/?p=${ product.id }` );
 
 		const fileInput = page.locator(
@@ -1166,16 +1166,28 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		);
 		expect( staleNonce ).toBeTruthy();
 
-		// Expire the 5-minute nonce cache so the upload must refresh first,
-		// simulating a page that stayed cached past its embedded nonce's
-		// server-side lifetime.
-		await page.clock.fastForward( '06:00' );
-		// fastForward leaves virtual time frozen at that point; resume so
-		// plupload's own timer-driven upload dispatch can still run once the
-		// refresh (a real fetch, unaffected by the fake clock) resolves.
-		await page.clock.resume();
+		// wp_create_nonce() is deterministic per tick, so a real refresh
+		// fired moments after page load could legitimately return the same
+		// string as the page-load nonce - that would make a same/different
+		// value comparison unreliable. Mock the refresh response with an
+		// arbitrary, unmistakably distinct nonce instead, so the assertion
+		// below only passes if the upload request actually carries this
+		// mocked value rather than the multipart_params captured at
+		// plupload Init time.
+		const mockedNonce = 'e2e-mocked-refreshed-nonce';
+		await page.route( '**/ppom/v1/nonces/file/**', ( route ) =>
+			route.fulfill( {
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					status: 'success',
+					ppom_file_upload_nonce: mockedNonce,
+					ppom_file_delete_nonce: 'e2e-mocked-delete-nonce',
+				} ),
+			} )
+		);
 
-		const [ refreshResponse, uploadRequest ] = await Promise.all( [
+		const [ , uploadRequest ] = await Promise.all( [
 			page.waitForResponse( ( response ) =>
 				response.url().includes( '/ppom/v1/nonces/file' )
 			),
@@ -1194,16 +1206,8 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 			} ),
 		] );
 
-		expect( refreshResponse.ok() ).toBe( true );
-		const { ppom_file_upload_nonce: refreshedNonce } =
-			await refreshResponse.json();
-		expect( refreshedNonce ).toBeTruthy();
-		// The endpoint mints a fresh nonce on every call, so this also
-		// proves a real refresh happened rather than a cache hit.
-		expect( refreshedNonce ).not.toBe( staleNonce );
-
 		const uploadBody = uploadRequest.postData() || '';
-		expect( uploadBody ).toContain( refreshedNonce );
+		expect( uploadBody ).toContain( mockedNonce );
 		expect( uploadBody ).not.toContain( staleNonce );
 	} );
 
