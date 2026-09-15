@@ -1170,6 +1170,10 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		// simulating a page that stayed cached past its embedded nonce's
 		// server-side lifetime.
 		await page.clock.fastForward( '06:00' );
+		// fastForward leaves virtual time frozen at that point; resume so
+		// plupload's own timer-driven upload dispatch can still run once the
+		// refresh (a real fetch, unaffected by the fake clock) resolves.
+		await page.clock.resume();
 
 		const [ refreshResponse, uploadRequest ] = await Promise.all( [
 			page.waitForResponse( ( response ) =>
