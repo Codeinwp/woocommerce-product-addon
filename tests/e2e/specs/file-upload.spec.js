@@ -1118,6 +1118,91 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		expect( refreshResult.newNonce ).toBeTruthy();
 	} );
 
+	/**
+	 * Regression for #729: a page-load nonce cached for longer than its
+	 * server-side lifetime was reused as-is for 5 minutes, so an upload
+	 * attempted in that window was rejected. This drives a real plupload
+	 * upload (not a direct call to the refresh helper, which does not catch
+	 * the ordering race), so it also guards against the refresh firing but
+	 * the file still going out with the stale multipart_params set at
+	 * plupload Init time - the actual bug, since plupload does not await
+	 * async event handlers.
+	 */
+	test( 'upload after the nonce cache expires uses the refreshed nonce, not the stale page-load one', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const fieldId = 'file_upload_stale_nonce_test';
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'File Upload Stale Nonce Test',
+			fields: [
+				buildFileField( {
+					title: 'Upload Your File',
+					dataName: fieldId,
+					// plupload reads this raw: '5' would mean 5 *bytes*.
+					file_size: '5mb',
+					files_allowed: '1',
+					file_types: 'png,jpg',
+				} ),
+			],
+		} );
+
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
+
+		await page.clock.install();
+		await page.goto( `/?p=${ product.id }` );
+
+		const fileInput = page.locator(
+			`#ppom-file-container-${ fieldId } input[type=file]`
+		);
+		await fileInput.waitFor( { state: 'attached', timeout: 10000 } );
+
+		const staleNonce = await page.evaluate(
+			() => window.ppom_file_vars?.ppom_file_upload_nonce
+		);
+		expect( staleNonce ).toBeTruthy();
+
+		// Expire the 5-minute nonce cache so the upload must refresh first,
+		// simulating a page that stayed cached past its embedded nonce's
+		// server-side lifetime.
+		await page.clock.fastForward( '06:00' );
+
+		const [ refreshResponse, uploadRequest ] = await Promise.all( [
+			page.waitForResponse( ( response ) =>
+				response.url().includes( '/ppom/v1/nonces/file' )
+			),
+			page.waitForRequest(
+				( request ) =>
+					request.url().includes( 'admin-ajax.php' ) &&
+					!! request.postData()?.includes( 'ppom_upload_file' )
+			),
+			fileInput.setInputFiles( {
+				name: 'pixel.png',
+				mimeType: 'image/png',
+				buffer: Buffer.from(
+					'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+					'base64'
+				),
+			} ),
+		] );
+
+		expect( refreshResponse.ok() ).toBe( true );
+		const { ppom_file_upload_nonce: refreshedNonce } =
+			await refreshResponse.json();
+		expect( refreshedNonce ).toBeTruthy();
+		// The endpoint mints a fresh nonce on every call, so this also
+		// proves a real refresh happened rather than a cache hit.
+		expect( refreshedNonce ).not.toBe( staleNonce );
+
+		const uploadBody = uploadRequest.postData() || '';
+		expect( uploadBody ).toContain( refreshedNonce );
+		expect( uploadBody ).not.toContain( staleNonce );
+	} );
+
 	test( 'should handle nonce refresh endpoint correctly', async ( {
 		page,
 		requestUtils,
