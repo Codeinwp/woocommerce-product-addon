@@ -228,6 +228,33 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
+	 * Registers the script/style registry, once per request.
+	 *
+	 * Normally reached via the `wp_enqueue_scripts` hook (see {@see load_scripts()}),
+	 * but a block theme can render the `[ppom]` shortcode (via its post-content
+	 * block) before that hook fires, so {@see load_scripts_by_product_id()} also
+	 * calls this defensively — otherwise its later `PPOM_SCRIPTS::enqueue_script()`
+	 * calls silently no-op against an unregistered handle (no `$path` fallback),
+	 * leaving e.g. `ppom-file-upload` enqueued with no localized `ppom_file_vars`.
+	 *
+	 * @return void
+	 */
+	private static function register_scripts_once() {
+
+		static $done = false;
+
+		if ( $done ) {
+			return;
+		}
+
+		$done = true;
+
+		PPOM_SCRIPTS::register_scripts( self::get_scripts() );
+		PPOM_SCRIPTS::register_styles( self::get_styles() );
+	}
+
+
+	/**
 	 * Registers PPOM assets on frontend requests and loads product-specific ones.
 	 *
 	 * @return void
@@ -240,13 +267,7 @@ class PPOM_FRONTEND_SCRIPTS {
 			return;
 		}
 
-		// Get all styles & scripts
-		$all_scripts = self::get_scripts();
-		$all_styles  = self::get_styles();
-
-		// Register all styles & scripts
-		PPOM_SCRIPTS::register_scripts( $all_scripts );
-		PPOM_SCRIPTS::register_styles( $all_styles );
+		self::register_scripts_once();
 
 		if ( ! is_object( $post ) ) {
 			return;
@@ -279,6 +300,8 @@ class PPOM_FRONTEND_SCRIPTS {
 	 * @see ppom_woocommerce_template_base_inputs_rendering()
 	 */
 	public static function load_scripts_by_product_id( $product_id, $ppom_id = null, $display_location = '' ) {
+
+		self::register_scripts_once();
 
 		if ( $product_id ) {
 

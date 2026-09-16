@@ -1150,7 +1150,11 @@ final class Callbacks {
 			case 'imageselect':
 				$new_option[ $option_key ]['link']        = isset( $option['link'] ) ? $option['link'] : '';
 				$new_option[ $option_key ]['url']         = isset( $option['url'] ) ? $option['url'] : '';
-				$new_option[ $option_key ]['image_id']    = isset( $option['id'] ) ? $option['id'] : '';
+				// `id` is the option's own identifier (e.g. "imagea"), not the
+				// attachment id — reading it here silently ignored any stored
+				// `image_id` update and re-served whatever attachment the field
+				// was first created against.
+				$new_option[ $option_key ]['image_id']    = isset( $option['image_id'] ) ? $option['image_id'] : '';
 				$new_option[ $option_key ]['description'] = isset( $option['description'] ) ? $option['description'] : '';
 				$new_option[ $option_key ]['stock']       = isset( $option['stock'] ) ? $option['stock'] : '';
 				$new_option[ $option_key ]['builder']     = isset( $option['builder'] ) ? $option['builder'] : '';
