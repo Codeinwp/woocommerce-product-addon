@@ -568,12 +568,20 @@ function ppom_get_palette_setting( input ) {
 /**
  * Shared field lookup used by pricing, conditions, and file upload helpers.
  *
+ * With two PPOM forms on one page, `wp_localize_script` overwrites the flat
+ * `ppom_input_vars` with whichever product rendered last (issue #735), so a
+ * `product_id` is needed to read the right product's data via
+ * `ppom_get_product_data()`. Falls back to the flat global when no
+ * product_id is available, matching the previous single-product behavior.
+ *
  * @param {string} field_id
+ * @param {number|string} [product_id]
  * @return {string}
  */
-function ppom_get_field_type_by_id( field_id ) {
+function ppom_get_field_type_by_id( field_id, product_id ) {
+	const data = ( product_id && ppom_get_product_data( product_id ) ) || ppom_input_vars;
 	let field_type = '';
-	jQuery.each( ppom_input_vars.ppom_inputs, function ( i, field ) {
+	jQuery.each( data.ppom_inputs, function ( i, field ) {
 		if ( field.data_name === field_id ) {
 			field_type = field.field_type;
 		}
@@ -585,12 +593,16 @@ function ppom_get_field_type_by_id( field_id ) {
 /**
  * Return the full localized field definition for a given data_name.
  *
+ * See {@see ppom_get_field_type_by_id} for why `product_id` matters here.
+ *
  * @param {string} field_id
+ * @param {number|string} [product_id]
  * @return {PPOMLocalizedFieldMeta|string}
  */
-function ppom_get_field_meta_by_id( field_id ) {
+function ppom_get_field_meta_by_id( field_id, product_id ) {
+	const data = ( product_id && ppom_get_product_data( product_id ) ) || ppom_input_vars;
 	let field_meta = '';
-	jQuery.each( ppom_input_vars.ppom_inputs, function ( i, field ) {
+	jQuery.each( data.ppom_inputs, function ( i, field ) {
 		if ( field.data_name === field_id ) {
 			field_meta = field;
 		}

@@ -155,6 +155,27 @@ async function getProductPpomAssignment( requestUtils, { productId } ) {
 	);
 }
 
+/**
+ * Create a fixture Page rendering one `[ppom product_id="X"]` shortcode per
+ * given product id, so a spec can put more than one PPOM form on the same
+ * page (issue #735) regardless of the active theme's single-product template.
+ */
+async function createPpomShortcodePage( requestUtils, { productIds, title } ) {
+	const payload = await postBootstrapAction(
+		requestUtils,
+		'ppom_e2e_create_shortcode_page',
+		{
+			product_ids: productIds,
+			title,
+		}
+	);
+
+	return {
+		...payload,
+		id: Number( payload.id ),
+	};
+}
+
 async function deletePpomGroupRows( requestUtils, { ppomIds } ) {
 	return postBootstrapAction(
 		requestUtils,
@@ -171,6 +192,7 @@ export {
 	attachPpomGroupToVariations,
 	createLegacyPpomGroup,
 	createPpomGroup,
+	createPpomShortcodePage,
 	createSimpleTextGroup,
 	deletePpomGroupRows,
 	getPpomAttachRowMeta,
