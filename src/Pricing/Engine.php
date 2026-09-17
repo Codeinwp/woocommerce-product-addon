@@ -1075,7 +1075,19 @@ final class Engine {
 			return 0.0;
 		}
 
-		return (float) wc_format_decimal( (string) $value );
+		$value = (string) $value;
+
+		if ( is_numeric( $value ) ) {
+			return (float) $value;
+		}
+
+		// wc_format_decimal() expects grouping removed; "1.000" would otherwise read as 1.0 (#720).
+		$thousands = wc_get_price_thousand_separator();
+		if ( '' !== $thousands && wc_get_price_decimal_separator() !== $thousands ) {
+			$value = str_replace( $thousands, '', $value );
+		}
+
+		return (float) wc_format_decimal( $value );
 	}
 
 	// Get total quantities

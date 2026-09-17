@@ -724,4 +724,45 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 
 		$this->assertSame( 1000.5, $info['price'] );
 	}
+
+	/**
+	 * On a zero-decimal store with dot grouping WooCommerce formats one thousand as
+	 * "1.000". wc_format_decimal() alone reads that as 1.0, so grouping must be stripped
+	 * first, while canonical numeric strings stay untouched. Regression for #720.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_product_base_recovers_zero_decimal_grouped_base() {
+		$product = $this->create_simple_product( array( 'regular_price' => '1000' ) );
+		$this->insert_ppom_meta(
+			array( $this->build_text_field( 'engraving', 'Engraving' ) ),
+			$product->get_id()
+		);
+
+		$discount  = 0;
+		$decimal   = static function () {
+			return ',';
+		};
+		$thousands = static function () {
+			return '.';
+		};
+		$decimals  = static function () {
+			return 0;
+		};
+		add_filter( 'wc_get_price_decimal_separator', $decimal );
+		add_filter( 'wc_get_price_thousand_separator', $thousands );
+		add_filter( 'wc_get_price_decimals', $decimals );
+
+		try {
+			$grouped   = Engine::price_get_product_base( '$1.000', $product, array(), 1, array(), $discount, null );
+			$canonical = Engine::price_get_product_base( '1000.50', $product, array(), 1, array(), $discount, null );
+		} finally {
+			remove_filter( 'wc_get_price_decimal_separator', $decimal );
+			remove_filter( 'wc_get_price_thousand_separator', $thousands );
+			remove_filter( 'wc_get_price_decimals', $decimals );
+		}
+
+		$this->assertSame( 1000.0, $grouped['price'] );
+		$this->assertSame( 1000.5, $canonical['price'] );
+	}
 }
