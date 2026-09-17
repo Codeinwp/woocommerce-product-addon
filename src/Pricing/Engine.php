@@ -1260,7 +1260,8 @@ final class Engine {
 	) {
 
 		// converting back to org price if Currency Switcher is used
-		$base_price = Callbacks::convert_price_back( $product_price );
+		// Filters may return a formatted string like "€ 10.00"; arithmetic on it throws on PHP 8 (#720).
+		$base_price = self::normalize_price_value( Callbacks::convert_price_back( $product_price ) );
 		// $base_price  = $product->get_price();
 		// $base_price = floatval($base_price);
 		// $base_price  = $product->get_price();
@@ -1340,7 +1341,14 @@ final class Engine {
 			'source' => $source,
 		);
 
-		return apply_filters( 'ppom_price_info', $price_info, $product, $ppom_fields_post, $ppom_field_prices );
+		$price_info = apply_filters( 'ppom_price_info', $price_info, $product, $ppom_fields_post, $ppom_field_prices );
+
+		// Same guard for the filtered result.
+		if ( is_array( $price_info ) && isset( $price_info['price'] ) ) {
+			$price_info['price'] = self::normalize_price_value( $price_info['price'] );
+		}
+
+		return $price_info;
 	}
 
 	// If price set by pricematrix in cart return matrix

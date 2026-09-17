@@ -603,6 +603,44 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 	}
 
 	/**
+	 * A formatted, non-numeric base price such as "€ 5.00" must be recovered before
+	 * the measure/quantity arithmetic, not throw "string * int". Regression for #720.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_product_base_recovers_formatted_base_before_multiplying() {
+		$product = $this->create_simple_product( array( 'regular_price' => '5' ) );
+		$this->insert_ppom_meta(
+			array( $this->build_text_field( 'engraving', 'Engraving' ) ),
+			$product->get_id()
+		);
+
+		$discount = 0;
+
+		$info = Engine::price_get_product_base(
+			'€ 5.00',
+			$product,
+			array(),
+			1,
+			array(
+				array(
+					'type'             => 'measure',
+					'apply'            => 'addon',
+					'price'            => 0,
+					'quantity'         => 4,
+					'price-multiplier' => 1,
+					'base_price'       => 0,
+				),
+			),
+			$discount,
+			null
+		);
+
+		$this->assertSame( 'measure', $info['source'] );
+		$this->assertEqualsWithDelta( 20.0, (float) $info['price'], 0.0001 );
+	}
+
+	/**
 	 * The ppom_price_info filter can override the computed base price+source pair.
 	 *
 	 * @return void
