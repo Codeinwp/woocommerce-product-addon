@@ -671,4 +671,36 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 		$this->assertSame( 'filter', $info['source'] );
 		$this->assertEqualsWithDelta( 123.45, (float) $info['price'], 0.0001 );
 	}
+
+	/**
+	 * A ppom_price_info filter returning a formatted price string must not reach the
+	 * callers as a string. Regression for #720.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_product_base_normalizes_filtered_price() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$this->insert_ppom_meta(
+			array( $this->build_text_field( 'engraving', 'Engraving' ) ),
+			$product->get_id()
+		);
+
+		$discount = 0;
+
+		$filter = static function () {
+			return array(
+				'price'  => '€ 7.50',
+				'source' => 'filter',
+			);
+		};
+		add_filter( 'ppom_price_info', $filter );
+
+		try {
+			$info = Engine::price_get_product_base( 10.0, $product, array(), 1, array(), $discount, null );
+		} finally {
+			remove_filter( 'ppom_price_info', $filter );
+		}
+
+		$this->assertSame( 7.5, $info['price'] );
+	}
 }

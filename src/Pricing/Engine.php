@@ -1261,7 +1261,7 @@ final class Engine {
 
 		// converting back to org price if Currency Switcher is used
 		// Filters may return a formatted string like "€ 10.00"; arithmetic on it throws on PHP 8 (#720).
-		$base_price = self::normalize_price_value( Callbacks::convert_price_back( $product_price ) );
+		$base_price = Callbacks::convert_price_back( self::normalize_price_value( $product_price ) );
 		// $base_price  = $product->get_price();
 		// $base_price = floatval($base_price);
 		// $base_price  = $product->get_price();
