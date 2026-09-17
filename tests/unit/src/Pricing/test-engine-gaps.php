@@ -703,4 +703,25 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 
 		$this->assertSame( 7.5, $info['price'] );
 	}
+
+	/**
+	 * A grouped price in the store's own separators, such as "€ 1,000.50" on a
+	 * dot-decimal store, is recovered in full. Regression for #720.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_product_base_recovers_grouped_formatted_base() {
+		$product = $this->create_simple_product( array( 'regular_price' => '1000.50' ) );
+		$this->insert_ppom_meta(
+			array( $this->build_text_field( 'engraving', 'Engraving' ) ),
+			$product->get_id()
+		);
+
+		$discount = 0;
+		$grouped  = '€ 1' . wc_get_price_thousand_separator() . '000' . wc_get_price_decimal_separator() . '50';
+
+		$info = Engine::price_get_product_base( $grouped, $product, array(), 1, array(), $discount, null );
+
+		$this->assertSame( 1000.5, $info['price'] );
+	}
 }
