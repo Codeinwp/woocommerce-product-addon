@@ -39,6 +39,10 @@ if ( ! defined( 'PPOM_E2E_SETTINGS_PANEL_OPTION' ) ) {
 	define( 'PPOM_E2E_SETTINGS_PANEL_OPTION', 'ppom-settings_panel' );
 }
 
+if ( ! defined( 'PPOM_E2E_FORMATTED_BASE_PRICE_OPTION' ) ) {
+	define( 'PPOM_E2E_FORMATTED_BASE_PRICE_OPTION', 'ppom_e2e_formatted_base_price' );
+}
+
 if ( ! defined( 'PPOM_E2E_SETTINGS_TOUCHED_OPTION' ) ) {
 	define( 'PPOM_E2E_SETTINGS_TOUCHED_OPTION', 'ppom_e2e_touched_settings' );
 }
@@ -81,6 +85,26 @@ function ppom_e2e_maybe_arm_group_read_failure() {
 	}
 }
 add_action( 'plugins_loaded', 'ppom_e2e_maybe_arm_group_read_failure', 20 );
+
+/**
+ * Simulate a currency integration that returns the cart base price as a
+ * formatted, non-numeric string (Codeinwp/woocommerce-product-addon#720).
+ *
+ * @return void
+ */
+function ppom_e2e_maybe_arm_formatted_base_price() {
+	if ( ! get_option( PPOM_E2E_FORMATTED_BASE_PRICE_OPTION ) ) {
+		return;
+	}
+
+	add_filter(
+		'ppom_product_price_on_cart',
+		function ( $price ) {
+			return '€ ' . number_format( (float) $price, 2, '.', '' );
+		}
+	);
+}
+add_action( 'plugins_loaded', 'ppom_e2e_maybe_arm_formatted_base_price', 20 );
 
 /**
  * Ensure product fixture pages render through WooCommerce's product template.
@@ -1562,6 +1586,33 @@ add_action( 'wp_ajax_ppom_e2e_set_group_read_failure', 'ppom_e2e_set_group_read_
 add_action( 'wp_ajax_nopriv_ppom_e2e_set_group_read_failure', 'ppom_e2e_set_group_read_failure' );
 
 /**
+ * Toggle the simulated formatted (non-numeric) cart base price.
+ *
+ * @return void
+ */
+function ppom_e2e_set_formatted_base_price() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$enabled_raw = isset( $_POST['enabled'] ) ? sanitize_text_field( wp_unslash( $_POST['enabled'] ) ) : '';
+	$enabled     = in_array( $enabled_raw, array( '1', 'true', 'yes' ), true );
+
+	if ( $enabled ) {
+		update_option( PPOM_E2E_FORMATTED_BASE_PRICE_OPTION, '1', false );
+	} else {
+		delete_option( PPOM_E2E_FORMATTED_BASE_PRICE_OPTION );
+	}
+
+	wp_send_json_success(
+		array(
+			'enabled' => $enabled,
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_set_formatted_base_price', 'ppom_e2e_set_formatted_base_price' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_set_formatted_base_price', 'ppom_e2e_set_formatted_base_price' );
+
+/**
  * Read a product's raw PPOM assignment post meta (for E2E assertions).
  *
  * @return void
@@ -1673,6 +1724,7 @@ function ppom_e2e_reset_state() {
 	delete_option( PPOM_E2E_META_IDS_OPTION );
 	delete_option( PPOM_E2E_LICENSE_FIXTURE_OPTION );
 	delete_option( PPOM_E2E_BREAK_GROUP_READS_OPTION );
+	delete_option( PPOM_E2E_FORMATTED_BASE_PRICE_OPTION );
 	update_option( 'woocommerce_coming_soon', 'no', false );
 	update_option( 'woocommerce_store_pages_only', 'no', false );
 
