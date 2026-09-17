@@ -1038,6 +1038,64 @@ add_action( 'wp_ajax_ppom_e2e_create_simple_product', 'ppom_e2e_create_simple_pr
 add_action( 'wp_ajax_nopriv_ppom_e2e_create_simple_product', 'ppom_e2e_create_simple_product' );
 
 /**
+ * Create a fixture Page embedding one `[ppom product_id="X"]` shortcode per
+ * given product id, so E2E specs can exercise more than one PPOM form on the
+ * same page (issue #735) without depending on a specific theme/template.
+ *
+ * @return void
+ */
+function ppom_e2e_create_shortcode_page() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$product_ids = ppom_e2e_decode_json_request( 'product_ids', array() );
+
+	if ( is_wp_error( $product_ids ) ) {
+		wp_send_json_error( array( 'message' => $product_ids->get_error_message() ), 400 );
+	}
+
+	$product_ids = array_values( array_filter( array_map( 'absint', (array) $product_ids ) ) );
+
+	if ( empty( $product_ids ) ) {
+		wp_send_json_error( array( 'message' => 'product_ids must contain at least one product id.' ), 400 );
+	}
+
+	$title = isset( $_POST['title'] )
+		? sanitize_text_field( wp_unslash( $_POST['title'] ) )
+		: 'PPOM E2E Shortcode Page';
+
+	$content = '';
+	foreach ( $product_ids as $product_id ) {
+		$content .= sprintf( '[ppom product_id="%d"]', $product_id );
+	}
+
+	$page_id = wp_insert_post(
+		array(
+			'post_type'    => 'page',
+			'post_status'  => 'publish',
+			'post_title'   => $title,
+			'post_content' => $content,
+		),
+		true
+	);
+
+	if ( is_wp_error( $page_id ) ) {
+		wp_send_json_error( array( 'message' => $page_id->get_error_message() ), 500 );
+	}
+
+	ppom_e2e_mark_fixture_post( $page_id );
+
+	wp_send_json_success(
+		array(
+			'id'        => (int) $page_id,
+			'permalink' => get_permalink( $page_id ),
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_create_shortcode_page', 'ppom_e2e_create_shortcode_page' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_create_shortcode_page', 'ppom_e2e_create_shortcode_page' );
+
+/**
  * Create a WooCommerce variable product for fixtures.
  *
  * @return void
@@ -1687,7 +1745,7 @@ function ppom_e2e_reset_state() {
 
 	$fixture_post_ids = get_posts(
 		array(
-			'post_type'      => array( 'product', 'product_variation' ),
+			'post_type'      => array( 'product', 'product_variation', 'page' ),
 			'post_status'    => 'any',
 			'posts_per_page' => -1,
 			'fields'         => 'ids',

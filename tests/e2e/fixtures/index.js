@@ -4,6 +4,7 @@ export {
 	attachPpomGroupToVariations,
 	createLegacyPpomGroup,
 	createPpomGroup,
+	createPpomShortcodePage,
 	createSimpleTextGroup,
 	deletePpomGroupRows,
 	getPpomAttachRowMeta,

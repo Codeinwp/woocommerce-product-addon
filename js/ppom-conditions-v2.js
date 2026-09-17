@@ -130,7 +130,7 @@ jQuery( function ( $ ) {
 	);
 
 	$( document ).on( 'ppom_hidden_fields_updated', function ( e ) {
-		ppom_fields_hidden_conditionally();
+		ppom_fields_hidden_conditionally( e.scope );
 	} );
 
 	$( document ).on( 'ppom_field_hidden', function ( e ) {
@@ -270,13 +270,13 @@ jQuery( function ( $ ) {
     });*/
 
 	$( document ).on( 'ppom_field_shown', function ( e ) {
-		ppom_fields_hidden_conditionally();
-
 		// Resolve the originating form the same way ppom_field_hidden does,
 		// so restoring defaults for one PPOM form can't read or touch
 		// another form's fields sharing the same data_name (issue #735).
 		const $scope = e.scope && e.scope.length ? e.scope : $( document );
 		const product_id = $scope.find( '[name="ppom_product_id"]' ).val();
+
+		ppom_fields_hidden_conditionally( $scope );
 
 		// Set checked/selected again
 		ppom_set_default_option( e.field, $scope );
@@ -374,7 +374,10 @@ jQuery( function ( $ ) {
 		}
 	} );
 
-	ppom_fields_hidden_conditionally();
+	// One PPOM form's #conditionally_hidden per `.ppom-wrapper` on the page.
+	$( '.ppom-wrapper' ).each( function ( i, wrapper ) {
+		ppom_fields_hidden_conditionally( $( wrapper ) );
+	} );
 } );
 
 function ppom_check_conditions( data_name, callback, $scope ) {
@@ -834,7 +837,16 @@ function ppom_set_default_option( field_id, $scope ) {
 }
 
 // Mirror the current hidden field list into the hidden input consumed by PHP.
-function ppom_fields_hidden_conditionally() {
+//
+// $scope confines both the scan and the write to one product's
+// `.ppom-wrapper`: PPOM renders `#conditionally_hidden` with no per-product
+// suffix, so on a page with two PPOM forms an unscoped scan/write only ever
+// reaches the first of the two duplicated ids — the second form's own
+// hidden-fields state (and required-field validation) never gets submitted
+// (issue #735).
+function ppom_fields_hidden_conditionally( $scope ) {
+	$scope = $scope && $scope.length ? $scope : jQuery( document );
+
 	// Reset
 	ppom_hidden_fields = [];
 	// jQuery(`.ppom-field-wrapper.ppom-c-hide`).filter(function() {
@@ -850,9 +862,9 @@ function ppom_fields_hidden_conditionally() {
 	// Use the actual visual state: per-source `ppom-locked-*` classes go
 	// stale when rules span multiple source fields, but `ppom-c-hide` always
 	// reflects what the customer sees.
-	jQuery( `.ppom-field-wrapper.ppom-c-hide` ).each( function ( i, h ) {
+	$scope.find( `.ppom-field-wrapper.ppom-c-hide` ).each( function ( i, h ) {
 		ppom_hidden_fields.push( jQuery( h ).data( 'data_name' ) );
 	} );
-	jQuery( '#conditionally_hidden' ).val( ppom_hidden_fields );
+	$scope.find( '#conditionally_hidden' ).val( ppom_hidden_fields );
 	// console.log(ppom_hidden_fields);
 }

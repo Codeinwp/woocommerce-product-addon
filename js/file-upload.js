@@ -39,6 +39,33 @@ const featherEditor = '';
 const uploaderInstances = {};
 const Cropped_Data_Captured = false;
 
+// A product can be embedded in more than one form on the same page (e.g. two
+// `[ppom product_id="X"]` shortcodes for the same product), so the product id
+// alone isn't a unique registry key — assign each `.ppom-wrapper` its own
+// stable id the first time it's seen and key uploader state by that instead.
+let ppom_wrapper_instance_counter = 0;
+const ppom_wrapper_instance_ids = new WeakMap();
+
+/**
+ * @param {jQuery} $scope A single `.ppom-wrapper` (or empty/document-wide scope).
+ * @return {string} Stable per-wrapper id, or '' when $scope has no element.
+ */
+function ppom_get_wrapper_instance_id( $scope ) {
+	const el = $scope && $scope[ 0 ];
+	if ( ! el ) {
+		return '';
+	}
+
+	if ( ! ppom_wrapper_instance_ids.has( el ) ) {
+		ppom_wrapper_instance_ids.set(
+			el,
+			String( ++ppom_wrapper_instance_counter )
+		);
+	}
+
+	return ppom_wrapper_instance_ids.get( el );
+}
+
 // Track nonce refresh state to avoid duplicate requests
 let nonceRefreshPromise = null;
 let lastNonceRefreshTime = Date.now();
@@ -304,11 +331,11 @@ jQuery( function ( $ ) {
 			}
 
 			const scopeWrapper = e.target.closest( '.ppom-wrapper' );
-			const scopeProductId = scopeWrapper
-				?.querySelector( '[name="ppom_product_id"]' )
-				?.value;
-			const instanceKey = scopeProductId
-				? fileDataName + '__' + scopeProductId
+			const wrapperInstanceId = ppom_get_wrapper_instance_id(
+				scopeWrapper ? jQuery( scopeWrapper ) : null
+			);
+			const instanceKey = wrapperInstanceId
+				? fileDataName + '__' + wrapperInstanceId
 				: fileDataName;
 
 			field_file_count[ instanceKey ] = 0;
@@ -318,7 +345,12 @@ jQuery( function ( $ ) {
 				uploaderInstance.removeFile( fileId );
 			}
 
-			const checkbox = document.querySelector(
+			// Scoped to this click's own field wrapper rather than looked up
+			// document-wide: two forms can restore the same field name with
+			// the same numeric file key (e.g. `0`), so an unscoped lookup can
+			// resolve to the other form's checkbox and delete/rename the
+			// wrong upload.
+			const checkbox = ppomFieldWrapper?.querySelector(
 				`input[name="ppom[fields][${ fileDataName }][${ fileId }][org]"]`
 			);
 			const fileName = checkbox?.value;
@@ -436,15 +468,45 @@ jQuery( function ( $ ) {
 			: { '': ppom_input_vars };
 
 	$.each( ppom_file_setup_products, function ( product_id, product_vars ) {
-		const $scope = product_id
-			? $( `.ppom-wrapper:has([name="ppom_product_id"][value="${ product_id }"])` )
-			: $( document );
-
-		$.each( product_vars.ppom_inputs, function ( index, file_input ) {
-			if ( file_input.type === 'file' || file_input.type === 'cropper' ) {
-				ppom_setup_file_upload_input( file_input, $scope );
+		const file_or_cropper_inputs = jQuery.grep(
+			product_vars.ppom_inputs,
+			function ( file_input ) {
+				return (
+					file_input.type === 'file' ||
+					file_input.type === 'cropper'
+				);
 			}
-		} );
+		);
+
+		if ( ! file_or_cropper_inputs.length ) {
+			return;
+		}
+
+		if ( ! product_id ) {
+			const $scope = $( document );
+			$.each( file_or_cropper_inputs, function ( index, file_input ) {
+				ppom_setup_file_upload_input( file_input, $scope );
+			} );
+			return;
+		}
+
+		// The same product can be embedded in more than one form on the
+		// page (e.g. two `[ppom product_id="X"]` shortcodes for the same
+		// product), so this selector can match several `.ppom-wrapper`
+		// elements: set up each one independently rather than collapsing
+		// them into a single shared $scope, or only the first ever gets
+		// its own uploader.
+		$( `.ppom-wrapper:has([name="ppom_product_id"][value="${ product_id }"])` ).each(
+			function ( i, wrapperEl ) {
+				const $scope = $( wrapperEl );
+				$.each(
+					file_or_cropper_inputs,
+					function ( index, file_input ) {
+						ppom_setup_file_upload_input( file_input, $scope );
+					}
+				);
+			}
+		);
 	} );
 } ); //	jQuery(function($){});
 
@@ -641,11 +703,14 @@ function ppom_setup_file_upload_input( file_input, $scope ) {
 	// Two PPOM forms on one page can render the same field data_name and the
 	// same DOM ids (issue #735's file-upload counterpart) — $scope is this
 	// call's own `.ppom-wrapper`, and every internal registry key below is
-	// suffixed with its product id so the two forms get independent
-	// uploaders instead of the second silently no-op'ing against the first's.
+	// suffixed with a per-wrapper id (not just the product id: the same
+	// product can be embedded in more than one form) so each form gets its
+	// own uploader instead of a later one silently no-op'ing against an
+	// earlier one that happens to share a key.
 	$scope = $scope && $scope.length ? $scope : jQuery( document );
 	const scope_product_id = $scope.find( '[name="ppom_product_id"]' ).val();
-	const key_suffix = scope_product_id ? '__' + scope_product_id : '';
+	const wrapper_instance_id = ppom_get_wrapper_instance_id( $scope );
+	const key_suffix = wrapper_instance_id ? '__' + wrapper_instance_id : '';
 	const instance_key = file_data_name + key_suffix;
 	const instance_full_key = data_name + key_suffix;
 
