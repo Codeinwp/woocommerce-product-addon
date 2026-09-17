@@ -1038,6 +1038,72 @@ add_action( 'wp_ajax_ppom_e2e_create_simple_product', 'ppom_e2e_create_simple_pr
 add_action( 'wp_ajax_nopriv_ppom_e2e_create_simple_product', 'ppom_e2e_create_simple_product' );
 
 /**
+ * Create a WooCommerce grouped product from existing child product IDs.
+ *
+ * @return void
+ */
+function ppom_e2e_create_grouped_product() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	if ( ! class_exists( 'WC_Product_Grouped' ) ) {
+		wp_send_json_error(
+			array(
+				'message' => 'WooCommerce grouped product support is unavailable.',
+			),
+			500
+		);
+	}
+
+	$children = ppom_e2e_decode_json_request( 'children', array() );
+
+	if ( is_wp_error( $children ) ) {
+		ppom_e2e_send_wp_error( $children );
+	}
+
+	$children = array_values( array_filter( array_map( 'absint', (array) $children ) ) );
+	$name     = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+
+	if ( '' === $name || empty( $children ) ) {
+		wp_send_json_error(
+			array(
+				'message' => 'Grouped product name and at least one child ID are required.',
+			),
+			400
+		);
+	}
+
+	$product = new WC_Product_Grouped();
+	$product->set_name( $name );
+	$product->set_status( 'publish' );
+	$product->set_children( $children );
+
+	$product_id = $product->save();
+
+	if ( ! $product_id ) {
+		wp_send_json_error(
+			array(
+				'message' => 'WooCommerce grouped product could not be saved.',
+			),
+			500
+		);
+	}
+
+	ppom_e2e_mark_fixture_post( $product_id );
+
+	wp_send_json_success(
+		array(
+			'id'       => (int) $product_id,
+			'name'     => $product->get_name(),
+			'type'     => $product->get_type(),
+			'children' => $product->get_children(),
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_create_grouped_product', 'ppom_e2e_create_grouped_product' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_create_grouped_product', 'ppom_e2e_create_grouped_product' );
+
+/**
  * Create a WooCommerce variable product for fixtures.
  *
  * @return void
