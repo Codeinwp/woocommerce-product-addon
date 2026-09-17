@@ -1082,9 +1082,10 @@ final class Engine {
 		}
 
 		// wc_format_decimal() expects grouping removed; "1.000" would otherwise read as 1.0 (#720).
+		// Only a separator in front of exactly three digits is grouping; "10.00" keeps its decimal point.
 		$thousands = wc_get_price_thousand_separator();
 		if ( '' !== $thousands && wc_get_price_decimal_separator() !== $thousands ) {
-			$value = str_replace( $thousands, '', $value );
+			$value = (string) preg_replace( '/' . preg_quote( $thousands, '/' ) . '(?=\d{3}(?!\d))/', '', $value );
 		}
 
 		return (float) wc_format_decimal( $value );

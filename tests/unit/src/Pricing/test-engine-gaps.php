@@ -765,4 +765,40 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 		$this->assertSame( 1000.0, $grouped['price'] );
 		$this->assertSame( 1000.5, $canonical['price'] );
 	}
+
+	/**
+	 * On a comma-decimal, dot-grouping store a dot followed by two digits is a decimal
+	 * point, not grouping: "€ 10.00" must stay 10, while "€ 1.000,50" is 1000.5.
+	 * Regression for #720.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_product_base_keeps_dot_decimal_on_comma_decimal_store() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$this->insert_ppom_meta(
+			array( $this->build_text_field( 'engraving', 'Engraving' ) ),
+			$product->get_id()
+		);
+
+		$discount  = 0;
+		$decimal   = static function () {
+			return ',';
+		};
+		$thousands = static function () {
+			return '.';
+		};
+		add_filter( 'wc_get_price_decimal_separator', $decimal );
+		add_filter( 'wc_get_price_thousand_separator', $thousands );
+
+		try {
+			$dot_decimal = Engine::price_get_product_base( '€ 10.00', $product, array(), 1, array(), $discount, null );
+			$grouped     = Engine::price_get_product_base( '€ 1.000,50', $product, array(), 1, array(), $discount, null );
+		} finally {
+			remove_filter( 'wc_get_price_decimal_separator', $decimal );
+			remove_filter( 'wc_get_price_thousand_separator', $thousands );
+		}
+
+		$this->assertSame( 10.0, $dot_decimal['price'] );
+		$this->assertSame( 1000.5, $grouped['price'] );
+	}
 }
