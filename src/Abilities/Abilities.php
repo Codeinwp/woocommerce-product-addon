@@ -247,7 +247,7 @@ final class Abilities implements RegisterHooks {
 				'output_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
-						'types'  => array(
+						'types'       => array(
 							'type'  => 'array',
 							'items' => array(
 								'type'       => 'object',
@@ -261,9 +261,13 @@ final class Abilities implements RegisterHooks {
 								),
 							),
 						),
-						'schema' => array(
+						'schema'      => array(
 							'type'                 => 'object',
 							'additionalProperties' => true,
+						),
+						'upgrade_url' => array(
+							'type'        => 'string',
+							'description' => __( 'Upgrade link, present when at least one field type is locked.', 'woocommerce-product-addon' ),
 						),
 					),
 				),
@@ -409,8 +413,12 @@ final class Abilities implements RegisterHooks {
 							'items' => array(
 								'type'       => 'object',
 								'properties' => array(
-									'code'    => array( 'type' => 'string' ),
-									'message' => array( 'type' => 'string' ),
+									'code'        => array( 'type' => 'string' ),
+									'message'     => array( 'type' => 'string' ),
+									'upgrade_url' => array(
+										'type'        => 'string',
+										'description' => __( 'Upgrade link, present when the error is caused by a PPOM Pro requirement.', 'woocommerce-product-addon' ),
+									),
 								),
 							),
 						),
@@ -532,7 +540,16 @@ final class Abilities implements RegisterHooks {
 			$group_ids = Helpers::normalize_ppom_meta_ids( $input['group_ids'] );
 
 			if ( count( $group_ids ) > 1 && ! Helpers::pro_is_installed() ) {
-				return new WP_Error( 'ppom_pro_required', __( 'Using multiple PPOM field groups on the same product is available in PRO.', 'woocommerce-product-addon' ), array( 'status' => 403 ) );
+				$upgrade_url = $this->upgrade_url( 'multiple-fields' );
+
+				return new WP_Error(
+					'ppom_pro_required',
+					$this->with_upgrade_link( __( 'Using multiple PPOM field groups on the same product is available in PRO.', 'woocommerce-product-addon' ), $upgrade_url ),
+					array(
+						'status'      => 403,
+						'upgrade_url' => $upgrade_url,
+					)
+				);
 			}
 
 			$found = array();
@@ -649,6 +666,10 @@ final class Abilities implements RegisterHooks {
 		}
 
 		$result = array( 'types' => $types );
+
+		if ( in_array( true, array_column( $types, 'locked' ), true ) ) {
+			$result['upgrade_url'] = $this->upgrade_url( 'locked-field-type' );
+		}
 
 		$type = is_array( $input ) && isset( $input['type'] ) ? sanitize_key( $input['type'] ) : '';
 		if ( '' !== $type ) {
@@ -776,14 +797,18 @@ final class Abilities implements RegisterHooks {
 
 		if ( $dry_run || ! empty( $errors ) ) {
 			if ( ! $dry_run ) {
-				return new WP_Error(
-					'ppom_invalid_field_group',
-					$errors[0]['message'],
-					array(
-						'status' => 400,
-						'errors' => $errors,
-					)
+				$data = array(
+					'status' => 400,
+					'errors' => $errors,
 				);
+				foreach ( $errors as $error ) {
+					if ( ! empty( $error['upgrade_url'] ) ) {
+						$data['upgrade_url'] = $error['upgrade_url'];
+						break;
+					}
+				}
+
+				return new WP_Error( 'ppom_invalid_field_group', $errors[0]['message'], $data );
 			}
 
 			return array(
@@ -862,7 +887,7 @@ final class Abilities implements RegisterHooks {
 	 * Validates submitted field definitions against the registered field types.
 	 *
 	 * @param array<int, mixed> $fields Submitted fields.
-	 * @return array<int, array{code: string, message: string}>
+	 * @return array<int, array{code: string, message: string, upgrade_url?: string}>
 	 */
 	private function validate_fields( array $fields ) {
 		$errors  = array();
@@ -891,11 +916,17 @@ final class Abilities implements RegisterHooks {
 				/* translators: %d: field position */
 				$errors[] = $this->error_item( 'ppom_missing_field_type', sprintf( __( 'Field %d is missing "type".', 'woocommerce-product-addon' ), $position ) );
 			} elseif ( isset( $catalog[ $type ] ) && ! empty( $catalog[ $type ]['locked'] ) ) {
-				$errors[] = $this->error_item(
+				$upgrade_url = $this->upgrade_url( 'locked-field-type' );
+				$error       = $this->error_item(
 					'ppom_pro_field_type',
-					/* translators: 1: field position, 2: field type, 3: plan name */
-					sprintf( __( 'Field %1$d uses the "%2$s" field type, which requires PPOM Pro (%3$s plan or higher).', 'woocommerce-product-addon' ), $position, $type, (string) $catalog[ $type ]['min_plan_label'] )
+					$this->with_upgrade_link(
+						/* translators: 1: field position, 2: field type, 3: plan name */
+						sprintf( __( 'Field %1$d uses the "%2$s" field type, which requires PPOM Pro (%3$s plan or higher).', 'woocommerce-product-addon' ), $position, $type, (string) $catalog[ $type ]['min_plan_label'] ),
+						$upgrade_url
+					)
 				);
+				$error['upgrade_url'] = $upgrade_url;
+				$errors[]             = $error;
 			} elseif ( ! isset( $inputs[ $type ] ) && isset( $catalog[ $type ] ) ) {
 				/* translators: 1: field position, 2: field type */
 				$errors[] = $this->error_item( 'ppom_field_type_unavailable', sprintf( __( 'Field %1$d uses the "%2$s" field type, which is not available on this site.', 'woocommerce-product-addon' ), $position, $type ) );
@@ -1021,6 +1052,35 @@ final class Abilities implements RegisterHooks {
 			'code'    => $code,
 			'message' => $message,
 		);
+	}
+
+	/**
+	 * Builds the PPOM Pro upgrade link relayed to AI agents.
+	 *
+	 * @param string $area Gated feature key, used as the UTM campaign.
+	 * @return string
+	 */
+	private function upgrade_url( $area ) {
+		$url = defined( 'PPOM_UPGRADE_URL' ) ? (string) PPOM_UPGRADE_URL : '';
+		if ( '' !== $url && function_exists( 'tsdk_translate_link' ) && function_exists( 'tsdk_utmify' ) ) {
+			$url = tsdk_utmify( tsdk_translate_link( $url ), $area, 'mcp' );
+		}
+
+		return $url;
+	}
+
+	/**
+	 * @param string $message     Human readable message.
+	 * @param string $upgrade_url Upgrade link.
+	 * @return string
+	 */
+	private function with_upgrade_link( $message, $upgrade_url ) {
+		if ( '' === $upgrade_url ) {
+			return $message;
+		}
+
+		/* translators: %s: upgrade URL */
+		return $message . ' ' . sprintf( __( 'Upgrade: %s', 'woocommerce-product-addon' ), $upgrade_url );
 	}
 
 	/**
