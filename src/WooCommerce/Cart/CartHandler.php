@@ -552,9 +552,17 @@ final class CartHandler {
 			$option_prices = json_decode( wp_unslash( $item['ppom']['ppom_option_price'] ), true );
 
 			if ( $option_prices ) {
+				$product_id      = isset( $item['product_id'] ) ? absint( $item['product_id'] ) : 0;
+				$variation_id    = isset( $item['variation_id'] ) ? absint( $item['variation_id'] ) : 0;
+				$pristine        = wc_get_product( $variation_id ? $variation_id : $product_id );
+				$selected_fields = isset( $item['ppom']['fields'] ) && is_array( $item['ppom']['fields'] ) ? $item['ppom']['fields'] : array();
+				$ppom_meta_ids   = isset( $selected_fields['id'] ) ? $selected_fields['id'] : '';
+				$attached_ids    = empty( $ppom_meta_ids ) ? array() : self::attached_meta_ids( $product_id, $ppom_meta_ids );
+				$counted_fields  = array();
+
 				foreach ( $option_prices as $fee ) {
 
-					if ( $fee['apply'] != 'onetime' ) {
+					if ( ! is_array( $fee ) || ! isset( $fee['apply'] ) || $fee['apply'] != 'onetime' ) {
 						continue;
 					}
 
@@ -567,6 +575,24 @@ final class CartHandler {
 
 					if ( ! empty( $fee['without_tax'] ) ) {
 						$fee_price = $fee['without_tax'];
+					}
+
+					// Charge the saved amount, never the payload's, so the line subtotal agrees.
+					$resolved = null;
+
+					if ( $pristine instanceof \WC_Product && ! empty( $ppom_meta_ids ) ) {
+						$resolved = self::canonical_onetime_price( $fee, $pristine, $attached_ids, $selected_fields, $counted_fields );
+					}
+
+					if ( null !== $resolved ) {
+						$fee_price        = apply_filters( 'ppom_option_price', $resolved );
+						$resolved_taxable = self::resolved_onetime_taxable( $fee, $attached_ids );
+
+						if ( null !== $resolved_taxable ) {
+							$taxable = $resolved_taxable;
+						}
+					} else {
+						$fee_price = self::unresolved_payload_amount( $fee_price );
 					}
 
 					// if(  'incl' === get_option( 'woocommerce_tax_display_shop' ) ) {
@@ -774,6 +800,420 @@ final class CartHandler {
 		return $quantity;
 	}
 
+	/**
+	 * Amount to use for a row that cannot be resolved from saved meta.
+	 *
+	 * @param mixed $amount Amount carried by the payload row.
+	 *
+	 * @return float
+	 */
+	private static function unresolved_payload_amount( $amount ) {
+		$amount = is_scalar( $amount ) ? (float) $amount : 0.0;
+
+		return $amount < 0 ? 0.0 : $amount;
+	}
+
+	/**
+	 * Whether a resolved fixed fee is taxable according to its saved field.
+	 *
+	 * @param array<string, mixed> $option       Single decoded option row.
+	 * @param int[]                $attached_ids Group ids confirmed attached to the product.
+	 *
+	 * @return bool|null Null when the field cannot be resolved.
+	 */
+	private static function resolved_onetime_taxable( array $option, array $attached_ids ) {
+		if ( empty( $attached_ids ) || ! isset( $option['data_name'] ) ) {
+			return null;
+		}
+
+		$field_meta = Helpers::get_field_meta_by_dataname( 0, sanitize_key( (string) $option['data_name'] ), implode( ',', $attached_ids ) );
+
+		if ( empty( $field_meta ) || ! is_array( $field_meta ) ) {
+			return null;
+		}
+
+		return isset( $field_meta['onetime_taxable'] ) && 'on' === $field_meta['onetime_taxable'];
+	}
+
+	/**
+	 * Canonical fixed-fee amount for one `ppom_option_price` row, or null when the row
+	 * cannot be resolved from saved meta at all.
+	 *
+	 * @param array<string, mixed> $option          Single decoded option row.
+	 * @param \WC_Product          $product         Pristine product of the cart line.
+	 * @param int[]                $attached_ids    Group ids confirmed attached to the product.
+	 * @param array<string, mixed> $selected_fields Field values submitted for the line.
+	 * @param array<string, bool>  $counted_fields  Fields already totalled for this line.
+	 *
+	 * @return float|null
+	 */
+	public static function canonical_onetime_price( array $option, $product, array $attached_ids, array $selected_fields, array &$counted_fields ) {
+		if ( ! isset( $option['data_name'] ) ) {
+			return null;
+		}
+
+		if ( isset( $option['option_id'] ) ) {
+			$key = sanitize_key( (string) $option['data_name'] ) . '|' . (string) $option['option_id'];
+
+			if ( isset( $counted_fields[ $key ] ) ) {
+				return 0.0;
+			}
+
+			$counted_fields[ $key ] = true;
+
+			return self::resolved_onetime_option_price( $option, $product, $attached_ids, $selected_fields );
+		}
+
+		return self::resolved_onetime_field_total( $option['data_name'], $product, $attached_ids, $selected_fields, $counted_fields );
+	}
+
+	/**
+	 * Narrows payload-supplied PPOM group ids to those actually attached to the product.
+	 *
+	 * @param int                     $product_id    Product the cart line refers to.
+	 * @param string|array<int, mixed> $ppom_meta_ids Group ids carried by the cart payload.
+	 *
+	 * @return int[] Attached group ids; empty when none of the requested ids belong to the product.
+	 */
+	private static function attached_meta_ids( $product_id, $ppom_meta_ids ) {
+		$requested = is_array( $ppom_meta_ids ) ? $ppom_meta_ids : explode( ',', (string) $ppom_meta_ids );
+		$requested = array_filter( array_map( 'absint', $requested ) );
+
+		if ( empty( $requested ) ) {
+			return array();
+		}
+
+		$ppom    = new \PPOM_Meta( $product_id );
+		$allowed = $ppom->get_meta_id( $product_id );
+		$allowed = array_filter( array_map( 'absint', is_array( $allowed ) ? $allowed : array( $allowed ) ) );
+
+		return array_values( array_intersect( $requested, $allowed ) );
+	}
+
+	/**
+	 * Server-resolved fixed-fee amount for one `ppom_option_price` row.
+	 *
+	 * @param array<string, mixed> $option          Single decoded option row.
+	 * @param \WC_Product          $product         Product of the cart line; percentage prices need it.
+	 * @param int[]                $attached_ids    Group ids confirmed attached to the product.
+	 * @param array<string, mixed> $selected_fields Field values submitted for the line.
+	 *
+	 * @return float
+	 */
+	private static function resolved_onetime_option_price( array $option, $product, array $attached_ids, array $selected_fields ) {
+		if ( empty( $attached_ids ) ) {
+			return 0.0;
+		}
+
+		$meta_ids   = implode( ',', $attached_ids );
+		$field_meta = Helpers::get_field_meta_by_dataname( 0, sanitize_key( (string) $option['data_name'] ), $meta_ids );
+
+		if ( empty( $field_meta ) || ! is_array( $field_meta ) ) {
+			return 0.0;
+		}
+
+		if ( ! isset( $field_meta['onetime'] ) || 'on' !== $field_meta['onetime'] ) {
+			return 0.0;
+		}
+
+		if ( ! self::option_is_selected( $field_meta, $option['option_id'], $selected_fields ) ) {
+			return 0.0;
+		}
+
+		$option_id = (string) $option['option_id'];
+
+		foreach ( self::saved_option_rows( $field_meta ) as $saved_option ) {
+			if ( in_array( $option_id, self::saved_option_ids( $saved_option, $field_meta ), true ) ) {
+				return self::saved_option_amount( $field_meta, $saved_option, $product );
+			}
+		}
+
+		return self::canonical_amount( Helpers::get_field_option_price_by_id( $option, $product, $meta_ids ), $product );
+	}
+
+	/**
+	 * Server-resolved fixed-fee total for a row that carries no option id.
+	 *
+	 * @param string               $data_name       Field data name carried by the row.
+	 * @param \WC_Product          $product         Pristine product of the cart line.
+	 * @param int[]                $attached_ids    Group ids confirmed attached to the product.
+	 * @param array<string, mixed> $selected_fields Field values submitted for the line.
+	 * @param array<string, bool>  $counted_fields  Fields already totalled for this line.
+	 *
+	 * @return float|null Canonical total, or null when the field prices outside its option list.
+	 */
+	private static function resolved_onetime_field_total( $data_name, $product, array $attached_ids, array $selected_fields, array &$counted_fields ) {
+		if ( empty( $attached_ids ) ) {
+			return 0.0;
+		}
+
+		$field_meta = Helpers::get_field_meta_by_dataname( 0, sanitize_key( (string) $data_name ), implode( ',', $attached_ids ) );
+
+		if ( empty( $field_meta ) || ! is_array( $field_meta ) ) {
+			return 0.0;
+		}
+
+		if ( ! isset( $field_meta['onetime'] ) || 'on' !== $field_meta['onetime'] ) {
+			return 0.0;
+		}
+
+		$saved_rows = self::saved_option_rows( $field_meta );
+
+		if ( empty( $saved_rows ) ) {
+			// Text-like fields price the field itself; anything else prices outside saved meta.
+			if ( ! isset( $field_meta['price'] ) || ! is_scalar( $field_meta['price'] ) || '' === (string) $field_meta['price'] ) {
+				return null;
+			}
+
+			$key = isset( $field_meta['data_name'] ) ? (string) $field_meta['data_name'] : (string) $data_name;
+
+			if ( isset( $counted_fields[ $key ] ) ) {
+				return 0.0;
+			}
+
+			$counted_fields[ $key ] = true;
+
+			return empty( self::submitted_option_tokens( isset( $selected_fields[ $key ] ) ? $selected_fields[ $key ] : '' ) )
+				? 0.0
+				: self::canonical_amount( $field_meta['price'], $product );
+		}
+
+		$key = isset( $field_meta['data_name'] ) ? (string) $field_meta['data_name'] : (string) $data_name;
+
+		if ( isset( $counted_fields[ $key ] ) ) {
+			return 0.0;
+		}
+
+		$counted_fields[ $key ] = true;
+
+		if ( ! isset( $selected_fields[ $key ] ) ) {
+			return 0.0;
+		}
+
+		$submitted = self::submitted_option_tokens( $selected_fields[ $key ] );
+
+		if ( empty( $submitted ) ) {
+			return 0.0;
+		}
+
+		$total = 0.0;
+
+		foreach ( $saved_rows as $saved_option ) {
+			if ( self::saved_option_matches_submission( $saved_option, $submitted ) ) {
+				$total += self::saved_option_amount( $field_meta, $saved_option, $product );
+			}
+		}
+
+		return $total;
+	}
+
+	/**
+	 * Canonical amount of one saved option, discount first as the pricing engine does.
+	 *
+	 * @param array<string, mixed> $field_meta   Saved field definition.
+	 * @param array<string, mixed> $saved_option Saved option row.
+	 * @param \WC_Product          $product      Pristine product of the cart line.
+	 *
+	 * @return float
+	 */
+	private static function saved_option_amount( array $field_meta, array $saved_option, $product ) {
+		$amount = '';
+
+		if ( isset( $saved_option['discount'] ) && is_scalar( $saved_option['discount'] ) && (float) $saved_option['discount'] > 0 ) {
+			$amount = (string) $saved_option['discount'];
+		} elseif ( isset( $saved_option['price'] ) && is_scalar( $saved_option['price'] ) ) {
+			$amount = (string) $saved_option['price'];
+		}
+
+		return self::canonical_amount( $amount, $product );
+	}
+
+	/**
+	 * Turns a saved amount into the figure the cart shows.
+	 *
+	 * Percentages resolve against the product base price. The amount stays net, because
+	 * the tax display transformation belongs to the display path alone.
+	 *
+	 * @param mixed       $amount  Saved amount, possibly a percentage.
+	 * @param \WC_Product $product Pristine product of the cart line.
+	 *
+	 * @return float
+	 */
+	private static function canonical_amount( $amount, $product ) {
+		if ( ! is_scalar( $amount ) || '' === (string) $amount ) {
+			return 0.0;
+		}
+
+		$amount = (string) $amount;
+
+		if ( false !== strpos( $amount, '%' ) ) {
+			$base   = Callbacks::convert_price_back( Helpers::get_product_price( $product, null, 'cart' ) );
+			$amount = Engine::get_amount_after_percentage( $base, $amount );
+		}
+
+		return (float) $amount;
+	}
+
+	/**
+	 * Every id shape a saved option row can be referenced by.
+	 *
+	 * Image rows are addressed as `<data_name>-<id>`, while other types use the id
+	 * `Helpers::get_option_id()` generates.
+	 *
+	 * @param array<string, mixed> $saved_option Saved option row.
+	 * @param array<string, mixed> $field_meta   Saved field definition.
+	 *
+	 * @return string[]
+	 */
+	private static function saved_option_ids( array $saved_option, array $field_meta ) {
+		$data_name = isset( $field_meta['data_name'] ) ? (string) $field_meta['data_name'] : '';
+		$ids       = array( (string) Helpers::get_option_id( $saved_option, $field_meta ) );
+
+		if ( isset( $saved_option['id'] ) && is_scalar( $saved_option['id'] ) ) {
+			$ids[] = (string) $saved_option['id'];
+			$ids[] = $data_name . '-' . $saved_option['id'];
+		}
+
+		return array_values( array_unique( $ids ) );
+	}
+
+	/**
+	 * Whether an option id belongs to the values submitted for its field.
+	 *
+	 * Cart payloads are untrusted, so rows are only honoured when the submitted values still
+	 * evidence the option selection.
+	 *
+	 * @param array<string, mixed> $field_meta      Saved field definition.
+	 * @param string               $option_id       Option id carried by the cart row.
+	 * @param array<string, mixed> $selected_fields Field values submitted for the line.
+	 *
+	 * @return bool
+	 */
+	private static function option_is_selected( array $field_meta, $option_id, array $selected_fields ) {
+		$data_name = isset( $field_meta['data_name'] ) ? (string) $field_meta['data_name'] : '';
+
+		if ( '' === $data_name || ! isset( $selected_fields[ $data_name ] ) ) {
+			return false;
+		}
+
+		$submitted = self::submitted_option_tokens( $selected_fields[ $data_name ] );
+
+		if ( empty( $submitted ) ) {
+			return false;
+		}
+
+		$option_id  = (string) $option_id;
+		$candidates = array();
+
+		foreach ( $submitted as $token ) {
+			$candidates[] = $token;
+			$candidates[] = sanitize_key( $data_name . '_' . $token );
+			$candidates[] = $data_name . '-' . $token;
+		}
+
+		foreach ( self::saved_option_rows( $field_meta ) as $saved_option ) {
+			if ( ! self::saved_option_matches_submission( $saved_option, $submitted ) ) {
+				continue;
+			}
+
+			$candidates = array_merge( $candidates, self::saved_option_ids( $saved_option, $field_meta ) );
+		}
+
+		return in_array( $option_id, $candidates, true );
+	}
+
+	/**
+	 * Flattens a submitted field value into comparable option tokens.
+	 *
+	 * @param mixed $value Submitted value for one field.
+	 *
+	 * @return string[]
+	 */
+	private static function submitted_option_tokens( $value ) {
+		$tokens = array();
+
+		foreach ( (array) $value as $entry ) {
+			if ( is_array( $entry ) ) {
+				$tokens = array_merge( $tokens, self::submitted_option_tokens( $entry ) );
+				continue;
+			}
+
+			if ( ! is_scalar( $entry ) ) {
+				continue;
+			}
+
+			$entry    = (string) $entry;
+			$tokens[] = $entry;
+
+			$decoded = json_decode( stripslashes( $entry ), true );
+			if ( ! is_array( $decoded ) ) {
+				continue;
+			}
+
+			foreach ( array( 'option_id', 'image_id', 'id' ) as $key ) {
+				if ( isset( $decoded[ $key ] ) && is_scalar( $decoded[ $key ] ) ) {
+					$tokens[] = (string) $decoded[ $key ];
+				}
+			}
+		}
+
+		return array_values( array_unique( $tokens ) );
+	}
+
+	/**
+	 * Saved option rows of a field, whichever key its type keeps them under.
+	 *
+	 * @param array<string, mixed> $field_meta Saved field definition.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function saved_option_rows( array $field_meta ) {
+		$rows = array();
+
+		foreach ( array( 'options', 'images', 'audio' ) as $key ) {
+			if ( empty( $field_meta[ $key ] ) || ! is_array( $field_meta[ $key ] ) ) {
+				continue;
+			}
+
+			foreach ( $field_meta[ $key ] as $row ) {
+				if ( is_array( $row ) ) {
+					$rows[] = $row;
+				}
+			}
+		}
+
+		return $rows;
+	}
+
+	/**
+	 * Whether a saved option row is named by the submitted tokens.
+	 *
+	 * @param array<string, mixed> $saved_option Saved option row.
+	 * @param string[]             $submitted    Tokens submitted for the field.
+	 *
+	 * @return bool
+	 */
+	private static function saved_option_matches_submission( array $saved_option, array $submitted ) {
+		foreach ( array( 'option', 'title' ) as $key ) {
+			if ( ! isset( $saved_option[ $key ] ) || ! is_scalar( $saved_option[ $key ] ) ) {
+				continue;
+			}
+
+			$label = (string) $saved_option[ $key ];
+
+			if ( in_array( $label, $submitted, true ) ) {
+				return true;
+			}
+
+			$translated = Helpers::wpml_translate( $label, 'PPOM' );
+			if ( is_scalar( $translated ) && in_array( (string) $translated, $submitted, true ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	// Control subtotal when quantities input used.
 	public static function item_subtotal( $item_subtotal, $cart_item, $cart_item_key ) {
 
@@ -788,27 +1228,76 @@ final class CartHandler {
 			return $item_subtotal;
 		}
 
-		$price = 0;
+		$product_id   = $cart_item['product_id'];
+		$quantity     = $cart_item['quantity'];
+		$variation_id = isset( $cart_item['variation_id'] ) ? absint( $cart_item['variation_id'] ) : 0;
+
+		// The selected variation prices the line, and its pristine copy resolves addons.
+		$pristine        = wc_get_product( $variation_id ? $variation_id : $product_id );
+		$line_product    = $pristine instanceof \WC_Product ? $pristine : new \WC_Product( $product_id );
+		$base_product    = isset( $cart_item['data'] ) && $cart_item['data'] instanceof \WC_Product ? $cart_item['data'] : $line_product;
+		$ppom_meta_ids   = isset( $cart_item['ppom']['fields']['id'] ) ? $cart_item['ppom']['fields']['id'] : '';
+		$selected_fields = isset( $cart_item['ppom']['fields'] ) && is_array( $cart_item['ppom']['fields'] ) ? $cart_item['ppom']['fields'] : array();
+		$attached_ids    = null;
+		$counted_fields  = array();
+
+		$price          = 0.0;
+		$resolved_price = 0.0;
+
 		foreach ( $option_prices as $option ) {
-			$option       = Helpers::translation_options( $option );
-			$option_price = isset( $option['price'] ) ? $option['price'] : 0;
-			if ( 0 === $option_price || ( ! isset( $option['apply'] ) || 'onetime' !== $option['apply'] ) ) {
+			if ( ! is_array( $option ) ) {
 				continue;
 			}
-			$price = isset( $option['discount'] ) && $option['discount'] > 0 ? $option['discount'] : $option_price;
-			if ( ! empty( $price ) ) {
-				$price = apply_filters( 'ppom_option_price', $price );
-				$price = floatval( wp_strip_all_tags( $price ) );
+
+			$option = Helpers::translation_options( $option );
+			if ( ! isset( $option['apply'] ) || 'onetime' !== $option['apply'] ) {
+				continue;
+			}
+
+			$option_price = isset( $option['price'] ) ? (float) $option['price'] : 0.0;
+
+			$resolved = null;
+
+			if ( ! empty( $ppom_meta_ids ) ) {
+				if ( null === $attached_ids ) {
+					$attached_ids = self::attached_meta_ids( $product_id, $ppom_meta_ids );
+				}
+
+				$resolved = self::canonical_onetime_price( $option, $line_product, $attached_ids, $selected_fields, $counted_fields );
+			}
+
+			if ( null !== $resolved ) {
+				$option_price = $resolved;
+			} else {
+				if ( isset( $option['discount'] ) && $option['discount'] > 0 ) {
+					$option_price = (float) $option['discount'];
+				}
+
+				$option_price = self::unresolved_payload_amount( $option_price );
+			}
+
+			$option_price = apply_filters( 'ppom_option_price', $option_price );
+			$option_price = floatval( wp_strip_all_tags( (string) $option_price ) );
+
+			// Accumulate every fixed-fee option on the line, not just the last one.
+			if ( null !== $resolved ) {
+				$resolved_price += $option_price;
+			} else {
+				$price += $option_price;
 			}
 		}
 
-		if ( 0 === $price ) {
+		// Saved amounts are net, so only they take the store's tax display treatment.
+		if ( $resolved_price > 0 ) {
+			$resolved_price = (float) apply_filters( 'ppom_option_price_vat', $resolved_price, $line_product );
+		}
+
+		$price += $resolved_price;
+
+		if ( 0.0 === $price ) {
 			return $item_subtotal;
 		}
-		$product_id    = $cart_item['product_id'];
-		$quantity      = $cart_item['quantity'];
-		$product_data  = new \WC_Product( $product_id );
-		$product_price = floatval( $product_data->get_price() ) * $quantity;
+		$product_price = floatval( $base_product->get_price() ) * $quantity;
 		$item_subtotal = $product_price + $price;
 		return Helpers::price( $item_subtotal );
 	}

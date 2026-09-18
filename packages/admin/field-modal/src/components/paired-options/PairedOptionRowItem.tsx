@@ -214,11 +214,7 @@ export function PairedOptionRowItem( {
 					flex="1 1 0"
 					minW={ 0 }
 					w="auto"
-					placeholder={
-						showSwitcherExtras
-							? i18n.pairedOptionId || 'Option ID'
-							: i18n.pairedOptionImageId || 'Image ID'
-					}
+					placeholder={ i18n.pairedOptionId || 'Option ID' }
 					value={ String( row.id ?? row.images ?? '' ) }
 					onChange={ ( e ) =>
 						onPatch( index, { id: e.target.value } )
