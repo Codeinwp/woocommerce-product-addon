@@ -136,9 +136,9 @@ final class SdkCompatAndMetadataRegistration implements RegisterHooks {
 						__( 'check what customers entered on an order', 'woocommerce-product-addon' ),
 					),
 					'prompts'      => array(
-						__( 'Show me what the customer entered in the PPOM fields of order 1024.', 'woocommerce-product-addon' ),
+						__( 'Create a PPOM "Gift options" field group with a gift message text field and a gift wrap checkbox that adds 5 to the price, then attach it to products 12, 15 and 18.', 'woocommerce-product-addon' ),
 						__( 'Add a required "Engraving text" text field to my "Personalization" field group.', 'woocommerce-product-addon' ),
-						__( 'Create a "Gift options" field group with a gift message text field and a gift wrap checkbox that adds 5 to the price, then attach it to products 12, 15 and 18.', 'woocommerce-product-addon' ),
+						__( 'Show me what the customer entered in the product fields of order 1024.', 'woocommerce-product-addon' ),
 					),
 					'abilities'    => array(
 						'ppom/list-field-types',
