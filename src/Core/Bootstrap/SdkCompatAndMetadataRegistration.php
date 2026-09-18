@@ -126,6 +126,34 @@ final class SdkCompatAndMetadataRegistration implements RegisterHooks {
 		);
 
 		add_filter(
+			'woocommerce_product_addon_ai_connect_metadata',
+			function () {
+				return array(
+					'name'         => 'PPOM',
+					'notice_cases' => array(
+						__( 'create product field groups', 'woocommerce-product-addon' ),
+						__( 'add priced options to a product', 'woocommerce-product-addon' ),
+						__( 'check what customers entered on an order', 'woocommerce-product-addon' ),
+					),
+					'prompts'      => array(
+						__( 'Show me what the customer entered in the PPOM fields of order 1024.', 'woocommerce-product-addon' ),
+						__( 'Add a required "Engraving text" text field to my "Personalization" field group.', 'woocommerce-product-addon' ),
+						__( 'Create a "Gift options" field group with a gift message text field and a gift wrap checkbox that adds 5 to the price, then attach it to products 12, 15 and 18.', 'woocommerce-product-addon' ),
+					),
+					'abilities'    => array(
+						'ppom/list-field-types',
+						'ppom/list-field-groups',
+						'ppom/get-field-group',
+						'ppom/upsert-field-group',
+						'ppom/delete-field-group',
+						'ppom/assign-field-groups',
+						'ppom/get-order-selections',
+					),
+				);
+			}
+		);
+
+		add_filter(
 			'woocommerce_product_addon_welcome_metadata',
 			function () {
 				return array(
