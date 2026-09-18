@@ -1118,6 +1118,99 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		expect( refreshResult.newNonce ).toBeTruthy();
 	} );
 
+	/**
+	 * Regression for #729: `lastNonceRefreshTime` used to start at
+	 * `Date.now()`, so the page-load nonce was trusted as fresh for 5
+	 * minutes even when a cached page served it already expired. The fix
+	 * makes the very first upload attempt always re-validate via REST
+	 * regardless of elapsed time, so this drives a real plupload upload
+	 * immediately after page load (not a direct call to the refresh
+	 * helper, which does not catch the ordering race) and checks a refresh
+	 * still happens - and that the upload actually waits for it, since
+	 * plupload does not await async event handlers on its own.
+	 */
+	test( 'the first upload on a page always uses a freshly-refreshed nonce', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const fieldId = 'file_upload_stale_nonce_test';
+		const product = await createSimpleProduct( requestUtils );
+		const { ppomId } = await createPpomGroup( requestUtils, {
+			groupName: 'File Upload Stale Nonce Test',
+			fields: [
+				buildFileField( {
+					title: 'Upload Your File',
+					dataName: fieldId,
+					// plupload reads this raw: '5' would mean 5 *bytes*.
+					file_size: '5mb',
+					files_allowed: '1',
+					file_types: 'png,jpg',
+				} ),
+			],
+		} );
+
+		await attachPpomGroupToProducts( requestUtils, {
+			ppomId,
+			productIds: [ product.id ],
+		} );
+
+		await page.goto( `/?p=${ product.id }` );
+
+		const fileInput = page.locator(
+			`#ppom-file-container-${ fieldId } input[type=file]`
+		);
+		await fileInput.waitFor( { state: 'attached', timeout: 10000 } );
+
+		const staleNonce = await page.evaluate(
+			() => window.ppom_file_vars?.ppom_file_upload_nonce
+		);
+		expect( staleNonce ).toBeTruthy();
+
+		// wp_create_nonce() is deterministic per tick, so a real refresh
+		// fired moments after page load could legitimately return the same
+		// string as the page-load nonce - that would make a same/different
+		// value comparison unreliable. Mock the refresh response with an
+		// arbitrary, unmistakably distinct nonce instead, so the assertion
+		// below only passes if the upload request actually carries this
+		// mocked value rather than the multipart_params captured at
+		// plupload Init time.
+		const mockedNonce = 'e2e-mocked-refreshed-nonce';
+		await page.route( '**/ppom/v1/nonces/file/**', ( route ) =>
+			route.fulfill( {
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					status: 'success',
+					ppom_file_upload_nonce: mockedNonce,
+					ppom_file_delete_nonce: 'e2e-mocked-delete-nonce',
+				} ),
+			} )
+		);
+
+		const [ , uploadRequest ] = await Promise.all( [
+			page.waitForResponse( ( response ) =>
+				response.url().includes( '/ppom/v1/nonces/file' )
+			),
+			page.waitForRequest(
+				( request ) =>
+					request.url().includes( 'admin-ajax.php' ) &&
+					!! request.postData()?.includes( 'ppom_upload_file' )
+			),
+			fileInput.setInputFiles( {
+				name: 'pixel.png',
+				mimeType: 'image/png',
+				buffer: Buffer.from(
+					'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+					'base64'
+				),
+			} ),
+		] );
+
+		const uploadBody = uploadRequest.postData() || '';
+		expect( uploadBody ).toContain( mockedNonce );
+		expect( uploadBody ).not.toContain( staleNonce );
+	} );
+
 	test( 'should handle nonce refresh endpoint correctly', async ( {
 		page,
 		requestUtils,
