@@ -26,6 +26,7 @@ export {
 export { getPpomLicenseFixture, setPpomLicenseFixture } from './license.js';
 export { setLegacyConditionsScript, setPpomSettings } from './settings.js';
 export {
+	createGroupedProduct,
 	createProductCategory,
 	createProductTag,
 	createProductVariation,
