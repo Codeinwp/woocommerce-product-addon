@@ -2927,21 +2927,12 @@ final class Helpers {
 	/**
 	 * Get file uploader notice text based on field meta.
 	 *
-	 * Default templates hold field meta as a \PPOM_InputManager. Legacy renderers
-	 * hold it as a plain args array. Both are accepted.
-	 *
-	 * @param \PPOM_InputManager|array<string, mixed> $meta_field Meta field object or args array.
+	 * @param \PPOM_InputManager $meta_field Meta field object.
 	 * @return string Notice text to display for file uploader field.
 	 */
 	public static function get_file_uploader_notice( $meta_field ) {
-		if ( is_array( $meta_field ) ) {
-			// Legacy renderers hold field meta as a plain args array.
-			$file_types = isset( $meta_field['file_types'] ) ? $meta_field['file_types'] : '';
-			$file_size  = isset( $meta_field['file_size'] ) ? $meta_field['file_size'] : '';
-		} else {
-			$file_types = $meta_field->get_meta_value( 'file_types' );
-			$file_size  = $meta_field->get_meta_value( 'file_size' );
-		}
+		$file_types = $meta_field->get_meta_value( 'file_types' );
+		$file_size  = $meta_field->get_meta_value( 'file_size' );
 
 		$notice = '';
 		if ( $file_types ) {

@@ -667,9 +667,10 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'file_cost'     => $file_cost,
 				'taxable'       => $taxable,
 				'language'      => $language,
-				// Built from $meta, not from the defaults above: the notice must
-				// state what was configured, not what the uploader falls back to.
-				'upload_notice' => \PPOM\Support\Helpers::get_file_uploader_notice( $meta ),
+				// Built from $meta through the same input manager the default
+				// templates use, so the field meta filters apply identically and
+				// the renderer defaults above never reach the notice.
+				'upload_notice' => \PPOM\Support\Helpers::get_file_uploader_notice( new PPOM_InputManager( $meta, $type ) ),
 			);
 
 
@@ -717,8 +718,8 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'croppie_options' => $croppie_options,
 				'first_option'    => $first_option,
 				'options'         => $options,
-				// Built from $meta, not from the defaults above.
-				'upload_notice'   => \PPOM\Support\Helpers::get_file_uploader_notice( $meta ),
+				// Same input manager the default cropper template uses.
+				'upload_notice'   => \PPOM\Support\Helpers::get_file_uploader_notice( new PPOM_InputManager( $meta, $type ) ),
 			);
 
 

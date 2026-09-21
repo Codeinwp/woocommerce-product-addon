@@ -240,4 +240,45 @@ class Test_Upload_Notice_Parity extends PPOM_Test_Case {
 			$this->assertStringNotContainsString( 'Accepted formats:', $html, "unexpected formats notice in {$mode} renderer" );
 		}
 	}
+
+	/**
+	 * The notice honours the field meta filters in both renderers.
+	 *
+	 * `PPOM_InputManager::get_meta_value()` runs every value through
+	 * `ppom_field_meta_value`, so an integration that rewrites `file_types`
+	 * must change what both renderers print.
+	 *
+	 * @return void
+	 */
+	public function test_field_meta_filter_reaches_the_notice_in_both_renderers() {
+		$product = $this->create_simple_product();
+		$field   = $this->build_file_field(
+			'artwork',
+			'Artwork',
+			array(
+				'file_types'          => 'jpg,png,pdf',
+				'file_size'           => '5mb',
+				'button_label_select' => '',
+				'files_allowed'       => '',
+			)
+		);
+		$this->insert_ppom_meta( array( $field ), $product->get_id() );
+
+		$filter = static function ( $value, $key ) {
+			return 'file_types' === $key ? 'svg' : $value;
+		};
+		add_filter( 'ppom_field_meta_value', $filter, 10, 2 );
+
+		$rendered = array(
+			'default' => $this->render_modern( $product->get_id() ),
+			'legacy'  => $this->render_legacy( $product->get_id() ),
+		);
+
+		remove_filter( 'ppom_field_meta_value', $filter, 10 );
+
+		foreach ( $rendered as $mode => $html ) {
+			$this->assertStringContainsString( 'Accepted formats: SVG.', $html, "filtered formats missing in {$mode} renderer" );
+			$this->assertStringNotContainsString( 'JPG,PNG,PDF', $html, "unfiltered formats leaked into {$mode} renderer" );
+		}
+	}
 }
