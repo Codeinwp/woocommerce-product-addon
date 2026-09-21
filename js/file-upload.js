@@ -41,7 +41,7 @@ const Cropped_Data_Captured = false;
 
 // Track nonce refresh state to avoid duplicate requests
 let nonceRefreshPromise = null;
-let lastNonceRefreshTime = Date.now();
+let lastNonceRefreshTime = 0;
 const NONCE_CACHE_DURATION = 300000; // 5 minutes in milliseconds
 
 /**
@@ -158,6 +158,30 @@ async function ppom_refresh_file_nonces() {
 		} );
 
 	return nonceRefreshPromise;
+}
+
+/**
+ * Refreshes the upload nonce (throttled, see NONCE_CACHE_DURATION) and only
+ * then starts the queue - up.start() is our own call, not a plupload-internal
+ * hook, so awaiting first here (unlike inside BeforeUpload) actually delays
+ * the request instead of racing it.
+ *
+ * @param {Object} up Plupload uploader instance.
+ */
+async function ppom_start_upload_with_fresh_nonce( up ) {
+	try {
+		await ppom_refresh_file_nonces();
+		up.setOption( 'multipart_params', {
+			...up.settings.multipart_params,
+			ppom_nonce: ppom_file_vars.ppom_file_upload_nonce,
+		} );
+	} catch ( error ) {
+		console.warn(
+			'Failed to refresh upload nonce, using existing:',
+			error
+		);
+	}
+	up.start();
 }
 
 jQuery( function ( $ ) {
@@ -846,7 +870,7 @@ function ppom_setup_file_upload_input( file_input ) {
 										],
 										up
 									);
-									up.start();
+									ppom_start_upload_with_fresh_nonce( up );
 								}
 							};
 							img.load( file.getSource() );
@@ -858,7 +882,7 @@ function ppom_setup_file_upload_input( file_input ) {
 								file_list_preview_containers[ file_data_name ],
 								up
 							);
-							up.start();
+							ppom_start_upload_with_fresh_nonce( up );
 						}
 
 						// Energy pack
@@ -1051,26 +1075,6 @@ function ppom_setup_file_upload_input( file_input ) {
 					file_resp: obj_resp,
 					time: new Date(),
 				} );
-			},
-
-			async BeforeUpload( up, file ) {
-				// Refresh nonces before upload to handle stale nonces in cached pages
-				try {
-					await ppom_refresh_file_nonces();
-					// Update the multipart_params with the fresh nonce
-					up.setOption( 'multipart_params', {
-						action: 'ppom_upload_file',
-						data_name: file_data_name,
-						ppom_nonce: ppom_file_vars.ppom_file_upload_nonce,
-						product_id: ppom_file_vars.product_id,
-					} );
-				} catch ( error ) {
-					// Log warning but continue with existing nonce
-					console.warn(
-						'Failed to refresh upload nonce, using existing:',
-						error
-					);
-				}
 			},
 
 			UploadProgress( up, file ) {
