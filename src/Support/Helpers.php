@@ -2931,8 +2931,14 @@ final class Helpers {
 	 * @return string Notice text to display for file uploader field.
 	 */
 	public static function get_file_uploader_notice( $meta_field ) {
-		$file_types = $meta_field->get_meta_value( 'file_types' );
-		$file_size  = $meta_field->get_meta_value( 'file_size' );
+		if ( is_array( $meta_field ) ) {
+			// Legacy renderers hold field meta as a plain args array.
+			$file_types = isset( $meta_field['file_types'] ) ? $meta_field['file_types'] : '';
+			$file_size  = isset( $meta_field['file_size'] ) ? $meta_field['file_size'] : '';
+		} else {
+			$file_types = $meta_field->get_meta_value( 'file_types' );
+			$file_size  = $meta_field->get_meta_value( 'file_size' );
+		}
 
 		$notice = '';
 		if ( $file_types ) {

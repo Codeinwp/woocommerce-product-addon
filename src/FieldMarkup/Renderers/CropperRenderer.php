@@ -7,6 +7,7 @@ namespace PPOM\FieldMarkup\Renderers;
 
 use PPOM\FieldMarkup\AbstractInputRenderer;
 use PPOM\FieldMarkup\FieldChrome;
+use PPOM\Support\Helpers;
 
 final class CropperRenderer extends AbstractInputRenderer {
 
@@ -40,6 +41,9 @@ final class CropperRenderer extends AbstractInputRenderer {
 		$html            .= 'class="btn btn-primary ' . esc_attr( $args['button_class'] ) . '">';
 		$html            .= $args['button_label'] . '</a>';
 		$html            .= '<span class="ppom-dragdrop-text">' . __( 'Drag file/directory here', 'woocommerce-product-addon' ) . '</span>';
+		$html            .= '<span class="ppom-field-notice">';
+		$html            .= esc_html( Helpers::get_file_uploader_notice( $args ) );
+		$html            .= '</span>';
 		$html            .= '</div>';
 
 		if ( ! empty( $args['dragdrop'] ) ) {

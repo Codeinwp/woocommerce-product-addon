@@ -7,6 +7,7 @@ namespace PPOM\FieldMarkup\Renderers;
 
 use PPOM\FieldMarkup\AbstractInputRenderer;
 use PPOM\FieldMarkup\FieldChrome;
+use PPOM\Support\Helpers;
 
 final class FileRenderer extends AbstractInputRenderer {
 
@@ -38,6 +39,9 @@ final class FileRenderer extends AbstractInputRenderer {
 		$html            .= $args['button_label'] . '</a>';
 		$html            .= '<span class="ppom-dragdrop-text">';
 		$html            .= __( 'Drag File Here', 'woocommerce-product-addon' );
+		$html            .= '</span>';
+		$html            .= '<span class="ppom-field-notice">';
+		$html            .= esc_html( Helpers::get_file_uploader_notice( $args ) );
 		$html            .= '</span>';
 		$html            .= '</div>';
 
