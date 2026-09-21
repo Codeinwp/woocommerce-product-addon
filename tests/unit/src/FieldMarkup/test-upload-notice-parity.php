@@ -288,4 +288,37 @@ class Test_Upload_Notice_Parity extends PPOM_Test_Case {
 			$this->assertStringNotContainsString( 'JPG,PNG,PDF', $html, "unfiltered formats leaked into {$mode} renderer" );
 		}
 	}
+
+	/**
+	 * Formats with no size print only the formats sentence, in both renderers.
+	 *
+	 * The reciprocal of the size-only case. This is the scenario QA step 6
+	 * walks through, and it guards the legacy template's `10mb` substitution.
+	 *
+	 * @return void
+	 */
+	public function test_formats_without_size_print_only_the_formats_in_either_renderer() {
+		$product = $this->create_simple_product();
+		$field   = $this->build_file_field(
+			'artwork',
+			'Artwork',
+			array(
+				'file_types'          => 'jpg,png,pdf',
+				'file_size'           => '',
+				'button_label_select' => '',
+				'files_allowed'       => '',
+			)
+		);
+		$this->insert_ppom_meta( array( $field ), $product->get_id() );
+
+		$rendered = array(
+			'default' => $this->render_modern( $product->get_id() ),
+			'legacy'  => $this->render_legacy( $product->get_id() ),
+		);
+
+		foreach ( $rendered as $mode => $html ) {
+			$this->assertStringContainsString( 'Accepted formats: JPG,PNG,PDF.', $html, "accepted formats missing in {$mode} renderer" );
+			$this->assertStringNotContainsString( 'Max size:', $html, "unexpected size notice in {$mode} renderer" );
+		}
+	}
 }
