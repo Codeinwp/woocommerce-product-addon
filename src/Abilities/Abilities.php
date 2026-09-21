@@ -118,7 +118,7 @@ final class Abilities implements RegisterHooks {
 					'properties' => array(
 						'product_id' => array(
 							'type'        => 'integer',
-							'description' => __( 'WooCommerce product ID.', 'woocommerce-product-addon' ),
+							'description' => __( 'Product ID', 'woocommerce-product-addon' ),
 						),
 						'group_ids'  => array(
 							'type'        => 'array',
@@ -164,7 +164,7 @@ final class Abilities implements RegisterHooks {
 		wp_register_ability(
 			'ppom/get-order-selections',
 			array(
-				'label'               => __( 'Get PPOM order selections', 'woocommerce-product-addon' ),
+				'label'               => __( 'Get order item meta', 'woocommerce-product-addon' ),
 				'description'         => __( 'Returns the PPOM field values customers submitted for each line item of an order, including the names of uploaded files. Contains customer data.', 'woocommerce-product-addon' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
@@ -267,7 +267,7 @@ final class Abilities implements RegisterHooks {
 						),
 						'upgrade_url' => array(
 							'type'        => 'string',
-							'description' => __( 'Upgrade link, present when at least one field type is locked.', 'woocommerce-product-addon' ),
+							'description' => __( 'Upgrade link, present when PPOM Pro is required.', 'woocommerce-product-addon' ),
 						),
 					),
 				),
@@ -338,7 +338,7 @@ final class Abilities implements RegisterHooks {
 		wp_register_ability(
 			'ppom/get-field-group',
 			array(
-				'label'               => __( 'Get a PPOM field group', 'woocommerce-product-addon' ),
+				'label'               => __( 'Get a field group by numeric ID', 'woocommerce-product-addon' ),
 				'description'         => __( 'Returns one PPOM field group with its settings and full field definitions, including option prices and conditional logic.', 'woocommerce-product-addon' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
@@ -346,7 +346,7 @@ final class Abilities implements RegisterHooks {
 					'properties' => array(
 						'group_id' => array(
 							'type'        => 'integer',
-							'description' => __( 'Field group ID.', 'woocommerce-product-addon' ),
+							'description' => __( 'Group ID', 'woocommerce-product-addon' ),
 						),
 					),
 					'required'   => array( 'group_id' ),
@@ -368,7 +368,7 @@ final class Abilities implements RegisterHooks {
 		wp_register_ability(
 			'ppom/upsert-field-group',
 			array(
-				'label'               => __( 'Create or update a PPOM field group', 'woocommerce-product-addon' ),
+				'label'               => __( 'Save or update a field group', 'woocommerce-product-addon' ),
 				'description'         => __( 'Creates a PPOM field group, or updates it when group_id is provided. On update the submitted fields replace the stored fields; omitted settings keep their stored value. Conditions and option prices are part of each field definition. Set dry_run to validate without saving.', 'woocommerce-product-addon' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
@@ -417,7 +417,7 @@ final class Abilities implements RegisterHooks {
 									'message'     => array( 'type' => 'string' ),
 									'upgrade_url' => array(
 										'type'        => 'string',
-										'description' => __( 'Upgrade link, present when the error is caused by a PPOM Pro requirement.', 'woocommerce-product-addon' ),
+										'description' => __( 'Upgrade link, present when PPOM Pro is required.', 'woocommerce-product-addon' ),
 									),
 								),
 							),
@@ -441,7 +441,7 @@ final class Abilities implements RegisterHooks {
 		wp_register_ability(
 			'ppom/delete-field-group',
 			array(
-				'label'               => __( 'Delete a PPOM field group', 'woocommerce-product-addon' ),
+				'label'               => __( 'Delete a product field group', 'woocommerce-product-addon' ),
 				'description'         => __( 'Permanently deletes a PPOM field group and removes it from the products it was attached to.', 'woocommerce-product-addon' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
@@ -449,7 +449,7 @@ final class Abilities implements RegisterHooks {
 					'properties' => array(
 						'group_id' => array(
 							'type'        => 'integer',
-							'description' => __( 'Field group ID.', 'woocommerce-product-addon' ),
+							'description' => __( 'Group ID', 'woocommerce-product-addon' ),
 						),
 					),
 					'required'   => array( 'group_id' ),
@@ -525,7 +525,7 @@ final class Abilities implements RegisterHooks {
 		$product_id = isset( $input['product_id'] ) ? absint( $input['product_id'] ) : 0;
 
 		if ( $product_id <= 0 || 'product' !== get_post_type( $product_id ) ) {
-			return new WP_Error( 'ppom_product_not_found', __( 'Product not found.', 'woocommerce-product-addon' ), array( 'status' => 404 ) );
+			return new WP_Error( 'ppom_product_not_found', __( 'No Product Found', 'woocommerce-product-addon' ), array( 'status' => 404 ) );
 		}
 
 		if ( ! current_user_can( 'edit_post', $product_id ) ) {
