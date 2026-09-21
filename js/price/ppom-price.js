@@ -1009,24 +1009,23 @@ function ppom_update_get_prices() {
 		}
 	);
 
-	// Price matrix
-	let ppom_pricematrix = jQuery( '.ppom_pricematrix.active' ).val();
+	// Price matrix. Pick the matrix that is actually on screen rather than the one
+	// carrying the `active` class. That class is bookkeeping owned by the condition
+	// engine, and with several conditional matrices the selector can match more than
+	// one, in which case jQuery answers val() for the first and hasClass() for any of
+	// them. The result was that one hidden matrix discarded a visible one.
+	const $ppom_visible_matrix = jQuery( '.ppom_pricematrix' )
+		.filter( function () {
+			return ! jQuery( this )
+				.closest( '.ppom-field-wrapper' )
+				.hasClass( 'ppom-c-hide' );
+		} )
+		.first();
 
-	// if conditionally hidden
-	if (
-		jQuery( '.ppom_pricematrix.active' )
-			.closest( '.ppom-field-wrapper' )
-			.hasClass( 'ppom-c-hide' )
-	) {
-		ppom_pricematrix = undefined;
-	}
-
-	const ppom_pricematrix_discount = jQuery( '.ppom_pricematrix.active' ).attr(
-		'data-discount'
-	);
-	const ppom_pricematrix_id = jQuery( '.ppom_pricematrix.active' ).data(
-		'dataname'
-	);
+	const ppom_pricematrix = $ppom_visible_matrix.val();
+	const ppom_pricematrix_discount =
+		$ppom_visible_matrix.attr( 'data-discount' );
+	const ppom_pricematrix_id = $ppom_visible_matrix.data( 'dataname' );
 	const ppom_matrix_array = Array();
 	const apply_as_discount = ppom_pricematrix_discount == 'on' ? true : false;
 
