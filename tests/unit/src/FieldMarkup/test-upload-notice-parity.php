@@ -248,6 +248,13 @@ class Test_Upload_Notice_Parity extends PPOM_Test_Case {
 	 * `ppom_field_meta_value`, so an integration that rewrites `file_types`
 	 * must change what both renderers print.
 	 *
+	 * This asserts parity between the two renderers, not that the notice agrees
+	 * with what the uploader enforces. The uploader config in
+	 * `classes/frontend-scripts.class.php` reads the saved field directly and
+	 * skips these filters, so a filtered notice can name formats the uploader
+	 * rejects. That gap predates this change and affects the default renderer
+	 * too, so it belongs in its own fix.
+	 *
 	 * @return void
 	 */
 	public function test_field_meta_filter_reaches_the_notice_in_both_renderers() {
