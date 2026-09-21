@@ -242,4 +242,65 @@ class Test_Conditional_Wrapper_Parity extends PPOM_Test_Case {
 		$this->assertStringContainsString( 'third-party-marker', $wrapper );
 		$this->assertStringContainsString( 'ppom-c-hide', $wrapper );
 	}
+
+	/**
+	 * A condition target cannot break out of the class attribute.
+	 *
+	 * The callback appends each saved rule target as `ppom-cond-{target}`, so a
+	 * crafted or imported field group puts stored data into the class attribute.
+	 * Both renderers must escape it at the output boundary.
+	 *
+	 * @return void
+	 */
+	public function test_condition_target_cannot_break_out_of_the_class_attribute() {
+		$product = $this->create_simple_product();
+
+		$trigger = $this->build_select_field(
+			'trigger',
+			'Trigger',
+			array(
+				array( 'option' => 'No', 'id' => 'no', 'price' => '' ),
+				array( 'option' => 'Yes', 'id' => 'yes', 'price' => '' ),
+			)
+		);
+
+		$extra = $this->build_text_field(
+			'extra',
+			'Extra',
+			array(
+				'logic'      => 'on',
+				'conditions' => array(
+					'visibility' => 'Show',
+					'bound'      => 'All',
+					'rules'      => array(
+						array(
+							'elements'       => 'trigger" data-injected="1',
+							'operators'      => 'is',
+							'element_values' => 'Yes',
+						),
+					),
+				),
+			)
+		);
+
+		$this->insert_ppom_meta( array( $trigger, $extra ), $product->get_id() );
+
+		$rendered = array(
+			'default' => $this->render_modern( $product->get_id() ),
+			'legacy'  => $this->render_legacy( $product->get_id() ),
+		);
+
+		foreach ( $rendered as $mode => $html ) {
+			$this->assertStringNotContainsString(
+				'trigger" data-injected',
+				$html,
+				"condition target broke out of the class attribute in {$mode} renderer"
+			);
+			$this->assertStringContainsString(
+				'trigger&quot; data-injected',
+				$html,
+				"condition target not escaped in {$mode} renderer"
+			);
+		}
+	}
 }
