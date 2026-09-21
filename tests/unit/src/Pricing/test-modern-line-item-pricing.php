@@ -346,4 +346,45 @@ class Test_Pricing_ModernLineItemPricing extends PPOM_Test_Case {
 
 		$this->assertEqualsWithDelta( 0.0, (float) $product->get_price(), 0.0001 );
 	}
+
+	/**
+	 * A posted matrix cannot override the saved one on the add-to-cart request.
+	 *
+	 * The session-restore filter does not run on the request that adds the line,
+	 * so `woocommerce_before_calculate_totals` prices from whatever the cart item
+	 * carries. On a product that legitimately has a matrix field, checking only
+	 * that a matrix exists is not enough.
+	 *
+	 * @return void
+	 */
+	public function test_posted_matrix_cannot_override_the_saved_matrix_on_add_to_cart() {
+		$this->initialize_woocommerce_checkout_context();
+		WC()->cart->empty_cart();
+
+		$product      = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$matrix_field = $this->build_price_matrix_field(
+			'tier',
+			array( array( 'option' => '1-10', 'price' => '5' ) )
+		);
+		$ppom_id = $this->insert_ppom_meta( array( $matrix_field ), $product->get_id() );
+
+		$injected            = $matrix_field;
+		$injected['options'] = array( array( 'option' => '1-99999', 'price' => '-1000' ) );
+
+		$key = $this->add_product_to_real_cart(
+			$product->get_id(),
+			array(
+				'fields'             => array( 'id' => (string) $ppom_id ),
+				'price_matrix_found' => $injected,
+			)
+		);
+		$this->assertNotFalse( $key, 'the product must reach the cart' );
+
+		WC()->cart->calculate_totals();
+
+		$item = WC()->cart->get_cart_item( $key );
+		$this->assertEqualsWithDelta( 5.0, (float) $item['data']->get_price(), 0.0001 );
+
+		WC()->cart->empty_cart();
+	}
 }
