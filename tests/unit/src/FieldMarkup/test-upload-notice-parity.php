@@ -145,4 +145,99 @@ class Test_Upload_Notice_Parity extends PPOM_Test_Case {
 			$this->assertStringContainsString( 'Max size: 2MB', $html, "max size missing in {$mode} renderer" );
 		}
 	}
+
+	/**
+	 * Blank constraints produce no notice in either renderer.
+	 *
+	 * The legacy template substitutes its own upload defaults before the renderer
+	 * sees the field. Those defaults must not reach the notice, because they are
+	 * not what the uploader enforces.
+	 *
+	 * @return void
+	 */
+	public function test_blank_file_constraints_produce_no_notice_in_either_renderer() {
+		$product = $this->create_simple_product();
+		$field   = $this->build_file_field(
+			'artwork',
+			'Artwork',
+			array(
+				'file_types'          => '',
+				'file_size'           => '',
+				'button_label_select' => '',
+				'files_allowed'       => '',
+			)
+		);
+		$this->insert_ppom_meta( array( $field ), $product->get_id() );
+
+		$rendered = array(
+			'default' => $this->render_modern( $product->get_id() ),
+			'legacy'  => $this->render_legacy( $product->get_id() ),
+		);
+
+		foreach ( $rendered as $mode => $html ) {
+			$this->assertStringNotContainsString( 'Accepted formats:', $html, "unexpected formats notice in {$mode} renderer" );
+			$this->assertStringNotContainsString( 'Max size:', $html, "unexpected size notice in {$mode} renderer" );
+		}
+	}
+
+	/**
+	 * Blank cropper constraints produce no notice in either renderer.
+	 *
+	 * @return void
+	 */
+	public function test_blank_cropper_constraints_produce_no_notice_in_either_renderer() {
+		$product = $this->create_simple_product();
+		$field   = $this->build_cropper_field(
+			'photo',
+			'Photo',
+			array(),
+			array(
+				'file_types'          => '',
+				'file_size'           => '',
+				'button_label_select' => '',
+				'files_allowed'       => '',
+			)
+		);
+		$this->insert_ppom_meta( array( $field ), $product->get_id() );
+
+		$rendered = array(
+			'default' => $this->render_modern( $product->get_id() ),
+			'legacy'  => $this->render_legacy( $product->get_id() ),
+		);
+
+		foreach ( $rendered as $mode => $html ) {
+			$this->assertStringNotContainsString( 'Accepted formats:', $html, "unexpected formats notice in {$mode} renderer" );
+			$this->assertStringNotContainsString( 'Max size:', $html, "unexpected size notice in {$mode} renderer" );
+		}
+	}
+
+	/**
+	 * A size with no formats prints only the size sentence, in both renderers.
+	 *
+	 * @return void
+	 */
+	public function test_size_without_formats_prints_only_the_size_in_either_renderer() {
+		$product = $this->create_simple_product();
+		$field   = $this->build_file_field(
+			'artwork',
+			'Artwork',
+			array(
+				'file_types'          => '',
+				'file_size'           => '4mb',
+				'button_label_select' => '',
+				'files_allowed'       => '',
+			)
+		);
+		$this->insert_ppom_meta( array( $field ), $product->get_id() );
+
+		$rendered = array(
+			'default' => $this->render_modern( $product->get_id() ),
+			'legacy'  => $this->render_legacy( $product->get_id() ),
+		);
+
+		foreach ( $rendered as $mode => $html ) {
+			$this->assertStringContainsString( 'Max size: 4MB', $html, "max size missing in {$mode} renderer" );
+			$this->assertStringNotContainsString( 'Accepted formats:', $html, "unexpected formats notice in {$mode} renderer" );
+		}
+	}
 }

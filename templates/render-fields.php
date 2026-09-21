@@ -667,6 +667,9 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'file_cost'     => $file_cost,
 				'taxable'       => $taxable,
 				'language'      => $language,
+				// Built from $meta, not from the defaults above: the notice must
+				// state what was configured, not what the uploader falls back to.
+				'upload_notice' => \PPOM\Support\Helpers::get_file_uploader_notice( $meta ),
 			);
 
 
@@ -678,11 +681,9 @@ foreach ( $ppom_fields_meta as $meta ) {
 		case 'cropper':
 			$label_select  = ( $meta['button_label_select'] == '' ? __( 'Select files', 'woocommerce-product-addon' ) : $meta['button_label_select'] );
 			$files_allowed = ( $meta['files_allowed'] == '' ? 1 : $meta['files_allowed'] );
-			// Match the uploader config in frontend-scripts.class.php, which reads
-			// the field meta and falls back to the cropper builder default.
-			$file_types = empty( $meta['file_types'] ) ? 'jpg,png' : $meta['file_types'];
-			$file_size  = ( $meta['file_size'] == '' ? '10mb' : $meta['file_size'] );
-			$chunk_size = apply_filters( 'ppom_file_upload_chunk_size', '1mb' );
+			$file_types    = 'jpg,png,gif';
+			$file_size     = ( $meta['file_size'] == '' ? '10mb' : $meta['file_size'] );
+			$chunk_size    = apply_filters( 'ppom_file_upload_chunk_size', '1mb' );
 
 			$drag_drop    = ( isset( $meta ['dragdrop'] ) ? $meta ['dragdrop'] : '' );
 			$button_class = ( isset( $meta ['button_class'] ) ? $meta ['button_class'] : '' );
@@ -716,6 +717,8 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'croppie_options' => $croppie_options,
 				'first_option'    => $first_option,
 				'options'         => $options,
+				// Built from $meta, not from the defaults above.
+				'upload_notice'   => \PPOM\Support\Helpers::get_file_uploader_notice( $meta ),
 			);
 
 
