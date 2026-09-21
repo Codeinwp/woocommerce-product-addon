@@ -140,15 +140,7 @@ final class SdkCompatAndMetadataRegistration implements RegisterHooks {
 						__( 'Add a required "Engraving text" text field to my "Personalization" field group.', 'woocommerce-product-addon' ),
 						__( 'Show me what the customer entered in the product fields of order 1024.', 'woocommerce-product-addon' ),
 					),
-					'abilities'    => array(
-						'ppom/list-field-types',
-						'ppom/list-field-groups',
-						'ppom/get-field-group',
-						'ppom/upsert-field-group',
-						'ppom/delete-field-group',
-						'ppom/assign-field-groups',
-						'ppom/get-order-selections',
-					),
+					'ability_prefix'    => 'ppom',
 				);
 			}
 		);
