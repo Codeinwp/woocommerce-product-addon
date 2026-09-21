@@ -256,4 +256,94 @@ class Test_Pricing_ModernLineItemPricing extends PPOM_Test_Case {
 
 		$this->assertEqualsWithDelta( 10.0, (float) $product->get_price(), 0.0001 );
 	}
+
+	/**
+	 * Restores a cart item through the real session filter chain, with a
+	 * shopper-supplied `price_matrix_found` payload attached.
+	 *
+	 * `CartHandler::add_cart_item_data()` stores the whole posted `ppom` array,
+	 * so anything a shopper posts under that key reaches the pricing pipeline.
+	 *
+	 * @param WC_Product $product  Product.
+	 * @param array      $injected Injected matrix payload.
+	 *
+	 * @return array
+	 */
+	private function restore_with_injected_matrix( $product, array $injected ) {
+		$cart_item = array(
+			'data'         => $product,
+			'product_id'   => $product->get_id(),
+			'variation_id' => 0,
+			'quantity'     => 1,
+			'ppom'         => array(
+				'fields'               => array(),
+				'conditionally_hidden' => '',
+				'price_matrix_found'   => $injected,
+			),
+		);
+
+		return apply_filters( 'woocommerce_get_cart_item_from_session', $cart_item, $cart_item );
+	}
+
+	/**
+	 * A posted matrix cannot price a product that has no matrix field.
+	 *
+	 * A negative row would otherwise set a negative line price, which offsets
+	 * other lines in the cart.
+	 *
+	 * @return void
+	 */
+	public function test_injected_negative_matrix_cannot_price_a_product_without_a_matrix_field() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$this->insert_ppom_meta( array( $this->build_text_field( 'note' ) ), $product->get_id() );
+
+		$this->restore_with_injected_matrix(
+			$product,
+			$this->build_price_matrix_field(
+				'injected',
+				array( array( 'option' => '1-99999', 'price' => '-1000' ) )
+			)
+		);
+
+		$this->assertEqualsWithDelta( 10.0, (float) $product->get_price(), 0.0001 );
+	}
+
+	/**
+	 * The same holds for a small positive row, which the old `> 0` check let through.
+	 *
+	 * @return void
+	 */
+	public function test_injected_positive_matrix_cannot_price_a_product_without_a_matrix_field() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$this->insert_ppom_meta( array( $this->build_text_field( 'note' ) ), $product->get_id() );
+
+		$this->restore_with_injected_matrix(
+			$product,
+			$this->build_price_matrix_field(
+				'injected',
+				array( array( 'option' => '1-99999', 'price' => '0.01' ) )
+			)
+		);
+
+		$this->assertEqualsWithDelta( 10.0, (float) $product->get_price(), 0.0001 );
+	}
+
+	/**
+	 * A zero row is still honoured when the product really has a matrix field,
+	 * so the guard does not undo the fix this branch exists for.
+	 *
+	 * @return void
+	 */
+	public function test_configured_zero_matrix_still_applies_through_the_session_filter() {
+		$product      = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$matrix_field = $this->build_price_matrix_field(
+			'matrix_zero',
+			array( array( 'option' => '1-10', 'price' => '0' ) )
+		);
+		$this->insert_ppom_meta( array( $matrix_field ), $product->get_id() );
+
+		$this->restore_with_injected_matrix( $product, $matrix_field );
+
+		$this->assertEqualsWithDelta( 0.0, (float) $product->get_price(), 0.0001 );
+	}
 }

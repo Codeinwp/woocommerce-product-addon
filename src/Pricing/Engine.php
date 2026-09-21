@@ -1289,7 +1289,9 @@ final class Engine {
 		$source = 'product';
 
 		$matrix_found = null;
-		if ( $ppom_pricematrix ) {
+		// The matrix payload rides on the cart item, which carries shopper-posted
+		// data. Only a product that really has a matrix field can be priced by one.
+		if ( $ppom_pricematrix && Helpers::has_field_by_type( $product_id, 'pricematrix' ) ) {
 			$matrix_found = self::parse_price_matrix( $ppom_pricematrix, $product, $product_quantity, $base_price, $total_addon_price, $total_cart_fee_price );
 		}
 
@@ -1782,6 +1784,11 @@ final class Engine {
 
 		$pricematrix_field = Helpers::has_field_by_type( $product_id, 'pricematrix' );
 		if ( ! $pricematrix_field ) {
+			// The posted ppom payload is stored wholesale by
+			// CartHandler::add_cart_item_data(), so a shopper can supply this key.
+			// Drop it when the product has no matrix field to price from.
+			unset( $cart_items['ppom']['price_matrix_found'] );
+
 			return $cart_items;
 		}
 
