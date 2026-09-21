@@ -1301,7 +1301,9 @@ final class Engine {
 		// If price matrix found
 		// ppom_pa($matrix_found);
 		if ( $matrix_found ) {
-			if ( $matrix_found['matrix_price'] > 0 ) {
+			// isset() is false for null (no matrix base price, e.g. a discount
+			// matrix) but true for a configured 0, which is an authoritative price.
+			if ( isset( $matrix_found['matrix_price'] ) ) {
 
 				$base_price = $matrix_found['matrix_price'];
 				$source     = 'matrix';
@@ -1602,14 +1604,15 @@ final class Engine {
 	public static function price_is_matrix_found( $product, $product_quantity, $base_price, $addon_price, $cart_fee ) {
 
 		$matrix_discount = 0.0;
-		$matrix_price    = 0.0;
+		$matrix_price    = null;
 		// Check if Price Matrix is used
 		$pricematrix_field = Helpers::has_field_by_type( Helpers::get_product_id( $product ), 'pricematrix' );
 		if ( ! $pricematrix_field ) {
 			return null;
 		}
 
-		$matrix_found = self::price_matrix_chunk( $product, $pricematrix_field, $product_quantity );
+		$matrix_found  = self::price_matrix_chunk( $product, $pricematrix_field, $product_quantity );
+		$has_row_price = isset( $matrix_found['raw_price'] ) && '' !== trim( (string) $matrix_found['raw_price'] );
 		// ppom_pa($matrix_found);
 
 		if ( isset( $matrix_found['discount'] ) ) {
@@ -1629,7 +1632,7 @@ final class Engine {
 				$matrix_discount = isset( $matrix_found['raw_price'] ) ? floatval( $matrix_found['raw_price'] ) : 0;
 			}
 		} else {
-			$matrix_price = isset( $matrix_found['raw_price'] ) ? $matrix_found['raw_price'] : $base_price;
+			$matrix_price = $has_row_price ? $matrix_found['raw_price'] : $base_price;
 		}
 		$matrix = array(
 			'matrix_price'    => $matrix_price,
@@ -1642,8 +1645,11 @@ final class Engine {
 	public static function parse_price_matrix( $ppom_pricematrix, $product, $product_quantity, $base_price, $addon_price, $cart_fee ) {
 
 		$matrix_discount = 0.0;
-		$matrix_price    = 0.0;
+		// null means the matrix supplied no base price at all. A configured 0 is
+		// a real price and must reach the caller intact.
+		$matrix_price    = null;
 		$matrix_found    = Helpers::extract_matrix_by_quantity( $ppom_pricematrix, $product, $product_quantity );
+		$has_row_price   = isset( $matrix_found['raw_price'] ) && '' !== trim( (string) $matrix_found['raw_price'] );
 		// ppom_pa($matrix_found);
 		if ( isset( $matrix_found['discount'] ) ) {
 			if ( ! empty( $matrix_found['percent'] ) ) {
@@ -1662,9 +1668,9 @@ final class Engine {
 				$matrix_discount = isset( $matrix_found['raw_price'] ) ? floatval( $matrix_found['raw_price'] ) : 0;
 			}
 		} elseif ( isset( $matrix_found['matrix_fixed'] ) ) {
-			$matrix_price = isset( $matrix_found['raw_price'] ) ? $matrix_found['raw_price'] / $product_quantity : $base_price;
+			$matrix_price = $has_row_price ? $matrix_found['raw_price'] / $product_quantity : $base_price;
 		} else {
-			$matrix_price = isset( $matrix_found['raw_price'] ) ? $matrix_found['raw_price'] : $base_price;
+			$matrix_price = $has_row_price ? $matrix_found['raw_price'] : $base_price;
 		}
 
 		$matrix = array(
