@@ -194,7 +194,8 @@ final class Validator {
 			}
 		}
 
-		if ( empty( $limits['min_qty'] ) && ! $product->is_type( 'group' ) && $limits['step'] > 0 && $data['min_value'] <= 1 ) {
+		// A step of 1 is PPOM's default, not a configured limit: keep WooCommerce's own minimum (0 = "not selected" for grouped / Mix and Match children). See #719.
+		if ( empty( $limits['min_qty'] ) && ! $product->is_type( 'group' ) && $limits['step'] > 1 && $data['min_value'] <= 1 ) {
 			$data['min_value'] = $limits['step'];
 		}
 
@@ -263,7 +264,8 @@ final class Validator {
 			}
 		}
 
-		if ( empty( $limits['min_qty'] ) && ! $product->is_type( 'group' ) && $limits['step'] > 0 && $data['min_qty'] <= 1 ) {
+		// A step of 1 is PPOM's default, not a configured limit: keep WooCommerce's own minimum (0 = "not selected" for grouped / Mix and Match children). See #719.
+		if ( empty( $limits['min_qty'] ) && ! $product->is_type( 'group' ) && $limits['step'] > 1 && $data['min_qty'] <= 1 ) {
 			$data['min_qty'] = $limits['step'];
 		}
 
