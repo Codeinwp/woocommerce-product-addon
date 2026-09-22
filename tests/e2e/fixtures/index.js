@@ -8,6 +8,7 @@ export {
 	deletePpomGroupRows,
 	getPpomAttachRowMeta,
 	getProductPpomAssignment,
+	setFormattedBasePrice,
 	setPpomGroupReadFailure,
 } from './ppom.js';
 export {

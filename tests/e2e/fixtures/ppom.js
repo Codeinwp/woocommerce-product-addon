@@ -39,10 +39,7 @@ async function createPpomGroup(
 	};
 }
 
-async function createLegacyPpomGroup(
-	requestUtils,
-	{ groupName, fields }
-) {
+async function createLegacyPpomGroup( requestUtils, { groupName, fields } ) {
 	const payload = await postBootstrapAction(
 		requestUtils,
 		'ppom_e2e_create_legacy_ppom_group',
@@ -135,6 +132,26 @@ async function getPpomAttachRowMeta( requestUtils, { ppomId } ) {
 	} );
 }
 
+/**
+ * Simulate a currency integration returning the cart base price as a
+ * formatted, non-numeric string such as "€ 10.00".
+ *
+ * Reverted by the bootstrap reset path.
+ *
+ * @param {import('@wordpress/e2e-test-utils-playwright').RequestUtils} requestUtils Authenticated request utils.
+ * @param {{ enabled: boolean }} options Whether the simulation is on.
+ * @return {Promise<{ enabled: boolean }>} Applied state.
+ */
+async function setFormattedBasePrice( requestUtils, { enabled } ) {
+	return postBootstrapAction(
+		requestUtils,
+		'ppom_e2e_set_formatted_base_price',
+		{
+			enabled: enabled ? '1' : '0',
+		}
+	);
+}
+
 async function setPpomGroupReadFailure( requestUtils, { enabled } ) {
 	return postBootstrapAction(
 		requestUtils,
@@ -175,5 +192,6 @@ export {
 	deletePpomGroupRows,
 	getPpomAttachRowMeta,
 	getProductPpomAssignment,
+	setFormattedBasePrice,
 	setPpomGroupReadFailure,
 };
