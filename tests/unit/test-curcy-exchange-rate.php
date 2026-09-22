@@ -255,4 +255,29 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 		$this->assertEqualsWithDelta( 500.0, (float) $range['price'], 0.0001 );
 		$this->assertEqualsWithDelta( 50.0, (float) $range['raw_price'], 0.0001 );
 	}
+
+	/**
+	 * The shop-loop price range of a price-matrix product is display and converts once.
+	 */
+	public function test_catalog_price_matrix_range_is_converted_once() {
+		$product = $this->create_simple_product( array( 'regular_price' => '100' ) );
+		$this->insert_ppom_meta(
+			array(
+				$this->build_price_matrix_field(
+					'matrix',
+					array(
+						array( 'option' => '1-5', 'price' => '50', 'id' => 'r1' ),
+						array( 'option' => '6-10', 'price' => '40', 'id' => 'r2' ),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$html = \PPOM\WooCommerce\Catalog\CatalogHandler::alter_price( $product->get_price_html(), $product );
+
+		$this->assertStringContainsString( '400.00', $html );
+		$this->assertStringContainsString( '500.00', $html );
+		$this->assertStringNotContainsString( '40.00', $html );
+	}
 }
