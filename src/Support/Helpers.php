@@ -1405,8 +1405,8 @@ final class Helpers {
 	 * Price matrix ranges for the client payload: `price` converted once for the
 	 * product-page total, `raw_price` untouched for server-side cart pricing (#755).
 	 *
-	 * @param array $ranges Normalized ranges from convert_options_to_key_val().
-	 * @return array
+	 * @param array<string, array<string, mixed>> $ranges Normalized ranges from convert_options_to_key_val().
+	 * @return array<string, array<string, mixed>>
 	 */
 	public static function convert_ranges_for_client( $ranges ) {
 		foreach ( (array) $ranges as $key => $range ) {
