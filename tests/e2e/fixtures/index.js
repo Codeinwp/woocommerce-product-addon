@@ -8,6 +8,7 @@ export {
 	deletePpomGroupRows,
 	getPpomAttachRowMeta,
 	getProductPpomAssignment,
+	setFormattedBasePrice,
 	setPpomGroupReadFailure,
 } from './ppom.js';
 export {
@@ -26,6 +27,7 @@ export {
 export { getPpomLicenseFixture, setPpomLicenseFixture } from './license.js';
 export { setLegacyConditionsScript, setPpomSettings } from './settings.js';
 export {
+	createGroupedProduct,
 	createProductCategory,
 	createProductTag,
 	createProductVariation,

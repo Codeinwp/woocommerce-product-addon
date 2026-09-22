@@ -1076,7 +1076,20 @@ final class Engine {
 			return 0.0;
 		}
 
-		return (float) wc_format_decimal( (string) $value );
+		$value = (string) $value;
+
+		if ( is_numeric( $value ) ) {
+			return (float) $value;
+		}
+
+		// wc_format_decimal() expects grouping removed; "1.000" would otherwise read as 1.0 (#720).
+		// Only a separator in front of exactly three digits is grouping; "10.00" keeps its decimal point.
+		$thousands = wc_get_price_thousand_separator();
+		if ( '' !== $thousands && wc_get_price_decimal_separator() !== $thousands ) {
+			$value = (string) preg_replace( '/' . preg_quote( $thousands, '/' ) . '(?=\d{3}(?!\d))/', '', $value );
+		}
+
+		return (float) wc_format_decimal( $value );
 	}
 
 	// Get total quantities
@@ -1260,8 +1273,9 @@ final class Engine {
 		$ppom_pricematrix = null
 	) {
 
+		// Filters may return a formatted string like "€ 10.00"; arithmetic on it throws on PHP 8 (#720).
 		// Callers pass the stored (store currency) price, so no switcher back-conversion here (#755).
-		$base_price = $product_price;
+		$base_price = self::normalize_price_value( $product_price );
 		// $base_price  = $product->get_price();
 		// $base_price = floatval($base_price);
 		// $base_price  = $product->get_price();
@@ -1341,7 +1355,14 @@ final class Engine {
 			'source' => $source,
 		);
 
-		return apply_filters( 'ppom_price_info', $price_info, $product, $ppom_fields_post, $ppom_field_prices );
+		$price_info = apply_filters( 'ppom_price_info', $price_info, $product, $ppom_fields_post, $ppom_field_prices );
+
+		// Same guard for the filtered result.
+		if ( is_array( $price_info ) && isset( $price_info['price'] ) ) {
+			$price_info['price'] = self::normalize_price_value( $price_info['price'] );
+		}
+
+		return $price_info;
 	}
 
 	// If price set by pricematrix in cart return matrix
