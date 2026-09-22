@@ -57,7 +57,7 @@ final class ImageRenderer extends AbstractInputRenderer {
 				$image_id    = isset( $image['image_id'] ) ? $image['image_id'] : 0;
 				$image_title = isset( $image['raw'] ) ? stripslashes( $image['raw'] ) : '';
 				$image_label = isset( $image['label'] ) ? stripslashes( $image['label'] ) : '';
-				$image_price = isset( $image['price'] ) ? $image['price'] : 0;
+				$image_price = apply_filters( 'ppom_option_price', isset( $image['price'] ) ? $image['price'] : 0 );
 				$option_id   = $id . '-' . $image_id;
 
 				if ( isset( $image['price'] ) && strpos( $image['price'], '%' ) !== false ) {
@@ -132,7 +132,7 @@ final class ImageRenderer extends AbstractInputRenderer {
 				$image_id    = isset( $image['image_id'] ) ? $image['image_id'] : 0;
 				$image_title = isset( $image['raw'] ) ? stripslashes( $image['raw'] ) : '';
 				$image_label = isset( $image['label'] ) ? stripslashes( $image['label'] ) : '';
-				$image_price = isset( $image['price'] ) ? $image['price'] : 0;
+				$image_price = apply_filters( 'ppom_option_price', isset( $image['price'] ) ? $image['price'] : 0 );
 				$option_id   = $id . '-' . $image_id;
 
 				if ( isset( $image['price'] ) && strpos( $image['price'], '%' ) !== false ) {

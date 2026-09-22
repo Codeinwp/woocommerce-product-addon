@@ -68,7 +68,7 @@ final class MeasureInputRenderer extends AbstractInputRenderer {
 				$option_id  = $option['option_id'];
 				$unit       = $option['raw'];
 				$html      .= '<input checked name="ppom[unit][' . $id . ']" value="' . esc_attr( $unit ) . '" class="form-check-input ppom-measure-unit" type="radio" id="' . esc_attr( $option_id ) . '" data-apply="measure" ';
-				$html      .= sprintf( 'data-use_units="' . esc_attr( $use_units ? '1' : '0' ) . '" data-price="%s" data-label="%s" data-data_name="%s" data-unit="%s" data-optionid="%s">', $option['price'], esc_attr( $data_label ), $id, $unit, $option_id );
+				$html      .= sprintf( 'data-use_units="' . esc_attr( $use_units ? '1' : '0' ) . '" data-price="%s" data-label="%s" data-data_name="%s" data-unit="%s" data-optionid="%s">', apply_filters( 'ppom_option_price', $option['price'] ), esc_attr( $data_label ), $id, $unit, $option_id );
 				$html      .= '<label class="form-check-label" id="' . esc_attr( $option_id ) . '">';
 				$html      .= $option['label'];
 				$html      .= '</label>';

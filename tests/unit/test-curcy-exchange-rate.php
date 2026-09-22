@@ -122,4 +122,44 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 
 		remove_filter( 'woocommerce_product_get_price', $get_price, 99 );
 	}
+
+	/**
+	 * Legacy input renderers (ppom_enable_legacy_inputs_rendering) receive the same
+	 * normalized options and must emit a data-price converted exactly once.
+	 */
+	public function test_legacy_renderers_emit_data_price_converted_once() {
+		$registry = new \PPOM\FieldMarkup\InputRendererRegistry( new \PPOM\FieldMarkup\FormAttributeContext() );
+		$product  = $this->create_simple_product( array( 'regular_price' => '100' ) );
+
+		foreach ( array( 'select', 'radio', 'checkbox', 'palettes' ) as $type ) {
+			$meta    = array( 'type' => $type, 'title' => 'Wrap', 'data_name' => 'wrap' );
+			$options = Helpers::convert_options_to_key_val(
+				array( array( 'option' => 'Premium', 'price' => '50', 'id' => 'premium', 'color' => '#fff' ) ),
+				$meta,
+				$product
+			);
+
+			$html = $registry->render(
+				$type,
+				array(
+					'id'         => 'wrap',
+					'type'       => $type,
+					'name'       => 'ppom[fields][wrap]',
+					'title'      => 'Wrap',
+					'data_name'  => 'wrap',
+					'onetime'    => '',
+					'taxable'    => '',
+					'classes'    => '',
+					'attributes' => array(),
+					'color_width' => '30',
+					'color_height' => '30',
+					'options'    => $options,
+					'product_id' => $product->get_id(),
+				),
+				null
+			);
+
+			$this->assertStringContainsString( 'data-price="500"', $html, "{$type}: data-price must carry one conversion." );
+		}
+	}
 }

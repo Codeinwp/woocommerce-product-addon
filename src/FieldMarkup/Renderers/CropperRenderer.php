@@ -72,7 +72,7 @@ final class CropperRenderer extends AbstractInputRenderer {
 
 			foreach ( $cropping_sizes as $key => $size ) {
 				$option_label = $size['label'];
-				$option_price = $size['price'];
+				$option_price = apply_filters( 'ppom_option_price', $size['price'] );
 				$raw_label    = $size['raw'];
 				$without_tax  = $size['without_tax'];
 				$option_id    = $size['option_id'];
