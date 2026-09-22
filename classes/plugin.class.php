@@ -961,8 +961,8 @@ class NM_PersonalizedProduct {
 			return apply_filters( 'woocs_exchange_value', $numeric_price );
 		}
 
-		// CURCY - WooCommerce Multi Currency.
-		if ( function_exists( 'wmc_get_price' ) ) {
+		// CURCY - WooCommerce Multi Currency. Since 2.2.x CURCY hooks ppom_option_price itself (#755).
+		if ( function_exists( 'wmc_get_price' ) && ! class_exists( 'WOOMULTI_CURRENCY_F_Plugin_Woocommerce_Product_Addon' ) ) {
 			return wmc_get_price( $numeric_price );
 		}
 

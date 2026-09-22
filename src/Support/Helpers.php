@@ -1349,7 +1349,7 @@ final class Helpers {
 
 				$ppom_new_option[ $the_option ] = array(
 					'label'       => $option_label,
-					'price'       => apply_filters( 'ppom_option_price', $option_price ),
+					'price'       => $option_price, // Raw store amount; each consumer applies ppom_option_price once (#755).
 					'raw_price'   => $option_raw_price,
 					'raw'         => $the_option,
 					'without_tax' => $option_price_without_tax,
