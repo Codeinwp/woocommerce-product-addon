@@ -280,4 +280,58 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 		$this->assertStringContainsString( '500.00', $html );
 		$this->assertStringNotContainsString( '40.00', $html );
 	}
+
+	/**
+	 * A wholesale plugin sets its price on the cart line and marks it wholesale_priced.
+	 * The bundled wholesale callback must hand PPOM that price in store currency, not
+	 * the switcher-converted value from get_price().
+	 */
+	public function test_wholesale_priced_line_with_switcher_is_converted_once() {
+		$get_price = static function ( $price ) {
+			return '' === $price ? $price : (float) $price * self::RATE;
+		};
+		add_filter( 'woocommerce_product_get_price', $get_price, 99 );
+		add_filter(
+			'ppom_product_price_on_cart',
+			static function ( $value, $cart_item ) {
+				return $cart_item['data']->get_price( 'edit' );
+			},
+			10,
+			2
+		);
+		// Wholesale plugin: prices the line at 8 during totals and flags it.
+		add_action(
+			'woocommerce_before_calculate_totals',
+			static function ( $cart ) {
+				foreach ( $cart->get_cart() as $cart_item ) {
+					$cart_item['data']->set_price( 8 );
+					$cart_item['data']->wwp_data = array( 'wholesale_priced' => 'yes' );
+				}
+			},
+			5
+		);
+
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'select',
+					'title'     => 'Wrap',
+					'data_name' => 'wrap',
+					'options'   => array( array( 'option' => 'Premium', 'price' => '5', 'id' => 'premium' ) ),
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'wrap' => 'Premium' ) ) );
+		$this->assertNotFalse( $cart_key );
+		$this->reload_real_cart_from_session();
+
+		WC()->cart->calculate_totals();
+		$this->assertEqualsWithDelta( 130.0, (float) WC()->cart->get_total( 'edit' ), 0.001, '(8 wholesale + 5) x rate.' );
+
+		remove_filter( 'woocommerce_product_get_price', $get_price, 99 );
+	}
 }

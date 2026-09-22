@@ -1833,7 +1833,8 @@ final class Engine {
 
 		// Wholesale price
 		if ( isset( $cart_content['data']->wwp_data['wholesale_priced'] ) && $cart_content['data']->wwp_data['wholesale_priced'] == 'yes' ) {
-			$product_price = $cart_content['data']->get_price();
+			// The wholesale price is set on the line; read it before switcher read filters (#755).
+			$product_price = $cart_content['data']->get_price( 'edit' );
 		}
 
 		return $product_price;
