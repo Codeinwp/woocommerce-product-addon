@@ -162,4 +162,97 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 			$this->assertStringContainsString( 'data-price="500"', $html, "{$type}: data-price must carry one conversion." );
 		}
 	}
+
+	/**
+	 * WOOCS-style switcher: converts on read and exposes back_convert(). The engine
+	 * now reads the stored (store currency) price, so it must not back-convert it again.
+	 */
+	public function test_cart_line_with_woocs_style_switcher_is_converted_once() {
+		global $WOOCS;
+		$WOOCS = new class() {
+			public $current_currency   = 'EUR';
+			public $default_currency   = 'RON';
+			public $is_multiple_allowed = true;
+			public function get_currencies() {
+				return array( 'EUR' => array( 'rate' => 10 ), 'RON' => array( 'rate' => 1 ) );
+			}
+			public function back_convert( $price, $rate ) {
+				return $price / $rate;
+			}
+		};
+		$exchange  = static function ( $price ) {
+			return (float) $price * self::RATE;
+		};
+		$get_price = static function ( $price ) {
+			return '' === $price ? $price : (float) $price * self::RATE;
+		};
+		add_filter( 'woocs_exchange_value', $exchange );
+		add_filter( 'woocommerce_product_get_price', $get_price, 99 );
+
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'select',
+					'title'     => 'Wrap',
+					'data_name' => 'wrap',
+					'options'   => array( array( 'option' => 'Premium', 'price' => '5', 'id' => 'premium' ) ),
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'wrap' => 'Premium' ) ) );
+		$this->assertNotFalse( $cart_key );
+		$this->reload_real_cart_from_session();
+
+		WC()->cart->calculate_totals();
+		$this->assertEqualsWithDelta( 150.0, (float) WC()->cart->get_total( 'edit' ), 0.001, '(10 + 5) x rate, base not back-converted twice.' );
+		WC()->cart->calculate_totals();
+		$this->assertEqualsWithDelta( 150.0, (float) WC()->cart->get_total( 'edit' ), 0.001 );
+
+		remove_filter( 'woocs_exchange_value', $exchange );
+		remove_filter( 'woocommerce_product_get_price', $get_price, 99 );
+		$WOOCS = null;
+	}
+
+	/**
+	 * The price matrix client payload feeds the product-page total, so its `price`
+	 * carries one conversion, while `raw_price` stays raw for server-side cart pricing.
+	 */
+	public function test_pricematrix_client_payload_converts_price_once_and_keeps_raw_price() {
+		$registry = new \PPOM\FieldMarkup\InputRendererRegistry( new \PPOM\FieldMarkup\FormAttributeContext() );
+		$product  = $this->create_simple_product( array( 'regular_price' => '100' ) );
+		$meta     = array( 'type' => 'pricematrix', 'title' => 'Matrix', 'data_name' => 'matrix' );
+		$ranges   = Helpers::convert_options_to_key_val(
+			array( array( 'option' => '1-5', 'price' => '50', 'id' => 'r1' ) ),
+			$meta,
+			$product
+		);
+
+		$html = $registry->render(
+			'pricematrix',
+			array(
+				'id'                  => 'matrix',
+				'type'                => 'pricematrix',
+				'name'                => 'ppom[fields][matrix]',
+				'label'               => 'Matrix',
+				'ranges'              => $ranges,
+				'discount'            => '',
+				'show_slider'         => '',
+				'qty_step'            => '1',
+				'hide_matrix'         => '',
+				'show_price_per_unit' => '',
+			),
+			null
+		);
+
+		$this->assertSame( 1, preg_match( '/name="ppom\[ppom_pricematrix\]"[^>]*value="([^"]*)"/', $html, $m ) );
+		$payload = json_decode( html_entity_decode( $m[1], ENT_QUOTES ), true );
+		$range   = reset( $payload );
+
+		$this->assertEqualsWithDelta( 500.0, (float) $range['price'], 0.0001 );
+		$this->assertEqualsWithDelta( 50.0, (float) $range['raw_price'], 0.0001 );
+	}
 }

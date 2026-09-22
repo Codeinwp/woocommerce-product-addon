@@ -13,7 +13,6 @@
 
 namespace PPOM\Pricing;
 
-use PPOM\Hooks\Callbacks;
 use PPOM\Support\Helpers;
 
 /**
@@ -1261,8 +1260,8 @@ final class Engine {
 		$ppom_pricematrix = null
 	) {
 
-		// converting back to org price if Currency Switcher is used
-		$base_price = Callbacks::convert_price_back( $product_price );
+		// Callers pass the stored (store currency) price, so no switcher back-conversion here (#755).
+		$base_price = $product_price;
 		// $base_price  = $product->get_price();
 		// $base_price = floatval($base_price);
 		// $base_price  = $product->get_price();

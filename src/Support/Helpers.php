@@ -1401,6 +1401,22 @@ final class Helpers {
 
 
 	// Generating option label with price
+	/**
+	 * Price matrix ranges for the client payload: `price` converted once for the
+	 * product-page total, `raw_price` untouched for server-side cart pricing (#755).
+	 *
+	 * @param array $ranges Normalized ranges from convert_options_to_key_val().
+	 * @return array
+	 */
+	public static function convert_ranges_for_client( $ranges ) {
+		foreach ( (array) $ranges as $key => $range ) {
+			if ( isset( $range['price'] ) ) {
+				$ranges[ $key ]['price'] = apply_filters( 'ppom_option_price', $range['price'] );
+			}
+		}
+		return $ranges;
+	}
+
 	public static function generate_option_label( $option, $price, $meta ) {
 
 		$meta_type = isset( $meta['type'] ) ? $meta['type'] : '';
