@@ -39,6 +39,9 @@ final class FileRenderer extends AbstractInputRenderer {
 		$html            .= '<span class="ppom-dragdrop-text">';
 		$html            .= __( 'Drag File Here', 'woocommerce-product-addon' );
 		$html            .= '</span>';
+		$html            .= '<span class="ppom-field-notice">';
+		$html            .= esc_html( isset( $args['upload_notice'] ) ? $args['upload_notice'] : '' );
+		$html            .= '</span>';
 		$html            .= '</div>';
 
 		if ( ! empty( $args['dragdrop'] ) ) {
