@@ -585,7 +585,7 @@ final class CartHandler {
 					}
 
 					if ( null !== $resolved ) {
-						$fee_price        = apply_filters( 'ppom_option_price', $resolved );
+						$fee_price        = Helpers::convert_fee_price( $resolved );
 						$resolved_taxable = self::resolved_onetime_taxable( $fee, $attached_ids );
 
 						if ( null !== $resolved_taxable ) {

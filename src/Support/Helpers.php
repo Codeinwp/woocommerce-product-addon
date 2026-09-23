@@ -1417,6 +1417,20 @@ final class Helpers {
 		return $ranges;
 	}
 
+	/**
+	 * Converts a one-time fee for the cart. CURCY converts fixed fees itself on
+	 * ppom_cart_fixed_fee, which runs after this, so it gets the store amount (#755).
+	 *
+	 * @param float|string $price Fee amount in store currency.
+	 * @return float|string
+	 */
+	public static function convert_fee_price( $price ) {
+		if ( class_exists( 'WOOMULTI_CURRENCY_F_Plugin_Woocommerce_Product_Addon' ) ) {
+			return $price;
+		}
+		return apply_filters( 'ppom_option_price', $price );
+	}
+
 	public static function generate_option_label( $option, $price, $meta ) {
 
 		$meta_type = isset( $meta['type'] ) ? $meta['type'] : '';

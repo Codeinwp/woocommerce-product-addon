@@ -1551,7 +1551,7 @@ final class Engine {
 
 				$label        = $fee['label'];
 				$option_label = isset( $fee['option_label'] ) ? $fee['option_label'] : '';
-				$fee_price    = apply_filters( 'ppom_option_price', $fee['price'] );
+				$fee_price    = Helpers::convert_fee_price( $fee['price'] );
 				$taxable      = $fee['taxable']; // deprecated soon
 
 				$label = "{$label}";

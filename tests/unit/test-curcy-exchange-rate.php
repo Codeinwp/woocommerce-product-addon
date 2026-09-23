@@ -427,4 +427,58 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 
 		remove_filter( 'woocommerce_product_get_price', $discount, 99 );
 	}
+
+	/**
+	 * CURCY converts fixed fees itself on ppom_cart_fixed_fee, so PPOM must not convert
+	 * the one-time fee a second time before that filter.
+	 */
+	public function test_one_time_fee_with_curcy_is_converted_once() {
+		if ( ! class_exists( 'WOOMULTI_CURRENCY_F_Plugin_Woocommerce_Product_Addon' ) ) {
+			eval( 'class WOOMULTI_CURRENCY_F_Plugin_Woocommerce_Product_Addon {}' );
+		}
+		$get_price = static function ( $price ) {
+			return '' === $price ? $price : (float) $price * self::RATE;
+		};
+		$fee_hook = static function ( $price ) {
+			return (float) $price * self::RATE;
+		};
+		add_filter( 'woocommerce_product_get_price', $get_price, 99 );
+		add_filter( 'ppom_cart_fixed_fee', $fee_hook );
+		add_filter(
+			'ppom_product_price_on_cart',
+			static function ( $value, $cart_item ) {
+				return $cart_item['data']->get_price( 'edit' );
+			},
+			10,
+			2
+		);
+
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'checkbox',
+					'title'     => 'Paid fee',
+					'data_name' => 'paid_fee',
+					'onetime'   => 'on',
+					'options'   => array( array( 'option' => 'Setup', 'price' => '20', 'id' => 'setup' ) ),
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'paid_fee' => array( 'Setup' ) ) ) );
+		$this->assertNotFalse( $cart_key );
+		$this->reload_real_cart_from_session();
+		WC()->cart->calculate_totals();
+
+		$fees = array_values( WC()->cart->get_fees() );
+		$this->assertCount( 1, $fees );
+		$this->assertEqualsWithDelta( 200.0, (float) $fees[0]->amount, 0.001, '20 x rate, once.' );
+		$this->assertEqualsWithDelta( 100.0, (float) WC()->cart->get_cart_contents_total(), 0.001 );
+
+		remove_filter( 'woocommerce_product_get_price', $get_price, 99 );
+		remove_filter( 'ppom_cart_fixed_fee', $fee_hook );
+	}
 }
