@@ -542,4 +542,35 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 
 		remove_filter( 'woocommerce_product_get_price', $get_price, 99 );
 	}
+
+	/**
+	 * The server-built legacy payload keeps honouring ppom_field_option_price, the
+	 * field-level adjustment hook, while staying in store currency.
+	 */
+	public function test_legacy_payload_keeps_field_option_price_adjustments() {
+		$double = static function ( $price ) {
+			return (float) $price * 2;
+		};
+		add_filter( 'ppom_field_option_price', $double );
+
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'select',
+					'title'     => 'Wrap',
+					'data_name' => 'wrap',
+					'options'   => array( array( 'option' => 'Premium', 'price' => '5', 'id' => 'premium' ) ),
+				),
+			),
+			$product->get_id()
+		);
+
+		$rows = Helpers::compute_option_price_from_fields( array( 'wrap' => 'Premium', 'id' => $meta_id ), $product->get_id() );
+
+		remove_filter( 'ppom_field_option_price', $double );
+
+		$this->assertCount( 1, $rows );
+		$this->assertEqualsWithDelta( 10.0, (float) $rows[0]['price'], 0.0001, 'Stored 5, adjusted x2, not converted.' );
+	}
 }
