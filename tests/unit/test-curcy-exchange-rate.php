@@ -55,12 +55,15 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 	 * converter must then leave the price alone instead of converting a second time.
 	 */
 	public function test_core_converter_yields_to_curcy_integration_hook() {
-		if ( ! class_exists( 'WOOMULTI_CURRENCY_F_Plugin_Woocommerce_Product_Addon' ) ) {
-			eval( 'class WOOMULTI_CURRENCY_F_Plugin_Woocommerce_Product_Addon {}' );
-		}
+		add_filter( 'ppom_curcy_integration_active', '__return_true' );
+		// Inert unless this test-only filter is on, so later tests are unaffected.
 		if ( ! function_exists( 'wmc_get_price' ) ) {
-			eval( 'function wmc_get_price( $price ) { return (float) $price * ' . self::RATE . '; }' );
+			eval( 'function wmc_get_price( $price ) { return apply_filters( "ppom_test_wmc_get_price", $price ); }' );
 		}
+		$wmc = static function ( $price ) {
+			return (float) $price * self::RATE;
+		};
+		add_filter( 'ppom_test_wmc_get_price', $wmc );
 
 		$ppom = PPOM();
 		remove_filter( 'ppom_option_price', array( $ppom, 'ppom_convert_price' ), 99 );
@@ -69,6 +72,8 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 		$result = apply_filters( 'ppom_option_price', 50 );
 
 		remove_filter( 'ppom_option_price', array( $ppom, 'ppom_convert_price' ), 99 );
+		remove_filter( 'ppom_test_wmc_get_price', $wmc );
+		remove_filter( 'ppom_curcy_integration_active', '__return_true' );
 
 		$this->assertEqualsWithDelta( 500.0, (float) $result, 0.0001, 'Rate must be applied once, not by CURCY and core both.' );
 	}
@@ -433,9 +438,7 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 	 * the one-time fee a second time before that filter.
 	 */
 	public function test_one_time_fee_with_curcy_is_converted_once() {
-		if ( ! class_exists( 'WOOMULTI_CURRENCY_F_Plugin_Woocommerce_Product_Addon' ) ) {
-			eval( 'class WOOMULTI_CURRENCY_F_Plugin_Woocommerce_Product_Addon {}' );
-		}
+		add_filter( 'ppom_curcy_integration_active', '__return_true' );
 		$get_price = static function ( $price ) {
 			return '' === $price ? $price : (float) $price * self::RATE;
 		};
@@ -480,6 +483,7 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 
 		remove_filter( 'woocommerce_product_get_price', $get_price, 99 );
 		remove_filter( 'ppom_cart_fixed_fee', $fee_hook );
+		remove_filter( 'ppom_curcy_integration_active', '__return_true' );
 	}
 
 	/**

@@ -1418,6 +1418,16 @@ final class Helpers {
 	}
 
 	/**
+	 * Whether CURCY's own PPOM integration is loaded. It hooks ppom_option_price and
+	 * ppom_cart_fixed_fee itself, so PPOM's CURCY conversion must step aside (#755).
+	 *
+	 * @return bool
+	 */
+	public static function curcy_integration_active() {
+		return (bool) apply_filters( 'ppom_curcy_integration_active', class_exists( 'WOOMULTI_CURRENCY_F_Plugin_Woocommerce_Product_Addon' ) );
+	}
+
+	/**
 	 * Converts a one-time fee for the cart. CURCY converts fixed fees itself on
 	 * ppom_cart_fixed_fee, which runs after this, so it gets the store amount (#755).
 	 *
@@ -1425,7 +1435,7 @@ final class Helpers {
 	 * @return float|string
 	 */
 	public static function convert_fee_price( $price ) {
-		if ( class_exists( 'WOOMULTI_CURRENCY_F_Plugin_Woocommerce_Product_Addon' ) ) {
+		if ( self::curcy_integration_active() ) {
 			return $price;
 		}
 		return apply_filters( 'ppom_option_price', $price );
