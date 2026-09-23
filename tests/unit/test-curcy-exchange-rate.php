@@ -481,4 +481,22 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 		remove_filter( 'woocommerce_product_get_price', $get_price, 99 );
 		remove_filter( 'ppom_cart_fixed_fee', $fee_hook );
 	}
+
+	/**
+	 * Checkbox discount prices follow the same contract: normalization keeps the stored
+	 * amount, the checkbox template converts it once.
+	 */
+	public function test_normalized_checkbox_discount_stays_unconverted() {
+		$product = $this->create_simple_product( array( 'regular_price' => '100' ) );
+		$meta    = array( 'type' => 'checkbox', 'title' => 'Wrap', 'data_name' => 'wrap' );
+
+		$options = Helpers::convert_options_to_key_val(
+			array( array( 'option' => 'Premium', 'price' => '50', 'discount' => '5', 'id' => 'premium' ) ),
+			$meta,
+			$product
+		);
+
+		$this->assertEqualsWithDelta( 5.0, (float) $options['Premium']['discount'], 0.0001 );
+		$this->assertEqualsWithDelta( 5.0, (float) $options['Premium']['raw_discount'], 0.0001 );
+	}
 }
