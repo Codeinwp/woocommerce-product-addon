@@ -334,4 +334,97 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 
 		remove_filter( 'woocommerce_product_get_price', $get_price, 99 );
 	}
+
+	/**
+	 * Price matrix "Base & Option" percent discount: the base comes from the converted
+	 * cart line, so the one-time fee component must be converted too before the percent.
+	 */
+	public function test_matrix_discount_on_base_and_fees_uses_one_currency() {
+		$get_price = static function ( $price ) {
+			return '' === $price ? $price : (float) $price * self::RATE;
+		};
+		add_filter( 'woocommerce_product_get_price', $get_price, 99 );
+		add_filter(
+			'ppom_product_price_on_cart',
+			static function ( $value, $cart_item ) {
+				return $cart_item['data']->get_price( 'edit' );
+			},
+			10,
+			2
+		);
+
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'select',
+					'title'     => 'Setup',
+					'data_name' => 'setup',
+					'onetime'   => 'on',
+					'options'   => array( array( 'option' => 'Yes', 'price' => '5', 'id' => 'yes' ) ),
+				),
+				$this->build_price_matrix_field(
+					'matrix',
+					array( array( 'option' => '2-4', 'price' => '10%', 'label' => 'Bulk', 'id' => 'bulk' ) ),
+					array( 'discount' => 'on', 'discount_type' => 'both' )
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'setup' => 'Yes' ) ), 2 );
+		$this->assertNotFalse( $cart_key );
+		$this->reload_real_cart_from_session();
+		WC()->cart->calculate_totals();
+
+		$discount = null;
+		foreach ( WC()->cart->get_fees() as $fee ) {
+			if ( 0 === strpos( $fee->id, 'ppom_matrix_fee' ) ) {
+				$discount = (float) $fee->amount;
+			}
+		}
+
+		// 10% of (2 x 10 x rate + 5 x rate) = 10% of 250.
+		$this->assertNotNull( $discount, 'Matrix discount fee must be added.' );
+		$this->assertEqualsWithDelta( -25.0, $discount, 0.001 );
+
+		remove_filter( 'woocommerce_product_get_price', $get_price, 99 );
+	}
+
+	/**
+	 * A dynamic-pricing read filter on woocommerce_product_get_price applies once to
+	 * the whole line WooCommerce reads, never twice to the base.
+	 */
+	public function test_read_filtered_dynamic_base_price_applies_once_to_line() {
+		$discount = static function ( $price ) {
+			return '' === $price ? $price : (float) $price * 0.9;
+		};
+		add_filter( 'woocommerce_product_get_price', $discount, 99 );
+
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'select',
+					'title'     => 'Wrap',
+					'data_name' => 'wrap',
+					'options'   => array( array( 'option' => 'Premium', 'price' => '5', 'id' => 'premium' ) ),
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'wrap' => 'Premium' ) ) );
+		$this->assertNotFalse( $cart_key );
+		$this->reload_real_cart_from_session();
+
+		WC()->cart->calculate_totals();
+		$this->assertEqualsWithDelta( 13.5, (float) WC()->cart->get_total( 'edit' ), 0.001, '(10 + 5) x 0.9, base not discounted twice.' );
+		WC()->cart->calculate_totals();
+		$this->assertEqualsWithDelta( 13.5, (float) WC()->cart->get_total( 'edit' ), 0.001 );
+
+		remove_filter( 'woocommerce_product_get_price', $discount, 99 );
+	}
 }
