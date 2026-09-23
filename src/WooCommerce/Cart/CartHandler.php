@@ -407,8 +407,8 @@ final class CartHandler {
 			unset( $values ['ppom'] ['fields']['id'] );
 		}
 
-		// converting back to org price if Currency Switcher is used
-		$ppom_item_org_price = Callbacks::convert_price_back( $wc_product->get_price() );
+		// Stored price in store currency; switcher read filters apply to the line afterwards (#755).
+		$ppom_item_org_price = $wc_product->get_price( 'edit' );
 		// $ppom_item_org_price = $wc_product->get_price();
 
 		$ppom_item_order_qty = floatval( $cart_items['quantity'] );

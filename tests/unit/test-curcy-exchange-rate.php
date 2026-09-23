@@ -503,4 +503,43 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 		$this->assertEqualsWithDelta( 5.0, (float) $options['Premium']['discount'], 0.0001 );
 		$this->assertEqualsWithDelta( 5.0, (float) $options['Premium']['raw_discount'], 0.0001 );
 	}
+
+	/**
+	 * Legacy price mode (ppom_legacy_price) prices the line in update_cart_fees(). It
+	 * must write the line in store currency, so the switcher converts it once on read.
+	 */
+	public function test_legacy_price_mode_line_is_converted_once() {
+		$get_price = static function ( $price ) {
+			return '' === $price ? $price : (float) $price * self::RATE;
+		};
+		add_filter( 'woocommerce_product_get_price', $get_price, 99 );
+
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'select',
+					'title'     => 'Wrap',
+					'data_name' => 'wrap',
+					'options'   => array( array( 'option' => 'Premium', 'price' => '5', 'id' => 'premium' ) ),
+				),
+			),
+			$product->get_id()
+		);
+
+		$item   = array(
+			'data'         => wc_get_product( $product->get_id() ),
+			'product_id'   => $product->get_id(),
+			'variation_id' => 0,
+			'quantity'     => 1,
+		);
+		$values = array( 'ppom' => array( 'fields' => array( 'wrap' => 'Premium', 'id' => $meta_id ) ) );
+
+		$result = \PPOM\WooCommerce\Cart\CartHandler::update_cart_fees( $item, $values );
+
+		$this->assertEqualsWithDelta( 15.0, (float) $result['data']->get_price( 'edit' ), 0.001, 'Stored line in store currency: 10 + 5.' );
+		$this->assertEqualsWithDelta( 150.0, (float) $result['data']->get_price(), 0.001, 'Read once through the switcher.' );
+
+		remove_filter( 'woocommerce_product_get_price', $get_price, 99 );
+	}
 }

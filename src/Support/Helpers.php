@@ -2004,7 +2004,21 @@ final class Helpers {
 	// Getting field option price
 	public static function get_field_option_price( $field_meta, $option_label ) {
 
-		// var_dump($field_meta['options']);
+		// For currency switcher
+		$option_price = apply_filters( 'ppom_option_price', self::get_field_option_raw_price( $field_meta, $option_label ) );
+
+		return apply_filters( 'ppom_field_option_price', wc_format_decimal( $option_price ), $field_meta, $option_label );
+	}
+
+	/**
+	 * Stored option price in store currency, for server-side cart math (#755).
+	 *
+	 * @param mixed $field_meta   Field settings.
+	 * @param mixed $option_label Selected option label.
+	 * @return mixed
+	 */
+	public static function get_field_option_raw_price( $field_meta, $option_label ) {
+
 		if ( ! isset( $field_meta['options'] ) || $field_meta['type'] == 'bulkquantity' || $field_meta['type'] == 'cropper' ) {
 			return 0;
 		}
@@ -2018,10 +2032,7 @@ final class Helpers {
 			}
 		}
 
-		// For currency switcher
-		$option_price = apply_filters( 'ppom_option_price', $option_price );
-
-		return apply_filters( 'ppom_field_option_price', wc_format_decimal( $option_price ), $field_meta, $option_label );
+		return $option_price;
 	}
 
 	// Getting field option price by ID
@@ -2444,7 +2455,7 @@ final class Helpers {
 
 			if ( is_array( $value ) ) {
 				foreach ( $value as $cb_value ) {
-					$price = self::get_field_option_price( $field_meta, $cb_value );
+					$price = wc_format_decimal( self::get_field_option_raw_price( $field_meta, $cb_value ) );
 					if ( 0 != $price ) {
 						$option_prices[] = array(
 							'apply'     => $apply,
@@ -2454,7 +2465,7 @@ final class Helpers {
 					}
 				}
 			} else {
-				$price = self::get_field_option_price( $field_meta, $value );
+				$price = wc_format_decimal( self::get_field_option_raw_price( $field_meta, $value ) );
 				if ( 0 != $price ) {
 					$option_prices[] = array(
 						'apply'     => $apply,
