@@ -70,6 +70,56 @@ class Test_Third_Party_Price_Mutation extends PPOM_Test_Case {
 	}
 
 	/**
+	 * A price filter or currency integration can hand back a formatted, non-numeric
+	 * base price such as "€ 10.00". Totals must recover the amount instead of dying
+	 * with "Unsupported operand types: float + string". Regression for #720.
+	 *
+	 * @return void
+	 */
+	public function testTotalsRecalcSurvivesNonNumericBasePrice() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+
+		$this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'radio',
+					'title'     => 'Gift wrap',
+					'data_name' => 'giftwrap',
+					'options'   => array(
+						array( 'option' => 'Premium wrap', 'price' => '5' ),
+					),
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+
+		$cart_key = $this->add_product_to_real_cart(
+			$product->get_id(),
+			array(
+				'fields' => array(
+					'giftwrap' => 'Premium wrap',
+				),
+			)
+		);
+
+		$this->assertNotFalse( $cart_key );
+		$this->reload_real_cart_from_session();
+
+		add_filter(
+			'ppom_product_price_on_cart',
+			function ( $price ) {
+				return '€ ' . number_format( (float) $price, 2, '.', '' );
+			}
+		);
+
+		WC()->cart->calculate_totals();
+
+		$this->assertSame( 15.0, (float) WC()->cart->get_total( 'edit' ) );
+	}
+
+	/**
 	 * The ppom_cart_line_total filter receives the cart item as second arg on the
 	 * totals-recalc path, same contract as the session-restore path.
 	 *

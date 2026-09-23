@@ -35,6 +35,18 @@ if ( ! defined( 'PPOM_E2E_BREAK_GROUP_READS_OPTION' ) ) {
 	define( 'PPOM_E2E_BREAK_GROUP_READS_OPTION', 'ppom_e2e_break_group_reads' );
 }
 
+if ( ! defined( 'PPOM_E2E_SETTINGS_PANEL_OPTION' ) ) {
+	define( 'PPOM_E2E_SETTINGS_PANEL_OPTION', 'ppom-settings_panel' );
+}
+
+if ( ! defined( 'PPOM_E2E_FORMATTED_BASE_PRICE_OPTION' ) ) {
+	define( 'PPOM_E2E_FORMATTED_BASE_PRICE_OPTION', 'ppom_e2e_formatted_base_price' );
+}
+
+if ( ! defined( 'PPOM_E2E_SETTINGS_TOUCHED_OPTION' ) ) {
+	define( 'PPOM_E2E_SETTINGS_TOUCHED_OPTION', 'ppom_e2e_touched_settings' );
+}
+
 /**
  * Rewrite SELECTs on the PPOM field-group table to a nonexistent table so they
  * error out, simulating a transient DB read failure (lock/timeout/dropped
@@ -73,6 +85,26 @@ function ppom_e2e_maybe_arm_group_read_failure() {
 	}
 }
 add_action( 'plugins_loaded', 'ppom_e2e_maybe_arm_group_read_failure', 20 );
+
+/**
+ * Simulate a currency integration that returns the cart base price as a
+ * formatted, non-numeric string (Codeinwp/woocommerce-product-addon#720).
+ *
+ * @return void
+ */
+function ppom_e2e_maybe_arm_formatted_base_price() {
+	if ( ! get_option( PPOM_E2E_FORMATTED_BASE_PRICE_OPTION ) ) {
+		return;
+	}
+
+	add_filter(
+		'ppom_product_price_on_cart',
+		function ( $price ) {
+			return '€ ' . number_format( (float) $price, 2, '.', '' );
+		}
+	);
+}
+add_action( 'plugins_loaded', 'ppom_e2e_maybe_arm_formatted_base_price', 20 );
 
 /**
  * Ensure product fixture pages render through WooCommerce's product template.
@@ -1030,6 +1062,72 @@ add_action( 'wp_ajax_ppom_e2e_create_simple_product', 'ppom_e2e_create_simple_pr
 add_action( 'wp_ajax_nopriv_ppom_e2e_create_simple_product', 'ppom_e2e_create_simple_product' );
 
 /**
+ * Create a WooCommerce grouped product from existing child product IDs.
+ *
+ * @return void
+ */
+function ppom_e2e_create_grouped_product() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	if ( ! class_exists( 'WC_Product_Grouped' ) ) {
+		wp_send_json_error(
+			array(
+				'message' => 'WooCommerce grouped product support is unavailable.',
+			),
+			500
+		);
+	}
+
+	$children = ppom_e2e_decode_json_request( 'children', array() );
+
+	if ( is_wp_error( $children ) ) {
+		ppom_e2e_send_wp_error( $children );
+	}
+
+	$children = array_values( array_filter( array_map( 'absint', (array) $children ) ) );
+	$name     = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
+
+	if ( '' === $name || empty( $children ) ) {
+		wp_send_json_error(
+			array(
+				'message' => 'Grouped product name and at least one child ID are required.',
+			),
+			400
+		);
+	}
+
+	$product = new WC_Product_Grouped();
+	$product->set_name( $name );
+	$product->set_status( 'publish' );
+	$product->set_children( $children );
+
+	$product_id = $product->save();
+
+	if ( ! $product_id ) {
+		wp_send_json_error(
+			array(
+				'message' => 'WooCommerce grouped product could not be saved.',
+			),
+			500
+		);
+	}
+
+	ppom_e2e_mark_fixture_post( $product_id );
+
+	wp_send_json_success(
+		array(
+			'id'       => (int) $product_id,
+			'name'     => $product->get_name(),
+			'type'     => $product->get_type(),
+			'children' => $product->get_children(),
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_create_grouped_product', 'ppom_e2e_create_grouped_product' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_create_grouped_product', 'ppom_e2e_create_grouped_product' );
+
+/**
  * Create a WooCommerce variable product for fixtures.
  *
  * @return void
@@ -1439,6 +1537,94 @@ add_action( 'wp_ajax_ppom_e2e_read_license_fixture', 'ppom_e2e_read_license_fixt
 add_action( 'wp_ajax_nopriv_ppom_e2e_read_license_fixture', 'ppom_e2e_read_license_fixture' );
 
 /**
+ * Allowlist of PPOM settings E2E fixtures may flip.
+ *
+ * @return string[]
+ */
+function ppom_e2e_settable_settings() {
+	return array(
+		'ppom_new_conditions',
+		'ppom_price_table_v2',
+		'ppom_enable_legacy_inputs_rendering',
+		'ppom_legacy_price',
+	);
+}
+
+/**
+ * Write one PPOM setting through whichever store the plugin currently reads.
+ *
+ * Mirrors Helpers::get_option(): migrated installs read the settings-panel
+ * array, older ones read a standalone option.
+ *
+ * @param string $key   Setting id.
+ * @param string $value Setting value; empty string removes it.
+ * @return void
+ */
+function ppom_e2e_write_ppom_setting( $key, $value ) {
+
+	if ( function_exists( 'ppom_settings_migrated' ) && ppom_settings_migrated() ) {
+		$saved = get_option( PPOM_E2E_SETTINGS_PANEL_OPTION );
+		$saved = is_array( $saved ) ? $saved : array();
+
+		if ( '' === $value ) {
+			unset( $saved[ $key ] );
+		} else {
+			$saved[ $key ] = $value;
+		}
+
+		update_option( PPOM_E2E_SETTINGS_PANEL_OPTION, $saved, false );
+	} elseif ( '' === $value ) {
+		delete_option( $key );
+	} else {
+		update_option( $key, $value, false );
+	}
+
+	$touched = get_option( PPOM_E2E_SETTINGS_TOUCHED_OPTION );
+	$touched = is_array( $touched ) ? $touched : array();
+
+	if ( ! in_array( $key, $touched, true ) ) {
+		$touched[] = $key;
+		update_option( PPOM_E2E_SETTINGS_TOUCHED_OPTION, $touched, false );
+	}
+}
+
+/**
+ * Set allowlisted PPOM settings, e.g. the "Legacy Conditions Script" toggle.
+ *
+ * @return void
+ */
+function ppom_e2e_set_ppom_settings() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$requested = ppom_e2e_decode_json_request( 'settings' );
+	$allowed   = ppom_e2e_settable_settings();
+	$applied   = array();
+
+	foreach ( $requested as $key => $value ) {
+		$key = sanitize_key( $key );
+
+		if ( ! in_array( $key, $allowed, true ) ) {
+			continue;
+		}
+
+		$value = is_scalar( $value ) ? sanitize_text_field( (string) $value ) : '';
+
+		ppom_e2e_write_ppom_setting( $key, $value );
+		$applied[ $key ] = $value;
+	}
+
+	wp_send_json_success(
+		array(
+			'applied'         => $applied,
+			'conditions_mode' => function_exists( 'ppom_get_conditions_mode' ) ? ppom_get_conditions_mode() : '',
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_set_ppom_settings', 'ppom_e2e_set_ppom_settings' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_set_ppom_settings', 'ppom_e2e_set_ppom_settings' );
+
+/**
  * Toggle the simulated transient failure of PPOM field-group reads.
  *
  * @return void
@@ -1464,6 +1650,33 @@ function ppom_e2e_set_group_read_failure() {
 }
 add_action( 'wp_ajax_ppom_e2e_set_group_read_failure', 'ppom_e2e_set_group_read_failure' );
 add_action( 'wp_ajax_nopriv_ppom_e2e_set_group_read_failure', 'ppom_e2e_set_group_read_failure' );
+
+/**
+ * Toggle the simulated formatted (non-numeric) cart base price.
+ *
+ * @return void
+ */
+function ppom_e2e_set_formatted_base_price() {
+	ppom_e2e_require_capability();
+	ppom_e2e_require_nonce();
+
+	$enabled_raw = isset( $_POST['enabled'] ) ? sanitize_text_field( wp_unslash( $_POST['enabled'] ) ) : '';
+	$enabled     = in_array( $enabled_raw, array( '1', 'true', 'yes' ), true );
+
+	if ( $enabled ) {
+		update_option( PPOM_E2E_FORMATTED_BASE_PRICE_OPTION, '1', false );
+	} else {
+		delete_option( PPOM_E2E_FORMATTED_BASE_PRICE_OPTION );
+	}
+
+	wp_send_json_success(
+		array(
+			'enabled' => $enabled,
+		)
+	);
+}
+add_action( 'wp_ajax_ppom_e2e_set_formatted_base_price', 'ppom_e2e_set_formatted_base_price' );
+add_action( 'wp_ajax_nopriv_ppom_e2e_set_formatted_base_price', 'ppom_e2e_set_formatted_base_price' );
 
 /**
  * Read a product's raw PPOM assignment post meta (for E2E assertions).
@@ -1577,8 +1790,14 @@ function ppom_e2e_reset_state() {
 	delete_option( PPOM_E2E_META_IDS_OPTION );
 	delete_option( PPOM_E2E_LICENSE_FIXTURE_OPTION );
 	delete_option( PPOM_E2E_BREAK_GROUP_READS_OPTION );
+	delete_option( PPOM_E2E_FORMATTED_BASE_PRICE_OPTION );
 	update_option( 'woocommerce_coming_soon', 'no', false );
 	update_option( 'woocommerce_store_pages_only', 'no', false );
+
+	foreach ( (array) get_option( PPOM_E2E_SETTINGS_TOUCHED_OPTION, array() ) as $touched_setting ) {
+		ppom_e2e_write_ppom_setting( $touched_setting, '' );
+	}
+	delete_option( PPOM_E2E_SETTINGS_TOUCHED_OPTION );
 
 	if ( defined( 'PPOM_PRODUCT_META_KEY' ) ) {
 		delete_post_meta_by_key( PPOM_PRODUCT_META_KEY );

@@ -241,6 +241,77 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 	}
 
 	/**
+	 * A bulk-quantity row whose `Quantity Range` has no second endpoint cannot
+	 * be matched against a quantity.
+	 *
+	 * @return void
+	 */
+	public function test_price_bulkquantity_chunk_skips_rows_missing_an_endpoint() {
+		$product = $this->create_simple_product();
+
+		$rows = array(
+			array(
+				'Quantity Range' => '1-9',
+				'Base Price'     => '10',
+				'ID'             => 'a',
+			),
+			array(
+				'Quantity Range' => '10+',
+				'Base Price'     => '20',
+				'ID'             => 'b',
+			),
+			// Stored JSON can decode a range into an array; casting one would
+			// raise a conversion notice before any endpoint check ran.
+			array(
+				'Quantity Range' => array( '10', '20' ),
+				'Base Price'     => '30',
+				'ID'             => 'c',
+			),
+			// A numeric prefix is not numeric to PHP, so this row is skipped too.
+			array(
+				'Quantity Range' => '10-20x',
+				'Base Price'     => '40',
+				'ID'             => 'd',
+			),
+			// A row can decode to null outright.
+			null,
+			array(
+				'Quantity Range' => '1-1e309',
+				'Base Price'     => '50',
+				'ID'             => 'e',
+			),
+			array(
+				'Quantity Range' => '1-99999999999999999999',
+				'Base Price'     => '60',
+				'ID'             => 'f',
+			),
+		);
+
+		$errors = array();
+		set_error_handler(
+			function ( $errno, $errstr ) use ( &$errors ) {
+				$errors[] = $errstr;
+				return true;
+			},
+			E_ALL
+		);
+
+		try {
+			$this->assertSame( $rows[0], Engine::price_bulkquantity_chunk( $product, $rows, 5 ) );
+			$this->assertSame( array(), Engine::price_bulkquantity_chunk( $product, $rows, 10 ) );
+			$this->assertSame( array(), Engine::price_bulkquantity_chunk( $product, $rows, 15 ) );
+			$this->assertSame( array(), Engine::price_bulkquantity_chunk( $product, $rows, 1000 ) );
+		} finally {
+			restore_error_handler();
+		}
+
+		$this->assertSame(
+			array(),
+			$errors,
+			'A row missing an endpoint must be skipped, not read. Raised: ' . implode( ' | ', $errors )
+		);
+	}
+	/**
 	 * price_has_discount_matrix returns false when the product has no pricematrix field.
 	 *
 	 * @return void
@@ -532,6 +603,44 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 	}
 
 	/**
+	 * A formatted, non-numeric base price such as "€ 5.00" must be recovered before
+	 * the measure/quantity arithmetic, not throw "string * int". Regression for #720.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_product_base_recovers_formatted_base_before_multiplying() {
+		$product = $this->create_simple_product( array( 'regular_price' => '5' ) );
+		$this->insert_ppom_meta(
+			array( $this->build_text_field( 'engraving', 'Engraving' ) ),
+			$product->get_id()
+		);
+
+		$discount = 0;
+
+		$info = Engine::price_get_product_base(
+			'€ 5.00',
+			$product,
+			array(),
+			1,
+			array(
+				array(
+					'type'             => 'measure',
+					'apply'            => 'addon',
+					'price'            => 0,
+					'quantity'         => 4,
+					'price-multiplier' => 1,
+					'base_price'       => 0,
+				),
+			),
+			$discount,
+			null
+		);
+
+		$this->assertSame( 'measure', $info['source'] );
+		$this->assertEqualsWithDelta( 20.0, (float) $info['price'], 0.0001 );
+	}
+
+	/**
 	 * The ppom_price_info filter can override the computed base price+source pair.
 	 *
 	 * @return void
@@ -561,5 +670,135 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 
 		$this->assertSame( 'filter', $info['source'] );
 		$this->assertEqualsWithDelta( 123.45, (float) $info['price'], 0.0001 );
+	}
+
+	/**
+	 * A ppom_price_info filter returning a formatted price string must not reach the
+	 * callers as a string. Regression for #720.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_product_base_normalizes_filtered_price() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$this->insert_ppom_meta(
+			array( $this->build_text_field( 'engraving', 'Engraving' ) ),
+			$product->get_id()
+		);
+
+		$discount = 0;
+
+		$filter = static function () {
+			return array(
+				'price'  => '€ 7.50',
+				'source' => 'filter',
+			);
+		};
+		add_filter( 'ppom_price_info', $filter );
+
+		try {
+			$info = Engine::price_get_product_base( 10.0, $product, array(), 1, array(), $discount, null );
+		} finally {
+			remove_filter( 'ppom_price_info', $filter );
+		}
+
+		$this->assertSame( 7.5, $info['price'] );
+	}
+
+	/**
+	 * A grouped price in the store's own separators, such as "€ 1,000.50" on a
+	 * dot-decimal store, is recovered in full. Regression for #720.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_product_base_recovers_grouped_formatted_base() {
+		$product = $this->create_simple_product( array( 'regular_price' => '1000.50' ) );
+		$this->insert_ppom_meta(
+			array( $this->build_text_field( 'engraving', 'Engraving' ) ),
+			$product->get_id()
+		);
+
+		$discount = 0;
+		$grouped  = '€ 1' . wc_get_price_thousand_separator() . '000' . wc_get_price_decimal_separator() . '50';
+
+		$info = Engine::price_get_product_base( $grouped, $product, array(), 1, array(), $discount, null );
+
+		$this->assertSame( 1000.5, $info['price'] );
+	}
+
+	/**
+	 * On a zero-decimal store with dot grouping WooCommerce formats one thousand as
+	 * "1.000". wc_format_decimal() alone reads that as 1.0, so grouping must be stripped
+	 * first, while canonical numeric strings stay untouched. Regression for #720.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_product_base_recovers_zero_decimal_grouped_base() {
+		$product = $this->create_simple_product( array( 'regular_price' => '1000' ) );
+		$this->insert_ppom_meta(
+			array( $this->build_text_field( 'engraving', 'Engraving' ) ),
+			$product->get_id()
+		);
+
+		$discount  = 0;
+		$decimal   = static function () {
+			return ',';
+		};
+		$thousands = static function () {
+			return '.';
+		};
+		$decimals  = static function () {
+			return 0;
+		};
+		add_filter( 'wc_get_price_decimal_separator', $decimal );
+		add_filter( 'wc_get_price_thousand_separator', $thousands );
+		add_filter( 'wc_get_price_decimals', $decimals );
+
+		try {
+			$grouped   = Engine::price_get_product_base( '$1.000', $product, array(), 1, array(), $discount, null );
+			$canonical = Engine::price_get_product_base( '1000.50', $product, array(), 1, array(), $discount, null );
+		} finally {
+			remove_filter( 'wc_get_price_decimal_separator', $decimal );
+			remove_filter( 'wc_get_price_thousand_separator', $thousands );
+			remove_filter( 'wc_get_price_decimals', $decimals );
+		}
+
+		$this->assertSame( 1000.0, $grouped['price'] );
+		$this->assertSame( 1000.5, $canonical['price'] );
+	}
+
+	/**
+	 * On a comma-decimal, dot-grouping store a dot followed by two digits is a decimal
+	 * point, not grouping: "€ 10.00" must stay 10, while "€ 1.000,50" is 1000.5.
+	 * Regression for #720.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_product_base_keeps_dot_decimal_on_comma_decimal_store() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$this->insert_ppom_meta(
+			array( $this->build_text_field( 'engraving', 'Engraving' ) ),
+			$product->get_id()
+		);
+
+		$discount  = 0;
+		$decimal   = static function () {
+			return ',';
+		};
+		$thousands = static function () {
+			return '.';
+		};
+		add_filter( 'wc_get_price_decimal_separator', $decimal );
+		add_filter( 'wc_get_price_thousand_separator', $thousands );
+
+		try {
+			$dot_decimal = Engine::price_get_product_base( '€ 10.00', $product, array(), 1, array(), $discount, null );
+			$grouped     = Engine::price_get_product_base( '€ 1.000,50', $product, array(), 1, array(), $discount, null );
+		} finally {
+			remove_filter( 'wc_get_price_decimal_separator', $decimal );
+			remove_filter( 'wc_get_price_thousand_separator', $thousands );
+		}
+
+		$this->assertSame( 10.0, $dot_decimal['price'] );
+		$this->assertSame( 1000.5, $grouped['price'] );
 	}
 }
