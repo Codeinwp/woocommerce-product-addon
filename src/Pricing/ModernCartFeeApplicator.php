@@ -43,7 +43,8 @@ final class ModernCartFeeApplicator {
 				if ( $matrix_found['discount'] == 'both' ) {
 					$total_addon_price    = ppom_price_get_addon_total( $ppom_field_prices );
 					$total_cart_fee_price = ppom_price_get_cart_fee_total( $ppom_field_prices );
-					$price_tobe_discount  = ( $cart_item_price * $quantity ) + $total_cart_fee_price;
+					// Fee rows are store currency; the line price is what WooCommerce shows, so convert the fees once (#755).
+					$price_tobe_discount  = ( $cart_item_price * $quantity ) + apply_filters( 'ppom_option_price', $total_cart_fee_price );
 				}
 
 				if ( ! empty( $matrix_found['percent'] ) ) {
@@ -65,7 +66,7 @@ final class ModernCartFeeApplicator {
 
 				$label        = $fee['label'];
 				$option_label = isset( $fee['option_label'] ) ? $fee['option_label'] : '';
-				$fee_price    = apply_filters( 'ppom_option_price', $fee['price'] );
+				$fee_price    = \PPOM\Support\Helpers::convert_fee_price( $fee['price'] );
 				$taxable      = $fee['taxable'];
 
 				$label = "{$fee_no}-{$label} ({$option_label})";

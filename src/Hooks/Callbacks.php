@@ -1164,7 +1164,8 @@ final class Callbacks {
 				break;
 
 			case 'checkbox':
-				$new_option[ $option_key ]['discount']     = isset( $option['discount'] ) ? apply_filters( 'ppom_option_price', $option['discount'] ) : '';
+				// Raw store amount; the checkbox template applies ppom_option_price once (#755).
+				$new_option[ $option_key ]['discount']     = isset( $option['discount'] ) ? $option['discount'] : '';
 				$new_option[ $option_key ]['raw_discount'] = isset( $option['discount'] ) ? $option['discount'] : '';
 				$new_option[ $option_key ]['tooltip']      = isset( $option['tooltip'] ) ? $option['tooltip'] : '';
 				break;

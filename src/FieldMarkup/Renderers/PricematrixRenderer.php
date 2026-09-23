@@ -86,7 +86,7 @@ final class PricematrixRenderer extends AbstractInputRenderer {
 
 		$html .= '</div>';
 
-		$ranges_json = wp_json_encode( $ranges );
+		$ranges_json = wp_json_encode( \PPOM\Support\Helpers::convert_ranges_for_client( $ranges ) );
 		$ranges_json = false === $ranges_json ? '' : $ranges_json;
 		$html       .= '<input name="ppom[ppom_pricematrix]" data-dataname="' . esc_attr( $id ) . '" data-discount="' . esc_attr( $discount ) . '" class="active ppom_pricematrix ppom-input" type="hidden" value="' . esc_attr( $ranges_json ) . '" />';
 

@@ -1349,7 +1349,7 @@ final class Helpers {
 
 				$ppom_new_option[ $the_option ] = array(
 					'label'       => $option_label,
-					'price'       => apply_filters( 'ppom_option_price', $option_price ),
+					'price'       => $option_price, // Raw store amount; each consumer applies ppom_option_price once (#755).
 					'raw_price'   => $option_raw_price,
 					'raw'         => $the_option,
 					'without_tax' => $option_price_without_tax,
@@ -1401,6 +1401,46 @@ final class Helpers {
 
 
 	// Generating option label with price
+	/**
+	 * Price matrix ranges for the client payload: `price` converted once for the
+	 * product-page total, `raw_price` untouched for server-side cart pricing (#755).
+	 *
+	 * @param array<string, array<string, mixed>> $ranges Normalized ranges from convert_options_to_key_val().
+	 * @return array<string, array<string, mixed>>
+	 */
+	public static function convert_ranges_for_client( $ranges ) {
+		foreach ( (array) $ranges as $key => $range ) {
+			if ( isset( $range['price'] ) ) {
+				$ranges[ $key ]['price'] = apply_filters( 'ppom_option_price', $range['price'] );
+			}
+		}
+		return $ranges;
+	}
+
+	/**
+	 * Whether CURCY's own PPOM integration is loaded. It hooks ppom_option_price and
+	 * ppom_cart_fixed_fee itself, so PPOM's CURCY conversion must step aside (#755).
+	 *
+	 * @return bool
+	 */
+	public static function curcy_integration_active() {
+		return (bool) apply_filters( 'ppom_curcy_integration_active', class_exists( 'WOOMULTI_CURRENCY_F_Plugin_Woocommerce_Product_Addon' ) );
+	}
+
+	/**
+	 * Converts a one-time fee for the cart. CURCY converts fixed fees itself on
+	 * ppom_cart_fixed_fee, which runs after this, so it gets the store amount (#755).
+	 *
+	 * @param float|string $price Fee amount in store currency.
+	 * @return float|string
+	 */
+	public static function convert_fee_price( $price ) {
+		if ( self::curcy_integration_active() ) {
+			return $price;
+		}
+		return apply_filters( 'ppom_option_price', $price );
+	}
+
 	public static function generate_option_label( $option, $price, $meta ) {
 
 		$meta_type = isset( $meta['type'] ) ? $meta['type'] : '';
@@ -1964,7 +2004,33 @@ final class Helpers {
 	// Getting field option price
 	public static function get_field_option_price( $field_meta, $option_label ) {
 
-		// var_dump($field_meta['options']);
+		// For currency switcher
+		$option_price = apply_filters( 'ppom_option_price', self::get_field_option_stored_price( $field_meta, $option_label ) );
+
+		return apply_filters( 'ppom_field_option_price', wc_format_decimal( $option_price ), $field_meta, $option_label );
+	}
+
+	/**
+	 * Option price in store currency for server-side cart math: the stored amount with
+	 * field-level adjustments (ppom_field_option_price), without currency conversion (#755).
+	 *
+	 * @param mixed $field_meta   Field settings.
+	 * @param mixed $option_label Selected option label.
+	 * @return mixed
+	 */
+	public static function get_field_option_raw_price( $field_meta, $option_label ) {
+		return apply_filters( 'ppom_field_option_price', wc_format_decimal( self::get_field_option_stored_price( $field_meta, $option_label ) ), $field_meta, $option_label );
+	}
+
+	/**
+	 * Option price exactly as saved in the field settings.
+	 *
+	 * @param mixed $field_meta   Field settings.
+	 * @param mixed $option_label Selected option label.
+	 * @return mixed
+	 */
+	private static function get_field_option_stored_price( $field_meta, $option_label ) {
+
 		if ( ! isset( $field_meta['options'] ) || $field_meta['type'] == 'bulkquantity' || $field_meta['type'] == 'cropper' ) {
 			return 0;
 		}
@@ -1978,10 +2044,7 @@ final class Helpers {
 			}
 		}
 
-		// For currency switcher
-		$option_price = apply_filters( 'ppom_option_price', $option_price );
-
-		return apply_filters( 'ppom_field_option_price', wc_format_decimal( $option_price ), $field_meta, $option_label );
+		return $option_price;
 	}
 
 	// Getting field option price by ID
@@ -2404,7 +2467,7 @@ final class Helpers {
 
 			if ( is_array( $value ) ) {
 				foreach ( $value as $cb_value ) {
-					$price = self::get_field_option_price( $field_meta, $cb_value );
+					$price = self::get_field_option_raw_price( $field_meta, $cb_value );
 					if ( 0 != $price ) {
 						$option_prices[] = array(
 							'apply'     => $apply,
@@ -2414,7 +2477,7 @@ final class Helpers {
 					}
 				}
 			} else {
-				$price = self::get_field_option_price( $field_meta, $value );
+				$price = self::get_field_option_raw_price( $field_meta, $value );
 				if ( 0 != $price ) {
 					$option_prices[] = array(
 						'apply'     => $apply,

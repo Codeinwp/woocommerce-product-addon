@@ -13,7 +13,6 @@
 
 namespace PPOM\Pricing;
 
-use PPOM\Hooks\Callbacks;
 use PPOM\Support\Helpers;
 
 /**
@@ -80,7 +79,8 @@ final class Engine {
 		$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
 		$total_cart_fee_price = self::price_get_cart_fee_total( $ppom_field_prices );
 
-		$base_price    = $wc_product->get_price();
+		// Price in store currency: WooCommerce applies read filters (currency switchers) afterwards (#755).
+		$base_price    = $wc_product->get_price( 'edit' );
 		$product_price = apply_filters( 'ppom_product_price_on_cart', $base_price, $cart_item );
 
 		// return array with: price, source
@@ -150,7 +150,8 @@ final class Engine {
 			$wc_product = $cart_item['data'];
 			$state      = self::$line_price_state[ $cart_item_key ];
 
-			if ( ! self::prices_match( (float) $wc_product->get_price(), $state['written'] ) ) {
+			// 'edit' reads what set_price() stored, before a currency switcher converts it (#755).
+			if ( ! self::prices_match( (float) $wc_product->get_price( 'edit' ), $state['written'] ) ) {
 				continue;
 			}
 
@@ -192,13 +193,13 @@ final class Engine {
 			// Early pass restores the line's base price; use current value as base.
 			// If it did not run, infer base to avoid double-counting on repeats.
 			$pristine      = wc_get_product( $variation_id ? $variation_id : $product_id );
-			$catalog_price = $pristine ? $pristine->get_price() : $wc_product->get_price();
+			$catalog_price = $pristine ? $pristine->get_price( 'edit' ) : $wc_product->get_price( 'edit' );
 
 			if ( isset( self::$line_base_restored[ $cart_item_key ] ) ) {
 				unset( self::$line_base_restored[ $cart_item_key ] );
-				$base_price = (float) $wc_product->get_price();
+				$base_price = (float) $wc_product->get_price( 'edit' );
 			} else {
-				$base_price = self::resolve_line_base_price( $cart_item_key, $wc_product->get_price(), $catalog_price );
+				$base_price = self::resolve_line_base_price( $cart_item_key, $wc_product->get_price( 'edit' ), $catalog_price );
 			}
 
 			// Recorded pre-filter, so restoring it never applies the filter twice.
@@ -966,9 +967,9 @@ final class Engine {
 		$option_label = isset( $option['raw'] ) ? $option['raw'] : '';
 		$without_tax  = isset( $option['without_tax'] ) ? $option['without_tax'] : '';
 
-		$field_price = apply_filters( 'ppom_option_price', $field_price );
-
-		$label_price = "{$field_title} - " . wc_price( $field_price );
+		// Charge rows stay in store currency: the switcher converts the cart line on read
+		// and Pro's WPML pass converts these rows itself. Only the label is display (#755).
+		$label_price = "{$field_title} - " . wc_price( apply_filters( 'ppom_option_price', $field_price ) );
 		// For bulkquantity
 		$base_price = isset( $option['Base Price'] ) ? $option['Base Price'] : '';
 		$option_id  = isset( $option['option_id'] ) ? $option['option_id'] : '';
@@ -1272,9 +1273,9 @@ final class Engine {
 		$ppom_pricematrix = null
 	) {
 
-		// converting back to org price if Currency Switcher is used
 		// Filters may return a formatted string like "€ 10.00"; arithmetic on it throws on PHP 8 (#720).
-		$base_price = Callbacks::convert_price_back( self::normalize_price_value( $product_price ) );
+		// Callers pass the stored (store currency) price, so no switcher back-conversion here (#755).
+		$base_price = self::normalize_price_value( $product_price );
 		// $base_price  = $product->get_price();
 		// $base_price = floatval($base_price);
 		// $base_price  = $product->get_price();
@@ -1515,7 +1516,8 @@ final class Engine {
 				if ( $matrix_found['discount'] == 'both' ) {
 					$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
 					$total_cart_fee_price = self::price_get_cart_fee_total( $ppom_field_prices );
-					$price_tobe_discount  = ( $cart_item_price * $quantity ) + $total_cart_fee_price;
+					// Fee rows are store currency; the line price is what WooCommerce shows, so convert the fees once (#755).
+					$price_tobe_discount  = ( $cart_item_price * $quantity ) + apply_filters( 'ppom_option_price', $total_cart_fee_price );
 				}
 
 				// var_dump($price_tobe_discount);
@@ -1549,7 +1551,7 @@ final class Engine {
 
 				$label        = $fee['label'];
 				$option_label = isset( $fee['option_label'] ) ? $fee['option_label'] : '';
-				$fee_price    = apply_filters( 'ppom_option_price', $fee['price'] );
+				$fee_price    = Helpers::convert_fee_price( $fee['price'] );
 				$taxable      = $fee['taxable']; // deprecated soon
 
 				$label = "{$label}";
@@ -1853,7 +1855,8 @@ final class Engine {
 
 		// Wholesale price
 		if ( isset( $cart_content['data']->wwp_data['wholesale_priced'] ) && $cart_content['data']->wwp_data['wholesale_priced'] == 'yes' ) {
-			$product_price = $cart_content['data']->get_price();
+			// The wholesale price is set on the line; read it before switcher read filters (#755).
+			$product_price = $cart_content['data']->get_price( 'edit' );
 		}
 
 		return $product_price;

@@ -407,8 +407,8 @@ final class CartHandler {
 			unset( $values ['ppom'] ['fields']['id'] );
 		}
 
-		// converting back to org price if Currency Switcher is used
-		$ppom_item_org_price = Callbacks::convert_price_back( $wc_product->get_price() );
+		// Stored price in store currency; switcher read filters apply to the line afterwards (#755).
+		$ppom_item_org_price = $wc_product->get_price( 'edit' );
 		// $ppom_item_org_price = $wc_product->get_price();
 
 		$ppom_item_order_qty = floatval( $cart_items['quantity'] );
@@ -585,7 +585,7 @@ final class CartHandler {
 					}
 
 					if ( null !== $resolved ) {
-						$fee_price        = apply_filters( 'ppom_option_price', $resolved );
+						$fee_price        = Helpers::convert_fee_price( $resolved );
 						$resolved_taxable = self::resolved_onetime_taxable( $fee, $attached_ids );
 
 						if ( null !== $resolved_taxable ) {
