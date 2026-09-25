@@ -1688,8 +1688,7 @@ final class Engine {
 	public static function parse_price_matrix( $ppom_pricematrix, $product, $product_quantity, $base_price, $addon_price, $cart_fee ) {
 
 		$matrix_discount = 0.0;
-		// null means the matrix supplied no base price at all. A configured 0 is
-		// a real price and must reach the caller intact.
+		// null: the matrix supplied no base price.
 		$matrix_price    = null;
 		$matrix_found    = Helpers::extract_matrix_by_quantity( $ppom_pricematrix, $product, $product_quantity );
 		$has_row_price   = isset( $matrix_found['raw_price'] ) && '' !== trim( (string) $matrix_found['raw_price'] );

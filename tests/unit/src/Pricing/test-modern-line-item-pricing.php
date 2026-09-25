@@ -10,6 +10,7 @@
 
 require_once dirname( __DIR__, 2 ) . '/class-ppom-test-case.php';
 
+use PPOM\Pricing\Engine;
 use PPOM\Pricing\ModernLineItemPricing;
 
 /**
@@ -213,7 +214,7 @@ class Test_Pricing_ModernLineItemPricing extends PPOM_Test_Case {
 
 	/**
 	 * A discount matrix supplies no base price of its own, so the catalog price
-	 * must survive. This is what the old `> 0` check was really protecting.
+	 * must survive.
 	 *
 	 * @return void
 	 */
@@ -258,18 +259,84 @@ class Test_Pricing_ModernLineItemPricing extends PPOM_Test_Case {
 	}
 
 	/**
+	 * A fixed matrix row left blank is not a total to split across the quantity.
+	 * The catalog price stands.
+	 *
+	 * @return void
+	 */
+	public function test_blank_fixed_matrix_row_price_leaves_catalog_base_price_intact() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+
+		$matrix_field = $this->build_price_matrix_field(
+			'matrix_blank_fixed',
+			array( array( 'option' => '1-10', 'price' => '', 'isfixed' => 'on' ) )
+		);
+		$this->insert_ppom_meta( array( $matrix_field ), $product->get_id() );
+
+		$item                               = $this->build_cart_item( $product, array(), 2 );
+		$item['ppom']['price_matrix_found'] = $matrix_field;
+
+		ModernLineItemPricing::apply_to_cart_item( $item, $item );
+
+		$this->assertEqualsWithDelta( 10.0, (float) $product->get_price(), 0.0001 );
+	}
+
+	/**
+	 * A discount matrix returns no matrix base price, so callers keep the catalog price.
+	 *
+	 * @return void
+	 */
+	public function test_discount_matrix_returns_null_matrix_price() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+
+		$matrix_field = $this->build_price_matrix_field(
+			'matrix_pct',
+			array( array( 'option' => '1-10', 'price' => '10%' ) ),
+			array( 'discount' => 'on', 'discount_type' => 'base' )
+		);
+		$this->insert_ppom_meta( array( $matrix_field ), $product->get_id() );
+
+		$parsed = Engine::parse_price_matrix( $matrix_field, $product, 1, 10.0, 0, 0 );
+		$found  = Engine::price_is_matrix_found( $product, 1, 10.0, 0, 0 );
+
+		$this->assertNull( $parsed['matrix_price'] );
+		$this->assertNull( $found['matrix_price'] );
+	}
+
+	/**
+	 * A blank matrix row returns the base price, not an empty string.
+	 *
+	 * @return void
+	 */
+	public function test_blank_matrix_row_returns_base_price() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+
+		$matrix_field = $this->build_price_matrix_field(
+			'matrix_blank',
+			array( array( 'option' => '1-10', 'price' => '' ) )
+		);
+		$this->insert_ppom_meta( array( $matrix_field ), $product->get_id() );
+
+		$parsed = Engine::parse_price_matrix( $matrix_field, $product, 1, 10.0, 0, 0 );
+		$found  = Engine::price_is_matrix_found( $product, 1, 10.0, 0, 0 );
+
+		$this->assertSame( 10.0, $parsed['matrix_price'] );
+		$this->assertSame( 10.0, $found['matrix_price'] );
+	}
+
+	/**
 	 * Restores a cart item through the real session filter chain, with a
 	 * shopper-supplied `price_matrix_found` payload attached.
 	 *
 	 * `CartHandler::add_cart_item_data()` stores the whole posted `ppom` array,
 	 * so anything a shopper posts under that key reaches the pricing pipeline.
 	 *
-	 * @param WC_Product $product  Product.
-	 * @param array      $injected Injected matrix payload.
+	 * @param WC_Product           $product  Product.
+	 * @param array<string, mixed> $injected Injected matrix payload.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
-	private function restore_with_injected_matrix( $product, array $injected ) {
+	private function restore_with_injected_matrix( WC_Product $product, array $injected ): array {
 		$cart_item = array(
 			'data'         => $product,
 			'product_id'   => $product->get_id(),
@@ -309,7 +376,7 @@ class Test_Pricing_ModernLineItemPricing extends PPOM_Test_Case {
 	}
 
 	/**
-	 * The same holds for a small positive row, which the old `> 0` check let through.
+	 * A small positive row is rejected the same way.
 	 *
 	 * @return void
 	 */
