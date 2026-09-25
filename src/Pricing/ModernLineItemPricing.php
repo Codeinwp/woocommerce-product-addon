@@ -35,7 +35,7 @@ final class ModernLineItemPricing {
 		$product_quantity  = floatval( $cart_item['quantity'] );
 		$ppom_field_prices = ppom_get_field_prices( $ppom_fields_post, $product_id, $product_quantity, $variation_id, $cart_item );
 		$ppom_discount     = 0;
-		$ppom_pricematrix  = isset( $cart_item['ppom']['price_matrix_found'] ) ? $cart_item['ppom']['price_matrix_found'] : null;
+		$ppom_pricematrix  = Engine::resolve_price_matrix_field( $cart_item );
 
 		$total_addon_price    = ppom_price_get_addon_total( $ppom_field_prices );
 		$total_cart_fee_price = ppom_price_get_cart_fee_total( $ppom_field_prices );
