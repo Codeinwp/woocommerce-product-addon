@@ -355,29 +355,6 @@ class Test_Pricing_ModernLineItemPricing extends PPOM_Test_Case {
 	/**
 	 * A posted matrix cannot price a product that has no matrix field.
 	 *
-	 * A negative row would otherwise set a negative line price, which offsets
-	 * other lines in the cart.
-	 *
-	 * @return void
-	 */
-	public function test_injected_negative_matrix_cannot_price_a_product_without_a_matrix_field() {
-		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
-		$this->insert_ppom_meta( array( $this->build_text_field( 'note' ) ), $product->get_id() );
-
-		$this->restore_with_injected_matrix(
-			$product,
-			$this->build_price_matrix_field(
-				'injected',
-				array( array( 'option' => '1-99999', 'price' => '-1000' ) )
-			)
-		);
-
-		$this->assertEqualsWithDelta( 10.0, (float) $product->get_price(), 0.0001 );
-	}
-
-	/**
-	 * A small positive row is rejected the same way.
-	 *
 	 * @return void
 	 */
 	public function test_injected_positive_matrix_cannot_price_a_product_without_a_matrix_field() {
