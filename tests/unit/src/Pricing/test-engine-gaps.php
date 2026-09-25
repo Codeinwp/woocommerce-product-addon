@@ -805,40 +805,27 @@ class Test_Pricing_Engine_Gaps extends PPOM_Test_Case {
 	/**
 	 * The field modal saves `isfixed => ''` on every matrix row that is not
 	 * ticked as fixed. Such a row is a per-unit price: 7 units at 1.80 cost
-	 * 1.80 each, not 1.80 for the whole line.
+	 * 1.80 each, not 1.80 for the whole line. Only a row ticked as fixed
+	 * (`isfixed => 'on'`) prices the whole range, so its per-unit price is the
+	 * row price divided by the quantity.
 	 *
 	 * @return void
 	 */
-	public function test_parse_price_matrix_treats_empty_isfixed_as_per_unit_price() {
+	public function test_parse_price_matrix_divides_only_rows_ticked_as_fixed() {
 		$product = $this->create_simple_product();
 		$field   = $this->build_price_matrix_field(
 			'matrix_a',
 			array(
 				array( 'option' => '1-1', 'price' => '2.02', 'isfixed' => '' ),
 				array( 'option' => '2-9', 'price' => '1.80', 'isfixed' => '' ),
+				array( 'option' => '10-20', 'price' => '30', 'isfixed' => 'on' ),
 			)
 		);
 
-		$matrix = Engine::parse_price_matrix( $field, $product, 7, 0.24, 0.0, 0.0 );
+		$unticked = Engine::parse_price_matrix( $field, $product, 7, 0.24, 0.0, 0.0 );
+		$ticked   = Engine::parse_price_matrix( $field, $product, 10, 0.24, 0.0, 0.0 );
 
-		$this->assertEqualsWithDelta( 1.80, (float) $matrix['matrix_price'], 0.0001 );
-	}
-
-	/**
-	 * A row ticked as fixed (`isfixed => 'on'`) prices the whole range, so the
-	 * per-unit price is the row price divided by the quantity.
-	 *
-	 * @return void
-	 */
-	public function test_parse_price_matrix_divides_fixed_row_price_by_quantity() {
-		$product = $this->create_simple_product();
-		$field   = $this->build_price_matrix_field(
-			'matrix_a',
-			array( array( 'option' => '2-9', 'price' => '14', 'isfixed' => 'on' ) )
-		);
-
-		$matrix = Engine::parse_price_matrix( $field, $product, 7, 0.24, 0.0, 0.0 );
-
-		$this->assertEqualsWithDelta( 2.0, (float) $matrix['matrix_price'], 0.0001 );
+		$this->assertEqualsWithDelta( 1.80, (float) $unticked['matrix_price'], 0.0001 );
+		$this->assertEqualsWithDelta( 3.0, (float) $ticked['matrix_price'], 0.0001 );
 	}
 }
