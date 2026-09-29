@@ -288,10 +288,24 @@ final class Manager {
 			$ppom_meta_selected = array();
 		}
 
-		$ppom_meta_selected = array_map( 'intval', $ppom_meta_selected );
+		self::set_product_field_groups( $post_id, $ppom_meta_selected );
+	}
 
-		// ppom_pa($ppom_meta_selected); exit;
-		update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $ppom_meta_selected );
+	/**
+	 * Stores the PPOM field group IDs attached to a product.
+	 *
+	 * Shared by {@see self::process_product_meta()} and the Abilities API layer.
+	 *
+	 * @param int               $post_id  Product ID receiving the PPOM assignment.
+	 * @param array<int|string> $meta_ids Field group IDs.
+	 *
+	 * @return void
+	 */
+	public static function set_product_field_groups( $post_id, array $meta_ids ) {
+
+		$meta_ids = array_map( 'intval', $meta_ids );
+
+		update_post_meta( $post_id, PPOM_PRODUCT_META_KEY, $meta_ids );
 
 		do_action( 'ppom_proccess_meta', $post_id );
 	}
@@ -459,14 +473,14 @@ final class Manager {
 	 * `the_meta` so each field row carries the new ppom_id. When a product ID
 	 * is supplied, the new group is attached to that product.
 	 *
-	 * Shared by {@see self::save_form_meta()} and {@see self::import_template()}.
+	 * Shared by {@see self::save_form_meta()}, {@see self::import_template()} and the Abilities API layer.
 	 *
 	 * @param array<int, array<string, mixed>> $fields     Untouched field schema (filter input, the_meta shape).
 	 * @param array<string, string>            $settings   Group settings: productmeta_name, dynamic_price_display, send_file_attachment, show_cart_thumb, aviary_api_key, productmeta_style, productmeta_js.
 	 * @param int                              $product_id Optional WooCommerce product ID to attach the new group to. 0 to skip.
 	 * @return int New productmeta_id, or 0 on insert failure.
 	 */
-	private static function create_group_from_fields( array $fields, array $settings, $product_id = 0 ) {
+	public static function create_group_from_fields( array $fields, array $settings, $product_id = 0 ) {
 
 		$product_meta      = apply_filters( 'ppom_meta_data_saving', $fields, '' );
 		$product_meta      = Validator::sanitize_array_data( $product_meta );
@@ -728,18 +742,6 @@ final class Manager {
 		} elseif ( isset( $_REQUEST['ppom'] ) && is_array( $_REQUEST['ppom'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized recursively below after Pro-disabled rows are preserved.
 			$ppom_meta = $_REQUEST['ppom']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized recursively below after Pro-disabled rows are preserved.
 		}
-		$ppom_meta    = self::preserve_unavailable_field_rows( (array) $ppom_meta, (int) $productmeta_id );
-		$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );
-		$product_meta = Validator::sanitize_array_data( $product_meta );
-		// Remove the meta row if the type or data_name is empty.
-		$product_meta = array_filter(
-			$product_meta,
-			function ( $pm ) {
-				return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] );
-			}
-		);
-		$product_meta = json_encode( $product_meta );
-
 		$productmeta_name     = isset( $_REQUEST['productmeta_name'] ) ? sanitize_text_field( $_REQUEST['productmeta_name'] ) : '';
 		$dynamic_price_hide   = isset( $_REQUEST['dynamic_price_hide'] ) ? sanitize_text_field( $_REQUEST['dynamic_price_hide'] ) : '';
 		$send_file_attachment = isset( $_REQUEST['send_file_attachment'] ) ? sanitize_text_field( $_REQUEST['send_file_attachment'] ) : '';
@@ -757,43 +759,17 @@ final class Manager {
 			wp_send_json( $resp );
 		}
 
-		$ppom_settings_meta_data = array(
+		$settings = array(
 			'productmeta_name'      => $productmeta_name,
 			'dynamic_price_display' => $dynamic_price_hide,
 			'send_file_attachment'  => $send_file_attachment,
 			'show_cart_thumb'       => $show_cart_thumb,
-			'aviary_api_key'        => trim( $aviary_api_key ),
-			'the_meta'              => $product_meta,
-		);
-		if ( ! Helpers::is_legacy_user() ) {
-			$ppom_settings_meta_data['productmeta_style'] = $productmeta_style;
-			$ppom_settings_meta_data['productmeta_js']    = $productmeta_js;
-		}
-
-		$dt = apply_filters( 'ppom_settings_meta_data_update', $ppom_settings_meta_data, $productmeta_id );
-
-		// wp_send_json($dt);
-
-		$where = array(
-			'productmeta_id' => $productmeta_id,
+			'aviary_api_key'        => $aviary_api_key,
+			'productmeta_style'     => $productmeta_style,
+			'productmeta_js'        => $productmeta_js,
 		);
 
-		$format       = array(
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-		);
-		$where_format = array(
-			'%d',
-		);
-
-		$rows_effected = MetaRepositoryAccessor::instance()->update_group( (int) $productmeta_id, $dt, $format, $where, $where_format );
+		$rows_effected = self::update_group_from_fields( (int) $productmeta_id, (array) $ppom_meta, $settings );
 
 		// $wpdb->show_errors(); $wpdb->print_error();
 
@@ -830,6 +806,72 @@ final class Manager {
 		}
 
 		wp_send_json( $resp );
+	}
+
+	/**
+	 * Persists an existing PPOM field group from a normalized payload.
+	 *
+	 * Preserves unavailable Pro rows, runs the `ppom_meta_data_saving` and
+	 * `ppom_settings_meta_data_update` filters, sanitizes via
+	 * {@see Validator::sanitize_array_data()} and updates the row via
+	 * {@see MetaRepositoryAccessor::update_group()}.
+	 *
+	 * Shared by {@see self::update_form_meta()} and the Abilities API layer.
+	 *
+	 * @param int                      $productmeta_id Field-group ID.
+	 * @param array<int|string, mixed> $ppom_meta      Untouched field schema (the_meta shape).
+	 * @param array<string, string>    $settings       Group settings: productmeta_name, dynamic_price_display, send_file_attachment, show_cart_thumb, aviary_api_key, productmeta_style, productmeta_js.
+	 * @return int|false Rows affected, or false on failure.
+	 */
+	public static function update_group_from_fields( $productmeta_id, array $ppom_meta, array $settings ) {
+
+		$ppom_meta    = self::preserve_unavailable_field_rows( $ppom_meta, (int) $productmeta_id );
+		$product_meta = apply_filters( 'ppom_meta_data_saving', (array) $ppom_meta, $productmeta_id );
+		$product_meta = Validator::sanitize_array_data( $product_meta );
+		// Remove the meta row if the type or data_name is empty.
+		$product_meta = array_filter(
+			$product_meta,
+			function ( $pm ) {
+				return ! empty( $pm['type'] ) || ! empty( $pm['data_name'] );
+			}
+		);
+		$product_meta = json_encode( $product_meta );
+
+		$ppom_settings_meta_data = array(
+			'productmeta_name'      => isset( $settings['productmeta_name'] ) ? (string) $settings['productmeta_name'] : '',
+			'dynamic_price_display' => isset( $settings['dynamic_price_display'] ) ? (string) $settings['dynamic_price_display'] : '',
+			'send_file_attachment'  => isset( $settings['send_file_attachment'] ) ? (string) $settings['send_file_attachment'] : '',
+			'show_cart_thumb'       => isset( $settings['show_cart_thumb'] ) ? (string) $settings['show_cart_thumb'] : '',
+			'aviary_api_key'        => trim( isset( $settings['aviary_api_key'] ) ? (string) $settings['aviary_api_key'] : '' ),
+			'the_meta'              => $product_meta,
+		);
+		if ( ! Helpers::is_legacy_user() ) {
+			$ppom_settings_meta_data['productmeta_style'] = isset( $settings['productmeta_style'] ) ? (string) $settings['productmeta_style'] : '';
+			$ppom_settings_meta_data['productmeta_js']    = isset( $settings['productmeta_js'] ) ? (string) $settings['productmeta_js'] : '';
+		}
+
+		$dt = apply_filters( 'ppom_settings_meta_data_update', $ppom_settings_meta_data, $productmeta_id );
+
+		$where = array(
+			'productmeta_id' => $productmeta_id,
+		);
+
+		$format       = array(
+			'%s',
+			'%s',
+			'%s',
+			'%s',
+			'%s',
+			'%s',
+			'%s',
+			'%s',
+			'%s',
+		);
+		$where_format = array(
+			'%d',
+		);
+
+		return MetaRepositoryAccessor::instance()->update_group( (int) $productmeta_id, $dt, $format, $where, $where_format );
 	}
 
 	/**

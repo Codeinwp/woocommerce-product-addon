@@ -43,6 +43,7 @@ final class BootstrapKernel {
 
 		( new RestBootstrap() )->register();
 		( new \PPOM\Admin\FieldModal\FieldModalRegistrar() )->register();
+		( new \PPOM\Abilities\Abilities() )->register();
 
 		$plugin->get_registry()->set( 'field_group.repository', FieldGroupRepository::instance() );
 
