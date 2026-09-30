@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: product addons, woocommerce product addons, woocommerce product options, custom fields, variable products
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 34.0.9
+Stable tag: 34.0.10
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -259,13 +259,23 @@ Please follow the reporting protocols outlined on our [Security Page](https://th
 
 == Changelog ==
 
-##### [Version 34.0.9](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.8...v34.0.9) (2026-09-07)
+##### [Version 34.0.10](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.9...v34.0.10) (2026-09-30)
 
-- Fixed the file upload button not working when a file or image field had no allowed file types configured.
-- Fixed intermittent file upload failures on cached product pages and pages left open for a long time.
-- Fixed Collapse fields that broke product page layouts.
-- Fixed cart prices being reset by third-party pricing plugins.
+- Fixed date pickers allowing dates before a configured future minimum date.
+- Fixed active product options missing from the cart when an earlier group is disabled.
+- Fixed cart subtotals for products with multiple fixed-fee options.
+- Fixed paired option labels that incorrectly showed Image ID.
+- Fixed Bulk Quantity fields when PPOM shortcode forms use a selected product.
+- Fixed legacy conditions so matching fields appear on product pages.
+- Fixed Bulk Quantity prices for incomplete quantity ranges.
+- Fixed file upload accessibility labels and button text contrast.
+- Fixed file uploads failing on cached product pages.
+- Fixed legacy file and cropper uploads to show accepted formats and maximum size.
+- Fixed conditional fields appearing before their rules matched in legacy input rendering.
+- Fixed optional product quantities starting at one when zero is allowed.
+- Fixed cart totals for products with formatted or invalid base prices.
 - Updated dependencies
+- Added AI agent support: let AI assistants read and change your PPOM field groups and settings.
 
 
 
