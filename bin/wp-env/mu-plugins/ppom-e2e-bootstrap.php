@@ -1547,6 +1547,7 @@ function ppom_e2e_settable_settings() {
 		'ppom_price_table_v2',
 		'ppom_enable_legacy_inputs_rendering',
 		'ppom_legacy_price',
+		'ppom_disable_bootstrap',
 	);
 }
 

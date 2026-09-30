@@ -114,6 +114,44 @@ class Test_File_Upload extends WP_UnitTestCase {
         unlink( $dir . $file_name );
     }
 
+    /**
+     * The "view large" modal is only hidden by Bootstrap CSS. Without that CSS it renders
+     * as a stray full-size image at the bottom of the page, so it must not be emitted unless
+     * the popup is enabled. Regression test for Codeinwp/ppom-pro#696.
+     */
+    public function test_uploaded_file_preview_omits_image_modal_by_default() {
+        $dir = ppom_get_dir_path();
+        wp_mkdir_p( $dir );
+        $file_name = 'pixel.png';
+        file_put_contents( $dir . $file_name, base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' ) );
+
+        $html = \PPOM\Files\Handler::uploaded_file_preview( $file_name, array( 'type' => 'cropper', 'data_name' => 'photo' ) );
+
+        $this->assertStringNotContainsString( 'ppom-modals', $html );
+
+        unlink( $dir . $file_name );
+    }
+
+    /**
+     * Sites that opt in via the filter keep the "view large" modal and its trigger button.
+     */
+    public function test_uploaded_file_preview_keeps_image_modal_when_popup_enabled() {
+        $dir = ppom_get_dir_path();
+        wp_mkdir_p( $dir );
+        $file_name = 'pixel.png';
+        file_put_contents( $dir . $file_name, base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' ) );
+        add_filter( 'ppom_show_image_popup', '__return_true' );
+
+        $html = \PPOM\Files\Handler::uploaded_file_preview( $file_name, array( 'type' => 'cropper', 'data_name' => 'photo' ) );
+
+        remove_filter( 'ppom_show_image_popup', '__return_true' );
+
+        $this->assertStringContainsString( 'ppom-modals', $html );
+        $this->assertStringContainsString( 'data-toggle="modal"', $html );
+
+        unlink( $dir . $file_name );
+    }
+
     public function test_ppom_create_chunk_file_output_error() {
         $file_path_to_read = tempnam(sys_get_temp_dir(), 'read');
         $ppom_chunk_file_path = '/invalid/path/chunk';

@@ -775,22 +775,27 @@ final class Handler {
 			$image_url = self::get_dir_url() . $file_name . '?nocache=' . time();
 			$html     .= '<div style="display:none" id="u_i_c_big_' . $file_id . '"><p id="thumb-thickbox"><img src="' . $image_url . '" /></p></div>';
 
-			// Loading Modals
-			$modal_vars = array(
-				'file_id'     => $file_id,
-				'image_full'  => $image_url,
-				'image_title' => $file_name,
-			);
-			ob_start();
-			Helpers::load_template( 'v10/file-modals.php', $modal_vars );
-			$html .= ob_get_clean();
+			// The modal is only hidden by Bootstrap CSS; without it, it renders as a stray
+			// full-size image at the bottom of the page. Emit it only when the popup is enabled.
+			$show_image_popup = apply_filters( 'ppom_show_image_popup', false );
+
+			if ( $show_image_popup ) {
+				$modal_vars = array(
+					'file_id'     => $file_id,
+					'image_full'  => $image_url,
+					'image_title' => $file_name,
+				);
+				ob_start();
+				Helpers::load_template( 'v10/file-modals.php', $modal_vars );
+				$html .= ob_get_clean();
+			}
 
 			// Tools group
 			$file_tools .= '<div class="btn-group" role="group" aria-label="Tools" style="text-align: center; display: block;">';
 			// $file_tools .= '<a href="#" class="nm-file-tools btn btn-primary u_i_c_tools_del" title="'.__('Remove', "woocommerce-product-addon").'"><span class="fa fa-times"></span></a>';
 			$file_tools .= '<button class="nm-file-tools btn btn-primary u_i_c_tools_del" title="' . __( 'Remove', 'woocommerce-product-addon' ) . '">' . __( 'Delete', 'woocommerce-product-addon' ) . '</button>';
 
-			if ( apply_filters( 'ppom_show_image_popup', false ) ) {
+			if ( $show_image_popup ) {
 				$file_tools .= '<a href="#" data-toggle="modal" data-target="#modalFile' . esc_attr( $file_id ) . '" class="btn btn-primary"><span class="fa fa-expand"></span></a>';
 			}
 
