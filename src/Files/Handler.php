@@ -251,23 +251,12 @@ final class Handler {
 			wp_send_json( $response );
 		}
 
-		// multipart_params sends product_id/data_name with every chunk (not just
-		// the last), so the field can — and should — be resolved up front: the
-		// mime allow-list below is shared by every upload-capable field, and
-		// without this, a field left at its default "jpg,pdf,zip" (or a cropper,
-		// which only ever wants images) would accept any type the *broadest*
-		// field on the site allows, like the svg entry that list now carries.
+		// Resolve the field first; its own file types authorize the extension.
 		$product_id = intval( $_REQUEST['product_id'] );
 		$data_name  = sanitize_key( $_REQUEST['data_name'] );
 		$file_meta  = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
 
-		// The upload nonce is public, so the posted product and field are not
-		// necessarily a pair the form could have produced. Keeping a file no
-		// form references only leaves something to clean up later.
-		//
-		// Same wording as the nonce failure above on purpose: saying which
-		// field names exist, and which of them accept uploads, would let the
-		// endpoint be probed to map a product's fields.
+		// Nonce-failure wording on purpose, so field names cannot be probed.
 		if ( ! self::field_accepts_uploads( $file_meta ) ) {
 			$response ['status']  = 'error';
 			$response ['message'] = __( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', 'woocommerce-product-addon' );
@@ -355,6 +344,9 @@ final class Handler {
 			$file_path = $file_dir_path . $file_name;
 		}
 
+		// Ends in .bin, so servers send partial uploads as application/octet-stream.
+		$chunk_file_path = $file_dir_path . pathinfo( $file_name, PATHINFO_FILENAME ) . '.part.bin';
+
 		// Remove old temp files
 		if ( is_dir( $file_dir_path ) && ( $dir = opendir( $file_dir_path ) ) ) {
 			while ( ( $file = readdir( $dir ) ) !== false ) {
@@ -362,9 +354,9 @@ final class Handler {
 
 				// Remove temp file if it is older than the max age and is not the current file
 				if (
-				preg_match( '/\.part$/', $file ) &&
+				preg_match( '/\.part(\.bin)?$/', $file ) &&
 				( filemtime( $tmp_file_path ) < time() - $maxFileAge ) &&
-				( $tmp_file_path != "$file_path.part" )
+				( $tmp_file_path != $chunk_file_path )
 				) {
 					@unlink( $tmp_file_path );
 				}
@@ -395,7 +387,6 @@ final class Handler {
 			die( UploadErrors::get_message_response( UploadErrors::MISSING_TEMP_FILE ) );
 		}
 
-		$chunk_file_path            = "$file_path.part";
 		$uploaded_file_path_to_read = $is_multipart ? $temp_file_name : 'php://input';
 
 		$error = self::create_chunk_file( $uploaded_file_path_to_read, $chunk_file_path, $chunk == 0 ? 'wb' : 'ab' );
@@ -411,19 +402,10 @@ final class Handler {
 		// Check if the file has been uploaded completely.
 		if ( ! $chunks || $chunk === $chunks - 1 ) {
 
-			// Give a unique name to prevent name collisions.
-			$file_name        = self::create_unique_file_name( $original_name, $file_ext, $file_dir_path );
-			$unique_file_path = $file_dir_path . $file_name;
-
-			rename( $chunk_file_path, $unique_file_path );
-			$file_path = $unique_file_path;
-
-			// The type check above only compared the declared extension against the
-			// allow-list, because the destination didn't exist yet to sniff — that's
-			// harmless for jpg/pdf/zip, but SVG is markup a browser will execute, so
-			// its actual content has to be checked now that the bytes are on disk.
-			if ( 'svg' === $file_ext && ! self::sanitize_svg_file( $file_path ) ) {
-				@unlink( $file_path );
+			// SVG is executable markup; sanitize it before it gets a public name.
+			$is_svg = 'svg' === $file_ext || 'image/svg+xml' === $file_type['type'];
+			if ( $is_svg && ! self::sanitize_svg_file( $chunk_file_path ) ) {
+				@unlink( $chunk_file_path );
 
 				$response ['status']  = 'error';
 				$response ['message'] = sprintf(
@@ -434,8 +416,13 @@ final class Handler {
 				wp_send_json( $response );
 			}
 
-			// $file_meta was already resolved and validated up front, since the
-			// mime/extension gate above needs it too.
+			// Give a unique name to prevent name collisions.
+			$file_name        = self::create_unique_file_name( $original_name, $file_ext, $file_dir_path );
+			$unique_file_path = $file_dir_path . $file_name;
+
+			rename( $chunk_file_path, $unique_file_path );
+			$file_path = $unique_file_path;
+
 			self::remember_uploaded_file( $file_name );
 
 			// making thumb if images
@@ -481,27 +468,21 @@ final class Handler {
 	}
 
 	/**
-	 * Whether a field's own "File types" setting allows the given extension.
-	 *
-	 * The mime/extension allow-list earlier in upload_file() is shared by every
-	 * upload-capable field on the site, so on its own it would let a field
-	 * accept anything any other field's setting allows — including a cropper
-	 * (images only) or a file field a store owner left at its default
-	 * "jpg,pdf,zip". Each field's own list is the actual authorization.
+	 * Whether the field's own "File types" setting allows the extension.
 	 *
 	 * @param mixed  $file_meta Field definition resolved from the posted data name.
 	 * @param string $extension Extension resolved from the upload request.
 	 *
 	 * @return bool
 	 */
-	private static function field_allows_extension( $file_meta, $extension ) {
+	private static function field_allows_extension( $file_meta, string $extension ): bool {
 
 		$type = is_array( $file_meta ) && isset( $file_meta['type'] ) ? $file_meta['type'] : '';
 
 		$default_types = 'cropper' === $type ? 'jpg,png' : 'jpg,pdf,zip';
 
 		$configured = is_array( $file_meta ) && ! empty( $file_meta['file_types'] )
-			? $file_meta['file_types']
+			? (string) $file_meta['file_types']
 			: $default_types;
 
 		$allowed = array_map( 'strtolower', array_map( 'trim', explode( ',', $configured ) ) );
@@ -510,99 +491,17 @@ final class Handler {
 	}
 
 	/**
-	 * Strips script-capable content from an uploaded SVG, in place.
+	 * Rewrites an uploaded SVG in place, keeping only safe markup.
 	 *
-	 * SVG is XML the browser will execute inline, so — unlike the other types
-	 * this endpoint accepts — its content has to be checked, not just its
-	 * extension. Rejects anything that isn't parseable XML rooted at <svg>;
-	 * otherwise strips <script>/<foreignObject>/event-driven tags, "on*"
-	 * attributes, and javascript: URIs, then rewrites the file.
+	 * @param string $file_path Path to the uploaded SVG.
 	 *
-	 * ponytail: denylist of the well-known SVG XSS vectors via DOMDocument,
-	 * not a full allowlist sanitizer. Swap for enshrined/svg-sanitize if this
-	 * endpoint ever needs to withstand adversarial (not just careless) input.
-	 *
-	 * @param string $file_path Path to the file to sanitize.
-	 *
-	 * @return bool True if the file is safe to keep, false if it was rejected.
+	 * @return bool False when the file is not a usable SVG.
 	 */
-	private static function sanitize_svg_file( $file_path ) {
+	private static function sanitize_svg_file( string $file_path ): bool {
 
-		// The dom extension is bundled by default but is still optional; without
-		// it, `new DOMDocument()` below is a fatal error, not a catchable one.
-		if ( ! class_exists( '\\DOMDocument' ) || ! class_exists( '\\DOMXPath' ) ) {
-			return false;
-		}
+		$clean = SvgSanitizer::clean( (string) file_get_contents( $file_path ) );
 
-		$content = file_get_contents( $file_path );
-		// On PHP 8+, DOMDocument::loadXML('') throws instead of returning false,
-		// so an empty upload has to be rejected before it ever reaches loadXML.
-		if ( empty( $content ) ) {
-			return false;
-		}
-
-		$previous_setting = libxml_use_internal_errors( true );
-		$doc              = new \DOMDocument();
-		// No DTD flags: external entities are not resolved.
-		$loaded = $doc->loadXML( $content, LIBXML_NONET | LIBXML_NOBLANKS );
-		libxml_clear_errors();
-		libxml_use_internal_errors( $previous_setting );
-
-		// A DOCTYPE can declare an internal entity whose expansion never becomes
-		// an inspectable element node without LIBXML_NOENT, so the tag/attribute
-		// removal below never sees it — yet saveXML() below writes the
-		// declaration and reference back unchanged, and a browser rendering the
-		// file expands and runs it. SVGs have no legitimate use for a DOCTYPE;
-		// reject the file outright rather than try to sanitize around one.
-		if ( $loaded && null !== $doc->doctype ) {
-			return false;
-		}
-
-		$root_name = $loaded && $doc->documentElement ? $doc->documentElement->localName : null;
-
-		if ( null === $root_name || 'svg' !== strtolower( $root_name ) ) {
-			return false;
-		}
-
-		// XML tag names are case-sensitive — a real <foreignObject> or
-		// <animateTransform> only matches this exact casing, and a renderer
-		// treating the file as SVG would honor it the same way.
-		$dangerous_tags = array( 'script', 'foreignObject', 'iframe', 'embed', 'object', 'animate', 'animateTransform', 'set' );
-		foreach ( $dangerous_tags as $tag ) {
-			foreach ( iterator_to_array( $doc->getElementsByTagName( $tag ) ) as $node ) {
-				if ( $node->parentNode ) {
-					$node->parentNode->removeChild( $node );
-				}
-			}
-		}
-
-		$elements = ( new \DOMXPath( $doc ) )->query( '//*' );
-		foreach ( $elements ? iterator_to_array( $elements ) : array() as $element ) {
-			// The '//*' xpath only ever matches element nodes, but DOMXPath::query()
-			// is typed to allow namespace nodes too — narrow it before using
-			// element-only members like ->attributes and ->removeAttribute().
-			if ( ! $element instanceof \DOMElement ) {
-				continue;
-			}
-
-			foreach ( iterator_to_array( $element->attributes ) as $attr ) {
-				// A URL's scheme is matched after stripping tab/newline/CR
-				// wherever they occur, not just at the ends — that's how a
-				// browser reads the same value, so java&#x09;script: has to be
-				// normalized the same way before the javascript: check below,
-				// or the literal tab hides the scheme from a naive prefix match.
-				$normalized_value = null !== $attr->nodeValue ? preg_replace( '/[\t\r\n]/', '', $attr->nodeValue ) : null;
-
-				$is_event_handler = 0 === stripos( $attr->nodeName, 'on' );
-				$is_script_uri    = null !== $normalized_value && preg_match( '/^\s*javascript:/i', $normalized_value );
-
-				if ( $is_event_handler || $is_script_uri ) {
-					$element->removeAttribute( $attr->nodeName );
-				}
-			}
-		}
-
-		return false !== file_put_contents( $file_path, $doc->saveXML() );
+		return null !== $clean && false !== file_put_contents( $file_path, $clean );
 	}
 
 	/**
