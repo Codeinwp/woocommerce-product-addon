@@ -88,6 +88,11 @@ jQuery( function ( $ ) {
 	 * @param {string} eventType - 'ppom_field_shown' or 'ppom_field_hidden'.
 	 */
 	function triggerFieldEvents( $group, eventType ) {
+		// Two PPOM forms on one page can share a data_name (issue #735), so
+		// ppom-conditions-v2.js's handlers scope their DOM lookups/resets to
+		// the event's `scope` — without it here they fall back to the whole
+		// document and can reset the *other* form's identically-named field.
+		const $scope = $group.closest( '.ppom-wrapper' );
 		$group.find( '.ppom-field-wrapper' ).each( function () {
 			const dataName = $( this ).attr( 'data-data_name' );
 			if ( ! dataName ) {
@@ -96,6 +101,7 @@ jQuery( function ( $ ) {
 			$.event.trigger( {
 				type: eventType,
 				field: dataName,
+				scope: $scope,
 				time: new Date(),
 			} );
 		} );
