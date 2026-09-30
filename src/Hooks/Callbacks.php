@@ -54,7 +54,7 @@ final class Callbacks {
 					$file_name  = isset( $values['org'] ) ? $values['org'] : '';
 
 					// Verify uploaded file type.
-					$allowed_types = isset( $cropper['file_types'] ) && ! empty( $cropper['file_types'] ) ? sanitize_text_field( $cropper['file_types'] ) : 'jpg,png';
+					$allowed_types = isset( $cropper['file_types'] ) && ! empty( $cropper['file_types'] ) ? sanitize_text_field( $cropper['file_types'] ) : Handler::DEFAULT_CROPPER_FILE_TYPES;
 					$allowed_types = explode( ',', $allowed_types );
 					$dir_path      = Handler::get_dir_path();
 					$file_type     = wp_check_filetype_and_ext( $dir_path . $file_name, $file_name );

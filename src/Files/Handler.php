@@ -19,6 +19,16 @@ final class Handler {
 	 */
 	private const OWNED_FILES_KEY = 'ppom_uploaded_files';
 
+	/**
+	 * Uploader default for a file field with no "File types" setting.
+	 */
+	public const DEFAULT_FILE_TYPES = 'jpg,pdf,zip';
+
+	/**
+	 * Uploader default for a cropper field with no "File types" setting.
+	 */
+	public const DEFAULT_CROPPER_FILE_TYPES = 'jpg,png';
+
 	public static function files_setup_get_directory( $sub_dir = false ) {
 
 		$upload_dir = wp_upload_dir();
@@ -294,13 +304,7 @@ final class Handler {
 		$restricted_type    = explode( ',', $restricted_type );
 
 		if ( empty( $extension ) || in_array( strtolower( $extension ), $restricted_type ) || ! self::field_allows_extension( $file_meta, $extension ) ) {
-			$response ['status']  = 'error';
-			$response ['message'] = sprintf(
-			// translators: %s: the name of the extension.
-				__( 'File type not valid - %s', 'woocommerce-product-addon' ),
-				$extension
-			);
-			wp_send_json( $response );
+			self::send_invalid_file_type( (string) $extension );
 		}
 		/* ========== Invalid File type checking ========== */
 
@@ -406,14 +410,7 @@ final class Handler {
 			$is_svg = 'svg' === $file_ext || 'image/svg+xml' === $file_type['type'];
 			if ( $is_svg && ! self::sanitize_svg_file( $chunk_file_path ) ) {
 				@unlink( $chunk_file_path );
-
-				$response ['status']  = 'error';
-				$response ['message'] = sprintf(
-				// translators: %s: the name of the extension.
-					__( 'File type not valid - %s', 'woocommerce-product-addon' ),
-					$file_ext
-				);
-				wp_send_json( $response );
+				self::send_invalid_file_type( $file_ext );
 			}
 
 			// Give a unique name to prevent name collisions.
@@ -479,7 +476,7 @@ final class Handler {
 
 		$type = is_array( $file_meta ) && isset( $file_meta['type'] ) ? $file_meta['type'] : '';
 
-		$default_types = 'cropper' === $type ? 'jpg,png' : 'jpg,pdf,zip';
+		$default_types = 'cropper' === $type ? self::DEFAULT_CROPPER_FILE_TYPES : self::DEFAULT_FILE_TYPES;
 
 		$configured = is_array( $file_meta ) && ! empty( $file_meta['file_types'] )
 			? (string) $file_meta['file_types']
@@ -487,7 +484,27 @@ final class Handler {
 
 		$allowed = array_map( 'strtolower', array_map( 'trim', explode( ',', $configured ) ) );
 
-		return in_array( strtolower( $extension ), $allowed, true );
+		// Plupload reads "*" as any extension; the mime and restricted checks still apply.
+		return in_array( '*', $allowed, true ) || in_array( strtolower( $extension ), $allowed, true );
+	}
+
+	/**
+	 * Ends the upload request with the invalid file type error.
+	 *
+	 * @param string $extension Extension named in the message.
+	 *
+	 * @return void
+	 */
+	private static function send_invalid_file_type( string $extension ): void {
+		$response = array(
+			'status'  => 'error',
+			'message' => sprintf(
+				// translators: %s: the name of the extension.
+				__( 'File type not valid - %s', 'woocommerce-product-addon' ),
+				$extension
+			),
+		);
+		wp_send_json( $response );
 	}
 
 	/**

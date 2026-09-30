@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b1705a064d409f43eb816be92fb4b4f8",
+    "content-hash": "74fb3f513a7ca4455e98782c544ece6d",
     "packages": [
         {
             "name": "codeinwp/themeisle-sdk",
@@ -45,7 +45,7 @@
                 "issues": "https://github.com/Codeinwp/themeisle-sdk/issues",
                 "source": "https://github.com/Codeinwp/themeisle-sdk/tree/v3.3.65"
             },
-            "time": "2026-08-24T15:59:27+00:00"
+            "time": "2026-09-29T09:35:47+00:00"
         },
         {
             "name": "enshrined/svg-sanitize",

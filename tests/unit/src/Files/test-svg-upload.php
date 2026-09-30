@@ -173,7 +173,7 @@ class Test_Svg_Upload extends WP_Ajax_UnitTestCase {
 	}
 
 	/**
-	 * Each payload carries an "alert" or "evil" marker that must not survive.
+	 * Each payload carries one of the markers checked below, which must not survive.
 	 *
 	 * @return array<string, array{0: string}>
 	 */
@@ -217,7 +217,7 @@ class Test_Svg_Upload extends WP_Ajax_UnitTestCase {
 
 		$this->assertIsString( $clean );
 		$this->assertStringStartsWith( '<svg', $clean );
-		foreach ( array( 'alert', 'evil', 'script', 'foreignObject', 'animate', '<set' ) as $marker ) {
+		foreach ( array( 'alert', 'evil', 'script', 'foreignObject', 'animate', '<set', 'data:image/svg+xml' ) as $marker ) {
 			$this->assertStringNotContainsStringIgnoringCase( $marker, $clean );
 		}
 	}
@@ -276,6 +276,7 @@ class Test_Svg_Upload extends WP_Ajax_UnitTestCase {
 			'default cropper refuses pdf'     => array( 'cropper', null, 'ppom-ajax-photo.pdf', false ),
 			'opted-in svg is taken'           => array( 'file', 'jpg, svg, pdf', 'ppom-ajax-logo.svg', true ),
 			'setting ignores case and spaces' => array( 'file', ' JPG , SVG ', 'ppom-ajax-logo.svg', true ),
+			'wildcard takes any allowed type' => array( 'file', '*', 'ppom-ajax-logo.svg', true ),
 		);
 	}
 
