@@ -173,9 +173,13 @@ async function getProductPpomAssignment( requestUtils, { productId } ) {
 }
 
 /**
- * Create a fixture Page rendering one `[ppom product_id="X"]` shortcode per
- * given product id, so a spec can put more than one PPOM form on the same
- * page (issue #735) regardless of the active theme's single-product template.
+ * Create a page with one `[ppom product_id="X"]` shortcode per product id.
+ *
+ * @param {Object}        requestUtils     Request utils.
+ * @param {Object}        root0            Arguments.
+ * @param {Array<number>} root0.productIds Product ids.
+ * @param {string}        [root0.title]    Page title.
+ * @return {Promise<{id: number, permalink: string}>} Created page.
  */
 async function createPpomShortcodePage( requestUtils, { productIds, title } ) {
 	const payload = await postBootstrapAction(

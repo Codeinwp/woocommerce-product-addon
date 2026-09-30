@@ -99,18 +99,20 @@ jQuery( function ( $ ) {
 	 */
 	function trigger_check_conditions( modifiedElement ) {
 		const data_name = modifiedElement.dataset?.data_name;
-		// Scope to the changed control's own product form so a control
-		// sharing a data_name with another PPOM form on the same page
-		// cannot read or toggle that other form's fields.
+		// Only the changed control's own form.
 		const $scope = jQuery( modifiedElement ).closest( '.ppom-wrapper' );
-		ppom_check_conditions( data_name, ( element_dataname, event_type, $scope ) => {
-			$.event.trigger( {
-				type: event_type,
-				field: element_dataname,
-				scope: $scope,
-				time: new Date(),
-			} );
-		}, $scope );
+		ppom_check_conditions(
+			data_name,
+			( element_dataname, event_type ) => {
+				$.event.trigger( {
+					type: event_type,
+					field: element_dataname,
+					scope: $scope,
+					time: new Date(),
+				} );
+			},
+			$scope
+		);
 	}
 
 	$( '.ppom-wrapper' ).on(
@@ -136,9 +138,7 @@ jQuery( function ( $ ) {
 	$( document ).on( 'ppom_field_hidden', function ( e ) {
 		// console.log(e.field)
 
-		// Resolve the originating form from the triggering event so a
-		// data_name shared by another PPOM form on the same page doesn't
-		// reset or re-evaluate that other form's fields (issue #735).
+		// Only the form that fired the event.
 		const $scope = e.scope && e.scope.length ? e.scope : $( document );
 		const product_id = $scope.find( '[name="ppom_product_id"]' ).val();
 
@@ -250,7 +250,7 @@ jQuery( function ( $ ) {
 
 		ppom_check_conditions(
 			e.field,
-			function ( element_dataname, event_type, $scope ) {
+			function ( element_dataname, event_type ) {
 				// console.log(`${element_dataname} ===> ${event_type}`);
 				$.event.trigger( {
 					type: event_type,
@@ -270,9 +270,7 @@ jQuery( function ( $ ) {
     });*/
 
 	$( document ).on( 'ppom_field_shown', function ( e ) {
-		// Resolve the originating form the same way ppom_field_hidden does,
-		// so restoring defaults for one PPOM form can't read or touch
-		// another form's fields sharing the same data_name (issue #735).
+		// Only the form that fired the event.
 		const $scope = e.scope && e.scope.length ? e.scope : $( document );
 		const product_id = $scope.find( '[name="ppom_product_id"]' ).val();
 
@@ -283,7 +281,7 @@ jQuery( function ( $ ) {
 
 		ppom_check_conditions(
 			e.field,
-			function ( element_dataname, event_type, $scope ) {
+			function ( element_dataname, event_type ) {
 				// console.log(`${element_dataname} ===> ${event_type}`);
 				$.event.trigger( {
 					type: event_type,
@@ -312,7 +310,9 @@ jQuery( function ( $ ) {
 			const classname = '.' + field_meta.data_name;
 			// console.log(field_meta.data_name, jQuery(`input[data-dataname="ppom[fields][${field_meta.data_name}]"]`));
 			$scope
-				.find( `input[data-dataname="ppom[fields][${ field_meta.data_name }]"]` )
+				.find(
+					`input[data-dataname="ppom[fields][${ field_meta.data_name }]"]`
+				)
 				.addClass( 'active' );
 			// $(classname).find('.ppom_pricematrix').addClass('active')
 		}
@@ -320,7 +320,9 @@ jQuery( function ( $ ) {
 		//Imageselect (Image dropdown)
 		if ( field_meta.type === 'imageselect' ) {
 			const dd_selector = 'ppom_imageselect_' + field_meta.data_name;
-			const ddData = $scope.find( '#' + dd_selector ).data( 'ppom_ddslick' );
+			const ddData = $scope
+				.find( '#' + dd_selector )
+				.data( 'ppom_ddslick' );
 			const image_replace = field_meta.image_replace
 				? field_meta.image_replace
 				: 'off';
@@ -374,7 +376,7 @@ jQuery( function ( $ ) {
 		}
 	} );
 
-	// One PPOM form's #conditionally_hidden per `.ppom-wrapper` on the page.
+	// Each form has its own #conditionally_hidden.
 	$( '.ppom-wrapper' ).each( function ( i, wrapper ) {
 		ppom_fields_hidden_conditionally( $( wrapper ) );
 	} );
@@ -384,10 +386,7 @@ function ppom_check_conditions( data_name, callback, $scope ) {
 	// Each `.ppom-cond-*` node describes one target field and its dependencies.
 	// We evaluate all rules for that target, then notify the rest of the stack
 	// through shared PPOM events instead of mutating unrelated features directly.
-	//
-	// $scope confines the target-node and value lookups to one product's
-	// `.ppom-wrapper`; without it, two PPOM forms on the same page that reuse
-	// a data_name read and toggle each other's fields (issue #735).
+	// $scope limits lookups to one form (defaults to the document).
 	$scope = $scope && $scope.length ? $scope : jQuery( document );
 	let is_matched = false;
 	let event_type, element_data_name;
@@ -408,8 +407,10 @@ function ppom_check_conditions( data_name, callback, $scope ) {
 				.data( `cond-input${ t }` )
 				?.toString()
 				?.toLowerCase();
-			const targetFieldValue =
-				ppom_get_element_value( targetFieldToCompare, $scope );
+			const targetFieldValue = ppom_get_element_value(
+				targetFieldToCompare,
+				$scope
+			);
 
 			const selectOptionValue = jQuery( this )
 				.data( `cond-val${ t }` )
@@ -539,15 +540,15 @@ function ppom_check_conditions( data_name, callback, $scope ) {
 function ppom_get_input_dom_type( data_name, $scope ) {
 	$scope = $scope && $scope.length ? $scope : jQuery( document );
 	// const field_obj = jQuery(`input[name="ppom[fields][${data_name}]"], input[name="ppom[fields][${data_name}[]]"], select[name="ppom[fields][${data_name}]"]`);
-	const field_obj = $scope.find( `.ppom-input[data-data_name="${ data_name }"]` );
+	const field_obj = $scope.find(
+		`.ppom-input[data-data_name="${ data_name }"]`
+	);
 	return field_obj.closest( '.ppom-field-wrapper' ).data( 'type' );
 }
 
 // Normalize values across PPOM field types so condition operators can stay
 // unaware of the exact DOM structure used by each input renderer.
-//
-// $scope confines every lookup to one product's `.ppom-wrapper`, defaulting
-// to the whole document for callers that don't have a specific form in mind.
+// $scope limits lookups to one form (defaults to the document).
 function ppom_get_element_value( data_name, $scope ) {
 	$scope = $scope && $scope.length ? $scope : jQuery( document );
 	const ppom_type = ppom_get_input_dom_type( data_name, $scope );
@@ -557,48 +558,52 @@ function ppom_get_element_value( data_name, $scope ) {
 	switch ( ppom_type ) {
 		case 'switcher':
 		case 'radio':
-			element_value = $scope.find(
-				`.ppom-input[data-data_name="${ data_name }"]:checked`
-			).val();
+			element_value = $scope
+				.find( `.ppom-input[data-data_name="${ data_name }"]:checked` )
+				.val();
 			break;
 		case 'palettes':
 		case 'checkbox':
-			$scope.find(
-				'input[name="ppom[fields][' + data_name + '][]"]:checked'
-			).each( function ( i ) {
-				value_found_cb[ i ] = jQuery( this ).val();
-			} );
+			$scope
+				.find(
+					'input[name="ppom[fields][' + data_name + '][]"]:checked'
+				)
+				.each( function ( i ) {
+					value_found_cb[ i ] = jQuery( this ).val();
+				} );
 			break;
 		case 'image':
 		case 'conditional_meta':
-			element_value = $scope.find(
-				`.ppom-input[data-data_name="${ data_name }"]:checked`
-			).data( 'label' );
+			element_value = $scope
+				.find( `.ppom-input[data-data_name="${ data_name }"]:checked` )
+				.data( 'label' );
 			break;
 		case 'imageselect':
-			element_value = $scope.find(
-				`.ppom-input[data-data_name="${ data_name }"]:checked`
-			).data( 'label' );
+			element_value = $scope
+				.find( `.ppom-input[data-data_name="${ data_name }"]:checked` )
+				.data( 'label' );
 			break;
 		case 'fixedprice':
-			var render_type = $scope.find( `.ppom-input-${ data_name }` ).attr(
-				'data-input'
-			);
+			var render_type = $scope
+				.find( `.ppom-input-${ data_name }` )
+				.attr( 'data-input' );
 			if ( render_type == 'radio' ) {
-				element_value = $scope.find(
-					`.ppom-input[data-data_name="${ data_name }"]:checked`
-				).val();
+				element_value = $scope
+					.find(
+						`.ppom-input[data-data_name="${ data_name }"]:checked`
+					)
+					.val();
 			} else {
-				element_value = $scope.find(
-					`.ppom-input[data-data_name="${ data_name }"]`
-				).val();
+				element_value = $scope
+					.find( `.ppom-input[data-data_name="${ data_name }"]` )
+					.val();
 			}
 			break;
 
 		default:
-			element_value = $scope.find(
-				`.ppom-input[data-data_name="${ data_name }"]`
-			).val();
+			element_value = $scope
+				.find( `.ppom-input[data-data_name="${ data_name }"]` )
+				.val();
 	}
 
 	if ( ppom_type === 'checkbox' || ppom_type === 'palettes' ) {
@@ -738,13 +743,7 @@ function ppom_compare_values( args ) {
 function ppom_set_default_option( field_id, $scope ) {
 	// When a field becomes visible again, restore its default state the same way
 	// the original PHP renderer would have populated it on first page load.
-	//
-	// $scope confines every id/name lookup below to one product's
-	// `.ppom-wrapper`: PPOM renders field ids from the bare data_name with no
-	// per-product suffix, so two PPOM forms on one page have literally
-	// duplicate DOM ids, and an unscoped `#id` lookup silently resolves to
-	// whichever form's element happens to be first in the document (issue
-	// #735).
+	// Scoped: forms share field ids.
 	$scope = $scope && $scope.length ? $scope : jQuery( document );
 	const product_id = $scope.find( '[name="ppom_product_id"]' ).val();
 
@@ -837,13 +836,7 @@ function ppom_set_default_option( field_id, $scope ) {
 }
 
 // Mirror the current hidden field list into the hidden input consumed by PHP.
-//
-// $scope confines both the scan and the write to one product's
-// `.ppom-wrapper`: PPOM renders `#conditionally_hidden` with no per-product
-// suffix, so on a page with two PPOM forms an unscoped scan/write only ever
-// reaches the first of the two duplicated ids — the second form's own
-// hidden-fields state (and required-field validation) never gets submitted
-// (issue #735).
+// Scoped: every form renders its own #conditionally_hidden.
 function ppom_fields_hidden_conditionally( $scope ) {
 	$scope = $scope && $scope.length ? $scope : jQuery( document );
 

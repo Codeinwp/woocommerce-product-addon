@@ -1131,6 +1131,7 @@ add_action( 'wp_ajax_nopriv_ppom_e2e_create_grouped_product', 'ppom_e2e_create_g
  * Create a fixture Page embedding one `[ppom product_id="X"]` shortcode per
  * given product id, so E2E specs can exercise more than one PPOM form on the
  * same page (issue #735) without depending on a specific theme/template.
+ * Create a fixture page with one `[ppom product_id="X"]` shortcode per product id.
  *
  * @return void
  */

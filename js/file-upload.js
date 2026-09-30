@@ -39,10 +39,7 @@ const featherEditor = '';
 const uploaderInstances = {};
 const Cropped_Data_Captured = false;
 
-// A product can be embedded in more than one form on the same page (e.g. two
-// `[ppom product_id="X"]` shortcodes for the same product), so the product id
-// alone isn't a unique registry key — assign each `.ppom-wrapper` its own
-// stable id the first time it's seen and key uploader state by that instead.
+// Per-form ids; one product can render in several forms.
 let ppom_wrapper_instance_counter = 0;
 const ppom_wrapper_instance_ids = new WeakMap();
 
@@ -52,7 +49,7 @@ const ppom_wrapper_instance_ids = new WeakMap();
  */
 function ppom_get_wrapper_instance_id( $scope ) {
 	const el = $scope && $scope[ 0 ];
-	if ( ! el ) {
+	if ( ! el || ! el.classList?.contains( 'ppom-wrapper' ) ) {
 		return '';
 	}
 
@@ -64,6 +61,51 @@ function ppom_get_wrapper_instance_id( $scope ) {
 	}
 
 	return ppom_wrapper_instance_ids.get( el );
+}
+
+/**
+ * Registry key for a field's uploader/preview state within one form.
+ *
+ * @param {string} data_name
+ * @param {jQuery} $scope
+ * @return {string} Field name, suffixed with the form id when known.
+ */
+function ppom_get_instance_key( data_name, $scope ) {
+	const wrapper_instance_id = ppom_get_wrapper_instance_id( $scope );
+	return wrapper_instance_id
+		? data_name + '__' + wrapper_instance_id
+		: data_name;
+}
+
+/**
+ * The given form, or else the first form containing `selector`.
+ *
+ * @param {jQuery} $scope   The field's `.ppom-wrapper`, if known.
+ * @param {string} selector A selector inside the field.
+ * @return {jQuery} The form, or the document when none matches.
+ */
+function ppom_get_field_scope( $scope, selector ) {
+	if ( $scope && $scope.length && $scope[ 0 ] !== document ) {
+		return $scope;
+	}
+
+	const $wrapper = jQuery( selector ).closest( '.ppom-wrapper' );
+	return $wrapper.length ? $wrapper : jQuery( document );
+}
+
+/**
+ * The `.ppom-wrapper` a field event belongs to, or every wrapper if unknown.
+ *
+ * @param {Object} e jQuery event.
+ * @return {jQuery} Matching `.ppom-wrapper` elements.
+ */
+function ppom_get_event_scopes( e ) {
+	if ( e.scope && e.scope.length ) {
+		return e.scope;
+	}
+
+	const $wrapper = jQuery( e.target ).closest( '.ppom-wrapper' );
+	return $wrapper.length ? $wrapper : jQuery( '.ppom-wrapper' );
 }
 
 // Track nonce refresh state to avoid duplicate requests
@@ -239,24 +281,30 @@ jQuery( function ( $ ) {
 		const data_name = e.data_name;
 		const input_type = e.input_type;
 		const file_input = e.file_input;
+		const $scope = e.scope && e.scope.length ? e.scope : $( document );
 
 		if ( input_type === 'cropper' ) {
-			field_meta = ppom_get_field_meta_by_id( data_name );
+			field_meta = ppom_get_field_meta_by_id(
+				data_name,
+				$scope.find( '[name="ppom_product_id"]' ).val()
+			);
 			// console.log('ppom',field_meta)
 			if ( field_meta.legacy_cropper === undefined ) {
 				ppom_show_cropped_preview(
 					data_name,
 					image_url,
 					image_id,
-					file_input
+					file_input,
+					$scope
 				);
 				// hiding the filelist-{data_name} when preview enabled
-				$( `#filelist-${ data_name }` ).hide();
+				$scope.find( `#filelist-${ data_name }` ).hide();
 				// hide the file upload area too
-				$( `.ppom-file-container.${ data_name }` ).hide();
+				$scope.find( `.ppom-file-container.${ data_name }` ).hide();
 				// also hide the crop ratio if only one option is provided
-				if ( $( `#crop-size-${ data_name } option` ).length === 1 ) {
-					$( `#crop-size-${ data_name }` ).hide();
+				const $crop_size = $scope.find( `#crop-size-${ data_name }` );
+				if ( $crop_size.find( 'option' ).length === 1 ) {
+					$crop_size.hide();
 				}
 			}
 		}
@@ -280,7 +328,9 @@ jQuery( function ( $ ) {
 		'.ppom-cropping-size',
 		function ( e ) {
 			const data_name = $( this ).data( 'field_name' );
-			const cropp_preview_container = jQuery(
+			const $scope = $( this ).closest( '.ppom-wrapper' );
+			const preview_key = ppom_get_instance_key( data_name, $scope );
+			const cropp_preview_container = $scope.find(
 				'.ppom-croppie-wrapper-' + data_name
 			);
 			const v_width = $( 'option:selected', this ).data( 'width' );
@@ -291,7 +341,7 @@ jQuery( function ( $ ) {
 				.each( function ( i, croppie_dom ) {
 					const image_id =
 						jQuery( croppie_dom ).attr( 'data-image_id' );
-					const croppie_container = jQuery(
+					const croppie_container = cropp_preview_container.find(
 						'.ppom-croppie-preview-' + image_id
 					);
 					// Destroy the current Croppie instance before re-initialising.
@@ -304,233 +354,184 @@ jQuery( function ( $ ) {
 					$( croppie_dom ).croppie( 'destroy' );
 					const viewport = { width: v_width, height: v_height };
 
-					file_list_preview_containers[ data_name ].croppie[
+					file_list_preview_containers[ preview_key ].croppie[
 						image_id
 					] = croppie_container;
-					file_list_preview_containers[ data_name ].image_id =
+					file_list_preview_containers[ preview_key ].image_id =
 						image_id;
 
-					ppom_set_croppie_options( data_name, viewport, image_id );
+					ppom_set_croppie_options(
+						data_name,
+						viewport,
+						image_id,
+						preview_key
+					);
 				} );
 		}
 	);
 
-	// Deleting File
-	//
-	// Delegated on `document` rather than bound to the first `.ppom-wrapper`
-	// found: a click handler attached only to that one node never fires for a
-	// second PPOM form's delete buttons on the same page (issue #735's
-	// file-upload counterpart).
+	// Deleting File; delegated so every form's buttons work.
 	document.addEventListener( 'click', async function ( e ) {
-			if (
-				! e.target.classList.contains( 'u_i_c_tools_del' ) ||
-				! plupload_instances
-			) {
-				return;
-			}
+		if (
+			! e.target.classList.contains( 'u_i_c_tools_del' ) ||
+			! plupload_instances
+		) {
+			return;
+		}
 
-			e.preventDefault();
+		e.preventDefault();
 
-			const delMessage = ppom_file_vars.delete_file_msg;
-			if ( ! confirm( delMessage ) ) {
-				return;
-			}
+		const delMessage = ppom_file_vars.delete_file_msg;
+		if ( ! confirm( delMessage ) ) {
+			return;
+		}
 
-			// Fresh uploads are wrapped by the uploader in `.ppom-file-wrapper`;
-			// files the server renders back into the form get `.u_i_c_box` instead.
-			// Both carry data-fileid, so accept either or delete does nothing on a
-			// restored file.
-			const ppomFileWrapper = e.target.closest(
-				'.ppom-file-wrapper, .u_i_c_box'
-			);
-			const fileId = ppomFileWrapper?.getAttribute( 'data-fileid' );
-			const ppomFieldWrapper = e.target.closest(
-				'div.ppom-field-wrapper'
-			);
-			const fileDataName =
-				ppomFieldWrapper?.getAttribute( 'data-data_name' );
+		// Fresh uploads are wrapped by the uploader in `.ppom-file-wrapper`;
+		// files the server renders back into the form get `.u_i_c_box` instead.
+		// Both carry data-fileid, so accept either or delete does nothing on a
+		// restored file.
+		const ppomFileWrapper = e.target.closest(
+			'.ppom-file-wrapper, .u_i_c_box'
+		);
+		const fileId = ppomFileWrapper?.getAttribute( 'data-fileid' );
+		const ppomFieldWrapper = e.target.closest( 'div.ppom-field-wrapper' );
+		const fileDataName = ppomFieldWrapper?.getAttribute( 'data-data_name' );
 
-			if ( ! fileId || ! fileDataName ) {
-				return;
-			}
+		if ( ! fileId || ! fileDataName ) {
+			return;
+		}
 
-			const scopeWrapper = e.target.closest( '.ppom-wrapper' );
-			const wrapperInstanceId = ppom_get_wrapper_instance_id(
-				scopeWrapper ? jQuery( scopeWrapper ) : null
-			);
-			const instanceKey = wrapperInstanceId
-				? fileDataName + '__' + wrapperInstanceId
-				: fileDataName;
+		const instanceKey = ppom_get_instance_key(
+			fileDataName,
+			jQuery( e.target ).closest( '.ppom-wrapper' )
+		);
 
-			field_file_count[ instanceKey ] = 0;
+		field_file_count[ instanceKey ] = 0;
 
-			const uploaderInstance = plupload_instances[ instanceKey ];
-			if ( uploaderInstance ) {
-				uploaderInstance.removeFile( fileId );
-			}
+		const uploaderInstance = plupload_instances[ instanceKey ];
+		if ( uploaderInstance ) {
+			uploaderInstance.removeFile( fileId );
+		}
 
-			// Scoped to this click's own field wrapper rather than looked up
-			// document-wide: two forms can restore the same field name with
-			// the same numeric file key (e.g. `0`), so an unscoped lookup can
-			// resolve to the other form's checkbox and delete/rename the
-			// wrong upload.
-			const checkbox = ppomFieldWrapper?.querySelector(
-				`input[name="ppom[fields][${ fileDataName }][${ fileId }][org]"]`
-			);
-			const fileName = checkbox?.value;
+		// Scoped: forms can share field name and file key.
+		const checkbox = ppomFieldWrapper?.querySelector(
+			`input[name="ppom[fields][${ fileDataName }][${ fileId }][org]"]`
+		);
+		const fileName = checkbox?.value;
 
-			if ( ! fileName ) {
-				return;
-			}
+		if ( ! fileName ) {
+			return;
+		}
 
-			// Delete animation.
-			// Scoped to this click's wrapper, not looked up by id: restored ids come
-			// from each field's own array key, so the first file of every field is
-			// `u_i_c_0` and a document lookup would leave another field's thumbnail
-			// showing the spinner for good.
-			const imageElement = ppomFileWrapper?.querySelector( 'img' );
-			if ( imageElement ) {
-				imageElement.src = `${ ppom_file_vars.plugin_url }/images/loading.gif`;
-			}
+		// Delete animation.
+		// Scoped to this click's wrapper, not looked up by id: restored ids come
+		// from each field's own array key, so the first file of every field is
+		// `u_i_c_0` and a document lookup would leave another field's thumbnail
+		// showing the spinner for good.
+		const imageElement = ppomFileWrapper?.querySelector( 'img' );
+		if ( imageElement ) {
+			imageElement.src = `${ ppom_file_vars.plugin_url }/images/loading.gif`;
+		}
 
-			// Refresh nonces before delete operation
-			try {
-				await ppom_refresh_file_nonces();
-			} catch ( error ) {
-				// Continue with existing nonce if refresh fails
-				console.warn(
-					'Failed to refresh nonce, using existing:',
-					error
-				);
-			}
+		// Refresh nonces before delete operation
+		try {
+			await ppom_refresh_file_nonces();
+		} catch ( error ) {
+			// Continue with existing nonce if refresh fails
+			console.warn( 'Failed to refresh nonce, using existing:', error );
+		}
 
-			const data = new URLSearchParams( {
-				action: 'ppom_delete_file',
-				file_name: fileName,
-				ppom_nonce: ppom_file_vars.ppom_file_delete_nonce,
-			} );
-
-			// On the page that performed the upload the token is on the input. A form
-			// rendered again from the cart has no token in its markup -- the server
-			// must not sign a file name it is handed, or it becomes an oracle -- so
-			// fall back to the copy this browser kept.
-			const deleteToken =
-				checkbox?.dataset?.deleteToken ||
-				ppom_read_delete_token( fileName );
-
-			if ( deleteToken ) {
-				data.append( 'ppom_delete_token', deleteToken );
-			}
-
-			try {
-				const response = await fetch( ppom_file_vars.ajaxurl, {
-					method: 'POST',
-					body: data,
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-						'X-Requested-With': 'XMLHttpRequest',
-					},
-				} );
-
-				const responseText = await response.text();
-				if ( ! response.ok ) {
-					confirm( `Error: ${ responseText }` );
-					return;
-				}
-
-				// The token is deliberately kept. delete_file() ends in die( 0 ), so a
-				// refusal also answers 200 and there is no signal here that survives
-				// translation; discarding on this path threw away the shopper's only
-				// proof and made the file impossible to remove. Entries are per tab
-				// and go when it closes.
-
-				// Update UI. Remove the wrapper this click resolved rather than
-				// looking one up by id: restored ids come from each field's own array
-				// key, so the first file of every field is `u_i_c_0` and a document
-				// lookup would take whichever comes first, stripping another field's
-				// value out of the form.
-				if ( ppomFileWrapper ) {
-					ppomFileWrapper.remove();
-				}
-
-				if ( checkbox ) {
-					checkbox.remove();
-				}
-
-				const croppiePreview = document.querySelector(
-					`.ppom-croppie-preview-${ fileId }`
-				);
-				if ( croppiePreview ) {
-					croppiePreview.remove();
-				}
-
-				// Send action to PPOM_Validate
-				document.dispatchEvent(
-					new CustomEvent( 'ppom_uploaded_file_removed', {
-						detail: {
-							field_name: fileDataName,
-							fileid: fileId,
-							time: new Date(),
-						},
-					} )
-				);
-
-				// Decrease file count
-				field_file_count[ instanceKey ] -= 1;
-			} catch ( error ) {
-				confirm( `Error: ${ error.message }` );
-			}
+		const data = new URLSearchParams( {
+			action: 'ppom_delete_file',
+			file_name: fileName,
+			ppom_nonce: ppom_file_vars.ppom_file_delete_nonce,
 		} );
 
-	// Two PPOM forms on one page each localize their own `ppom_input_vars`
-	// snapshot (see ppom_input_vars_by_product in ppom.inputs.js); walk every
-	// product present so a 'file'/'cropper' field shared by both forms gets
-	// its own uploader instead of only the last-localized product's.
-	const ppom_file_setup_products =
-		typeof window.ppom_input_vars_by_product !== 'undefined'
-			? window.ppom_input_vars_by_product
-			: { '': ppom_input_vars };
+		// On the page that performed the upload the token is on the input. A form
+		// rendered again from the cart has no token in its markup -- the server
+		// must not sign a file name it is handed, or it becomes an oracle -- so
+		// fall back to the copy this browser kept.
+		const deleteToken =
+			checkbox?.dataset?.deleteToken ||
+			ppom_read_delete_token( fileName );
 
-	$.each( ppom_file_setup_products, function ( product_id, product_vars ) {
-		const file_or_cropper_inputs = jQuery.grep(
-			product_vars.ppom_inputs,
-			function ( file_input ) {
-				return (
-					file_input.type === 'file' ||
-					file_input.type === 'cropper'
-				);
-			}
-		);
-
-		if ( ! file_or_cropper_inputs.length ) {
-			return;
+		if ( deleteToken ) {
+			data.append( 'ppom_delete_token', deleteToken );
 		}
 
-		if ( ! product_id ) {
-			const $scope = $( document );
-			$.each( file_or_cropper_inputs, function ( index, file_input ) {
-				ppom_setup_file_upload_input( file_input, $scope );
+		try {
+			const response = await fetch( ppom_file_vars.ajaxurl, {
+				method: 'POST',
+				body: data,
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+					'X-Requested-With': 'XMLHttpRequest',
+				},
 			} );
-			return;
-		}
 
-		// The same product can be embedded in more than one form on the
-		// page (e.g. two `[ppom product_id="X"]` shortcodes for the same
-		// product), so this selector can match several `.ppom-wrapper`
-		// elements: set up each one independently rather than collapsing
-		// them into a single shared $scope, or only the first ever gets
-		// its own uploader.
-		$( `.ppom-wrapper:has([name="ppom_product_id"][value="${ product_id }"])` ).each(
-			function ( i, wrapperEl ) {
-				const $scope = $( wrapperEl );
-				$.each(
-					file_or_cropper_inputs,
-					function ( index, file_input ) {
-						ppom_setup_file_upload_input( file_input, $scope );
-					}
-				);
+			const responseText = await response.text();
+			if ( ! response.ok ) {
+				confirm( `Error: ${ responseText }` );
+				return;
 			}
-		);
+
+			// The token is deliberately kept. delete_file() ends in die( 0 ), so a
+			// refusal also answers 200 and there is no signal here that survives
+			// translation; discarding on this path threw away the shopper's only
+			// proof and made the file impossible to remove. Entries are per tab
+			// and go when it closes.
+
+			// Update UI. Remove the wrapper this click resolved rather than
+			// looking one up by id: restored ids come from each field's own array
+			// key, so the first file of every field is `u_i_c_0` and a document
+			// lookup would take whichever comes first, stripping another field's
+			// value out of the form.
+			if ( ppomFileWrapper ) {
+				ppomFileWrapper.remove();
+			}
+
+			if ( checkbox ) {
+				checkbox.remove();
+			}
+
+			const croppiePreview = ppomFieldWrapper.querySelector(
+				`.ppom-croppie-preview-${ fileId }`
+			);
+			if ( croppiePreview ) {
+				croppiePreview.remove();
+			}
+
+			// Send action to PPOM_Validate
+			document.dispatchEvent(
+				new CustomEvent( 'ppom_uploaded_file_removed', {
+					detail: {
+						field_name: fileDataName,
+						fileid: fileId,
+						time: new Date(),
+					},
+				} )
+			);
+
+			// Decrease file count
+			field_file_count[ instanceKey ] -= 1;
+		} catch ( error ) {
+			confirm( `Error: ${ error.message }` );
+		}
+	} );
+
+	// One uploader per field per form, fed by that form's product data.
+	$( '.ppom-wrapper' ).each( function ( i, wrapperEl ) {
+		const $scope = $( wrapperEl );
+		const product_vars =
+			ppom_get_product_data(
+				$scope.find( '[name="ppom_product_id"]' ).val()
+			) || ppom_input_vars;
+
+		$.each( product_vars.ppom_inputs, function ( index, file_input ) {
+			if ( file_input.type === 'file' || file_input.type === 'cropper' ) {
+				ppom_setup_file_upload_input( file_input, $scope );
+			}
+		} );
 	} );
 } ); //	jQuery(function($){});
 
@@ -592,9 +593,15 @@ function ppom_show_cropped_preview(
 	file_name,
 	image_url,
 	image_id,
-	file_input
+	file_input,
+	$scope
 ) {
-	const cropp_preview_container = jQuery(
+	$scope = ppom_get_field_scope(
+		$scope,
+		'.ppom-croppie-wrapper-' + file_name
+	);
+	const preview_key = ppom_get_instance_key( file_name, $scope );
+	const cropp_preview_container = $scope.find(
 		'.ppom-croppie-wrapper-' + file_name
 	);
 	// Enable size option
@@ -603,9 +610,9 @@ function ppom_show_cropped_preview(
 		.prop( 'disabled', false );
 	cropp_preview_container.find( '.ppom-cropping-size' ).show();
 
-	const container_width = jQuery(
-		'#ppom-file-container-' + file_name
-	).width();
+	const container_width = $scope
+		.find( '#ppom-file-container-' + file_name )
+		.width();
 	const croppie_container = jQuery( '<div/>' )
 		.addClass( 'ppom-croppie-preview-' + image_id )
 		.attr( 'data-image_id', image_id )
@@ -630,10 +637,7 @@ function ppom_show_cropped_preview(
 		is_change_image: true,
 		original_data_name: file_name,
 	};
-	// Cropper's "change image" re-upload keeps the document-wide default: its
-	// own multi-form scoping is a separate, cropper-specific gap (unlike the
-	// plain 'file' field flow above, this path isn't wired to a $scope).
-	ppom_setup_file_upload_input( file_inputs, jQuery( document ) );
+	ppom_setup_file_upload_input( file_inputs, $scope );
 
 	// file_list_preview_containers[file_name]['croppie'] = cropp_preview_container.find('.ppom-croppie-preview');
 
@@ -644,7 +648,7 @@ function ppom_show_cropped_preview(
 			// croppie_container.croppie('result', 'rawcanvas').then(function(canvas) {
 			// console.log(canvas);
 
-			ppom_generate_cropper_data_for_cart( file_name );
+			ppom_generate_cropper_data_for_cart( file_name, $scope );
 
 			jQuery.event.trigger( {
 				type: 'ppom_croppie_update',
@@ -657,16 +661,23 @@ function ppom_show_cropped_preview(
 		}
 	);
 
-	file_list_preview_containers[ file_name ].croppie[ image_id ] =
+	file_list_preview_containers[ preview_key ].croppie[ image_id ] =
 		croppie_container;
-	file_list_preview_containers[ file_name ].image_id = image_id;
-	file_list_preview_containers[ file_name ].image_url = image_url;
+	file_list_preview_containers[ preview_key ].image_id = image_id;
+	file_list_preview_containers[ preview_key ].image_url = image_url;
 
-	file_list_preview_containers[ file_name ].container_width = container_width;
-	ppom_set_croppie_options( file_name, undefined, image_id );
+	file_list_preview_containers[ preview_key ].container_width =
+		container_width;
+	ppom_set_croppie_options( file_name, undefined, image_id, preview_key );
 }
 
-function ppom_set_croppie_options( file_name, viewport, image_id ) {
+function ppom_set_croppie_options(
+	file_name,
+	viewport,
+	image_id,
+	preview_key
+) {
+	preview_key = preview_key || file_name;
 	const croppie_options = ppom_file_vars.croppie_options;
 	jQuery.each( croppie_options, function ( field_name, option ) {
 		if ( file_name === field_name ) {
@@ -675,13 +686,13 @@ function ppom_set_croppie_options( file_name, viewport, image_id ) {
 			// url / viewport values from a previous call.
 			const workingOption = jQuery.extend( true, {}, option );
 			workingOption.url =
-				file_list_preview_containers[ file_name ].image_url;
+				file_list_preview_containers[ preview_key ].image_url;
 			if ( viewport !== undefined ) {
 				viewport.type = workingOption.viewport.type;
 				workingOption.viewport = viewport;
 			}
 
-			const preview = file_list_preview_containers[ file_name ];
+			const preview = file_list_preview_containers[ preview_key ];
 			let applied = workingOption;
 			if (
 				preview.container_width !== undefined &&
@@ -712,6 +723,7 @@ function ppom_reset_cropping_preview( file_name ) {
  * resulting hidden checkbox inputs compatible with the price/validation stack.
  *
  * @param {PPOMUploadFieldMeta} file_input
+ * @param {jQuery}              [$scope]   The field's `.ppom-wrapper`.
  * @return {void}
  */
 function ppom_setup_file_upload_input( file_input, $scope ) {
@@ -724,29 +736,29 @@ function ppom_setup_file_upload_input( file_input, $scope ) {
 		data_name = file_data_name + '-' + file_id;
 	}
 
-	// Two PPOM forms on one page can render the same field data_name and the
-	// same DOM ids (issue #735's file-upload counterpart) — $scope is this
-	// call's own `.ppom-wrapper`, and every internal registry key below is
-	// suffixed with a per-wrapper id (not just the product id: the same
-	// product can be embedded in more than one form) so each form gets its
-	// own uploader instead of a later one silently no-op'ing against an
-	// earlier one that happens to share a key.
-	$scope = $scope && $scope.length ? $scope : jQuery( document );
-	const scope_product_id = $scope.find( '[name="ppom_product_id"]' ).val();
-	const wrapper_instance_id = ppom_get_wrapper_instance_id( $scope );
-	const key_suffix = wrapper_instance_id ? '__' + wrapper_instance_id : '';
-	const instance_key = file_data_name + key_suffix;
-	const instance_full_key = data_name + key_suffix;
+	// State is keyed per form; forms share data_names and ids.
+	$scope = ppom_get_field_scope( $scope, '#selectfiles-' + data_name );
 
-	if ( plupload_instances[ instance_full_key ] !== undefined ) {
+	if (
+		plupload_instances[ ppom_get_instance_key( data_name, $scope ) ] !==
+		undefined
+	) {
 		return;
 	}
 
+	const $browseButton = $scope.find( '#selectfiles-' + data_name );
+
+	// Field not rendered in this form.
+	if ( ! $browseButton.length ) {
+		return;
+	}
+
+	const $container = $scope.find( '#ppom-file-container-' + file_data_name );
+	const scope_product_id = $scope.find( '[name="ppom_product_id"]' ).val();
+	const instance_key = ppom_get_instance_key( file_data_name, $scope );
+
 	if (
-		! Object.prototype.hasOwnProperty.call(
-			field_file_count,
-			instance_key
-		)
+		! Object.prototype.hasOwnProperty.call( field_file_count, instance_key )
 	) {
 		field_file_count[ instance_key ] = 0;
 	}
@@ -755,9 +767,7 @@ function ppom_setup_file_upload_input( file_input, $scope ) {
 	);
 
 	// Energy pack
-	const bar = window.document.getElementById(
-		`ppom-progressbar-${ file_data_name }`
-	);
+	const bar = $scope.find( `#ppom-progressbar-${ file_data_name }` )[ 0 ];
 
 	const ppom_file_data = {
 		action: 'ppom_upload_file',
@@ -771,15 +781,9 @@ function ppom_setup_file_upload_input( file_input, $scope ) {
 		img_dim_errormsg = file_input.img_dimension_error;
 	}
 
-	const $browseButton = $scope.find( '#selectfiles-' + data_name );
-	const $container = $scope.find( '#ppom-file-container-' + file_data_name );
-
 	plupload_instances[ instance_key ] = new plupload.Uploader( {
 		runtimes: ppom_file_vars.plupload_runtime,
-		// Pass the scoped DOM elements themselves rather than the bare id
-		// strings: plupload resolves a string via `document.getElementById`,
-		// which always finds the *first* of two forms' identically-id'd
-		// buttons/containers — binding both uploaders to the same node.
+		// Elements, not ids: ids resolve to the first form.
 		browse_button: $browseButton[ 0 ],
 		container: $container[ 0 ],
 		drop_element: $container[ 0 ],
@@ -847,14 +851,8 @@ function ppom_setup_file_upload_input( file_input, $scope ) {
 					)
 				) {
 					jQuery( document ).on( 'ppom_field_shown', function ( e ) {
-						// e.scope (see ppom-conditions-v2.js) is this specific
-						// form's `.ppom-wrapper` when available, so a field
-						// shown in one PPOM form doesn't get set up against
-						// another form's identically-named field/container.
-						const $shownScope =
-							e.scope && e.scope.length
-								? e.scope
-								: jQuery( document );
+						// Only the form the field was shown in.
+						const $shownScopes = ppom_get_event_scopes( e );
 						jQuery.each(
 							ppom_input_vars.ppom_inputs,
 							function ( index, file_input ) {
@@ -869,9 +867,13 @@ function ppom_setup_file_upload_input( file_input, $scope ) {
 										file_input.file_size &&
 										file_input.files_allowed
 									) {
-										ppom_setup_file_upload_input(
-											file_input,
-											$shownScope
+										$shownScopes.each(
+											function ( i, wrapper ) {
+												ppom_setup_file_upload_input(
+													file_input,
+													jQuery( wrapper )
+												);
+											}
 										);
 									}
 								}
@@ -1061,6 +1063,7 @@ function ppom_setup_file_upload_input( file_input, $scope ) {
 						type: 'ppom_image_ready',
 						image: file,
 						data_name: file_data_name,
+						scope: $scope,
 						input_type: file_input.type,
 						image_url: obj_resp.file_url,
 						image_resp: obj_resp,
@@ -1247,8 +1250,13 @@ function ppom_setup_file_upload_input( file_input, $scope ) {
 
 // Persist the Croppie canvas output into hidden inputs so PHP can rebuild the
 // edited image from the same request payload used for normal uploaded files.
-function ppom_generate_cropper_data_for_cart( field_name ) {
-	const cropp_preview_container = jQuery(
+function ppom_generate_cropper_data_for_cart( field_name, $scope ) {
+	$scope = ppom_get_field_scope(
+		$scope,
+		'.ppom-croppie-wrapper-' + field_name
+	);
+	const preview_key = ppom_get_instance_key( field_name, $scope );
+	const cropp_preview_container = $scope.find(
 		'.ppom-croppie-wrapper-' + field_name
 	);
 
@@ -1267,9 +1275,11 @@ function ppom_generate_cropper_data_for_cart( field_name ) {
 					const image_url = canvas.toDataURL();
 					//console.log(image_url);
 					// remove first
-					jQuery(
-						`input[name="ppom[fields][${ field_name }][${ image_id }][cropped]"]`
-					).remove();
+					$scope
+						.find(
+							`input[name="ppom[fields][${ field_name }][${ image_id }][cropped]"]`
+						)
+						.remove();
 
 					// Add file check
 					jQuery(
@@ -1281,7 +1291,9 @@ function ppom_generate_cropper_data_for_cart( field_name ) {
 					)
 						.val( image_url )
 						.css( 'display', 'none' )
-						.appendTo( file_list_preview_containers[ field_name ] );
+						.appendTo(
+							file_list_preview_containers[ preview_key ]
+						);
 				} );
 		} );
 }

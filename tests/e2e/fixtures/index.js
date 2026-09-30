@@ -14,6 +14,7 @@ export {
 } from './ppom.js';
 export {
 	buildCheckboxField,
+	buildCropperField,
 	buildDateField,
 	buildFileField,
 	buildHtmlField,
