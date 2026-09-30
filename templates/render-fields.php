@@ -227,9 +227,20 @@ foreach ( $ppom_fields_meta as $meta ) {
 	}
 
 	$ppom_cond_data     = ppom_get_conditional_data_attributes( $meta );
-	$field_main_wrapper = 'ppom-field-wrapper ppom-col col-md-' . esc_attr( $col ) . ' ' . esc_attr( $input_wrapper_class );
+	$field_main_wrapper = 'ppom-field-wrapper ppom-col col-md-' . $col . ' ' . $input_wrapper_class;
 
-	$ppom_field_wrapper_div = '<div data-data_name=' . esc_attr( $data_name ) . ' ' . $ppom_cond_data . ' class="' . apply_filters( 'ppom_field_main_wapper_class', $field_main_wrapper, $meta ) . '">';
+	// The current conditional engine registers on `ppom_field_main_wrapper_class`
+	// and adds the initial `ppom-c-hide` and `ppom-cond-*` classes. This template
+	// only ever applied the misspelled name below, so legacy rendering started
+	// every conditional field visible and the condition script never found it.
+	$field_main_wrapper = apply_filters( 'ppom_field_main_wrapper_class', $field_main_wrapper, explode( ' ', $field_main_wrapper ), $meta );
+
+	// Deprecated misspelling, kept for anything already hooked to it. Escaped here
+	// because the filters above put saved field data into the class attribute.
+	$field_main_wrapper = apply_filters( 'ppom_field_main_wapper_class', $field_main_wrapper, $meta );
+
+	$ppom_field_wrapper_div = '<div data-data_name=' . esc_attr( $data_name ) . ' ' . $ppom_cond_data . ' class="' . esc_attr( $field_main_wrapper ) . '">';
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- an HTML tag built directly above, with every dynamic part escaped there.
 	echo apply_filters( 'ppom_field_wrapper_div', $ppom_field_wrapper_div, $meta, $product );
 
 	// Text|Email|Date|Number
@@ -667,6 +678,10 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'file_cost'     => $file_cost,
 				'taxable'       => $taxable,
 				'language'      => $language,
+				// Built from $meta through the same input manager the default
+				// templates use, so the field meta filters apply identically and
+				// the renderer defaults above never reach the notice.
+				'upload_notice' => \PPOM\Support\Helpers::get_file_uploader_notice( new PPOM_InputManager( $meta, $type ) ),
 			);
 
 
@@ -714,6 +729,8 @@ foreach ( $ppom_fields_meta as $meta ) {
 				'croppie_options' => $croppie_options,
 				'first_option'    => $first_option,
 				'options'         => $options,
+				// Same input manager the default cropper template uses.
+				'upload_notice'   => \PPOM\Support\Helpers::get_file_uploader_notice( new PPOM_InputManager( $meta, $type ) ),
 			);
 
 

@@ -40,12 +40,16 @@ $custom_attr = array();
 ?>
 
 
-<div class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
+<fieldset class="<?php echo esc_attr( $fm->field_inner_wrapper_classes() ); ?>">
 
 	<!-- if title of field exist -->
 	<?php if ( $fm->field_label() ) : ?>
-		<label class="<?php echo esc_attr( $fm->label_classes() ); ?>"
-				for="<?php echo esc_attr( $fm->data_name() ); ?>"><?php echo $fm->field_label(); ?></label>
+		<legend class="<?php echo esc_attr( $fm->label_classes() ); ?>">
+			<?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ppom_esc_html() sanitizes via wp_kses(), same pattern used for this value across the template set (quantities.php, cropper.php, divider.php, text.php).
+			echo ppom_esc_html( $fm->field_label() );
+			?>
+		</legend>
 	<?php endif ?>
 
 	<!-- Legacy View -->
@@ -117,6 +121,7 @@ $custom_attr = array();
 									type="checkbox"
 									name="<?php echo esc_attr( $fm->form_name() ); ?>[]"
 									id="<?php echo esc_attr( $option_id ); ?>"
+									aria-label="<?php echo esc_attr( $image_label ? $image_label : $image_title ); ?>"
 									data-price="<?php echo esc_attr( $image_price ); ?>"
 									class="<?php echo esc_attr( $input_classes ); ?>"
 									data-label="<?php echo esc_attr( $image_title ); ?>"
@@ -132,6 +137,7 @@ $custom_attr = array();
 									type="radio"
 									name="<?php echo esc_attr( $fm->form_name() ); ?>[]"
 									id="<?php echo esc_attr( $option_id ); ?>"
+									aria-label="<?php echo esc_attr( $image_label ? $image_label : $image_title ); ?>"
 									data-price="<?php echo esc_attr( $image_price ); ?>"
 									class="<?php echo esc_attr( $input_classes ); ?>"
 									data-label="<?php echo esc_attr( $image_title ); ?>"
@@ -214,6 +220,7 @@ $custom_attr = array();
 					?>
 
 					<label class="ppom-palette-item">
+						<span class="screen-reader-text"><?php echo esc_html( $image_label ? $image_label : $image_title ); ?></span>
 						<span class="pre_upload_image <?php echo esc_attr( $fm->input_classes() ); ?>">
 							<input
 									type="checkbox"
@@ -314,4 +321,4 @@ $custom_attr = array();
 		<?php
 	}
 	?>
-</div>
+</fieldset>

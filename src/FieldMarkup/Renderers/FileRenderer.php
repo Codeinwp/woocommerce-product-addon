@@ -23,10 +23,10 @@ final class FileRenderer extends AbstractInputRenderer {
 
 		$input_wrapper_class = FieldChrome::inputWrapperClass( $this->context, $id, $args );
 
-		$html = '<div id="ppom-file-container-' . esc_attr( $args['id'] ) . '" class="' . $input_wrapper_class . '">';
+		$html = '<fieldset id="ppom-file-container-' . esc_attr( $args['id'] ) . '" class="' . $input_wrapper_class . '">';
 		if ( $label ) {
-			$html .= '<label class="' . $this->context->getDefaultSettingValue( 'global', 'label_class', $id ) . '" for="' . $id . '">';
-			$html .= $label . '</label>';
+			$html .= '<legend class="' . $this->context->getDefaultSettingValue( 'global', 'label_class', $id ) . '">';
+			$html .= $label . '</legend>';
 		}
 
 		$container_height = isset( $args['dragdrop'] ) ? 'auto' : '30px';
@@ -38,6 +38,9 @@ final class FileRenderer extends AbstractInputRenderer {
 		$html            .= $args['button_label'] . '</a>';
 		$html            .= '<span class="ppom-dragdrop-text">';
 		$html            .= __( 'Drag File Here', 'woocommerce-product-addon' );
+		$html            .= '</span>';
+		$html            .= '<span class="ppom-field-notice">';
+		$html            .= esc_html( isset( $args['upload_notice'] ) ? $args['upload_notice'] : '' );
 		$html            .= '</span>';
 		$html            .= '</div>';
 
@@ -78,7 +81,7 @@ final class FileRenderer extends AbstractInputRenderer {
 
 		$html .= '</div>';
 
-		$html .= '</div>';
+		$html .= '</fieldset>';
 
 		return $this->applyOutputFilter( $html, $args, $default_files );
 	}

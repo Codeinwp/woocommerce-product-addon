@@ -287,4 +287,72 @@ class Test_Validator_Limits extends PPOM_Test_Case {
 		$this->assertSame( 2, $validated['step'] );
 		$this->assertSame( 2, (int) $validated['input_value'] );
 	}
+
+	/**
+	 * Regression for Codeinwp/woocommerce-product-addon#719.
+	 *
+	 * WooCommerce grouped children and Mix and Match children render with a
+	 * zero minimum so "0" means "not selected". PPOM must leave that alone
+	 * when it has no quantity limits of its own.
+	 *
+	 * @return void
+	 */
+	public function test_validation_product_limits_keeps_zero_minimum_without_ppom() {
+		$product = $this->create_simple_product();
+
+		$validated = Validator::validation_product_limits(
+			array(
+				'min_value'   => 0,
+				'max_value'   => '',
+				'input_value' => '',
+			),
+			$product
+		);
+
+		$this->assertSame( 0, $validated['min_value'] );
+		$this->assertSame( '', $validated['input_value'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_validation_product_limits_keeps_zero_minimum_with_non_quantity_ppom_group() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta(
+			array( $this->build_text_field( 'engraving', 'Engraving' ) ),
+			$product->get_id()
+		);
+
+		$validated = Validator::validation_product_limits(
+			array(
+				'min_value'   => 0,
+				'max_value'   => '',
+				'input_value' => '',
+			),
+			$product
+		);
+
+		$this->assertSame( 0, $validated['min_value'] );
+		$this->assertSame( '', $validated['input_value'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_validation_variation_limits_keeps_zero_minimum_without_ppom() {
+		$pair      = $this->create_variable_product_with_variation();
+		$variation = $pair['variation'];
+
+		$validated = Validator::validation_variation_limits(
+			array(
+				'min_qty'     => 0,
+				'max_qty'     => '',
+				'input_value' => '',
+			),
+			$variation,
+			$variation
+		);
+
+		$this->assertSame( 0, $validated['min_qty'] );
+	}
 }

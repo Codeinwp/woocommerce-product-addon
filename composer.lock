@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f94835ec65e54543d8453e459f8b8483",
+    "content-hash": "76f26c65a990e5a9e1aa3017c1c7291e",
     "packages": [
         {
             "name": "codeinwp/themeisle-sdk",
-            "version": "3.3.61",
+            "version": "3.3.65",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Codeinwp/themeisle-sdk.git",
-                "reference": "9fe698b52dec768a0dd8b500fb51efe40962ee99"
+                "reference": "f650fe856d52ce4e5754557d89ba2f3127ad54d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Codeinwp/themeisle-sdk/zipball/9fe698b52dec768a0dd8b500fb51efe40962ee99",
-                "reference": "9fe698b52dec768a0dd8b500fb51efe40962ee99",
+                "url": "https://api.github.com/repos/Codeinwp/themeisle-sdk/zipball/f650fe856d52ce4e5754557d89ba2f3127ad54d8",
+                "reference": "f650fe856d52ce4e5754557d89ba2f3127ad54d8",
                 "shasum": ""
             },
             "require-dev": {
@@ -43,9 +43,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Codeinwp/themeisle-sdk/issues",
-                "source": "https://github.com/Codeinwp/themeisle-sdk/tree/v3.3.61"
+                "source": "https://github.com/Codeinwp/themeisle-sdk/tree/v3.3.65"
             },
-            "time": "2026-08-24T15:59:27+00:00"
+            "time": "2026-09-29T09:35:47+00:00"
         }
     ],
     "packages-dev": [
@@ -537,16 +537,16 @@
         },
         {
             "name": "php-stubs/woocommerce-stubs",
-            "version": "v11.0.0",
+            "version": "v11.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-stubs/woocommerce-stubs.git",
-                "reference": "923dd29055713886efd7f85ea2510b9c6955a714"
+                "reference": "b34e5fa17f177b89f486b639c41e57d78a44d4cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-stubs/woocommerce-stubs/zipball/923dd29055713886efd7f85ea2510b9c6955a714",
-                "reference": "923dd29055713886efd7f85ea2510b9c6955a714",
+                "url": "https://api.github.com/repos/php-stubs/woocommerce-stubs/zipball/b34e5fa17f177b89f486b639c41e57d78a44d4cd",
+                "reference": "b34e5fa17f177b89f486b639c41e57d78a44d4cd",
                 "shasum": ""
             },
             "require": {
@@ -575,9 +575,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-stubs/woocommerce-stubs/issues",
-                "source": "https://github.com/php-stubs/woocommerce-stubs/tree/v11.0.0"
+                "source": "https://github.com/php-stubs/woocommerce-stubs/tree/v11.1.1"
             },
-            "time": "2026-08-04T19:31:58+00:00"
+            "time": "2026-09-18T13:07:48+00:00"
         },
         {
             "name": "php-stubs/wordpress-stubs",

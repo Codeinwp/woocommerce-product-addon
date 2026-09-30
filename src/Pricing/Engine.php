@@ -1075,7 +1075,20 @@ final class Engine {
 			return 0.0;
 		}
 
-		return (float) wc_format_decimal( (string) $value );
+		$value = (string) $value;
+
+		if ( is_numeric( $value ) ) {
+			return (float) $value;
+		}
+
+		// wc_format_decimal() expects grouping removed; "1.000" would otherwise read as 1.0 (#720).
+		// Only a separator in front of exactly three digits is grouping; "10.00" keeps its decimal point.
+		$thousands = wc_get_price_thousand_separator();
+		if ( '' !== $thousands && wc_get_price_decimal_separator() !== $thousands ) {
+			$value = (string) preg_replace( '/' . preg_quote( $thousands, '/' ) . '(?=\d{3}(?!\d))/', '', $value );
+		}
+
+		return (float) wc_format_decimal( $value );
 	}
 
 	// Get total quantities
@@ -1260,7 +1273,8 @@ final class Engine {
 	) {
 
 		// converting back to org price if Currency Switcher is used
-		$base_price = Callbacks::convert_price_back( $product_price );
+		// Filters may return a formatted string like "€ 10.00"; arithmetic on it throws on PHP 8 (#720).
+		$base_price = Callbacks::convert_price_back( self::normalize_price_value( $product_price ) );
 		// $base_price  = $product->get_price();
 		// $base_price = floatval($base_price);
 		// $base_price  = $product->get_price();
@@ -1340,7 +1354,14 @@ final class Engine {
 			'source' => $source,
 		);
 
-		return apply_filters( 'ppom_price_info', $price_info, $product, $ppom_fields_post, $ppom_field_prices );
+		$price_info = apply_filters( 'ppom_price_info', $price_info, $product, $ppom_fields_post, $ppom_field_prices );
+
+		// Same guard for the filtered result.
+		if ( is_array( $price_info ) && isset( $price_info['price'] ) ) {
+			$price_info['price'] = self::normalize_price_value( $price_info['price'] );
+		}
+
+		return $price_info;
 	}
 
 	// If price set by pricematrix in cart return matrix
@@ -1371,20 +1392,49 @@ final class Engine {
 		return apply_filters( 'ppom_price_matrix_chunk_cart', $matrix_found, $product, $pm_applied );
 	}
 
+	/**
+	 * Parse one endpoint of a bulk-quantity `Quantity Range`.
+	 *
+	 * @param mixed $value Raw endpoint from the stored matrix.
+	 * @return int|null Integer value, or null when the endpoint is unusable.
+	 */
+	private static function parse_range_endpoint( $value ) {
+
+		if ( ! is_scalar( $value ) ) {
+			return null;
+		}
+
+		$trimmed = trim( (string) $value );
+
+		if ( ! preg_match( '/^[0-9]{1,15}$/', $trimmed ) ) {
+			return null;
+		}
+
+		return intval( $trimmed );
+	}
+
 	// If Bulkquantity add-on is used, get it's chunk
 	public static function price_bulkquantity_chunk( $product, $bulkquantity_options, $product_quantity ) {
 
 		$bq_found = array();
 
-		if ( count( $bulkquantity_options ) > 0 ) {
+		if ( is_array( $bulkquantity_options ) ) {
 
 			foreach ( $bulkquantity_options as $bq ) {
 
-				// ppom_pa($bq);
-				$range       = $bq['Quantity Range'];
+				if ( ! is_array( $bq ) ) {
+					continue;
+				}
+
+				$range       = isset( $bq['Quantity Range'] ) && is_scalar( $bq['Quantity Range'] ) ? (string) $bq['Quantity Range'] : '';
 				$range_array = explode( '-', $range );
-				$range_start = intval( $range_array[0] );
-				$range_end   = intval( $range_array[1] );
+
+				$range_start = self::parse_range_endpoint( $range_array[0] );
+				$range_end   = isset( $range_array[1] ) ? self::parse_range_endpoint( $range_array[1] ) : null;
+
+				if ( null === $range_start || null === $range_end ) {
+					continue;
+				}
 
 				// var_dump($bq);
 				$quantity = intval( $product_quantity );

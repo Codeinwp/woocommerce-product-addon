@@ -104,6 +104,34 @@ async function createSimpleProducts( requestUtils, products = [] ) {
 	return createdProducts;
 }
 
+/**
+ * Create a WooCommerce grouped product wrapping existing child products.
+ *
+ * @param {import('@wordpress/e2e-test-utils-playwright').RequestUtils} requestUtils Request utility.
+ * @param {object} overrides Overrides; `childIds` (number[]) is required.
+ *
+ * @return {Promise<object>}
+ */
+async function createGroupedProduct( requestUtils, overrides = {} ) {
+	if (
+		! Array.isArray( overrides.childIds ) ||
+		overrides.childIds.length === 0
+	) {
+		throw new Error( 'createGroupedProduct requires a non-empty childIds.' );
+	}
+
+	const suffix = uniqueSuffix();
+
+	return postBootstrapAction(
+		requestUtils,
+		'ppom_e2e_create_grouped_product',
+		{
+			name: overrides.name ?? `PPOM Grouped Product ${ suffix }`,
+			children: overrides.childIds,
+		}
+	);
+}
+
 async function createVariableProduct( requestUtils, overrides = {} ) {
 	const suffix = uniqueSuffix();
 
@@ -148,6 +176,7 @@ async function createProductVariation( requestUtils, overrides = {} ) {
 }
 
 export {
+	createGroupedProduct,
 	createProductCategory,
 	createProductTag,
 	createProductVariation,

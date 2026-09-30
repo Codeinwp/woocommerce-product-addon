@@ -202,7 +202,7 @@ class PPOM_Form {
 			}
 
 			do_action( 'ppom_rendering_inputs', $meta, $data_name, $fm->input_classes_array(), $fm->field_label(), $fm->options() );
-			do_action( "ppom_rendering_inputs_{$type}", $meta, $default_value );
+			do_action( "ppom_rendering_inputs_{$type}", $meta, $default_value, $this->product );
 
 			$field_html .= ob_get_clean();
 

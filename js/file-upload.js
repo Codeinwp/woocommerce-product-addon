@@ -41,7 +41,7 @@ const Cropped_Data_Captured = false;
 
 // Track nonce refresh state to avoid duplicate requests
 let nonceRefreshPromise = null;
-let lastNonceRefreshTime = Date.now();
+let lastNonceRefreshTime = 0;
 const NONCE_CACHE_DURATION = 300000; // 5 minutes in milliseconds
 
 /**
@@ -158,6 +158,30 @@ async function ppom_refresh_file_nonces() {
 		} );
 
 	return nonceRefreshPromise;
+}
+
+/**
+ * Refreshes the upload nonce (throttled, see NONCE_CACHE_DURATION) and only
+ * then starts the queue - up.start() is our own call, not a plupload-internal
+ * hook, so awaiting first here (unlike inside BeforeUpload) actually delays
+ * the request instead of racing it.
+ *
+ * @param {Object} up Plupload uploader instance.
+ */
+async function ppom_start_upload_with_fresh_nonce( up ) {
+	try {
+		await ppom_refresh_file_nonces();
+		up.setOption( 'multipart_params', {
+			...up.settings.multipart_params,
+			ppom_nonce: ppom_file_vars.ppom_file_upload_nonce,
+		} );
+	} catch ( error ) {
+		console.warn(
+			'Failed to refresh upload nonce, using existing:',
+			error
+		);
+	}
+	up.start();
 }
 
 jQuery( function ( $ ) {
@@ -663,6 +687,50 @@ function ppom_setup_file_upload_input( file_input ) {
 
 		init: {
 			PostInit() {
+				// Plupload's HTML5 runtime injects a real <input type="file">
+				// (invisible, stacked over the "Select files" button) into our
+				// `container` element with no accessible name of its own.
+				// Give it one now that it exists. Cropper's "Change image"
+				// flow runs this same setup a second time against the same
+				// container (see ppom_show_cropped_preview), so a plain
+				// querySelector here would keep re-labelling the first
+				// (original) input and leave the second one unnamed --
+				// each PostInit only ever runs after the shim it belongs to
+				// has just been appended, so the *last* match in the
+				// container is always this instance's own input.
+				const containerFileInputs = document.querySelectorAll(
+					`#ppom-file-container-${ file_data_name } input[type="file"]`
+				);
+				const nativeFileInput =
+					containerFileInputs[ containerFileInputs.length - 1 ];
+				if ( nativeFileInput ) {
+					// Read from what's actually rendered rather than
+					// `file_input.title`: that's the raw stored metadata,
+					// not the translated/filtered/escaped text a sighted
+					// shopper sees. For the normal case the field legend
+					// (e.g. "Upload Your Design") is the useful name --
+					// the chooser button's own text is just the generic
+					// default "Select files". For cropper's "Change image"
+					// uploader (is_change_image) it's the other way round:
+					// the button text is the specific name and the legend
+					// is the shared, less-useful field title.
+					const chooserButton = document.getElementById(
+						'selectfiles-' + data_name
+					);
+					const legend = document.querySelector(
+						`#ppom-file-container-${ file_data_name } > legend`
+					);
+					const primaryName = file_input.is_change_image
+						? chooserButton?.textContent.trim()
+						: legend?.textContent.trim();
+					const fallbackName = file_input.is_change_image
+						? legend?.textContent.trim()
+						: chooserButton?.textContent.trim();
+					const accessibleName =
+						primaryName || fallbackName || 'Select files';
+					nativeFileInput.setAttribute( 'aria-label', accessibleName );
+				}
+
 				// file_list_preview_containers[file_data_name].html('');
 				if (
 					! file_list_preview_containers[ file_data_name ].is(
@@ -802,7 +870,7 @@ function ppom_setup_file_upload_input( file_input ) {
 										],
 										up
 									);
-									up.start();
+									ppom_start_upload_with_fresh_nonce( up );
 								}
 							};
 							img.load( file.getSource() );
@@ -814,7 +882,7 @@ function ppom_setup_file_upload_input( file_input ) {
 								file_list_preview_containers[ file_data_name ],
 								up
 							);
-							up.start();
+							ppom_start_upload_with_fresh_nonce( up );
 						}
 
 						// Energy pack
@@ -1007,26 +1075,6 @@ function ppom_setup_file_upload_input( file_input ) {
 					file_resp: obj_resp,
 					time: new Date(),
 				} );
-			},
-
-			async BeforeUpload( up, file ) {
-				// Refresh nonces before upload to handle stale nonces in cached pages
-				try {
-					await ppom_refresh_file_nonces();
-					// Update the multipart_params with the fresh nonce
-					up.setOption( 'multipart_params', {
-						action: 'ppom_upload_file',
-						data_name: file_data_name,
-						ppom_nonce: ppom_file_vars.ppom_file_upload_nonce,
-						product_id: ppom_file_vars.product_id,
-					} );
-				} catch ( error ) {
-					// Log warning but continue with existing nonce
-					console.warn(
-						'Failed to refresh upload nonce, using existing:',
-						error
-					);
-				}
 			},
 
 			UploadProgress( up, file ) {

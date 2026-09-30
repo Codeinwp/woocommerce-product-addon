@@ -40,6 +40,9 @@ final class CropperRenderer extends AbstractInputRenderer {
 		$html            .= 'class="btn btn-primary ' . esc_attr( $args['button_class'] ) . '">';
 		$html            .= $args['button_label'] . '</a>';
 		$html            .= '<span class="ppom-dragdrop-text">' . __( 'Drag file/directory here', 'woocommerce-product-addon' ) . '</span>';
+		$html            .= '<span class="ppom-field-notice">';
+		$html            .= esc_html( isset( $args['upload_notice'] ) ? $args['upload_notice'] : '' );
+		$html            .= '</span>';
 		$html            .= '</div>';
 
 		if ( ! empty( $args['dragdrop'] ) ) {
