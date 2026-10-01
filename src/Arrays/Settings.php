@@ -7,6 +7,7 @@
 
 namespace PPOM\Arrays;
 
+use PPOM\Files\Handler;
 use PPOM\Support\Helpers;
 use PPOM_Meta;
 use WC_Product;
@@ -607,7 +608,7 @@ final class Settings {
 					// Ensure defaults so the frontend uploader never receives an empty
 					// file_types value, which crashes plupload during init.
 					if ( empty( $fields_meta['file_types'] ) ) {
-						$fields_meta['file_types'] = 'jpg,pdf,zip';
+						$fields_meta['file_types'] = Handler::DEFAULT_FILE_TYPES;
 					}
 					if ( empty( $fields_meta['file_size'] ) ) {
 						$fields_meta['file_size'] = '1mb';
@@ -619,7 +620,7 @@ final class Settings {
 					// Same guard as 'file', but cropper is image-only — match its
 					// builder default (jpg,png) instead of allowing pdf/zip.
 					if ( empty( $fields_meta['file_types'] ) ) {
-						$fields_meta['file_types'] = 'jpg,png';
+						$fields_meta['file_types'] = Handler::DEFAULT_CROPPER_FILE_TYPES;
 					}
 					if ( empty( $fields_meta['file_size'] ) ) {
 						$fields_meta['file_size'] = '1mb';

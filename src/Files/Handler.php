@@ -19,6 +19,16 @@ final class Handler {
 	 */
 	private const OWNED_FILES_KEY = 'ppom_uploaded_files';
 
+	/**
+	 * Uploader default for a file field with no "File types" setting.
+	 */
+	public const DEFAULT_FILE_TYPES = 'jpg,pdf,zip';
+
+	/**
+	 * Uploader default for a cropper field with no "File types" setting.
+	 */
+	public const DEFAULT_CROPPER_FILE_TYPES = 'jpg,png';
+
 	public static function files_setup_get_directory( $sub_dir = false ) {
 
 		$upload_dir = wp_upload_dir();
@@ -251,6 +261,18 @@ final class Handler {
 			wp_send_json( $response );
 		}
 
+		// Resolve the field first; its own file types authorize the extension.
+		$product_id = intval( $_REQUEST['product_id'] );
+		$data_name  = sanitize_key( $_REQUEST['data_name'] );
+		$file_meta  = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
+
+		// Nonce-failure wording on purpose, so field names cannot be probed.
+		if ( ! self::field_accepts_uploads( $file_meta ) ) {
+			$response ['status']  = 'error';
+			$response ['message'] = __( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', 'woocommerce-product-addon' );
+			wp_send_json( $response );
+		}
+
 		$file_name = '';
 
 		if ( isset( $_REQUEST['name'] ) && $_REQUEST['name'] != '' ) {
@@ -266,7 +288,8 @@ final class Handler {
 			array(
 				'ai'  => 'application/postscript',
 				'eps' => 'application/postscript',
-			) 
+				'svg' => 'image/svg+xml',
+			)
 		);
 
 		$allowed_mime_types = array_merge( get_allowed_mime_types(), $additional_mime_types );
@@ -280,14 +303,8 @@ final class Handler {
 		$restricted_type    = Helpers::get_option( 'ppom_restricted_file_type', $default_restricted );
 		$restricted_type    = explode( ',', $restricted_type );
 
-		if ( empty( $extension ) || in_array( strtolower( $extension ), $restricted_type ) ) {
-			$response ['status']  = 'error';
-			$response ['message'] = sprintf(
-			// translators: %s: the name of the extension.
-				__( 'File type not valid - %s', 'woocommerce-product-addon' ),
-				$extension
-			);
-			wp_send_json( $response );
+		if ( empty( $extension ) || in_array( strtolower( $extension ), $restricted_type ) || ! self::field_allows_extension( $file_meta, $extension ) ) {
+			self::send_invalid_file_type( (string) $extension );
 		}
 		/* ========== Invalid File type checking ========== */
 
@@ -331,6 +348,9 @@ final class Handler {
 			$file_path = $file_dir_path . $file_name;
 		}
 
+		// Ends in .bin, so servers send partial uploads as application/octet-stream.
+		$chunk_file_path = $file_dir_path . pathinfo( $file_name, PATHINFO_FILENAME ) . '.part.bin';
+
 		// Remove old temp files
 		if ( is_dir( $file_dir_path ) && ( $dir = opendir( $file_dir_path ) ) ) {
 			while ( ( $file = readdir( $dir ) ) !== false ) {
@@ -338,9 +358,9 @@ final class Handler {
 
 				// Remove temp file if it is older than the max age and is not the current file
 				if (
-				preg_match( '/\.part$/', $file ) &&
+				preg_match( '/\.part(\.bin)?$/', $file ) &&
 				( filemtime( $tmp_file_path ) < time() - $maxFileAge ) &&
-				( $tmp_file_path != "$file_path.part" )
+				( $tmp_file_path != $chunk_file_path )
 				) {
 					@unlink( $tmp_file_path );
 				}
@@ -371,7 +391,6 @@ final class Handler {
 			die( UploadErrors::get_message_response( UploadErrors::MISSING_TEMP_FILE ) );
 		}
 
-		$chunk_file_path            = "$file_path.part";
 		$uploaded_file_path_to_read = $is_multipart ? $temp_file_name : 'php://input';
 
 		$error = self::create_chunk_file( $uploaded_file_path_to_read, $chunk_file_path, $chunk == 0 ? 'wb' : 'ab' );
@@ -387,31 +406,19 @@ final class Handler {
 		// Check if the file has been uploaded completely.
 		if ( ! $chunks || $chunk === $chunks - 1 ) {
 
+			// SVG is executable markup; sanitize it before it gets a public name.
+			$is_svg = 'svg' === $file_ext || 'image/svg+xml' === $file_type['type'];
+			if ( $is_svg && ! self::sanitize_svg_file( $chunk_file_path ) ) {
+				@unlink( $chunk_file_path );
+				self::send_invalid_file_type( $file_ext );
+			}
+
 			// Give a unique name to prevent name collisions.
 			$file_name        = self::create_unique_file_name( $original_name, $file_ext, $file_dir_path );
 			$unique_file_path = $file_dir_path . $file_name;
 
 			rename( $chunk_file_path, $unique_file_path );
 			$file_path = $unique_file_path;
-
-			$product_id = intval( $_REQUEST['product_id'] );
-			$data_name  = sanitize_key( $_REQUEST['data_name'] );
-			$file_meta  = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
-
-			// The upload nonce is public, so the posted product and field are not
-			// necessarily a pair the form could have produced. Keeping a file no
-			// form references only leaves something to clean up later.
-			//
-			// Same wording as the nonce failure above on purpose: saying which
-			// field names exist, and which of them accept uploads, would let the
-			// endpoint be probed to map a product's fields.
-			if ( ! self::field_accepts_uploads( $file_meta ) ) {
-				@unlink( $file_path );
-
-				$response ['status']  = 'error';
-				$response ['message'] = __( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', 'woocommerce-product-addon' );
-				wp_send_json( $response );
-			}
 
 			self::remember_uploaded_file( $file_name );
 
@@ -455,6 +462,63 @@ final class Handler {
 		// Return JSON-RPC response
 		// die ( '{"jsonrpc" : "2.0", "result" : '. json_encode($response) .', "id" : "id"}' );
 		die( json_encode( apply_filters( 'ppom_file_upload', $response, $file_type, $file_dir_path, $file_name ) ) );
+	}
+
+	/**
+	 * Whether the field's own "File types" setting allows the extension.
+	 *
+	 * @param mixed  $file_meta Field definition resolved from the posted data name.
+	 * @param string $extension Extension resolved from the upload request.
+	 *
+	 * @return bool
+	 */
+	private static function field_allows_extension( $file_meta, string $extension ): bool {
+
+		$type = is_array( $file_meta ) && isset( $file_meta['type'] ) ? $file_meta['type'] : '';
+
+		$default_types = 'cropper' === $type ? self::DEFAULT_CROPPER_FILE_TYPES : self::DEFAULT_FILE_TYPES;
+
+		$configured = is_array( $file_meta ) && ! empty( $file_meta['file_types'] )
+			? (string) $file_meta['file_types']
+			: $default_types;
+
+		$allowed = array_map( 'strtolower', array_map( 'trim', explode( ',', $configured ) ) );
+
+		// Plupload reads "*" as any extension; the mime and restricted checks still apply.
+		return in_array( '*', $allowed, true ) || in_array( strtolower( $extension ), $allowed, true );
+	}
+
+	/**
+	 * Ends the upload request with the invalid file type error.
+	 *
+	 * @param string $extension Extension named in the message.
+	 *
+	 * @return void
+	 */
+	private static function send_invalid_file_type( string $extension ): void {
+		$response = array(
+			'status'  => 'error',
+			'message' => sprintf(
+				// translators: %s: the name of the extension.
+				__( 'File type not valid - %s', 'woocommerce-product-addon' ),
+				$extension
+			),
+		);
+		wp_send_json( $response );
+	}
+
+	/**
+	 * Rewrites an uploaded SVG in place, keeping only safe markup.
+	 *
+	 * @param string $file_path Path to the uploaded SVG.
+	 *
+	 * @return bool False when the file is not a usable SVG.
+	 */
+	private static function sanitize_svg_file( string $file_path ): bool {
+
+		$clean = SvgSanitizer::clean( (string) file_get_contents( $file_path ) );
+
+		return null !== $clean && false !== file_put_contents( $file_path, $clean );
 	}
 
 	/**

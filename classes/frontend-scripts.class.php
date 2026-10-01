@@ -427,7 +427,7 @@ class PPOM_FRONTEND_SCRIPTS {
 								// Cropper is image-only; default to its builder value (jpg,png) so the
 								// uploader never receives an empty file_types (which crashes plupload).
 								if ( empty( $fields_meta['file_types'] ) ) {
-									$fields_meta['file_types'] = 'jpg,png';
+									$fields_meta['file_types'] = \PPOM\Files\Handler::DEFAULT_CROPPER_FILE_TYPES;
 								}
 								if ( empty( $fields_meta['file_size'] ) ) {
 									$fields_meta['file_size'] = '1mb';
@@ -452,7 +452,7 @@ class PPOM_FRONTEND_SCRIPTS {
 								// Default so the uploader never receives an empty file_types,
 								// which crashes plupload during init.
 								if ( empty( $fields_meta['file_types'] ) ) {
-									$fields_meta['file_types'] = 'jpg,pdf,zip';
+									$fields_meta['file_types'] = \PPOM\Files\Handler::DEFAULT_FILE_TYPES;
 								}
 								if ( empty( $fields_meta['file_size'] ) ) {
 									$fields_meta['file_size'] = '1mb';
