@@ -195,6 +195,106 @@ test.describe( 'Multiple PPOM forms on one page', () => {
 		await expect( previewB ).toHaveCount( 1 );
 	} );
 
+	test( 'hiding resets and showing restores defaults only in the changed form', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const token = uniqueToken();
+		const triggerId = `trigger_${ token }`;
+		const targetId = `target_${ token }`;
+		const choiceId = `choice_${ token }`;
+		const revealOption = { label: 'Reveal', value: 'reveal' };
+		const hideOption = { label: 'Hide', value: 'hide' };
+		const revealRule = {
+			visibility: 'Show',
+			bound: 'All',
+			rules: [
+				{
+					elements: triggerId,
+					operators: 'is',
+					element_values: revealOption.label,
+				},
+			],
+		};
+
+		const { formA, formB } = await openTwoForms( {
+			page,
+			requestUtils,
+			token,
+			fields: [
+				buildSelectField( {
+					title: `Trigger ${ token }`,
+					dataName: triggerId,
+					options: [ hideOption, revealOption ],
+				} ),
+				buildTextField( {
+					title: `Target ${ token }`,
+					dataName: targetId,
+					logic: 'on',
+					conditions: revealRule,
+				} ),
+				buildSelectField( {
+					title: `Choice ${ token }`,
+					dataName: choiceId,
+					selected: 'Two',
+					options: [
+						{ label: 'One', value: 'one' },
+						{ label: 'Two', value: 'two' },
+					],
+					logic: 'on',
+					conditions: revealRule,
+				} ),
+			],
+		} );
+
+		const triggerA = formA.locator(
+			`select[name="ppom[fields][${ triggerId }]"]`
+		);
+		const triggerB = formB.locator(
+			`select[name="ppom[fields][${ triggerId }]"]`
+		);
+		const textA = formA.locator(
+			`input[name="ppom[fields][${ targetId }]"]`
+		);
+		const textB = formB.locator(
+			`input[name="ppom[fields][${ targetId }]"]`
+		);
+		const choiceA = formA.locator(
+			`select[name="ppom[fields][${ choiceId }]"]`
+		);
+		const choiceB = formB.locator(
+			`select[name="ppom[fields][${ choiceId }]"]`
+		);
+
+		// Showing in B restores B's default only; an unscoped `#id` hits A.
+		await triggerB.selectOption( { label: revealOption.label } );
+		await expect( choiceB ).toBeVisible();
+		await expect( choiceB ).toHaveValue( 'Two' );
+		await expect( choiceA ).toBeHidden();
+		await expect( choiceA ).not.toHaveValue( 'Two' );
+
+		await triggerA.selectOption( { label: revealOption.label } );
+		await expect( choiceA ).toHaveValue( 'Two' );
+
+		await textA.fill( 'value A' );
+		await textB.fill( 'value B' );
+
+		// Hiding in B resets B only.
+		await triggerB.selectOption( { label: hideOption.label } );
+		await expect( textB ).toBeHidden();
+		await expect( textB ).toHaveValue( '' );
+		await expect( textA ).toHaveValue( 'value A' );
+
+		await triggerB.selectOption( { label: revealOption.label } );
+		await textB.fill( 'value B' );
+
+		// Hiding in A resets A only.
+		await triggerA.selectOption( { label: hideOption.label } );
+		await expect( textA ).toBeHidden();
+		await expect( textA ).toHaveValue( '' );
+		await expect( textB ).toHaveValue( 'value B' );
+	} );
+
 	test( 'cropper upload shows its preview only in its own form', async ( {
 		page,
 		requestUtils,

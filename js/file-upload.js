@@ -96,7 +96,7 @@ function ppom_get_field_scope( $scope, selector ) {
 /**
  * The `.ppom-wrapper` a field event belongs to, or every wrapper if unknown.
  *
- * @param {Object} e jQuery event.
+ * @param {{ scope?: jQuery, target: EventTarget }} e jQuery event.
  * @return {jQuery} Matching `.ppom-wrapper` elements.
  */
 function ppom_get_event_scopes( e ) {
@@ -587,8 +587,16 @@ function save_edited_photo( img_id, photo_url ) {
 	} );
 }
 
-// Once an upload finishes, create the Croppie preview that feeds the hidden
-// cropped-image payload later submitted with the add-to-cart request.
+/**
+ * Once an upload finishes, create the Croppie preview that feeds the hidden
+ * cropped-image payload later submitted with the add-to-cart request.
+ *
+ * @param {string}              file_name
+ * @param {string}              image_url
+ * @param {string}              image_id
+ * @param {PPOMUploadFieldMeta} file_input
+ * @param {jQuery}              [$scope]
+ */
 function ppom_show_cropped_preview(
 	file_name,
 	image_url,
@@ -671,6 +679,12 @@ function ppom_show_cropped_preview(
 	ppom_set_croppie_options( file_name, undefined, image_id, preview_key );
 }
 
+/**
+ * @param {string} file_name
+ * @param {Object} [viewport]
+ * @param {string} image_id
+ * @param {string} [preview_key]
+ */
 function ppom_set_croppie_options(
 	file_name,
 	viewport,
@@ -844,7 +858,6 @@ function ppom_setup_file_upload_input( file_input, $scope ) {
 					nativeFileInput.setAttribute( 'aria-label', accessibleName );
 				}
 
-				// file_list_preview_containers[instance_key].html('');
 				if (
 					! file_list_preview_containers[ instance_key ].is(
 						':visible'
@@ -1248,8 +1261,13 @@ function ppom_setup_file_upload_input( file_input, $scope ) {
 	uploaderInstances[ instance_key ] = plupload_instances[ instance_key ];
 }
 
-// Persist the Croppie canvas output into hidden inputs so PHP can rebuild the
-// edited image from the same request payload used for normal uploaded files.
+/**
+ * Persist the Croppie canvas output into hidden inputs so PHP can rebuild the
+ * edited image from the same request payload used for normal uploaded files.
+ *
+ * @param {string} field_name
+ * @param {jQuery} [$scope]
+ */
 function ppom_generate_cropper_data_for_cart( field_name, $scope ) {
 	$scope = ppom_get_field_scope(
 		$scope,

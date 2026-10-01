@@ -139,8 +139,8 @@ jQuery( function ( $ ) {
 		// console.log(e.field)
 
 		// Only the form that fired the event.
-		const $scope = e.scope && e.scope.length ? e.scope : $( document );
-		const product_id = $scope.find( '[name="ppom_product_id"]' ).val();
+		const $scope = ppom_form_scope( e.scope );
+		const product_id = ppom_form_product_id( $scope );
 
 		const element_type = ppom_get_field_type_by_id( e.field, product_id );
 		switch ( element_type ) {
@@ -271,8 +271,8 @@ jQuery( function ( $ ) {
 
 	$( document ).on( 'ppom_field_shown', function ( e ) {
 		// Only the form that fired the event.
-		const $scope = e.scope && e.scope.length ? e.scope : $( document );
-		const product_id = $scope.find( '[name="ppom_product_id"]' ).val();
+		const $scope = ppom_form_scope( e.scope );
+		const product_id = ppom_form_product_id( $scope );
 
 		ppom_fields_hidden_conditionally( $scope );
 
@@ -382,12 +382,34 @@ jQuery( function ( $ ) {
 	} );
 } );
 
+/**
+ * The given form, or the whole document when none is given.
+ *
+ * @param {jQuery} [$scope] A `.ppom-wrapper`.
+ * @return {jQuery} The form or the document.
+ */
+function ppom_form_scope( $scope ) {
+	return $scope && $scope.length ? $scope : jQuery( document );
+}
+
+/**
+ * @param {jQuery} [$scope] A `.ppom-wrapper`.
+ * @return {string|undefined} The form's product id.
+ */
+function ppom_form_product_id( $scope ) {
+	return ppom_form_scope( $scope ).find( '[name="ppom_product_id"]' ).val();
+}
+
+/**
+ * @param {string}                                                                                                    data_name
+ * @param {(element_data_name: string, event_type: 'ppom_field_hidden' | 'ppom_field_shown', $scope: jQuery) => void} callback
+ * @param {jQuery}                                                                                                    [$scope]
+ */
 function ppom_check_conditions( data_name, callback, $scope ) {
 	// Each `.ppom-cond-*` node describes one target field and its dependencies.
 	// We evaluate all rules for that target, then notify the rest of the stack
 	// through shared PPOM events instead of mutating unrelated features directly.
-	// $scope limits lookups to one form (defaults to the document).
-	$scope = $scope && $scope.length ? $scope : jQuery( document );
+	$scope = ppom_form_scope( $scope );
 	let is_matched = false;
 	let event_type, element_data_name;
 
@@ -537,8 +559,13 @@ function ppom_check_conditions( data_name, callback, $scope ) {
 	} );
 }
 
+/**
+ * @param {string} data_name
+ * @param {jQuery} [$scope]
+ * @return {string|undefined} The field wrapper's type.
+ */
 function ppom_get_input_dom_type( data_name, $scope ) {
-	$scope = $scope && $scope.length ? $scope : jQuery( document );
+	$scope = ppom_form_scope( $scope );
 	// const field_obj = jQuery(`input[name="ppom[fields][${data_name}]"], input[name="ppom[fields][${data_name}[]]"], select[name="ppom[fields][${data_name}]"]`);
 	const field_obj = $scope.find(
 		`.ppom-input[data-data_name="${ data_name }"]`
@@ -546,11 +573,16 @@ function ppom_get_input_dom_type( data_name, $scope ) {
 	return field_obj.closest( '.ppom-field-wrapper' ).data( 'type' );
 }
 
-// Normalize values across PPOM field types so condition operators can stay
-// unaware of the exact DOM structure used by each input renderer.
-// $scope limits lookups to one form (defaults to the document).
+/**
+ * Normalize values across PPOM field types so condition operators can stay
+ * unaware of the exact DOM structure used by each input renderer.
+ *
+ * @param {string} data_name
+ * @param {jQuery} [$scope]
+ * @return {string|string[]|undefined} The field's current value.
+ */
 function ppom_get_element_value( data_name, $scope ) {
-	$scope = $scope && $scope.length ? $scope : jQuery( document );
+	$scope = ppom_form_scope( $scope );
 	const ppom_type = ppom_get_input_dom_type( data_name, $scope );
 	let element_value = '';
 	const value_found_cb = [];
@@ -740,12 +772,15 @@ function ppom_compare_values( args ) {
 	return result;
 }
 
+/**
+ * @param {string} field_id
+ * @param {jQuery} [$scope]
+ */
 function ppom_set_default_option( field_id, $scope ) {
 	// When a field becomes visible again, restore its default state the same way
 	// the original PHP renderer would have populated it on first page load.
-	// Scoped: forms share field ids.
-	$scope = $scope && $scope.length ? $scope : jQuery( document );
-	const product_id = $scope.find( '[name="ppom_product_id"]' ).val();
+	$scope = ppom_form_scope( $scope );
+	const product_id = ppom_form_product_id( $scope );
 
 	const field = ppom_get_field_meta_by_id( field_id, product_id );
 
@@ -835,10 +870,13 @@ function ppom_set_default_option( field_id, $scope ) {
 	}
 }
 
-// Mirror the current hidden field list into the hidden input consumed by PHP.
-// Scoped: every form renders its own #conditionally_hidden.
+/**
+ * Mirror the current hidden field list into the hidden input consumed by PHP.
+ *
+ * @param {jQuery} [$scope]
+ */
 function ppom_fields_hidden_conditionally( $scope ) {
-	$scope = $scope && $scope.length ? $scope : jQuery( document );
+	$scope = ppom_form_scope( $scope );
 
 	// Reset
 	ppom_hidden_fields = [];
