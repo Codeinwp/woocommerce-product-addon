@@ -368,4 +368,53 @@ class Test_Svg_Upload extends WP_Ajax_UnitTestCase {
 		$this->assertCount( 1, glob( $base . '.*.part.bin' ) ?: array() );
 		$this->assertCount( 0, glob( $base . '.*.' . pathinfo( $name, PATHINFO_EXTENSION ) . '.part*' ) ?: array() );
 	}
+
+	/**
+	 * @return array<string, array{0: string}>
+	 */
+	public function non_upload_field_provider(): array {
+		return array(
+			'svg' => array( 'ppom-ajax-logo.svg' ),
+			// Passes the default type check, so only the field check can refuse it.
+			'jpg' => array( 'ppom-ajax-photo.jpg' ),
+		);
+	}
+
+	/**
+	 * @dataProvider non_upload_field_provider
+	 *
+	 * @param string $name Posted file name.
+	 */
+	public function test_non_upload_field_is_refused_before_any_bytes_are_written( string $name ): void {
+		$this->create_product_with_file_field( null, 'text' );
+
+		$response = $this->send_chunk( $name, 0, 2 );
+
+		$this->assertSame( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', $response['message'] ?? '' );
+		$this->assertCount( 0, glob( ppom_get_dir_path() . pathinfo( $name, PATHINFO_FILENAME ) . '.*' ) ?: array() );
+	}
+
+	public function test_stale_chunks_are_removed_but_the_current_one_is_kept(): void {
+		$this->create_product_with_file_field( 'txt,svg' );
+		$dir   = ppom_get_dir_path();
+		$stale = array( $dir . 'ppom-ajax-stale.0a1b2c3d-x.part.bin', $dir . 'ppom-ajax-legacy.0a1b2c3d-x.svg.part' );
+		foreach ( $stale as $path ) {
+			file_put_contents( $path, 'stale' );
+			touch( $path, time() - 6 * HOUR_IN_SECONDS );
+		}
+
+		$this->send_chunk( 'ppom-ajax-notes.txt', 0, 3 );
+		$current = glob( $dir . 'ppom-ajax-notes.*.part.bin' ) ?: array();
+		$this->assertCount( 1, $current );
+		foreach ( $stale as $path ) {
+			$this->assertFileDoesNotExist( $path );
+		}
+
+		// An old current chunk must survive its own next request.
+		file_put_contents( $current[0], 'first chunk' );
+		touch( $current[0], time() - 6 * HOUR_IN_SECONDS );
+		$this->send_chunk( 'ppom-ajax-notes.txt', 1, 3 );
+
+		$this->assertSame( 'first chunk', (string) file_get_contents( $current[0] ) );
+	}
 }
