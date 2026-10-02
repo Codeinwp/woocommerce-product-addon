@@ -24,6 +24,21 @@ import {
 	setPpomLicenseFixture,
 } from '../fixtures/index.js';
 
+/**
+ * Dismiss every dialog the page opens and record its message.
+ *
+ * @param {import('@playwright/test').Page} page Playwright page.
+ * @return {string[]} Messages, filled as dialogs open.
+ */
+function collectDialogs( page ) {
+	const dialogs = [];
+	page.on( 'dialog', ( dialog ) => {
+		dialogs.push( dialog.message() );
+		dialog.dismiss().catch( () => {} );
+	} );
+	return dialogs;
+}
+
 test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 	/**
 	 * Test that file upload field renders correctly and nonce refresh functionality is available.
@@ -134,11 +149,7 @@ test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
 		await fileInput.waitFor( { state: 'attached', timeout: 10000 } );
 
 		// The bug surfaced as an alert() from the upload error path.
-		const dialogs = [];
-		page.on( 'dialog', ( dialog ) => {
-			dialogs.push( dialog.message() );
-			dialog.dismiss().catch( () => {} );
-		} );
+		const dialogs = collectDialogs( page );
 
 		await fileInput.setInputFiles(
 			path.join( __dirname, '../../unit/fixtures/sample.heic' )
@@ -1376,11 +1387,7 @@ test.describe( 'File Upload with hyphenated Data names', () => {
 				productIds: [ product.id ],
 			} );
 
-			const dialogs = [];
-			page.on( 'dialog', ( dialog ) => {
-				dialogs.push( dialog.message() );
-				dialog.dismiss().catch( () => {} );
-			} );
+			const dialogs = collectDialogs( page );
 
 			await page.goto( `/?p=${ product.id }` );
 
@@ -1438,11 +1445,7 @@ test.describe( 'File Upload with hyphenated Data names', () => {
 				productIds: [ product.id ],
 			} );
 
-			const dialogs = [];
-			page.on( 'dialog', ( dialog ) => {
-				dialogs.push( dialog.message() );
-				dialog.dismiss().catch( () => {} );
-			} );
+			const dialogs = collectDialogs( page );
 			const pageErrors = [];
 			page.on( 'pageerror', ( error ) =>
 				pageErrors.push( error.message )
