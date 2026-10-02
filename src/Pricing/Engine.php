@@ -72,7 +72,7 @@ final class Engine {
 		$product_quantity  = floatval( $cart_item['quantity'] );
 		$ppom_field_prices = self::get_field_prices( $ppom_fields_post, $product_id, $product_quantity, $variation_id, $cart_item );
 		$ppom_discount     = 0;
-		$ppom_pricematrix  = isset( $cart_item['ppom']['price_matrix_found'] ) ? $cart_item['ppom']['price_matrix_found'] : null;
+		$ppom_pricematrix  = self::resolve_price_matrix_field( $cart_item );
 		// ppom_pa($product_quantity);
 		// ppom_pa($ppom_fields_post);
 		// ppom_pa($ppom_field_prices);
@@ -181,7 +181,7 @@ final class Engine {
 			$product_quantity  = floatval( $cart_item['quantity'] );
 			$ppom_field_prices = self::get_field_prices( $ppom_fields_post, $product_id, $product_quantity, $variation_id, $cart_item );
 			$ppom_discount     = 0;
-			$ppom_pricematrix  = isset( $cart_item['ppom']['price_matrix_found'] ) ? $cart_item['ppom']['price_matrix_found'] : null;
+			$ppom_pricematrix  = self::resolve_price_matrix_field( $cart_item );
 			// ppom_pa($product_quantity);
 			// ppom_pa($ppom_fields_post);
 			// ppom_pa($ppom_field_prices);
@@ -1289,7 +1289,9 @@ final class Engine {
 		$source = 'product';
 
 		$matrix_found = null;
-		if ( $ppom_pricematrix ) {
+		// The matrix payload rides on the cart item, which carries shopper-posted
+		// data. Only a product that really has a matrix field can be priced by one.
+		if ( $ppom_pricematrix && Helpers::has_field_by_type( $product_id, 'pricematrix' ) ) {
 			$matrix_found = self::parse_price_matrix( $ppom_pricematrix, $product, $product_quantity, $base_price, $total_addon_price, $total_cart_fee_price );
 		}
 
@@ -1301,7 +1303,9 @@ final class Engine {
 		// If price matrix found
 		// ppom_pa($matrix_found);
 		if ( $matrix_found ) {
-			if ( $matrix_found['matrix_price'] > 0 ) {
+			// isset() is false for null (no matrix base price, e.g. a discount
+			// matrix) but true for a configured 0, which is an authoritative price.
+			if ( isset( $matrix_found['matrix_price'] ) ) {
 
 				$base_price = $matrix_found['matrix_price'];
 				$source     = 'matrix';
@@ -1598,18 +1602,60 @@ final class Engine {
 		}
 	}
 
+	/**
+	 * Resolves the price matrix field for a cart line from saved PPOM metadata.
+	 *
+	 * The cart item carries the posted `ppom` payload verbatim, so anything under
+	 * `price_matrix_found` is shopper-supplied and must never define pricing. The
+	 * saved field group is the only authority. Conditionally hidden matrices are
+	 * skipped, and the usual filter still applies so integrations keep working.
+	 *
+	 * @param array<string, mixed> $cart_item Cart item.
+	 *
+	 * @return array<string, mixed> Matrix field definition, or an empty array.
+	 */
+	public static function resolve_price_matrix_field( $cart_item ) {
+
+		$product_id = isset( $cart_item['data'] ) ? Helpers::get_product_id( $cart_item['data'] ) : 0;
+		if ( ! $product_id ) {
+			return array();
+		}
+
+		$matrix_found      = array();
+		$pricematrix_field = Helpers::has_field_by_type( $product_id, 'pricematrix' );
+
+		if ( $pricematrix_field ) {
+			$conditionally_hidden = isset( $cart_item['ppom']['conditionally_hidden'] )
+				? $cart_item['ppom']['conditionally_hidden']
+				: '';
+
+			foreach ( $pricematrix_field as $pm ) {
+				$pm_dataname = isset( $pm['data_name'] ) ? $pm['data_name'] : '';
+				if ( Helpers::is_field_hidden_by_condition( $pm_dataname, $conditionally_hidden ) ) {
+					continue;
+				}
+
+				$matrix_found = $pm;
+				break;
+			}
+		}
+
+		return apply_filters( 'ppom_price_marix_found', $matrix_found, $cart_item );
+	}
+
 	// Check if price is being pulled by matrix
 	public static function price_is_matrix_found( $product, $product_quantity, $base_price, $addon_price, $cart_fee ) {
 
 		$matrix_discount = 0.0;
-		$matrix_price    = 0.0;
+		$matrix_price    = null;
 		// Check if Price Matrix is used
 		$pricematrix_field = Helpers::has_field_by_type( Helpers::get_product_id( $product ), 'pricematrix' );
 		if ( ! $pricematrix_field ) {
 			return null;
 		}
 
-		$matrix_found = self::price_matrix_chunk( $product, $pricematrix_field, $product_quantity );
+		$matrix_found  = self::price_matrix_chunk( $product, $pricematrix_field, $product_quantity );
+		$has_row_price = isset( $matrix_found['raw_price'] ) && '' !== trim( (string) $matrix_found['raw_price'] );
 		// ppom_pa($matrix_found);
 
 		if ( isset( $matrix_found['discount'] ) ) {
@@ -1629,7 +1675,7 @@ final class Engine {
 				$matrix_discount = isset( $matrix_found['raw_price'] ) ? floatval( $matrix_found['raw_price'] ) : 0;
 			}
 		} else {
-			$matrix_price = isset( $matrix_found['raw_price'] ) ? $matrix_found['raw_price'] : $base_price;
+			$matrix_price = $has_row_price ? $matrix_found['raw_price'] : $base_price;
 		}
 		$matrix = array(
 			'matrix_price'    => $matrix_price,
@@ -1642,8 +1688,10 @@ final class Engine {
 	public static function parse_price_matrix( $ppom_pricematrix, $product, $product_quantity, $base_price, $addon_price, $cart_fee ) {
 
 		$matrix_discount = 0.0;
-		$matrix_price    = 0.0;
+		// null: the matrix supplied no base price.
+		$matrix_price    = null;
 		$matrix_found    = Helpers::extract_matrix_by_quantity( $ppom_pricematrix, $product, $product_quantity );
+		$has_row_price   = isset( $matrix_found['raw_price'] ) && '' !== trim( (string) $matrix_found['raw_price'] );
 		// ppom_pa($matrix_found);
 		if ( isset( $matrix_found['discount'] ) ) {
 			if ( ! empty( $matrix_found['percent'] ) ) {
@@ -1662,9 +1710,9 @@ final class Engine {
 				$matrix_discount = isset( $matrix_found['raw_price'] ) ? floatval( $matrix_found['raw_price'] ) : 0;
 			}
 		} elseif ( isset( $matrix_found['matrix_fixed'] ) ) {
-			$matrix_price = isset( $matrix_found['raw_price'] ) ? $matrix_found['raw_price'] / $product_quantity : $base_price;
+			$matrix_price = $has_row_price ? $matrix_found['raw_price'] / $product_quantity : $base_price;
 		} else {
-			$matrix_price = isset( $matrix_found['raw_price'] ) ? $matrix_found['raw_price'] : $base_price;
+			$matrix_price = $has_row_price ? $matrix_found['raw_price'] : $base_price;
 		}
 
 		$matrix = array(
@@ -1776,27 +1824,15 @@ final class Engine {
 
 		$pricematrix_field = Helpers::has_field_by_type( $product_id, 'pricematrix' );
 		if ( ! $pricematrix_field ) {
+			// The posted ppom payload is stored wholesale by
+			// CartHandler::add_cart_item_data(), so a shopper can supply this key.
+			// Drop it when the product has no matrix field to price from.
+			unset( $cart_items['ppom']['price_matrix_found'] );
+
 			return $cart_items;
 		}
 
-		$matrix_found = array();
-		foreach ( $pricematrix_field as $pm ) {
-
-			$pm_dataname          = isset( $pm['data_name'] ) ? $pm['data_name'] : '';
-			$conditionally_hidden = isset( $cart_items['ppom']['conditionally_hidden'] )
-				? $cart_items['ppom']['conditionally_hidden']
-				: '';
-			if ( Helpers::is_field_hidden_by_condition( $pm_dataname, $conditionally_hidden ) ) {
-				continue;
-			}
-
-			$matrix_found = $pm;
-			break;
-		}
-
-		// ppom_pa($pm_applied);
-		// $matrix_found = Helpers::extract_matrix_by_quantity($pm_applied, $wc_product, $product_quantity);
-		$cart_items['ppom']['price_matrix_found'] = apply_filters( 'ppom_price_marix_found', $matrix_found, $cart_items );
+		$cart_items['ppom']['price_matrix_found'] = self::resolve_price_matrix_field( $cart_items );
 
 		return $cart_items;
 	}
