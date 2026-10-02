@@ -1040,6 +1040,8 @@ final class Callbacks {
 				return ob_get_clean();
 			}
 
+			// Block themes render this before `wp_enqueue_scripts`.
+			\PPOM_FRONTEND_SCRIPTS::register_scripts_once();
 			\PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id( (int) $params['product_id'], null, 'shortcode' );
 			?>
 		<form class="cart"

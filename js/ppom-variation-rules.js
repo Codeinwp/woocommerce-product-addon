@@ -88,6 +88,8 @@ jQuery( function ( $ ) {
 	 * @param {string} eventType - 'ppom_field_shown' or 'ppom_field_hidden'.
 	 */
 	function triggerFieldEvents( $group, eventType ) {
+		// Scope handlers to this form.
+		const $scope = $group.closest( '.ppom-wrapper' );
 		$group.find( '.ppom-field-wrapper' ).each( function () {
 			const dataName = $( this ).attr( 'data-data_name' );
 			if ( ! dataName ) {
@@ -96,6 +98,7 @@ jQuery( function ( $ ) {
 			$.event.trigger( {
 				type: eventType,
 				field: dataName,
+				scope: $scope,
 				time: new Date(),
 			} );
 		} );

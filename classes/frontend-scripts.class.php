@@ -228,6 +228,28 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
+	 * Registers the script/style registry, once per request.
+	 *
+	 * Block themes can render the shortcode before `wp_enqueue_scripts`.
+	 *
+	 * @return void
+	 */
+	public static function register_scripts_once() {
+
+		static $done = false;
+
+		if ( $done ) {
+			return;
+		}
+
+		$done = true;
+
+		PPOM_SCRIPTS::register_scripts( self::get_scripts() );
+		PPOM_SCRIPTS::register_styles( self::get_styles() );
+	}
+
+
+	/**
 	 * Registers PPOM assets on frontend requests and loads product-specific ones.
 	 *
 	 * @return void
@@ -240,13 +262,7 @@ class PPOM_FRONTEND_SCRIPTS {
 			return;
 		}
 
-		// Get all styles & scripts
-		$all_scripts = self::get_scripts();
-		$all_styles  = self::get_styles();
-
-		// Register all styles & scripts
-		PPOM_SCRIPTS::register_scripts( $all_scripts );
-		PPOM_SCRIPTS::register_styles( $all_styles );
+		self::register_scripts_once();
 
 		if ( ! is_object( $post ) ) {
 			return;

@@ -4,6 +4,7 @@ export {
 	attachPpomGroupToVariations,
 	createLegacyPpomGroup,
 	createPpomGroup,
+	createPpomShortcodePage,
 	createSimpleTextGroup,
 	deletePpomGroupRows,
 	getPpomAttachRowMeta,
@@ -13,6 +14,7 @@ export {
 } from './ppom.js';
 export {
 	buildCheckboxField,
+	buildCropperField,
 	buildDateField,
 	buildFileField,
 	buildHtmlField,
