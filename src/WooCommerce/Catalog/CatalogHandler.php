@@ -134,13 +134,16 @@ final class CatalogHandler {
 				if ( $meta['type'] == 'pricematrix' ) {
 
 					$options = $meta['options'];
-					$ranges  = Helpers::convert_options_to_key_val( $options, $meta, $product );
+					$ranges  = Helpers::convert_ranges_for_client( Helpers::convert_options_to_key_val( $options, $meta, $product ) );
 					// ppom_pa($ranges);
 
 					if ( isset( $meta['discount'] ) && $meta['discount'] == 'on' ) {
 
 						$last_discount = end( $ranges );
-						$least_price   = $last_discount['price'];
+						if ( false === $last_discount ) {
+							continue;
+						}
+						$least_price = $last_discount['price'];
 
 						if ( ! empty( $last_discount['percent'] ) ) {
 							$max_discount = $last_discount['percent'];
