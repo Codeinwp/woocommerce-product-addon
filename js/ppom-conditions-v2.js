@@ -82,6 +82,14 @@ jQuery( function ( $ ) {
 					time: new Date(),
 				} );
 			} );
+
+		// The price table is built on document ready, before this replay decides
+		// which fields are on screen. Recalculate once the initial state settles,
+		// otherwise a conditionally shown price matrix is missing from the first
+		// total and the page disagrees with the cart until something changes.
+		if ( typeof window.ppom_update_option_prices === 'function' ) {
+			window.ppom_update_option_prices();
+		}
 	}, 100 );
 
 	// $('form.cart').on('change', 'select, input[type="radio"], input[type="checkbox"]', function(ev) {
