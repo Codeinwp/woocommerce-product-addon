@@ -26,7 +26,9 @@
  *   max_img_w?: string,
  *   min_img_w?: string,
  *   max_img_h?: string,
- *   min_img_h?: string
+ *   min_img_h?: string,
+ *   is_change_image?: true,
+ *   original_data_name?: string
  * }} PPOMUploadFieldMeta
  */
 let isCartBlock = false;
@@ -626,13 +628,13 @@ function ppom_reset_cropping_preview( file_name ) {
  */
 function ppom_setup_file_upload_input( file_input ) {
 	const file_inputs = file_input;
-	const parts = file_input.data_name.split( '-' );
-	const [ file_data_name, file_id ] = parts;
-	let data_name = file_data_name;
-
-	if ( file_id !== undefined ) {
-		data_name = file_data_name + '-' + file_id;
-	}
+	// Data names may contain dashes, so never split them.
+	const file_data_name =
+		file_input.original_data_name || file_input.data_name;
+	const data_name = file_input.data_name;
+	const file_id = file_input.is_change_image
+		? data_name.slice( file_data_name.length + 1 )
+		: undefined;
 
 	if ( plupload_instances[ data_name ] !== undefined ) {
 		return;

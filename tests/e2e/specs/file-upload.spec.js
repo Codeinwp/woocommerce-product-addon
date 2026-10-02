@@ -15,10 +15,13 @@ import { request as playwrightRequest } from '@playwright/test';
 
 import {
 	attachPpomGroupToProducts,
+	buildCropperField,
 	buildFileField,
 	buildTextField,
 	createPpomGroup,
 	createSimpleProduct,
+	getPpomLicenseFixture,
+	setPpomLicenseFixture,
 } from '../fixtures/index.js';
 
 test.describe( 'File Upload with Dynamic Nonce Refresh', () => {
@@ -1332,5 +1335,156 @@ test.describe( 'File Upload Accessibility', () => {
 			'aria-label',
 			'Upload Your Design'
 		);
+	} );
+} );
+
+test.describe( 'File Upload with hyphenated Data names', () => {
+	const PNG_1X1 = {
+		name: 'pixel.png',
+		mimeType: 'image/png',
+		buffer: Buffer.from(
+			'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+			'base64'
+		),
+	};
+
+	/**
+	 * The uploader split the Data name at "-", so the picker bound
+	 * to a missing button and uploads named the wrong field.
+	 */
+	for ( const fieldId of [ 'my-doc', 'document-level-2011-secondary' ] ) {
+		test( `"Select files" opens the picker and uploads for "${ fieldId }"`, async ( {
+			page,
+			requestUtils,
+		} ) => {
+			const product = await createSimpleProduct( requestUtils );
+			const { ppomId } = await createPpomGroup( requestUtils, {
+				groupName: 'Hyphenated File Field',
+				fields: [
+					buildFileField( {
+						title: 'Upload Your Document',
+						dataName: fieldId,
+						file_size: '5mb',
+						files_allowed: '1',
+						file_types: 'jpg,png',
+					} ),
+				],
+			} );
+
+			await attachPpomGroupToProducts( requestUtils, {
+				ppomId,
+				productIds: [ product.id ],
+			} );
+
+			const dialogs = [];
+			page.on( 'dialog', ( dialog ) => {
+				dialogs.push( dialog.message() );
+				dialog.dismiss().catch( () => {} );
+			} );
+
+			await page.goto( `/?p=${ product.id }` );
+
+			await page
+				.locator(
+					`#ppom-file-container-${ fieldId } input[type=file]`
+				)
+				.waitFor( { state: 'attached', timeout: 10000 } );
+
+			const [ fileChooser ] = await Promise.all( [
+				page.waitForEvent( 'filechooser', { timeout: 5000 } ),
+				page.locator( `#selectfiles-${ fieldId }` ).click(),
+			] );
+			await fileChooser.setFiles( PNG_1X1 );
+
+			await expect(
+				page.locator(
+					`#filelist-${ fieldId } input[name^="ppom[fields][${ fieldId }]"][name$="[org]"]`
+				)
+			).toHaveCount( 1, { timeout: 10000 } );
+			expect( dialogs ).toEqual( [] );
+		} );
+	}
+
+	test( 'cropper with a hyphenated Data name uploads and changes its image', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const fieldId = 'crop-front-side';
+		const previousLicense = await getPpomLicenseFixture( requestUtils );
+		await setPpomLicenseFixture( requestUtils, { valid: true, plan: 1 } );
+
+		try {
+			const product = await createSimpleProduct( requestUtils );
+			const { ppomId } = await createPpomGroup( requestUtils, {
+				groupName: 'Hyphenated Cropper Field',
+				fields: [
+					buildCropperField( {
+						title: 'Crop Your Photo',
+						dataName: fieldId,
+						options: [
+							{
+								label: 'Square',
+								value: 'square',
+								width: '100',
+								height: '100',
+							},
+						],
+					} ),
+				],
+			} );
+
+			await attachPpomGroupToProducts( requestUtils, {
+				ppomId,
+				productIds: [ product.id ],
+			} );
+
+			const dialogs = [];
+			page.on( 'dialog', ( dialog ) => {
+				dialogs.push( dialog.message() );
+				dialog.dismiss().catch( () => {} );
+			} );
+			const pageErrors = [];
+			page.on( 'pageerror', ( error ) =>
+				pageErrors.push( error.message )
+			);
+
+			await page.goto( `/?p=${ product.id }` );
+
+			const croppie = page.locator(
+				`.ppom-croppie-wrapper-${ fieldId } .croppie-container`
+			);
+
+			const [ firstChooser ] = await Promise.all( [
+				page.waitForEvent( 'filechooser', { timeout: 10000 } ),
+				page.locator( `#selectfiles-${ fieldId }` ).click(),
+			] );
+			await firstChooser.setFiles( PNG_1X1 );
+			await expect( croppie ).toHaveCount( 1, { timeout: 10000 } );
+			const firstImageId = await croppie.getAttribute( 'data-image_id' );
+
+			// The "Change image" button is keyed by data name plus image id.
+			const [ changeChooser ] = await Promise.all( [
+				page.waitForEvent( 'filechooser', { timeout: 10000 } ),
+				page
+					.locator( `#selectfiles-${ fieldId }-${ firstImageId }` )
+					.click(),
+			] );
+			await changeChooser.setFiles( PNG_1X1 );
+
+			await expect( croppie ).toHaveCount( 1, { timeout: 10000 } );
+			await expect( croppie ).not.toHaveAttribute(
+				'data-image_id',
+				firstImageId,
+				{ timeout: 10000 }
+			);
+			expect( dialogs ).toEqual( [] );
+			expect( pageErrors ).toEqual( [] );
+		} finally {
+			await setPpomLicenseFixture( requestUtils, {
+				valid: previousLicense.status === 'valid',
+				plan: previousLicense.plan,
+				proInstalled: previousLicense.pro_installed,
+			} );
+		}
 	} );
 } );
