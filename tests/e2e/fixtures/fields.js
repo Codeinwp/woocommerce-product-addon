@@ -118,6 +118,21 @@ function buildFileField( args ) {
 	} );
 }
 
+function buildCropperField( { options = [], ...args } ) {
+	return buildField( 'cropper', {
+		file_size: '5mb',
+		files_allowed: '1',
+		file_types: 'jpg,png',
+		...args,
+		options: options.map( ( option ) =>
+			buildOption( option.label, option.value, {
+				width: option.width,
+				height: option.height,
+			} )
+		),
+	} );
+}
+
 function buildHtmlField( { html = '', ...args } ) {
 	return buildField( 'section', {
 		html,
@@ -175,6 +190,7 @@ function buildTextCounterField( {
 
 export {
 	buildCheckboxField,
+	buildCropperField,
 	buildDateField,
 	buildImageField,
 	buildNumberField,
