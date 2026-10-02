@@ -1369,8 +1369,9 @@ final class Helpers {
 					$ppom_new_option[ $the_option ]['option_weight'] = $option['weight'];
 				}
 
-				// Matrix-fixed @since 22.0
-				if ( isset( $option['isfixed'] ) ) {
+				// Matrix-fixed @since 22.0. The field modal saves isfixed='' on
+				// unticked rows; only 'on' means the row prices the whole range.
+				if ( isset( $option['isfixed'] ) && 'on' === $option['isfixed'] ) {
 					$ppom_new_option[ $the_option ]['matrix_fixed'] = $option['isfixed'];
 				}
 
