@@ -40,7 +40,7 @@ final class ModernLineItemPricing {
 		$total_addon_price    = ppom_price_get_addon_total( $ppom_field_prices );
 		$total_cart_fee_price = ppom_price_get_cart_fee_total( $ppom_field_prices );
 
-		$product_price = apply_filters( 'ppom_product_price_on_cart', $wc_product->get_price(), $cart_item );
+		$product_price = apply_filters( 'ppom_product_price_on_cart', $wc_product->get_price( 'edit' ), $cart_item );
 
 		$price_info         = ppom_price_get_product_base(
 			$product_price,
