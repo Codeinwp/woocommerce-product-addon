@@ -5,12 +5,32 @@
  * @package ppom-pro
  */
 
+use PPOM\Files\Handler;
 use PPOM\WooCommerce\Order\OrderHandler;
 
 /**
  * @covers \PPOM\WooCommerce\Order\OrderHandler
  */
 class Test_Order_Handler extends PPOM_Test_Case {
+
+	/**
+	 * Upload-pool files to remove after each test, even if a notice or assertion
+	 * aborts it, so a leaked fixture cannot break the next test's preconditions.
+	 *
+	 * @var array<int, string>
+	 */
+	private $artifacts = array();
+
+	public function tearDown(): void {
+		foreach ( $this->artifacts as $path ) {
+			if ( $path && file_exists( $path ) ) {
+				@unlink( $path );
+			}
+		}
+		$this->artifacts = array();
+
+		parent::tearDown();
+	}
 
 	/**
 	 * @return void
@@ -166,6 +186,9 @@ class Test_Order_Handler extends PPOM_Test_Case {
 		$base_path  = ppom_get_dir_path() . $file_name;
 		$confirmed  = ppom_get_dir_path( 'confirmed/' . $order_id ) . $product_id . '-' . $file_name;
 
+		$this->artifacts[] = $base_path;
+		$this->artifacts[] = $confirmed;
+
 		file_put_contents( $confirmed, 'moved at first checkout' );
 		$this->assertFileDoesNotExist( $base_path );
 
@@ -245,8 +268,12 @@ class Test_Order_Handler extends PPOM_Test_Case {
 		$this->assertFileExists( $confirmed );
 		$this->assertSame( $file_name, $out['ppom']['fields']['design_file']['file_0']['org'] );
 
-		unlink( $base_path );
-		unlink( $confirmed );
+		// Reorder provenance: the restored copy is recorded as owned so the new
+		// checkout's rename_files() ownership gate will move it (ppom-pro#794).
+		$this->assertTrue(
+			Handler::owns_uploaded_file( $file_name ),
+			'The reordered pool copy must be recorded as owned for the new checkout.'
+		);
 	}
 
 	/**

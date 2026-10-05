@@ -858,7 +858,6 @@ final class Handler {
 			return apply_filters( 'ppom_file_download_url', '', $file_name );
 		}
 
-		$base_dir_path      = self::get_dir_path() . $file_name;
 		$confirm_dir        = 'confirmed/' . $order_id;
 		$confirmed_dir_path = self::get_dir_path( $confirm_dir );
 		$edits_dir_path     = self::get_dir_path( 'edits' ) . $file_name;
@@ -869,14 +868,9 @@ final class Handler {
 
 		$file_name = $product_id . '-' . $file_name;
 
-		// Confirmed first: once this order owns its file, never touch the shared
-		// pool again — the base file may belong to another (re-)order (#655).
+		// Resolve only files owned by this order; never consult the shared pool (#655).
 		if ( file_exists( $confirmed_dir_path . $file_name ) ) {
 			$file_download_url_found = $ppom_dir_url . 'confirmed/' . $order_id . '/' . $file_name;
-		} elseif ( file_exists( $base_dir_path ) ) {
-			if ( rename( $base_dir_path, $confirmed_dir_path . $file_name ) ) {
-				$file_download_url_found = $ppom_dir_url . 'confirmed/' . $order_id . '/' . $file_name;
-			}
 		} elseif ( file_exists( $edits_dir_path ) ) {
 			$file_download_url_found = $ppom_dir_url . 'edits/' . $file_name;
 		}

@@ -273,6 +273,11 @@ final class OrderHandler {
 							continue;
 						}
 
+						// Only move shared uploads owned by this visitor.
+						if ( ! Handler::owns_uploaded_file( $file_name ) ) {
+							continue;
+						}
+
 						$file_cropped = isset( $file_data['cropped'] ) ? true : false;
 
 						$new_filename     = Handler::file_get_name( $file_name, $product_id, $cart_item );
@@ -391,9 +396,16 @@ final class OrderHandler {
 				$file_name = $file_data['org'];
 				$confirmed = $confirmed_dir . Handler::file_get_name( $file_name, $product_id );
 
-				if ( ! file_exists( $base_dir . $file_name ) && file_exists( $confirmed ) ) {
+				if ( ! file_exists( $confirmed ) ) {
+					continue;
+				}
+
+				if ( ! file_exists( $base_dir . $file_name ) ) {
 					copy( $confirmed, $base_dir . $file_name );
 				}
+
+				// Record ownership so rename_files() can move the file on reorder.
+				Handler::remember_uploaded_file( $file_name );
 			}
 		}
 	}

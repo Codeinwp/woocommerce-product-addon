@@ -10,11 +10,16 @@ require_once __DIR__ . '/class-ppom-test-case.php';
 class Test_File_Helpers extends PPOM_Test_Case {
 
 	/**
-	 * Ensure base uploads move into the confirmed order directory with product prefix.
+	 * A download URL must not claim a shared-pool file this order never confirmed.
+	 *
+	 * Checkout's rename_files() moves an owned upload into confirmed/; a file still
+	 * sitting only in the shared pool has no proven provenance for this order
+	 * (it may be another shopper's in-flight upload), so resolving the URL must
+	 * neither move nor serve it.
 	 *
 	 * @return void
 	 */
-	public function testGetFileDownloadUrlMovesBaseFileToConfirmedDirectoryWithProductPrefix() {
+	public function testGetFileDownloadUrlDoesNotClaimUnconfirmedBasePoolFile() {
 		$order_id   = 123;
 		$product_id = 55;
 		$file_name  = 'sample.txt';
@@ -30,14 +35,11 @@ class Test_File_Helpers extends PPOM_Test_Case {
 
 		$url = ppom_get_file_download_url( $file_name, $order_id, $product_id );
 
-		$this->assertFileDoesNotExist( $base_path );
-		$this->assertFileExists( $confirmed );
-		$this->assertSame(
-			ppom_get_dir_url() . 'confirmed/' . $order_id . '/' . $product_id . '-' . $file_name,
-			$url
-		);
+		$this->assertFileExists( $base_path, 'The shared-pool file must be left untouched.' );
+		$this->assertFileDoesNotExist( $confirmed, 'The pool file must not be moved into confirmed.' );
+		$this->assertSame( '', $url, 'An unconfirmed pool file must not resolve to a URL.' );
 
-		unlink( $confirmed );
+		unlink( $base_path );
 	}
 
 	/**
