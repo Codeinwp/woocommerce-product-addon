@@ -5,7 +5,6 @@
  * @package ppom-pro
  */
 
-use PPOM\Files\Handler;
 use PPOM\WooCommerce\Order\OrderHandler;
 
 /**
@@ -268,11 +267,10 @@ class Test_Order_Handler extends PPOM_Test_Case {
 		$this->assertFileExists( $confirmed );
 		$this->assertSame( $file_name, $out['ppom']['fields']['design_file']['file_0']['org'] );
 
-		// Reorder provenance: the restored copy is recorded as owned so the new
-		// checkout's rename_files() ownership gate will move it (ppom-pro#794).
+		// Order Again marks the rehydrated item so checkout will move its files.
 		$this->assertTrue(
-			Handler::owns_uploaded_file( $file_name ),
-			'The reordered pool copy must be recorded as owned for the new checkout.'
+			! empty( $out['_ppom_files_verified'] ),
+			'The reordered item must be marked ownership-verified for checkout.'
 		);
 	}
 

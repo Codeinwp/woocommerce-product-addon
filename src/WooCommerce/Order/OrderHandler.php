@@ -208,7 +208,7 @@ final class OrderHandler {
 	 *
 	 * @param int      $order_id    Order ID.
 	 * @param mixed    $posted_data Posted checkout data.
-	 * @param WC_Order $order       Processed order.
+	 * @param \WC_Order $order       Processed order.
 	 *
 	 * @return void
 	 *
@@ -235,6 +235,9 @@ final class OrderHandler {
 			if ( ! isset( $cart_item['ppom']['fields'] ) ) {
 				continue;
 			}
+
+			// Files are ownership-verified when added to the cart; legacy items must re-verify each file.
+			$files_verified = ! empty( $cart_item['_ppom_files_verified'] );
 
 			$product_id      = $cart_item['product_id'];
 			$all_moved_files = array();
@@ -273,8 +276,9 @@ final class OrderHandler {
 							continue;
 						}
 
-						// Only move shared uploads owned by this visitor.
-						if ( ! Handler::owns_uploaded_file( $file_name ) ) {
+						// Unverified cart data may reference another shopper's upload;
+						// move only if owned by the current visitor.
+						if ( ! $files_verified && ! Handler::owns_uploaded_file( $file_name ) ) {
 							continue;
 						}
 
@@ -353,6 +357,10 @@ final class OrderHandler {
 		if ( is_array( $ppom_data ) && array_key_exists( 'fields', $ppom_data ) ) {
 			self::restore_order_files_to_upload_dir( $ppom_data['fields'], $item, $order );
 			$cart_item_data['ppom'] = $ppom_data;
+
+			// WooCommerce scopes Order Again to the order's own customer, so these
+			// files are provably theirs; mark the item so checkout will move them.
+			$cart_item_data['_ppom_files_verified'] = true;
 		}
 
 		return $cart_item_data;
@@ -396,16 +404,9 @@ final class OrderHandler {
 				$file_name = $file_data['org'];
 				$confirmed = $confirmed_dir . Handler::file_get_name( $file_name, $product_id );
 
-				if ( ! file_exists( $confirmed ) ) {
-					continue;
-				}
-
-				if ( ! file_exists( $base_dir . $file_name ) ) {
+				if ( ! file_exists( $base_dir . $file_name ) && file_exists( $confirmed ) ) {
 					copy( $confirmed, $base_dir . $file_name );
 				}
-
-				// Record ownership so rename_files() can move the file on reorder.
-				Handler::remember_uploaded_file( $file_name );
 			}
 		}
 	}

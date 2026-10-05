@@ -380,6 +380,9 @@ final class CartHandler {
 		// re-scrub before it is stored: only this visitor's uploads persist.
 		$cart['ppom'] = Handler::retain_owned_uploads( $ppom_posted_fields );
 
+		// Set server-side after ownership is confirmed so checkout can safely move uploads.
+		$cart['_ppom_files_verified'] = true;
+
 		return $cart;
 	}
 
