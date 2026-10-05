@@ -612,4 +612,70 @@ class Test_Files_Handler extends PPOM_Test_Case {
 		);
 		$this->assertMatchesRegularExpression( '/^[a-f0-9]{32}$/', $token );
 	}
+
+	/**
+	 * Upload names carry no directory part, so anything with a slash or a
+	 * traversal segment is rejected before it can reach a file operation.
+	 *
+	 * @return void
+	 */
+	public function test_is_plain_file_name_rejects_paths_and_traversal() {
+		$this->assertTrue( Handler::is_plain_file_name( 'artwork.aaa111.png' ) );
+
+		foreach ( array( '', '../../../wp-config.php', 'sub/dir/file.png', '..\\wp-config.php', '/etc/passwd', '.' ) as $bad ) {
+			$this->assertFalse(
+				Handler::is_plain_file_name( $bad ),
+				sprintf( 'A name resolving outside the upload pool must be rejected: "%s".', $bad )
+			);
+		}
+	}
+
+	/**
+	 * The cart payload keeps a file entry only when the visitor uploaded that
+	 * exact file this session; a traversing or unowned "org" is dropped before it
+	 * is stored on the cart.
+	 *
+	 * @return void
+	 */
+	public function test_retain_owned_uploads_drops_traversing_and_unowned_entries() {
+		$this->start_fresh_guest_session();
+		WC()->session->set( 'ppom_uploaded_files', array( 'mine.aaa111.png' ) );
+
+		$payload = array(
+			'fields' => array(
+				'id'          => '3',
+				'design_file' => array(
+					0 => array( 'org' => 'mine.aaa111.png' ),
+					1 => array( 'org' => '../../../wp-config.php' ),
+					2 => array( 'org' => 'someone-else.bbb222.png' ),
+				),
+			),
+		);
+
+		$kept = Handler::retain_owned_uploads( $payload );
+
+		$this->assertArrayHasKey( 0, $kept['fields']['design_file'], 'The visitor\'s own upload must survive.' );
+		$this->assertArrayNotHasKey( 1, $kept['fields']['design_file'], 'A traversing file name must be dropped.' );
+		$this->assertArrayNotHasKey( 2, $kept['fields']['design_file'], 'A file owned by another visitor must be dropped.' );
+	}
+
+	/**
+	 * Scrubbing file ownership must not disturb non-file fields, which have no
+	 * "org" and are never checked against the upload pool.
+	 *
+	 * @return void
+	 */
+	public function test_retain_owned_uploads_leaves_non_file_fields_untouched() {
+		$this->start_fresh_guest_session();
+
+		$payload = array(
+			'fields' => array(
+				'id'        => '3',
+				'full_name' => 'Ada Lovelace',
+				'colours'   => array( 'red', 'blue' ),
+			),
+		);
+
+		$this->assertSame( $payload, Handler::retain_owned_uploads( $payload ) );
+	}
 }

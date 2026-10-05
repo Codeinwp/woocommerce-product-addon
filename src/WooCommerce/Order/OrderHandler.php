@@ -265,7 +265,14 @@ final class OrderHandler {
 						if ( ! isset( $file_data['org'] ) ) {
 							continue;
 						}
-						$file_name    = $file_data['org'];
+						$file_name = $file_data['org'];
+
+						// Orders saved before upload names were validated may carry a
+						// traversing name; never rename a file outside the pool.
+						if ( ! Handler::is_plain_file_name( $file_name ) ) {
+							continue;
+						}
+
 						$file_cropped = isset( $file_data['cropped'] ) ? true : false;
 
 						$new_filename     = Handler::file_get_name( $file_name, $product_id, $cart_item );
@@ -377,7 +384,7 @@ final class OrderHandler {
 			}
 
 			foreach ( $values as $file_data ) {
-				if ( ! is_array( $file_data ) || empty( $file_data['org'] ) ) {
+				if ( ! is_array( $file_data ) || empty( $file_data['org'] ) || ! Handler::is_plain_file_name( $file_data['org'] ) ) {
 					continue;
 				}
 

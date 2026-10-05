@@ -11,6 +11,7 @@
 namespace PPOM\WooCommerce\Cart;
 
 use PPOM_Meta;
+use PPOM\Files\Handler;
 use PPOM\Hooks\Callbacks;
 use PPOM\Pricing\Engine;
 use PPOM\Support\Helpers;
@@ -365,8 +366,11 @@ final class CartHandler {
 			return $cart;
 		}
 
+		// Keep only this visitor's uploads before saving or storing the payload.
+		$owned_payload = Handler::retain_owned_uploads( $_POST['ppom'] );
+
 		// PPOM also saving cropped images under this filter.
-		$ppom_posted_fields = apply_filters( 'ppom_add_cart_item_data', $_POST['ppom'], $_POST );
+		$ppom_posted_fields = apply_filters( 'ppom_add_cart_item_data', $owned_payload, $_POST );
 		$ppom_posted_fields = Helpers::filter_ppom_payload_by_active_variation( (array) $ppom_posted_fields, $product_id, $variation_id );
 		if ( empty( $ppom_posted_fields['fields'] ) ) {
 			return $cart;

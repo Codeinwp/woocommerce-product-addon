@@ -679,6 +679,74 @@ final class Handler {
 	}
 
 	/**
+	 * Whether a stored file reference is a plain name inside the upload pool.
+	 *
+	 * Upload names are generated server-side and carry no directory part, so a
+	 * value with a slash or a traversal segment never came from the uploader and
+	 * must not reach a file operation that joins it onto the upload path.
+	 *
+	 * @param mixed $file_name Stored file reference from cart/order data.
+	 *
+	 * @return bool
+	 */
+	public static function is_plain_file_name( $file_name ) {
+
+		return is_string( $file_name )
+			&& '' !== $file_name
+			&& '.' !== $file_name
+			&& basename( $file_name ) === $file_name
+			&& 0 === validate_file( $file_name );
+	}
+
+	/**
+	 * Whether the current visitor uploaded the given file and it is a plain name.
+	 *
+	 * @param mixed $file_name Stored file reference from cart data.
+	 *
+	 * @return bool
+	 */
+	public static function owns_safe_upload( $file_name ) {
+
+		return self::is_plain_file_name( $file_name ) && self::owns_uploaded_file( $file_name );
+	}
+
+	/**
+	 * Drops file-field entries the current visitor did not legitimately upload.
+	 *
+	 * The posted file reference ("org") is the only value an attacker can tamper
+	 * with. Entries outside the upload pool or belonging to another shopper are
+	 * removed before the payload is saved.
+	 *
+	 * @param mixed $ppom Posted PPOM payload ($_POST['ppom']).
+	 *
+	 * @return mixed Payload with unowned file entries removed.
+	 */
+	public static function retain_owned_uploads( $ppom ) {
+
+		if ( ! is_array( $ppom ) || empty( $ppom['fields'] ) || ! is_array( $ppom['fields'] ) ) {
+			return $ppom;
+		}
+
+		foreach ( $ppom['fields'] as $data_name => $values ) {
+			if ( 'id' === $data_name || ! is_array( $values ) ) {
+				continue;
+			}
+
+			foreach ( $values as $file_id => $file_data ) {
+				if ( ! is_array( $file_data ) || ! isset( $file_data['org'] ) || ! is_string( $file_data['org'] ) ) {
+					continue;
+				}
+
+				if ( ! self::owns_safe_upload( wp_unslash( $file_data['org'] ) ) ) {
+					unset( $ppom['fields'][ $data_name ][ $file_id ] );
+				}
+			}
+		}
+
+		return $ppom;
+	}
+
+	/**
 	 * Deletes a temporary PPOM upload.
 	 *
 	 * @return void
@@ -782,6 +850,12 @@ final class Handler {
 	 * @see self::get_dir_path()
 	 */
 	public static function get_file_download_url( $file_name, $order_id, $product_id ) {
+
+		// Orders placed before upload names were validated may carry a traversing
+		// name; never join it onto the upload path.
+		if ( ! self::is_plain_file_name( $file_name ) ) {
+			return apply_filters( 'ppom_file_download_url', '', $file_name );
+		}
 
 		$base_dir_path      = self::get_dir_path() . $file_name;
 		$confirm_dir        = 'confirmed/' . $order_id;
