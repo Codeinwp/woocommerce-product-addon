@@ -376,7 +376,9 @@ final class CartHandler {
 			return $cart;
 		}
 
-		$cart['ppom'] = $ppom_posted_fields;
+		// The filter above receives raw $_POST and may mutate the payload, so
+		// re-scrub before it is stored: only this visitor's uploads persist.
+		$cart['ppom'] = Handler::retain_owned_uploads( $ppom_posted_fields );
 
 		return $cart;
 	}

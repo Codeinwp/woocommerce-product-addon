@@ -734,7 +734,7 @@ final class Handler {
 			}
 
 			foreach ( $values as $file_id => $file_data ) {
-				if ( ! is_array( $file_data ) || ! isset( $file_data['org'] ) || ! is_string( $file_data['org'] ) ) {
+				if ( ! is_array( $file_data ) || ! array_key_exists( 'org', $file_data ) ) {
 					continue;
 				}
 

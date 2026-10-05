@@ -648,6 +648,8 @@ class Test_Files_Handler extends PPOM_Test_Case {
 					0 => array( 'org' => 'mine.aaa111.png' ),
 					1 => array( 'org' => '../../../wp-config.php' ),
 					2 => array( 'org' => 'someone-else.bbb222.png' ),
+					3 => array( 'org' => null ),
+					4 => array( 'org' => array( 'nested' ) ),
 				),
 			),
 		);
@@ -657,6 +659,8 @@ class Test_Files_Handler extends PPOM_Test_Case {
 		$this->assertArrayHasKey( 0, $kept['fields']['design_file'], 'The visitor\'s own upload must survive.' );
 		$this->assertArrayNotHasKey( 1, $kept['fields']['design_file'], 'A traversing file name must be dropped.' );
 		$this->assertArrayNotHasKey( 2, $kept['fields']['design_file'], 'A file owned by another visitor must be dropped.' );
+		$this->assertArrayNotHasKey( 3, $kept['fields']['design_file'], 'A file entry with a null org must be dropped.' );
+		$this->assertArrayNotHasKey( 4, $kept['fields']['design_file'], 'A file entry with a non-string org must be dropped.' );
 	}
 
 	/**
