@@ -622,7 +622,7 @@ class Test_Files_Handler extends PPOM_Test_Case {
 	public function test_is_plain_file_name_rejects_paths_and_traversal() {
 		$this->assertTrue( Handler::is_plain_file_name( 'artwork.aaa111.png' ) );
 
-		foreach ( array( '', '../../../wp-config.php', 'sub/dir/file.png', '..\\wp-config.php', '/etc/passwd', '.' ) as $bad ) {
+		foreach ( array( '', '..', '../../../wp-config.php', 'sub/dir/file.png', '..\\wp-config.php', '/etc/passwd', '.' ) as $bad ) {
 			$this->assertFalse(
 				Handler::is_plain_file_name( $bad ),
 				sprintf( 'A name resolving outside the upload pool must be rejected: "%s".', $bad )

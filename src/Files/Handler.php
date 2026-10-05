@@ -694,6 +694,7 @@ final class Handler {
 		return is_string( $file_name )
 			&& '' !== $file_name
 			&& '.' !== $file_name
+			&& '..' !== $file_name
 			&& basename( $file_name ) === $file_name
 			&& 0 === validate_file( $file_name );
 	}
