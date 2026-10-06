@@ -368,17 +368,20 @@ final class OrderHandler {
 	 * shopper's cart.
 	 *
 	 * @param mixed $cart_item_data Cart item data built for the reorder.
+	 * @param mixed $item           Order item being re-ordered (duck-typed: needs get_product_id()).
 	 *
 	 * @return mixed
 	 *
 	 * @see self::restore_order_files_to_upload_dir()
 	 */
-	public static function retain_owned_reorder_files( $cart_item_data ) {
+	public static function retain_owned_reorder_files( $cart_item_data, $item = null ) {
 		if ( ! is_array( $cart_item_data ) || ! isset( $cart_item_data['ppom'] ) ) {
 			return $cart_item_data;
 		}
 
-		$cart_item_data['ppom'] = Handler::retain_owned_uploads( $cart_item_data['ppom'] );
+		$product_id = is_object( $item ) && method_exists( $item, 'get_product_id' ) ? (int) $item->get_product_id() : 0;
+
+		$cart_item_data['ppom'] = Handler::retain_owned_uploads( $cart_item_data['ppom'], $product_id );
 
 		return $cart_item_data;
 	}

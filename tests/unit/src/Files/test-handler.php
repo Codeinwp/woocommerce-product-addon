@@ -631,13 +631,28 @@ class Test_Files_Handler extends PPOM_Test_Case {
 	}
 
 	/**
-	 * The cart payload keeps a file entry only when the visitor uploaded that
-	 * exact file this session; a traversing or unowned "org" is dropped before it
-	 * is stored on the cart.
+	 * Creates a product whose PPOM group holds the given fields.
+	 *
+	 * @param list<array<string, mixed>> $fields Field definitions.
+	 *
+	 * @return int Product ID.
+	 */
+	private function product_with_fields( array $fields ): int {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( $fields, $product->get_id() );
+
+		return $product->get_id();
+	}
+
+	/**
+	 * A configured file field keeps only owned, well-formed rows; traversing,
+	 * unowned, scalar and org-less rows are dropped.
 	 *
 	 * @return void
 	 */
-	public function test_retain_owned_uploads_drops_traversing_and_unowned_entries() {
+	public function test_retain_owned_uploads_drops_unusable_rows_of_a_file_field() {
+		$product_id = $this->product_with_fields( array( $this->build_file_field( 'design_file' ) ) );
+
 		$this->start_fresh_guest_session();
 		WC()->session->set( 'ppom_uploaded_files', array( 'mine.aaa111.png' ) );
 
@@ -650,36 +665,115 @@ class Test_Files_Handler extends PPOM_Test_Case {
 					2 => array( 'org' => 'someone-else.bbb222.png' ),
 					3 => array( 'org' => null ),
 					4 => array( 'org' => array( 'nested' ) ),
+					5 => 'scalar-row',
+					6 => array( 'cropped' => 'no-org' ),
 				),
 			),
 		);
 
-		$kept = Handler::retain_owned_uploads( $payload );
+		$kept = Handler::retain_owned_uploads( $payload, $product_id );
 
-		$this->assertArrayHasKey( 0, $kept['fields']['design_file'], 'The visitor\'s own upload must survive.' );
-		$this->assertArrayNotHasKey( 1, $kept['fields']['design_file'], 'A traversing file name must be dropped.' );
-		$this->assertArrayNotHasKey( 2, $kept['fields']['design_file'], 'A file owned by another visitor must be dropped.' );
-		$this->assertArrayNotHasKey( 3, $kept['fields']['design_file'], 'A file entry with a null org must be dropped.' );
-		$this->assertArrayNotHasKey( 4, $kept['fields']['design_file'], 'A file entry with a non-string org must be dropped.' );
+		$this->assertSame(
+			array( 0 => array( 'org' => 'mine.aaa111.png' ) ),
+			$kept['fields']['design_file'],
+			'Only the visitor\'s own well-formed upload may survive.'
+		);
 	}
 
 	/**
-	 * Scrubbing file ownership must not disturb non-file fields, which have no
-	 * "org" and are never checked against the upload pool.
+	 * An owned upload is revalidated against the field it is submitted under, so
+	 * a file accepted by a permissive field cannot be moved into a stricter one.
+	 *
+	 * @return void
+	 */
+	public function test_retain_owned_uploads_rechecks_extension_per_field() {
+		$product_id = $this->product_with_fields(
+			array(
+				$this->build_file_field( 'design_file' ),
+				$this->build_file_field( 'invoice_pdf', 'Invoice', array( 'file_types' => 'pdf' ) ),
+			)
+		);
+
+		$this->start_fresh_guest_session();
+		WC()->session->set( 'ppom_uploaded_files', array( 'mine.aaa111.png' ) );
+
+		$payload = array(
+			'fields' => array(
+				'design_file' => array( 0 => array( 'org' => 'mine.aaa111.png' ) ),
+				'invoice_pdf' => array( 0 => array( 'org' => 'mine.aaa111.png' ) ),
+			),
+		);
+
+		$kept = Handler::retain_owned_uploads( $payload, $product_id );
+
+		$this->assertCount( 1, $kept['fields']['design_file'] );
+		$this->assertSame( array(), $kept['fields']['invoice_pdf'], 'A png must not pass a pdf-only field.' );
+	}
+
+	/**
+	 * A configured file field posted as a scalar is replaced by an empty row list,
+	 * and a cropper keeps its ratio beside its owned image.
+	 *
+	 * @return void
+	 */
+	public function test_retain_owned_uploads_normalises_scalar_field_and_keeps_cropper_ratio() {
+		$product_id = $this->product_with_fields(
+			array(
+				$this->build_file_field( 'design_file' ),
+				$this->build_cropper_field( 'photo' ),
+			)
+		);
+
+		$this->start_fresh_guest_session();
+		WC()->session->set( 'ppom_uploaded_files', array( 'face.ccc333.jpg' ) );
+
+		$payload = array(
+			'fields' => array(
+				'design_file' => 'not-a-row-list',
+				'photo'       => array(
+					'ratio' => '1',
+					0       => array( 'org' => 'face.ccc333.jpg' ),
+				),
+			),
+		);
+
+		$kept = Handler::retain_owned_uploads( $payload, $product_id );
+
+		$this->assertSame( array(), $kept['fields']['design_file'] );
+		$this->assertSame( $payload['fields']['photo'], $kept['fields']['photo'] );
+	}
+
+	/**
+	 * Keys that are not configured upload fields keep their values, except that
+	 * a file reference the visitor does not own is still dropped.
 	 *
 	 * @return void
 	 */
 	public function test_retain_owned_uploads_leaves_non_file_fields_untouched() {
+		$product_id = $this->product_with_fields( array( $this->build_text_field( 'full_name' ) ) );
+
 		$this->start_fresh_guest_session();
+		WC()->session->set( 'ppom_uploaded_files', array( 'mine.aaa111.png' ) );
 
 		$payload = array(
 			'fields' => array(
-				'id'        => '3',
-				'full_name' => 'Ada Lovelace',
-				'colours'   => array( 'red', 'blue' ),
+				'id'                   => '3',
+				'full_name'            => 'Ada Lovelace',
+				'colours'              => array( 'red', 'blue' ),
+				'design_file__clone_1' => array(
+					0 => array( 'org' => 'mine.aaa111.png' ),
+					1 => array( 'org' => 'someone-else.bbb222.png' ),
+				),
 			),
 		);
 
-		$this->assertSame( $payload, Handler::retain_owned_uploads( $payload ) );
+		$kept = Handler::retain_owned_uploads( $payload, $product_id );
+
+		$this->assertSame( 'Ada Lovelace', $kept['fields']['full_name'] );
+		$this->assertSame( array( 'red', 'blue' ), $kept['fields']['colours'] );
+		$this->assertSame(
+			array( 0 => array( 'org' => 'mine.aaa111.png' ) ),
+			$kept['fields']['design_file__clone_1']
+		);
 	}
 }

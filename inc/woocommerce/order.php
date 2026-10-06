@@ -52,11 +52,12 @@ function ppom_wc_order_again_compatibility( $cart_item_data, $item, $order ) {
  * Keeps only reordered file references owned by the current session.
  *
  * @param mixed $cart_item_data Cart item data built for the reorder.
+ * @param mixed $item           Order item being re-ordered.
  *
  * @return mixed
  */
-function ppom_retain_owned_reorder_files( $cart_item_data ) {
-	return \PPOM\WooCommerce\Order\OrderHandler::retain_owned_reorder_files( $cart_item_data );
+function ppom_retain_owned_reorder_files( $cart_item_data, $item = null ) {
+	return \PPOM\WooCommerce\Order\OrderHandler::retain_owned_reorder_files( $cart_item_data, $item );
 }
 
 function ppom_woocommerce_order_item_meta_html( $item_id, $item ) {

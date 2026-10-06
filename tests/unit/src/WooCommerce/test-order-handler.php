@@ -273,7 +273,7 @@ class Test_Order_Handler extends PPOM_Test_Case {
 			'The restored copy must be owned so cart edits keep it and checkout moves it.'
 		);
 
-		$final = OrderHandler::retain_owned_reorder_files( $out );
+		$final = OrderHandler::retain_owned_reorder_files( $out, $item );
 		$this->assertSame(
 			$file_name,
 			$final['ppom']['fields']['design_file']['file_0']['org'],
@@ -380,7 +380,7 @@ class Test_Order_Handler extends PPOM_Test_Case {
 		);
 		$this->assertSame( 'another shopper upload', file_get_contents( $base_path ) );
 
-		$final = OrderHandler::retain_owned_reorder_files( $out );
+		$final = OrderHandler::retain_owned_reorder_files( $out, $item );
 		$this->assertArrayNotHasKey(
 			'file_0',
 			$final['ppom']['fields']['design_file'],

@@ -712,39 +712,108 @@ final class Handler {
 	}
 
 	/**
-	 * Drops file-field entries the current visitor did not legitimately upload.
+	 * Keeps only well-formed file rows the current visitor uploaded for that field.
 	 *
-	 * The posted file reference ("org") is the only value an attacker can tamper
-	 * with. Entries outside the upload pool or belonging to another shopper are
-	 * removed before the payload is saved.
+	 * Fields are resolved from the product's saved schema, not the posted shape:
+	 * every row of a configured file or cropper field must name an owned plain
+	 * upload whose extension that field allows. Keys that do not resolve to an
+	 * upload field (addon clones, say) still lose any file reference the visitor
+	 * does not own.
 	 *
-	 * @param mixed $ppom Posted PPOM payload ($_POST['ppom']).
+	 * @param mixed $ppom       Posted or rehydrated PPOM payload.
+	 * @param int   $product_id Product the payload belongs to.
 	 *
-	 * @return mixed Payload with unowned file entries removed.
+	 * @return mixed Payload with unusable file rows removed.
 	 */
-	public static function retain_owned_uploads( $ppom ) {
+	public static function retain_owned_uploads( $ppom, int $product_id ) {
 
 		if ( ! is_array( $ppom ) || empty( $ppom['fields'] ) || ! is_array( $ppom['fields'] ) ) {
 			return $ppom;
 		}
 
 		foreach ( $ppom['fields'] as $data_name => $values ) {
-			if ( 'id' === $data_name || ! is_array( $values ) ) {
+			if ( 'id' === $data_name ) {
 				continue;
 			}
 
-			foreach ( $values as $file_id => $file_data ) {
-				if ( ! is_array( $file_data ) || ! array_key_exists( 'org', $file_data ) ) {
-					continue;
-				}
+			$field_meta = Helpers::get_field_meta_by_dataname( $product_id, (string) $data_name );
 
-				if ( ! self::owns_safe_upload( wp_unslash( $file_data['org'] ) ) ) {
-					unset( $ppom['fields'][ $data_name ][ $file_id ] );
-				}
-			}
+			$ppom['fields'][ $data_name ] = is_array( $field_meta ) && self::field_accepts_uploads( $field_meta )
+				? self::retain_field_uploads( $values, $field_meta )
+				: self::drop_unowned_file_rows( $values );
 		}
 
 		return $ppom;
+	}
+
+	/**
+	 * Keeps the valid upload rows of one configured file or cropper field.
+	 *
+	 * @param mixed                $values     Posted rows of the field.
+	 * @param array<string, mixed> $field_meta Saved field definition.
+	 *
+	 * @return array<int|string, mixed>
+	 */
+	private static function retain_field_uploads( $values, array $field_meta ): array {
+
+		if ( ! is_array( $values ) ) {
+			return array();
+		}
+
+		foreach ( $values as $file_id => $row ) {
+			// The cropper stores its chosen ratio beside the file rows.
+			if ( 'ratio' === $file_id && 'cropper' === $field_meta['type'] && is_scalar( $row ) ) {
+				continue;
+			}
+
+			if ( ! self::is_field_upload( $row, $field_meta ) ) {
+				unset( $values[ $file_id ] );
+			}
+		}
+
+		return $values;
+	}
+
+	/**
+	 * Whether a row names an owned upload this field's file types allow.
+	 *
+	 * @param mixed                $row        One posted file row.
+	 * @param array<string, mixed> $field_meta Saved field definition.
+	 *
+	 * @return bool
+	 */
+	private static function is_field_upload( $row, array $field_meta ): bool {
+
+		if ( ! is_array( $row ) || ! isset( $row['org'] ) || ! is_string( $row['org'] ) ) {
+			return false;
+		}
+
+		$file_name = wp_unslash( $row['org'] );
+
+		return self::owns_safe_upload( $file_name )
+			&& self::field_allows_extension( $field_meta, (string) pathinfo( $file_name, PATHINFO_EXTENSION ) );
+	}
+
+	/**
+	 * Drops file-shaped rows the visitor does not own from a non-upload key.
+	 *
+	 * @param mixed $values Posted value of the key.
+	 *
+	 * @return mixed
+	 */
+	private static function drop_unowned_file_rows( $values ) {
+
+		if ( ! is_array( $values ) ) {
+			return $values;
+		}
+
+		foreach ( $values as $file_id => $row ) {
+			if ( is_array( $row ) && array_key_exists( 'org', $row ) && ! self::owns_safe_upload( wp_unslash( $row['org'] ) ) ) {
+				unset( $values[ $file_id ] );
+			}
+		}
+
+		return $values;
 	}
 
 	/**

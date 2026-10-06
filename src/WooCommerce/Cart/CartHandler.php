@@ -367,7 +367,7 @@ final class CartHandler {
 		}
 
 		// Keep only this visitor's uploads before saving or storing the payload.
-		$owned_payload = Handler::retain_owned_uploads( $_POST['ppom'] );
+		$owned_payload = Handler::retain_owned_uploads( $_POST['ppom'], (int) $product_id );
 
 		// PPOM also saving cropped images under this filter.
 		$ppom_posted_fields = apply_filters( 'ppom_add_cart_item_data', $owned_payload, $_POST );
@@ -378,7 +378,7 @@ final class CartHandler {
 
 		// The filter above receives raw $_POST and may mutate the payload, so
 		// re-scrub before it is stored: only this visitor's uploads persist.
-		$cart['ppom'] = Handler::retain_owned_uploads( $ppom_posted_fields );
+		$cart['ppom'] = Handler::retain_owned_uploads( $ppom_posted_fields, (int) $product_id );
 
 		return $cart;
 	}
