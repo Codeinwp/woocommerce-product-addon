@@ -12,6 +12,7 @@ namespace PPOM\WooCommerce\Product;
 
 use PPOM_Form;
 use PPOM_Meta;
+use PPOM\Files\Handler;
 use PPOM\Hooks\Callbacks;
 use PPOM\Support\Helpers;
 
@@ -217,6 +218,11 @@ final class ProductHandler {
 			$passed = self::check_validation( $product_id, $_POST, true, $variation_id );
 		}
 
+		// Server-side even with browser validation: dropped uploads leave a field empty.
+		if ( ! self::validate_required_uploads( (int) $product_id, (int) $variation_id ) ) {
+			$passed = false;
+		}
+
 		$posted_fields = isset( $_POST['ppom']['fields'] ) ? wp_unslash( $_POST['ppom']['fields'] ) : null; // phpcs:ignore WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$fields        = is_array( $posted_fields ) ? ppom_sanitize_array_data( $posted_fields ) : null;
 		$product_id    = isset( $_POST['ppom_product_id'] ) ? intval( wp_unslash( $_POST['ppom_product_id'] ) ) : $product_id; // phpcs:ignore WordPress.Security.NonceVerification
@@ -343,13 +349,7 @@ final class ProductHandler {
 
 			// ppom_pa($field);
 
-			// Check field Visibility settings
-			if ( ! Helpers::is_field_visible( $field ) ) {
-				continue;
-			}
-
-			$ppom_id = isset( $field['ppom_id'] ) ? absint( $field['ppom_id'] ) : 0;
-			if ( $ppom_id > 0 && ! Helpers::is_meta_group_active_for_variation( $product_id, $ppom_id, $variation_id ) ) {
+			if ( ! self::field_applies_to_selection( $field, (int) $product_id, $variation_id ) ) {
 				continue;
 			}
 
@@ -360,8 +360,6 @@ final class ProductHandler {
 			$passed = apply_filters( 'ppom_before_fields_validation', $passed, $field, $post_data, $product_id );
 
 			$data_name = sanitize_key( $field['data_name'] );
-
-			$title = isset( $field['title'] ) ? $field['title'] : '';
 
 			// var_dump($data_name, Helpers::is_field_hidden_by_condition($data_name));
 			// Check if field is required by hidden by condition
@@ -376,19 +374,7 @@ final class ProductHandler {
 			} elseif ( isset( $field['required'] ) && 'on' === $field['required'] && ! Helpers::has_posted_field_value( $ppom_posted_fields, $field ) ) {
 
 				// Note: Checkbox is being validate by hook: ppom_has_posted_field_value
-				// $error_message = isset($field['error_message']) ? $field['error_message'] : '';
-				// $error_message = (isset($field['error_message']) && $field['error_message'] != '') ? $title.": ".$field['error_message'] : "{$title} is a required field";
-			
-				$error_message = ( isset( $field['error_message'] ) && $field['error_message'] != '' )
-				? sprintf( '%1$s: %2$s', $title, $field['error_message'] )
-				: sprintf(
-					/* translators: %s: the name of the field. */
-					__( '%s is a required field', 'woocommerce-product-addon' ),
-					$title
-				);
-				$error_message = $error_message;
-				$error_message = stripslashes( $error_message );
-				Helpers::wc_add_notice( $error_message );
+				Helpers::wc_add_notice( self::required_field_message( $field ) );
 				$passed = false;
 			}
 		}
@@ -396,5 +382,143 @@ final class ProductHandler {
 		// ppom_pa($post_data); exit;
 
 		return apply_filters( 'ppom_add_to_cart_validation', $passed, $ppom, $product_id, $variation_id );
+	}
+
+	/**
+	 * Rejects add-to-cart when a required upload field loses every file row to
+	 * the ownership/schema check that runs before the item is stored.
+	 *
+	 * Required-field validation reads the raw request, where any non-empty file
+	 * array counts as present, and it is skipped when validation runs in the
+	 * browser, so a dropped upload would otherwise still let the product in.
+	 *
+	 * @param int $product_id   Product being added.
+	 * @param int $variation_id Selected variation, or 0.
+	 *
+	 * @return bool
+	 *
+	 * @see Handler::retain_owned_uploads()
+	 */
+	private static function validate_required_uploads( int $product_id, int $variation_id ): bool {
+
+		$posted = isset( $_POST['ppom'] ) ? $_POST['ppom'] : null; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified by WooCommerce add-to-cart.
+		if ( ! is_array( $posted ) || ! isset( $posted['fields'] ) || ! is_array( $posted['fields'] ) ) {
+			return true;
+		}
+
+		$ppom = new PPOM_Meta( $product_id );
+		if ( ! $ppom->fields ) {
+			return true;
+		}
+
+		$owned  = Handler::retain_owned_uploads( $posted, $product_id );
+		$passed = true;
+
+		foreach ( $ppom->fields as $field ) {
+			if ( ! self::is_required_upload_in_play( $field, $product_id, $variation_id ) ) {
+				continue;
+			}
+
+			if ( Helpers::has_posted_field_value( $posted['fields'], $field ) && 0 === self::count_file_rows( $owned['fields'], (string) $field['data_name'] ) ) {
+				Helpers::wc_add_notice( self::required_field_message( $field ) );
+				$passed = false;
+			}
+		}
+
+		return $passed;
+	}
+
+	/**
+	 * Whether a field is a required, visible, active upload field.
+	 *
+	 * @param mixed $field        Saved field definition.
+	 * @param int   $product_id   Product being added.
+	 * @param int   $variation_id Selected variation, or 0.
+	 *
+	 * @return bool
+	 */
+	private static function is_required_upload_in_play( $field, int $product_id, int $variation_id ): bool {
+
+		if ( ! is_array( $field ) || empty( $field['data_name'] ) || ! isset( $field['required'] ) || 'on' !== $field['required'] ) {
+			return false;
+		}
+
+		return Handler::field_accepts_uploads( $field )
+			&& self::field_applies_to_selection( $field, $product_id, $variation_id )
+			&& ! Helpers::is_field_hidden_by_condition( sanitize_key( $field['data_name'] ) );
+	}
+
+	/**
+	 * Whether a field is visible and its group is active for the variation.
+	 *
+	 * @param array<string, mixed> $field        Saved field definition.
+	 * @param int                  $product_id   Product being added.
+	 * @param int                  $variation_id Selected variation, or 0.
+	 *
+	 * @return bool
+	 */
+	private static function field_applies_to_selection( array $field, int $product_id, int $variation_id ): bool {
+
+		if ( ! Helpers::is_field_visible( $field ) ) {
+			return false;
+		}
+
+		$ppom_id = isset( $field['ppom_id'] ) ? absint( $field['ppom_id'] ) : 0;
+
+		return 0 === $ppom_id || Helpers::is_meta_group_active_for_variation( $product_id, $ppom_id, $variation_id );
+	}
+
+	/**
+	 * Counts file rows posted for a field, including its repeater clones.
+	 *
+	 * @param mixed  $fields    Posted PPOM fields.
+	 * @param string $data_name Field data name.
+	 *
+	 * @return int
+	 */
+	private static function count_file_rows( $fields, string $data_name ): int {
+
+		if ( ! is_array( $fields ) ) {
+			return 0;
+		}
+
+		$data_name = sanitize_key( $data_name );
+		$count     = 0;
+
+		foreach ( $fields as $key => $rows ) {
+			if ( ! is_array( $rows ) || ! in_array( $data_name, explode( '__clone_', (string) $key ), true ) ) {
+				continue;
+			}
+
+			foreach ( $rows as $row ) {
+				if ( is_array( $row ) && isset( $row['org'] ) ) {
+					++$count;
+				}
+			}
+		}
+
+		return $count;
+	}
+
+	/**
+	 * Builds the notice for a missing required field.
+	 *
+	 * @param array<string, mixed> $field Saved field definition.
+	 *
+	 * @return string
+	 */
+	private static function required_field_message( array $field ): string {
+
+		$title = isset( $field['title'] ) ? $field['title'] : '';
+
+		$error_message = ( isset( $field['error_message'] ) && $field['error_message'] != '' )
+			? sprintf( '%1$s: %2$s', $title, $field['error_message'] )
+			: sprintf(
+				/* translators: %s: the name of the field. */
+				__( '%s is a required field', 'woocommerce-product-addon' ),
+				$title
+			);
+
+		return stripslashes( $error_message );
 	}
 }

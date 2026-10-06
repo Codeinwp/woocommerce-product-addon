@@ -553,7 +553,7 @@ final class Handler {
 	 *
 	 * @return bool
 	 */
-	private static function field_accepts_uploads( $file_meta ) {
+	public static function field_accepts_uploads( $file_meta ) {
 
 		if ( ! is_array( $file_meta ) || ! isset( $file_meta['type'] ) ) {
 			return false;
