@@ -76,7 +76,6 @@ test.describe( 'File upload preview modal', () => {
 			page.locator( `#filelist-${ fieldId } .u_i_c_tools_del` )
 		).toBeVisible( { timeout: 10000 } );
 
-		// The modal markup must not exist, so nothing can render at the bottom of the page.
 		await expect( page.locator( '.ppom-modals' ) ).toHaveCount( 0 );
 
 		// Uploads are renamed with a unique suffix, so match the upload directory instead of

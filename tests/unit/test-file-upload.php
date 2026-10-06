@@ -101,17 +101,14 @@ class Test_File_Upload extends WP_UnitTestCase {
      * Real images must keep getting a thumbnail preview, not the file icon.
      */
     public function test_uploaded_file_preview_png_still_uses_thumb() {
-        $dir = ppom_get_dir_path();
-        wp_mkdir_p( $dir );
-        $file_name = 'pixel.png';
-        file_put_contents( $dir . $file_name, base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' ) );
+        $path = $this->create_pixel_png();
 
-        $html = \PPOM\Files\Handler::uploaded_file_preview( $file_name, array( 'type' => 'file', 'data_name' => 'upload' ) );
+        $html = \PPOM\Files\Handler::uploaded_file_preview( basename( $path ), array( 'type' => 'file', 'data_name' => 'upload' ) );
 
         $this->assertStringContainsString( '/thumbs/', $html );
         $this->assertStringNotContainsString( 'images/file.png', $html );
 
-        unlink( $dir . $file_name );
+        unlink( $path );
     }
 
     /**
@@ -119,37 +116,50 @@ class Test_File_Upload extends WP_UnitTestCase {
      * as a stray full-size image at the bottom of the page, so it must not be emitted unless
      * the popup is enabled. Regression test for Codeinwp/ppom-pro#696.
      */
-    public function test_uploaded_file_preview_omits_image_modal_by_default() {
-        $dir = ppom_get_dir_path();
-        wp_mkdir_p( $dir );
-        $file_name = 'pixel.png';
-        file_put_contents( $dir . $file_name, base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' ) );
+    public function test_uploaded_file_preview_omits_image_modal_by_default(): void {
+        $path = $this->create_pixel_png();
 
-        $html = \PPOM\Files\Handler::uploaded_file_preview( $file_name, array( 'type' => 'cropper', 'data_name' => 'photo' ) );
+        $html = \PPOM\Files\Handler::uploaded_file_preview( basename( $path ), array( 'type' => 'cropper', 'data_name' => 'photo' ) );
 
         $this->assertStringNotContainsString( 'ppom-modals', $html );
 
-        unlink( $dir . $file_name );
+        unlink( $path );
     }
 
     /**
      * Sites that opt in via the filter keep the "view large" modal and its trigger button.
      */
-    public function test_uploaded_file_preview_keeps_image_modal_when_popup_enabled() {
-        $dir = ppom_get_dir_path();
-        wp_mkdir_p( $dir );
-        $file_name = 'pixel.png';
-        file_put_contents( $dir . $file_name, base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' ) );
+    public function test_uploaded_file_preview_keeps_image_modal_when_popup_enabled(): void {
+        $path = $this->create_pixel_png();
         add_filter( 'ppom_show_image_popup', '__return_true' );
 
-        $html = \PPOM\Files\Handler::uploaded_file_preview( $file_name, array( 'type' => 'cropper', 'data_name' => 'photo' ) );
+        $html = \PPOM\Files\Handler::uploaded_file_preview( basename( $path ), array( 'type' => 'cropper', 'data_name' => 'photo' ) );
 
         remove_filter( 'ppom_show_image_popup', '__return_true' );
 
         $this->assertStringContainsString( 'ppom-modals', $html );
         $this->assertStringContainsString( 'data-toggle="modal"', $html );
 
-        unlink( $dir . $file_name );
+        $html = \PPOM\Files\Handler::uploaded_file_preview( basename( $path ), array( 'type' => 'cropper', 'data_name' => 'photo' ) );
+
+        $this->assertStringNotContainsString( 'ppom-modals', $html );
+        $this->assertStringNotContainsString( 'data-toggle="modal"', $html );
+
+        unlink( $path );
+    }
+
+    /**
+     * Write a 1x1 PNG into the PPOM upload directory.
+     *
+     * @return string The full path of the file.
+     */
+    private function create_pixel_png(): string {
+        $dir = ppom_get_dir_path();
+        wp_mkdir_p( $dir );
+        $path = $dir . 'pixel.png';
+        file_put_contents( $path, base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' ) );
+
+        return $path;
     }
 
     public function test_ppom_create_chunk_file_output_error() {
