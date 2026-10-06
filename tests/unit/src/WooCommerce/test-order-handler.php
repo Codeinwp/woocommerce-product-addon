@@ -5,6 +5,7 @@
  * @package ppom-pro
  */
 
+use PPOM\Files\Handler;
 use PPOM\WooCommerce\Order\OrderHandler;
 
 /**
@@ -267,11 +268,110 @@ class Test_Order_Handler extends PPOM_Test_Case {
 		$this->assertFileExists( $confirmed );
 		$this->assertSame( $file_name, $out['ppom']['fields']['design_file']['file_0']['org'] );
 
-		// Order Again marks the rehydrated item so checkout will move its files.
 		$this->assertTrue(
-			! empty( $out['_ppom_files_verified'] ),
-			'The reordered item must be marked ownership-verified for checkout.'
+			Handler::owns_uploaded_file( $file_name ),
+			'The restored copy must be owned so cart edits keep it and checkout moves it.'
 		);
+	}
+
+	/**
+	 * Order Again must not claim a same-named pool file this session does not
+	 * own; it may be another shopper's upload.
+	 *
+	 * @return void
+	 */
+	public function test_order_again_does_not_claim_unowned_pool_file() {
+		WC()->session = new WC_Session_Handler();
+		WC()->session->init();
+
+		$order_id   = 903;
+		$product_id = 46;
+		$file_name  = 'shared-name.txt';
+		$base_path  = ppom_get_dir_path() . $file_name;
+		$confirmed  = ppom_get_dir_path( 'confirmed/' . $order_id ) . $product_id . '-' . $file_name;
+
+		$this->artifacts[] = $base_path;
+		$this->artifacts[] = $confirmed;
+
+		file_put_contents( $confirmed, 'reorder source' );
+		file_put_contents( $base_path, 'another shopper upload' );
+
+		$item = new class( $file_name, $product_id ) {
+			/**
+			 * @var string
+			 */
+			private $file_name;
+
+			/**
+			 * @var int
+			 */
+			private $product_id;
+
+			/**
+			 * @param string $file_name  Uploaded file name.
+			 * @param int    $product_id Product ID.
+			 */
+			public function __construct( $file_name, $product_id ) {
+				$this->file_name  = $file_name;
+				$this->product_id = $product_id;
+			}
+
+			/**
+			 * @param string $key Meta key.
+			 *
+			 * @return array<string, mixed>|string
+			 */
+			public function get_meta( $key = '' ) {
+				if ( '_ppom_fields' !== $key ) {
+					return '';
+				}
+
+				return array(
+					'fields' => array(
+						'id'          => '2',
+						'design_file' => array(
+							'file_0' => array( 'org' => $this->file_name ),
+						),
+					),
+				);
+			}
+
+			/**
+			 * @return int
+			 */
+			public function get_product_id() {
+				return $this->product_id;
+			}
+		};
+
+		$order = new class( $order_id ) {
+			/**
+			 * @var int
+			 */
+			private $id;
+
+			/**
+			 * @param int $id Order ID.
+			 */
+			public function __construct( $id ) {
+				$this->id = $id;
+			}
+
+			/**
+			 * @return int
+			 */
+			public function get_id() {
+				return $this->id;
+			}
+		};
+
+		OrderHandler::wc_order_again_compatibility( array(), $item, $order );
+
+		$this->assertFalse(
+			Handler::owns_uploaded_file( $file_name ),
+			'An existing pool file this session never owned must not be claimed.'
+		);
+		$this->assertSame( 'another shopper upload', file_get_contents( $base_path ) );
 	}
 
 	/**

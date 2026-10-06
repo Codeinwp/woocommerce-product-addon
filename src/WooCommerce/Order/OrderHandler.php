@@ -236,9 +236,6 @@ final class OrderHandler {
 				continue;
 			}
 
-			// Files are ownership-verified when added to the cart; legacy items must re-verify each file.
-			$files_verified = ! empty( $cart_item['_ppom_files_verified'] );
-
 			$product_id      = $cart_item['product_id'];
 			$all_moved_files = array();
 
@@ -276,9 +273,8 @@ final class OrderHandler {
 							continue;
 						}
 
-						// Unverified cart data may reference another shopper's upload;
-						// move only if owned by the current visitor.
-						if ( ! $files_verified && ! Handler::owns_uploaded_file( $file_name ) ) {
+						// Cart data may be stale or restored; move only this visitor's uploads.
+						if ( ! Handler::owns_uploaded_file( $file_name ) ) {
 							continue;
 						}
 
@@ -355,13 +351,8 @@ final class OrderHandler {
 		$ppom_data = $item->get_meta( '_ppom_fields' );
 
 		if ( is_array( $ppom_data ) && array_key_exists( 'fields', $ppom_data ) ) {
-			$restored               = self::restore_order_files_to_upload_dir( $ppom_data['fields'], $item, $order );
+			self::restore_order_files_to_upload_dir( $ppom_data['fields'], $item, $order );
 			$cart_item_data['ppom'] = $ppom_data;
-
-			// Verify restored files for checkout; session ownership enables cart edits.
-			if ( $restored ) {
-				$cart_item_data['_ppom_files_verified'] = true;
-			}
 		}
 
 		return $cart_item_data;
@@ -381,17 +372,16 @@ final class OrderHandler {
 	 * @param mixed $item   Order item being re-ordered (duck-typed: needs get_product_id()).
 	 * @param mixed $order  Original order (duck-typed: needs get_id()).
 	 *
-	 * @return bool Whether at least one file was restored and recorded as owned.
+	 * @return void
 	 */
 	private static function restore_order_files_to_upload_dir( $fields, $item, $order ) {
 		if ( ! is_array( $fields ) || ! is_object( $item ) || ! is_object( $order ) || ! method_exists( $order, 'get_id' ) || ! method_exists( $item, 'get_product_id' ) ) {
-			return false;
+			return;
 		}
 
 		$product_id    = $item->get_product_id();
 		$base_dir      = Handler::get_dir_path();
 		$confirmed_dir = Handler::get_dir_path( 'confirmed/' . $order->get_id() );
-		$restored_any  = false;
 
 		foreach ( $fields as $values ) {
 			if ( ! is_array( $values ) ) {
@@ -410,17 +400,21 @@ final class OrderHandler {
 					continue;
 				}
 
-				if ( ! file_exists( $base_dir . $file_name ) && ! copy( $confirmed, $base_dir . $file_name ) ) {
+				$pool_path = $base_dir . $file_name;
+
+				// A pool file this session does not own may be another shopper's.
+				if ( file_exists( $pool_path ) ) {
+					if ( ! Handler::owns_uploaded_file( $file_name ) ) {
+						continue;
+					}
+				} elseif ( ! copy( $confirmed, $pool_path ) ) {
 					continue;
 				}
 
-				// Track ownership of the customer's reordered file for cart edits and checkout.
+				// Owned per file, so cart edits keep it and checkout moves it.
 				Handler::remember_uploaded_file( $file_name );
-				$restored_any = true;
 			}
 		}
-
-		return $restored_any;
 	}
 
 	/**
