@@ -195,4 +195,44 @@ class Test_Hotpath_Cart_Payload extends PPOM_Test_Case {
 		$this->assertArrayNotHasKey( 'ppom', $restored );
 		$this->assertEqualsWithDelta( 10.0, (float) $restored['data']->get_price(), 0.0001 );
 	}
+	/**
+	 * Both ownership scrubs in add_cart_item_data run: a posted unowned row is
+	 * dropped before the ppom_add_cart_item_data filter, and one the filter
+	 * injects is dropped before the payload is stored.
+	 *
+	 * @return void
+	 */
+	public function test_add_cart_item_data_drops_unowned_rows_before_and_after_filter() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_file_field( 'design_file' ) ), $product->get_id() );
+
+		WC()->cart    = null;
+		WC()->session = new WC_Session_Handler();
+		WC()->session->init();
+
+		$seen_by_filter = null;
+		$inject         = static function ( $payload ) use ( &$seen_by_filter ) {
+			$seen_by_filter                      = $payload['fields']['design_file'];
+			$payload['fields']['design_file'][1] = array( 'org' => 'injected.def456.png' );
+
+			return $payload;
+		};
+		add_filter( 'ppom_add_cart_item_data', $inject );
+
+		$_POST['ppom'] = array(
+			'fields' => array(
+				'design_file' => array( 0 => array( 'org' => 'posted.abc123.png' ) ),
+			),
+		);
+
+		try {
+			$cart_item = ppom_woocommerce_add_cart_item_data( array(), $product->get_id() );
+		} finally {
+			remove_filter( 'ppom_add_cart_item_data', $inject );
+		}
+
+		$this->assertSame( array(), $seen_by_filter, 'The posted unowned row must be dropped before the filter.' );
+		$this->assertSame( array(), $cart_item['ppom']['fields']['design_file'], 'A row injected by the filter must not be stored.' );
+		$this->assertSame( array(), $cart_item[ \PPOM\Files\Handler::VERIFIED_FILES_KEY ] );
+	}
 }

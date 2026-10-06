@@ -350,16 +350,7 @@ final class CartHandler {
 			return $cart;
 		}
 
-		$wc_cart = function_exists( 'WC' ) ? WC()->cart : null;
-
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by WooCommerce add-to-cart nonce.
-		if ( isset( $_POST['ppom_cart_key'] ) && is_string( $_POST['ppom_cart_key'] ) && $wc_cart ) {
-			$remove_key = sanitize_text_field( wp_unslash( $_POST['ppom_cart_key'] ) );
-			if ( '' !== $remove_key && $wc_cart->get_cart_item( $remove_key ) ) {
-				$wc_cart->remove_cart_item( $remove_key );
-			}
-		}
-		// phpcs:enable WordPress.Security.NonceVerification.Missing
+		$verified = self::remove_replaced_cart_item();
 
 		// ADDED WC BUNDLES COMPATIBILITY
 		if ( function_exists( 'wc_pb_is_bundled_cart_item' ) && wc_pb_is_bundled_cart_item( $cart ) ) {
@@ -367,7 +358,7 @@ final class CartHandler {
 		}
 
 		// Keep only this visitor's uploads before saving or storing the payload.
-		$owned_payload = Handler::retain_owned_uploads( $_POST['ppom'], (int) $product_id );
+		$owned_payload = Handler::retain_owned_uploads( $_POST['ppom'], (int) $product_id, $verified );
 
 		// PPOM also saving cropped images under this filter.
 		$ppom_posted_fields = apply_filters( 'ppom_add_cart_item_data', $owned_payload, $_POST );
@@ -378,9 +369,37 @@ final class CartHandler {
 
 		// The filter above receives raw $_POST and may mutate the payload, so
 		// re-scrub before it is stored: only this visitor's uploads persist.
-		$cart['ppom'] = Handler::retain_owned_uploads( $ppom_posted_fields, (int) $product_id );
+		$cart['ppom'] = Handler::retain_owned_uploads( $ppom_posted_fields, (int) $product_id, $verified );
+
+		$cart[ Handler::VERIFIED_FILES_KEY ] = Handler::payload_file_names( $cart['ppom'] );
 
 		return $cart;
+	}
+
+	/**
+	 * Removes the cart item an edit replaces and returns its verified uploads.
+	 *
+	 * The edited item resubmits the same uploads, which the current session may
+	 * not own when the cart was restored on another device.
+	 *
+	 * @return list<string>
+	 */
+	private static function remove_replaced_cart_item(): array {
+
+		$wc_cart = function_exists( 'WC' ) ? WC()->cart : null;
+
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- WooCommerce add-to-cart sends no nonce; the key only matches this session's cart.
+		$remove_key = isset( $_POST['ppom_cart_key'] ) && is_string( $_POST['ppom_cart_key'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_cart_key'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		$replaced = '' !== $remove_key && $wc_cart ? $wc_cart->get_cart_item( $remove_key ) : array();
+		if ( empty( $replaced ) ) {
+			return array();
+		}
+
+		$wc_cart->remove_cart_item( $remove_key );
+
+		return Handler::verified_file_names( $replaced );
 	}
 
 	public static function update_cart_fees( $cart_items, $values ) {

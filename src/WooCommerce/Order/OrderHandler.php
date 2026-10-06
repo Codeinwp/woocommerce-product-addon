@@ -237,6 +237,7 @@ final class OrderHandler {
 			}
 
 			$product_id      = $cart_item['product_id'];
+			$verified        = Handler::verified_file_names( $cart_item );
 			$all_moved_files = array();
 
 			foreach ( $cart_item['ppom']['fields'] as $key => $values ) {
@@ -267,14 +268,8 @@ final class OrderHandler {
 						}
 						$file_name = $file_data['org'];
 
-						// Orders saved before upload names were validated may carry a
-						// traversing name; never rename a file outside the pool.
-						if ( ! Handler::is_plain_file_name( $file_name ) ) {
-							continue;
-						}
-
-						// Cart data may be stale or restored; move only this visitor's uploads.
-						if ( ! Handler::owns_uploaded_file( $file_name ) ) {
+						// Cart data may be stale or restored; move only this shopper's uploads.
+						if ( ! Handler::is_usable_upload( $file_name, $verified ) ) {
 							continue;
 						}
 
@@ -382,6 +377,8 @@ final class OrderHandler {
 		$product_id = is_object( $item ) && method_exists( $item, 'get_product_id' ) ? (int) $item->get_product_id() : 0;
 
 		$cart_item_data['ppom'] = Handler::retain_owned_uploads( $cart_item_data['ppom'], $product_id );
+
+		$cart_item_data[ Handler::VERIFIED_FILES_KEY ] = Handler::payload_file_names( $cart_item_data['ppom'] );
 
 		return $cart_item_data;
 	}

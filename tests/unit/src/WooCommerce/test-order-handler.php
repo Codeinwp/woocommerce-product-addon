@@ -33,6 +33,94 @@ class Test_Order_Handler extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Order item stub whose PPOM meta holds one design_file upload.
+	 *
+	 * @param string $file_name  Uploaded file name.
+	 * @param int    $product_id Product ID.
+	 *
+	 * @return object
+	 */
+	private function reorder_item( string $file_name, int $product_id ) {
+		return new class( $file_name, $product_id ) {
+			/**
+			 * @var string
+			 */
+			private $file_name;
+
+			/**
+			 * @var int
+			 */
+			private $product_id;
+
+			/**
+			 * @param string $file_name  Uploaded file name.
+			 * @param int    $product_id Product ID.
+			 */
+			public function __construct( string $file_name, int $product_id ) {
+				$this->file_name  = $file_name;
+				$this->product_id = $product_id;
+			}
+
+			/**
+			 * @param string $key Meta key.
+			 *
+			 * @return array{fields: array{id: string, design_file: array{file_0: array{org: string}}}}|string
+			 */
+			public function get_meta( $key = '' ) {
+				if ( '_ppom_fields' !== $key ) {
+					return '';
+				}
+
+				return array(
+					'fields' => array(
+						'id'          => '2',
+						'design_file' => array(
+							'file_0' => array( 'org' => $this->file_name ),
+						),
+					),
+				);
+			}
+
+			/**
+			 * @return int
+			 */
+			public function get_product_id(): int {
+				return $this->product_id;
+			}
+		};
+	}
+
+	/**
+	 * Order stub that only exposes its ID.
+	 *
+	 * @param int $order_id Order ID.
+	 *
+	 * @return object
+	 */
+	private function reorder_order( int $order_id ) {
+		return new class( $order_id ) {
+			/**
+			 * @var int
+			 */
+			private $id;
+
+			/**
+			 * @param int $id Order ID.
+			 */
+			public function __construct( int $id ) {
+				$this->id = $id;
+			}
+
+			/**
+			 * @return int
+			 */
+			public function get_id(): int {
+				return $this->id;
+			}
+		};
+	}
+
+	/**
 	 * @return void
 	 */
 	public function test_posted_fields_without_cropper_payloads_removes_listed_keys() {
@@ -192,74 +280,9 @@ class Test_Order_Handler extends PPOM_Test_Case {
 		file_put_contents( $confirmed, 'moved at first checkout' );
 		$this->assertFileDoesNotExist( $base_path );
 
-		$item = new class( $file_name, $product_id ) {
-			/**
-			 * @var string
-			 */
-			private $file_name;
+		$item = $this->reorder_item( $file_name, $product_id );
 
-			/**
-			 * @var int
-			 */
-			private $product_id;
-
-			/**
-			 * @param string $file_name  Uploaded file name.
-			 * @param int    $product_id Product ID.
-			 */
-			public function __construct( $file_name, $product_id ) {
-				$this->file_name  = $file_name;
-				$this->product_id = $product_id;
-			}
-
-			/**
-			 * @param string $key Meta key.
-			 *
-			 * @return array<string, mixed>|string
-			 */
-			public function get_meta( $key = '' ) {
-				if ( '_ppom_fields' !== $key ) {
-					return '';
-				}
-
-				return array(
-					'fields' => array(
-						'id'          => '2',
-						'design_file' => array(
-							'file_0' => array( 'org' => $this->file_name ),
-						),
-					),
-				);
-			}
-
-			/**
-			 * @return int
-			 */
-			public function get_product_id() {
-				return $this->product_id;
-			}
-		};
-
-		$order = new class( $order_id ) {
-			/**
-			 * @var int
-			 */
-			private $id;
-
-			/**
-			 * @param int $id Order ID.
-			 */
-			public function __construct( $id ) {
-				$this->id = $id;
-			}
-
-			/**
-			 * @return int
-			 */
-			public function get_id() {
-				return $this->id;
-			}
-		};
+		$order = $this->reorder_order( $order_id );
 
 		$out = OrderHandler::wc_order_again_compatibility( array(), $item, $order );
 
@@ -303,74 +326,9 @@ class Test_Order_Handler extends PPOM_Test_Case {
 		file_put_contents( $confirmed, 'reorder source' );
 		file_put_contents( $base_path, 'another shopper upload' );
 
-		$item = new class( $file_name, $product_id ) {
-			/**
-			 * @var string
-			 */
-			private $file_name;
+		$item = $this->reorder_item( $file_name, $product_id );
 
-			/**
-			 * @var int
-			 */
-			private $product_id;
-
-			/**
-			 * @param string $file_name  Uploaded file name.
-			 * @param int    $product_id Product ID.
-			 */
-			public function __construct( $file_name, $product_id ) {
-				$this->file_name  = $file_name;
-				$this->product_id = $product_id;
-			}
-
-			/**
-			 * @param string $key Meta key.
-			 *
-			 * @return array<string, mixed>|string
-			 */
-			public function get_meta( $key = '' ) {
-				if ( '_ppom_fields' !== $key ) {
-					return '';
-				}
-
-				return array(
-					'fields' => array(
-						'id'          => '2',
-						'design_file' => array(
-							'file_0' => array( 'org' => $this->file_name ),
-						),
-					),
-				);
-			}
-
-			/**
-			 * @return int
-			 */
-			public function get_product_id() {
-				return $this->product_id;
-			}
-		};
-
-		$order = new class( $order_id ) {
-			/**
-			 * @var int
-			 */
-			private $id;
-
-			/**
-			 * @param int $id Order ID.
-			 */
-			public function __construct( $id ) {
-				$this->id = $id;
-			}
-
-			/**
-			 * @return int
-			 */
-			public function get_id() {
-				return $this->id;
-			}
-		};
+		$order = $this->reorder_order( $order_id );
 
 		$out = OrderHandler::wc_order_again_compatibility( array(), $item, $order );
 

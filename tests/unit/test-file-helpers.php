@@ -10,6 +10,24 @@ require_once __DIR__ . '/class-ppom-test-case.php';
 class Test_File_Helpers extends PPOM_Test_Case {
 
 	/**
+	 * Files to remove after each test.
+	 *
+	 * @var list<string>
+	 */
+	private $artifacts = array();
+
+	public function tearDown(): void {
+		foreach ( $this->artifacts as $path ) {
+			if ( file_exists( $path ) ) {
+				unlink( $path );
+			}
+		}
+		$this->artifacts = array();
+
+		parent::tearDown();
+	}
+
+	/**
 	 * A download URL must not claim a shared-pool file this order never confirmed.
 	 *
 	 * Checkout's rename_files() moves an owned upload into confirmed/; a file still
@@ -40,6 +58,42 @@ class Test_File_Helpers extends PPOM_Test_Case {
 		$this->assertSame( '', $url, 'An unconfirmed pool file must not resolve to a URL.' );
 
 		unlink( $base_path );
+	}
+
+	/**
+	 * A traversing name resolves to no URL and moves nothing.
+	 *
+	 * @return void
+	 */
+	public function test_download_url_rejects_traversing_name() {
+		$outside           = dirname( ppom_get_dir_path() ) . '/sample.txt';
+		$this->artifacts[] = $outside;
+		file_put_contents( $outside, 'outside the pool' );
+
+		// Lets the old rename() succeed, so a regression is visible.
+		$prefixed_dir = ppom_get_dir_path( 'confirmed/123' ) . '55-..';
+		wp_mkdir_p( $prefixed_dir );
+		$this->artifacts[] = $prefixed_dir . '/sample.txt';
+
+		$url = ppom_get_file_download_url( '../sample.txt', 123, 55 );
+		$this->assertFileExists( $outside, 'A file outside the pool must not be moved.' );
+		rmdir( $prefixed_dir );
+
+		$this->assertSame( '', $url );
+	}
+
+	/**
+	 * An in-flight edit under the unprefixed name is not this order's file, so it
+	 * resolves to no URL.
+	 *
+	 * @return void
+	 */
+	public function test_download_url_ignores_unprefixed_edit() {
+		$edit              = ppom_get_dir_path( 'edits' ) . 'edited-only.txt';
+		$this->artifacts[] = $edit;
+		file_put_contents( $edit, 'in-flight edit' );
+
+		$this->assertSame( '', ppom_get_file_download_url( 'edited-only.txt', 123, 55 ) );
 	}
 
 	/**

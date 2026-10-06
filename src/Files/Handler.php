@@ -20,6 +20,14 @@ final class Handler {
 	private const OWNED_FILES_KEY = 'ppom_uploaded_files';
 
 	/**
+	 * Cart item key listing the upload names verified when the item was added.
+	 *
+	 * The session ownership list does not follow a persistent cart to another
+	 * device, so the item carries its own verified names.
+	 */
+	public const VERIFIED_FILES_KEY = 'ppom_verified_files';
+
+	/**
 	 * Uploader default for a file field with no "File types" setting.
 	 */
 	public const DEFAULT_FILE_TYPES = 'jpg,pdf,zip';
@@ -712,6 +720,61 @@ final class Handler {
 	}
 
 	/**
+	 * Whether the visitor may use an upload: owned in this session, or among the
+	 * names verified for the cart item it belongs to.
+	 *
+	 * @param mixed        $file_name Stored file reference.
+	 * @param list<string> $verified  Names verified when the cart item was added.
+	 *
+	 * @return bool
+	 */
+	public static function is_usable_upload( $file_name, array $verified = array() ): bool {
+
+		return self::owns_safe_upload( $file_name )
+			|| ( self::is_plain_file_name( $file_name ) && in_array( $file_name, $verified, true ) );
+	}
+
+	/**
+	 * Names verified for a cart item when it was added.
+	 *
+	 * @param mixed $cart_item Cart item data.
+	 *
+	 * @return list<string>
+	 */
+	public static function verified_file_names( $cart_item ): array {
+
+		$names = is_array( $cart_item ) && isset( $cart_item[ self::VERIFIED_FILES_KEY ] ) ? $cart_item[ self::VERIFIED_FILES_KEY ] : array();
+
+		return is_array( $names ) ? array_values( array_filter( $names, 'is_string' ) ) : array();
+	}
+
+	/**
+	 * Lists the file names left in a scrubbed PPOM payload.
+	 *
+	 * @param mixed $ppom Payload returned by self::retain_owned_uploads().
+	 *
+	 * @return list<string>
+	 */
+	public static function payload_file_names( $ppom ): array {
+
+		$names = array();
+
+		if ( ! is_array( $ppom ) || ! isset( $ppom['fields'] ) || ! is_array( $ppom['fields'] ) ) {
+			return $names;
+		}
+
+		foreach ( $ppom['fields'] as $values ) {
+			foreach ( is_array( $values ) ? $values : array() as $row ) {
+				if ( is_array( $row ) && isset( $row['org'] ) && is_string( $row['org'] ) ) {
+					$names[] = wp_unslash( $row['org'] );
+				}
+			}
+		}
+
+		return array_values( array_unique( $names ) );
+	}
+
+	/**
 	 * Keeps only well-formed file rows the current visitor uploaded for that field.
 	 *
 	 * Fields are resolved from the product's saved schema, not the posted shape:
@@ -720,12 +783,13 @@ final class Handler {
 	 * upload field (addon clones, say) still lose any file reference the visitor
 	 * does not own.
 	 *
-	 * @param mixed $ppom       Posted or rehydrated PPOM payload.
-	 * @param int   $product_id Product the payload belongs to.
+	 * @param mixed        $ppom       Posted or rehydrated PPOM payload.
+	 * @param int          $product_id Product the payload belongs to.
+	 * @param list<string> $verified   Names already verified for the cart item being replaced.
 	 *
 	 * @return mixed Payload with unusable file rows removed.
 	 */
-	public static function retain_owned_uploads( $ppom, int $product_id ) {
+	public static function retain_owned_uploads( $ppom, int $product_id, array $verified = array() ) {
 
 		if ( ! is_array( $ppom ) || empty( $ppom['fields'] ) || ! is_array( $ppom['fields'] ) ) {
 			return $ppom;
@@ -739,8 +803,8 @@ final class Handler {
 			$field_meta = Helpers::get_field_meta_by_dataname( $product_id, (string) $data_name );
 
 			$ppom['fields'][ $data_name ] = is_array( $field_meta ) && self::field_accepts_uploads( $field_meta )
-				? self::retain_field_uploads( $values, $field_meta )
-				: self::drop_unowned_file_rows( $values );
+				? self::retain_field_uploads( $values, $field_meta, $verified )
+				: self::drop_unowned_file_rows( $values, $verified );
 		}
 
 		return $ppom;
@@ -751,10 +815,11 @@ final class Handler {
 	 *
 	 * @param mixed                $values     Posted rows of the field.
 	 * @param array<string, mixed> $field_meta Saved field definition.
+	 * @param list<string>         $verified   Names already verified for the replaced cart item.
 	 *
 	 * @return array<int|string, mixed>
 	 */
-	private static function retain_field_uploads( $values, array $field_meta ): array {
+	private static function retain_field_uploads( $values, array $field_meta, array $verified ): array {
 
 		if ( ! is_array( $values ) ) {
 			return array();
@@ -766,7 +831,7 @@ final class Handler {
 				continue;
 			}
 
-			if ( ! self::is_field_upload( $row, $field_meta ) ) {
+			if ( ! self::is_field_upload( $row, $field_meta, $verified ) ) {
 				unset( $values[ $file_id ] );
 			}
 		}
@@ -779,10 +844,11 @@ final class Handler {
 	 *
 	 * @param mixed                $row        One posted file row.
 	 * @param array<string, mixed> $field_meta Saved field definition.
+	 * @param list<string>         $verified   Names already verified for the replaced cart item.
 	 *
 	 * @return bool
 	 */
-	private static function is_field_upload( $row, array $field_meta ): bool {
+	private static function is_field_upload( $row, array $field_meta, array $verified ): bool {
 
 		if ( ! is_array( $row ) || ! isset( $row['org'] ) || ! is_string( $row['org'] ) ) {
 			return false;
@@ -790,25 +856,26 @@ final class Handler {
 
 		$file_name = wp_unslash( $row['org'] );
 
-		return self::owns_safe_upload( $file_name )
+		return self::is_usable_upload( $file_name, $verified )
 			&& self::field_allows_extension( $field_meta, (string) pathinfo( $file_name, PATHINFO_EXTENSION ) );
 	}
 
 	/**
 	 * Drops file-shaped rows the visitor does not own from a non-upload key.
 	 *
-	 * @param mixed $values Posted value of the key.
+	 * @param mixed        $values   Posted value of the key.
+	 * @param list<string> $verified Names already verified for the replaced cart item.
 	 *
 	 * @return mixed
 	 */
-	private static function drop_unowned_file_rows( $values ) {
+	private static function drop_unowned_file_rows( $values, array $verified ) {
 
 		if ( ! is_array( $values ) ) {
 			return $values;
 		}
 
 		foreach ( $values as $file_id => $row ) {
-			if ( is_array( $row ) && array_key_exists( 'org', $row ) && ! self::owns_safe_upload( wp_unslash( $row['org'] ) ) ) {
+			if ( is_array( $row ) && array_key_exists( 'org', $row ) && ! self::is_usable_upload( wp_unslash( $row['org'] ), $verified ) ) {
 				unset( $values[ $file_id ] );
 			}
 		}

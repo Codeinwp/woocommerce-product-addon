@@ -401,7 +401,7 @@ final class ProductHandler {
 	 */
 	private static function validate_required_uploads( int $product_id, int $variation_id ): bool {
 
-		$posted = isset( $_POST['ppom'] ) ? $_POST['ppom'] : null; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified by WooCommerce add-to-cart.
+		$posted = isset( $_POST['ppom'] ) ? $_POST['ppom'] : null; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce add-to-cart sends no nonce; read-only validation.
 		if ( ! is_array( $posted ) || ! isset( $posted['fields'] ) || ! is_array( $posted['fields'] ) ) {
 			return true;
 		}

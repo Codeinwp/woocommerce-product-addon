@@ -189,51 +189,26 @@ class Test_Product_Handler extends PPOM_Test_Case {
 	}
 
 	/**
-	 * A required upload whose only row is not the visitor's own must block
-	 * add-to-cart instead of being silently dropped later.
+	 * Required-upload validation uses the rows that survive the ownership
+	 * check: a required field whose only row is not the visitor's own blocks
+	 * add-to-cart, the visitor's own upload passes, and an optional field is
+	 * never a reason to reject.
 	 *
 	 * @return void
 	 */
-	public function test_required_upload_rejected_when_row_is_not_owned() {
-		WC()->session = new WC_Session_Handler();
-		WC()->session->init();
-
-		$product_id = $this->post_file_row( true, 'someone-else.bbb222.png' );
-
-		$this->assertFalse( ProductHandler::validate_product( true, $product_id, 1 ) );
-		$this->assertStringContainsString(
-			'Design is a required field',
-			wp_strip_all_tags( wc_print_notices( true ) )
-		);
-	}
-
-	/**
-	 * The visitor's own upload with an allowed extension still passes.
-	 *
-	 * @return void
-	 */
-	public function test_required_upload_passes_with_owned_row() {
+	public function test_required_upload_validation_uses_owned_rows() {
 		WC()->session = new WC_Session_Handler();
 		WC()->session->init();
 		WC()->session->set( 'ppom_uploaded_files', array( 'mine.aaa111.png' ) );
 
+		$product_id = $this->post_file_row( true, 'someone-else.bbb222.png' );
+		$this->assertFalse( ProductHandler::validate_product( true, $product_id, 1 ) );
+		$this->assertStringContainsString( 'Design is a required field', wp_strip_all_tags( wc_print_notices( true ) ) );
+
 		$product_id = $this->post_file_row( true, 'mine.aaa111.png' );
-
-		$this->assertTrue( ProductHandler::validate_product( true, $product_id, 1 ) );
-	}
-
-	/**
-	 * An optional upload field is not a reason to reject; its unusable row is
-	 * just dropped when the item is stored.
-	 *
-	 * @return void
-	 */
-	public function test_optional_upload_not_rejected_when_row_is_dropped() {
-		WC()->session = new WC_Session_Handler();
-		WC()->session->init();
+		$this->assertTrue( ProductHandler::validate_product( true, $product_id, 1 ), 'The visitor\'s own upload passes.' );
 
 		$product_id = $this->post_file_row( false, 'someone-else.bbb222.png' );
-
-		$this->assertTrue( ProductHandler::validate_product( true, $product_id, 1 ) );
+		$this->assertTrue( ProductHandler::validate_product( true, $product_id, 1 ), 'An optional field is not rejected.' );
 	}
 }
