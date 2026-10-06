@@ -272,6 +272,13 @@ class Test_Order_Handler extends PPOM_Test_Case {
 			Handler::owns_uploaded_file( $file_name ),
 			'The restored copy must be owned so cart edits keep it and checkout moves it.'
 		);
+
+		$final = OrderHandler::retain_owned_reorder_files( $out );
+		$this->assertSame(
+			$file_name,
+			$final['ppom']['fields']['design_file']['file_0']['org'],
+			'A restored, owned file must survive the final reorder pass.'
+		);
 	}
 
 	/**
@@ -365,13 +372,61 @@ class Test_Order_Handler extends PPOM_Test_Case {
 			}
 		};
 
-		OrderHandler::wc_order_again_compatibility( array(), $item, $order );
+		$out = OrderHandler::wc_order_again_compatibility( array(), $item, $order );
 
 		$this->assertFalse(
 			Handler::owns_uploaded_file( $file_name ),
 			'An existing pool file this session never owned must not be claimed.'
 		);
 		$this->assertSame( 'another shopper upload', file_get_contents( $base_path ) );
+
+		$final = OrderHandler::retain_owned_reorder_files( $out );
+		$this->assertArrayNotHasKey(
+			'file_0',
+			$final['ppom']['fields']['design_file'],
+			'The reordered cart must not reference the unowned pool file.'
+		);
+	}
+
+	/**
+	 * The final reorder pass must run after PPOM Pro's rehydration (priority 99),
+	 * or Pro's payload would restore the unowned reference.
+	 *
+	 * @return void
+	 */
+	public function test_reorder_ownership_pass_runs_last() {
+		$this->assertSame(
+			PHP_INT_MAX,
+			has_filter( 'woocommerce_order_again_cart_item_data', 'ppom_retain_owned_reorder_files' )
+		);
+	}
+
+	/**
+	 * Rehydrated payloads (e.g. from PPOM Pro) are filtered by the final pass even
+	 * when the earlier restore never saw them.
+	 *
+	 * @return void
+	 */
+	public function test_reorder_pass_drops_unowned_rehydrated_reference() {
+		WC()->session = new WC_Session_Handler();
+		WC()->session->init();
+
+		$cart_item = array(
+			'ppom' => array(
+				'fields' => array(
+					'id'          => '2',
+					'design_file' => array(
+						'file_0' => array( 'org' => 'not-mine.abc123.png' ),
+					),
+					'note'        => 'keep me',
+				),
+			),
+		);
+
+		$final = OrderHandler::retain_owned_reorder_files( $cart_item );
+
+		$this->assertArrayNotHasKey( 'file_0', $final['ppom']['fields']['design_file'] );
+		$this->assertSame( 'keep me', $final['ppom']['fields']['note'] );
 	}
 
 	/**

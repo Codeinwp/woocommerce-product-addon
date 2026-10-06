@@ -359,6 +359,31 @@ final class OrderHandler {
 	}
 
 	/**
+	 * Drops reordered file references the current session does not own.
+	 *
+	 * Runs after every other Order Again callback, because PPOM Pro rehydrates
+	 * the payload from order meta at a later priority. A file whose restore was
+	 * skipped (a same-named pool file belonging to someone else, or a missing
+	 * confirmed copy) would otherwise be rendered from the shared pool in this
+	 * shopper's cart.
+	 *
+	 * @param mixed $cart_item_data Cart item data built for the reorder.
+	 *
+	 * @return mixed
+	 *
+	 * @see self::restore_order_files_to_upload_dir()
+	 */
+	public static function retain_owned_reorder_files( $cart_item_data ) {
+		if ( ! is_array( $cart_item_data ) || ! isset( $cart_item_data['ppom'] ) ) {
+			return $cart_item_data;
+		}
+
+		$cart_item_data['ppom'] = Handler::retain_owned_uploads( $cart_item_data['ppom'] );
+
+		return $cart_item_data;
+	}
+
+	/**
 	 * Copies an order's confirmed uploads back into the shared upload pool.
 	 *
 	 * Checkout moves uploads out of the pool into confirmed/{order_id}
