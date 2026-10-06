@@ -15,6 +15,7 @@ use PPOM_Meta;
 use PPOM\Files\Handler;
 use PPOM\Hooks\Callbacks;
 use PPOM\Support\Helpers;
+use PPOM\WooCommerce\Cart\CartHandler;
 
 /**
  * @internal
@@ -411,7 +412,7 @@ final class ProductHandler {
 			return true;
 		}
 
-		$owned  = Handler::retain_owned_uploads( $posted, $product_id );
+		$owned  = Handler::retain_owned_uploads( $posted, $product_id, CartHandler::replaced_item_verified_files() );
 		$passed = true;
 
 		foreach ( $ppom->fields as $field ) {

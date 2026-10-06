@@ -15,24 +15,6 @@ use PPOM\Files\Handler;
 class Test_Files_Handler extends PPOM_Test_Case {
 
 	/**
-	 * Track artifacts to clean up.
-	 *
-	 * @var array<int, string>
-	 */
-	private $artifacts = array();
-
-	public function tearDown(): void {
-		foreach ( $this->artifacts as $path ) {
-			if ( $path && file_exists( $path ) ) {
-				@unlink( $path );
-			}
-		}
-		$this->artifacts = array();
-
-		parent::tearDown();
-	}
-
-	/**
 	 * create_unique_file_name embeds the 6-char hash slug between the base name and extension.
 	 *
 	 * @return void

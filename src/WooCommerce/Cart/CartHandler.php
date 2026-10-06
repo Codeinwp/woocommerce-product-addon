@@ -377,29 +377,60 @@ final class CartHandler {
 	}
 
 	/**
-	 * Removes the cart item an edit replaces and returns its verified uploads.
+	 * Upload names verified for the cart item an edit replaces.
 	 *
 	 * The edited item resubmits the same uploads, which the current session may
 	 * not own when the cart was restored on another device.
 	 *
 	 * @return list<string>
 	 */
+	public static function replaced_item_verified_files(): array {
+
+		$replaced = self::replaced_cart_item();
+
+		return null === $replaced ? array() : Handler::verified_file_names( $replaced['item'] );
+	}
+
+	/**
+	 * Removes the cart item an edit replaces and returns its verified uploads.
+	 *
+	 * @return list<string>
+	 */
 	private static function remove_replaced_cart_item(): array {
+
+		$replaced = self::replaced_cart_item();
+		if ( null === $replaced ) {
+			return array();
+		}
+
+		$replaced['cart']->remove_cart_item( $replaced['key'] );
+
+		return Handler::verified_file_names( $replaced['item'] );
+	}
+
+	/**
+	 * The cart item named by ppom_cart_key, when it is in this session's cart.
+	 *
+	 * @return array{cart: \WC_Cart, key: string, item: array<string, mixed>}|null
+	 */
+	private static function replaced_cart_item(): ?array {
 
 		$wc_cart = function_exists( 'WC' ) ? WC()->cart : null;
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- WooCommerce add-to-cart sends no nonce; the key only matches this session's cart.
-		$remove_key = isset( $_POST['ppom_cart_key'] ) && is_string( $_POST['ppom_cart_key'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_cart_key'] ) ) : '';
+		$key = isset( $_POST['ppom_cart_key'] ) && is_string( $_POST['ppom_cart_key'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_cart_key'] ) ) : '';
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
-		$replaced = '' !== $remove_key && $wc_cart ? $wc_cart->get_cart_item( $remove_key ) : array();
-		if ( empty( $replaced ) ) {
-			return array();
+		$item = '' !== $key && $wc_cart ? $wc_cart->get_cart_item( $key ) : array();
+		if ( empty( $item ) ) {
+			return null;
 		}
 
-		$wc_cart->remove_cart_item( $remove_key );
-
-		return Handler::verified_file_names( $replaced );
+		return array(
+			'cart' => $wc_cart,
+			'key'  => $key,
+			'item' => $item,
+		);
 	}
 
 	public static function update_cart_fees( $cart_items, $values ) {

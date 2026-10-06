@@ -14,25 +14,6 @@ use PPOM\WooCommerce\Order\OrderHandler;
 class Test_Order_Handler extends PPOM_Test_Case {
 
 	/**
-	 * Upload-pool files to remove after each test, even if a notice or assertion
-	 * aborts it, so a leaked fixture cannot break the next test's preconditions.
-	 *
-	 * @var array<int, string>
-	 */
-	private $artifacts = array();
-
-	public function tearDown(): void {
-		foreach ( $this->artifacts as $path ) {
-			if ( $path && file_exists( $path ) ) {
-				@unlink( $path );
-			}
-		}
-		$this->artifacts = array();
-
-		parent::tearDown();
-	}
-
-	/**
 	 * Order item stub whose PPOM meta holds one design_file upload.
 	 *
 	 * @param string $file_name  Uploaded file name.
@@ -302,6 +283,7 @@ class Test_Order_Handler extends PPOM_Test_Case {
 			$final['ppom']['fields']['design_file']['file_0']['org'],
 			'A restored, owned file must survive the final reorder pass.'
 		);
+		$this->assertSame( array( $file_name ), $final[ Handler::VERIFIED_FILES_KEY ] );
 	}
 
 	/**
@@ -344,6 +326,7 @@ class Test_Order_Handler extends PPOM_Test_Case {
 			$final['ppom']['fields']['design_file'],
 			'The reordered cart must not reference the unowned pool file.'
 		);
+		$this->assertSame( array(), $final[ Handler::VERIFIED_FILES_KEY ] );
 	}
 
 	/**

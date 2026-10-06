@@ -10,24 +10,6 @@ require_once __DIR__ . '/class-ppom-test-case.php';
 class Test_File_Helpers extends PPOM_Test_Case {
 
 	/**
-	 * Files to remove after each test.
-	 *
-	 * @var list<string>
-	 */
-	private $artifacts = array();
-
-	public function tearDown(): void {
-		foreach ( $this->artifacts as $path ) {
-			if ( file_exists( $path ) ) {
-				unlink( $path );
-			}
-		}
-		$this->artifacts = array();
-
-		parent::tearDown();
-	}
-
-	/**
 	 * A download URL must not claim a shared-pool file this order never confirmed.
 	 *
 	 * Checkout's rename_files() moves an owned upload into confirmed/; a file still
@@ -49,6 +31,8 @@ class Test_File_Helpers extends PPOM_Test_Case {
 		$base_path     = $base_dir . $file_name;
 		$confirmed     = $confirmed_dir . $product_id . '-' . $file_name;
 
+		$this->artifacts[] = $base_path;
+		$this->artifacts[] = $confirmed;
 		file_put_contents( $base_path, 'sample data' );
 
 		$url = ppom_get_file_download_url( $file_name, $order_id, $product_id );
@@ -56,8 +40,6 @@ class Test_File_Helpers extends PPOM_Test_Case {
 		$this->assertFileExists( $base_path, 'The shared-pool file must be left untouched.' );
 		$this->assertFileDoesNotExist( $confirmed, 'The pool file must not be moved into confirmed.' );
 		$this->assertSame( '', $url, 'An unconfirmed pool file must not resolve to a URL.' );
-
-		unlink( $base_path );
 	}
 
 	/**
