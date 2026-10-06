@@ -860,7 +860,6 @@ final class Handler {
 
 		$confirm_dir        = 'confirmed/' . $order_id;
 		$confirmed_dir_path = self::get_dir_path( $confirm_dir );
-		$edits_dir_path     = self::get_dir_path( 'edits' ) . $file_name;
 
 		$ppom_dir_url = self::get_dir_url();
 
@@ -868,11 +867,10 @@ final class Handler {
 
 		$file_name = $product_id . '-' . $file_name;
 
-		// Resolve only files owned by this order; never consult the shared pool (#655).
+		// Only use this order's confirmed file to avoid cross-order matches (#655).
+		// Order rendering resolves checkout-renamed edits separately.
 		if ( file_exists( $confirmed_dir_path . $file_name ) ) {
 			$file_download_url_found = $ppom_dir_url . 'confirmed/' . $order_id . '/' . $file_name;
-		} elseif ( file_exists( $edits_dir_path ) ) {
-			$file_download_url_found = $ppom_dir_url . 'edits/' . $file_name;
 		}
 
 		return apply_filters( 'ppom_file_download_url', $file_download_url_found, $file_name );

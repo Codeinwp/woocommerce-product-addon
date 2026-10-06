@@ -355,12 +355,13 @@ final class OrderHandler {
 		$ppom_data = $item->get_meta( '_ppom_fields' );
 
 		if ( is_array( $ppom_data ) && array_key_exists( 'fields', $ppom_data ) ) {
-			self::restore_order_files_to_upload_dir( $ppom_data['fields'], $item, $order );
+			$restored               = self::restore_order_files_to_upload_dir( $ppom_data['fields'], $item, $order );
 			$cart_item_data['ppom'] = $ppom_data;
 
-			// WooCommerce scopes Order Again to the order's own customer, so these
-			// files are provably theirs; mark the item so checkout will move them.
-			$cart_item_data['_ppom_files_verified'] = true;
+			// Verify restored files for checkout; session ownership enables cart edits.
+			if ( $restored ) {
+				$cart_item_data['_ppom_files_verified'] = true;
+			}
 		}
 
 		return $cart_item_data;
@@ -380,16 +381,17 @@ final class OrderHandler {
 	 * @param mixed $item   Order item being re-ordered (duck-typed: needs get_product_id()).
 	 * @param mixed $order  Original order (duck-typed: needs get_id()).
 	 *
-	 * @return void
+	 * @return bool Whether at least one file was restored and recorded as owned.
 	 */
 	private static function restore_order_files_to_upload_dir( $fields, $item, $order ) {
 		if ( ! is_array( $fields ) || ! is_object( $item ) || ! is_object( $order ) || ! method_exists( $order, 'get_id' ) || ! method_exists( $item, 'get_product_id' ) ) {
-			return;
+			return false;
 		}
 
 		$product_id    = $item->get_product_id();
 		$base_dir      = Handler::get_dir_path();
 		$confirmed_dir = Handler::get_dir_path( 'confirmed/' . $order->get_id() );
+		$restored_any  = false;
 
 		foreach ( $fields as $values ) {
 			if ( ! is_array( $values ) ) {
@@ -404,11 +406,21 @@ final class OrderHandler {
 				$file_name = $file_data['org'];
 				$confirmed = $confirmed_dir . Handler::file_get_name( $file_name, $product_id );
 
-				if ( ! file_exists( $base_dir . $file_name ) && file_exists( $confirmed ) ) {
-					copy( $confirmed, $base_dir . $file_name );
+				if ( ! file_exists( $confirmed ) ) {
+					continue;
 				}
+
+				if ( ! file_exists( $base_dir . $file_name ) && ! copy( $confirmed, $base_dir . $file_name ) ) {
+					continue;
+				}
+
+				// Track ownership of the customer's reordered file for cart edits and checkout.
+				Handler::remember_uploaded_file( $file_name );
+				$restored_any = true;
 			}
 		}
+
+		return $restored_any;
 	}
 
 	/**
