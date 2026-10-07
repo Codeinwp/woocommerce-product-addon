@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: product addons, woocommerce product addons, woocommerce product options, custom fields, variable products
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 34.0.10
+Stable tag: 34.0.11
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -259,23 +259,18 @@ Please follow the reporting protocols outlined on our [Security Page](https://th
 
 == Changelog ==
 
-##### [Version 34.0.10](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.9...v34.0.10) (2026-09-30)
+##### [Version 34.0.11](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.10...v34.0.11) (2026-10-07)
 
-- Fixed date pickers allowing dates before a configured future minimum date.
-- Fixed active product options missing from the cart when an earlier group is disabled.
-- Fixed cart subtotals for products with multiple fixed-fee options.
-- Fixed paired option labels that incorrectly showed Image ID.
-- Fixed Bulk Quantity fields when PPOM shortcode forms use a selected product.
-- Fixed legacy conditions so matching fields appear on product pages.
-- Fixed Bulk Quantity prices for incomplete quantity ranges.
-- Fixed file upload accessibility labels and button text contrast.
-- Fixed file uploads failing on cached product pages.
-- Fixed legacy file and cropper uploads to show accepted formats and maximum size.
-- Fixed conditional fields appearing before their rules matched in legacy input rendering.
-- Fixed optional product quantities starting at one when zero is allowed.
-- Fixed cart totals for products with formatted or invalid base prices.
+- Fixed SVG uploads failing in File upload fields
+- Fixed the first product-page price to use the visible conditional price matrix.
+- Fixed conditional fields to respond only to selections in their own product form.
+- Fixed modern pricing to honor zero-price matrix selections
+- Fixed the file picker for upload fields with hyphenated names.
+- Fixed PPOM applying currency exchange rates twice to priced options and cart totals.
+- Fixed PPOM Pro converting WPML cart option charges twice.
+- Fixed currency switchers converting PPOM option prices more than once.
+- Fixed file uploads allowing visitors to delete files outside uploads folder.
 - Updated dependencies
-- Added AI agent support: let AI assistants read and change your PPOM field groups and settings.
 
 
 
