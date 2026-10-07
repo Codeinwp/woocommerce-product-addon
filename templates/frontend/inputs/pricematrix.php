@@ -125,6 +125,6 @@ if ( ! $ranges ) {
 			data-dataname="<?php echo esc_attr( $fm->form_name() ); ?>"
 			class="active ppom_pricematrix ppom-input"
 			data-discount="<?php echo esc_attr( $discount ); ?>"
-			value="<?php echo esc_attr( json_encode( $ranges ) ); ?>"
+			value="<?php echo esc_attr( wp_json_encode( \PPOM\Support\Helpers::convert_ranges_for_client( $ranges ) ) ); ?>"
 	>
 </div>

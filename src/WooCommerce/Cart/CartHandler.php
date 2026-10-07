@@ -11,6 +11,7 @@
 namespace PPOM\WooCommerce\Cart;
 
 use PPOM_Meta;
+use PPOM\Files\Handler;
 use PPOM\Hooks\Callbacks;
 use PPOM\Pricing\Engine;
 use PPOM\Support\Helpers;
@@ -349,32 +350,87 @@ final class CartHandler {
 			return $cart;
 		}
 
-		$wc_cart = function_exists( 'WC' ) ? WC()->cart : null;
-
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified by WooCommerce add-to-cart nonce.
-		if ( isset( $_POST['ppom_cart_key'] ) && is_string( $_POST['ppom_cart_key'] ) && $wc_cart ) {
-			$remove_key = sanitize_text_field( wp_unslash( $_POST['ppom_cart_key'] ) );
-			if ( '' !== $remove_key && $wc_cart->get_cart_item( $remove_key ) ) {
-				$wc_cart->remove_cart_item( $remove_key );
-			}
-		}
-		// phpcs:enable WordPress.Security.NonceVerification.Missing
+		$verified = self::remove_replaced_cart_item();
 
 		// ADDED WC BUNDLES COMPATIBILITY
 		if ( function_exists( 'wc_pb_is_bundled_cart_item' ) && wc_pb_is_bundled_cart_item( $cart ) ) {
 			return $cart;
 		}
 
+		// Keep only this visitor's uploads before saving or storing the payload.
+		$owned_payload = Handler::retain_owned_uploads( $_POST['ppom'], (int) $product_id, $verified );
+
 		// PPOM also saving cropped images under this filter.
-		$ppom_posted_fields = apply_filters( 'ppom_add_cart_item_data', $_POST['ppom'], $_POST );
+		$ppom_posted_fields = apply_filters( 'ppom_add_cart_item_data', $owned_payload, $_POST );
 		$ppom_posted_fields = Helpers::filter_ppom_payload_by_active_variation( (array) $ppom_posted_fields, $product_id, $variation_id );
 		if ( empty( $ppom_posted_fields['fields'] ) ) {
 			return $cart;
 		}
 
-		$cart['ppom'] = $ppom_posted_fields;
+		// The filter above receives raw $_POST and may mutate the payload, so
+		// re-scrub before it is stored: only this visitor's uploads persist.
+		$cart['ppom'] = Handler::retain_owned_uploads( $ppom_posted_fields, (int) $product_id, $verified );
+
+		$cart[ Handler::VERIFIED_FILES_KEY ] = Handler::payload_file_names( $cart['ppom'] );
 
 		return $cart;
+	}
+
+	/**
+	 * Upload names verified for the cart item an edit replaces.
+	 *
+	 * The edited item resubmits the same uploads, which the current session may
+	 * not own when the cart was restored on another device.
+	 *
+	 * @return list<string>
+	 */
+	public static function replaced_item_verified_files(): array {
+
+		$replaced = self::replaced_cart_item();
+
+		return null === $replaced ? array() : Handler::verified_file_names( $replaced['item'] );
+	}
+
+	/**
+	 * Removes the cart item an edit replaces and returns its verified uploads.
+	 *
+	 * @return list<string>
+	 */
+	private static function remove_replaced_cart_item(): array {
+
+		$replaced = self::replaced_cart_item();
+		if ( null === $replaced ) {
+			return array();
+		}
+
+		$replaced['cart']->remove_cart_item( $replaced['key'] );
+
+		return Handler::verified_file_names( $replaced['item'] );
+	}
+
+	/**
+	 * The cart item named by ppom_cart_key, when it is in this session's cart.
+	 *
+	 * @return array{cart: \WC_Cart, key: string, item: array<string, mixed>}|null
+	 */
+	private static function replaced_cart_item(): ?array {
+
+		$wc_cart = function_exists( 'WC' ) ? WC()->cart : null;
+
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- WooCommerce add-to-cart sends no nonce; the key only matches this session's cart.
+		$key = isset( $_POST['ppom_cart_key'] ) && is_string( $_POST['ppom_cart_key'] ) ? sanitize_text_field( wp_unslash( $_POST['ppom_cart_key'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		$item = '' !== $key && $wc_cart ? $wc_cart->get_cart_item( $key ) : array();
+		if ( empty( $item ) ) {
+			return null;
+		}
+
+		return array(
+			'cart' => $wc_cart,
+			'key'  => $key,
+			'item' => $item,
+		);
 	}
 
 	public static function update_cart_fees( $cart_items, $values ) {
@@ -407,8 +463,8 @@ final class CartHandler {
 			unset( $values ['ppom'] ['fields']['id'] );
 		}
 
-		// converting back to org price if Currency Switcher is used
-		$ppom_item_org_price = Callbacks::convert_price_back( $wc_product->get_price() );
+		// Stored price in store currency; switcher read filters apply to the line afterwards (#755).
+		$ppom_item_org_price = $wc_product->get_price( 'edit' );
 		// $ppom_item_org_price = $wc_product->get_price();
 
 		$ppom_item_order_qty = floatval( $cart_items['quantity'] );
@@ -585,7 +641,7 @@ final class CartHandler {
 					}
 
 					if ( null !== $resolved ) {
-						$fee_price        = apply_filters( 'ppom_option_price', $resolved );
+						$fee_price        = Helpers::convert_fee_price( $resolved );
 						$resolved_taxable = self::resolved_onetime_taxable( $fee, $attached_ids );
 
 						if ( null !== $resolved_taxable ) {

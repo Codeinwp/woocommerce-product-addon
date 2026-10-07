@@ -228,6 +228,28 @@ class PPOM_FRONTEND_SCRIPTS {
 
 
 	/**
+	 * Registers the script/style registry, once per request.
+	 *
+	 * Block themes can render the shortcode before `wp_enqueue_scripts`.
+	 *
+	 * @return void
+	 */
+	public static function register_scripts_once() {
+
+		static $done = false;
+
+		if ( $done ) {
+			return;
+		}
+
+		$done = true;
+
+		PPOM_SCRIPTS::register_scripts( self::get_scripts() );
+		PPOM_SCRIPTS::register_styles( self::get_styles() );
+	}
+
+
+	/**
 	 * Registers PPOM assets on frontend requests and loads product-specific ones.
 	 *
 	 * @return void
@@ -240,13 +262,7 @@ class PPOM_FRONTEND_SCRIPTS {
 			return;
 		}
 
-		// Get all styles & scripts
-		$all_scripts = self::get_scripts();
-		$all_styles  = self::get_styles();
-
-		// Register all styles & scripts
-		PPOM_SCRIPTS::register_scripts( $all_scripts );
-		PPOM_SCRIPTS::register_styles( $all_styles );
+		self::register_scripts_once();
 
 		if ( ! is_object( $post ) ) {
 			return;
@@ -427,7 +443,7 @@ class PPOM_FRONTEND_SCRIPTS {
 								// Cropper is image-only; default to its builder value (jpg,png) so the
 								// uploader never receives an empty file_types (which crashes plupload).
 								if ( empty( $fields_meta['file_types'] ) ) {
-									$fields_meta['file_types'] = 'jpg,png';
+									$fields_meta['file_types'] = \PPOM\Files\Handler::DEFAULT_CROPPER_FILE_TYPES;
 								}
 								if ( empty( $fields_meta['file_size'] ) ) {
 									$fields_meta['file_size'] = '1mb';
@@ -452,7 +468,7 @@ class PPOM_FRONTEND_SCRIPTS {
 								// Default so the uploader never receives an empty file_types,
 								// which crashes plupload during init.
 								if ( empty( $fields_meta['file_types'] ) ) {
-									$fields_meta['file_types'] = 'jpg,pdf,zip';
+									$fields_meta['file_types'] = \PPOM\Files\Handler::DEFAULT_FILE_TYPES;
 								}
 								if ( empty( $fields_meta['file_size'] ) ) {
 									$fields_meta['file_size'] = '1mb';

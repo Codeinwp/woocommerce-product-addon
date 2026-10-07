@@ -87,5 +87,8 @@ final class WooCommerceCartLifecycleHooks {
 		add_filter( 'woocommerce_is_attribute_in_product_name', '__return_false' );
 
 		add_action( 'woocommerce_checkout_order_processed', 'ppom_woocommerce_rename_files', 10, 3 );
+		// Store API / block checkout fires its own order-processed action (only the
+		// order), so confirm uploads there too instead of lazily on first view.
+		add_action( 'woocommerce_store_api_checkout_order_processed', 'ppom_store_api_rename_files', 10, 1 );
 	}
 }

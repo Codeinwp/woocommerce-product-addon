@@ -60,6 +60,13 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	protected $ppom_test_license_plan_value = 1;
 
 	/**
+	 * Files a test creates, removed in tearDown() even when the test fails.
+	 *
+	 * @var list<string>
+	 */
+	protected $artifacts = array();
+
+	/**
 	 * Reset globals and settings used by the helper-heavy tests.
 	 *
 	 * @return void
@@ -93,6 +100,13 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function tearDown(): void {
+		foreach ( $this->artifacts as $path ) {
+			if ( is_file( $path ) ) {
+				unlink( $path );
+			}
+		}
+		$this->artifacts = array();
+
 		$_POST    = array();
 		$_GET     = array();
 		$_REQUEST = array();

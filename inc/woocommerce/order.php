@@ -30,8 +30,34 @@ function ppom_woocommerce_rename_files( $order_id, $posted_data, $order ) {
 	\PPOM\WooCommerce\Order\OrderHandler::rename_files( $order_id, $posted_data, $order );
 }
 
+/**
+ * Confirms PPOM uploads for a Store API / block checkout order.
+ *
+ * The Store API order-processed action passes only the order, unlike the classic
+ * checkout hook, so adapt it to the shared handler.
+ *
+ * @param \WC_Order $order Processed order.
+ *
+ * @return void
+ */
+function ppom_store_api_rename_files( \WC_Order $order ) {
+	\PPOM\WooCommerce\Order\OrderHandler::rename_files( $order->get_id(), array(), $order );
+}
+
 function ppom_wc_order_again_compatibility( $cart_item_data, $item, $order ) {
 	return \PPOM\WooCommerce\Order\OrderHandler::wc_order_again_compatibility( $cart_item_data, $item, $order );
+}
+
+/**
+ * Keeps only reordered file references owned by the current session.
+ *
+ * @param mixed $cart_item_data Cart item data built for the reorder.
+ * @param mixed $item           Order item being re-ordered.
+ *
+ * @return mixed
+ */
+function ppom_retain_owned_reorder_files( $cart_item_data, $item = null ) {
+	return \PPOM\WooCommerce\Order\OrderHandler::retain_owned_reorder_files( $cart_item_data, $item );
 }
 
 function ppom_woocommerce_order_item_meta_html( $item_id, $item ) {

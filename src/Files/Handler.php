@@ -19,6 +19,24 @@ final class Handler {
 	 */
 	private const OWNED_FILES_KEY = 'ppom_uploaded_files';
 
+	/**
+	 * Cart item key listing the upload names verified when the item was added.
+	 *
+	 * The session ownership list does not follow a persistent cart to another
+	 * device, so the item carries its own verified names.
+	 */
+	public const VERIFIED_FILES_KEY = 'ppom_verified_files';
+
+	/**
+	 * Uploader default for a file field with no "File types" setting.
+	 */
+	public const DEFAULT_FILE_TYPES = 'jpg,pdf,zip';
+
+	/**
+	 * Uploader default for a cropper field with no "File types" setting.
+	 */
+	public const DEFAULT_CROPPER_FILE_TYPES = 'jpg,png';
+
 	public static function files_setup_get_directory( $sub_dir = false ) {
 
 		$upload_dir = wp_upload_dir();
@@ -251,6 +269,18 @@ final class Handler {
 			wp_send_json( $response );
 		}
 
+		// Resolve the field first; its own file types authorize the extension.
+		$product_id = intval( $_REQUEST['product_id'] );
+		$data_name  = sanitize_key( $_REQUEST['data_name'] );
+		$file_meta  = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
+
+		// Nonce-failure wording on purpose, so field names cannot be probed.
+		if ( ! self::field_accepts_uploads( $file_meta ) ) {
+			$response ['status']  = 'error';
+			$response ['message'] = __( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', 'woocommerce-product-addon' );
+			wp_send_json( $response );
+		}
+
 		$file_name = '';
 
 		if ( isset( $_REQUEST['name'] ) && $_REQUEST['name'] != '' ) {
@@ -266,7 +296,8 @@ final class Handler {
 			array(
 				'ai'  => 'application/postscript',
 				'eps' => 'application/postscript',
-			) 
+				'svg' => 'image/svg+xml',
+			)
 		);
 
 		$allowed_mime_types = array_merge( get_allowed_mime_types(), $additional_mime_types );
@@ -280,14 +311,8 @@ final class Handler {
 		$restricted_type    = Helpers::get_option( 'ppom_restricted_file_type', $default_restricted );
 		$restricted_type    = explode( ',', $restricted_type );
 
-		if ( empty( $extension ) || in_array( strtolower( $extension ), $restricted_type ) ) {
-			$response ['status']  = 'error';
-			$response ['message'] = sprintf(
-			// translators: %s: the name of the extension.
-				__( 'File type not valid - %s', 'woocommerce-product-addon' ),
-				$extension
-			);
-			wp_send_json( $response );
+		if ( empty( $extension ) || in_array( strtolower( $extension ), $restricted_type ) || ! self::field_allows_extension( $file_meta, $extension ) ) {
+			self::send_invalid_file_type( (string) $extension );
 		}
 		/* ========== Invalid File type checking ========== */
 
@@ -331,6 +356,9 @@ final class Handler {
 			$file_path = $file_dir_path . $file_name;
 		}
 
+		// Ends in .bin, so servers send partial uploads as application/octet-stream.
+		$chunk_file_path = $file_dir_path . pathinfo( $file_name, PATHINFO_FILENAME ) . '.part.bin';
+
 		// Remove old temp files
 		if ( is_dir( $file_dir_path ) && ( $dir = opendir( $file_dir_path ) ) ) {
 			while ( ( $file = readdir( $dir ) ) !== false ) {
@@ -338,9 +366,9 @@ final class Handler {
 
 				// Remove temp file if it is older than the max age and is not the current file
 				if (
-				preg_match( '/\.part$/', $file ) &&
+				preg_match( '/\.part(\.bin)?$/', $file ) &&
 				( filemtime( $tmp_file_path ) < time() - $maxFileAge ) &&
-				( $tmp_file_path != "$file_path.part" )
+				( $tmp_file_path != $chunk_file_path )
 				) {
 					@unlink( $tmp_file_path );
 				}
@@ -371,7 +399,6 @@ final class Handler {
 			die( UploadErrors::get_message_response( UploadErrors::MISSING_TEMP_FILE ) );
 		}
 
-		$chunk_file_path            = "$file_path.part";
 		$uploaded_file_path_to_read = $is_multipart ? $temp_file_name : 'php://input';
 
 		$error = self::create_chunk_file( $uploaded_file_path_to_read, $chunk_file_path, $chunk == 0 ? 'wb' : 'ab' );
@@ -387,31 +414,19 @@ final class Handler {
 		// Check if the file has been uploaded completely.
 		if ( ! $chunks || $chunk === $chunks - 1 ) {
 
+			// SVG is executable markup; sanitize it before it gets a public name.
+			$is_svg = 'svg' === $file_ext || 'image/svg+xml' === $file_type['type'];
+			if ( $is_svg && ! self::sanitize_svg_file( $chunk_file_path ) ) {
+				@unlink( $chunk_file_path );
+				self::send_invalid_file_type( $file_ext );
+			}
+
 			// Give a unique name to prevent name collisions.
 			$file_name        = self::create_unique_file_name( $original_name, $file_ext, $file_dir_path );
 			$unique_file_path = $file_dir_path . $file_name;
 
 			rename( $chunk_file_path, $unique_file_path );
 			$file_path = $unique_file_path;
-
-			$product_id = intval( $_REQUEST['product_id'] );
-			$data_name  = sanitize_key( $_REQUEST['data_name'] );
-			$file_meta  = Helpers::get_field_meta_by_dataname( $product_id, $data_name );
-
-			// The upload nonce is public, so the posted product and field are not
-			// necessarily a pair the form could have produced. Keeping a file no
-			// form references only leaves something to clean up later.
-			//
-			// Same wording as the nonce failure above on purpose: saying which
-			// field names exist, and which of them accept uploads, would let the
-			// endpoint be probed to map a product's fields.
-			if ( ! self::field_accepts_uploads( $file_meta ) ) {
-				@unlink( $file_path );
-
-				$response ['status']  = 'error';
-				$response ['message'] = __( 'You cannot upload the file at this time, please refresh the page and try again. Note that your current option choices will be reset.', 'woocommerce-product-addon' );
-				wp_send_json( $response );
-			}
 
 			self::remember_uploaded_file( $file_name );
 
@@ -458,6 +473,63 @@ final class Handler {
 	}
 
 	/**
+	 * Whether the field's own "File types" setting allows the extension.
+	 *
+	 * @param mixed  $file_meta Field definition resolved from the posted data name.
+	 * @param string $extension Extension resolved from the upload request.
+	 *
+	 * @return bool
+	 */
+	private static function field_allows_extension( $file_meta, string $extension ): bool {
+
+		$type = is_array( $file_meta ) && isset( $file_meta['type'] ) ? $file_meta['type'] : '';
+
+		$default_types = 'cropper' === $type ? self::DEFAULT_CROPPER_FILE_TYPES : self::DEFAULT_FILE_TYPES;
+
+		$configured = is_array( $file_meta ) && ! empty( $file_meta['file_types'] )
+			? (string) $file_meta['file_types']
+			: $default_types;
+
+		$allowed = array_map( 'strtolower', array_map( 'trim', explode( ',', $configured ) ) );
+
+		// Plupload reads "*" as any extension; the mime and restricted checks still apply.
+		return in_array( '*', $allowed, true ) || in_array( strtolower( $extension ), $allowed, true );
+	}
+
+	/**
+	 * Ends the upload request with the invalid file type error.
+	 *
+	 * @param string $extension Extension named in the message.
+	 *
+	 * @return void
+	 */
+	private static function send_invalid_file_type( string $extension ): void {
+		$response = array(
+			'status'  => 'error',
+			'message' => sprintf(
+				// translators: %s: the name of the extension.
+				__( 'File type not valid - %s', 'woocommerce-product-addon' ),
+				$extension
+			),
+		);
+		wp_send_json( $response );
+	}
+
+	/**
+	 * Rewrites an uploaded SVG in place, keeping only safe markup.
+	 *
+	 * @param string $file_path Path to the uploaded SVG.
+	 *
+	 * @return bool False when the file is not a usable SVG.
+	 */
+	private static function sanitize_svg_file( string $file_path ): bool {
+
+		$clean = SvgSanitizer::clean( (string) file_get_contents( $file_path ) );
+
+		return null !== $clean && false !== file_put_contents( $file_path, $clean );
+	}
+
+	/**
 	 * Capability proving the holder uploaded this file.
 	 *
 	 * Derived from the stored name and the site's salt, so a caller who knows
@@ -489,7 +561,7 @@ final class Handler {
 	 *
 	 * @return bool
 	 */
-	private static function field_accepts_uploads( $file_meta ) {
+	public static function field_accepts_uploads( $file_meta ) {
 
 		if ( ! is_array( $file_meta ) || ! isset( $file_meta['type'] ) ) {
 			return false;
@@ -615,6 +687,203 @@ final class Handler {
 	}
 
 	/**
+	 * Whether a stored file reference is a plain name inside the upload pool.
+	 *
+	 * Upload names are generated server-side and carry no directory part, so a
+	 * value with a slash or a traversal segment never came from the uploader and
+	 * must not reach a file operation that joins it onto the upload path.
+	 *
+	 * @param mixed $file_name Stored file reference from cart/order data.
+	 *
+	 * @return bool
+	 */
+	public static function is_plain_file_name( $file_name ) {
+
+		return is_string( $file_name )
+			&& '' !== $file_name
+			&& '.' !== $file_name
+			&& '..' !== $file_name
+			&& basename( $file_name ) === $file_name
+			&& 0 === validate_file( $file_name );
+	}
+
+	/**
+	 * Whether the current visitor uploaded the given file and it is a plain name.
+	 *
+	 * @param mixed $file_name Stored file reference from cart data.
+	 *
+	 * @return bool
+	 */
+	public static function owns_safe_upload( $file_name ) {
+
+		return self::is_plain_file_name( $file_name ) && self::owns_uploaded_file( $file_name );
+	}
+
+	/**
+	 * Whether the visitor may use an upload: owned in this session, or among the
+	 * names verified for the cart item it belongs to.
+	 *
+	 * @param mixed        $file_name Stored file reference.
+	 * @param list<string> $verified  Names verified when the cart item was added.
+	 *
+	 * @return bool
+	 */
+	public static function is_usable_upload( $file_name, array $verified = array() ): bool {
+
+		return self::owns_safe_upload( $file_name )
+			|| ( self::is_plain_file_name( $file_name ) && in_array( $file_name, $verified, true ) );
+	}
+
+	/**
+	 * Names verified for a cart item when it was added.
+	 *
+	 * @param mixed $cart_item Cart item data.
+	 *
+	 * @return list<string>
+	 */
+	public static function verified_file_names( $cart_item ): array {
+
+		$names = is_array( $cart_item ) && isset( $cart_item[ self::VERIFIED_FILES_KEY ] ) ? $cart_item[ self::VERIFIED_FILES_KEY ] : array();
+
+		return is_array( $names ) ? array_values( array_filter( $names, 'is_string' ) ) : array();
+	}
+
+	/**
+	 * Lists the file names left in a scrubbed PPOM payload.
+	 *
+	 * @param mixed $ppom Payload returned by self::retain_owned_uploads().
+	 *
+	 * @return list<string>
+	 */
+	public static function payload_file_names( $ppom ): array {
+
+		$names = array();
+
+		if ( ! is_array( $ppom ) || ! isset( $ppom['fields'] ) || ! is_array( $ppom['fields'] ) ) {
+			return $names;
+		}
+
+		foreach ( $ppom['fields'] as $values ) {
+			foreach ( is_array( $values ) ? $values : array() as $row ) {
+				if ( is_array( $row ) && isset( $row['org'] ) && is_string( $row['org'] ) ) {
+					$names[] = wp_unslash( $row['org'] );
+				}
+			}
+		}
+
+		return array_values( array_unique( $names ) );
+	}
+
+	/**
+	 * Keeps only well-formed file rows the current visitor uploaded for that field.
+	 *
+	 * Fields are resolved from the product's saved schema, not the posted shape:
+	 * every row of a configured file or cropper field must name an owned plain
+	 * upload whose extension that field allows. Keys that do not resolve to an
+	 * upload field (addon clones, say) still lose any file reference the visitor
+	 * does not own.
+	 *
+	 * @param mixed        $ppom       Posted or rehydrated PPOM payload.
+	 * @param int          $product_id Product the payload belongs to.
+	 * @param list<string> $verified   Names already verified for the cart item being replaced.
+	 *
+	 * @return mixed Payload with unusable file rows removed.
+	 */
+	public static function retain_owned_uploads( $ppom, int $product_id, array $verified = array() ) {
+
+		if ( ! is_array( $ppom ) || empty( $ppom['fields'] ) || ! is_array( $ppom['fields'] ) ) {
+			return $ppom;
+		}
+
+		foreach ( $ppom['fields'] as $data_name => $values ) {
+			if ( 'id' === $data_name ) {
+				continue;
+			}
+
+			$field_meta = Helpers::get_field_meta_by_dataname( $product_id, (string) $data_name );
+
+			$ppom['fields'][ $data_name ] = is_array( $field_meta ) && self::field_accepts_uploads( $field_meta )
+				? self::retain_field_uploads( $values, $field_meta, $verified )
+				: self::drop_unowned_file_rows( $values, $verified );
+		}
+
+		return $ppom;
+	}
+
+	/**
+	 * Keeps the valid upload rows of one configured file or cropper field.
+	 *
+	 * @param mixed                $values     Posted rows of the field.
+	 * @param array<string, mixed> $field_meta Saved field definition.
+	 * @param list<string>         $verified   Names already verified for the replaced cart item.
+	 *
+	 * @return array<int|string, mixed>
+	 */
+	private static function retain_field_uploads( $values, array $field_meta, array $verified ): array {
+
+		if ( ! is_array( $values ) ) {
+			return array();
+		}
+
+		foreach ( $values as $file_id => $row ) {
+			// The cropper stores its chosen ratio beside the file rows.
+			if ( 'ratio' === $file_id && 'cropper' === $field_meta['type'] && is_scalar( $row ) ) {
+				continue;
+			}
+
+			if ( ! self::is_field_upload( $row, $field_meta, $verified ) ) {
+				unset( $values[ $file_id ] );
+			}
+		}
+
+		return $values;
+	}
+
+	/**
+	 * Whether a row names an owned upload this field's file types allow.
+	 *
+	 * @param mixed                $row        One posted file row.
+	 * @param array<string, mixed> $field_meta Saved field definition.
+	 * @param list<string>         $verified   Names already verified for the replaced cart item.
+	 *
+	 * @return bool
+	 */
+	private static function is_field_upload( $row, array $field_meta, array $verified ): bool {
+
+		if ( ! is_array( $row ) || ! isset( $row['org'] ) || ! is_string( $row['org'] ) ) {
+			return false;
+		}
+
+		$file_name = wp_unslash( $row['org'] );
+
+		return self::is_usable_upload( $file_name, $verified )
+			&& self::field_allows_extension( $field_meta, (string) pathinfo( $file_name, PATHINFO_EXTENSION ) );
+	}
+
+	/**
+	 * Drops file-shaped rows the visitor does not own from a non-upload key.
+	 *
+	 * @param mixed        $values   Posted value of the key.
+	 * @param list<string> $verified Names already verified for the replaced cart item.
+	 *
+	 * @return mixed
+	 */
+	private static function drop_unowned_file_rows( $values, array $verified ) {
+
+		if ( ! is_array( $values ) ) {
+			return $values;
+		}
+
+		foreach ( $values as $file_id => $row ) {
+			if ( is_array( $row ) && array_key_exists( 'org', $row ) && ! self::is_usable_upload( wp_unslash( $row['org'] ), $verified ) ) {
+				unset( $values[ $file_id ] );
+			}
+		}
+
+		return $values;
+	}
+
+	/**
 	 * Deletes a temporary PPOM upload.
 	 *
 	 * @return void
@@ -719,10 +988,14 @@ final class Handler {
 	 */
 	public static function get_file_download_url( $file_name, $order_id, $product_id ) {
 
-		$base_dir_path      = self::get_dir_path() . $file_name;
+		// Orders placed before upload names were validated may carry a traversing
+		// name; never join it onto the upload path.
+		if ( ! self::is_plain_file_name( $file_name ) ) {
+			return apply_filters( 'ppom_file_download_url', '', $file_name );
+		}
+
 		$confirm_dir        = 'confirmed/' . $order_id;
 		$confirmed_dir_path = self::get_dir_path( $confirm_dir );
-		$edits_dir_path     = self::get_dir_path( 'edits' ) . $file_name;
 
 		$ppom_dir_url = self::get_dir_url();
 
@@ -730,16 +1003,10 @@ final class Handler {
 
 		$file_name = $product_id . '-' . $file_name;
 
-		// Confirmed first: once this order owns its file, never touch the shared
-		// pool again — the base file may belong to another (re-)order (#655).
+		// Only use this order's confirmed file to avoid cross-order matches (#655).
+		// Order rendering resolves checkout-renamed edits separately.
 		if ( file_exists( $confirmed_dir_path . $file_name ) ) {
 			$file_download_url_found = $ppom_dir_url . 'confirmed/' . $order_id . '/' . $file_name;
-		} elseif ( file_exists( $base_dir_path ) ) {
-			if ( rename( $base_dir_path, $confirmed_dir_path . $file_name ) ) {
-				$file_download_url_found = $ppom_dir_url . 'confirmed/' . $order_id . '/' . $file_name;
-			}
-		} elseif ( file_exists( $edits_dir_path ) ) {
-			$file_download_url_found = $ppom_dir_url . 'edits/' . $file_name;
 		}
 
 		return apply_filters( 'ppom_file_download_url', $file_download_url_found, $file_name );

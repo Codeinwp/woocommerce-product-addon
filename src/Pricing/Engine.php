@@ -13,7 +13,6 @@
 
 namespace PPOM\Pricing;
 
-use PPOM\Hooks\Callbacks;
 use PPOM\Support\Helpers;
 
 /**
@@ -72,7 +71,7 @@ final class Engine {
 		$product_quantity  = floatval( $cart_item['quantity'] );
 		$ppom_field_prices = self::get_field_prices( $ppom_fields_post, $product_id, $product_quantity, $variation_id, $cart_item );
 		$ppom_discount     = 0;
-		$ppom_pricematrix  = isset( $cart_item['ppom']['price_matrix_found'] ) ? $cart_item['ppom']['price_matrix_found'] : null;
+		$ppom_pricematrix  = self::resolve_price_matrix_field( $cart_item );
 		// ppom_pa($product_quantity);
 		// ppom_pa($ppom_fields_post);
 		// ppom_pa($ppom_field_prices);
@@ -80,7 +79,8 @@ final class Engine {
 		$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
 		$total_cart_fee_price = self::price_get_cart_fee_total( $ppom_field_prices );
 
-		$base_price    = $wc_product->get_price();
+		// Price in store currency: WooCommerce applies read filters (currency switchers) afterwards (#755).
+		$base_price    = $wc_product->get_price( 'edit' );
 		$product_price = apply_filters( 'ppom_product_price_on_cart', $base_price, $cart_item );
 
 		// return array with: price, source
@@ -150,7 +150,8 @@ final class Engine {
 			$wc_product = $cart_item['data'];
 			$state      = self::$line_price_state[ $cart_item_key ];
 
-			if ( ! self::prices_match( (float) $wc_product->get_price(), $state['written'] ) ) {
+			// 'edit' reads what set_price() stored, before a currency switcher converts it (#755).
+			if ( ! self::prices_match( (float) $wc_product->get_price( 'edit' ), $state['written'] ) ) {
 				continue;
 			}
 
@@ -181,7 +182,7 @@ final class Engine {
 			$product_quantity  = floatval( $cart_item['quantity'] );
 			$ppom_field_prices = self::get_field_prices( $ppom_fields_post, $product_id, $product_quantity, $variation_id, $cart_item );
 			$ppom_discount     = 0;
-			$ppom_pricematrix  = isset( $cart_item['ppom']['price_matrix_found'] ) ? $cart_item['ppom']['price_matrix_found'] : null;
+			$ppom_pricematrix  = self::resolve_price_matrix_field( $cart_item );
 			// ppom_pa($product_quantity);
 			// ppom_pa($ppom_fields_post);
 			// ppom_pa($ppom_field_prices);
@@ -192,13 +193,13 @@ final class Engine {
 			// Early pass restores the line's base price; use current value as base.
 			// If it did not run, infer base to avoid double-counting on repeats.
 			$pristine      = wc_get_product( $variation_id ? $variation_id : $product_id );
-			$catalog_price = $pristine ? $pristine->get_price() : $wc_product->get_price();
+			$catalog_price = $pristine ? $pristine->get_price( 'edit' ) : $wc_product->get_price( 'edit' );
 
 			if ( isset( self::$line_base_restored[ $cart_item_key ] ) ) {
 				unset( self::$line_base_restored[ $cart_item_key ] );
-				$base_price = (float) $wc_product->get_price();
+				$base_price = (float) $wc_product->get_price( 'edit' );
 			} else {
-				$base_price = self::resolve_line_base_price( $cart_item_key, $wc_product->get_price(), $catalog_price );
+				$base_price = self::resolve_line_base_price( $cart_item_key, $wc_product->get_price( 'edit' ), $catalog_price );
 			}
 
 			// Recorded pre-filter, so restoring it never applies the filter twice.
@@ -966,9 +967,9 @@ final class Engine {
 		$option_label = isset( $option['raw'] ) ? $option['raw'] : '';
 		$without_tax  = isset( $option['without_tax'] ) ? $option['without_tax'] : '';
 
-		$field_price = apply_filters( 'ppom_option_price', $field_price );
-
-		$label_price = "{$field_title} - " . wc_price( $field_price );
+		// Charge rows stay in store currency: the switcher converts the cart line on read
+		// and Pro's WPML pass converts these rows itself. Only the label is display (#755).
+		$label_price = "{$field_title} - " . wc_price( apply_filters( 'ppom_option_price', $field_price ) );
 		// For bulkquantity
 		$base_price = isset( $option['Base Price'] ) ? $option['Base Price'] : '';
 		$option_id  = isset( $option['option_id'] ) ? $option['option_id'] : '';
@@ -1272,9 +1273,9 @@ final class Engine {
 		$ppom_pricematrix = null
 	) {
 
-		// converting back to org price if Currency Switcher is used
 		// Filters may return a formatted string like "€ 10.00"; arithmetic on it throws on PHP 8 (#720).
-		$base_price = Callbacks::convert_price_back( self::normalize_price_value( $product_price ) );
+		// Callers pass the stored (store currency) price, so no switcher back-conversion here (#755).
+		$base_price = self::normalize_price_value( $product_price );
 		// $base_price  = $product->get_price();
 		// $base_price = floatval($base_price);
 		// $base_price  = $product->get_price();
@@ -1289,7 +1290,9 @@ final class Engine {
 		$source = 'product';
 
 		$matrix_found = null;
-		if ( $ppom_pricematrix ) {
+		// The matrix payload rides on the cart item, which carries shopper-posted
+		// data. Only a product that really has a matrix field can be priced by one.
+		if ( $ppom_pricematrix && Helpers::has_field_by_type( $product_id, 'pricematrix' ) ) {
 			$matrix_found = self::parse_price_matrix( $ppom_pricematrix, $product, $product_quantity, $base_price, $total_addon_price, $total_cart_fee_price );
 		}
 
@@ -1301,7 +1304,9 @@ final class Engine {
 		// If price matrix found
 		// ppom_pa($matrix_found);
 		if ( $matrix_found ) {
-			if ( $matrix_found['matrix_price'] > 0 ) {
+			// isset() is false for null (no matrix base price, e.g. a discount
+			// matrix) but true for a configured 0, which is an authoritative price.
+			if ( isset( $matrix_found['matrix_price'] ) ) {
 
 				$base_price = $matrix_found['matrix_price'];
 				$source     = 'matrix';
@@ -1515,7 +1520,8 @@ final class Engine {
 				if ( $matrix_found['discount'] == 'both' ) {
 					$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
 					$total_cart_fee_price = self::price_get_cart_fee_total( $ppom_field_prices );
-					$price_tobe_discount  = ( $cart_item_price * $quantity ) + $total_cart_fee_price;
+					// Fee rows are store currency; the line price is what WooCommerce shows, so convert the fees once (#755).
+					$price_tobe_discount  = ( $cart_item_price * $quantity ) + apply_filters( 'ppom_option_price', $total_cart_fee_price );
 				}
 
 				// var_dump($price_tobe_discount);
@@ -1549,7 +1555,7 @@ final class Engine {
 
 				$label        = $fee['label'];
 				$option_label = isset( $fee['option_label'] ) ? $fee['option_label'] : '';
-				$fee_price    = apply_filters( 'ppom_option_price', $fee['price'] );
+				$fee_price    = Helpers::convert_fee_price( $fee['price'] );
 				$taxable      = $fee['taxable']; // deprecated soon
 
 				$label = "{$label}";
@@ -1598,18 +1604,60 @@ final class Engine {
 		}
 	}
 
+	/**
+	 * Resolves the price matrix field for a cart line from saved PPOM metadata.
+	 *
+	 * The cart item carries the posted `ppom` payload verbatim, so anything under
+	 * `price_matrix_found` is shopper-supplied and must never define pricing. The
+	 * saved field group is the only authority. Conditionally hidden matrices are
+	 * skipped, and the usual filter still applies so integrations keep working.
+	 *
+	 * @param array<string, mixed> $cart_item Cart item.
+	 *
+	 * @return array<string, mixed> Matrix field definition, or an empty array.
+	 */
+	public static function resolve_price_matrix_field( $cart_item ) {
+
+		$product_id = isset( $cart_item['data'] ) ? Helpers::get_product_id( $cart_item['data'] ) : 0;
+		if ( ! $product_id ) {
+			return array();
+		}
+
+		$matrix_found      = array();
+		$pricematrix_field = Helpers::has_field_by_type( $product_id, 'pricematrix' );
+
+		if ( $pricematrix_field ) {
+			$conditionally_hidden = isset( $cart_item['ppom']['conditionally_hidden'] )
+				? $cart_item['ppom']['conditionally_hidden']
+				: '';
+
+			foreach ( $pricematrix_field as $pm ) {
+				$pm_dataname = isset( $pm['data_name'] ) ? $pm['data_name'] : '';
+				if ( Helpers::is_field_hidden_by_condition( $pm_dataname, $conditionally_hidden ) ) {
+					continue;
+				}
+
+				$matrix_found = $pm;
+				break;
+			}
+		}
+
+		return apply_filters( 'ppom_price_marix_found', $matrix_found, $cart_item );
+	}
+
 	// Check if price is being pulled by matrix
 	public static function price_is_matrix_found( $product, $product_quantity, $base_price, $addon_price, $cart_fee ) {
 
 		$matrix_discount = 0.0;
-		$matrix_price    = 0.0;
+		$matrix_price    = null;
 		// Check if Price Matrix is used
 		$pricematrix_field = Helpers::has_field_by_type( Helpers::get_product_id( $product ), 'pricematrix' );
 		if ( ! $pricematrix_field ) {
 			return null;
 		}
 
-		$matrix_found = self::price_matrix_chunk( $product, $pricematrix_field, $product_quantity );
+		$matrix_found  = self::price_matrix_chunk( $product, $pricematrix_field, $product_quantity );
+		$has_row_price = isset( $matrix_found['raw_price'] ) && '' !== trim( (string) $matrix_found['raw_price'] );
 		// ppom_pa($matrix_found);
 
 		if ( isset( $matrix_found['discount'] ) ) {
@@ -1629,7 +1677,7 @@ final class Engine {
 				$matrix_discount = isset( $matrix_found['raw_price'] ) ? floatval( $matrix_found['raw_price'] ) : 0;
 			}
 		} else {
-			$matrix_price = isset( $matrix_found['raw_price'] ) ? $matrix_found['raw_price'] : $base_price;
+			$matrix_price = $has_row_price ? $matrix_found['raw_price'] : $base_price;
 		}
 		$matrix = array(
 			'matrix_price'    => $matrix_price,
@@ -1642,8 +1690,10 @@ final class Engine {
 	public static function parse_price_matrix( $ppom_pricematrix, $product, $product_quantity, $base_price, $addon_price, $cart_fee ) {
 
 		$matrix_discount = 0.0;
-		$matrix_price    = 0.0;
+		// null: the matrix supplied no base price.
+		$matrix_price    = null;
 		$matrix_found    = Helpers::extract_matrix_by_quantity( $ppom_pricematrix, $product, $product_quantity );
+		$has_row_price   = isset( $matrix_found['raw_price'] ) && '' !== trim( (string) $matrix_found['raw_price'] );
 		// ppom_pa($matrix_found);
 		if ( isset( $matrix_found['discount'] ) ) {
 			if ( ! empty( $matrix_found['percent'] ) ) {
@@ -1662,9 +1712,9 @@ final class Engine {
 				$matrix_discount = isset( $matrix_found['raw_price'] ) ? floatval( $matrix_found['raw_price'] ) : 0;
 			}
 		} elseif ( isset( $matrix_found['matrix_fixed'] ) ) {
-			$matrix_price = isset( $matrix_found['raw_price'] ) ? $matrix_found['raw_price'] / $product_quantity : $base_price;
+			$matrix_price = $has_row_price ? $matrix_found['raw_price'] / $product_quantity : $base_price;
 		} else {
-			$matrix_price = isset( $matrix_found['raw_price'] ) ? $matrix_found['raw_price'] : $base_price;
+			$matrix_price = $has_row_price ? $matrix_found['raw_price'] : $base_price;
 		}
 
 		$matrix = array(
@@ -1776,27 +1826,15 @@ final class Engine {
 
 		$pricematrix_field = Helpers::has_field_by_type( $product_id, 'pricematrix' );
 		if ( ! $pricematrix_field ) {
+			// The posted ppom payload is stored wholesale by
+			// CartHandler::add_cart_item_data(), so a shopper can supply this key.
+			// Drop it when the product has no matrix field to price from.
+			unset( $cart_items['ppom']['price_matrix_found'] );
+
 			return $cart_items;
 		}
 
-		$matrix_found = array();
-		foreach ( $pricematrix_field as $pm ) {
-
-			$pm_dataname          = isset( $pm['data_name'] ) ? $pm['data_name'] : '';
-			$conditionally_hidden = isset( $cart_items['ppom']['conditionally_hidden'] )
-				? $cart_items['ppom']['conditionally_hidden']
-				: '';
-			if ( Helpers::is_field_hidden_by_condition( $pm_dataname, $conditionally_hidden ) ) {
-				continue;
-			}
-
-			$matrix_found = $pm;
-			break;
-		}
-
-		// ppom_pa($pm_applied);
-		// $matrix_found = Helpers::extract_matrix_by_quantity($pm_applied, $wc_product, $product_quantity);
-		$cart_items['ppom']['price_matrix_found'] = apply_filters( 'ppom_price_marix_found', $matrix_found, $cart_items );
+		$cart_items['ppom']['price_matrix_found'] = self::resolve_price_matrix_field( $cart_items );
 
 		return $cart_items;
 	}
@@ -1853,7 +1891,8 @@ final class Engine {
 
 		// Wholesale price
 		if ( isset( $cart_content['data']->wwp_data['wholesale_priced'] ) && $cart_content['data']->wwp_data['wholesale_priced'] == 'yes' ) {
-			$product_price = $cart_content['data']->get_price();
+			// The wholesale price is set on the line; read it before switcher read filters (#755).
+			$product_price = $cart_content['data']->get_price( 'edit' );
 		}
 
 		return $product_price;

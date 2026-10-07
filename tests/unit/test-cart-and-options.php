@@ -367,6 +367,41 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Image options keep the attachment id stored under `id`.
+	 *
+	 * @return void
+	 */
+	public function testConvertOptionsToKeyValKeepsStoredImageAttachmentId(): void {
+		$product = $this->create_simple_product();
+
+		$options = ppom_convert_options_to_key_val(
+			array(
+				array(
+					'title' => 'Image A',
+					'id'    => '1794',
+					'link'  => 'https://example.com/image-a.jpg',
+					'price' => '50',
+				),
+				array(
+					'title' => 'Image B',
+					'id'    => '1795',
+					'link'  => 'https://example.com/image-b.jpg',
+					'price' => '',
+				),
+			),
+			array(
+				'type'      => 'image',
+				'data_name' => 'choose_logo',
+			),
+			$product
+		);
+
+		$this->assertSame( '1794', $options['Image A']['image_id'] );
+		$this->assertSame( '1795', $options['Image B']['image_id'] );
+		$this->assertNotSame( $options['Image A']['option_id'], $options['Image B']['option_id'] );
+	}
+
+	/**
 	 * Ensure legacy option arrays without persisted IDs still resolve price by generated option ID.
 	 *
 	 * @return void

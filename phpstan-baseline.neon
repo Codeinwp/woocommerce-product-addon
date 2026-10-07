@@ -7231,12 +7231,6 @@ parameters:
 			path: src/WooCommerce/Order/OrderHandler.php
 
 		-
-			message: '#^Parameter \$order of method PPOM\\WooCommerce\\Order\\OrderHandler\:\:rename_files\(\) has invalid type PPOM\\WooCommerce\\Order\\WC_Order\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/WooCommerce/Order/OrderHandler.php
-
-		-
 			message: '#^Method PPOM\\WooCommerce\\Product\\ProductHandler\:\:check_validation\(\) has parameter \$post_data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1

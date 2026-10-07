@@ -45,14 +45,16 @@ jQuery( function ( $ ) {
 				const data_name = $( field ).data( 'data_name' );
 				ppom_check_conditions(
 					data_name,
-					function ( element_dataname, event_type ) {
+					function ( element_dataname, event_type, $scope ) {
 						// console.log(data_name, event_type);
 						$.event.trigger( {
 							type: event_type,
 							field: element_dataname,
+							scope: $scope,
 							time: new Date(),
 						} );
-					}
+					},
+					$( field ).closest( '.ppom-wrapper' )
 				);
 			} );
 
@@ -62,13 +64,15 @@ jQuery( function ( $ ) {
 				const data_name = $( field ).data( 'data_name' );
 				ppom_check_conditions(
 					data_name,
-					function ( element_dataname, event_type ) {
+					function ( element_dataname, event_type, $scope ) {
 						$.event.trigger( {
 							type: event_type,
 							field: element_dataname,
+							scope: $scope,
 							time: new Date(),
 						} );
-					}
+					},
+					$( field ).closest( '.ppom-wrapper' )
 				);
 			} );
 
@@ -79,9 +83,18 @@ jQuery( function ( $ ) {
 				$.event.trigger( {
 					type: 'ppom_field_hidden',
 					field: data_name,
+					scope: $( field ).closest( '.ppom-wrapper' ),
 					time: new Date(),
 				} );
 			} );
+
+		// The price table is built on document ready, before this replay decides
+		// which fields are on screen. Recalculate once the initial state settles,
+		// otherwise a conditionally shown price matrix is missing from the first
+		// total and the page disagrees with the cart until something changes.
+		if ( typeof window.ppom_update_option_prices === 'function' ) {
+			window.ppom_update_option_prices();
+		}
 	}, 100 );
 
 	// $('form.cart').on('change', 'select, input[type="radio"], input[type="checkbox"]', function(ev) {
@@ -94,13 +107,20 @@ jQuery( function ( $ ) {
 	 */
 	function trigger_check_conditions( modifiedElement ) {
 		const data_name = modifiedElement.dataset?.data_name;
-		ppom_check_conditions( data_name, ( element_dataname, event_type ) => {
-			$.event.trigger( {
-				type: event_type,
-				field: element_dataname,
-				time: new Date(),
-			} );
-		} );
+		// Only the changed control's own form.
+		const $scope = jQuery( modifiedElement ).closest( '.ppom-wrapper' );
+		ppom_check_conditions(
+			data_name,
+			( element_dataname, event_type ) => {
+				$.event.trigger( {
+					type: event_type,
+					field: element_dataname,
+					scope: $scope,
+					time: new Date(),
+				} );
+			},
+			$scope
+		);
 	}
 
 	$( '.ppom-wrapper' ).on(
@@ -120,20 +140,26 @@ jQuery( function ( $ ) {
 	);
 
 	$( document ).on( 'ppom_hidden_fields_updated', function ( e ) {
-		ppom_fields_hidden_conditionally();
+		ppom_fields_hidden_conditionally( e.scope );
 	} );
 
 	$( document ).on( 'ppom_field_hidden', function ( e ) {
 		// console.log(e.field)
 
-		const element_type = ppom_get_field_type_by_id( e.field );
+		// Only the form that fired the event.
+		const $scope = ppom_form_scope( e.scope );
+		const product_id = ppom_form_product_id( $scope );
+
+		const element_type = ppom_get_field_type_by_id( e.field, product_id );
 		switch ( element_type ) {
 			case 'select':
-				$( 'select[name="ppom[fields][' + e.field + ']"]' ).val( '' );
+				$scope
+					.find( 'select[name="ppom[fields][' + e.field + ']"]' )
+					.val( '' );
 				break;
 
 			case 'multiple_select':
-				var selector = $(
+				var selector = $scope.find(
 					'select[name="ppom[fields][' + e.field + '][]"]'
 				);
 				var selected_value = selector.val();
@@ -147,86 +173,86 @@ jQuery( function ( $ ) {
 						const the_id =
 							'ppom-multipleselect-' + e.field + '-' + option_id;
 
-						$( '#' + the_id ).remove();
+						$scope.find( '#' + the_id ).remove();
 					}
 				);
 
 				if ( selected_value ) {
-					$( 'select[name="ppom[fields][' + e.field + '][]"]' )
-						.val( null )
-						.trigger( 'change' );
+					selector.val( null ).trigger( 'change' );
 				}
 
 				break;
 
 			case 'checkbox':
-				$( 'input[name="ppom[fields][' + e.field + '][]"]' ).prop(
-					'checked',
-					false
-				);
+				$scope
+					.find( 'input[name="ppom[fields][' + e.field + '][]"]' )
+					.prop( 'checked', false );
 				break;
 
 			case 'radio':
-				$( 'input[name="ppom[fields][' + e.field + ']"]' ).prop(
-					'checked',
-					false
-				);
+				$scope
+					.find( 'input[name="ppom[fields][' + e.field + ']"]' )
+					.prop( 'checked', false );
 				break;
 
 			case 'file':
-				$( '#filelist-' + e.field )
+				$scope
+					.find( '#filelist-' + e.field )
 					.find( '.u_i_c_box' )
 					.remove();
 				break;
 
 			case 'palettes':
 			case 'image':
-				$( 'input[name="ppom[fields][' + e.field + '][]"]' ).prop(
-					'checked',
-					false
-				);
+				$scope
+					.find( 'input[name="ppom[fields][' + e.field + '][]"]' )
+					.prop( 'checked', false );
 				break;
 
 			case 'imageselect':
 				var the_id = 'ppom-imageselect' + e.field;
-				$( '#' + the_id ).remove();
+				$scope.find( '#' + the_id ).remove();
 				break;
 
 			case 'quantityoption':
-				$( '#' + e.field ).val( '' );
+				$scope.find( '#' + e.field ).val( '' );
 				var the_id = 'ppom-quantityoption-rm' + e.field;
-				$( '#' + the_id ).remove();
+				$scope.find( '#' + the_id ).remove();
 				break;
 
 			case 'pricematrix':
-				$(
-					`input[data-dataname="ppom[fields][${ e.field }]"]`
-				).removeClass( 'active' );
+				$scope
+					.find( `input[data-dataname="ppom[fields][${ e.field }]"]` )
+					.removeClass( 'active' );
 				break;
 
 			case 'quantities':
-				$( `input[name^="ppom[fields][${ e.field }]"]` ).val( '' );
+				$scope
+					.find( `input[name^="ppom[fields][${ e.field }]"]` )
+					.val( '' );
 				break;
 
 			case 'fixedprice':
 				// if select type is radio
-				$( 'input[name="ppom[fields][' + e.field + ']"]' ).prop(
-					'checked',
-					false
-				);
+				$scope
+					.find( 'input[name="ppom[fields][' + e.field + ']"]' )
+					.prop( 'checked', false );
 				// if select type is select
-				$( 'select[name="ppom[fields][' + e.field + ']"]' ).val( '' );
+				$scope
+					.find( 'select[name="ppom[fields][' + e.field + ']"]' )
+					.val( '' );
 				break;
 
 			default:
 				// Reset text/textarea/date/email etc types
-				$( '#' + e.field ).val( '' );
+				$scope.find( '#' + e.field ).val( '' );
 				break;
 		}
 
 		$.event.trigger( {
 			type: 'ppom_hidden_fields_updated',
 			field: e.field,
+			scope: $scope,
 			time: new Date(),
 		} );
 
@@ -237,9 +263,11 @@ jQuery( function ( $ ) {
 				$.event.trigger( {
 					type: event_type,
 					field: element_dataname,
+					scope: $scope,
 					time: new Date(),
 				} );
-			}
+			},
+			$scope
 		);
 	} );
 
@@ -250,10 +278,14 @@ jQuery( function ( $ ) {
     });*/
 
 	$( document ).on( 'ppom_field_shown', function ( e ) {
-		ppom_fields_hidden_conditionally();
+		// Only the form that fired the event.
+		const $scope = ppom_form_scope( e.scope );
+		const product_id = ppom_form_product_id( $scope );
+
+		ppom_fields_hidden_conditionally( $scope );
 
 		// Set checked/selected again
-		ppom_set_default_option( e.field );
+		ppom_set_default_option( e.field, $scope );
 
 		ppom_check_conditions(
 			e.field,
@@ -262,12 +294,14 @@ jQuery( function ( $ ) {
 				$.event.trigger( {
 					type: event_type,
 					field: element_dataname,
+					scope: $scope,
 					time: new Date(),
 				} );
-			}
+			},
+			$scope
 		);
 
-		const field_meta = ppom_get_field_meta_by_id( e.field );
+		const field_meta = ppom_get_field_meta_by_id( e.field, product_id );
 
 		// Apply FileAPI to DOM
 		// PPOM version 22.0 has issue, commenting it so far by Najeeb April 4, 2021
@@ -278,21 +312,25 @@ jQuery( function ( $ ) {
 		// Price Matrix
 		if ( field_meta.type == 'pricematrix' ) {
 			// Resettin
-			$( '.ppom_pricematrix' ).removeClass( 'active' );
+			$scope.find( '.ppom_pricematrix' ).removeClass( 'active' );
 
 			// Set Active
 			const classname = '.' + field_meta.data_name;
 			// console.log(field_meta.data_name, jQuery(`input[data-dataname="ppom[fields][${field_meta.data_name}]"]`));
-			jQuery(
-				`input[data-dataname="ppom[fields][${ field_meta.data_name }]"]`
-			).addClass( 'active' );
+			$scope
+				.find(
+					`input[data-dataname="ppom[fields][${ field_meta.data_name }]"]`
+				)
+				.addClass( 'active' );
 			// $(classname).find('.ppom_pricematrix').addClass('active')
 		}
 
 		//Imageselect (Image dropdown)
 		if ( field_meta.type === 'imageselect' ) {
 			const dd_selector = 'ppom_imageselect_' + field_meta.data_name;
-			const ddData = $( '#' + dd_selector ).data( 'ppom_ddslick' );
+			const ddData = $scope
+				.find( '#' + dd_selector )
+				.data( 'ppom_ddslick' );
 			const image_replace = field_meta.image_replace
 				? field_meta.image_replace
 				: 'off';
@@ -307,7 +345,7 @@ jQuery( function ( $ ) {
 
 		// Multiple Select Addon
 		if ( field_meta.type === 'multiple_select' ) {
-			const selector = jQuery(
+			const selector = $scope.find(
 				'select[name="ppom[fields][' + field_meta.data_name + '][]"]'
 			);
 			const selected_value = selector.val();
@@ -346,17 +384,44 @@ jQuery( function ( $ ) {
 		}
 	} );
 
-	ppom_fields_hidden_conditionally();
+	// Each form has its own #conditionally_hidden.
+	$( '.ppom-wrapper' ).each( function ( i, wrapper ) {
+		ppom_fields_hidden_conditionally( $( wrapper ) );
+	} );
 } );
 
-function ppom_check_conditions( data_name, callback ) {
+/**
+ * The given form, or the whole document when none is given.
+ *
+ * @param {jQuery} [$scope] A `.ppom-wrapper`.
+ * @return {jQuery} The form or the document.
+ */
+function ppom_form_scope( $scope ) {
+	return $scope && $scope.length ? $scope : jQuery( document );
+}
+
+/**
+ * @param {jQuery} [$scope] A `.ppom-wrapper`.
+ * @return {string|undefined} The form's product id.
+ */
+function ppom_form_product_id( $scope ) {
+	return ppom_form_scope( $scope ).find( '[name="ppom_product_id"]' ).val();
+}
+
+/**
+ * @param {string}                                                                                                    data_name
+ * @param {(element_data_name: string, event_type: 'ppom_field_hidden' | 'ppom_field_shown', $scope: jQuery) => void} callback
+ * @param {jQuery}                                                                                                    [$scope]
+ */
+function ppom_check_conditions( data_name, callback, $scope ) {
 	// Each `.ppom-cond-*` node describes one target field and its dependencies.
 	// We evaluate all rules for that target, then notify the rest of the stack
 	// through shared PPOM events instead of mutating unrelated features directly.
+	$scope = ppom_form_scope( $scope );
 	let is_matched = false;
 	let event_type, element_data_name;
 
-	jQuery( `div.ppom-cond-${ data_name }` ).each( function () {
+	$scope.find( `div.ppom-cond-${ data_name }` ).each( function () {
 		// return this.data('cond-val1').match(/\w*-Back/);
 		// console.log(jQuery(this));
 		const total_cond = parseInt( jQuery( this ).data( 'cond-total' ) );
@@ -372,8 +437,10 @@ function ppom_check_conditions( data_name, callback ) {
 				.data( `cond-input${ t }` )
 				?.toString()
 				?.toLowerCase();
-			const targetFieldValue =
-				ppom_get_element_value( targetFieldToCompare );
+			const targetFieldValue = ppom_get_element_value(
+				targetFieldToCompare,
+				$scope
+			);
 
 			const selectOptionValue = jQuery( this )
 				.data( `cond-val${ t }` )
@@ -430,7 +497,7 @@ function ppom_check_conditions( data_name, callback ) {
  				}
 
 				if ( typeof callback === 'function' ) {
-					callback( element_data_name, event_type );
+					callback( element_data_name, event_type, $scope );
 				}
 			} else if ( matched_conditions[ element_data_name ] == total_cond && binding === 'All') {
 				// remove/add locked classes for all dependent fields
@@ -449,7 +516,7 @@ function ppom_check_conditions( data_name, callback ) {
 				} );
 
 				if ( typeof callback === 'function' ) {
-					callback( element_data_name, event_type );
+					callback( element_data_name, event_type, $scope );
 				}
 			} else if (
 				! is_matched ||
@@ -484,7 +551,7 @@ function ppom_check_conditions( data_name, callback ) {
 				}
 
 				if ( typeof callback === 'function' ) {
-					callback( element_data_name, event_type );
+					callback( element_data_name, event_type, $scope );
 				}
 			} else {
 				jQuery( this ).removeClass(
@@ -493,71 +560,90 @@ function ppom_check_conditions( data_name, callback ) {
 				// console.log('event_type', event_type);
 
 				if ( typeof callback === 'function' ) {
-					callback( element_data_name, event_type );
+					callback( element_data_name, event_type, $scope );
 				}
 			}
 		}
 	} );
 }
 
-function ppom_get_input_dom_type( data_name ) {
+/**
+ * @param {string} data_name
+ * @param {jQuery} [$scope]
+ * @return {string|undefined} The field wrapper's type.
+ */
+function ppom_get_input_dom_type( data_name, $scope ) {
+	$scope = ppom_form_scope( $scope );
 	// const field_obj = jQuery(`input[name="ppom[fields][${data_name}]"], input[name="ppom[fields][${data_name}[]]"], select[name="ppom[fields][${data_name}]"]`);
-	const field_obj = jQuery( `.ppom-input[data-data_name="${ data_name }"]` );
+	const field_obj = $scope.find(
+		`.ppom-input[data-data_name="${ data_name }"]`
+	);
 	return field_obj.closest( '.ppom-field-wrapper' ).data( 'type' );
 }
 
-// Normalize values across PPOM field types so condition operators can stay
-// unaware of the exact DOM structure used by each input renderer.
-function ppom_get_element_value( data_name ) {
-	const ppom_type = ppom_get_input_dom_type( data_name );
+/**
+ * Normalize values across PPOM field types so condition operators can stay
+ * unaware of the exact DOM structure used by each input renderer.
+ *
+ * @param {string} data_name
+ * @param {jQuery} [$scope]
+ * @return {string|string[]|undefined} The field's current value.
+ */
+function ppom_get_element_value( data_name, $scope ) {
+	$scope = ppom_form_scope( $scope );
+	const ppom_type = ppom_get_input_dom_type( data_name, $scope );
 	let element_value = '';
 	const value_found_cb = [];
 
 	switch ( ppom_type ) {
 		case 'switcher':
 		case 'radio':
-			element_value = jQuery(
-				`.ppom-input[data-data_name="${ data_name }"]:checked`
-			).val();
+			element_value = $scope
+				.find( `.ppom-input[data-data_name="${ data_name }"]:checked` )
+				.val();
 			break;
 		case 'palettes':
 		case 'checkbox':
-			jQuery(
-				'input[name="ppom[fields][' + data_name + '][]"]:checked'
-			).each( function ( i ) {
-				value_found_cb[ i ] = jQuery( this ).val();
-			} );
+			$scope
+				.find(
+					'input[name="ppom[fields][' + data_name + '][]"]:checked'
+				)
+				.each( function ( i ) {
+					value_found_cb[ i ] = jQuery( this ).val();
+				} );
 			break;
 		case 'image':
 		case 'conditional_meta':
-			element_value = jQuery(
-				`.ppom-input[data-data_name="${ data_name }"]:checked`
-			).data( 'label' );
+			element_value = $scope
+				.find( `.ppom-input[data-data_name="${ data_name }"]:checked` )
+				.data( 'label' );
 			break;
 		case 'imageselect':
-			element_value = jQuery(
-				`.ppom-input[data-data_name="${ data_name }"]:checked`
-			).data( 'label' );
+			element_value = $scope
+				.find( `.ppom-input[data-data_name="${ data_name }"]:checked` )
+				.data( 'label' );
 			break;
 		case 'fixedprice':
-			var render_type = jQuery( `.ppom-input-${ data_name }` ).attr(
-				'data-input'
-			);
+			var render_type = $scope
+				.find( `.ppom-input-${ data_name }` )
+				.attr( 'data-input' );
 			if ( render_type == 'radio' ) {
-				element_value = jQuery(
-					`.ppom-input[data-data_name="${ data_name }"]:checked`
-				).val();
+				element_value = $scope
+					.find(
+						`.ppom-input[data-data_name="${ data_name }"]:checked`
+					)
+					.val();
 			} else {
-				element_value = jQuery(
-					`.ppom-input[data-data_name="${ data_name }"]`
-				).val();
+				element_value = $scope
+					.find( `.ppom-input[data-data_name="${ data_name }"]` )
+					.val();
 			}
 			break;
 
 		default:
-			element_value = jQuery(
-				`.ppom-input[data-data_name="${ data_name }"]`
-			).val();
+			element_value = $scope
+				.find( `.ppom-input[data-data_name="${ data_name }"]` )
+				.val();
 	}
 
 	if ( ppom_type === 'checkbox' || ppom_type === 'palettes' ) {
@@ -694,13 +780,17 @@ function ppom_compare_values( args ) {
 	return result;
 }
 
-function ppom_set_default_option( field_id ) {
+/**
+ * @param {string} field_id
+ * @param {jQuery} [$scope]
+ */
+function ppom_set_default_option( field_id, $scope ) {
 	// When a field becomes visible again, restore its default state the same way
 	// the original PHP renderer would have populated it on first page load.
-	// get product id
-	const product_id = ppom_input_vars.product_id;
+	$scope = ppom_form_scope( $scope );
+	const product_id = ppom_form_product_id( $scope );
 
-	const field = ppom_get_field_meta_by_id( field_id );
+	const field = ppom_get_field_meta_by_id( field_id, product_id );
 
 	switch ( field.type ) {
 		// Check if field is
@@ -712,7 +802,8 @@ function ppom_set_default_option( field_id ) {
 				// console.log('optio nid ', opt_id);
 
 				if ( options.option == field.selected ) {
-					jQuery( '#' + opt_id )
+					$scope
+						.find( '#' + opt_id )
 						.prop( 'checked', true )
 						.trigger( 'change' );
 				}
@@ -723,7 +814,7 @@ function ppom_set_default_option( field_id ) {
 			// The hidden-field reset calls val('') on a select with no ''
 			// option, which leaves selectedIndex at -1 and makes val()
 			// return null — so a cleared select must be detected via both.
-			const $select = jQuery( '#' + field.data_name );
+			const $select = $scope.find( '#' + field.data_name );
 			const current_value = $select.val();
 
 			if ( null === current_value || '' === current_value ) {
@@ -742,10 +833,9 @@ function ppom_set_default_option( field_id ) {
 		case 'image':
 			jQuery.each( field.images, function ( index, img ) {
 				if ( img.title == field.selected ) {
-					jQuery( '#' + field.data_name + '-' + img.id ).prop(
-						'checked',
-						true
-					);
+					$scope
+						.find( '#' + field.data_name + '-' + img.id )
+						.prop( 'checked', true );
 				}
 			} );
 			break;
@@ -758,7 +848,7 @@ function ppom_set_default_option( field_id ) {
 				// Imported metas can lack the `checked` key entirely.
 				const default_checked = ( field.checked || '' ).split( '\r\n' );
 				if ( jQuery.inArray( options.option, default_checked ) > -1 ) {
-					jQuery( '#' + opt_id ).prop( 'checked', true );
+					$scope.find( '#' + opt_id ).prop( 'checked', true );
 				}
 			} );
 			break;
@@ -771,7 +861,8 @@ function ppom_set_default_option( field_id ) {
 				}
 				const opt_id =
 					product_id + '-' + field.data_name + '-' + options.id;
-				jQuery( '#' + opt_id )
+				$scope
+					.find( '#' + opt_id )
 					.val( options.default )
 					.trigger( 'change' );
 			} );
@@ -780,15 +871,21 @@ function ppom_set_default_option( field_id ) {
 		case 'text':
 		case 'date':
 		case 'number':
-			if ( '' === jQuery( '#' + field.data_name ).val() ) {
-				jQuery( '#' + field.data_name ).val( field.default_value );
+			if ( '' === $scope.find( '#' + field.data_name ).val() ) {
+				$scope.find( '#' + field.data_name ).val( field.default_value );
 			}
 			break;
 	}
 }
 
-// Mirror the current hidden field list into the hidden input consumed by PHP.
-function ppom_fields_hidden_conditionally() {
+/**
+ * Mirror the current hidden field list into the hidden input consumed by PHP.
+ *
+ * @param {jQuery} [$scope]
+ */
+function ppom_fields_hidden_conditionally( $scope ) {
+	$scope = ppom_form_scope( $scope );
+
 	// Reset
 	ppom_hidden_fields = [];
 	// jQuery(`.ppom-field-wrapper.ppom-c-hide`).filter(function() {
@@ -804,9 +901,9 @@ function ppom_fields_hidden_conditionally() {
 	// Use the actual visual state: per-source `ppom-locked-*` classes go
 	// stale when rules span multiple source fields, but `ppom-c-hide` always
 	// reflects what the customer sees.
-	jQuery( `.ppom-field-wrapper.ppom-c-hide` ).each( function ( i, h ) {
+	$scope.find( `.ppom-field-wrapper.ppom-c-hide` ).each( function ( i, h ) {
 		ppom_hidden_fields.push( jQuery( h ).data( 'data_name' ) );
 	} );
-	jQuery( '#conditionally_hidden' ).val( ppom_hidden_fields );
+	$scope.find( '#conditionally_hidden' ).val( ppom_hidden_fields );
 	// console.log(ppom_hidden_fields);
 }

@@ -5,12 +5,101 @@
  * @package ppom-pro
  */
 
+use PPOM\Files\Handler;
 use PPOM\WooCommerce\Order\OrderHandler;
 
 /**
  * @covers \PPOM\WooCommerce\Order\OrderHandler
  */
 class Test_Order_Handler extends PPOM_Test_Case {
+
+	/**
+	 * Order item stub whose PPOM meta holds one design_file upload.
+	 *
+	 * @param string $file_name  Uploaded file name.
+	 * @param int    $product_id Product ID.
+	 *
+	 * @return object
+	 */
+	private function reorder_item( string $file_name, int $product_id ) {
+		return new class( $file_name, $product_id ) {
+			/**
+			 * @var string
+			 */
+			private $file_name;
+
+			/**
+			 * @var int
+			 */
+			private $product_id;
+
+			/**
+			 * @param string $file_name  Uploaded file name.
+			 * @param int    $product_id Product ID.
+			 */
+			public function __construct( string $file_name, int $product_id ) {
+				$this->file_name  = $file_name;
+				$this->product_id = $product_id;
+			}
+
+			/**
+			 * @param string $key Meta key.
+			 *
+			 * @return array{fields: array{id: string, design_file: array{file_0: array{org: string}}}}|string
+			 */
+			public function get_meta( $key = '' ) {
+				if ( '_ppom_fields' !== $key ) {
+					return '';
+				}
+
+				return array(
+					'fields' => array(
+						'id'          => '2',
+						'design_file' => array(
+							'file_0' => array( 'org' => $this->file_name ),
+						),
+					),
+				);
+			}
+
+			/**
+			 * @return int
+			 */
+			public function get_product_id(): int {
+				return $this->product_id;
+			}
+		};
+	}
+
+	/**
+	 * Order stub that only exposes its ID.
+	 *
+	 * @param int $order_id Order ID.
+	 *
+	 * @return object
+	 */
+	private function reorder_order( int $order_id ) {
+		return new class( $order_id ) {
+			/**
+			 * @var int
+			 */
+			private $id;
+
+			/**
+			 * @param int $id Order ID.
+			 */
+			public function __construct( int $id ) {
+				$this->id = $id;
+			}
+
+			/**
+			 * @return int
+			 */
+			public function get_id(): int {
+				return $this->id;
+			}
+		};
+	}
 
 	/**
 	 * @return void
@@ -166,77 +255,15 @@ class Test_Order_Handler extends PPOM_Test_Case {
 		$base_path  = ppom_get_dir_path() . $file_name;
 		$confirmed  = ppom_get_dir_path( 'confirmed/' . $order_id ) . $product_id . '-' . $file_name;
 
+		$this->artifacts[] = $base_path;
+		$this->artifacts[] = $confirmed;
+
 		file_put_contents( $confirmed, 'moved at first checkout' );
 		$this->assertFileDoesNotExist( $base_path );
 
-		$item = new class( $file_name, $product_id ) {
-			/**
-			 * @var string
-			 */
-			private $file_name;
+		$item = $this->reorder_item( $file_name, $product_id );
 
-			/**
-			 * @var int
-			 */
-			private $product_id;
-
-			/**
-			 * @param string $file_name  Uploaded file name.
-			 * @param int    $product_id Product ID.
-			 */
-			public function __construct( $file_name, $product_id ) {
-				$this->file_name  = $file_name;
-				$this->product_id = $product_id;
-			}
-
-			/**
-			 * @param string $key Meta key.
-			 *
-			 * @return array<string, mixed>|string
-			 */
-			public function get_meta( $key = '' ) {
-				if ( '_ppom_fields' !== $key ) {
-					return '';
-				}
-
-				return array(
-					'fields' => array(
-						'id'          => '2',
-						'design_file' => array(
-							'file_0' => array( 'org' => $this->file_name ),
-						),
-					),
-				);
-			}
-
-			/**
-			 * @return int
-			 */
-			public function get_product_id() {
-				return $this->product_id;
-			}
-		};
-
-		$order = new class( $order_id ) {
-			/**
-			 * @var int
-			 */
-			private $id;
-
-			/**
-			 * @param int $id Order ID.
-			 */
-			public function __construct( $id ) {
-				$this->id = $id;
-			}
-
-			/**
-			 * @return int
-			 */
-			public function get_id() {
-				return $this->id;
-			}
-		};
+		$order = $this->reorder_order( $order_id );
 
 		$out = OrderHandler::wc_order_again_compatibility( array(), $item, $order );
 
@@ -245,8 +272,102 @@ class Test_Order_Handler extends PPOM_Test_Case {
 		$this->assertFileExists( $confirmed );
 		$this->assertSame( $file_name, $out['ppom']['fields']['design_file']['file_0']['org'] );
 
-		unlink( $base_path );
-		unlink( $confirmed );
+		$this->assertTrue(
+			Handler::owns_uploaded_file( $file_name ),
+			'The restored copy must be owned so cart edits keep it and checkout moves it.'
+		);
+
+		$final = OrderHandler::retain_owned_reorder_files( $out, $item );
+		$this->assertSame(
+			$file_name,
+			$final['ppom']['fields']['design_file']['file_0']['org'],
+			'A restored, owned file must survive the final reorder pass.'
+		);
+		$this->assertSame( array( $file_name ), $final[ Handler::VERIFIED_FILES_KEY ] );
+	}
+
+	/**
+	 * Order Again must not claim a same-named pool file this session does not
+	 * own; it may be another shopper's upload.
+	 *
+	 * @return void
+	 */
+	public function test_order_again_does_not_claim_unowned_pool_file() {
+		WC()->session = new WC_Session_Handler();
+		WC()->session->init();
+
+		$order_id   = 903;
+		$product_id = 46;
+		$file_name  = 'shared-name.txt';
+		$base_path  = ppom_get_dir_path() . $file_name;
+		$confirmed  = ppom_get_dir_path( 'confirmed/' . $order_id ) . $product_id . '-' . $file_name;
+
+		$this->artifacts[] = $base_path;
+		$this->artifacts[] = $confirmed;
+
+		file_put_contents( $confirmed, 'reorder source' );
+		file_put_contents( $base_path, 'another shopper upload' );
+
+		$item = $this->reorder_item( $file_name, $product_id );
+
+		$order = $this->reorder_order( $order_id );
+
+		$out = OrderHandler::wc_order_again_compatibility( array(), $item, $order );
+
+		$this->assertFalse(
+			Handler::owns_uploaded_file( $file_name ),
+			'An existing pool file this session never owned must not be claimed.'
+		);
+		$this->assertSame( 'another shopper upload', file_get_contents( $base_path ) );
+
+		$final = OrderHandler::retain_owned_reorder_files( $out, $item );
+		$this->assertArrayNotHasKey(
+			'file_0',
+			$final['ppom']['fields']['design_file'],
+			'The reordered cart must not reference the unowned pool file.'
+		);
+		$this->assertSame( array(), $final[ Handler::VERIFIED_FILES_KEY ] );
+	}
+
+	/**
+	 * The final reorder pass must run after PPOM Pro's rehydration (priority 99),
+	 * or Pro's payload would restore the unowned reference.
+	 *
+	 * @return void
+	 */
+	public function test_reorder_ownership_pass_runs_last() {
+		$this->assertSame(
+			PHP_INT_MAX,
+			has_filter( 'woocommerce_order_again_cart_item_data', 'ppom_retain_owned_reorder_files' )
+		);
+	}
+
+	/**
+	 * Rehydrated payloads (e.g. from PPOM Pro) are filtered by the final pass even
+	 * when the earlier restore never saw them.
+	 *
+	 * @return void
+	 */
+	public function test_reorder_pass_drops_unowned_rehydrated_reference() {
+		WC()->session = new WC_Session_Handler();
+		WC()->session->init();
+
+		$cart_item = array(
+			'ppom' => array(
+				'fields' => array(
+					'id'          => '2',
+					'design_file' => array(
+						'file_0' => array( 'org' => 'not-mine.abc123.png' ),
+					),
+					'note'        => 'keep me',
+				),
+			),
+		);
+
+		$final = OrderHandler::retain_owned_reorder_files( $cart_item );
+
+		$this->assertArrayNotHasKey( 'file_0', $final['ppom']['fields']['design_file'] );
+		$this->assertSame( 'keep me', $final['ppom']['fields']['note'] );
 	}
 
 	/**

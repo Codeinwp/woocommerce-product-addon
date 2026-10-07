@@ -568,12 +568,18 @@ function ppom_get_palette_setting( input ) {
 /**
  * Shared field lookup used by pricing, conditions, and file upload helpers.
  *
- * @param {string} field_id
+ * Pass product_id on multi-product pages; the flat global holds the last one.
+ *
+ * @param {string}        field_id
+ * @param {number|string} [product_id]
  * @return {string}
  */
-function ppom_get_field_type_by_id( field_id ) {
+function ppom_get_field_type_by_id( field_id, product_id ) {
+	const data =
+		( product_id && ppom_get_product_data( product_id ) ) ||
+		ppom_input_vars;
 	let field_type = '';
-	jQuery.each( ppom_input_vars.ppom_inputs, function ( i, field ) {
+	jQuery.each( data.ppom_inputs, function ( i, field ) {
 		if ( field.data_name === field_id ) {
 			field_type = field.field_type;
 		}
@@ -585,12 +591,16 @@ function ppom_get_field_type_by_id( field_id ) {
 /**
  * Return the full localized field definition for a given data_name.
  *
- * @param {string} field_id
+ * @param {string}        field_id
+ * @param {number|string} [product_id]
  * @return {PPOMLocalizedFieldMeta|string}
  */
-function ppom_get_field_meta_by_id( field_id ) {
+function ppom_get_field_meta_by_id( field_id, product_id ) {
+	const data =
+		( product_id && ppom_get_product_data( product_id ) ) ||
+		ppom_input_vars;
 	let field_meta = '';
-	jQuery.each( ppom_input_vars.ppom_inputs, function ( i, field ) {
+	jQuery.each( data.ppom_inputs, function ( i, field ) {
 		if ( field.data_name === field_id ) {
 			field_meta = field;
 		}

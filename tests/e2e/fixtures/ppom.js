@@ -172,6 +172,31 @@ async function getProductPpomAssignment( requestUtils, { productId } ) {
 	);
 }
 
+/**
+ * Create a page with one `[ppom product_id="X"]` shortcode per product id.
+ *
+ * @param {Object}        requestUtils     Request utils.
+ * @param {Object}        root0            Arguments.
+ * @param {Array<number>} root0.productIds Product ids.
+ * @param {string}        [root0.title]    Page title.
+ * @return {Promise<{id: number, permalink: string}>} Created page.
+ */
+async function createPpomShortcodePage( requestUtils, { productIds, title } ) {
+	const payload = await postBootstrapAction(
+		requestUtils,
+		'ppom_e2e_create_shortcode_page',
+		{
+			product_ids: productIds,
+			title,
+		}
+	);
+
+	return {
+		...payload,
+		id: Number( payload.id ),
+	};
+}
+
 async function deletePpomGroupRows( requestUtils, { ppomIds } ) {
 	return postBootstrapAction(
 		requestUtils,
@@ -188,6 +213,7 @@ export {
 	attachPpomGroupToVariations,
 	createLegacyPpomGroup,
 	createPpomGroup,
+	createPpomShortcodePage,
 	createSimpleTextGroup,
 	deletePpomGroupRows,
 	getPpomAttachRowMeta,
