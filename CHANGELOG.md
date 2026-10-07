@@ -1,3 +1,16 @@
+##### [Version 34.0.11](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.10...v34.0.11) (2026-10-07)
+
+- Fixed SVG uploads failing in File upload fields
+- Fixed the first product-page price to use the visible conditional price matrix.
+- Fixed conditional fields to respond only to selections in their own product form.
+- Fixed modern pricing to honor zero-price matrix selections
+- Fixed the file picker for upload fields with hyphenated names.
+- Fixed PPOM applying currency exchange rates twice to priced options and cart totals.
+- Fixed PPOM Pro converting WPML cart option charges twice.
+- Fixed currency switchers converting PPOM option prices more than once.
+- Fixed file uploads allowing visitors to delete files outside uploads folder.
+- Updated dependencies
+
 ##### [Version 34.0.10](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.9...v34.0.10) (2026-09-30)
 
 - Fixed date pickers allowing dates before a configured future minimum date.
