@@ -163,4 +163,52 @@ class Test_Product_Handler extends PPOM_Test_Case {
 		$this->assertTrue( $result );
 		$this->assertSame( $existing_price, $_POST['ppom']['ppom_option_price'] );
 	}
+	/**
+	 * Builds a product with one file field and posts a single row for it.
+	 *
+	 * @param bool   $required Whether the field is required.
+	 * @param string $org      Posted file reference.
+	 *
+	 * @return int Product ID.
+	 */
+	private function post_file_row( bool $required, string $org ): int {
+		$product_id = $this->create_simple_product()->get_id();
+		$meta_id    = $this->insert_ppom_meta(
+			array( $this->build_file_field( 'design_file', 'Design', array( 'required' => $required ? 'on' : '' ) ) ),
+			$product_id
+		);
+
+		$_POST['ppom'] = array(
+			'fields' => array(
+				'id'          => (string) $meta_id,
+				'design_file' => array( 0 => array( 'org' => $org ) ),
+			),
+		);
+
+		return $product_id;
+	}
+
+	/**
+	 * Required-upload validation uses the rows that survive the ownership
+	 * check: a required field whose only row is not the visitor's own blocks
+	 * add-to-cart, the visitor's own upload passes, and an optional field is
+	 * never a reason to reject.
+	 *
+	 * @return void
+	 */
+	public function test_required_upload_validation_uses_owned_rows() {
+		WC()->session = new WC_Session_Handler();
+		WC()->session->init();
+		WC()->session->set( 'ppom_uploaded_files', array( 'mine.aaa111.png' ) );
+
+		$product_id = $this->post_file_row( true, 'someone-else.bbb222.png' );
+		$this->assertFalse( ProductHandler::validate_product( true, $product_id, 1 ) );
+		$this->assertStringContainsString( 'Design is a required field', wp_strip_all_tags( wc_print_notices( true ) ) );
+
+		$product_id = $this->post_file_row( true, 'mine.aaa111.png' );
+		$this->assertTrue( ProductHandler::validate_product( true, $product_id, 1 ), 'The visitor\'s own upload passes.' );
+
+		$product_id = $this->post_file_row( false, 'someone-else.bbb222.png' );
+		$this->assertTrue( ProductHandler::validate_product( true, $product_id, 1 ), 'An optional field is not rejected.' );
+	}
 }

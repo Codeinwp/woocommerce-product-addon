@@ -15,24 +15,6 @@ use PPOM\Files\Handler;
 class Test_Files_Handler extends PPOM_Test_Case {
 
 	/**
-	 * Track artifacts to clean up.
-	 *
-	 * @var array<int, string>
-	 */
-	private $artifacts = array();
-
-	public function tearDown(): void {
-		foreach ( $this->artifacts as $path ) {
-			if ( $path && file_exists( $path ) ) {
-				@unlink( $path );
-			}
-		}
-		$this->artifacts = array();
-
-		parent::tearDown();
-	}
-
-	/**
 	 * create_unique_file_name embeds the 6-char hash slug between the base name and extension.
 	 *
 	 * @return void
@@ -611,5 +593,169 @@ class Test_Files_Handler extends PPOM_Test_Case {
 			'Knowing the file name must not be enough to produce the token.'
 		);
 		$this->assertMatchesRegularExpression( '/^[a-f0-9]{32}$/', $token );
+	}
+
+	/**
+	 * Upload names carry no directory part, so anything with a slash or a
+	 * traversal segment is rejected before it can reach a file operation.
+	 *
+	 * @return void
+	 */
+	public function test_is_plain_file_name_rejects_paths_and_traversal() {
+		$this->assertTrue( Handler::is_plain_file_name( 'artwork.aaa111.png' ) );
+
+		foreach ( array( '', '..', '../../../wp-config.php', 'sub/dir/file.png', '..\\wp-config.php', '/etc/passwd', '.' ) as $bad ) {
+			$this->assertFalse(
+				Handler::is_plain_file_name( $bad ),
+				sprintf( 'A name resolving outside the upload pool must be rejected: "%s".', $bad )
+			);
+		}
+	}
+
+	/**
+	 * Creates a product whose PPOM group holds the given fields.
+	 *
+	 * @param list<array<string, mixed>> $fields Field definitions.
+	 *
+	 * @return int Product ID.
+	 */
+	private function product_with_fields( array $fields ): int {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( $fields, $product->get_id() );
+
+		return $product->get_id();
+	}
+
+	/**
+	 * A configured file field keeps only owned, well-formed rows; traversing,
+	 * unowned, scalar and org-less rows are dropped.
+	 *
+	 * @return void
+	 */
+	public function test_retain_owned_uploads_drops_unusable_rows_of_a_file_field() {
+		$product_id = $this->product_with_fields( array( $this->build_file_field( 'design_file' ) ) );
+
+		$this->start_fresh_guest_session();
+		WC()->session->set( 'ppom_uploaded_files', array( 'mine.aaa111.png' ) );
+
+		$payload = array(
+			'fields' => array(
+				'id'          => '3',
+				'design_file' => array(
+					0 => array( 'org' => 'mine.aaa111.png' ),
+					1 => array( 'org' => '../../../wp-config.php' ),
+					2 => array( 'org' => 'someone-else.bbb222.png' ),
+					3 => array( 'org' => null ),
+					4 => array( 'org' => array( 'nested' ) ),
+					5 => 'scalar-row',
+					6 => array( 'cropped' => 'no-org' ),
+				),
+			),
+		);
+
+		$kept = Handler::retain_owned_uploads( $payload, $product_id );
+
+		$this->assertSame(
+			array( 0 => array( 'org' => 'mine.aaa111.png' ) ),
+			$kept['fields']['design_file'],
+			'Only the visitor\'s own well-formed upload may survive.'
+		);
+	}
+
+	/**
+	 * An owned upload is revalidated against the field it is submitted under, so
+	 * a file accepted by a permissive field cannot be moved into a stricter one.
+	 *
+	 * @return void
+	 */
+	public function test_retain_owned_uploads_rechecks_extension_per_field() {
+		$product_id = $this->product_with_fields(
+			array(
+				$this->build_file_field( 'design_file' ),
+				$this->build_file_field( 'invoice_pdf', 'Invoice', array( 'file_types' => 'pdf' ) ),
+			)
+		);
+
+		$this->start_fresh_guest_session();
+		WC()->session->set( 'ppom_uploaded_files', array( 'mine.aaa111.png' ) );
+
+		$payload = array(
+			'fields' => array(
+				'design_file' => array( 0 => array( 'org' => 'mine.aaa111.png' ) ),
+				'invoice_pdf' => array( 0 => array( 'org' => 'mine.aaa111.png' ) ),
+			),
+		);
+
+		$kept = Handler::retain_owned_uploads( $payload, $product_id );
+
+		$this->assertCount( 1, $kept['fields']['design_file'] );
+		$this->assertSame( array(), $kept['fields']['invoice_pdf'], 'A png must not pass a pdf-only field.' );
+	}
+
+	/**
+	 * A configured file field posted as a scalar is replaced by an empty row list,
+	 * and a cropper keeps its ratio beside its owned image.
+	 *
+	 * @return void
+	 */
+	public function test_retain_owned_uploads_normalises_scalar_field_and_keeps_cropper_ratio() {
+		$product_id = $this->product_with_fields(
+			array(
+				$this->build_file_field( 'design_file' ),
+				$this->build_cropper_field( 'photo' ),
+			)
+		);
+
+		$this->start_fresh_guest_session();
+		WC()->session->set( 'ppom_uploaded_files', array( 'face.ccc333.jpg' ) );
+
+		$payload = array(
+			'fields' => array(
+				'design_file' => 'not-a-row-list',
+				'photo'       => array(
+					'ratio' => '1',
+					0       => array( 'org' => 'face.ccc333.jpg' ),
+				),
+			),
+		);
+
+		$kept = Handler::retain_owned_uploads( $payload, $product_id );
+
+		$this->assertSame( array(), $kept['fields']['design_file'] );
+		$this->assertSame( $payload['fields']['photo'], $kept['fields']['photo'] );
+	}
+
+	/**
+	 * Keys that are not configured upload fields keep their values, except that
+	 * a file reference the visitor does not own is still dropped.
+	 *
+	 * @return void
+	 */
+	public function test_retain_owned_uploads_leaves_non_file_fields_untouched() {
+		$product_id = $this->product_with_fields( array( $this->build_text_field( 'full_name' ) ) );
+
+		$this->start_fresh_guest_session();
+		WC()->session->set( 'ppom_uploaded_files', array( 'mine.aaa111.png' ) );
+
+		$payload = array(
+			'fields' => array(
+				'id'                   => '3',
+				'full_name'            => 'Ada Lovelace',
+				'colours'              => array( 'red', 'blue' ),
+				'design_file__clone_1' => array(
+					0 => array( 'org' => 'mine.aaa111.png' ),
+					1 => array( 'org' => 'someone-else.bbb222.png' ),
+				),
+			),
+		);
+
+		$kept = Handler::retain_owned_uploads( $payload, $product_id );
+
+		$this->assertSame( 'Ada Lovelace', $kept['fields']['full_name'] );
+		$this->assertSame( array( 'red', 'blue' ), $kept['fields']['colours'] );
+		$this->assertSame(
+			array( 0 => array( 'org' => 'mine.aaa111.png' ) ),
+			$kept['fields']['design_file__clone_1']
+		);
 	}
 }

@@ -164,6 +164,8 @@ class NM_PersonalizedProduct {
 		// add_action( 'in_admin_header', 'ppom_hooks_remove_admin_notices', 99 );
 
 		add_filter( 'woocommerce_order_again_cart_item_data', 'ppom_wc_order_again_compatibility', 10, 3 );
+		// Last, so it also covers payloads rehydrated by later callbacks (PPOM Pro).
+		add_filter( 'woocommerce_order_again_cart_item_data', 'ppom_retain_owned_reorder_files', PHP_INT_MAX, 2 );
 		// Show description tooltip.
 		add_filter( 'ppom_field_description', array( $this, 'show_tooltip' ), 15, 2 );
 

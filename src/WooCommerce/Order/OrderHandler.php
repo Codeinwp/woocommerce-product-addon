@@ -208,7 +208,7 @@ final class OrderHandler {
 	 *
 	 * @param int      $order_id    Order ID.
 	 * @param mixed    $posted_data Posted checkout data.
-	 * @param WC_Order $order       Processed order.
+	 * @param \WC_Order $order       Processed order.
 	 *
 	 * @return void
 	 *
@@ -237,6 +237,7 @@ final class OrderHandler {
 			}
 
 			$product_id      = $cart_item['product_id'];
+			$verified        = Handler::verified_file_names( $cart_item );
 			$all_moved_files = array();
 
 			foreach ( $cart_item['ppom']['fields'] as $key => $values ) {
@@ -265,7 +266,13 @@ final class OrderHandler {
 						if ( ! isset( $file_data['org'] ) ) {
 							continue;
 						}
-						$file_name    = $file_data['org'];
+						$file_name = $file_data['org'];
+
+						// Cart data may be stale or restored; move only this shopper's uploads.
+						if ( ! Handler::is_usable_upload( $file_name, $verified ) ) {
+							continue;
+						}
+
 						$file_cropped = isset( $file_data['cropped'] ) ? true : false;
 
 						$new_filename     = Handler::file_get_name( $file_name, $product_id, $cart_item );
@@ -347,6 +354,36 @@ final class OrderHandler {
 	}
 
 	/**
+	 * Drops reordered file references the current session does not own.
+	 *
+	 * Runs after every other Order Again callback, because PPOM Pro rehydrates
+	 * the payload from order meta at a later priority. A file whose restore was
+	 * skipped (a same-named pool file belonging to someone else, or a missing
+	 * confirmed copy) would otherwise be rendered from the shared pool in this
+	 * shopper's cart.
+	 *
+	 * @param mixed $cart_item_data Cart item data built for the reorder.
+	 * @param mixed $item           Order item being re-ordered (duck-typed: needs get_product_id()).
+	 *
+	 * @return mixed
+	 *
+	 * @see self::restore_order_files_to_upload_dir()
+	 */
+	public static function retain_owned_reorder_files( $cart_item_data, $item = null ) {
+		if ( ! is_array( $cart_item_data ) || ! isset( $cart_item_data['ppom'] ) ) {
+			return $cart_item_data;
+		}
+
+		$product_id = is_object( $item ) && method_exists( $item, 'get_product_id' ) ? (int) $item->get_product_id() : 0;
+
+		$cart_item_data['ppom'] = Handler::retain_owned_uploads( $cart_item_data['ppom'], $product_id );
+
+		$cart_item_data[ Handler::VERIFIED_FILES_KEY ] = Handler::payload_file_names( $cart_item_data['ppom'] );
+
+		return $cart_item_data;
+	}
+
+	/**
 	 * Copies an order's confirmed uploads back into the shared upload pool.
 	 *
 	 * Checkout moves uploads out of the pool into confirmed/{order_id}
@@ -377,16 +414,30 @@ final class OrderHandler {
 			}
 
 			foreach ( $values as $file_data ) {
-				if ( ! is_array( $file_data ) || empty( $file_data['org'] ) ) {
+				if ( ! is_array( $file_data ) || empty( $file_data['org'] ) || ! Handler::is_plain_file_name( $file_data['org'] ) ) {
 					continue;
 				}
 
 				$file_name = $file_data['org'];
 				$confirmed = $confirmed_dir . Handler::file_get_name( $file_name, $product_id );
 
-				if ( ! file_exists( $base_dir . $file_name ) && file_exists( $confirmed ) ) {
-					copy( $confirmed, $base_dir . $file_name );
+				if ( ! file_exists( $confirmed ) ) {
+					continue;
 				}
+
+				$pool_path = $base_dir . $file_name;
+
+				// A pool file this session does not own may be another shopper's.
+				if ( file_exists( $pool_path ) ) {
+					if ( ! Handler::owns_uploaded_file( $file_name ) ) {
+						continue;
+					}
+				} elseif ( ! copy( $confirmed, $pool_path ) ) {
+					continue;
+				}
+
+				// Owned per file, so cart edits keep it and checkout moves it.
+				Handler::remember_uploaded_file( $file_name );
 			}
 		}
 	}

@@ -7,6 +7,9 @@
 
 require_once __DIR__ . '/class-ppom-test-case.php';
 
+use PPOM\Files\Handler;
+use PPOM\WooCommerce\Product\ProductHandler;
+
 class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 
 	/**
@@ -692,5 +695,173 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 
 		$this->assertSame( 'Red, Blue', $item->get_meta( 'extras', true ) );
 		$this->assertSame( array( 'Red', 'Blue' ), $stored_payload['fields']['extras'] );
+	}
+	/**
+	 * Puts pool uploads in the real cart for a product with one file field.
+	 * Every name starts out owned by this session.
+	 *
+	 * @param list<string> $file_names Upload names in the pool.
+	 * @param bool         $required   Whether the file field is required.
+	 *
+	 * @return array{product_id: int, meta_id: int, cart_key: string}
+	 */
+	private function cart_with_pool_uploads( array $file_names, bool $required = false ): array {
+		$this->initialize_woocommerce_checkout_context();
+
+		$product = $this->create_simple_product( array( 'virtual' => true ) );
+		$meta_id = $this->insert_ppom_meta(
+			array( $this->build_file_field( 'design_file', 'Design', array( 'required' => $required ? 'on' : '' ) ) ),
+			$product->get_id()
+		);
+
+		foreach ( $file_names as $index => $file_name ) {
+			$path = ppom_get_dir_path() . $file_name;
+			file_put_contents( $path, 'upload ' . $index );
+			$this->artifacts[] = $path;
+		}
+
+		WC()->session->set( 'ppom_uploaded_files', $file_names );
+
+		$cart_key = $this->add_product_to_real_cart( $product->get_id(), $this->file_payload( (int) $meta_id, $file_names ) );
+		$this->assertIsString( $cart_key );
+
+		return array(
+			'product_id' => $product->get_id(),
+			'meta_id'    => (int) $meta_id,
+			'cart_key'   => $cart_key,
+		);
+	}
+
+	/**
+	 * Posted PPOM payload with one design_file row per name.
+	 *
+	 * @param int          $meta_id    PPOM group ID.
+	 * @param list<string> $file_names Upload names.
+	 *
+	 * @return array{fields: array{id: string, design_file: list<array{org: string}>}}
+	 */
+	private function file_payload( int $meta_id, array $file_names ): array {
+		$rows = array();
+		foreach ( $file_names as $file_name ) {
+			$rows[] = array( 'org' => $file_name );
+		}
+
+		return array(
+			'fields' => array(
+				'id'          => (string) $meta_id,
+				'design_file' => $rows,
+			),
+		);
+	}
+
+	/**
+	 * Places an order from a cart holding the given pool uploads.
+	 *
+	 * @param list<string> $file_names Upload names in the pool.
+	 *
+	 * @return array{order: WC_Order, product_id: int}
+	 */
+	private function order_with_pool_uploads( array $file_names ): array {
+		$cart = $this->cart_with_pool_uploads( $file_names );
+
+		return array(
+			'order'      => $this->create_order_from_real_cart(),
+			'product_id' => $cart['product_id'],
+		);
+	}
+
+	/**
+	 * Path an upload is confirmed to for an order.
+	 *
+	 * @param WC_Order $order      Order.
+	 * @param int      $product_id Product ID.
+	 * @param string   $file_name  Upload name.
+	 *
+	 * @return string
+	 */
+	private function confirmed_path( WC_Order $order, int $product_id, string $file_name ): string {
+		$path              = ppom_get_dir_path( 'confirmed/' . $order->get_id() ) . $product_id . '-' . $file_name;
+		$this->artifacts[] = $path;
+
+		return $path;
+	}
+
+	/**
+	 * Store API (block) checkout confirms the shopper's own upload into the
+	 * order's directory.
+	 *
+	 * @return void
+	 */
+	public function test_store_api_checkout_confirms_owned_upload() {
+		$placed = $this->order_with_pool_uploads( array( 'design.abc123.txt' ) );
+
+		do_action( 'woocommerce_store_api_checkout_order_processed', $placed['order'] );
+
+		$this->assertFileExists( $this->confirmed_path( $placed['order'], $placed['product_id'], 'design.abc123.txt' ) );
+		$this->assertFileDoesNotExist( ppom_get_dir_path() . 'design.abc123.txt' );
+	}
+
+	/**
+	 * A cart reference that is neither owned by the session nor verified on the
+	 * cart item (stale or pre-patch data) stays in the pool, while the shopper's
+	 * own upload in the same item is confirmed.
+	 *
+	 * @return void
+	 */
+	public function test_store_api_checkout_leaves_unowned_pool_file() {
+		$placed = $this->order_with_pool_uploads( array( 'mine.abc123.txt', 'other.def456.txt' ) );
+
+		$contents = WC()->cart->get_cart();
+		foreach ( $contents as $key => $item ) {
+			$contents[ $key ][ Handler::VERIFIED_FILES_KEY ] = array( 'mine.abc123.txt' );
+		}
+		WC()->cart->set_cart_contents( $contents );
+		WC()->session->set( 'ppom_uploaded_files', array( 'mine.abc123.txt' ) );
+
+		do_action( 'woocommerce_store_api_checkout_order_processed', $placed['order'] );
+
+		$this->assertFileExists( $this->confirmed_path( $placed['order'], $placed['product_id'], 'mine.abc123.txt' ) );
+		$this->assertFileExists( ppom_get_dir_path() . 'other.def456.txt', 'An unowned pool file must stay where it is.' );
+		$this->assertFileDoesNotExist( $this->confirmed_path( $placed['order'], $placed['product_id'], 'other.def456.txt' ) );
+	}
+
+	/**
+	 * A persistent cart restored in a session without the ownership list (the
+	 * shopper switched devices) still confirms the uploads verified when the item
+	 * was added.
+	 *
+	 * @return void
+	 */
+	public function test_checkout_confirms_verified_upload_without_session_ownership() {
+		$placed = $this->order_with_pool_uploads( array( 'design.abc123.txt' ) );
+
+		WC()->session->set( 'ppom_uploaded_files', array() );
+
+		do_action( 'woocommerce_store_api_checkout_order_processed', $placed['order'] );
+
+		$this->assertFileExists( $this->confirmed_path( $placed['order'], $placed['product_id'], 'design.abc123.txt' ) );
+	}
+	/**
+	 * Editing a cart item on a device whose session never owned its upload keeps
+	 * the uploads verified on the replaced item, passes required validation,
+	 * removes the old item, and still drops a name outside that list.
+	 *
+	 * @return void
+	 */
+	public function test_cart_edit_reuses_replaced_item_verified_uploads() {
+		$cart = $this->cart_with_pool_uploads( array( 'design.abc123.txt' ), true );
+
+		WC()->session->set( 'ppom_uploaded_files', array() );
+
+		$_POST['ppom_cart_key'] = $cart['cart_key'];
+		$_POST['ppom']          = $this->file_payload( $cart['meta_id'], array( 'design.abc123.txt', 'other.def456.txt' ) );
+
+		$this->assertTrue( ProductHandler::validate_product( true, $cart['product_id'], 1 ), 'The required upload must still count as present.' );
+
+		$item = ppom_woocommerce_add_cart_item_data( array(), $cart['product_id'] );
+
+		$this->assertSame( array( array( 'org' => 'design.abc123.txt' ) ), $item['ppom']['fields']['design_file'] );
+		$this->assertSame( array( 'design.abc123.txt' ), $item[ Handler::VERIFIED_FILES_KEY ] );
+		$this->assertEmpty( WC()->cart->get_cart_item( $cart['cart_key'] ), 'The replaced item must be removed.' );
 	}
 }
