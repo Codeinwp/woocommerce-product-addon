@@ -1013,7 +1013,7 @@ final class Engine {
 	/**
 	 * Whether a charge row's price is a percentage of the product price, using
 	 * the checkbox discount over the option price as get_field_prices() does.
-	 * Only option-list types pass a saved option; others pass posted data.
+	 * Percentage detection is restricted to the listed saved-option field types.
 	 *
 	 * @param array<string, mixed>|string $option     Option the row was priced from.
 	 * @param string                      $field_type Saved field type.
