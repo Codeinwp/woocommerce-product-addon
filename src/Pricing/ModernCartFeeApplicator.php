@@ -41,10 +41,8 @@ final class ModernCartFeeApplicator {
 				$native_product      = wc_get_product( $product_id );
 				$price_tobe_discount = ppom_get_product_price( $native_product ) * $quantity;
 				if ( $matrix_found['discount'] == 'both' ) {
-					$total_addon_price    = ppom_price_get_addon_total( $ppom_field_prices );
-					$total_cart_fee_price = ppom_price_get_cart_fee_total( $ppom_field_prices );
-					// Fee rows are store currency; the line price is what WooCommerce shows, so convert the fees once (#755).
-					$price_tobe_discount  = ( $cart_item_price * $quantity ) + apply_filters( 'ppom_option_price', $total_cart_fee_price );
+					$total_addon_price   = ppom_price_get_addon_total( $ppom_field_prices );
+					$price_tobe_discount = ( $cart_item_price * $quantity ) + Engine::price_get_client_cart_fee_total( $ppom_field_prices );
 				}
 
 				if ( ! empty( $matrix_found['percent'] ) ) {

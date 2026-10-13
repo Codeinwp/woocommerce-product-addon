@@ -138,6 +138,32 @@ class Test_Pricing_Engine extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Flat fees are converted to the shown currency; percentage fees already are.
+	 *
+	 * @return void
+	 */
+	public function test_price_get_client_cart_fee_total_converts_flat_fees_only() {
+		$converter = static function ( $price ): float {
+			return (float) $price * 10;
+		};
+		add_filter( 'ppom_option_price', $converter );
+
+		try {
+			$total = Engine::price_get_client_cart_fee_total(
+				array(
+					array( 'apply' => 'cart_fee', 'price' => 2, 'is_percent' => false ),
+					array( 'apply' => 'cart_fee', 'price' => 3, 'is_percent' => true ),
+					array( 'apply' => 'addon', 'price' => 100, 'is_percent' => false ),
+				)
+			);
+		} finally {
+			remove_filter( 'ppom_option_price', $converter );
+		}
+
+		$this->assertEqualsWithDelta( 23.0, $total, 0.0001 );
+	}
+
+	/**
 	 * @return void
 	 */
 	public function test_price_get_cart_fee_total_empty() {

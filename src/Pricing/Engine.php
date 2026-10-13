@@ -295,7 +295,7 @@ final class Engine {
 	 * @param int|string                $variation_id     Variation ID.
 	 * @param array<string, mixed>|null $item             Cart item context.
 	 *
-	 * @return array<string, mixed>
+	 * @return array<int, array<string, mixed>>
 	 *
 	 * @see Helpers::get_field_meta_by_dataname()
 	 * @see self::price_get_product_base()
@@ -1069,6 +1069,27 @@ final class Engine {
 	}
 
 	/**
+	 * Total of the one-time fees in the currency the cart line is shown in. Flat fee
+	 * rows are store currency; percentage fees are already a share of the shown price.
+	 *
+	 * @param array<int, array<string, mixed>> $price_array Charge rows from get_field_prices().
+	 * @return float
+	 */
+	public static function price_get_client_cart_fee_total( $price_array ): float {
+		$total_cart_fee = 0.0;
+
+		foreach ( $price_array as $price ) {
+			if ( 'cart_fee' !== $price['apply'] ) {
+				continue;
+			}
+			$fee_price       = self::normalize_price_value( $price['price'] );
+			$total_cart_fee += empty( $price['is_percent'] ) ? (float) apply_filters( 'ppom_option_price', $fee_price ) : $fee_price;
+		}
+
+		return $total_cart_fee;
+	}
+
+	/**
 	 * Coerce a raw addon price value to a float.
 	 *
 	 * Admins occasionally type currency symbols, spaces, or trailing labels
@@ -1535,10 +1556,8 @@ final class Engine {
 				$native_product      = wc_get_product( $product_id );
 				$price_tobe_discount = Helpers::get_product_price( $native_product ) * $quantity;
 				if ( $matrix_found['discount'] == 'both' ) {
-					$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
-					$total_cart_fee_price = self::price_get_cart_fee_total( $ppom_field_prices );
-					// Fee rows are store currency; the line price is what WooCommerce shows, so convert the fees once (#755).
-					$price_tobe_discount  = ( $cart_item_price * $quantity ) + apply_filters( 'ppom_option_price', $total_cart_fee_price );
+					$total_addon_price   = self::price_get_addon_total( $ppom_field_prices );
+					$price_tobe_discount = ( $cart_item_price * $quantity ) + self::price_get_client_cart_fee_total( $ppom_field_prices );
 				}
 
 				// var_dump($price_tobe_discount);

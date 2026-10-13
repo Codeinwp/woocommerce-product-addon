@@ -136,6 +136,44 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$this->assertEqualsWithDelta( 110.0, $total, 0.001, 'Fee is 10% of the converted base 100, not converted again.' );
 	}
 
+	public function test_matrix_discount_base_keeps_percent_one_time_fee_from_converted_base() {
+		$product = $this->create_simple_product( array( 'regular_price' => (string) ( 10 * self::RATE ) ) );
+		$this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'select',
+					'title'     => 'Setup',
+					'data_name' => 'setup',
+					'onetime'   => 'on',
+					'options'   => array( array( 'option' => 'Yes', 'price' => '10%', 'id' => 'yes' ) ),
+				),
+				$this->build_price_matrix_field(
+					'matrix',
+					array( array( 'option' => '2-4', 'price' => '10%', 'label' => 'Bulk', 'id' => 'bulk' ) ),
+					array( 'discount' => 'on', 'discount_type' => 'both' )
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'setup' => 'Yes' ) ), 2 );
+		$this->assertNotFalse( $cart_key );
+		$this->reload_real_cart_from_session();
+		WC()->cart->calculate_totals();
+
+		$discount = null;
+		foreach ( WC()->cart->get_fees() as $fee ) {
+			if ( 0 === strpos( $fee->id, 'ppom_matrix_fee' ) ) {
+				$discount = (float) $fee->amount;
+			}
+		}
+
+		// 10% of (2 x converted base 100 + fee 10% of 100).
+		$this->assertNotNull( $discount, 'Matrix discount fee must be added.' );
+		$this->assertEqualsWithDelta( -21.0, $discount, 0.001 );
+	}
+
 	public function test_one_time_fee_row_is_left_to_the_fee_path() {
 		$rows = PPOM()->convert_cart_rows_wcml(
 			array(
