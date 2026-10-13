@@ -77,8 +77,9 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 	 * priced option, and returns the cart total with that option chosen.
 	 *
 	 * @param array{price: string, discount?: string} $premium Pricing of the chosen option.
+	 * @param array{onetime?: 'on'}                  $field   Extra field settings.
 	 */
-	private function cart_total_for_option( array $premium, string $type = 'select' ): float {
+	private function cart_total_for_option( array $premium, string $type = 'select', array $field = array() ): float {
 		$product = $this->create_simple_product( array( 'regular_price' => (string) ( 10 * self::RATE ) ) );
 		$this->insert_ppom_meta(
 			array(
@@ -90,7 +91,7 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 						array( 'option' => 'None', 'price' => '', 'id' => 'none' ),
 						array( 'option' => 'Premium', 'id' => 'premium' ) + $premium,
 					),
-				),
+				) + $field,
 			),
 			$product->get_id()
 		);
@@ -121,6 +122,18 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$total = $this->cart_total_for_option( array( 'price' => '20', 'discount' => '10%' ), 'checkbox' );
 
 		$this->assertEqualsWithDelta( 110.0, $total, 0.001, 'The 10% discount price comes from the converted base, not converted again.' );
+	}
+
+	public function test_one_time_fee_is_converted_once() {
+		$total = $this->cart_total_for_option( array( 'price' => '5' ), 'select', array( 'onetime' => 'on' ) );
+
+		$this->assertEqualsWithDelta( 150.0, $total, 0.001, 'Converted base 100 + fee 5 x rate.' );
+	}
+
+	public function test_percent_one_time_fee_keeps_amount_taken_from_converted_base() {
+		$total = $this->cart_total_for_option( array( 'price' => '10%' ), 'select', array( 'onetime' => 'on' ) );
+
+		$this->assertEqualsWithDelta( 110.0, $total, 0.001, 'Fee is 10% of the converted base 100, not converted again.' );
 	}
 
 	public function test_one_time_fee_row_is_left_to_the_fee_path() {

@@ -66,7 +66,8 @@ final class ModernCartFeeApplicator {
 
 				$label        = $fee['label'];
 				$option_label = isset( $fee['option_label'] ) ? $fee['option_label'] : '';
-				$fee_price    = \PPOM\Support\Helpers::convert_fee_price( $fee['price'] );
+				// A percentage fee is already a share of the converted product price.
+				$fee_price    = empty( $fee['is_percent'] ) ? \PPOM\Support\Helpers::convert_fee_price( $fee['price'] ) : $fee['price'];
 				$taxable      = $fee['taxable'];
 
 				$label = "{$fee_no}-{$label} ({$option_label})";

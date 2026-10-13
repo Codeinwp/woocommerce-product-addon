@@ -967,8 +967,8 @@ final class Engine {
 		$option_label = isset( $option['raw'] ) ? $option['raw'] : '';
 		$without_tax  = isset( $option['without_tax'] ) ? $option['without_tax'] : '';
 
-		// Charge rows stay in store currency: the switcher converts the cart line on read,
-		// and a WPML pass on ppom_fields_prices converts these rows itself. Only the label is display.
+		// Charge rows stay in store currency: switchers convert the cart line on read, and
+		// the WCML pass on ppom_fields_prices converts the rows. Only the label is converted here.
 		$label_price = "{$field_title} - " . wc_price( apply_filters( 'ppom_option_price', $field_price ) );
 		// For bulkquantity
 		$base_price = isset( $option['Base Price'] ) ? $option['Base Price'] : '';
@@ -1572,7 +1572,8 @@ final class Engine {
 
 				$label        = $fee['label'];
 				$option_label = isset( $fee['option_label'] ) ? $fee['option_label'] : '';
-				$fee_price    = Helpers::convert_fee_price( $fee['price'] );
+				// A percentage fee is already a share of the converted product price.
+				$fee_price    = empty( $fee['is_percent'] ) ? Helpers::convert_fee_price( $fee['price'] ) : $fee['price'];
 				$taxable      = $fee['taxable']; // deprecated soon
 
 				$label = "{$label}";

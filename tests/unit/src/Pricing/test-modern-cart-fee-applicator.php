@@ -205,6 +205,52 @@ class Test_Pricing_ModernCartFeeApplicator extends PPOM_Test_Case {
 	}
 
 	/**
+	 * A percentage fee is a share of the product price, which a currency switcher has
+	 * already converted, so the currency conversion must not apply to it again.
+	 *
+	 * @return void
+	 */
+	public function test_percent_fee_is_not_currency_converted_again() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10', 'virtual' => true ) );
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_select_field(
+					'gift_wrap',
+					'Gift Wrap',
+					array( array( 'option' => 'Premium', 'price' => '10%' ) ),
+					array( 'onetime' => 'on' )
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+		$cart_key = $this->add_product_to_real_cart(
+			$product->get_id(),
+			array( 'fields' => array( 'gift_wrap' => 'Premium' ) )
+		);
+		$this->assertNotFalse( $cart_key );
+		$this->reload_real_cart_from_session();
+		WC()->cart->fees_api()->remove_all_fees();
+
+		$converter = static function ( $price ): float {
+			return (float) $price * 10;
+		};
+		add_filter( 'ppom_option_price', $converter );
+
+		try {
+			ModernCartFeeApplicator::apply_to_cart( WC()->cart );
+		} finally {
+			remove_filter( 'ppom_option_price', $converter );
+		}
+
+		$fees = WC()->cart->get_fees();
+		$this->assertCount( 1, $fees );
+		$this->assertEqualsWithDelta( 1.0, (float) reset( $fees )->amount, 0.0001, '10% of the product price 10.' );
+	}
+
+	/**
 	 * Regression for #630: Engine::price_cart_fee must not fatally resolve
 	 * WooCommerce tax classes inside PPOM\Pricing namespace.
 	 *
