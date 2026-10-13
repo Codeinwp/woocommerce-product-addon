@@ -967,8 +967,8 @@ final class Engine {
 		$option_label = isset( $option['raw'] ) ? $option['raw'] : '';
 		$without_tax  = isset( $option['without_tax'] ) ? $option['without_tax'] : '';
 
-		// Charge rows stay in store currency: the switcher converts the cart line on read
-		// and Pro's WPML pass converts these rows itself. Only the label is display (#755).
+		// Charge rows stay in store currency: the switcher converts the cart line on read,
+		// and a WPML pass on ppom_fields_prices converts these rows itself. Only the label is display.
 		$label_price = "{$field_title} - " . wc_price( apply_filters( 'ppom_option_price', $field_price ) );
 		// For bulkquantity
 		$base_price = isset( $option['Base Price'] ) ? $option['Base Price'] : '';
@@ -994,12 +994,29 @@ final class Engine {
 				'option_label' => $option_label,
 				'quantity'     => $qty,
 				'base_price'   => $base_price,
+				'is_percent'   => self::is_percent_option_price( $option ),
 			),
 			$field_meta,
 			$field_price,
 			$option,
 			$qty
 		);
+	}
+
+	/**
+	 * Whether a charge row's price is a percentage of the product price, using
+	 * the checkbox discount over the option price as get_field_prices() does.
+	 *
+	 * @param array<string, mixed>|string $option Option the row was priced from; text fields pass the posted value.
+	 * @return bool
+	 */
+	private static function is_percent_option_price( $option ): bool {
+		if ( ! is_array( $option ) ) {
+			return false;
+		}
+		$raw_price = isset( $option['raw_discount'] ) && $option['raw_discount'] > 0 ? $option['raw_discount'] : ( $option['raw_price'] ?? '' );
+
+		return false !== strpos( (string) $raw_price, '%' );
 	}
 
 	// Get total addon price of given Price Array
