@@ -73,8 +73,9 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 	}
 
 	/**
-	 * Adds a product whose catalog price is the WCML-converted base, with one
-	 * priced option, and returns the cart total with that option chosen.
+	 * Adds a product whose catalog price is the WCML-converted base, with the
+	 * option under test and a flat 5 gift option, and returns the cart total with
+	 * both chosen. The gift adds 50 only when option rows are converted.
 	 *
 	 * @param array{price: string, discount?: string} $premium Pricing of the chosen option.
 	 * @param array{onetime?: 'on'}                  $field   Extra field settings.
@@ -92,12 +93,22 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 						array( 'option' => 'Premium', 'id' => 'premium' ) + $premium,
 					),
 				) + $field,
+				array(
+					'type'      => 'select',
+					'title'     => 'Gift',
+					'data_name' => 'gift',
+					'options'   => array( array( 'option' => 'Card', 'price' => '5', 'id' => 'card' ) ),
+				),
 			),
 			$product->get_id()
 		);
 
 		$this->initialize_woocommerce_checkout_context();
-		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'wrap' => 'checkbox' === $type ? array( 'Premium' ) : 'Premium' ) ) );
+		$posted   = array(
+			'wrap' => 'checkbox' === $type ? array( 'Premium' ) : 'Premium',
+			'gift' => 'Card',
+		);
+		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => $posted ) );
 		$this->assertNotFalse( $cart_key );
 		$this->reload_real_cart_from_session();
 
@@ -111,29 +122,29 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 	}
 
 	public function test_cart_line_adds_option_in_client_currency_without_pro() {
-		$this->assertEqualsWithDelta( 150.0, $this->cart_total_for_option( array( 'price' => '5' ) ), 0.001, 'Converted base 100 + option 5 x rate.' );
+		$this->assertEqualsWithDelta( 200.0, $this->cart_total_for_option( array( 'price' => '5' ) ), 0.001, 'Converted base 100 + option 5 x rate + gift 5 x rate.' );
 	}
 
 	public function test_percent_option_keeps_amount_taken_from_converted_base() {
-		$this->assertEqualsWithDelta( 110.0, $this->cart_total_for_option( array( 'price' => '10%' ) ), 0.001, '10% of the converted base 100, not converted again.' );
+		$this->assertEqualsWithDelta( 160.0, $this->cart_total_for_option( array( 'price' => '10%' ) ), 0.001, 'Base 100 + 10% of it, not converted again + gift 50.' );
 	}
 
 	public function test_checkbox_percent_discount_keeps_amount_taken_from_converted_base() {
 		$total = $this->cart_total_for_option( array( 'price' => '20', 'discount' => '10%' ), 'checkbox' );
 
-		$this->assertEqualsWithDelta( 110.0, $total, 0.001, 'The 10% discount price comes from the converted base, not converted again.' );
+		$this->assertEqualsWithDelta( 160.0, $total, 0.001, 'Base 100 + the 10% discount price of it, not converted again + gift 50.' );
 	}
 
 	public function test_one_time_fee_is_converted_once() {
 		$total = $this->cart_total_for_option( array( 'price' => '5' ), 'select', array( 'onetime' => 'on' ) );
 
-		$this->assertEqualsWithDelta( 150.0, $total, 0.001, 'Converted base 100 + fee 5 x rate.' );
+		$this->assertEqualsWithDelta( 200.0, $total, 0.001, 'Base 100 + fee 5 x rate + gift 50.' );
 	}
 
 	public function test_percent_one_time_fee_keeps_amount_taken_from_converted_base() {
 		$total = $this->cart_total_for_option( array( 'price' => '10%' ), 'select', array( 'onetime' => 'on' ) );
 
-		$this->assertEqualsWithDelta( 110.0, $total, 0.001, 'Fee is 10% of the converted base 100, not converted again.' );
+		$this->assertEqualsWithDelta( 160.0, $total, 0.001, 'Base 100 + fee 10% of it, not converted again + gift 50.' );
 	}
 
 	public function test_matrix_discount_base_keeps_percent_one_time_fee_from_converted_base() {
@@ -174,6 +185,30 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$this->assertEqualsWithDelta( -21.0, $discount, 0.001 );
 	}
 
+	public function test_posted_text_value_cannot_mark_its_fee_as_percent() {
+		$product = $this->create_simple_product( array( 'regular_price' => (string) ( 10 * self::RATE ) ) );
+		$this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'text',
+					'title'     => 'Engraving',
+					'data_name' => 'engraving',
+					'price'     => '5',
+					'onetime'   => 'on',
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'engraving' => array( 'raw_price' => '10%' ) ) ) );
+		$this->assertNotFalse( $cart_key );
+		$this->reload_real_cart_from_session();
+		WC()->cart->calculate_totals();
+
+		$this->assertEqualsWithDelta( 150.0, (float) WC()->cart->get_total( 'edit' ), 0.001, 'Base 100 + the flat fee 5 x rate; the posted value cannot skip conversion.' );
+	}
+
 	public function test_one_time_fee_row_is_left_to_the_fee_path() {
 		$rows = PPOM()->convert_cart_rows_wcml(
 			array(
@@ -205,8 +240,11 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 	public function test_cart_pass_not_registered_when_pro_converts_the_rows() {
 		$ppom = PPOM();
 		remove_filter( 'ppom_fields_prices', array( $ppom, 'convert_cart_rows_wcml' ) );
-		add_filter( 'ppom_option_price', 'ppom_hooks_convert_price', 99, 1 );
+		$ppom->maybe_register_option_price_hook();
+		$this->assertSame( 10, has_filter( 'ppom_fields_prices', array( $ppom, 'convert_cart_rows_wcml' ) ), 'Without Pro the free plugin converts the rows.' );
 
+		remove_filter( 'ppom_fields_prices', array( $ppom, 'convert_cart_rows_wcml' ) );
+		add_filter( 'ppom_option_price', 'ppom_hooks_convert_price', 99, 1 );
 		$ppom->maybe_register_option_price_hook();
 
 		$this->assertFalse( has_filter( 'ppom_fields_prices', array( $ppom, 'convert_cart_rows_wcml' ) ), 'PPOM Pro converts the rows itself; converting here too would apply the rate twice.' );

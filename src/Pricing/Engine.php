@@ -21,6 +21,13 @@ use PPOM\Support\Helpers;
 final class Engine {
 
 	/**
+	 * Field types whose options can be priced as a percentage of the product price.
+	 *
+	 * @var list<string>
+	 */
+	private const PERCENT_PRICED_FIELD_TYPES = array( 'select', 'radio', 'checkbox', 'multiple_select', 'cropper', 'palettes', 'imageselect', 'image', 'audio' );
+
+	/**
 	 * Stores the last base price and last written price for each cart line,
 	 * so repeated totals passes can detect whether a third party has changed
 	 * the line's price since PPOM last priced it.
@@ -994,7 +1001,7 @@ final class Engine {
 				'option_label' => $option_label,
 				'quantity'     => $qty,
 				'base_price'   => $base_price,
-				'is_percent'   => self::is_percent_option_price( $option ),
+				'is_percent'   => self::is_percent_option_price( $option, $field_type ),
 			),
 			$field_meta,
 			$field_price,
@@ -1006,12 +1013,14 @@ final class Engine {
 	/**
 	 * Whether a charge row's price is a percentage of the product price, using
 	 * the checkbox discount over the option price as get_field_prices() does.
+	 * Only option-list types pass a saved option; others pass posted data.
 	 *
-	 * @param array<string, mixed>|string $option Option the row was priced from; text fields pass the posted value.
+	 * @param array<string, mixed>|string $option     Option the row was priced from.
+	 * @param string                      $field_type Saved field type.
 	 * @return bool
 	 */
-	private static function is_percent_option_price( $option ): bool {
-		if ( ! is_array( $option ) ) {
+	private static function is_percent_option_price( $option, string $field_type ): bool {
+		if ( ! in_array( $field_type, self::PERCENT_PRICED_FIELD_TYPES, true ) || ! is_array( $option ) ) {
 			return false;
 		}
 		$raw_price = isset( $option['raw_discount'] ) && $option['raw_discount'] > 0 ? $option['raw_discount'] : ( $option['raw_price'] ?? '' );
