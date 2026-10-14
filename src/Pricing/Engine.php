@@ -23,7 +23,7 @@ final class Engine {
 	/**
 	 * Field types whose options can be priced as a percentage of the product price.
 	 *
-	 * @var list<string>
+	 * @var list<'select'|'radio'|'checkbox'|'multiple_select'|'cropper'|'palettes'|'imageselect'|'image'|'audio'>
 	 */
 	private const PERCENT_PRICED_FIELD_TYPES = array( 'select', 'radio', 'checkbox', 'multiple_select', 'cropper', 'palettes', 'imageselect', 'image', 'audio' );
 
@@ -1084,7 +1084,7 @@ final class Engine {
 	 * @param array<int, array<string, mixed>> $price_array Charge rows from get_field_prices().
 	 * @return float
 	 */
-	public static function price_get_client_cart_fee_total( $price_array ): float {
+	public static function price_get_client_cart_fee_total( array $price_array ): float {
 		$total_cart_fee = 0.0;
 
 		foreach ( $price_array as $price ) {
@@ -1565,7 +1565,6 @@ final class Engine {
 				$native_product      = wc_get_product( $product_id );
 				$price_tobe_discount = Helpers::get_product_price( $native_product ) * $quantity;
 				if ( $matrix_found['discount'] == 'both' ) {
-					$total_addon_price   = self::price_get_addon_total( $ppom_field_prices );
 					$price_tobe_discount = ( $cart_item_price * $quantity ) + self::price_get_client_cart_fee_total( $ppom_field_prices );
 				}
 

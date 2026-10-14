@@ -2076,8 +2076,8 @@ final class Helpers {
 	 * Option price for the legacy cart line: flat prices in the currency the line is
 	 * priced in, while a percentage already is a share of that line's base price.
 	 *
-	 * @param mixed $field_meta   Field settings.
-	 * @param mixed $option_label Selected option label.
+	 * @param array<mixed>|string $field_meta   Field settings, as get_field_meta_by_dataname() returns them.
+	 * @param mixed               $option_label Selected option label.
 	 * @return mixed
 	 */
 	private static function get_field_option_line_price( $field_meta, $option_label ) {

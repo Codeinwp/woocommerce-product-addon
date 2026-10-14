@@ -210,7 +210,7 @@ class Test_Pricing_ModernCartFeeApplicator extends PPOM_Test_Case {
 	 *
 	 * @return void
 	 */
-	public function test_percent_fee_is_not_currency_converted_again() {
+	public function test_percent_fee_is_not_currency_converted_again(): void {
 		$product = $this->create_simple_product( array( 'regular_price' => '10', 'virtual' => true ) );
 
 		$this->insert_ppom_meta(

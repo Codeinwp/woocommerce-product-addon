@@ -22,8 +22,7 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 	/** @var callable(float|int|string): float */
 	private $wcml_converter;
 
-	/** @var object|null */
-	private $previous_woocommerce_wpml;
+	private ?object $previous_woocommerce_wpml = null;
 
 	public function setUp(): void {
 		parent::setUp();
@@ -60,11 +59,9 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 	private function set_wcml_loads_product_prices( bool $loads ): void {
 		$GLOBALS['woocommerce_wpml'] = (object) array(
 			'multi_currency' => new class( $loads ) {
-				/** @var bool */
-				public $loads_prices;
+				public bool $loads_prices;
 
-				/** @var object */
-				public $prices;
+				public object $prices;
 
 				public function __construct( bool $loads_prices ) {
 					$this->loads_prices = $loads_prices;
@@ -134,33 +131,33 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		return $first_pass;
 	}
 
-	public function test_cart_line_adds_option_in_client_currency_without_pro() {
+	public function test_cart_line_adds_option_in_client_currency_without_pro(): void {
 		$this->assertEqualsWithDelta( 200.0, $this->cart_total_for_option( array( 'price' => '5' ) ), 0.001, 'Converted base 100 + option 5 x rate + gift 5 x rate.' );
 	}
 
-	public function test_percent_option_keeps_amount_taken_from_converted_base() {
+	public function test_percent_option_keeps_amount_taken_from_converted_base(): void {
 		$this->assertEqualsWithDelta( 160.0, $this->cart_total_for_option( array( 'price' => '10%' ) ), 0.001, 'Base 100 + 10% of it, not converted again + gift 50.' );
 	}
 
-	public function test_checkbox_percent_discount_keeps_amount_taken_from_converted_base() {
+	public function test_checkbox_percent_discount_keeps_amount_taken_from_converted_base(): void {
 		$total = $this->cart_total_for_option( array( 'price' => '20', 'discount' => '10%' ), 'checkbox' );
 
 		$this->assertEqualsWithDelta( 160.0, $total, 0.001, 'Base 100 + the 10% discount price of it, not converted again + gift 50.' );
 	}
 
-	public function test_one_time_fee_is_converted_once() {
+	public function test_one_time_fee_is_converted_once(): void {
 		$total = $this->cart_total_for_option( array( 'price' => '5' ), 'select', array( 'onetime' => 'on' ) );
 
 		$this->assertEqualsWithDelta( 200.0, $total, 0.001, 'Base 100 + fee 5 x rate + gift 50.' );
 	}
 
-	public function test_percent_one_time_fee_keeps_amount_taken_from_converted_base() {
+	public function test_percent_one_time_fee_keeps_amount_taken_from_converted_base(): void {
 		$total = $this->cart_total_for_option( array( 'price' => '10%' ), 'select', array( 'onetime' => 'on' ) );
 
 		$this->assertEqualsWithDelta( 160.0, $total, 0.001, 'Base 100 + fee 10% of it, not converted again + gift 50.' );
 	}
 
-	public function test_matrix_discount_base_keeps_percent_one_time_fee_from_converted_base() {
+	public function test_matrix_discount_base_keeps_percent_one_time_fee_from_converted_base(): void {
 		$product = $this->create_simple_product( array( 'regular_price' => (string) ( 10 * self::RATE ) ) );
 		$this->insert_ppom_meta(
 			array(
@@ -198,7 +195,7 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$this->assertEqualsWithDelta( -21.0, $discount, 0.001 );
 	}
 
-	public function test_posted_text_value_cannot_mark_its_fee_as_percent() {
+	public function test_posted_text_value_cannot_mark_its_fee_as_percent(): void {
 		$product = $this->create_simple_product( array( 'regular_price' => (string) ( 10 * self::RATE ) ) );
 		$this->insert_ppom_meta(
 			array(
@@ -222,7 +219,7 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$this->assertEqualsWithDelta( 150.0, (float) WC()->cart->get_total( 'edit' ), 0.001, 'Base 100 + the flat fee 5 x rate; the posted value cannot skip conversion.' );
 	}
 
-	public function test_one_time_fee_row_is_left_to_the_fee_path() {
+	public function test_one_time_fee_row_is_left_to_the_fee_path(): void {
 		$rows = PPOM()->convert_cart_rows_wcml(
 			array(
 				array( 'apply' => 'addon', 'price' => 5, 'is_percent' => false ),
@@ -234,7 +231,7 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$this->assertEqualsWithDelta( 5.0, (float) $rows[1]['price'], 0.0001, 'One-time fees are converted when the fee is added.' );
 	}
 
-	public function test_rows_stay_in_store_currency_when_wcml_does_not_convert_product_prices() {
+	public function test_rows_stay_in_store_currency_when_wcml_does_not_convert_product_prices(): void {
 		$this->set_wcml_loads_product_prices( false );
 
 		$rows = PPOM()->convert_cart_rows_wcml( array( array( 'apply' => 'addon', 'price' => 5, 'is_percent' => false ) ) );
@@ -242,7 +239,7 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$this->assertEqualsWithDelta( 5.0, (float) $rows[0]['price'], 0.0001, 'The base stays in store currency on this request, so the option must too.' );
 	}
 
-	public function test_rows_untouched_without_wcml() {
+	public function test_rows_untouched_without_wcml(): void {
 		unset( $GLOBALS['woocommerce_wpml'] );
 
 		$rows = PPOM()->convert_cart_rows_wcml( array( array( 'apply' => 'addon', 'price' => 5, 'is_percent' => false ) ) );
@@ -250,7 +247,7 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$this->assertEqualsWithDelta( 5.0, (float) $rows[0]['price'], 0.0001 );
 	}
 
-	public function test_cart_pass_not_registered_when_pro_converts_the_rows() {
+	public function test_cart_pass_not_registered_when_pro_converts_the_rows(): void {
 		$ppom = PPOM();
 		remove_filter( 'ppom_fields_prices', array( $ppom, 'convert_cart_rows_wcml' ) );
 		$ppom->maybe_register_option_price_hook();
@@ -337,13 +334,13 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		);
 	}
 
-	public function test_legacy_line_adds_flat_option_in_client_currency() {
+	public function test_legacy_line_adds_flat_option_in_client_currency(): void {
 		$cart = $this->legacy_cart( array( $this->priced_select( 'upgrade', '5' ) ), array( 'upgrade' => 'Yes' ), array( $this->browser_row( 'upgrade', 'variable' ) ) );
 
 		$this->assertEqualsWithDelta( 150.0, $cart['line'], 0.001, 'Converted base 100 + option 5 x rate.' );
 	}
 
-	public function test_legacy_line_keeps_percent_option_taken_from_converted_base() {
+	public function test_legacy_line_keeps_percent_option_taken_from_converted_base(): void {
 		$cart = $this->legacy_cart(
 			array( $this->priced_select( 'upgrade', '10%' ), $this->priced_select( 'gift', '5' ) ),
 			array( 'upgrade' => 'Yes', 'gift' => 'Yes' ),
@@ -353,13 +350,13 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$this->assertEqualsWithDelta( 160.0, $cart['line'], 0.001, 'Base 100 + 10% of it, not converted again + gift 5 x rate.' );
 	}
 
-	public function test_legacy_server_built_payload_adds_flat_option_in_client_currency() {
+	public function test_legacy_server_built_payload_adds_flat_option_in_client_currency(): void {
 		$cart = $this->legacy_cart( array( $this->priced_select( 'upgrade', '5' ) ), array( 'upgrade' => 'Yes' ), null );
 
 		$this->assertEqualsWithDelta( 150.0, $cart['line'], 0.001, 'Without a posted payload the server builds one; base 100 + option 5 x rate.' );
 	}
 
-	public function test_legacy_percent_one_time_fee_is_converted_once() {
+	public function test_legacy_percent_one_time_fee_is_converted_once(): void {
 		$cart = $this->legacy_cart(
 			array( $this->priced_select( 'setup', '10%', true ), $this->priced_select( 'wrap', '5', true ) ),
 			array( 'setup' => 'Yes', 'wrap' => 'Yes' ),
@@ -370,7 +367,7 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$this->assertEqualsWithDelta( 100.0, $cart['line'], 0.001, 'One-time fees are not added to the line.' );
 	}
 
-	public function test_legacy_percent_one_time_fee_row_subtotal_is_converted_once() {
+	public function test_legacy_percent_one_time_fee_row_subtotal_is_converted_once(): void {
 		$cart = $this->legacy_cart( array( $this->priced_select( 'setup', '10%', true ) ), array( 'setup' => 'Yes' ), array( $this->browser_row( 'setup', 'onetime' ) ) );
 
 		$this->assertStringContainsString( '110.00', $cart['subtotal'], 'Row subtotal: base 100 + fee 10% of it.' );

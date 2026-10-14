@@ -142,7 +142,7 @@ class Test_Pricing_Engine extends WP_UnitTestCase {
 	 *
 	 * @return void
 	 */
-	public function test_price_get_client_cart_fee_total_converts_flat_fees_only() {
+	public function test_price_get_client_cart_fee_total_converts_flat_fees_only(): void {
 		$converter = static function ( $price ): float {
 			return (float) $price * 10;
 		};

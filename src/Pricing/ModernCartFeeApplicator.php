@@ -41,7 +41,6 @@ final class ModernCartFeeApplicator {
 				$native_product      = wc_get_product( $product_id );
 				$price_tobe_discount = ppom_get_product_price( $native_product ) * $quantity;
 				if ( $matrix_found['discount'] == 'both' ) {
-					$total_addon_price   = ppom_price_get_addon_total( $ppom_field_prices );
 					$price_tobe_discount = ( $cart_item_price * $quantity ) + Engine::price_get_client_cart_fee_total( $ppom_field_prices );
 				}
 

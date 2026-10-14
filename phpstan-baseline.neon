@@ -5995,30 +5995,6 @@ parameters:
 			path: src/Support/Helpers.php
 
 		-
-			message: '#^Method PPOM\\Support\\Helpers\:\:get_field_option_price_by_id\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Support/Helpers.php
-
-		-
-			message: '#^Method PPOM\\Support\\Helpers\:\:get_field_option_price_by_id\(\) has parameter \$option with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Support/Helpers.php
-
-		-
-			message: '#^Method PPOM\\Support\\Helpers\:\:get_field_option_price_by_id\(\) has parameter \$ppom_meta_ids with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Support/Helpers.php
-
-		-
-			message: '#^Method PPOM\\Support\\Helpers\:\:get_field_option_price_by_id\(\) has parameter \$product with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Support/Helpers.php
-
-		-
 			message: '#^Method PPOM\\Support\\Helpers\:\:get_field_option_weight_by_id\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1

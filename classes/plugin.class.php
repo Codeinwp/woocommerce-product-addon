@@ -949,15 +949,11 @@ class NM_PersonalizedProduct {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public function convert_cart_rows_wcml( $field_prices ) {
-		if ( ! \PPOM\Support\Helpers::wcml_converts_product_prices() ) {
-			return $field_prices;
-		}
-
 		foreach ( $field_prices as $index => $row ) {
 			if ( ! isset( $row['price'] ) || 'cart_fee' === ( $row['apply'] ?? '' ) || ! empty( $row['is_percent'] ) ) {
 				continue;
 			}
-			$field_prices[ $index ]['price'] = $this->ppom_convert_price( $row['price'] );
+			$field_prices[ $index ]['price'] = \PPOM\Support\Helpers::convert_to_wcml_line_currency( $row['price'] );
 		}
 
 		return $field_prices;
