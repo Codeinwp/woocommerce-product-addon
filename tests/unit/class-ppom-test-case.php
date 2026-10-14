@@ -881,4 +881,34 @@ abstract class PPOM_Test_Case extends WP_UnitTestCase {
 
 		return rest_get_server()->dispatch( $request );
 	}
+
+	/**
+	 * Runs the legacy frontend loader for a product and returns the captured ppom_input_vars.
+	 *
+	 * @return array<string, mixed>|null Null when the loader localized nothing.
+	 */
+	protected function capture_frontend_input_vars( int $product_id ): ?array {
+		PPOM_FRONTEND_SCRIPTS::init();
+		$reflection = new ReflectionClass( 'PPOM_FRONTEND_SCRIPTS' );
+		foreach ( array( 'get_scripts' => 'register_scripts', 'get_styles' => 'register_styles' ) as $getter => $register ) {
+			$method = $reflection->getMethod( $getter );
+			$method->setAccessible( true );
+			PPOM_SCRIPTS::$register( $method->invoke( null ) );
+		}
+
+		$captured = null;
+		$filter   = static function ( $vars ) use ( &$captured ) {
+			$captured = $vars;
+			return $vars;
+		};
+		add_filter( 'ppom_input_vars', $filter );
+
+		try {
+			PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id( $product_id );
+		} finally {
+			remove_filter( 'ppom_input_vars', $filter );
+		}
+
+		return $captured;
+	}
 }

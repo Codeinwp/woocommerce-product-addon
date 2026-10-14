@@ -577,12 +577,6 @@ parameters:
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Cannot call method get_title\(\) on WC_Product\|false\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
 			message: '#^Constant PPOM_PATH not found\.$#'
 			identifier: constant.notFound
 			count: 1
@@ -634,12 +628,6 @@ parameters:
 			message: '#^Parameter \#2 \$css of static method PPOM_SCRIPTS\:\:inline_style\(\) expects string, string\|false given\.$#'
 			identifier: argument.type
 			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Parameter \#3 \$product of static method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) expects WC_Product, WC_Product\|false\|null given\.$#'
-			identifier: argument.type
-			count: 5
 			path: classes/frontend-scripts.class.php
 
 		-

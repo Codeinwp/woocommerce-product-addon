@@ -299,6 +299,9 @@ class PPOM_FRONTEND_SCRIPTS {
 		if ( $product_id ) {
 
 			$product = wc_get_product( $product_id );
+			if ( ! $product instanceof WC_Product ) {
+				return '';
+			}
 
 			$ppom = new PPOM_Meta( $product_id );
 
@@ -576,7 +579,7 @@ class PPOM_FRONTEND_SCRIPTS {
 				$input_js_vars['ppom_inputs']              = $inputs_meta_updated;
 				$input_js_vars['field_meta']               = $inputs_meta_updated;
 				$input_js_vars['wc_no_decimal']            = $decimal_palces;
-				$input_js_vars['wc_product_price']         = ppom_get_product_price( $product, '', 'product' );
+				$input_js_vars['wc_product_price']         = \PPOM\Support\Helpers::get_product_display_price( $product );
 				$input_js_vars['wc_product_regular_price'] = ppom_get_product_regular_price( $product );
 				$input_js_vars['product_title']            = $product->get_title();
 				$input_js_vars['show_price_per_unit']      = $show_price_per_unit;
