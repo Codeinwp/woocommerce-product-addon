@@ -2532,16 +2532,18 @@ final class Helpers {
 	/**
 	 * Builds a legacy ppom_option_price structure from posted field values.
 	 *
-	 * @param array<string, mixed> $fields_posted Posted ppom[fields] payload.
-	 * @param int                  $product_id    Product ID to look up field metadata against.
+	 * @param array<string, mixed>   $fields_posted Posted ppom[fields] payload.
+	 * @param int                    $product_id    Product ID to look up field metadata against.
+	 * @param \WC_Product|false|null $line_product  Product the cart line is priced from, such as the
+	 *                                              selected variation; percentages are taken of its price.
 	 *
 	 * @return array<array<string, mixed>> Option-price entries (empty when no priced options match).
 	 */
-	public static function compute_option_price_from_fields( $fields_posted, $product_id ) {
+	public static function compute_option_price_from_fields( $fields_posted, $product_id, $line_product = null ) {
 
 		$option_prices = array();
 		$ppom_id       = isset( $fields_posted['id'] ) ? $fields_posted['id'] : null;
-		$product       = wc_get_product( $product_id );
+		$product       = $line_product instanceof \WC_Product ? $line_product : wc_get_product( $product_id );
 
 		foreach ( $fields_posted as $data_name => $value ) {
 

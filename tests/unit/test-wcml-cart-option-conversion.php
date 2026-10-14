@@ -363,6 +363,30 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$this->assertEqualsWithDelta( 220.0, $cart['line'], 0.001, 'Base 200 + 10% of it; the bare number 10 gave 210.' );
 	}
 
+	public function test_legacy_server_built_payload_takes_percent_option_from_the_cart_variation(): void {
+		$created = $this->create_variable_product_with_variation( array(), array( 'regular_price' => '200' ) );
+		$parent  = $created['product'];
+		$cheaper = new WC_Product_Variation();
+		$cheaper->set_parent_id( $parent->get_id() );
+		$cheaper->set_status( 'publish' );
+		$cheaper->set_regular_price( '100' );
+		$cheaper->save();
+		WC_Product_Variable::sync( $parent->get_id() );
+
+		$meta_id = $this->insert_ppom_meta( array( $this->priced_select( 'upgrade', '10%' ) ), $parent->get_id() );
+		$item    = array(
+			'data'         => $created['variation'],
+			'quantity'     => 1,
+			'product_id'   => $parent->get_id(),
+			'variation_id' => $created['variation']->get_id(),
+			'ppom'         => array( 'fields' => array( 'id' => $meta_id, 'upgrade' => 'Yes' ) ),
+		);
+
+		$item = CartHandler::update_cart_fees( $item, $item );
+
+		$this->assertEqualsWithDelta( 220.0, (float) $item['data']->get_price( 'edit' ), 0.001, 'The 200 variation + 10% of it, not 10% of the cheapest variation.' );
+	}
+
 	public function test_legacy_percent_one_time_fee_is_converted_once(): void {
 		$cart = $this->legacy_cart(
 			array( $this->priced_select( 'setup', '10%', true ), $this->priced_select( 'wrap', '5', true ) ),
