@@ -183,6 +183,25 @@ final class Helpers {
 		return apply_filters( 'ppom_product_price', $product_price, $product );
 	}
 
+	/**
+	 * Product price for the browser price summary, in the shopper's currency.
+	 *
+	 * CURCY's PPOM integration reverts ppom_product_price to store currency for
+	 * server-side pricing, so it is converted back here for display only.
+	 *
+	 * @param \WC_Product $product Product.
+	 * @return mixed Whatever ppom_product_price returns, converted under CURCY.
+	 */
+	public static function get_product_display_price( \WC_Product $product ) {
+		$product_price = self::get_product_price( $product, '', 'product' );
+
+		if ( self::curcy_integration_active() && function_exists( 'wmc_get_price' ) ) {
+			return wmc_get_price( $product_price );
+		}
+
+		return $product_price;
+	}
+
 	// Get product Regular Price after some filters like currency switcher
 	public static function get_product_regular_price( $product ) {
 
