@@ -949,7 +949,7 @@ class NM_PersonalizedProduct {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public function convert_cart_rows_wcml( $field_prices ) {
-		if ( ! $this->wcml_converts_product_prices() ) {
+		if ( ! \PPOM\Support\Helpers::wcml_converts_product_prices() ) {
 			return $field_prices;
 		}
 
@@ -961,22 +961,6 @@ class NM_PersonalizedProduct {
 		}
 
 		return $field_prices;
-	}
-
-	/**
-	 * Whether WCML converts product prices in this request. On admin-ajax actions
-	 * outside its allowlist it leaves them in store currency.
-	 *
-	 * @return bool
-	 */
-	private function wcml_converts_product_prices(): bool {
-		global $woocommerce_wpml;
-
-		$multi_currency = $woocommerce_wpml->multi_currency ?? null;
-
-		return is_object( $multi_currency )
-			&& method_exists( $multi_currency, 'are_filters_need_loading' )
-			&& $multi_currency->are_filters_need_loading();
 	}
 
 	/**

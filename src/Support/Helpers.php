@@ -1419,6 +1419,55 @@ final class Helpers {
 	}
 
 	/**
+	 * Whether WCML converts product prices in this request. On admin-ajax actions
+	 * outside its allowlist it leaves them in store currency.
+	 *
+	 * @return bool
+	 */
+	public static function wcml_converts_product_prices(): bool {
+		global $woocommerce_wpml;
+
+		$multi_currency = $woocommerce_wpml->multi_currency ?? null;
+
+		return is_object( $multi_currency )
+			&& method_exists( $multi_currency, 'are_filters_need_loading' )
+			&& $multi_currency->are_filters_need_loading();
+	}
+
+	/**
+	 * Converts a store-currency amount to the currency WCML prices the cart line in.
+	 * Other switchers convert the line when it is read, so the amount stays as is.
+	 *
+	 * @param mixed $price Amount in store currency.
+	 * @return mixed
+	 */
+	public static function convert_to_wcml_line_currency( $price ) {
+		if ( ! is_numeric( $price ) || ! self::wcml_converts_product_prices() ) {
+			return $price;
+		}
+
+		return apply_filters( 'wcml_raw_price_amount', (float) $price );
+	}
+
+	/**
+	 * Store-currency amount of a price WCML converted for this request.
+	 *
+	 * @param mixed $price Amount in the WCML client currency.
+	 * @return mixed
+	 */
+	public static function wcml_store_currency_price( $price ) {
+		global $woocommerce_wpml;
+
+		$prices = $woocommerce_wpml->multi_currency->prices ?? null;
+
+		if ( ! is_numeric( $price ) || ! is_object( $prices ) || ! method_exists( $prices, 'unconvert_price_amount' ) || ! self::wcml_converts_product_prices() ) {
+			return $price;
+		}
+
+		return $prices->unconvert_price_amount( (float) $price );
+	}
+
+	/**
 	 * Whether CURCY's own PPOM integration is loaded. It hooks ppom_option_price and
 	 * ppom_cart_fixed_fee itself, so PPOM's CURCY conversion must step aside (#755).
 	 *
@@ -2024,6 +2073,24 @@ final class Helpers {
 	}
 
 	/**
+	 * Option price for the legacy cart line: flat prices in the currency the line is
+	 * priced in, while a percentage already is a share of that line's base price.
+	 *
+	 * @param mixed $field_meta   Field settings.
+	 * @param mixed $option_label Selected option label.
+	 * @return mixed
+	 */
+	private static function get_field_option_line_price( $field_meta, $option_label ) {
+		$price = self::get_field_option_raw_price( $field_meta, $option_label );
+
+		if ( false !== strpos( (string) self::get_field_option_stored_price( $field_meta, $option_label ), '%' ) ) {
+			return $price;
+		}
+
+		return self::convert_to_wcml_line_currency( $price );
+	}
+
+	/**
 	 * Option price exactly as saved in the field settings.
 	 *
 	 * @param mixed $field_meta   Field settings.
@@ -2048,8 +2115,16 @@ final class Helpers {
 		return $option_price;
 	}
 
-	// Getting field option price by ID
-	public static function get_field_option_price_by_id( $option, $product, $ppom_meta_ids ) {
+	/**
+	 * Getting field option price by ID.
+	 *
+	 * @param array<string, mixed>  $option           Cart payload row with data_name and option_id.
+	 * @param \WC_Product           $product          Product of the cart line; percentage prices need it.
+	 * @param string|int|array<int> $ppom_meta_ids    PPOM field group ids.
+	 * @param bool                  $in_line_currency Return a flat price in the currency the cart line is priced in.
+	 * @return mixed
+	 */
+	public static function get_field_option_price_by_id( $option, $product, $ppom_meta_ids, bool $in_line_currency = false ) {
 
 		$data_name = isset( $option['data_name'] ) ? $option['data_name'] : '';
 		$option_id = isset( $option['option_id'] ) ? $option['option_id'] : '';
@@ -2077,7 +2152,7 @@ final class Helpers {
 			return 0;
 		}
 
-		$option_price = 0;
+		$saved_price = '';
 
 		switch ( $field_type ) {
 
@@ -2087,14 +2162,7 @@ final class Helpers {
 
 						$image_id = $field_meta['data_name'] . '-' . $option['id'];
 						if ( $image_id == $option_id && isset( $option['price'] ) && $option['price'] != '' ) {
-
-							if ( strpos( $option['price'], '%' ) !== false ) {
-								$option_price = Engine::get_amount_after_percentage( $product->get_price(), $option['price'] );
-							} else {
-								// For currency switcher
-								// $option_price = apply_filters('ppom_option_price', $option['price']);
-								$option_price = $option['price'];
-							}
+							$saved_price = (string) $option['price'];
 						}
 					}
 				}
@@ -2105,22 +2173,36 @@ final class Helpers {
 					foreach ( $field_meta['options'] as $option ) {
 
 						if ( $option['id'] == $option_id && isset( $option['price'] ) && $option['price'] != '' ) {
-
-							if ( strpos( $option['price'], '%' ) !== false ) {
-								$option_price = Engine::get_amount_after_percentage( $product->get_price(), $option['price'] );
-							} else {
-								// For currency switcher
-								// $option_price = apply_filters('ppom_option_price', $option['price']);
-								$option_price = $option['price'];
-							}
+							$saved_price = (string) $option['price'];
 						}
 					}
 				}
 				break;
 		}
 
+		$option_price = self::saved_option_amount( $saved_price, $product, $in_line_currency );
 
 		return apply_filters( 'ppom_field_option_price_by_id', wc_format_decimal( $option_price ), $field_meta, $option_id, $product );
+	}
+
+	/**
+	 * Amount of a saved option price: a percentage of the product price, or the flat price.
+	 *
+	 * @param string      $saved_price      Saved option price, empty when no option matched.
+	 * @param \WC_Product $product          Product of the cart line.
+	 * @param bool        $in_line_currency Convert a flat price to the currency the cart line is priced in.
+	 * @return mixed
+	 */
+	private static function saved_option_amount( string $saved_price, $product, bool $in_line_currency ) {
+		if ( '' === $saved_price ) {
+			return 0;
+		}
+
+		if ( false !== strpos( $saved_price, '%' ) ) {
+			return Engine::get_amount_after_percentage( $product->get_price(), $saved_price );
+		}
+
+		return $in_line_currency ? self::convert_to_wcml_line_currency( $saved_price ) : $saved_price;
 	}
 
 	// Getting field option weight by ID
@@ -2468,7 +2550,7 @@ final class Helpers {
 
 			if ( is_array( $value ) ) {
 				foreach ( $value as $cb_value ) {
-					$price = self::get_field_option_raw_price( $field_meta, $cb_value );
+					$price = self::get_field_option_line_price( $field_meta, $cb_value );
 					if ( 0 != $price ) {
 						$option_prices[] = array(
 							'apply'     => $apply,
@@ -2478,7 +2560,7 @@ final class Helpers {
 					}
 				}
 			} else {
-				$price = self::get_field_option_raw_price( $field_meta, $value );
+				$price = self::get_field_option_line_price( $field_meta, $value );
 				if ( 0 != $price ) {
 					$option_prices[] = array(
 						'apply'     => $apply,

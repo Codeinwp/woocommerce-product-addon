@@ -512,7 +512,7 @@ final class CartHandler {
 				if ( isset( $option['apply'] ) && ( 'variable' === $option['apply'] || 'onetime' === $option['apply'] ) ) {
 					$resolved_line_price = isset( $option['price'] ) ? $option['price'] : 0;
 					if ( isset( $option['data_name'] ) && isset( $option['option_id'] ) ) {
-						$resolved_line_price = Helpers::get_field_option_price_by_id( $option, $wc_product, $ppom_meta_ids );
+						$resolved_line_price = Helpers::get_field_option_price_by_id( $option, $wc_product, $ppom_meta_ids, true );
 					}
 				}
 
@@ -1087,7 +1087,8 @@ final class CartHandler {
 	/**
 	 * Turns a saved amount into the figure the cart shows.
 	 *
-	 * Percentages resolve against the product base price. The amount stays net, because
+	 * Percentages resolve against the store-currency product base price, so callers
+	 * convert flat and percentage amounts the same way. The amount stays net, because
 	 * the tax display transformation belongs to the display path alone.
 	 *
 	 * @param mixed       $amount  Saved amount, possibly a percentage.
@@ -1103,7 +1104,7 @@ final class CartHandler {
 		$amount = (string) $amount;
 
 		if ( false !== strpos( $amount, '%' ) ) {
-			$base   = Callbacks::convert_price_back( Helpers::get_product_price( $product, null, 'cart' ) );
+			$base   = Helpers::wcml_store_currency_price( Callbacks::convert_price_back( Helpers::get_product_price( $product, null, 'cart' ) ) );
 			$amount = Engine::get_amount_after_percentage( $base, $amount );
 		}
 

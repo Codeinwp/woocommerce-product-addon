@@ -13,6 +13,8 @@
 
 require_once __DIR__ . '/class-ppom-test-case.php';
 
+use PPOM\WooCommerce\Cart\CartHandler;
+
 class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 
 	const RATE = 10;
@@ -53,7 +55,7 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 
 	/**
 	 * Stands in for WCML's multi-currency object, which reports whether product
-	 * prices are converted in the current request.
+	 * prices are converted in the current request and converts them back.
 	 */
 	private function set_wcml_loads_product_prices( bool $loads ): void {
 		$GLOBALS['woocommerce_wpml'] = (object) array(
@@ -61,8 +63,19 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 				/** @var bool */
 				public $loads_prices;
 
+				/** @var object */
+				public $prices;
+
 				public function __construct( bool $loads_prices ) {
 					$this->loads_prices = $loads_prices;
+					$this->prices       = new class() {
+						/**
+						 * @param float $amount Client-currency amount.
+						 */
+						public function unconvert_price_amount( float $amount ): float {
+							return $amount / Test_Wcml_Cart_Option_Conversion::RATE;
+						}
+					};
 				}
 
 				public function are_filters_need_loading(): bool {
@@ -248,5 +261,118 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$ppom->maybe_register_option_price_hook();
 
 		$this->assertFalse( has_filter( 'ppom_fields_prices', array( $ppom, 'convert_cart_rows_wcml' ) ), 'PPOM Pro converts the rows itself; converting here too would apply the rate twice.' );
+	}
+
+	/**
+	 * Prices a legacy-mode (ppom_legacy_price) cart line the way its cart hooks do.
+	 * Legacy hooks are registered at plugin load, so the handlers are called directly.
+	 *
+	 * @param list<array<string, mixed>>              $fields  Field definitions.
+	 * @param array<string, string>                   $posted  Submitted field values.
+	 * @param list<array<string, string>>|null        $payload Browser-built option rows, or null for the server fallback.
+	 * @return array{line: float, fees: list<float>, subtotal: string} Fees in ascending order.
+	 */
+	private function legacy_cart( array $fields, array $posted, ?array $payload ): array {
+		$product = $this->create_simple_product( array( 'regular_price' => (string) ( 10 * self::RATE ) ) );
+		$meta_id = $this->insert_ppom_meta( $fields, $product->get_id() );
+
+		$this->initialize_woocommerce_checkout_context();
+		$key  = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$ppom = array( 'fields' => array( 'id' => $meta_id ) + $posted );
+		if ( null !== $payload ) {
+			$ppom['ppom_option_price'] = wp_json_encode( $payload );
+		}
+		WC()->cart->cart_contents[ $key ]['ppom'] = $ppom;
+
+		$item = CartHandler::update_cart_fees( WC()->cart->cart_contents[ $key ], WC()->cart->cart_contents[ $key ] );
+
+		WC()->cart->cart_contents[ $key ]['data'] = $item['data'];
+		WC()->cart->fees_api()->remove_all_fees();
+		CartHandler::add_fixed_fee( WC()->cart );
+
+		$fees = array();
+		foreach ( WC()->cart->fees_api()->get_fees() as $fee ) {
+			$fees[] = (float) $fee->amount;
+		}
+		sort( $fees );
+
+		return array(
+			'line'     => (float) $item['data']->get_price( 'edit' ),
+			'fees'     => $fees,
+			'subtotal' => wp_strip_all_tags( (string) CartHandler::item_subtotal( '', WC()->cart->cart_contents[ $key ], $key ) ),
+		);
+	}
+
+	/**
+	 * Select field with one priced option.
+	 *
+	 * @return array{type: 'select', title: string, data_name: string, options: list<array{option: string, price: string, id: string}>, onetime?: 'on'}
+	 */
+	private function priced_select( string $data_name, string $price, bool $onetime = false ): array {
+		$field = array(
+			'type'      => 'select',
+			'title'     => ucfirst( $data_name ),
+			'data_name' => $data_name,
+			'options'   => array( array( 'option' => 'Yes', 'price' => $price, 'id' => 'yes' ) ),
+		);
+
+		return $onetime ? $field + array( 'onetime' => 'on' ) : $field;
+	}
+
+	/**
+	 * Option row as the product page posts it; the server prices it from saved settings.
+	 *
+	 * @return array{label: string, price: '0', apply: string, product_title: string, taxable: '', without_tax: '', option_id: 'yes', data_name: string}
+	 */
+	private function browser_row( string $data_name, string $apply ): array {
+		return array(
+			'label'         => $data_name,
+			'price'         => '0',
+			'apply'         => $apply,
+			'product_title' => 'Product',
+			'taxable'       => '',
+			'without_tax'   => '',
+			'option_id'     => 'yes',
+			'data_name'     => $data_name,
+		);
+	}
+
+	public function test_legacy_line_adds_flat_option_in_client_currency() {
+		$cart = $this->legacy_cart( array( $this->priced_select( 'upgrade', '5' ) ), array( 'upgrade' => 'Yes' ), array( $this->browser_row( 'upgrade', 'variable' ) ) );
+
+		$this->assertEqualsWithDelta( 150.0, $cart['line'], 0.001, 'Converted base 100 + option 5 x rate.' );
+	}
+
+	public function test_legacy_line_keeps_percent_option_taken_from_converted_base() {
+		$cart = $this->legacy_cart(
+			array( $this->priced_select( 'upgrade', '10%' ), $this->priced_select( 'gift', '5' ) ),
+			array( 'upgrade' => 'Yes', 'gift' => 'Yes' ),
+			array( $this->browser_row( 'upgrade', 'variable' ), $this->browser_row( 'gift', 'variable' ) )
+		);
+
+		$this->assertEqualsWithDelta( 160.0, $cart['line'], 0.001, 'Base 100 + 10% of it, not converted again + gift 5 x rate.' );
+	}
+
+	public function test_legacy_server_built_payload_adds_flat_option_in_client_currency() {
+		$cart = $this->legacy_cart( array( $this->priced_select( 'upgrade', '5' ) ), array( 'upgrade' => 'Yes' ), null );
+
+		$this->assertEqualsWithDelta( 150.0, $cart['line'], 0.001, 'Without a posted payload the server builds one; base 100 + option 5 x rate.' );
+	}
+
+	public function test_legacy_percent_one_time_fee_is_converted_once() {
+		$cart = $this->legacy_cart(
+			array( $this->priced_select( 'setup', '10%', true ), $this->priced_select( 'wrap', '5', true ) ),
+			array( 'setup' => 'Yes', 'wrap' => 'Yes' ),
+			array( $this->browser_row( 'setup', 'onetime' ), $this->browser_row( 'wrap', 'onetime' ) )
+		);
+
+		$this->assertEqualsWithDelta( array( 10.0, 50.0 ), $cart['fees'], 0.001, 'Fees: 10% of the converted base 100, and 5 x rate.' );
+		$this->assertEqualsWithDelta( 100.0, $cart['line'], 0.001, 'One-time fees are not added to the line.' );
+	}
+
+	public function test_legacy_percent_one_time_fee_row_subtotal_is_converted_once() {
+		$cart = $this->legacy_cart( array( $this->priced_select( 'setup', '10%', true ) ), array( 'setup' => 'Yes' ), array( $this->browser_row( 'setup', 'onetime' ) ) );
+
+		$this->assertStringContainsString( '110.00', $cart['subtotal'], 'Row subtotal: base 100 + fee 10% of it.' );
 	}
 }
