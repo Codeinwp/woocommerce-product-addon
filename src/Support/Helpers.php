@@ -2073,21 +2073,24 @@ final class Helpers {
 	}
 
 	/**
-	 * Option price for the legacy cart line: flat prices in the currency the line is
-	 * priced in, while a percentage already is a share of that line's base price.
+	 * Option price for the legacy cart line: a flat price in the currency the line is
+	 * priced in, or a percentage of the product price, which already is in it.
 	 *
-	 * @param array<mixed>|string $field_meta   Field settings, as get_field_meta_by_dataname() returns them.
-	 * @param mixed               $option_label Selected option label.
+	 * @param array<mixed>|string    $field_meta   Field settings, as get_field_meta_by_dataname() returns them.
+	 * @param mixed                  $option_label Selected option label.
+	 * @param \WC_Product|false|null $product      Product of the cart line, as wc_get_product() returns it.
 	 * @return mixed
 	 */
-	private static function get_field_option_line_price( $field_meta, $option_label ) {
-		$price = self::get_field_option_raw_price( $field_meta, $option_label );
+	private static function get_field_option_line_price( $field_meta, $option_label, $product ) {
+		$stored_price = (string) self::get_field_option_stored_price( $field_meta, $option_label );
 
-		if ( false !== strpos( (string) self::get_field_option_stored_price( $field_meta, $option_label ), '%' ) ) {
-			return $price;
+		if ( false === strpos( $stored_price, '%' ) ) {
+			return self::convert_to_wcml_line_currency( self::get_field_option_raw_price( $field_meta, $option_label ) );
 		}
 
-		return self::convert_to_wcml_line_currency( $price );
+		$amount = $product instanceof \WC_Product ? Engine::get_amount_after_percentage( $product->get_price(), $stored_price ) : 0;
+
+		return apply_filters( 'ppom_field_option_price', wc_format_decimal( $amount ), $field_meta, $option_label );
 	}
 
 	/**
@@ -2538,6 +2541,7 @@ final class Helpers {
 
 		$option_prices = array();
 		$ppom_id       = isset( $fields_posted['id'] ) ? $fields_posted['id'] : null;
+		$product       = wc_get_product( $product_id );
 
 		foreach ( $fields_posted as $data_name => $value ) {
 
@@ -2550,7 +2554,7 @@ final class Helpers {
 
 			if ( is_array( $value ) ) {
 				foreach ( $value as $cb_value ) {
-					$price = self::get_field_option_line_price( $field_meta, $cb_value );
+					$price = self::get_field_option_line_price( $field_meta, $cb_value, $product );
 					if ( 0 != $price ) {
 						$option_prices[] = array(
 							'apply'     => $apply,
@@ -2560,7 +2564,7 @@ final class Helpers {
 					}
 				}
 			} else {
-				$price = self::get_field_option_line_price( $field_meta, $value );
+				$price = self::get_field_option_line_price( $field_meta, $value, $product );
 				if ( 0 != $price ) {
 					$option_prices[] = array(
 						'apply'     => $apply,

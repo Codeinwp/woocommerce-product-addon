@@ -267,10 +267,11 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 	 * @param list<array<string, mixed>>              $fields  Field definitions.
 	 * @param array<string, string>                   $posted  Submitted field values.
 	 * @param list<array<string, string>>|null        $payload Browser-built option rows, or null for the server fallback.
+	 * @param float                                   $base    Product price, already in the WCML client currency.
 	 * @return array{line: float, fees: list<float>, subtotal: string} Fees in ascending order.
 	 */
-	private function legacy_cart( array $fields, array $posted, ?array $payload ): array {
-		$product = $this->create_simple_product( array( 'regular_price' => (string) ( 10 * self::RATE ) ) );
+	private function legacy_cart( array $fields, array $posted, ?array $payload, float $base = 10 * self::RATE ): array {
+		$product = $this->create_simple_product( array( 'regular_price' => (string) $base ) );
 		$meta_id = $this->insert_ppom_meta( $fields, $product->get_id() );
 
 		$this->initialize_woocommerce_checkout_context();
@@ -354,6 +355,12 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		$cart = $this->legacy_cart( array( $this->priced_select( 'upgrade', '5' ) ), array( 'upgrade' => 'Yes' ), null );
 
 		$this->assertEqualsWithDelta( 150.0, $cart['line'], 0.001, 'Without a posted payload the server builds one; base 100 + option 5 x rate.' );
+	}
+
+	public function test_legacy_server_built_payload_takes_percent_option_from_converted_base(): void {
+		$cart = $this->legacy_cart( array( $this->priced_select( 'upgrade', '10%' ) ), array( 'upgrade' => 'Yes' ), null, 200.0 );
+
+		$this->assertEqualsWithDelta( 220.0, $cart['line'], 0.001, 'Base 200 + 10% of it; the bare number 10 gave 210.' );
 	}
 
 	public function test_legacy_percent_one_time_fee_is_converted_once(): void {
