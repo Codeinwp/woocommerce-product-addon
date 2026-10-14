@@ -124,6 +124,40 @@ class Test_Product_Handler extends PPOM_Test_Case {
 	}
 
 	/**
+	 * The server-built payload takes a percentage option of the selected variation's
+	 * price, not of the parent's, which is the cheapest variation.
+	 */
+	public function test_validate_product_legacy_mode_prices_percent_option_from_selected_variation(): void {
+		$created = $this->create_variable_product_with_variation( array(), array( 'regular_price' => '200' ) );
+		$parent  = $created['product'];
+		$cheaper = new WC_Product_Variation();
+		$cheaper->set_parent_id( $parent->get_id() );
+		$cheaper->set_status( 'publish' );
+		$cheaper->set_regular_price( '100' );
+		$cheaper->save();
+		WC_Product_Variable::sync( $parent->get_id() );
+
+		$meta_id = $this->insert_ppom_meta(
+			array( $this->build_select_field( 'upgrade', 'Upgrade', array( array( 'option' => 'Yes', 'price' => '10%' ) ) ) ),
+			$parent->get_id()
+		);
+
+		$this->set_ppom_option( 'ppom_legacy_price', 'yes' );
+
+		$_POST['ppom'] = array(
+			'fields' => array(
+				'id'      => (string) $meta_id,
+				'upgrade' => 'Yes',
+			),
+		);
+
+		$this->assertTrue( ProductHandler::validate_product( true, $parent->get_id(), 1, $created['variation']->get_id() ) );
+
+		$decoded = json_decode( $_POST['ppom']['ppom_option_price'], true );
+		$this->assertEqualsWithDelta( 20.0, (float) $decoded[0]['price'], 0.001, '10% of the 200 variation, not of the 100 one.' );
+	}
+
+	/**
 	 * When ppom_option_price is already populated, validate_product() must
 	 * leave it untouched and pass validation normally.
 	 *
