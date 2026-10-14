@@ -598,7 +598,7 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 		$filters = $this->simulate_curcy_product_price();
 		$product = $this->create_product_with_priced_select();
 
-		$vars = $this->capture_legacy_input_vars( $product->get_id() );
+		$vars = $this->capture_frontend_input_vars( $product->get_id() );
 
 		$this->remove_curcy_product_price( $filters );
 
@@ -607,12 +607,16 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 	}
 
 	/**
-	 * Without CURCY's integration the summary base is the filtered product price, untouched.
+	 * Without CURCY's integration the summary base is the filtered product price, untouched,
+	 * even when wmc_get_price() exists.
 	 */
 	public function test_summary_base_price_is_unchanged_without_curcy(): void {
+		$wmc     = $this->stub_wmc_get_price();
 		$product = $this->create_product_with_priced_select();
 
 		$vars = \PPOM\Arrays\Settings::get_js_input_vars( $product );
+
+		remove_filter( 'ppom_test_wmc_get_price', $wmc );
 
 		$this->assertEqualsWithDelta( 100.0, (float) $vars['wc_product_price'], 0.0001 );
 	}
@@ -644,9 +648,6 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 	 * @return array{get_price: callable(mixed): mixed, revert: callable(mixed): float, wmc: callable(mixed): float}
 	 */
 	private function simulate_curcy_product_price(): array {
-		if ( ! function_exists( 'wmc_get_price' ) ) {
-			eval( 'function wmc_get_price( $price ) { return apply_filters( "ppom_test_wmc_get_price", $price ); }' );
-		}
 		$filters = array(
 			'get_price' => static function ( $price ) {
 				return '' === $price ? $price : (float) $price * self::RATE;
@@ -654,16 +655,30 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 			'revert'    => static function ( $price ): float {
 				return (float) $price / self::RATE;
 			},
-			'wmc'       => static function ( $price ): float {
-				return (float) $price * self::RATE;
-			},
+			'wmc'       => $this->stub_wmc_get_price(),
 		);
 		add_filter( 'ppom_curcy_integration_active', '__return_true' );
 		add_filter( 'woocommerce_product_get_price', $filters['get_price'], 99 );
 		add_filter( 'ppom_product_price', $filters['revert'] );
-		add_filter( 'ppom_test_wmc_get_price', $filters['wmc'] );
 
 		return $filters;
+	}
+
+	/**
+	 * Makes wmc_get_price() available and converting at RATE.
+	 *
+	 * @return callable(mixed): float The ppom_test_wmc_get_price filter to remove afterwards.
+	 */
+	private function stub_wmc_get_price(): callable {
+		if ( ! function_exists( 'wmc_get_price' ) ) {
+			eval( 'function wmc_get_price( $price ) { return apply_filters( "ppom_test_wmc_get_price", $price ); }' );
+		}
+		$wmc = static function ( $price ): float {
+			return (float) $price * self::RATE;
+		};
+		add_filter( 'ppom_test_wmc_get_price', $wmc );
+
+		return $wmc;
 	}
 
 	/**
@@ -674,35 +689,5 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 		remove_filter( 'woocommerce_product_get_price', $filters['get_price'], 99 );
 		remove_filter( 'ppom_product_price', $filters['revert'] );
 		remove_filter( 'ppom_test_wmc_get_price', $filters['wmc'] );
-	}
-
-	/**
-	 * Runs the legacy frontend loader and returns the captured ppom_input_vars.
-	 *
-	 * @return array<string, mixed>|null Null when the loader localized nothing.
-	 */
-	private function capture_legacy_input_vars( int $product_id ): ?array {
-		PPOM_FRONTEND_SCRIPTS::init();
-		$reflection = new ReflectionClass( 'PPOM_FRONTEND_SCRIPTS' );
-		foreach ( array( 'get_scripts' => 'register_scripts', 'get_styles' => 'register_styles' ) as $getter => $register ) {
-			$method = $reflection->getMethod( $getter );
-			$method->setAccessible( true );
-			PPOM_SCRIPTS::$register( $method->invoke( null ) );
-		}
-
-		$captured = null;
-		$filter   = static function ( $vars ) use ( &$captured ) {
-			$captured = $vars;
-			return $vars;
-		};
-		add_filter( 'ppom_input_vars', $filter );
-
-		try {
-			PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id( $product_id );
-		} finally {
-			remove_filter( 'ppom_input_vars', $filter );
-		}
-
-		return $captured;
 	}
 }
