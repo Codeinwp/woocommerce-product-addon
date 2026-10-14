@@ -236,7 +236,7 @@ final class ProductHandler {
 					return $passed;
 				}
 
-				$computed = Helpers::compute_option_price_from_fields( $fields, $product_id );
+				$computed = Helpers::compute_option_price_from_fields( $fields, $product_id, wc_get_product( $variation_id ? $variation_id : $product_id ) );
 				if ( ! empty( $computed ) ) {
 					$_POST['ppom']['ppom_option_price'] = wp_json_encode( $computed );
 					return $passed;

@@ -919,8 +919,9 @@ class NM_PersonalizedProduct {
 	}
 
 	/**
-	 * Register the core ppom_option_price conversion hook only when PPOM Pro
-	 * has not already registered ppom_hooks_convert_price on the same filter.
+	 * Register the core ppom_option_price conversion hook and the WCML cart row
+	 * pass only when PPOM Pro has not already registered ppom_hooks_convert_price
+	 * on the same filter. Running Pro registers both conversions itself.
 	 *
 	 * Called from __construct() on woocommerce_init — after every plugin has
 	 * loaded — so has_filter() reflects the final registration state. Exposed
@@ -932,7 +933,30 @@ class NM_PersonalizedProduct {
 	public function maybe_register_option_price_hook() {
 		if ( ! has_filter( 'ppom_option_price', 'ppom_hooks_convert_price' ) ) {
 			add_filter( 'ppom_option_price', array( $this, 'ppom_convert_price' ), 99, 1 );
+			add_filter( 'ppom_fields_prices', array( $this, 'convert_cart_rows_wcml' ), 10, 1 );
 		}
+	}
+
+	/**
+	 * Convert cart charge rows to the WCML client currency.
+	 *
+	 * WCML converts the product price when its meta is read, not the cart line,
+	 * so option rows must be converted to match the base. One-time fees are
+	 * converted when the fee is added, and percent rows are already a share of
+	 * the converted base.
+	 *
+	 * @param array<int, array<string, mixed>> $field_prices Charge rows from Engine::get_field_prices().
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function convert_cart_rows_wcml( $field_prices ) {
+		foreach ( $field_prices as $index => $row ) {
+			if ( ! isset( $row['price'] ) || 'cart_fee' === ( $row['apply'] ?? '' ) || ! empty( $row['is_percent'] ) ) {
+				continue;
+			}
+			$field_prices[ $index ]['price'] = \PPOM\Support\Helpers::convert_to_wcml_line_currency( $row['price'] );
+		}
+
+		return $field_prices;
 	}
 
 	/**
