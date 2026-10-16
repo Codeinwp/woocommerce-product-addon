@@ -643,9 +643,7 @@ final class Settings {
 		$js_vars['wc_currency_pos']           = get_option( 'woocommerce_currency_pos' );
 		$js_vars['wc_decimal_sep']            = get_option( 'woocommerce_price_decimal_sep' );
 		$js_vars['wc_no_decimal']             = $decimal_palces;
-		$variation_id                         = '';
-		$context                              = 'product';
-		$js_vars['wc_product_price']          = Helpers::get_product_price( $product, $variation_id, $context );
+		$js_vars['wc_product_price']          = Helpers::get_product_display_price( $product );
 		$js_vars['wc_product_regular_price']  = Helpers::get_product_regular_price( $product );
 		$ppom_label_discount_price            = Helpers::get_option( 'ppom_label_discount_price', __( 'Discount Price', 'woocommerce-product-addon' ) );
 		$ppom_label_product_price             = Helpers::get_option( 'ppom_label_product_price', __( 'Product Price', 'woocommerce-product-addon' ) );

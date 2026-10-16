@@ -215,6 +215,13 @@ class Test_Order_Handler extends PPOM_Test_Case {
 					'fields' => array( 'size' => 'L' ),
 				);
 			}
+
+			/**
+			 * @return int
+			 */
+			public function get_product_id(): int {
+				return 0;
+			}
 		};
 
 		$out = OrderHandler::wc_order_again_compatibility( $cart, $item, null );

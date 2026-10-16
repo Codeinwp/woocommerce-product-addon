@@ -42,29 +42,7 @@ class Test_Bulkquantity_Options_Regression extends PPOM_Test_Case {
 		$product = $this->create_simple_product();
 		$this->insert_ppom_meta( array( $this->bulkquantity_field( wp_json_encode( $this->bulkquantity_rows() ) ) ), $product->get_id() );
 
-		PPOM_FRONTEND_SCRIPTS::init();
-		$reflection = new ReflectionClass( 'PPOM_FRONTEND_SCRIPTS' );
-
-		$get_scripts = $reflection->getMethod( 'get_scripts' );
-		$get_scripts->setAccessible( true );
-		PPOM_SCRIPTS::register_scripts( $get_scripts->invoke( null ) );
-
-		$get_styles = $reflection->getMethod( 'get_styles' );
-		$get_styles->setAccessible( true );
-		PPOM_SCRIPTS::register_styles( $get_styles->invoke( null ) );
-
-		$captured = null;
-		$filter   = static function ( $vars ) use ( &$captured ) {
-			$captured = $vars;
-			return $vars;
-		};
-		add_filter( 'ppom_input_vars', $filter, 10, 1 );
-
-		try {
-			PPOM_FRONTEND_SCRIPTS::load_scripts_by_product_id( $product->get_id() );
-		} finally {
-			remove_filter( 'ppom_input_vars', $filter, 10 );
-		}
+		$captured = $this->capture_frontend_input_vars( $product->get_id() );
 
 		$this->assertIsArray( $captured );
 		$this->assertSame( 'bulkquantity', $captured['field_meta'][0]['type'] );

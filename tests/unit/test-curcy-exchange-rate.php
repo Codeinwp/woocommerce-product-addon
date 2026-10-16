@@ -573,4 +573,121 @@ class Test_Curcy_Exchange_Rate extends PPOM_Test_Case {
 		$this->assertCount( 1, $rows );
 		$this->assertEqualsWithDelta( 10.0, (float) $rows[0]['price'], 0.0001, 'Stored 5, adjusted x2, not converted.' );
 	}
+
+	/**
+	 * CURCY reverts ppom_product_price to store currency for server-side pricing.
+	 * The price summary base must still be sent to the browser in the selected currency.
+	 */
+	public function test_summary_base_price_is_in_selected_currency_under_curcy(): void {
+		$filters = $this->simulate_curcy_product_price();
+		$product = $this->create_product_with_priced_select();
+
+		$vars         = \PPOM\Arrays\Settings::get_js_input_vars( $product );
+		$server_price = Helpers::get_product_price( $product );
+
+		$this->remove_curcy_product_price( $filters );
+
+		$this->assertEqualsWithDelta( 1000.0, (float) $vars['wc_product_price'], 0.0001, 'Shown as 100 x rate.' );
+		$this->assertEqualsWithDelta( 100.0, (float) $server_price, 0.0001, 'Server-side pricing stays in store currency.' );
+	}
+
+	/**
+	 * The legacy script loader sends the same base price as the current one.
+	 */
+	public function test_legacy_loader_summary_base_price_is_in_selected_currency_under_curcy(): void {
+		$filters = $this->simulate_curcy_product_price();
+		$product = $this->create_product_with_priced_select();
+
+		$vars = $this->capture_frontend_input_vars( $product->get_id() );
+
+		$this->remove_curcy_product_price( $filters );
+
+		$this->assertIsArray( $vars );
+		$this->assertEqualsWithDelta( 1000.0, (float) $vars['wc_product_price'], 0.0001 );
+	}
+
+	/**
+	 * Without CURCY's integration the summary base is the filtered product price, untouched,
+	 * even when wmc_get_price() exists.
+	 */
+	public function test_summary_base_price_is_unchanged_without_curcy(): void {
+		$wmc     = $this->stub_wmc_get_price();
+		$product = $this->create_product_with_priced_select();
+
+		$vars = \PPOM\Arrays\Settings::get_js_input_vars( $product );
+
+		remove_filter( 'ppom_test_wmc_get_price', $wmc );
+
+		$this->assertEqualsWithDelta( 100.0, (float) $vars['wc_product_price'], 0.0001 );
+	}
+
+	/**
+	 * A 100 product with a select field whose option costs 50.
+	 */
+	private function create_product_with_priced_select(): WC_Product {
+		$product = $this->create_simple_product( array( 'regular_price' => '100' ) );
+		$this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'select',
+					'title'     => 'Wrap',
+					'data_name' => 'wrap',
+					'options'   => array( array( 'option' => 'Premium', 'price' => '50', 'id' => 'premium' ) ),
+				),
+			),
+			$product->get_id()
+		);
+
+		return $product;
+	}
+
+	/**
+	 * Mirrors CURCY: product prices read converted, ppom_product_price reverts them,
+	 * and wmc_get_price() converts at the same rate.
+	 *
+	 * @return array{get_price: callable(mixed): mixed, revert: callable(mixed): float, wmc: callable(mixed): float}
+	 */
+	private function simulate_curcy_product_price(): array {
+		$filters = array(
+			'get_price' => static function ( $price ) {
+				return '' === $price ? $price : (float) $price * self::RATE;
+			},
+			'revert'    => static function ( $price ): float {
+				return (float) $price / self::RATE;
+			},
+			'wmc'       => $this->stub_wmc_get_price(),
+		);
+		add_filter( 'ppom_curcy_integration_active', '__return_true' );
+		add_filter( 'woocommerce_product_get_price', $filters['get_price'], 99 );
+		add_filter( 'ppom_product_price', $filters['revert'] );
+
+		return $filters;
+	}
+
+	/**
+	 * Makes wmc_get_price() available and converting at RATE.
+	 *
+	 * @return callable(mixed): float The ppom_test_wmc_get_price filter to remove afterwards.
+	 */
+	private function stub_wmc_get_price(): callable {
+		if ( ! function_exists( 'wmc_get_price' ) ) {
+			eval( 'function wmc_get_price( $price ) { return apply_filters( "ppom_test_wmc_get_price", $price ); }' );
+		}
+		$wmc = static function ( $price ): float {
+			return (float) $price * self::RATE;
+		};
+		add_filter( 'ppom_test_wmc_get_price', $wmc );
+
+		return $wmc;
+	}
+
+	/**
+	 * @param array{get_price: callable(mixed): mixed, revert: callable(mixed): float, wmc: callable(mixed): float} $filters Filters from simulate_curcy_product_price().
+	 */
+	private function remove_curcy_product_price( array $filters ): void {
+		remove_filter( 'ppom_curcy_integration_active', '__return_true' );
+		remove_filter( 'woocommerce_product_get_price', $filters['get_price'], 99 );
+		remove_filter( 'ppom_product_price', $filters['revert'] );
+		remove_filter( 'ppom_test_wmc_get_price', $filters['wmc'] );
+	}
 }

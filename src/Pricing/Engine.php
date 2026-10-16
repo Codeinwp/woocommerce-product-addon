@@ -21,6 +21,13 @@ use PPOM\Support\Helpers;
 final class Engine {
 
 	/**
+	 * Field types whose options can be priced as a percentage of the product price.
+	 *
+	 * @var list<'select'|'radio'|'checkbox'|'multiple_select'|'cropper'|'palettes'|'imageselect'|'image'|'audio'>
+	 */
+	private const PERCENT_PRICED_FIELD_TYPES = array( 'select', 'radio', 'checkbox', 'multiple_select', 'cropper', 'palettes', 'imageselect', 'image', 'audio' );
+
+	/**
 	 * Stores the last base price and last written price for each cart line,
 	 * so repeated totals passes can detect whether a third party has changed
 	 * the line's price since PPOM last priced it.
@@ -295,7 +302,7 @@ final class Engine {
 	 * @param int|string                $variation_id     Variation ID.
 	 * @param array<string, mixed>|null $item             Cart item context.
 	 *
-	 * @return array<string, mixed>
+	 * @return array<int, array<string, mixed>>
 	 *
 	 * @see Helpers::get_field_meta_by_dataname()
 	 * @see self::price_get_product_base()
@@ -967,8 +974,8 @@ final class Engine {
 		$option_label = isset( $option['raw'] ) ? $option['raw'] : '';
 		$without_tax  = isset( $option['without_tax'] ) ? $option['without_tax'] : '';
 
-		// Charge rows stay in store currency: the switcher converts the cart line on read
-		// and Pro's WPML pass converts these rows itself. Only the label is display (#755).
+		// Charge rows stay in store currency: switchers convert the cart line on read, and
+		// the WCML pass on ppom_fields_prices converts the rows. Only the label is converted here.
 		$label_price = "{$field_title} - " . wc_price( apply_filters( 'ppom_option_price', $field_price ) );
 		// For bulkquantity
 		$base_price = isset( $option['Base Price'] ) ? $option['Base Price'] : '';
@@ -994,12 +1001,31 @@ final class Engine {
 				'option_label' => $option_label,
 				'quantity'     => $qty,
 				'base_price'   => $base_price,
+				'is_percent'   => self::is_percent_option_price( $option, $field_type ),
 			),
 			$field_meta,
 			$field_price,
 			$option,
 			$qty
 		);
+	}
+
+	/**
+	 * Whether a charge row's price is a percentage of the product price, using
+	 * the checkbox discount over the option price as get_field_prices() does.
+	 * Percentage detection is restricted to the listed saved-option field types.
+	 *
+	 * @param array<string, mixed>|string $option     Option the row was priced from.
+	 * @param string                      $field_type Saved field type.
+	 * @return bool
+	 */
+	private static function is_percent_option_price( $option, string $field_type ): bool {
+		if ( ! in_array( $field_type, self::PERCENT_PRICED_FIELD_TYPES, true ) || ! is_array( $option ) ) {
+			return false;
+		}
+		$raw_price = isset( $option['raw_discount'] ) && $option['raw_discount'] > 0 ? $option['raw_discount'] : ( $option['raw_price'] ?? '' );
+
+		return false !== strpos( (string) $raw_price, '%' );
 	}
 
 	// Get total addon price of given Price Array
@@ -1046,6 +1072,27 @@ final class Engine {
 					$total_cart_fee += self::normalize_price_value( $price['price'] );
 				}
 			}
+		}
+
+		return $total_cart_fee;
+	}
+
+	/**
+	 * Total of the one-time fees in the currency the cart line is shown in. Flat fee
+	 * rows are store currency; percentage fees are already a share of the shown price.
+	 *
+	 * @param array<int, array<string, mixed>> $price_array Charge rows from get_field_prices().
+	 * @return float
+	 */
+	public static function price_get_client_cart_fee_total( array $price_array ): float {
+		$total_cart_fee = 0.0;
+
+		foreach ( $price_array as $price ) {
+			if ( 'cart_fee' !== $price['apply'] ) {
+				continue;
+			}
+			$fee_price       = self::normalize_price_value( $price['price'] );
+			$total_cart_fee += empty( $price['is_percent'] ) ? (float) apply_filters( 'ppom_option_price', $fee_price ) : $fee_price;
 		}
 
 		return $total_cart_fee;
@@ -1518,10 +1565,7 @@ final class Engine {
 				$native_product      = wc_get_product( $product_id );
 				$price_tobe_discount = Helpers::get_product_price( $native_product ) * $quantity;
 				if ( $matrix_found['discount'] == 'both' ) {
-					$total_addon_price    = self::price_get_addon_total( $ppom_field_prices );
-					$total_cart_fee_price = self::price_get_cart_fee_total( $ppom_field_prices );
-					// Fee rows are store currency; the line price is what WooCommerce shows, so convert the fees once (#755).
-					$price_tobe_discount  = ( $cart_item_price * $quantity ) + apply_filters( 'ppom_option_price', $total_cart_fee_price );
+					$price_tobe_discount = ( $cart_item_price * $quantity ) + self::price_get_client_cart_fee_total( $ppom_field_prices );
 				}
 
 				// var_dump($price_tobe_discount);
@@ -1555,7 +1599,8 @@ final class Engine {
 
 				$label        = $fee['label'];
 				$option_label = isset( $fee['option_label'] ) ? $fee['option_label'] : '';
-				$fee_price    = Helpers::convert_fee_price( $fee['price'] );
+				// A percentage fee is already a share of the converted product price.
+				$fee_price    = empty( $fee['is_percent'] ) ? Helpers::convert_fee_price( $fee['price'] ) : $fee['price'];
 				$taxable      = $fee['taxable']; // deprecated soon
 
 				$label = "{$label}";
