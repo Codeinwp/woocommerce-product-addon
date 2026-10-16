@@ -381,11 +381,33 @@ final class CartHandler {
 
 		$cart[ Handler::VERIFIED_FILES_KEY ] = Handler::payload_file_names( $cart['ppom'] );
 
-		if ( ! Helpers::is_cart_quantity_updatable( $product_id ) ) {
-			$cart[ self::LINE_KEY ] = wp_generate_uuid4();
+		return self::separate_quantity_controlled_line( $cart, (int) $product_id );
+	}
+
+	/**
+	 * Gives the cart item of a quantity-controlling product its own line.
+	 *
+	 * Sold-individually products keep the shared cart id, which is how
+	 * WooCommerce rejects a second add.
+	 *
+	 * @param array<string, mixed> $cart_item_data Cart item data.
+	 * @param int                  $product_id     Parent product ID.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function separate_quantity_controlled_line( array $cart_item_data, int $product_id ): array {
+		if ( Helpers::is_cart_quantity_updatable( $product_id ) ) {
+			return $cart_item_data;
 		}
 
-		return $cart;
+		$product = wc_get_product( $product_id );
+		if ( $product && $product->is_sold_individually() ) {
+			return $cart_item_data;
+		}
+
+		$cart_item_data[ self::LINE_KEY ] = wp_generate_uuid4();
+
+		return $cart_item_data;
 	}
 
 	/**

@@ -1248,6 +1248,51 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Creates a product with one Quantities field and returns the add-to-cart payload for it.
+	 *
+	 * @param string               $option_price      Price of the single Quantities option.
+	 * @param array<string, mixed> $field_extra       Extra Quantities field settings.
+	 * @param bool                 $sold_individually Whether the product is sold individually.
+	 *
+	 * @return array{product_id: int, payload: array{fields: array{id: string, sizes: array{Small: '4'}}}}
+	 */
+	private function create_quantities_product( string $option_price, array $field_extra = array(), bool $sold_individually = false ): array {
+		$product = $this->create_simple_product( array( 'regular_price' => '20.15' ) );
+		$product->set_sold_individually( $sold_individually );
+		$product->save();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_quantities_field(
+					'sizes',
+					'Sizes',
+					array( array( 'option' => 'Small', 'price' => $option_price, 'id' => 'small' ) ),
+					$field_extra
+				),
+			),
+			$product->get_id()
+		);
+
+		return array(
+			'product_id' => $product->get_id(),
+			'payload'    => array(
+				'fields' => array(
+					'id'    => (string) $meta_id,
+					'sizes' => array( 'Small' => '4' ),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Quantity of each line in the current cart.
+	 *
+	 * @return list<int>
+	 */
+	private function cart_line_quantities(): array {
+		return array_values( wp_list_pluck( WC()->cart->get_cart(), 'quantity' ) );
+	}
+
+	/**
 	 * Adds the same linked Quantities configuration twice and returns the cart line quantities.
 	 *
 	 * @param string $option_price Price of the single Quantities option.
@@ -1257,31 +1302,12 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 */
 	private function add_same_linked_quantities_twice( string $option_price, int $quantity ): array {
 		$this->initialize_woocommerce_checkout_context();
-		WC()->cart->empty_cart();
 
-		$product = $this->create_simple_product( array( 'regular_price' => '20.15' ) );
-		$meta_id = $this->insert_ppom_meta(
-			array(
-				$this->build_quantities_field(
-					'sizes',
-					'Sizes',
-					array( array( 'option' => 'Small', 'price' => $option_price, 'id' => 'small' ) )
-				),
-			),
-			$product->get_id()
-		);
+		$linked = $this->create_quantities_product( $option_price );
+		$this->assertNotFalse( $this->add_product_to_real_cart( $linked['product_id'], $linked['payload'], $quantity ) );
+		$this->assertNotFalse( $this->add_product_to_real_cart( $linked['product_id'], $linked['payload'], $quantity ) );
 
-		$payload = array(
-			'fields' => array(
-				'id'    => (string) $meta_id,
-				'sizes' => array( 'Small' => '4' ),
-			),
-		);
-
-		$this->assertNotFalse( $this->add_product_to_real_cart( $product->get_id(), $payload, $quantity ) );
-		$this->assertNotFalse( $this->add_product_to_real_cart( $product->get_id(), $payload, $quantity ) );
-
-		$quantities = array_values( wp_list_pluck( WC()->cart->get_cart(), 'quantity' ) );
+		$quantities = $this->cart_line_quantities();
 		WC()->cart->empty_cart();
 
 		return $quantities;
@@ -1306,29 +1332,70 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	}
 
 	/**
-	 * Identical adds without a quantity-controlling field still merge into one line.
+	 * Linked adds stay separate while identical unlinked Quantities adds still merge.
 	 *
 	 * @return void
 	 */
-	public function test_identical_adds_without_quantities_field_still_merge(): void {
+	public function test_only_linked_quantities_adds_stay_separate(): void {
 		$this->initialize_woocommerce_checkout_context();
+
+		$linked   = $this->create_quantities_product( '' );
+		$unlinked = $this->create_quantities_product( '', array( 'unlink_order_qty' => 'on' ) );
+
+		$this->add_product_to_real_cart( $linked['product_id'], $linked['payload'], 4 );
+		$this->add_product_to_real_cart( $linked['product_id'], $linked['payload'], 4 );
+		$this->add_product_to_real_cart( $unlinked['product_id'], $unlinked['payload'], 2 );
+		$this->add_product_to_real_cart( $unlinked['product_id'], $unlinked['payload'], 3 );
+
+		$quantities = $this->cart_line_quantities();
 		WC()->cart->empty_cart();
 
-		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
-		$meta_id = $this->insert_ppom_meta( array( $this->build_text_field( 'note' ) ), $product->get_id() );
-		$payload = array(
-			'fields' => array(
-				'id'   => (string) $meta_id,
-				'note' => 'Hello',
-			),
-		);
+		$this->assertSame( array( 4, 4, 5 ), $quantities );
+	}
 
-		$this->add_product_to_real_cart( $product->get_id(), $payload, 2 );
-		$this->add_product_to_real_cart( $product->get_id(), $payload, 3 );
+	/**
+	 * A sold-individually linked Quantities product still rejects a second identical add.
+	 *
+	 * @return void
+	 */
+	public function test_sold_individually_linked_quantities_rejects_second_add(): void {
+		$this->initialize_woocommerce_checkout_context();
 
-		$quantities = array_values( wp_list_pluck( WC()->cart->get_cart(), 'quantity' ) );
+		$linked = $this->create_quantities_product( '', array(), true );
+
+		$this->assertNotFalse( $this->add_product_to_real_cart( $linked['product_id'], $linked['payload'], 4 ) );
+		$second = $this->add_product_to_real_cart( $linked['product_id'], $linked['payload'], 4 );
+
+		$quantities = $this->cart_line_quantities();
+		WC()->cart->empty_cart();
+		wc_clear_notices();
+
+		$this->assertFalse( $second );
+		$this->assertSame( array( 1 ), $quantities );
+	}
+
+	/**
+	 * Order again keeps two identical linked Quantities order lines apart.
+	 *
+	 * @return void
+	 */
+	public function test_order_again_keeps_identical_linked_quantities_lines_apart(): void {
+		$this->initialize_woocommerce_checkout_context();
+
+		$linked = $this->create_quantities_product( '' );
+		$this->add_product_to_real_cart( $linked['product_id'], $linked['payload'], 4 );
+		$this->add_product_to_real_cart( $linked['product_id'], $linked['payload'], 4 );
+
+		$order = $this->create_order_from_real_cart();
 		WC()->cart->empty_cart();
 
-		$this->assertSame( array( 5 ), $quantities );
+		$cart_ids = array();
+		foreach ( $order->get_items() as $item ) {
+			$cart_item_data = apply_filters( 'woocommerce_order_again_cart_item_data', array(), $item, $order );
+			$cart_ids[]     = WC()->cart->generate_cart_id( $item->get_product_id(), $item->get_variation_id(), array(), $cart_item_data );
+		}
+
+		$this->assertCount( 2, $cart_ids );
+		$this->assertCount( 2, array_unique( $cart_ids ) );
 	}
 }
