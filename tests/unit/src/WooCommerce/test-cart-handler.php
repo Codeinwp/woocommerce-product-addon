@@ -1246,4 +1246,89 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 
 		$this->assertSame( Helpers::price( 13 ), $subtotal );
 	}
+
+	/**
+	 * Adds the same linked Quantities configuration twice and returns the cart line quantities.
+	 *
+	 * @param string $option_price Price of the single Quantities option.
+	 * @param int    $quantity     Order quantity the product form posts.
+	 *
+	 * @return list<int>
+	 */
+	private function add_same_linked_quantities_twice( string $option_price, int $quantity ): array {
+		$this->initialize_woocommerce_checkout_context();
+		WC()->cart->empty_cart();
+
+		$product = $this->create_simple_product( array( 'regular_price' => '20.15' ) );
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_quantities_field(
+					'sizes',
+					'Sizes',
+					array( array( 'option' => 'Small', 'price' => $option_price, 'id' => 'small' ) )
+				),
+			),
+			$product->get_id()
+		);
+
+		$payload = array(
+			'fields' => array(
+				'id'    => (string) $meta_id,
+				'sizes' => array( 'Small' => '4' ),
+			),
+		);
+
+		$this->assertNotFalse( $this->add_product_to_real_cart( $product->get_id(), $payload, $quantity ) );
+		$this->assertNotFalse( $this->add_product_to_real_cart( $product->get_id(), $payload, $quantity ) );
+
+		$quantities = array_values( wp_list_pluck( WC()->cart->get_cart(), 'quantity' ) );
+		WC()->cart->empty_cart();
+
+		return $quantities;
+	}
+
+	/**
+	 * An unpriced linked Quantities field keeps each add on its own line at the field total.
+	 *
+	 * @return void
+	 */
+	public function test_identical_unpriced_linked_quantities_adds_stay_separate_lines(): void {
+		$this->assertSame( array( 4, 4 ), $this->add_same_linked_quantities_twice( '', 4 ) );
+	}
+
+	/**
+	 * A priced linked Quantities field keeps each add on its own line at quantity 1.
+	 *
+	 * @return void
+	 */
+	public function test_identical_priced_linked_quantities_adds_stay_separate_lines(): void {
+		$this->assertSame( array( 1, 1 ), $this->add_same_linked_quantities_twice( '5', 4 ) );
+	}
+
+	/**
+	 * Identical adds without a quantity-controlling field still merge into one line.
+	 *
+	 * @return void
+	 */
+	public function test_identical_adds_without_quantities_field_still_merge(): void {
+		$this->initialize_woocommerce_checkout_context();
+		WC()->cart->empty_cart();
+
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$meta_id = $this->insert_ppom_meta( array( $this->build_text_field( 'note' ) ), $product->get_id() );
+		$payload = array(
+			'fields' => array(
+				'id'   => (string) $meta_id,
+				'note' => 'Hello',
+			),
+		);
+
+		$this->add_product_to_real_cart( $product->get_id(), $payload, 2 );
+		$this->add_product_to_real_cart( $product->get_id(), $payload, 3 );
+
+		$quantities = array_values( wp_list_pluck( WC()->cart->get_cart(), 'quantity' ) );
+		WC()->cart->empty_cart();
+
+		$this->assertSame( array( 5 ), $quantities );
+	}
 }

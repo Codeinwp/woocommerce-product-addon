@@ -22,6 +22,14 @@ use PPOM\Support\Helpers;
 final class CartHandler {
 
 	/**
+	 * Cart item key that keeps each add of a quantity-controlling product on its own line.
+	 *
+	 * WooCommerce merges identical adds by summing their quantities, while those
+	 * fields fix the line quantity themselves.
+	 */
+	private const LINE_KEY = 'ppom_line_key';
+
+	/**
 	 * Legacy option-price JSON: summed quantities when `include` is empty, or 1 when `include` is `on`.
 	 *
 	 * @param array $option_prices Decoded `ppom_option_price` payload.
@@ -372,6 +380,10 @@ final class CartHandler {
 		$cart['ppom'] = Handler::retain_owned_uploads( $ppom_posted_fields, (int) $product_id, $verified );
 
 		$cart[ Handler::VERIFIED_FILES_KEY ] = Handler::payload_file_names( $cart['ppom'] );
+
+		if ( ! Helpers::is_cart_quantity_updatable( $product_id ) ) {
+			$cart[ self::LINE_KEY ] = wp_generate_uuid4();
+		}
 
 		return $cart;
 	}
