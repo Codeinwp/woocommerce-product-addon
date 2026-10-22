@@ -1404,19 +1404,21 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 *
 	 * @return void
 	 */
-	public function test_unvalidated_add_rejects_missing_required_field() {
+	public function test_unvalidated_add_rejects_empty_and_keeps_filled_required_field() {
 		$this->initialize_woocommerce_checkout_context();
-		$product = $this->create_simple_product();
-		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+		$product_id = $this->create_required_engraving_product();
 
-		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'engraving' => '' ) ) );
-		$notices  = wp_strip_all_tags( wc_print_notices( true ) );
-		$is_empty = WC()->cart->is_empty();
+		$empty = $this->direct_add( $product_id, array( 'fields' => array( 'engraving' => '' ) ) );
+		$this->assertFalse( $empty['key'] );
+		$this->assertStringContainsString( 'Engraving is a required field', $empty['notices'] );
+
+		$_POST['ppom'] = array( 'fields' => array( 'engraving' => 'Hello' ) );
+		$cart_key      = WC()->cart->add_to_cart( $product_id, 1 );
+		$item          = $cart_key ? WC()->cart->get_cart_item( $cart_key ) : array();
 		WC()->cart->empty_cart();
 
-		$this->assertFalse( $cart_key );
-		$this->assertTrue( $is_empty );
-		$this->assertStringContainsString( 'Engraving is a required field', $notices );
+		$this->assertIsString( $cart_key );
+		$this->assertSame( 'Hello', $item['ppom']['fields']['engraving'] );
 	}
 
 	/**
@@ -1426,8 +1428,7 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 */
 	public function test_unvalidated_add_rejects_missing_or_fieldless_payload() {
 		$this->initialize_woocommerce_checkout_context();
-		$product = $this->create_simple_product();
-		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+		$product_id = $this->create_required_engraving_product();
 
 		$payloads = array(
 			'no payload'   => null,
@@ -1435,48 +1436,15 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 			'empty fields' => array( 'fields' => array() ),
 		);
 		foreach ( $payloads as $label => $payload ) {
-			unset( $_POST['ppom'] );
-			if ( null !== $payload ) {
-				$_POST['ppom'] = $payload;
-			}
+			$result = $this->direct_add( $product_id, $payload );
 
-			$cart_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
-			$notices  = wp_strip_all_tags( wc_print_notices( true ) );
-			WC()->cart->empty_cart();
-
-			$this->assertFalse( $cart_key, $label );
-			$this->assertStringContainsString( 'Engraving is a required field', $notices, $label );
+			$this->assertFalse( $result['key'], $label );
+			$this->assertStringContainsString( 'Engraving is a required field', $result['notices'], $label );
 		}
-	}
 
-	/**
-	 * @return void
-	 */
-	public function test_unvalidated_add_without_payload_allows_optional_fields() {
-		$this->initialize_woocommerce_checkout_context();
-		$product = $this->create_simple_product();
-		$this->insert_ppom_meta( array( $this->build_text_field( 'note', 'Note' ) ), $product->get_id() );
-
-		$cart_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
-		WC()->cart->empty_cart();
-
-		$this->assertIsString( $cart_key );
-	}
-
-	/**
-	 * @return void
-	 */
-	public function test_unvalidated_add_keeps_filled_required_field() {
-		$this->initialize_woocommerce_checkout_context();
-		$product = $this->create_simple_product();
-		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
-
-		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'engraving' => 'Hello' ) ) );
-		$item     = $cart_key ? WC()->cart->get_cart_item( $cart_key ) : array();
-		WC()->cart->empty_cart();
-
-		$this->assertIsString( $cart_key );
-		$this->assertSame( 'Hello', $item['ppom']['fields']['engraving'] );
+		$optional = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'note', 'Note' ) ), $optional->get_id() );
+		$this->assertIsString( $this->direct_add( $optional->get_id(), null )['key'], 'Optional fields need no payload.' );
 	}
 
 	/**
@@ -1486,15 +1454,18 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 */
 	public function test_paypal_cart_simulation_is_not_validated() {
 		$this->initialize_woocommerce_checkout_context();
-		$product = $this->create_simple_product();
-		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+		$product_id = $this->create_required_engraving_product();
+		$empty      = array( 'fields' => array( 'engraving' => '' ) );
 
 		add_filter( 'woocommerce_paypal_payments_is_simulating_cart', '__return_true' );
-		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'engraving' => '' ) ) );
+		$simulated = $this->direct_add( $product_id, $empty );
 		remove_filter( 'woocommerce_paypal_payments_is_simulating_cart', '__return_true' );
-		WC()->cart->empty_cart();
 
-		$this->assertIsString( $cart_key );
+		$real = $this->direct_add( $product_id, $empty );
+
+		$this->assertIsString( $simulated['key'] );
+		$this->assertFalse( $real['key'] );
+		$this->assertStringContainsString( 'Engraving is a required field', $real['notices'] );
 	}
 
 	/**
@@ -1504,8 +1475,7 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 */
 	public function test_add_from_inside_validation_filter_is_not_revalidated() {
 		$this->initialize_woocommerce_checkout_context();
-		$product = $this->create_simple_product();
-		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+		$product_id    = $this->create_required_engraving_product();
 		$_POST['ppom'] = array( 'fields' => array( 'engraving' => '' ) );
 
 		$nested_key = false;
@@ -1514,11 +1484,16 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 			return false;
 		};
 		add_filter( 'woocommerce_add_to_cart_validation', $add_nested, 99, 2 );
-		apply_filters( 'woocommerce_add_to_cart_validation', true, $product->get_id(), 1 );
+		apply_filters( 'woocommerce_add_to_cart_validation', true, $product_id, 1 );
 		remove_filter( 'woocommerce_add_to_cart_validation', $add_nested, 99 );
 		WC()->cart->empty_cart();
+		wc_clear_notices();
+
+		$outside = $this->direct_add( $product_id, $_POST['ppom'] );
 
 		$this->assertIsString( $nested_key );
+		$this->assertFalse( $outside['key'] );
+		$this->assertStringContainsString( 'Engraving is a required field', $outside['notices'] );
 	}
 
 	/**
@@ -1529,16 +1504,93 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	public function test_validation_of_one_product_does_not_cover_another_add() {
 		$this->initialize_woocommerce_checkout_context();
 		$validated = $this->create_simple_product();
-		$direct    = $this->create_simple_product();
-		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $direct->get_id() );
+		$direct_id = $this->create_required_engraving_product();
 
 		$passed        = apply_filters( 'woocommerce_add_to_cart_validation', true, $validated->get_id(), 1 );
 		$validated_key = WC()->cart->add_to_cart( $validated->get_id(), 1 );
-		$direct_key    = $this->add_product_to_real_cart( $direct->get_id(), array( 'fields' => array( 'engraving' => '' ) ) );
-		WC()->cart->empty_cart();
+		$direct        = $this->direct_add( $direct_id, array( 'fields' => array( 'engraving' => '' ) ) );
 
 		$this->assertTrue( $passed );
 		$this->assertIsString( $validated_key );
-		$this->assertFalse( $direct_key );
+		$this->assertFalse( $direct['key'] );
+	}
+
+	/**
+	 * A passed validation is used up by the add that follows it.
+	 *
+	 * @return void
+	 */
+	public function test_passed_validation_covers_only_the_next_add() {
+		$this->initialize_woocommerce_checkout_context();
+		$product_id    = $this->create_required_engraving_product();
+		$_POST['ppom'] = array( 'fields' => array( 'engraving' => 'Hello' ) );
+
+		$passed    = apply_filters( 'woocommerce_add_to_cart_validation', true, $product_id, 1 );
+		$first_key = WC()->cart->add_to_cart( $product_id, 1 );
+		$second    = $this->direct_add( $product_id, array( 'fields' => array( 'engraving' => '' ) ) );
+
+		$this->assertTrue( $passed );
+		$this->assertIsString( $first_key );
+		$this->assertFalse( $second['key'] );
+	}
+
+	/**
+	 * Product Bundles adds bundled items itself, from the container's add.
+	 *
+	 * @return void
+	 */
+	public function test_bundled_items_skip_the_unvalidated_add_check() {
+		if ( ! function_exists( 'wc_pb_is_bundled_cart_item' ) ) {
+			// Mirrors Product Bundles: only items carrying `bundled_by` are bundled.
+			function wc_pb_is_bundled_cart_item( array $cart_item ): bool {
+				return ! empty( $cart_item['bundled_by'] );
+			}
+		}
+
+		$this->initialize_woocommerce_checkout_context();
+		$product_id = $this->create_required_engraving_product();
+
+		$bundled_key = WC()->cart->add_to_cart( $product_id, 1, 0, array(), array( 'bundled_by' => 'container-key' ) );
+		WC()->cart->empty_cart();
+		$standalone = $this->direct_add( $product_id, null );
+
+		$this->assertIsString( $bundled_key );
+		$this->assertFalse( $standalone['key'] );
+	}
+
+	/**
+	 * Creates a product with a required "Engraving" text field.
+	 *
+	 * @return int
+	 */
+	private function create_required_engraving_product(): int {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+
+		return $product->get_id();
+	}
+
+	/**
+	 * Adds a product with WC_Cart::add_to_cart() and no validation filter, as PayPal Payments does.
+	 *
+	 * @param int                       $product_id Product to add.
+	 * @param array<string, mixed>|null $payload    Posted `ppom` payload, or none.
+	 *
+	 * @return array{key: string|false, notices: string}
+	 */
+	private function direct_add( int $product_id, ?array $payload ): array {
+		unset( $_POST['ppom'] );
+		if ( null !== $payload ) {
+			$_POST['ppom'] = $payload;
+		}
+
+		$cart_key = WC()->cart->add_to_cart( $product_id, 1 );
+		$notices  = wp_strip_all_tags( wc_print_notices( true ) );
+		WC()->cart->empty_cart();
+
+		return array(
+			'key'     => $cart_key,
+			'notices' => $notices,
+		);
 	}
 }

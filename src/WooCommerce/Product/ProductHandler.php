@@ -345,10 +345,11 @@ final class ProductHandler {
 	 *
 	 * PayPal Payments' buttons copy the product form into $_POST and call
 	 * WC_Cart::add_to_cart() directly. An add that follows a passed validation
-	 * of the same product (form submit, Store API, Order Again) uses up that
-	 * result; adds made from inside the filter keep the outer result. PayPal's
-	 * price simulations run on a half-filled form and are skipped; the add made
-	 * on button click is checked.
+	 * of the same product (form submit) uses up that result; adds made from
+	 * inside the filter keep the outer result. Store API adds are neither
+	 * recorded nor checked here; validate_store_api_add_to_cart() checks them.
+	 * PayPal's price simulations run on a half-filled form and are skipped; the
+	 * add made on button click is checked.
 	 *
 	 * @param int $product_id   Product being added.
 	 * @param int $quantity     Requested quantity.

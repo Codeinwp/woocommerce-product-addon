@@ -308,6 +308,15 @@ class Test_Product_Handler extends PPOM_Test_Case {
 		foreach ( array( $optional, $plain ) as $product ) {
 			$this->assertSame( 201, $this->store_api_add_item( $product->get_id() )->get_status(), $product->get_name() );
 		}
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'note', 'Note' ),
+				$this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ),
+			),
+			$optional->get_id()
+		);
+		$this->assertSame( 400, $this->store_api_add_item( $optional->get_id() )->get_status(), 'Adding a required field blocks the same product.' );
 	}
 
 	/**
@@ -400,17 +409,47 @@ class Test_Product_Handler extends PPOM_Test_Case {
 	public function test_express_buttons_kept_when_ppom_fields_are_inactive() {
 		$product = $this->create_simple_product();
 		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'status' => 'off' ) ) ), $product->get_id() );
+		$inactive = $this->express_button_verdicts( $product );
 
-		$this->assertTrue( apply_filters( 'wcpay_payment_request_is_product_supported', true, $product ) );
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving' ) ), $product->get_id() );
+		$active = $this->express_button_verdicts( $product );
 
+		$this->assertSame(
+			array(
+				'supported' => true,
+				'hidden'    => false,
+			),
+			$inactive
+		);
+		$this->assertSame(
+			array(
+				'supported' => false,
+				'hidden'    => true,
+			),
+			$active,
+			'The same product with an active field loses the buttons.'
+		);
+	}
+
+	/**
+	 * WooPayments' support verdict and Stripe's hide verdict on the product's page.
+	 *
+	 * @param WC_Product $product Product to check.
+	 *
+	 * @return array{supported: bool, hidden: bool}
+	 */
+	private function express_button_verdicts( WC_Product $product ): array {
 		$this->go_to( get_permalink( $product->get_id() ) );
-		$hidden = apply_filters( 'wc_stripe_hide_payment_request_on_product_page', false, get_post( $product->get_id() ) );
+		$verdicts = array(
+			'supported' => (bool) apply_filters( 'wcpay_payment_request_is_product_supported', true, $product ),
+			'hidden'    => (bool) apply_filters( 'wc_stripe_hide_payment_request_on_product_page', false, get_post( $product->get_id() ) ),
+		);
 
 		// go_to() leaves the product slug in this global.
 		$this->go_to( home_url( '/' ) );
 		unset( $GLOBALS['product'] );
 
-		$this->assertFalse( $hidden );
+		return $verdicts;
 	}
 
 	/**
