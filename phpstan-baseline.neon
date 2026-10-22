@@ -577,12 +577,6 @@ parameters:
 			path: classes/frontend-scripts.class.php
 
 		-
-			message: '#^Cannot call method get_title\(\) on WC_Product\|false\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
 			message: '#^Constant PPOM_PATH not found\.$#'
 			identifier: constant.notFound
 			count: 1
@@ -634,12 +628,6 @@ parameters:
 			message: '#^Parameter \#2 \$css of static method PPOM_SCRIPTS\:\:inline_style\(\) expects string, string\|false given\.$#'
 			identifier: argument.type
 			count: 1
-			path: classes/frontend-scripts.class.php
-
-		-
-			message: '#^Parameter \#3 \$product of static method PPOM_FRONTEND_SCRIPTS\:\:set_localize_data\(\) expects WC_Product, WC_Product\|false\|null given\.$#'
-			identifier: argument.type
-			count: 5
 			path: classes/frontend-scripts.class.php
 
 		-
@@ -4147,12 +4135,6 @@ parameters:
 			path: inc/woocommerce/order.php
 
 		-
-			message: '#^Result of static method PPOM\\WooCommerce\\Order\\OrderHandler\:\:wc_order_again_compatibility\(\) \(void\) is used\.$#'
-			identifier: staticMethod.void
-			count: 1
-			path: inc/woocommerce/order.php
-
-		-
 			message: '#^Function ppom_woocommerce_ajax_validate\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -5995,30 +5977,6 @@ parameters:
 			path: src/Support/Helpers.php
 
 		-
-			message: '#^Method PPOM\\Support\\Helpers\:\:get_field_option_price_by_id\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Support/Helpers.php
-
-		-
-			message: '#^Method PPOM\\Support\\Helpers\:\:get_field_option_price_by_id\(\) has parameter \$option with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Support/Helpers.php
-
-		-
-			message: '#^Method PPOM\\Support\\Helpers\:\:get_field_option_price_by_id\(\) has parameter \$ppom_meta_ids with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Support/Helpers.php
-
-		-
-			message: '#^Method PPOM\\Support\\Helpers\:\:get_field_option_price_by_id\(\) has parameter \$product with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Support/Helpers.php
-
-		-
 			message: '#^Method PPOM\\Support\\Helpers\:\:get_field_option_weight_by_id\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -7191,12 +7149,6 @@ parameters:
 		-
 			message: '#^Method PPOM\\WooCommerce\\Order\\OrderHandler\:\:wc_order_again_compatibility\(\) has parameter \$cart_item_data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/WooCommerce/Order/OrderHandler.php
-
-		-
-			message: '#^Method PPOM\\WooCommerce\\Order\\OrderHandler\:\:wc_order_again_compatibility\(\) with return type void returns array but should not return anything\.$#'
-			identifier: return.void
 			count: 1
 			path: src/WooCommerce/Order/OrderHandler.php
 

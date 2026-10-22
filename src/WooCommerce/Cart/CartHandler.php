@@ -22,6 +22,14 @@ use PPOM\Support\Helpers;
 final class CartHandler {
 
 	/**
+	 * Cart item key that keeps each add of a quantity-controlling product on its own line.
+	 *
+	 * WooCommerce merges identical adds by summing their quantities, while those
+	 * fields fix the line quantity themselves.
+	 */
+	private const LINE_KEY = 'ppom_line_key';
+
+	/**
 	 * Legacy option-price JSON: summed quantities when `include` is empty, or 1 when `include` is `on`.
 	 *
 	 * @param array $option_prices Decoded `ppom_option_price` payload.
@@ -373,7 +381,33 @@ final class CartHandler {
 
 		$cart[ Handler::VERIFIED_FILES_KEY ] = Handler::payload_file_names( $cart['ppom'] );
 
-		return $cart;
+		return self::separate_quantity_controlled_line( $cart, (int) $product_id );
+	}
+
+	/**
+	 * Gives the cart item of a quantity-controlling product its own line.
+	 *
+	 * Sold-individually products keep the shared cart id, which is how
+	 * WooCommerce rejects a second add.
+	 *
+	 * @param array<string, mixed> $cart_item_data Cart item data.
+	 * @param int                  $product_id     Parent product ID.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function separate_quantity_controlled_line( array $cart_item_data, int $product_id ): array {
+		if ( Helpers::is_cart_quantity_updatable( $product_id ) ) {
+			return $cart_item_data;
+		}
+
+		$product = wc_get_product( $product_id );
+		if ( $product && $product->is_sold_individually() ) {
+			return $cart_item_data;
+		}
+
+		$cart_item_data[ self::LINE_KEY ] = wp_generate_uuid4();
+
+		return $cart_item_data;
 	}
 
 	/**
@@ -443,7 +477,7 @@ final class CartHandler {
 		$product_id = Helpers::get_product_id( $wc_product );
 
 		if ( empty( $values['ppom']['ppom_option_price'] ) && ! empty( $values['ppom']['fields'] ) ) {
-			$computed = Helpers::compute_option_price_from_fields( $values['ppom']['fields'], $product_id );
+			$computed = Helpers::compute_option_price_from_fields( $values['ppom']['fields'], $product_id, $wc_product );
 			if ( ! empty( $computed ) ) {
 				$values['ppom']['ppom_option_price'] = wp_json_encode( $computed );
 			}
@@ -512,7 +546,7 @@ final class CartHandler {
 				if ( isset( $option['apply'] ) && ( 'variable' === $option['apply'] || 'onetime' === $option['apply'] ) ) {
 					$resolved_line_price = isset( $option['price'] ) ? $option['price'] : 0;
 					if ( isset( $option['data_name'] ) && isset( $option['option_id'] ) ) {
-						$resolved_line_price = Helpers::get_field_option_price_by_id( $option, $wc_product, $ppom_meta_ids );
+						$resolved_line_price = Helpers::get_field_option_price_by_id( $option, $wc_product, $ppom_meta_ids, true );
 					}
 				}
 
@@ -1087,7 +1121,8 @@ final class CartHandler {
 	/**
 	 * Turns a saved amount into the figure the cart shows.
 	 *
-	 * Percentages resolve against the product base price. The amount stays net, because
+	 * Percentages resolve against the store-currency product base price, so callers
+	 * convert flat and percentage amounts the same way. The amount stays net, because
 	 * the tax display transformation belongs to the display path alone.
 	 *
 	 * @param mixed       $amount  Saved amount, possibly a percentage.
@@ -1103,7 +1138,7 @@ final class CartHandler {
 		$amount = (string) $amount;
 
 		if ( false !== strpos( $amount, '%' ) ) {
-			$base   = Callbacks::convert_price_back( Helpers::get_product_price( $product, null, 'cart' ) );
+			$base   = Helpers::wcml_store_currency_price( Callbacks::convert_price_back( Helpers::get_product_price( $product, null, 'cart' ) ) );
 			$amount = Engine::get_amount_after_percentage( $base, $amount );
 		}
 

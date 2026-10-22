@@ -12,6 +12,7 @@ namespace PPOM\WooCommerce\Order;
 
 use PPOM\Files\Handler;
 use PPOM\Support\Helpers;
+use PPOM\WooCommerce\Cart\CartHandler;
 
 /**
  * @internal
@@ -340,7 +341,7 @@ final class OrderHandler {
 	 * @param  array                  $cart_item_data Current custom item data.
 	 * @param  \WC_Order_Item_Product $item Order Item Product
 	 * @param  \WC_Order              $order
-	 * @return void
+	 * @return array<string, mixed>
 	 */
 	public static function wc_order_again_compatibility( $cart_item_data, $item, $order ) {
 		$ppom_data = $item->get_meta( '_ppom_fields' );
@@ -348,6 +349,7 @@ final class OrderHandler {
 		if ( is_array( $ppom_data ) && array_key_exists( 'fields', $ppom_data ) ) {
 			self::restore_order_files_to_upload_dir( $ppom_data['fields'], $item, $order );
 			$cart_item_data['ppom'] = $ppom_data;
+			$cart_item_data         = CartHandler::separate_quantity_controlled_line( $cart_item_data, (int) $item->get_product_id() );
 		}
 
 		return $cart_item_data;
