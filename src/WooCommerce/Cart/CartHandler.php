@@ -15,6 +15,7 @@ use PPOM\Files\Handler;
 use PPOM\Hooks\Callbacks;
 use PPOM\Pricing\Engine;
 use PPOM\Support\Helpers;
+use PPOM\WooCommerce\Product\ProductHandler;
 
 /**
  * @internal
@@ -339,9 +340,11 @@ final class CartHandler {
 	 * @param array $cart         Cart item data.
 	 * @param int   $product_id   Product ID.
 	 * @param int   $variation_id Selected variation ID, or 0 for simple products.
-	 * @param int   $quantity     Requested quantity (unused; kept for filter compatibility).
+	 * @param int   $quantity     Requested quantity.
 	 *
 	 * @return array
+	 *
+	 * @throws \Exception When an add that skipped WooCommerce's validation fails PPOM's.
 	 *
 	 * @see ppom_check_validation()
 	 * @see ppom_price_controller()
@@ -358,10 +361,18 @@ final class CartHandler {
 			return $cart;
 		}
 
+		$is_bundled = function_exists( 'wc_pb_is_bundled_cart_item' ) && wc_pb_is_bundled_cart_item( $cart );
+
+		// Before the edited item is removed, so its uploads still count. WC_Cart::add_to_cart()
+		// turns the exception into a failed add; the notices are already queued.
+		if ( ! $is_bundled && ! ProductHandler::validate_unvalidated_add( (int) $product_id, (int) $quantity, (int) $variation_id ) ) {
+			throw new \Exception();
+		}
+
 		$verified = self::remove_replaced_cart_item();
 
 		// ADDED WC BUNDLES COMPATIBILITY
-		if ( function_exists( 'wc_pb_is_bundled_cart_item' ) && wc_pb_is_bundled_cart_item( $cart ) ) {
+		if ( $is_bundled ) {
 			return $cart;
 		}
 

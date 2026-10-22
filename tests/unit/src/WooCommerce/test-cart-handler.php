@@ -1398,4 +1398,82 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 		$this->assertCount( 2, $cart_ids );
 		$this->assertCount( 2, array_unique( $cart_ids ) );
 	}
+
+	/**
+	 * PayPal Payments' buttons post the product form and call add_to_cart() directly, without the validation filter.
+	 *
+	 * @return void
+	 */
+	public function test_unvalidated_add_rejects_missing_required_field() {
+		$this->initialize_woocommerce_checkout_context();
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+
+		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'engraving' => '' ) ) );
+		$notices  = wp_strip_all_tags( wc_print_notices( true ) );
+		$is_empty = WC()->cart->is_empty();
+		WC()->cart->empty_cart();
+
+		$this->assertFalse( $cart_key );
+		$this->assertTrue( $is_empty );
+		$this->assertStringContainsString( 'Engraving is a required field', $notices );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_unvalidated_add_keeps_filled_required_field() {
+		$this->initialize_woocommerce_checkout_context();
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+
+		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'engraving' => 'Hello' ) ) );
+		$item     = $cart_key ? WC()->cart->get_cart_item( $cart_key ) : array();
+		WC()->cart->empty_cart();
+
+		$this->assertIsString( $cart_key );
+		$this->assertSame( 'Hello', $item['ppom']['fields']['engraving'] );
+	}
+
+	/**
+	 * PayPal simulates the cart for live totals while the form is still being filled in.
+	 *
+	 * @return void
+	 */
+	public function test_paypal_cart_simulation_is_not_validated() {
+		$this->initialize_woocommerce_checkout_context();
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+
+		add_filter( 'woocommerce_paypal_payments_is_simulating_cart', '__return_true' );
+		$cart_key = $this->add_product_to_real_cart( $product->get_id(), array( 'fields' => array( 'engraving' => '' ) ) );
+		remove_filter( 'woocommerce_paypal_payments_is_simulating_cart', '__return_true' );
+		WC()->cart->empty_cart();
+
+		$this->assertIsString( $cart_key );
+	}
+
+	/**
+	 * PPOM Pro's Variation Quantity adds each variation from inside the validation filter.
+	 *
+	 * @return void
+	 */
+	public function test_add_from_inside_validation_filter_is_not_revalidated() {
+		$this->initialize_woocommerce_checkout_context();
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+		$_POST['ppom'] = array( 'fields' => array( 'engraving' => '' ) );
+
+		$nested_key = false;
+		$add_nested = static function ( $passed, $product_id ) use ( &$nested_key ) {
+			$nested_key = WC()->cart->add_to_cart( $product_id, 1 );
+			return false;
+		};
+		add_filter( 'woocommerce_add_to_cart_validation', $add_nested, 99, 2 );
+		apply_filters( 'woocommerce_add_to_cart_validation', true, $product->get_id(), 1 );
+		remove_filter( 'woocommerce_add_to_cart_validation', $add_nested, 99 );
+		WC()->cart->empty_cart();
+
+		$this->assertIsString( $nested_key );
+	}
 }

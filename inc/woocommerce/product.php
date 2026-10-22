@@ -45,6 +45,41 @@ function ppom_woocommerce_validate_product( $passed, $product_id, $qty, $variati
 	return \PPOM\WooCommerce\Product\ProductHandler::validate_product( $passed, $product_id, $qty, $variation_id, $variations );
 }
 
+/**
+ * Filter callback for WooPayments' product-page express checkout support.
+ *
+ * @param bool                  $is_supported Gateway's verdict.
+ * @param WC_Product|false|null $product      Product on the page.
+ *
+ * @return bool
+ */
+function ppom_woocommerce_supports_express_checkout( $is_supported, $product ): bool {
+	return \PPOM\WooCommerce\Product\ProductHandler::supports_express_checkout( $is_supported, $product );
+}
+
+/**
+ * Filter callback for wc_stripe_hide_payment_request_on_product_page.
+ *
+ * @param bool         $hide Gateway's verdict.
+ * @param WP_Post|null $post Current post.
+ *
+ * @return bool
+ */
+function ppom_woocommerce_hide_express_checkout_on_product_page( $hide, $post ): bool {
+	return \PPOM\WooCommerce\Product\ProductHandler::hide_express_checkout_on_product_page( $hide, $post );
+}
+
+/**
+ * Action callback for woocommerce_store_api_validate_add_to_cart.
+ *
+ * @param WC_Product $product Product or variation being added.
+ *
+ * @return void
+ */
+function ppom_woocommerce_validate_store_api_add_to_cart( WC_Product $product ): void {
+	\PPOM\WooCommerce\Product\ProductHandler::validate_store_api_add_to_cart( $product );
+}
+
 function ppom_woocommerce_ajax_validate() {
 	\PPOM\WooCommerce\Product\ProductHandler::ajax_validate();
 }

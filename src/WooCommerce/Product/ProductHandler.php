@@ -10,8 +10,11 @@
 
 namespace PPOM\WooCommerce\Product;
 
+use Automattic\WooCommerce\StoreApi\Exceptions\RouteException;
 use PPOM_Form;
 use PPOM_Meta;
+use WC_Product;
+use WP_Post;
 use PPOM\Files\Handler;
 use PPOM\Hooks\Callbacks;
 use PPOM\Support\Helpers;
@@ -251,6 +254,141 @@ final class ProductHandler {
 		}
 
 		return $passed;
+	}
+
+	/**
+	 * Filter callback: product-page express checkout support (WooPayments).
+	 *
+	 * Express buttons add the product without the PPOM form, so its fields
+	 * would be neither validated nor stored.
+	 *
+	 * @param bool                  $is_supported Gateway's verdict.
+	 * @param WC_Product|false|null $product      Product on the page.
+	 *
+	 * @return bool
+	 */
+	public static function supports_express_checkout( $is_supported, $product ): bool {
+
+		if ( ! $is_supported || ! $product instanceof WC_Product ) {
+			return (bool) $is_supported;
+		}
+
+		return ! self::has_ppom_fields( $product );
+	}
+
+	/**
+	 * Filter callback: hides Stripe's product-page express checkout for PPOM products.
+	 *
+	 * @param bool         $hide Gateway's verdict.
+	 * @param WP_Post|null $post Current post.
+	 *
+	 * @return bool
+	 */
+	public static function hide_express_checkout_on_product_page( $hide, $post ): bool {
+
+		// Stripe also runs this filter in a one-off settings migration; only answer on product pages.
+		if ( $hide || ! is_product() || ! $post instanceof WP_Post ) {
+			return (bool) $hide;
+		}
+
+		$product = wc_get_product( $post->ID );
+
+		return $product instanceof WC_Product && self::has_ppom_fields( $product );
+	}
+
+	/**
+	 * Rejects Store API adds that skip a required PPOM field.
+	 *
+	 * Store API requests carry no PPOM form, so the add-to-cart validation
+	 * sees nothing posted and lets the product in. Conditionally shown fields
+	 * are skipped because their visibility depends on the missing form.
+	 *
+	 * @param WC_Product $product Product or variation being added.
+	 *
+	 * @return void
+	 *
+	 * @throws RouteException When a required field applies.
+	 */
+	public static function validate_store_api_add_to_cart( WC_Product $product ): void {
+
+		if ( isset( $_POST['ppom'] ) ) {
+			return;
+		}
+
+		$product_id   = (int) Helpers::get_product_id( $product );
+		$variation_id = $product->is_type( 'variation' ) ? $product->get_id() : 0;
+		$ppom         = new PPOM_Meta( $product_id );
+		if ( ! $ppom->fields ) {
+			return;
+		}
+
+		foreach ( $ppom->fields as $field ) {
+			if ( self::is_unconditionally_required( $field, $product_id, $variation_id ) ) {
+				throw new RouteException( 'ppom_required_field', self::required_field_message( $field ), 400 );
+			}
+		}
+	}
+
+	/**
+	 * Validates a posted PPOM payload when the add skipped WooCommerce's add-to-cart validation.
+	 *
+	 * PayPal Payments' buttons copy the product form into $_POST and call
+	 * WC_Cart::add_to_cart() directly. Adds made while the validation filter
+	 * has run (form submit, Store API, Order Again, or from inside the filter)
+	 * keep the result PPOM gave there. PayPal's price simulations run on a
+	 * half-filled form and are skipped; the add made on button click is checked.
+	 *
+	 * @param int $product_id   Product being added.
+	 * @param int $quantity     Requested quantity.
+	 * @param int $variation_id Selected variation, or 0.
+	 *
+	 * @return bool
+	 */
+	public static function validate_unvalidated_add( int $product_id, int $quantity, int $variation_id ): bool {
+
+		if ( did_filter( 'woocommerce_add_to_cart_validation' ) || apply_filters( 'woocommerce_paypal_payments_is_simulating_cart', false ) ) {
+			return true;
+		}
+
+		$passed = self::validate_product( true, $product_id, $quantity, $variation_id );
+
+		// validate_product() leaves field checks to the browser when AJAX validation is on.
+		if ( ( new PPOM_Meta( $product_id ) )->ajax_validation_enabled ) {
+			$passed = self::check_validation( $product_id, $_POST, $passed, $variation_id );
+		}
+
+		return (bool) $passed;
+	}
+
+	/**
+	 * Whether PPOM fields are attached to the product.
+	 *
+	 * @param WC_Product $product Product or variation.
+	 *
+	 * @return bool
+	 */
+	private static function has_ppom_fields( WC_Product $product ): bool {
+
+		$ppom = new PPOM_Meta( (int) Helpers::get_product_id( $product ) );
+
+		return (bool) $ppom->is_exists;
+	}
+
+	/**
+	 * Whether a field is required, always shown, and active for the selection.
+	 *
+	 * @param mixed $field        Saved field definition.
+	 * @param int   $product_id   Product being added.
+	 * @param int   $variation_id Selected variation, or 0.
+	 *
+	 * @return bool
+	 */
+	private static function is_unconditionally_required( $field, int $product_id, int $variation_id ): bool {
+
+		return is_array( $field )
+			&& isset( $field['required'] ) && 'on' === $field['required']
+			&& ( ! isset( $field['logic'] ) || 'on' !== $field['logic'] )
+			&& self::field_applies_to_selection( $field, $product_id, $variation_id );
 	}
 
 	/**

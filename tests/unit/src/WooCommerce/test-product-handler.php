@@ -245,4 +245,104 @@ class Test_Product_Handler extends PPOM_Test_Case {
 		$product_id = $this->post_file_row( false, 'someone-else.bbb222.png' );
 		$this->assertTrue( ProductHandler::validate_product( true, $product_id, 1 ), 'An optional field is not rejected.' );
 	}
+
+	/**
+	 * @return void
+	 */
+	public function test_woopayments_express_buttons_unsupported_for_ppom_products() {
+		$ppom_product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving' ) ), $ppom_product->get_id() );
+		$plain_product = $this->create_simple_product();
+
+		foreach ( array( 'wcpay_payment_request_is_product_supported', 'wcpay_woopay_button_is_product_supported' ) as $hook ) {
+			$this->assertFalse( apply_filters( $hook, true, $ppom_product ), $hook . ': PPOM product' );
+			$this->assertTrue( apply_filters( $hook, true, $plain_product ), $hook . ': product without PPOM' );
+			$this->assertFalse( apply_filters( $hook, false, $plain_product ), $hook . ': gateway verdict kept' );
+			$this->assertFalse( apply_filters( $hook, false, null ), $hook . ': no product' );
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_stripe_express_buttons_hidden_on_ppom_product_page() {
+		$ppom_product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving' ) ), $ppom_product->get_id() );
+		$plain_product = $this->create_simple_product();
+		$ppom_post     = get_post( $ppom_product->get_id() );
+
+		$this->go_to( get_permalink( $ppom_product->get_id() ) );
+		$this->assertTrue( apply_filters( 'wc_stripe_hide_payment_request_on_product_page', false, $ppom_post ) );
+
+		$this->go_to( get_permalink( $plain_product->get_id() ) );
+		$this->assertFalse( apply_filters( 'wc_stripe_hide_payment_request_on_product_page', false, get_post( $plain_product->get_id() ) ) );
+
+		// Stripe's one-off location migration runs this filter outside product pages.
+		$this->go_to( home_url( '/' ) );
+		$this->assertFalse( apply_filters( 'wc_stripe_hide_payment_request_on_product_page', false, $ppom_post ) );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_store_api_add_item_rejects_missing_required_ppom_field() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+
+		$response = $this->store_api_add_item( $product->get_id() );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'ppom_required_field', $response->get_data()['code'] );
+		$this->assertSame( 'Engraving is a required field', $response->get_data()['message'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_store_api_add_item_allows_products_without_unconditional_required_fields() {
+		$optional = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'note', 'Note' ) ), $optional->get_id() );
+
+		$conditional = $this->create_simple_product();
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field(
+					'engraving',
+					'Engraving',
+					array(
+						'required' => 'on',
+						'logic'    => 'on',
+					)
+				),
+			),
+			$conditional->get_id()
+		);
+
+		$plain = $this->create_simple_product();
+
+		foreach ( array( $optional, $conditional, $plain ) as $product ) {
+			$this->assertSame( 201, $this->store_api_add_item( $product->get_id() )->get_status(), $product->get_name() );
+		}
+	}
+
+	/**
+	 * Adds a product through the Store API the way express checkout buttons do.
+	 *
+	 * @param int $product_id Product to add.
+	 *
+	 * @return WP_REST_Response
+	 */
+	private function store_api_add_item( int $product_id ): WP_REST_Response {
+		add_filter( 'woocommerce_store_api_disable_nonce_check', '__return_true' );
+
+		$request = new WP_REST_Request( 'POST', '/wc/store/v1/cart/add-item' );
+		$request->set_param( 'id', $product_id );
+		$request->set_param( 'quantity', 1 );
+		$response = rest_do_request( $request );
+
+		remove_filter( 'woocommerce_store_api_disable_nonce_check', '__return_true' );
+		WC()->cart->empty_cart();
+
+		return $response;
+	}
 }
