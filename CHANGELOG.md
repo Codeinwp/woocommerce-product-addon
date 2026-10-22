@@ -1,3 +1,10 @@
+##### [Version 34.0.12](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.11...v34.0.12) (2026-10-22)
+
+- Fixed the PPOM price summary showing the product price in the wrong currency
+- Fixed cart option prices showing unconverted in secondary WCML currencies.
+- Fixed identical linked-quantity products merging into one cart line
+- Updated dependencies
+
 ##### [Version 34.0.11](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.10...v34.0.11) (2026-10-07)
 
 - Fixed SVG uploads failing in File upload fields

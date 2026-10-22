@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: product addons, woocommerce product addons, woocommerce product options, custom fields, variable products
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 34.0.11
+Stable tag: 34.0.12
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -259,17 +259,11 @@ Please follow the reporting protocols outlined on our [Security Page](https://th
 
 == Changelog ==
 
-##### [Version 34.0.11](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.10...v34.0.11) (2026-10-07)
+##### [Version 34.0.12](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.11...v34.0.12) (2026-10-22)
 
-- Fixed SVG uploads failing in File upload fields
-- Fixed the first product-page price to use the visible conditional price matrix.
-- Fixed conditional fields to respond only to selections in their own product form.
-- Fixed modern pricing to honor zero-price matrix selections
-- Fixed the file picker for upload fields with hyphenated names.
-- Fixed PPOM applying currency exchange rates twice to priced options and cart totals.
-- Fixed PPOM Pro converting WPML cart option charges twice.
-- Fixed currency switchers converting PPOM option prices more than once.
-- Fixed file uploads allowing visitors to delete files outside uploads folder.
+- Fixed the PPOM price summary showing the product price in the wrong currency
+- Fixed cart option prices showing unconverted in secondary WCML currencies.
+- Fixed identical linked-quantity products merging into one cart line
 - Updated dependencies
 
 
