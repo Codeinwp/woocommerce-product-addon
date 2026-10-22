@@ -245,4 +245,238 @@ class Test_Product_Handler extends PPOM_Test_Case {
 		$product_id = $this->post_file_row( false, 'someone-else.bbb222.png' );
 		$this->assertTrue( ProductHandler::validate_product( true, $product_id, 1 ), 'An optional field is not rejected.' );
 	}
+
+	/**
+	 * @return void
+	 */
+	public function test_woopayments_express_buttons_unsupported_for_ppom_products() {
+		$ppom_product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving' ) ), $ppom_product->get_id() );
+		$plain_product = $this->create_simple_product();
+
+		foreach ( array( 'wcpay_payment_request_is_product_supported', 'wcpay_woopay_button_is_product_supported' ) as $hook ) {
+			$this->assertFalse( apply_filters( $hook, true, $ppom_product ), $hook . ': PPOM product' );
+			$this->assertTrue( apply_filters( $hook, true, $plain_product ), $hook . ': product without PPOM' );
+			$this->assertFalse( apply_filters( $hook, false, $plain_product ), $hook . ': gateway verdict kept' );
+			$this->assertFalse( apply_filters( $hook, false, null ), $hook . ': no product' );
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_stripe_express_buttons_hidden_on_ppom_product_page() {
+		$ppom_product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving' ) ), $ppom_product->get_id() );
+		$plain_product = $this->create_simple_product();
+		$ppom_post     = get_post( $ppom_product->get_id() );
+
+		$this->go_to( get_permalink( $ppom_product->get_id() ) );
+		$this->assertTrue( apply_filters( 'wc_stripe_hide_payment_request_on_product_page', false, $ppom_post ) );
+
+		$this->go_to( get_permalink( $plain_product->get_id() ) );
+		$this->assertFalse( apply_filters( 'wc_stripe_hide_payment_request_on_product_page', false, get_post( $plain_product->get_id() ) ) );
+
+		// Stripe's one-off location migration runs this filter outside product pages.
+		$this->go_to( home_url( '/' ) );
+		$this->assertFalse( apply_filters( 'wc_stripe_hide_payment_request_on_product_page', false, $ppom_post ) );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_store_api_add_item_rejects_missing_required_ppom_field() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+
+		$response = $this->store_api_add_item( $product->get_id() );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'ppom_required_field', $response->get_data()['code'] );
+		$this->assertSame( 'Engraving is a required field', $response->get_data()['message'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_store_api_add_item_allows_products_without_required_fields() {
+		$optional = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'note', 'Note' ) ), $optional->get_id() );
+
+		$plain = $this->create_simple_product();
+
+		foreach ( array( $optional, $plain ) as $product ) {
+			$this->assertSame( 201, $this->store_api_add_item( $product->get_id() )->get_status(), $product->get_name() );
+		}
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'note', 'Note' ),
+				$this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ),
+			),
+			$optional->get_id()
+		);
+		$this->assertSame( 400, $this->store_api_add_item( $optional->get_id() )->get_status(), 'Adding a required field blocks the same product.' );
+	}
+
+	/**
+	 * A form-encoded Store API request can post a `ppom` key without the required value.
+	 *
+	 * @return void
+	 */
+	public function test_store_api_add_item_checks_posted_ppom_values() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+
+		$payloads = array(
+			'marker only'  => array( 'marker' => '1' ),
+			'empty fields' => array( 'fields' => array() ),
+			'empty value'  => array( 'fields' => array( 'engraving' => '' ) ),
+			'empty array'  => array( 'fields' => array( 'engraving' => array( '' ) ) ),
+			'forged hide'  => array( 'conditionally_hidden' => 'engraving' ),
+		);
+		foreach ( $payloads as $label => $payload ) {
+			$this->assertSame( 400, $this->store_api_add_item( $product->get_id(), $payload )->get_status(), $label );
+		}
+
+		$this->assertSame( 201, $this->store_api_add_item( $product->get_id(), array( 'fields' => array( 'engraving' => 'Hello' ) ) )->get_status() );
+	}
+
+	/**
+	 * Direct adds stand aside only while a Store API route is dispatched.
+	 *
+	 * @return void
+	 */
+	public function test_direct_add_is_checked_after_a_store_api_request() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+
+		$this->assertSame( 400, $this->store_api_add_item( $product->get_id() )->get_status() );
+
+		$cart_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		WC()->cart->empty_cart();
+		wc_clear_notices();
+
+		$this->assertFalse( $cart_key );
+	}
+
+	/**
+	 * A hide rule that does not match leaves the field shown, so it stays required.
+	 *
+	 * @return void
+	 */
+	public function test_store_api_add_item_requires_conditional_field_unless_posted_hidden() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field( 'gift', 'Gift', array( array( 'option' => 'Yes' ) ) ),
+				$this->build_text_field(
+					'engraving',
+					'Engraving',
+					array(
+						'required'   => 'on',
+						'logic'      => 'on',
+						'conditions' => array(
+							'visibility' => 'Hide',
+							'bound'      => 'Any',
+							'rules'      => array(
+								array(
+									'elements'       => 'gift',
+									'operators'      => 'is',
+									'element_values' => 'Yes',
+								),
+							),
+						),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$response = $this->store_api_add_item( $product->get_id() );
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'Engraving is a required field', $response->get_data()['message'] );
+
+		$hidden = array(
+			'fields'               => array( 'gift' => array( 'Yes' ) ),
+			'conditionally_hidden' => 'engraving',
+		);
+		$this->assertSame( 201, $this->store_api_add_item( $product->get_id(), $hidden )->get_status() );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_express_buttons_kept_when_ppom_fields_are_inactive() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'status' => 'off' ) ) ), $product->get_id() );
+		$inactive = $this->express_button_verdicts( $product );
+
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving' ) ), $product->get_id() );
+		$active = $this->express_button_verdicts( $product );
+
+		$this->assertSame(
+			array(
+				'supported' => true,
+				'hidden'    => false,
+			),
+			$inactive
+		);
+		$this->assertSame(
+			array(
+				'supported' => false,
+				'hidden'    => true,
+			),
+			$active,
+			'The same product with an active field loses the buttons.'
+		);
+	}
+
+	/**
+	 * WooPayments' support verdict and Stripe's hide verdict on the product's page.
+	 *
+	 * @param WC_Product $product Product to check.
+	 *
+	 * @return array{supported: bool, hidden: bool}
+	 */
+	private function express_button_verdicts( WC_Product $product ): array {
+		$this->go_to( get_permalink( $product->get_id() ) );
+		$verdicts = array(
+			'supported' => (bool) apply_filters( 'wcpay_payment_request_is_product_supported', true, $product ),
+			'hidden'    => (bool) apply_filters( 'wc_stripe_hide_payment_request_on_product_page', false, get_post( $product->get_id() ) ),
+		);
+
+		// go_to() leaves the product slug in this global.
+		$this->go_to( home_url( '/' ) );
+		unset( $GLOBALS['product'] );
+
+		return $verdicts;
+	}
+
+	/**
+	 * Adds a product through the Store API the way express checkout buttons do.
+	 *
+	 * @param int                  $product_id Product to add.
+	 * @param array<string, mixed> $ppom       Form-encoded `ppom` payload, or none.
+	 *
+	 * @return WP_REST_Response
+	 */
+	private function store_api_add_item( int $product_id, array $ppom = array() ): WP_REST_Response {
+		add_filter( 'woocommerce_store_api_disable_nonce_check', '__return_true' );
+		if ( $ppom ) {
+			$_POST['ppom'] = $ppom;
+		}
+
+		$request = new WP_REST_Request( 'POST', '/wc/store/v1/cart/add-item' );
+		$request->set_param( 'id', $product_id );
+		$request->set_param( 'quantity', 1 );
+		$response = rest_do_request( $request );
+
+		unset( $_POST['ppom'] );
+		remove_filter( 'woocommerce_store_api_disable_nonce_check', '__return_true' );
+		WC()->cart->empty_cart();
+		wc_clear_notices();
+
+		return $response;
+	}
 }

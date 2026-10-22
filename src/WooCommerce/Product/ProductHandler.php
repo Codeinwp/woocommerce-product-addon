@@ -10,8 +10,12 @@
 
 namespace PPOM\WooCommerce\Product;
 
+use Automattic\WooCommerce\StoreApi\Exceptions\RouteException;
 use PPOM_Form;
 use PPOM_Meta;
+use WC_Product;
+use WP_Post;
+use WP_REST_Request;
 use PPOM\Files\Handler;
 use PPOM\Hooks\Callbacks;
 use PPOM\Support\Helpers;
@@ -21,6 +25,20 @@ use PPOM\WooCommerce\Cart\CartHandler;
  * @internal
  */
 final class ProductHandler {
+
+	/**
+	 * Products that passed WooCommerce's add-to-cart validation and await their add.
+	 *
+	 * @var array<int, true>
+	 */
+	private static $validated_adds = array();
+
+	/**
+	 * Whether a Store API route is being dispatched.
+	 *
+	 * @var bool
+	 */
+	private static $dispatching_store_api = false;
 
 	/**
 	 * Whether the field participates in add-to-cart validation (required / min-max option checks).
@@ -254,6 +272,239 @@ final class ProductHandler {
 	}
 
 	/**
+	 * Filter callback: product-page express checkout support (WooPayments).
+	 *
+	 * Express buttons add the product without the PPOM form, so its fields
+	 * would be neither validated nor stored.
+	 *
+	 * @param bool                  $is_supported Gateway's verdict.
+	 * @param WC_Product|false|null $product      Product on the page.
+	 *
+	 * @return bool
+	 */
+	public static function supports_express_checkout( $is_supported, $product ): bool {
+
+		if ( ! $is_supported || ! $product instanceof WC_Product ) {
+			return (bool) $is_supported;
+		}
+
+		return ! self::has_ppom_fields( $product );
+	}
+
+	/**
+	 * Filter callback: hides Stripe's product-page express checkout for PPOM products.
+	 *
+	 * @param bool         $hide Gateway's verdict.
+	 * @param WP_Post|null $post Current post.
+	 *
+	 * @return bool
+	 */
+	public static function hide_express_checkout_on_product_page( $hide, $post ): bool {
+
+		// Stripe also runs this filter in a one-off settings migration; only answer on product pages.
+		if ( $hide || ! is_product() || ! $post instanceof WP_Post ) {
+			return (bool) $hide;
+		}
+
+		$product = wc_get_product( $post->ID );
+
+		return $product instanceof WC_Product && self::has_ppom_fields( $product );
+	}
+
+	/**
+	 * Rejects Store API adds that leave a required PPOM field empty.
+	 *
+	 * The add-to-cart validation treats a request without posted fields as
+	 * having nothing to check. Here missing fields count as empty, and a
+	 * conditional field counts as shown unless the posted form says it is
+	 * hidden, since its visibility cannot be worked out without the form.
+	 *
+	 * @param WC_Product $product Product or variation being added.
+	 *
+	 * @return void
+	 *
+	 * @throws RouteException When a required field is empty.
+	 */
+	public static function validate_store_api_add_to_cart( WC_Product $product ): void {
+
+		$product_id   = (int) Helpers::get_product_id( $product );
+		$variation_id = $product->is_type( 'variation' ) ? $product->get_id() : 0;
+		$ppom         = new PPOM_Meta( $product_id );
+		if ( ! $ppom->fields ) {
+			return;
+		}
+
+		$missing = self::missing_required_field( $ppom->fields, $product_id, $variation_id );
+		if ( null !== $missing ) {
+			throw new RouteException( 'ppom_required_field', self::required_field_message( $missing ), 400 );
+		}
+	}
+
+	/**
+	 * Validates PPOM fields when the add skipped WooCommerce's add-to-cart validation.
+	 *
+	 * PayPal Payments' buttons copy the product form into $_POST and call
+	 * WC_Cart::add_to_cart() directly. An add that follows a passed validation
+	 * of the same product (form submit) uses up that result; adds made from
+	 * inside the filter keep the outer result. Store API adds are neither
+	 * recorded nor checked here; validate_store_api_add_to_cart() checks them.
+	 * PayPal's price simulations run on a half-filled form and are skipped; the
+	 * add made on button click is checked.
+	 *
+	 * @param int $product_id   Product being added.
+	 * @param int $quantity     Requested quantity.
+	 * @param int $variation_id Selected variation, or 0.
+	 *
+	 * @return bool
+	 */
+	public static function validate_unvalidated_add( int $product_id, int $quantity, int $variation_id ): bool {
+
+		// The Store API filters item data before validating, and checks the add itself.
+		if ( self::$dispatching_store_api || doing_filter( 'woocommerce_add_to_cart_validation' ) || apply_filters( 'woocommerce_paypal_payments_is_simulating_cart', false ) ) {
+			return true;
+		}
+
+		if ( isset( self::$validated_adds[ $product_id ] ) ) {
+			unset( self::$validated_adds[ $product_id ] );
+			return true;
+		}
+
+		$ppom = new PPOM_Meta( $product_id );
+		if ( ! $ppom->fields ) {
+			return true;
+		}
+
+		// check_validation() passes a payload with no fields, so required values are checked first.
+		$missing = self::missing_required_field( $ppom->fields, $product_id, $variation_id );
+		if ( null !== $missing ) {
+			Helpers::wc_add_notice( self::required_field_message( $missing ) );
+			return false;
+		}
+
+		$passed = self::validate_product( true, $product_id, $quantity, $variation_id );
+
+		// validate_product() leaves field checks to the browser when AJAX validation is on.
+		if ( $ppom->ajax_validation_enabled ) {
+			$passed = self::check_validation( $product_id, $_POST, $passed, $variation_id );
+		}
+
+		return (bool) $passed;
+	}
+
+	/**
+	 * Filter callback for rest_request_before_callbacks: notes a Store API dispatch.
+	 *
+	 * @param mixed                $response Response so far.
+	 * @param array<string, mixed> $handler  Route handler.
+	 * @param WP_REST_Request      $request  Request being dispatched.
+	 *
+	 * @return mixed
+	 */
+	public static function start_rest_dispatch( $response, $handler, WP_REST_Request $request ) {
+
+		self::$dispatching_store_api = 0 === strpos( $request->get_route(), '/wc/store/' );
+
+		return $response;
+	}
+
+	/**
+	 * Filter callback for rest_request_after_callbacks: ends the noted dispatch.
+	 *
+	 * @param mixed $response Route response.
+	 *
+	 * @return mixed
+	 */
+	public static function end_rest_dispatch( $response ) {
+
+		self::$dispatching_store_api = false;
+
+		return $response;
+	}
+
+	/**
+	 * Filter callback: records a product whose add-to-cart validation passed.
+	 *
+	 * Runs last on woocommerce_add_to_cart_validation so it sees the final verdict.
+	 *
+	 * @param bool       $passed     Validation verdict.
+	 * @param int|string $product_id Product being validated.
+	 *
+	 * @return bool
+	 */
+	public static function record_validated_add( $passed, $product_id ): bool {
+
+		// Store API adds never reach WC_Cart::add_to_cart(), which would use up the record.
+		if ( $passed && ! self::$dispatching_store_api ) {
+			self::$validated_adds[ (int) $product_id ] = true;
+		}
+
+		return (bool) $passed;
+	}
+
+	/**
+	 * Whether the product has active PPOM fields.
+	 *
+	 * @param WC_Product $product Product or variation.
+	 *
+	 * @return bool
+	 */
+	private static function has_ppom_fields( WC_Product $product ): bool {
+
+		$ppom = new PPOM_Meta( (int) Helpers::get_product_id( $product ) );
+
+		return ! empty( $ppom->fields );
+	}
+
+	/**
+	 * The first required field that applies to the selection and has no posted value.
+	 *
+	 * Absent `ppom[fields]` counts as empty. The posted hidden list is honoured
+	 * only for fields with conditions; conditions are evaluated in the browser.
+	 *
+	 * @param array<array-key, mixed> $fields       Saved field definitions.
+	 * @param int                     $product_id   Product being added.
+	 * @param int                     $variation_id Selected variation, or 0.
+	 *
+	 * @return array<string, mixed>|null
+	 */
+	private static function missing_required_field( array $fields, int $product_id, int $variation_id ): ?array {
+
+		$posted = isset( $_POST['ppom']['fields'] ) && is_array( $_POST['ppom']['fields'] ) ? wp_unslash( $_POST['ppom']['fields'] ) : array();
+
+		foreach ( $fields as $field ) {
+			if ( self::is_required_field_missing( $field, $posted, $product_id, $variation_id ) ) {
+				return $field;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Whether a required field that applies to the selection has no posted value.
+	 *
+	 * @param mixed                $field        Saved field definition.
+	 * @param array<string, mixed> $posted       Posted `ppom[fields]`, or empty.
+	 * @param int                  $product_id   Product being added.
+	 * @param int                  $variation_id Selected variation, or 0.
+	 *
+	 * @return bool
+	 *
+	 * @phpstan-assert-if-true array<string, mixed> $field
+	 */
+	private static function is_required_field_missing( $field, array $posted, int $product_id, int $variation_id ): bool {
+
+		$is_conditional = isset( $field['logic'] ) && 'on' === $field['logic'];
+
+		return is_array( $field )
+			&& ! empty( $field['data_name'] )
+			&& isset( $field['required'] ) && 'on' === $field['required']
+			&& self::field_applies_to_selection( $field, $product_id, $variation_id )
+			&& ! ( $is_conditional && Helpers::is_field_hidden_by_condition( sanitize_key( $field['data_name'] ) ) )
+			&& ! Helpers::has_posted_field_value( $posted, $field );
+	}
+
+	/**
 	 * Validates PPOM fields through the AJAX validation endpoint.
 	 *
 	 * @return void
@@ -389,9 +640,10 @@ final class ProductHandler {
 	 * Rejects add-to-cart when a required upload field loses every file row to
 	 * the ownership/schema check that runs before the item is stored.
 	 *
-	 * Required-field validation reads the raw request, where any non-empty file
-	 * array counts as present, and it is skipped when validation runs in the
-	 * browser, so a dropped upload would otherwise still let the product in.
+	 * Required-field validation reads the raw request, where a file array counts
+	 * as present when any nested value is filled, and it is skipped when
+	 * validation runs in the browser, so a dropped upload would otherwise still
+	 * let the product in.
 	 *
 	 * @param int $product_id   Product being added.
 	 * @param int $variation_id Selected variation, or 0.
