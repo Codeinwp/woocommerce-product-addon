@@ -647,6 +647,89 @@ class Test_Checkout_Lifecycle extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Ensure a session cart line without a product object still stores display meta.
+	 *
+	 * @return void
+	 */
+	public function test_order_item_meta_from_session_cart_line(): void {
+		$product = $this->create_simple_product();
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$order = $this->create_order_with_product( $product );
+		$item  = $this->get_first_order_item( $order );
+
+		ppom_woocommerce_order_item_meta(
+			$item,
+			'ppom-test-cart-key',
+			array(
+				'product_id'   => $product->get_id(),
+				'variation_id' => 0,
+				'ppom'         => array(
+					'fields' => array(
+						'engraving' => 'Session Hello',
+					),
+				),
+			),
+			$order
+		);
+
+		$item->save();
+
+		$this->assertSame( 'Session Hello', $item->get_meta( 'engraving', true ) );
+	}
+
+	/**
+	 * Ensure a session variation line without a product object resolves the parent field schema.
+	 *
+	 * @return void
+	 */
+	public function test_order_item_meta_from_session_variation_line(): void {
+		$products  = $this->create_variable_product_with_variation(
+			array(),
+			array(
+				'regular_price' => '12',
+			)
+		);
+		$product   = $products['product'];
+		$variation = $products['variation'];
+
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$order = $this->create_order_with_product( $variation );
+		$item  = $this->get_first_order_item( $order );
+
+		ppom_woocommerce_order_item_meta(
+			$item,
+			'ppom-test-cart-key',
+			array(
+				'product_id'   => $product->get_id(),
+				'variation_id' => $variation->get_id(),
+				'ppom'         => array(
+					'fields' => array(
+						'engraving' => 'Session Variation Hello',
+					),
+				),
+			),
+			$order
+		);
+
+		$item->save();
+
+		$this->assertSame( 'Session Variation Hello', $item->get_meta( 'engraving', true ) );
+	}
+
+	/**
 	 * Ensure checkbox selections persist as display text and raw array payloads on order items.
 	 *
 	 * @return void
