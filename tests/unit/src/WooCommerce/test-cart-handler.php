@@ -1476,4 +1476,25 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 
 		$this->assertIsString( $nested_key );
 	}
+
+	/**
+	 * A passed validation covers only that product's next add.
+	 *
+	 * @return void
+	 */
+	public function test_validation_of_one_product_does_not_cover_another_add() {
+		$this->initialize_woocommerce_checkout_context();
+		$validated = $this->create_simple_product();
+		$direct    = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $direct->get_id() );
+
+		$passed        = apply_filters( 'woocommerce_add_to_cart_validation', true, $validated->get_id(), 1 );
+		$validated_key = WC()->cart->add_to_cart( $validated->get_id(), 1 );
+		$direct_key    = $this->add_product_to_real_cart( $direct->get_id(), array( 'fields' => array( 'engraving' => '' ) ) );
+		WC()->cart->empty_cart();
+
+		$this->assertTrue( $passed );
+		$this->assertIsString( $validated_key );
+		$this->assertFalse( $direct_key );
+	}
 }

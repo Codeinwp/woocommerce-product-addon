@@ -26,6 +26,13 @@ use PPOM\WooCommerce\Cart\CartHandler;
 final class ProductHandler {
 
 	/**
+	 * Products that passed WooCommerce's add-to-cart validation and await their add.
+	 *
+	 * @var array<int, true>
+	 */
+	private static $validated_adds = array();
+
+	/**
 	 * Whether the field participates in add-to-cart validation (required / min-max option checks).
 	 *
 	 * @param array $field PPOM field definition.
@@ -297,23 +304,20 @@ final class ProductHandler {
 	}
 
 	/**
-	 * Rejects Store API adds that skip a required PPOM field.
+	 * Rejects Store API adds that leave a required PPOM field empty.
 	 *
-	 * Store API requests carry no PPOM form, so the add-to-cart validation
-	 * sees nothing posted and lets the product in. Conditionally shown fields
-	 * are skipped because their visibility depends on the missing form.
+	 * The add-to-cart validation treats a request without posted fields as
+	 * having nothing to check. Here missing fields count as empty, and a
+	 * conditional field counts as shown unless the posted form says it is
+	 * hidden, since its visibility cannot be worked out without the form.
 	 *
 	 * @param WC_Product $product Product or variation being added.
 	 *
 	 * @return void
 	 *
-	 * @throws RouteException When a required field applies.
+	 * @throws RouteException When a required field is empty.
 	 */
 	public static function validate_store_api_add_to_cart( WC_Product $product ): void {
-
-		if ( isset( $_POST['ppom'] ) ) {
-			return;
-		}
 
 		$product_id   = (int) Helpers::get_product_id( $product );
 		$variation_id = $product->is_type( 'variation' ) ? $product->get_id() : 0;
@@ -322,8 +326,10 @@ final class ProductHandler {
 			return;
 		}
 
+		$posted = isset( $_POST['ppom']['fields'] ) && is_array( $_POST['ppom']['fields'] ) ? wp_unslash( $_POST['ppom']['fields'] ) : array();
+
 		foreach ( $ppom->fields as $field ) {
-			if ( self::is_unconditionally_required( $field, $product_id, $variation_id ) ) {
+			if ( self::is_required_field_missing( $field, $posted, $product_id, $variation_id ) ) {
 				throw new RouteException( 'ppom_required_field', self::required_field_message( $field ), 400 );
 			}
 		}
@@ -333,10 +339,11 @@ final class ProductHandler {
 	 * Validates a posted PPOM payload when the add skipped WooCommerce's add-to-cart validation.
 	 *
 	 * PayPal Payments' buttons copy the product form into $_POST and call
-	 * WC_Cart::add_to_cart() directly. Adds made while the validation filter
-	 * has run (form submit, Store API, Order Again, or from inside the filter)
-	 * keep the result PPOM gave there. PayPal's price simulations run on a
-	 * half-filled form and are skipped; the add made on button click is checked.
+	 * WC_Cart::add_to_cart() directly. An add that follows a passed validation
+	 * of the same product (form submit, Store API, Order Again) uses up that
+	 * result; adds made from inside the filter keep the outer result. PayPal's
+	 * price simulations run on a half-filled form and are skipped; the add made
+	 * on button click is checked.
 	 *
 	 * @param int $product_id   Product being added.
 	 * @param int $quantity     Requested quantity.
@@ -346,7 +353,12 @@ final class ProductHandler {
 	 */
 	public static function validate_unvalidated_add( int $product_id, int $quantity, int $variation_id ): bool {
 
-		if ( did_filter( 'woocommerce_add_to_cart_validation' ) || apply_filters( 'woocommerce_paypal_payments_is_simulating_cart', false ) ) {
+		if ( doing_filter( 'woocommerce_add_to_cart_validation' ) || apply_filters( 'woocommerce_paypal_payments_is_simulating_cart', false ) ) {
+			return true;
+		}
+
+		if ( isset( self::$validated_adds[ $product_id ] ) ) {
+			unset( self::$validated_adds[ $product_id ] );
 			return true;
 		}
 
@@ -361,7 +373,26 @@ final class ProductHandler {
 	}
 
 	/**
-	 * Whether PPOM fields are attached to the product.
+	 * Filter callback: records a product whose add-to-cart validation passed.
+	 *
+	 * Runs last on woocommerce_add_to_cart_validation so it sees the final verdict.
+	 *
+	 * @param bool       $passed     Validation verdict.
+	 * @param int|string $product_id Product being validated.
+	 *
+	 * @return bool
+	 */
+	public static function record_validated_add( $passed, $product_id ): bool {
+
+		if ( $passed ) {
+			self::$validated_adds[ (int) $product_id ] = true;
+		}
+
+		return (bool) $passed;
+	}
+
+	/**
+	 * Whether the product has active PPOM fields.
 	 *
 	 * @param WC_Product $product Product or variation.
 	 *
@@ -371,24 +402,27 @@ final class ProductHandler {
 
 		$ppom = new PPOM_Meta( (int) Helpers::get_product_id( $product ) );
 
-		return (bool) $ppom->is_exists;
+		return ! empty( $ppom->fields );
 	}
 
 	/**
-	 * Whether a field is required, always shown, and active for the selection.
+	 * Whether a required field that applies to the selection has no posted value.
 	 *
-	 * @param mixed $field        Saved field definition.
-	 * @param int   $product_id   Product being added.
-	 * @param int   $variation_id Selected variation, or 0.
+	 * @param mixed                $field        Saved field definition.
+	 * @param array<string, mixed> $posted       Posted `ppom[fields]`, or empty.
+	 * @param int                  $product_id   Product being added.
+	 * @param int                  $variation_id Selected variation, or 0.
 	 *
 	 * @return bool
 	 */
-	private static function is_unconditionally_required( $field, int $product_id, int $variation_id ): bool {
+	private static function is_required_field_missing( $field, array $posted, int $product_id, int $variation_id ): bool {
 
 		return is_array( $field )
+			&& ! empty( $field['data_name'] )
 			&& isset( $field['required'] ) && 'on' === $field['required']
-			&& ( ! isset( $field['logic'] ) || 'on' !== $field['logic'] )
-			&& self::field_applies_to_selection( $field, $product_id, $variation_id );
+			&& self::field_applies_to_selection( $field, $product_id, $variation_id )
+			&& ! Helpers::is_field_hidden_by_condition( sanitize_key( $field['data_name'] ) )
+			&& ! Helpers::has_posted_field_value( $posted, $field );
 	}
 
 	/**

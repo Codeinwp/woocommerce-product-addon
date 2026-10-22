@@ -46,6 +46,18 @@ function ppom_woocommerce_validate_product( $passed, $product_id, $qty, $variati
 }
 
 /**
+ * Filter callback for woocommerce_add_to_cart_validation; records a passed validation.
+ *
+ * @param bool       $passed     Validation verdict.
+ * @param int|string $product_id Product being validated.
+ *
+ * @return bool
+ */
+function ppom_woocommerce_record_validated_add( $passed, $product_id ): bool {
+	return \PPOM\WooCommerce\Product\ProductHandler::record_validated_add( $passed, $product_id );
+}
+
+/**
  * Filter callback for WooPayments' product-page express checkout support.
  *
  * @param bool                  $is_supported Gateway's verdict.

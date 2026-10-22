@@ -299,49 +299,124 @@ class Test_Product_Handler extends PPOM_Test_Case {
 	/**
 	 * @return void
 	 */
-	public function test_store_api_add_item_allows_products_without_unconditional_required_fields() {
+	public function test_store_api_add_item_allows_products_without_required_fields() {
 		$optional = $this->create_simple_product();
 		$this->insert_ppom_meta( array( $this->build_text_field( 'note', 'Note' ) ), $optional->get_id() );
 
-		$conditional = $this->create_simple_product();
-		$this->insert_ppom_meta(
-			array(
-				$this->build_text_field(
-					'engraving',
-					'Engraving',
-					array(
-						'required' => 'on',
-						'logic'    => 'on',
-					)
-				),
-			),
-			$conditional->get_id()
-		);
-
 		$plain = $this->create_simple_product();
 
-		foreach ( array( $optional, $conditional, $plain ) as $product ) {
+		foreach ( array( $optional, $plain ) as $product ) {
 			$this->assertSame( 201, $this->store_api_add_item( $product->get_id() )->get_status(), $product->get_name() );
 		}
 	}
 
 	/**
+	 * A form-encoded Store API request can post a `ppom` key without the required value.
+	 *
+	 * @return void
+	 */
+	public function test_store_api_add_item_checks_posted_ppom_values() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+
+		$payloads = array(
+			'marker only'  => array( 'marker' => '1' ),
+			'empty fields' => array( 'fields' => array() ),
+			'empty value'  => array( 'fields' => array( 'engraving' => '' ) ),
+		);
+		foreach ( $payloads as $label => $payload ) {
+			$this->assertSame( 400, $this->store_api_add_item( $product->get_id(), $payload )->get_status(), $label );
+		}
+
+		$this->assertSame( 201, $this->store_api_add_item( $product->get_id(), array( 'fields' => array( 'engraving' => 'Hello' ) ) )->get_status() );
+	}
+
+	/**
+	 * A hide rule that does not match leaves the field shown, so it stays required.
+	 *
+	 * @return void
+	 */
+	public function test_store_api_add_item_requires_conditional_field_unless_posted_hidden() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta(
+			array(
+				$this->build_checkbox_field( 'gift', 'Gift', array( array( 'option' => 'Yes' ) ) ),
+				$this->build_text_field(
+					'engraving',
+					'Engraving',
+					array(
+						'required'   => 'on',
+						'logic'      => 'on',
+						'conditions' => array(
+							'visibility' => 'Hide',
+							'bound'      => 'Any',
+							'rules'      => array(
+								array(
+									'elements'       => 'gift',
+									'operators'      => 'is',
+									'element_values' => 'Yes',
+								),
+							),
+						),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$response = $this->store_api_add_item( $product->get_id() );
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'Engraving is a required field', $response->get_data()['message'] );
+
+		$hidden = array(
+			'fields'               => array( 'gift' => array( 'Yes' ) ),
+			'conditionally_hidden' => 'engraving',
+		);
+		$this->assertSame( 201, $this->store_api_add_item( $product->get_id(), $hidden )->get_status() );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_express_buttons_kept_when_ppom_fields_are_inactive() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'status' => 'off' ) ) ), $product->get_id() );
+
+		$this->assertTrue( apply_filters( 'wcpay_payment_request_is_product_supported', true, $product ) );
+
+		$this->go_to( get_permalink( $product->get_id() ) );
+		$hidden = apply_filters( 'wc_stripe_hide_payment_request_on_product_page', false, get_post( $product->get_id() ) );
+
+		// go_to() leaves the product slug in this global.
+		$this->go_to( home_url( '/' ) );
+		unset( $GLOBALS['product'] );
+
+		$this->assertFalse( $hidden );
+	}
+
+	/**
 	 * Adds a product through the Store API the way express checkout buttons do.
 	 *
-	 * @param int $product_id Product to add.
+	 * @param int                  $product_id Product to add.
+	 * @param array<string, mixed> $ppom       Form-encoded `ppom` payload, or none.
 	 *
 	 * @return WP_REST_Response
 	 */
-	private function store_api_add_item( int $product_id ): WP_REST_Response {
+	private function store_api_add_item( int $product_id, array $ppom = array() ): WP_REST_Response {
 		add_filter( 'woocommerce_store_api_disable_nonce_check', '__return_true' );
+		if ( $ppom ) {
+			$_POST['ppom'] = $ppom;
+		}
 
 		$request = new WP_REST_Request( 'POST', '/wc/store/v1/cart/add-item' );
 		$request->set_param( 'id', $product_id );
 		$request->set_param( 'quantity', 1 );
 		$response = rest_do_request( $request );
 
+		unset( $_POST['ppom'] );
 		remove_filter( 'woocommerce_store_api_disable_nonce_check', '__return_true' );
 		WC()->cart->empty_cart();
+		wc_clear_notices();
 
 		return $response;
 	}
