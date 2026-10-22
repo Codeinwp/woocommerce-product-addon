@@ -640,9 +640,10 @@ final class ProductHandler {
 	 * Rejects add-to-cart when a required upload field loses every file row to
 	 * the ownership/schema check that runs before the item is stored.
 	 *
-	 * Required-field validation reads the raw request, where any non-empty file
-	 * array counts as present, and it is skipped when validation runs in the
-	 * browser, so a dropped upload would otherwise still let the product in.
+	 * Required-field validation reads the raw request, where a file array counts
+	 * as present when any nested value is filled, and it is skipped when
+	 * validation runs in the browser, so a dropped upload would otherwise still
+	 * let the product in.
 	 *
 	 * @param int $product_id   Product being added.
 	 * @param int $variation_id Selected variation, or 0.
