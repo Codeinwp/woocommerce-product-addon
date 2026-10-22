@@ -352,6 +352,13 @@ final class CartHandler {
 	 */
 	public static function add_cart_item_data( $cart, $product_id, $variation_id = 0, $quantity = 1 ) {
 
+		$is_bundled = function_exists( 'wc_pb_is_bundled_cart_item' ) && wc_pb_is_bundled_cart_item( $cart );
+
+		// Before the payload and edit-removal steps; WC_Cart::add_to_cart() fails the add on throw.
+		if ( ! $is_bundled && ! ProductHandler::validate_unvalidated_add( (int) $product_id, (int) $quantity, (int) $variation_id ) ) {
+			throw new \Exception();
+		}
+
 		if ( ! isset( $_POST['ppom'] ) ) {
 			return $cart;
 		}
@@ -359,14 +366,6 @@ final class CartHandler {
 		$ppom = new PPOM_Meta( $product_id );
 		if ( ! $ppom->ppom_settings ) {
 			return $cart;
-		}
-
-		$is_bundled = function_exists( 'wc_pb_is_bundled_cart_item' ) && wc_pb_is_bundled_cart_item( $cart );
-
-		// Before the edited item is removed, so its uploads still count. WC_Cart::add_to_cart()
-		// turns the exception into a failed add; the notices are already queued.
-		if ( ! $is_bundled && ! ProductHandler::validate_unvalidated_add( (int) $product_id, (int) $quantity, (int) $variation_id ) ) {
-			throw new \Exception();
 		}
 
 		$verified = self::remove_replaced_cart_item();

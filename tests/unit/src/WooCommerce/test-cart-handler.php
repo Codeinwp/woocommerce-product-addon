@@ -1420,6 +1420,50 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	}
 
 	/**
+	 * A crafted request can leave out the PPOM payload or send one without fields.
+	 *
+	 * @return void
+	 */
+	public function test_unvalidated_add_rejects_missing_or_fieldless_payload() {
+		$this->initialize_woocommerce_checkout_context();
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+
+		$payloads = array(
+			'no payload'   => null,
+			'marker only'  => array( 'marker' => '1' ),
+			'empty fields' => array( 'fields' => array() ),
+		);
+		foreach ( $payloads as $label => $payload ) {
+			unset( $_POST['ppom'] );
+			if ( null !== $payload ) {
+				$_POST['ppom'] = $payload;
+			}
+
+			$cart_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+			$notices  = wp_strip_all_tags( wc_print_notices( true ) );
+			WC()->cart->empty_cart();
+
+			$this->assertFalse( $cart_key, $label );
+			$this->assertStringContainsString( 'Engraving is a required field', $notices, $label );
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_unvalidated_add_without_payload_allows_optional_fields() {
+		$this->initialize_woocommerce_checkout_context();
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'note', 'Note' ) ), $product->get_id() );
+
+		$cart_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		WC()->cart->empty_cart();
+
+		$this->assertIsString( $cart_key );
+	}
+
+	/**
 	 * @return void
 	 */
 	public function test_unvalidated_add_keeps_filled_required_field() {

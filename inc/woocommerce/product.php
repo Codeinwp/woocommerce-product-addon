@@ -58,6 +58,30 @@ function ppom_woocommerce_record_validated_add( $passed, $product_id ): bool {
 }
 
 /**
+ * Filter callback for rest_request_before_callbacks.
+ *
+ * @param mixed                $response Response so far.
+ * @param array<string, mixed> $handler  Route handler.
+ * @param WP_REST_Request      $request  Request being dispatched.
+ *
+ * @return mixed
+ */
+function ppom_woocommerce_start_rest_dispatch( $response, $handler, WP_REST_Request $request ) {
+	return \PPOM\WooCommerce\Product\ProductHandler::start_rest_dispatch( $response, $handler, $request );
+}
+
+/**
+ * Filter callback for rest_request_after_callbacks.
+ *
+ * @param mixed $response Route response.
+ *
+ * @return mixed
+ */
+function ppom_woocommerce_end_rest_dispatch( $response ) {
+	return \PPOM\WooCommerce\Product\ProductHandler::end_rest_dispatch( $response );
+}
+
+/**
  * Filter callback for WooPayments' product-page express checkout support.
  *
  * @param bool                  $is_supported Gateway's verdict.

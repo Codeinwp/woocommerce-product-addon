@@ -323,12 +323,31 @@ class Test_Product_Handler extends PPOM_Test_Case {
 			'marker only'  => array( 'marker' => '1' ),
 			'empty fields' => array( 'fields' => array() ),
 			'empty value'  => array( 'fields' => array( 'engraving' => '' ) ),
+			'forged hide'  => array( 'conditionally_hidden' => 'engraving' ),
 		);
 		foreach ( $payloads as $label => $payload ) {
 			$this->assertSame( 400, $this->store_api_add_item( $product->get_id(), $payload )->get_status(), $label );
 		}
 
 		$this->assertSame( 201, $this->store_api_add_item( $product->get_id(), array( 'fields' => array( 'engraving' => 'Hello' ) ) )->get_status() );
+	}
+
+	/**
+	 * Direct adds stand aside only while a Store API route is dispatched.
+	 *
+	 * @return void
+	 */
+	public function test_direct_add_is_checked_after_a_store_api_request() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+
+		$this->assertSame( 400, $this->store_api_add_item( $product->get_id() )->get_status() );
+
+		$cart_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		WC()->cart->empty_cart();
+		wc_clear_notices();
+
+		$this->assertFalse( $cart_key );
 	}
 
 	/**
