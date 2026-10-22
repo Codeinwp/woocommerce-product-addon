@@ -1032,9 +1032,7 @@ final class Helpers {
 							break;
 
 						default:
-							if ( $value != '' ) {
-								$has_value = true;
-							}
+							$has_value = self::has_filled_value( $value );
 							break;
 
 					}
@@ -1048,6 +1046,28 @@ final class Helpers {
 		}
 
 		return apply_filters( 'ppom_has_posted_field_value', $has_value, $posted_fields, $field );
+	}
+
+	/**
+	 * Whether a posted value, or anything nested in a posted array, is filled in.
+	 *
+	 * @param mixed $value Posted field value.
+	 *
+	 * @return bool
+	 */
+	private static function has_filled_value( $value ): bool {
+
+		if ( ! is_array( $value ) ) {
+			return '' !== (string) $value;
+		}
+
+		foreach ( $value as $item ) {
+			if ( self::has_filled_value( $item ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public static function is_aviary_installed() {

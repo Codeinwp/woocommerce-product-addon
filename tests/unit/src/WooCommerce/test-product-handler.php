@@ -332,6 +332,7 @@ class Test_Product_Handler extends PPOM_Test_Case {
 			'marker only'  => array( 'marker' => '1' ),
 			'empty fields' => array( 'fields' => array() ),
 			'empty value'  => array( 'fields' => array( 'engraving' => '' ) ),
+			'empty array'  => array( 'fields' => array( 'engraving' => array( '' ) ) ),
 			'forged hide'  => array( 'conditionally_hidden' => 'engraving' ),
 		);
 		foreach ( $payloads as $label => $payload ) {
