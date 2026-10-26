@@ -53,6 +53,14 @@ const PPOM_Validate = {
 			}
 		);
 
+		// Phone widgets mount after init, so delegate from the PHP-rendered root.
+		jQuery( document ).on( 'input', '.ppom-addon-phone', function () {
+			PPOM_Validate.validate_data().then(
+				PPOM_Validate.enable_button,
+				PPOM_Validate.disable_button
+			);
+		} );
+
 		// keyup events for texts input e.g: text,email,number
 		PPOM_Validate.$ppom_input_texts.keyup( async function ( e ) {
 			PPOM_Validate.validate_data().then(
@@ -153,7 +161,8 @@ const PPOM_Validate = {
 		if (
 			field.type === 'imageselect' ||
 			field.type === 'quantities' ||
-			field.type === 'fonts'
+			field.type === 'fonts' ||
+			field.type === 'phone'
 		) {
 			ppom_type = field.type;
 		}
@@ -247,6 +256,12 @@ const PPOM_Validate = {
 				}
 				return element_value !== 0;
 				break;
+			case 'phone':
+				// The widget's only named input is the hidden submission field.
+				element_value = jQuery(
+					`input[name="ppom[fields][${ data_name }]"]`
+				).val();
+				return !! element_value;
 			case 'measure':
 				element_value =
 					jQuery( `#${ data_name }` ).val() != null
