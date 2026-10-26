@@ -1250,7 +1250,7 @@ final class Manager {
 		$pro_product_slug = defined( 'PPOM_PRO_BASENAME' ) ? PPOM_PRO_BASENAME : '';
 
 		$is_pro     = 'valid' === $status;
-		$is_expired = 'expired' === $status || 'active-expired' === $status;
+		$is_expired = in_array( $status, array( 'expired', 'active_expired', 'active-expired' ), true );
 
 		if ( $is_pro ) {
 			// translators: %s is the discount percentage.
