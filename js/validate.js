@@ -257,11 +257,7 @@ const PPOM_Validate = {
 				return element_value !== 0;
 				break;
 			case 'phone':
-				// The widget's only named input is the hidden submission field.
-				element_value = jQuery(
-					`input[name="ppom[fields][${ data_name }]"]`
-				).val();
-				return !! element_value;
+				return PPOM_Validate.phone_has_number( data_name );
 			case 'measure':
 				element_value =
 					jQuery( `#${ data_name }` ).val() != null
@@ -282,6 +278,30 @@ const PPOM_Validate = {
 				return element_value !== 0;
 				break;
 		}
+	},
+
+	/**
+	 * @param {string} data_name Sanitized field data name.
+	 * @return {boolean} Whether digits follow the dial code.
+	 */
+	phone_has_number( data_name ) {
+		// The widget's only named input is the hidden submission field.
+		const $submission = jQuery(
+			`input[name="ppom[fields][${ data_name }]"]`
+		);
+		const value = $submission.val() || '';
+		// The submission keeps the dial code after the number is deleted; the
+		// visible input shows it as the first token.
+		const dial_code = (
+			$submission
+				.closest( '.ppom-addon-phone' )
+				.find( 'input[type="tel"]' )
+				.val() || ''
+		)
+			.split( ' ' )[ 0 ]
+			.replace( /\D/g, '' );
+
+		return value !== '' && value !== dial_code;
 	},
 
 	text_events( e ) {
