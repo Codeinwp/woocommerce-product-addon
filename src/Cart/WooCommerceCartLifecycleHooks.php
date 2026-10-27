@@ -24,6 +24,15 @@ final class WooCommerceCartLifecycleHooks {
 
 		add_filter( 'woocommerce_add_cart_item_data', 'ppom_woocommerce_add_cart_item_data', 10, 4 );
 
+		// Express buttons and the Store API add products without the PPOM form.
+		add_filter( 'wcpay_payment_request_is_product_supported', 'ppom_woocommerce_supports_express_checkout', 10, 2 );
+		add_filter( 'wcpay_woopay_button_is_product_supported', 'ppom_woocommerce_supports_express_checkout', 10, 2 );
+		add_filter( 'wc_stripe_hide_payment_request_on_product_page', 'ppom_woocommerce_hide_express_checkout_on_product_page', 10, 2 );
+		add_action( 'woocommerce_store_api_validate_add_to_cart', 'ppom_woocommerce_validate_store_api_add_to_cart' );
+		add_filter( 'woocommerce_add_to_cart_validation', 'ppom_woocommerce_record_validated_add', PHP_INT_MAX, 2 );
+		add_filter( 'rest_request_before_callbacks', 'ppom_woocommerce_start_rest_dispatch', 10, 3 );
+		add_filter( 'rest_request_after_callbacks', 'ppom_woocommerce_end_rest_dispatch' );
+
 		if ( PriceMode::is_legacy() ) {
 
 			add_filter( 'woocommerce_get_cart_item_from_session', 'ppom_woocommerce_update_cart_fees', 10, 2 );
