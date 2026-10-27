@@ -292,7 +292,8 @@ final class Helpers {
 			$variation_id = $cart_item['variation_id'];
 		}
 
-		$product_id                  = self::get_product_id( $cart_item['data'] );
+		$product                     = $cart_item['data'] ?? wc_get_product( $cart_item['product_id'] ?? 0 );
+		$product_id                  = self::get_product_id( $product );
 		$cart_item['ppom']['fields'] = self::filter_posted_ppom_fields_by_active_variation( $cart_item['ppom']['fields'], $product_id, $variation_id );
 
 		// Fields sanitization.
