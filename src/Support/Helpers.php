@@ -292,7 +292,8 @@ final class Helpers {
 			$variation_id = $cart_item['variation_id'];
 		}
 
-		$product_id                  = self::get_product_id( $cart_item['data'] );
+		$product                     = $cart_item['data'] ?? wc_get_product( $cart_item['product_id'] ?? 0 );
+		$product_id                  = self::get_product_id( $product );
 		$cart_item['ppom']['fields'] = self::filter_posted_ppom_fields_by_active_variation( $cart_item['ppom']['fields'], $product_id, $variation_id );
 
 		// Fields sanitization.
@@ -1032,9 +1033,7 @@ final class Helpers {
 							break;
 
 						default:
-							if ( $value != '' ) {
-								$has_value = true;
-							}
+							$has_value = self::has_filled_value( $value );
 							break;
 
 					}
@@ -1048,6 +1047,28 @@ final class Helpers {
 		}
 
 		return apply_filters( 'ppom_has_posted_field_value', $has_value, $posted_fields, $field );
+	}
+
+	/**
+	 * Whether a posted value, or anything nested in a posted array, is filled in.
+	 *
+	 * @param mixed $value Posted field value.
+	 *
+	 * @return bool
+	 */
+	private static function has_filled_value( $value ): bool {
+
+		if ( ! is_array( $value ) ) {
+			return '' !== (string) $value;
+		}
+
+		foreach ( $value as $item ) {
+			if ( self::has_filled_value( $item ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public static function is_aviary_installed() {
