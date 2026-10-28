@@ -53,6 +53,14 @@ const PPOM_Validate = {
 			}
 		);
 
+		// Phone widgets mount after init, so delegate from the PHP-rendered root.
+		jQuery( document ).on( 'input', '.ppom-addon-phone', function () {
+			PPOM_Validate.validate_data().then(
+				PPOM_Validate.enable_button,
+				PPOM_Validate.disable_button
+			);
+		} );
+
 		// keyup events for texts input e.g: text,email,number
 		PPOM_Validate.$ppom_input_texts.keyup( async function ( e ) {
 			PPOM_Validate.validate_data().then(
@@ -153,7 +161,8 @@ const PPOM_Validate = {
 		if (
 			field.type === 'imageselect' ||
 			field.type === 'quantities' ||
-			field.type === 'fonts'
+			field.type === 'fonts' ||
+			field.type === 'phone'
 		) {
 			ppom_type = field.type;
 		}
@@ -247,6 +256,8 @@ const PPOM_Validate = {
 				}
 				return element_value !== 0;
 				break;
+			case 'phone':
+				return PPOM_Validate.phone_has_number( data_name );
 			case 'measure':
 				element_value =
 					jQuery( `#${ data_name }` ).val() != null
@@ -267,6 +278,30 @@ const PPOM_Validate = {
 				return element_value !== 0;
 				break;
 		}
+	},
+
+	/**
+	 * @param {string} data_name Sanitized field data name.
+	 * @return {boolean} Whether digits follow the dial code.
+	 */
+	phone_has_number( data_name ) {
+		// The widget's only named input is the hidden submission field.
+		const $submission = jQuery(
+			`input[name="ppom[fields][${ data_name }]"]`
+		);
+		const value = $submission.val() || '';
+		// The submission keeps the dial code after the number is deleted; the
+		// visible input shows it as the first token.
+		const dial_code = (
+			$submission
+				.closest( '.ppom-addon-phone' )
+				.find( 'input[type="tel"]' )
+				.val() || ''
+		)
+			.split( ' ' )[ 0 ]
+			.replace( /\D/g, '' );
+
+		return value !== '' && value !== dial_code;
 	},
 
 	text_events( e ) {
