@@ -160,6 +160,10 @@ final class FieldModalRestController {
 		if ( function_exists( 'tsdk_utmify' ) ) {
 			$condition_upgrade_url = tsdk_utmify( $condition_upgrade_url, 'react-field-modal', 'condition' );
 		}
+		$cfr_docs_url = 'https://docs.themeisle.com/product-option-manager/personalized-product-meta-manager#conditional-repeater';
+		if ( function_exists( 'tsdk_utmify' ) ) {
+			$cfr_docs_url = tsdk_utmify( $cfr_docs_url, 'conditional-repeater', 'field-editor' );
+		}
 
 		$catalog        = $this->schema_builder->get_catalog();
 		$catalog_groups = $this->schema_builder->get_catalog_groups_for_rest();
@@ -249,7 +253,7 @@ final class FieldModalRestController {
 			),
 			'upsell'                           => $upsell,
 			'links'                            => array(
-				'cfrDocsUrl'         => 'https://docs.themeisle.com/article/1700-personalized-product-meta-manager#conditional-repeater',
+				'cfrDocsUrl'         => esc_url_raw( $cfr_docs_url ),
 				'cfrUpgradeUrl'      => esc_url( $cfr_upgrade_url ),
 				'cfrViewDemoUrl'     => 'https://demo-ppom-lite.vertisite.cloud/product/personalized-caps-using-conditional-repeater/',
 				'conditionUpgradeUrl' => esc_url( $condition_upgrade_url ),

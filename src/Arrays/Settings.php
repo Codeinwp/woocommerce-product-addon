@@ -743,7 +743,7 @@ final class Settings {
 				'actions' => array(
 					array(
 						'title' => __( 'Documentation', 'woocommerce-product-addon' ),
-						'link'  => 'https://docs.themeisle.com/article/1801-what-is-the-difference-between-ppom-free-and-ppom-pro',
+						'link'  => tsdk_utmify( 'https://docs.themeisle.com/product-option-manager/what-is-the-difference-between-ppom-free-and-ppom-pro', 'free-vs-pro', 'alladdonspage' ),
 					),
 					array(
 						'title' => __( 'Demo', 'woocommerce-product-addon' ),
@@ -758,7 +758,7 @@ final class Settings {
 				'actions' => array(
 					array(
 						'title' => __( 'Documentation', 'woocommerce-product-addon' ),
-						'link'  => 'https://docs.themeisle.com/article/1793-how-to-enable-the-cart-edit-in-ppom',
+						'link'  => tsdk_utmify( 'https://docs.themeisle.com/product-option-manager/how-to-enable-the-cart-edit-in-ppom', 'cart-edit', 'alladdonspage' ),
 					),
 				),
 				'type'    => 'feature',
@@ -769,7 +769,7 @@ final class Settings {
 				'actions' => array(
 					array(
 						'title' => __( 'Documentation', 'woocommerce-product-addon' ),
-						'link'  => 'https://docs.themeisle.com/article/1700-personalized-product-meta-manager#conditional-repeater',
+						'link'  => tsdk_utmify( 'https://docs.themeisle.com/product-option-manager/personalized-product-meta-manager#conditional-repeater', 'conditional-repeater', 'alladdonspage' ),
 					),
 				),
 				'type'    => 'feature',
@@ -786,7 +786,7 @@ final class Settings {
 				'actions' => array(
 					array(
 						'title' => __( 'Documentation', 'woocommerce-product-addon' ),
-						'link'  => 'https://docs.themeisle.com/article/1982-how-to-configure-the-field-popup-in-ppom',
+						'link'  => tsdk_utmify( 'https://docs.themeisle.com/product-option-manager/how-to-configure-the-field-popup-in-ppom', 'field-popup', 'alladdonspage' ),
 					),
 				),  
 				'type'    => 'feature',
