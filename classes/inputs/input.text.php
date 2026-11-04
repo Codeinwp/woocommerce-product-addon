@@ -43,7 +43,10 @@ class NM_Text_wooproduct extends PPOM_Inputs {
 	 */
 	private function get_settings() {
 
-		$regex_help_url = tsdk_utmify( 'https://docs.themeisle.com/product-option-manager/input-masking-documentation-for-field-configuration', 'input-masking', 'field-editor' );
+		$regex_help_url = 'https://docs.themeisle.com/product-option-manager/input-masking-documentation-for-field-configuration';
+		if ( function_exists( 'tsdk_utmify' ) ) {
+			$regex_help_url = tsdk_utmify( $regex_help_url, 'input-masking', 'field-editor' );
+		}
 
 		$input_meta = array(
 			'title'           => array(
