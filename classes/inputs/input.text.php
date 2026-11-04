@@ -43,7 +43,10 @@ class NM_Text_wooproduct extends PPOM_Inputs {
 	 */
 	private function get_settings() {
 
-		$regex_help_url = 'https://docs.themeisle.com/article/2060-input-masking-documentation-for-field-configuration';
+		$regex_help_url = 'https://docs.themeisle.com/product-option-manager/input-masking-documentation-for-field-configuration';
+		if ( function_exists( 'tsdk_utmify' ) ) {
+			$regex_help_url = tsdk_utmify( $regex_help_url, 'input-masking', 'field-editor' );
+		}
 
 		$input_meta = array(
 			'title'           => array(
@@ -107,7 +110,7 @@ class NM_Text_wooproduct extends PPOM_Inputs {
 				'type'        => 'text',
 				'title'       => __( 'Input Masking', 'woocommerce-product-addon' ),
 				'desc'        => __( 'Input masking ensures that users input data in predefined formats.', 'woocommerce-product-addon' ),
-				'link'        => __( '<a href="https://docs.themeisle.com/article/2060-input-masking-documentation-for-field-configuration" target="_blank">Options</a>', 'woocommerce-product-addon' ),
+				'link'        => '<a href="' . esc_url( $regex_help_url ) . '" target="_blank">' . __( 'Options', 'woocommerce-product-addon' ) . '</a>',
 				'col_classes' => array( 'col-md-3', 'col-sm-12' ),
 			),
 			'width'           => array(

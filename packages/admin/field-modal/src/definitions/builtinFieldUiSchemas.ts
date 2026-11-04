@@ -6,6 +6,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import type { SettingMeta, SettingSchema } from './types';
+import { docsURL } from '../utils/docsURL';
 
 const HALF_WIDTH = [ 'col-md-3', 'col-sm-12' ];
 
@@ -282,10 +283,16 @@ function textSettings(): SettingSchema {
 				'woocommerce-product-addon'
 			),
 			{
-				link: __(
-					'<a href="https://docs.themeisle.com/article/2060-input-masking-documentation-for-field-configuration" target="_blank">Options</a>',
-					'woocommerce-product-addon'
-				),
+				link:
+					'<a href="' +
+					docsURL(
+						'https://docs.themeisle.com/product-option-manager/input-masking-documentation-for-field-configuration',
+						'input-masking',
+						'field-editor'
+					) +
+					'" target="_blank">' +
+					__( 'Options', 'woocommerce-product-addon' ) +
+					'</a>',
 				col_classes: HALF_WIDTH,
 			}
 		),
@@ -312,7 +319,13 @@ function textSettings(): SettingSchema {
 			),
 			{
 				link:
-					'<a target="_blank" href="https://docs.themeisle.com/article/2060-input-masking-documentation-for-field-configuration">' +
+					'<a target="_blank" href="' +
+					docsURL(
+						'https://docs.themeisle.com/product-option-manager/input-masking-documentation-for-field-configuration',
+						'input-masking',
+						'field-editor'
+					) +
+					'">' +
 					__( 'See More', 'woocommerce-product-addon' ) +
 					'</a>',
 				col_classes: HALF_WIDTH,
@@ -1875,7 +1888,13 @@ function chainedSettings(): SettingSchema {
 			),
 			{
 				link:
-					'<a href="https://docs.themeisle.com/article/1799-how-to-configure-the-chained-input" target="_blank" rel="noreferrer noopener">' +
+					'<a href="' +
+					docsURL(
+						'https://docs.themeisle.com/product-option-manager/how-to-configure-the-chained-input',
+						'chained-input',
+						'field-editor'
+					) +
+					'" target="_blank" rel="noreferrer noopener">' +
 					__( 'Documentation', 'woocommerce-product-addon' ) +
 					'</a>',
 			}
@@ -2930,7 +2949,13 @@ function fontsSettings(): SettingSchema {
 			),
 			{
 				link:
-					'<a href="https://docs.themeisle.com/product-option-manager/ppom-pro-input-types#fonts-picker-input" target="_blank" rel="noreferrer noopener">' +
+					'<a href="' +
+					docsURL(
+						'https://docs.themeisle.com/product-option-manager/ppom-pro-input-types#13-fonts-picker',
+						'fonts-picker',
+						'field-editor'
+					) +
+					'" target="_blank" rel="noreferrer noopener">' +
 					__( 'Learn more', 'woocommerce-product-addon' ) +
 					'</a>',
 			}
