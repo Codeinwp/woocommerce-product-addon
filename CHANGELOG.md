@@ -1,3 +1,11 @@
+##### [Version 34.0.13](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.12...v34.0.13) (2026-11-05)
+
+- Fixed express checkout buttons ignoring required PPOM fields on product pages
+- Fixed PayPal orders missing entered product personalisation
+- Added required-field checks to express checkout flows
+- Fixed required Phone fields blocking checkout after entering a number
+- Updated dependencies
+
 ##### [Version 34.0.12](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.11...v34.0.12) (2026-10-22)
 
 - Fixed the PPOM price summary showing the product price in the wrong currency
