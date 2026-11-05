@@ -79,7 +79,7 @@ class PPOM_Freemium {
 				<p><strong><?php esc_html_e( 'Use Case:', 'woocommerce-product-addon' ); ?></strong> <?php esc_html_e( 'Selling personalized caps? With the Conditional Repeater, customers can select the number of caps (e.g., 5), and the feature will automatically generate 5 fields to enter unique names for each cap. This makes it simple to personalize multiple caps in one go!', 'woocommerce-product-addon' ); ?> <a href="https://demo-ppom-lite.vertisite.cloud/product/personalized-caps-using-conditional-repeater/" class="ppom-repeater-learn-more" target="_blank"><?php esc_html_e( 'View Demo', 'woocommerce-product-addon' ); ?> <span class="dashicons dashicons-external"></span></a></p>
 			</div>
 
-			<a target="_blank" class="btn btn-sm btn-secondary mr-2" href="https://docs.themeisle.com/article/1700-personalized-product-meta-manager#conditional-repeater"><?php esc_html_e( 'Check Documentation', 'woocommerce-product-addon' ); ?></a>
+			<a target="_blank" class="btn btn-sm btn-secondary mr-2" href="<?php echo esc_url( tsdk_utmify( 'https://docs.themeisle.com/product-option-manager/personalized-product-meta-manager#conditional-repeater', 'conditional-repeater', 'field-editor' ) ); ?>"><?php esc_html_e( 'Check Documentation', 'woocommerce-product-addon' ); ?></a>
 			<a target="_blank" class="btn btn-sm btn-primary" href="<?php echo esc_url( $upgrade_url ); ?>"><?php esc_html_e( 'Upgrade to Plus', 'woocommerce-product-addon' ); ?></a>
 		</div>
 		<?php

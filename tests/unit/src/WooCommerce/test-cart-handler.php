@@ -1398,4 +1398,199 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 		$this->assertCount( 2, $cart_ids );
 		$this->assertCount( 2, array_unique( $cart_ids ) );
 	}
+
+	/**
+	 * PayPal Payments' buttons post the product form and call add_to_cart() directly, without the validation filter.
+	 *
+	 * @return void
+	 */
+	public function test_unvalidated_add_rejects_empty_and_keeps_filled_required_field() {
+		$this->initialize_woocommerce_checkout_context();
+		$product_id = $this->create_required_engraving_product();
+
+		$empty = $this->direct_add( $product_id, array( 'fields' => array( 'engraving' => '' ) ) );
+		$this->assertFalse( $empty['key'] );
+		$this->assertStringContainsString( 'Engraving is a required field', $empty['notices'] );
+
+		$_POST['ppom'] = array( 'fields' => array( 'engraving' => 'Hello' ) );
+		$cart_key      = WC()->cart->add_to_cart( $product_id, 1 );
+		$item          = $cart_key ? WC()->cart->get_cart_item( $cart_key ) : array();
+		WC()->cart->empty_cart();
+
+		$this->assertIsString( $cart_key );
+		$this->assertSame( 'Hello', $item['ppom']['fields']['engraving'] );
+	}
+
+	/**
+	 * A crafted request can leave out the PPOM payload or send one without fields.
+	 *
+	 * @return void
+	 */
+	public function test_unvalidated_add_rejects_missing_or_fieldless_payload() {
+		$this->initialize_woocommerce_checkout_context();
+		$product_id = $this->create_required_engraving_product();
+
+		$payloads = array(
+			'no payload'   => null,
+			'marker only'  => array( 'marker' => '1' ),
+			'empty fields' => array( 'fields' => array() ),
+		);
+		foreach ( $payloads as $label => $payload ) {
+			$result = $this->direct_add( $product_id, $payload );
+
+			$this->assertFalse( $result['key'], $label );
+			$this->assertStringContainsString( 'Engraving is a required field', $result['notices'], $label );
+		}
+
+		$optional = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'note', 'Note' ) ), $optional->get_id() );
+		$this->assertIsString( $this->direct_add( $optional->get_id(), null )['key'], 'Optional fields need no payload.' );
+	}
+
+	/**
+	 * PayPal simulates the cart for live totals while the form is still being filled in.
+	 *
+	 * @return void
+	 */
+	public function test_paypal_cart_simulation_is_not_validated() {
+		$this->initialize_woocommerce_checkout_context();
+		$product_id = $this->create_required_engraving_product();
+		$empty      = array( 'fields' => array( 'engraving' => '' ) );
+
+		add_filter( 'woocommerce_paypal_payments_is_simulating_cart', '__return_true' );
+		$simulated = $this->direct_add( $product_id, $empty );
+		remove_filter( 'woocommerce_paypal_payments_is_simulating_cart', '__return_true' );
+
+		$real = $this->direct_add( $product_id, $empty );
+
+		$this->assertIsString( $simulated['key'] );
+		$this->assertFalse( $real['key'] );
+		$this->assertStringContainsString( 'Engraving is a required field', $real['notices'] );
+	}
+
+	/**
+	 * PPOM Pro's Variation Quantity adds each variation from inside the validation filter.
+	 *
+	 * @return void
+	 */
+	public function test_add_from_inside_validation_filter_is_not_revalidated() {
+		$this->initialize_woocommerce_checkout_context();
+		$product_id    = $this->create_required_engraving_product();
+		$_POST['ppom'] = array( 'fields' => array( 'engraving' => '' ) );
+
+		$nested_key = false;
+		$add_nested = static function ( $passed, $product_id ) use ( &$nested_key ) {
+			$nested_key = WC()->cart->add_to_cart( $product_id, 1 );
+			return false;
+		};
+		add_filter( 'woocommerce_add_to_cart_validation', $add_nested, 99, 2 );
+		apply_filters( 'woocommerce_add_to_cart_validation', true, $product_id, 1 );
+		remove_filter( 'woocommerce_add_to_cart_validation', $add_nested, 99 );
+		WC()->cart->empty_cart();
+		wc_clear_notices();
+
+		$outside = $this->direct_add( $product_id, $_POST['ppom'] );
+
+		$this->assertIsString( $nested_key );
+		$this->assertFalse( $outside['key'] );
+		$this->assertStringContainsString( 'Engraving is a required field', $outside['notices'] );
+	}
+
+	/**
+	 * A passed validation covers only that product's next add.
+	 *
+	 * @return void
+	 */
+	public function test_validation_of_one_product_does_not_cover_another_add() {
+		$this->initialize_woocommerce_checkout_context();
+		$validated = $this->create_simple_product();
+		$direct_id = $this->create_required_engraving_product();
+
+		$passed        = apply_filters( 'woocommerce_add_to_cart_validation', true, $validated->get_id(), 1 );
+		$validated_key = WC()->cart->add_to_cart( $validated->get_id(), 1 );
+		$direct        = $this->direct_add( $direct_id, array( 'fields' => array( 'engraving' => '' ) ) );
+
+		$this->assertTrue( $passed );
+		$this->assertIsString( $validated_key );
+		$this->assertFalse( $direct['key'] );
+	}
+
+	/**
+	 * A passed validation is used up by the add that follows it.
+	 *
+	 * @return void
+	 */
+	public function test_passed_validation_covers_only_the_next_add() {
+		$this->initialize_woocommerce_checkout_context();
+		$product_id    = $this->create_required_engraving_product();
+		$_POST['ppom'] = array( 'fields' => array( 'engraving' => 'Hello' ) );
+
+		$passed    = apply_filters( 'woocommerce_add_to_cart_validation', true, $product_id, 1 );
+		$first_key = WC()->cart->add_to_cart( $product_id, 1 );
+		$second    = $this->direct_add( $product_id, array( 'fields' => array( 'engraving' => '' ) ) );
+
+		$this->assertTrue( $passed );
+		$this->assertIsString( $first_key );
+		$this->assertFalse( $second['key'] );
+	}
+
+	/**
+	 * Product Bundles adds bundled items itself, from the container's add.
+	 *
+	 * @return void
+	 */
+	public function test_bundled_items_skip_the_unvalidated_add_check() {
+		if ( ! function_exists( 'wc_pb_is_bundled_cart_item' ) ) {
+			// Mirrors Product Bundles: only items carrying `bundled_by` are bundled.
+			function wc_pb_is_bundled_cart_item( array $cart_item ): bool {
+				return ! empty( $cart_item['bundled_by'] );
+			}
+		}
+
+		$this->initialize_woocommerce_checkout_context();
+		$product_id = $this->create_required_engraving_product();
+
+		$bundled_key = WC()->cart->add_to_cart( $product_id, 1, 0, array(), array( 'bundled_by' => 'container-key' ) );
+		WC()->cart->empty_cart();
+		$standalone = $this->direct_add( $product_id, null );
+
+		$this->assertIsString( $bundled_key );
+		$this->assertFalse( $standalone['key'] );
+	}
+
+	/**
+	 * Creates a product with a required "Engraving" text field.
+	 *
+	 * @return int
+	 */
+	private function create_required_engraving_product(): int {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_text_field( 'engraving', 'Engraving', array( 'required' => 'on' ) ) ), $product->get_id() );
+
+		return $product->get_id();
+	}
+
+	/**
+	 * Adds a product with WC_Cart::add_to_cart() and no validation filter, as PayPal Payments does.
+	 *
+	 * @param int                       $product_id Product to add.
+	 * @param array<string, mixed>|null $payload    Posted `ppom` payload, or none.
+	 *
+	 * @return array{key: string|false, notices: string}
+	 */
+	private function direct_add( int $product_id, ?array $payload ): array {
+		unset( $_POST['ppom'] );
+		if ( null !== $payload ) {
+			$_POST['ppom'] = $payload;
+		}
+
+		$cart_key = WC()->cart->add_to_cart( $product_id, 1 );
+		$notices  = wp_strip_all_tags( wc_print_notices( true ) );
+		WC()->cart->empty_cart();
+
+		return array(
+			'key'     => $cart_key,
+			'notices' => $notices,
+		);
+	}
 }

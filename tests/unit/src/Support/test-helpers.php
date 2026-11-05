@@ -234,4 +234,29 @@ class Test_Helpers_Src extends PPOM_Test_Case {
 		$this->assertCount( 1200, $decoded['ppom'] );
 		$this->assertSame( 'Field 1199', $decoded['ppom'][1199]['title'] );
 	}
+
+	/**
+	 * A posted array counts as a value only when something in it is filled in.
+	 *
+	 * @return void
+	 */
+	public function test_has_posted_field_value_ignores_arrays_of_empty_values(): void {
+		$text = array(
+			'data_name' => 'engraving',
+			'type'      => 'text',
+		);
+
+		$cases = array(
+			'empty array item'  => array( array( '' ), false ),
+			'nested empty item' => array( array( array( '' ) ), false ),
+			'empty array'       => array( array(), false ),
+			'empty string'      => array( '', false ),
+			'filled array item' => array( array( 'Hi' ), true ),
+			'filled string'     => array( 'Hi', true ),
+			'zero string'       => array( '0', true ),
+		);
+		foreach ( $cases as $label => list( $value, $expected ) ) {
+			$this->assertSame( $expected, Helpers::has_posted_field_value( array( 'engraving' => $value ), $text ), $label );
+		}
+	}
 }
