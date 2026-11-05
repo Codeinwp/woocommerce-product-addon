@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: product addons, woocommerce product addons, woocommerce product options, custom fields, variable products
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 34.0.12
+Stable tag: 34.0.13
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -259,11 +259,12 @@ Please follow the reporting protocols outlined on our [Security Page](https://th
 
 == Changelog ==
 
-##### [Version 34.0.12](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.11...v34.0.12) (2026-10-22)
+##### [Version 34.0.13](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.12...v34.0.13) (2026-11-05)
 
-- Fixed the PPOM price summary showing the product price in the wrong currency
-- Fixed cart option prices showing unconverted in secondary WCML currencies.
-- Fixed identical linked-quantity products merging into one cart line
+- Fixed express checkout buttons ignoring required PPOM fields on product pages
+- Fixed PayPal orders missing entered product personalisation
+- Added required-field checks to express checkout flows
+- Fixed required Phone fields blocking checkout after entering a number
 - Updated dependencies
 
 
