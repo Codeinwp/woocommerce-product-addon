@@ -527,11 +527,15 @@ function ppom_check_conditions( data_name, callback, $scope ) {
 								.map((cls) => cls.replace("ppom-cond-", "ppom-locked-"))
 								.join(" ");
 
+					// The event must match the visibility applied here, or the
+					// hidden handler clears a field that stays visible.
 					if ( visibility === 'hide' ) {
+						event_type = 'ppom_field_shown';
 						jQuery( this ).removeClass(
 							`${ classes } ppom-c-hide`
 						);
 					} else {
+						event_type = 'ppom_field_hidden';
 						jQuery( this ).addClass(
 							`${ classes } ppom-c-hide`
 						);
