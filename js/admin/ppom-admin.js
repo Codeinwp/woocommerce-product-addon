@@ -910,9 +910,6 @@ jQuery( function ( $ ) {
 			// handle multiple options
 			const ppom_option_type = 'ppom_copy_option';
 			const option_selector = clone_new_field.find( '.ppom-option-keys' );
-			const add_cond_selector = clone_new_field.find(
-				'.ppom-conditional-keys'
-			);
 			const eventcalendar_selector = clone_new_field.find(
 				'.ppom-eventcalendar-field'
 			);
@@ -927,7 +924,6 @@ jQuery( function ( $ ) {
 				.remove();
 			// clone_new_field.find('[data-table-id="imageselect"] .pre-upload-box li').remove();
 			// clone_new_field.find('.data-options').not(':last').remove();
-			clone_new_field.find( '.webcontact-rules' ).not( ':last' ).remove();
 
 			// set existing conditions meta
 			$( clone_new_field )
@@ -976,12 +972,21 @@ jQuery( function ( $ ) {
 				option_index,
 				ppom_option_type
 			);
-			ppom_add_condition_set_index(
-				add_cond_selector,
-				field_index,
-				field_type,
-				option_index
-			);
+			// Re-index every condition rule of the copy; a single shared index
+			// would make all rules overwrite each other on save.
+			clone_new_field
+				.find( '.webcontact-rules' )
+				.each( function ( index, rule_row ) {
+					const rule_inputs = $( rule_row ).find(
+						'.ppom-conditional-keys'
+					);
+					ppom_add_condition_set_index(
+						rule_inputs,
+						field_index,
+						field_type,
+						index
+					);
+				} );
 
 			// for eventcalendar changing index
 			ppom_eventcalendar_set_index( eventcalendar_selector, field_index );
