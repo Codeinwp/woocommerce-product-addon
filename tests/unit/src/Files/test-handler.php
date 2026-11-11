@@ -8,11 +8,79 @@
 require_once dirname( __DIR__, 2 ) . '/class-ppom-test-case.php';
 
 use PPOM\Files\Handler;
+use PPOM\Files\UploadErrors;
 
 /**
  * @covers \PPOM\Files\Handler
  */
 class Test_Files_Handler extends PPOM_Test_Case {
+
+	/**
+	 * @return array<string, array{0: mixed, 1: int}>
+	 */
+	public function configured_file_size_provider(): array {
+		return array(
+			'megabytes'       => array( '2mb', 2 * MB_IN_BYTES ),
+			'kilobytes'       => array( '512 KB', 512 * KB_IN_BYTES ),
+			'bytes'           => array( '4096b', 4096 ),
+			'unitless is MB'  => array( '5', 5 * MB_IN_BYTES ),
+			'decimal value'   => array( '1.5mb', (int) ( 1.5 * MB_IN_BYTES ) ),
+			'empty is legacy' => array( '', 10 * MB_IN_BYTES ),
+			'invalid fallback' => array( 'unlimited', 10 * MB_IN_BYTES ),
+		);
+	}
+
+	/**
+	 * @dataProvider configured_file_size_provider
+	 *
+	 * @param mixed $configured Stored field setting.
+	 * @param int   $expected   Expected byte limit.
+	 * @return void
+	 */
+	public function test_configured_file_size_is_converted_to_bytes( $configured, int $expected ) {
+		$this->assertSame(
+			$expected,
+			Handler::field_file_size_limit( array( 'file_size' => $configured ) )
+		);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_chunk_writer_removes_a_partial_file_that_exceeds_the_limit() {
+		$dir         = Handler::get_dir_path();
+		$source      = $dir . 'chunk-source-' . wp_generate_password( 6, false ) . '.bin';
+		$destination = $dir . 'chunk-destination-' . wp_generate_password( 6, false ) . '.part.bin';
+
+		$this->artifacts[] = $source;
+		$this->artifacts[] = $destination;
+
+		file_put_contents( $source, '56789' );
+		file_put_contents( $destination, '1234' );
+
+		$error = Handler::create_chunk_file( $source, $destination, 'ab', 8 );
+
+		$this->assertSame( UploadErrors::FILE_TOO_LARGE, $error );
+		$this->assertFileDoesNotExist( $destination );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_chunk_writer_accepts_a_file_at_the_limit() {
+		$dir         = Handler::get_dir_path();
+		$source      = $dir . 'chunk-source-' . wp_generate_password( 6, false ) . '.bin';
+		$destination = $dir . 'chunk-destination-' . wp_generate_password( 6, false ) . '.part.bin';
+
+		$this->artifacts[] = $source;
+		$this->artifacts[] = $destination;
+
+		file_put_contents( $source, '5678' );
+		file_put_contents( $destination, '1234' );
+
+		$this->assertFalse( Handler::create_chunk_file( $source, $destination, 'ab', 8 ) );
+		$this->assertSame( '12345678', (string) file_get_contents( $destination ) );
+	}
 
 	/**
 	 * create_unique_file_name embeds the 6-char hash slug between the base name and extension.

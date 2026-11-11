@@ -37,6 +37,11 @@ final class Handler {
 	 */
 	public const DEFAULT_CROPPER_FILE_TYPES = 'jpg,png';
 
+	/**
+	 * Legacy renderer fallback when a field has no stored size setting.
+	 */
+	private const DEFAULT_FILE_SIZE = '10mb';
+
 	public static function files_setup_get_directory( $sub_dir = false ) {
 
 		$upload_dir = wp_upload_dir();
@@ -204,29 +209,108 @@ final class Handler {
 	 * @param string $file_path_to_read The file to read.
 	 * @param string $ppom_chunk_file_path The chunk file to write.
 	 * @param string $mode The writing mode for the chunk file.
+	 * @param int    $max_bytes Maximum complete file size; zero disables the limit.
 	 *
 	 * @return false|string The error.
 	 */
-	public static function create_chunk_file( $file_path_to_read, $ppom_chunk_file_path, $mode ) {
-		$chunk_file = fopen( $ppom_chunk_file_path, $mode );
-		if ( $chunk_file ) {
-			// Read binary input stream and append it to temp file
-			$temp_file = fopen( $file_path_to_read, 'rb' );
+	public static function create_chunk_file( $file_path_to_read, $ppom_chunk_file_path, $mode, int $max_bytes = 0 ) {
+		$temp_file = fopen( $file_path_to_read, 'rb' );
+		if ( ! $temp_file ) {
+			return UploadErrors::OPEN_INPUT;
+		}
 
-			if ( $temp_file ) {
-				while ( $buff = fread( $temp_file, 4096 ) ) {
-					fwrite( $chunk_file, $buff );
-				}
-			} else {
-				return UploadErrors::OPEN_INPUT;
-			}
+		$chunk_file = fopen( $ppom_chunk_file_path, $mode );
+		if ( ! $chunk_file ) {
+			fclose( $temp_file );
+			return UploadErrors::OPEN_OUTPUT;
+		}
+		if ( ! flock( $chunk_file, LOCK_EX ) ) {
 			fclose( $temp_file );
 			fclose( $chunk_file );
-		} else {
 			return UploadErrors::OPEN_OUTPUT;
 		}
 
+		$file_stats     = fstat( $chunk_file );
+		$existing_bytes = 'ab' === $mode && is_array( $file_stats ) ? (int) $file_stats['size'] : 0;
+
+		if ( $max_bytes > 0 && $existing_bytes > $max_bytes ) {
+			fclose( $temp_file );
+			fclose( $chunk_file );
+			@unlink( $ppom_chunk_file_path );
+			return UploadErrors::FILE_TOO_LARGE;
+		}
+
+		$total_bytes = $existing_bytes;
+		while ( ! feof( $temp_file ) ) {
+			$buffer = fread( $temp_file, 4096 );
+			if ( false === $buffer ) {
+				fclose( $temp_file );
+				fclose( $chunk_file );
+				@unlink( $ppom_chunk_file_path );
+				return UploadErrors::OPEN_INPUT;
+			}
+			if ( '' === $buffer ) {
+				break;
+			}
+
+			$total_bytes += strlen( $buffer );
+			if ( $max_bytes > 0 && $total_bytes > $max_bytes ) {
+				fclose( $temp_file );
+				fclose( $chunk_file );
+				@unlink( $ppom_chunk_file_path );
+				return UploadErrors::FILE_TOO_LARGE;
+			}
+
+			if ( false === fwrite( $chunk_file, $buffer ) ) {
+				fclose( $temp_file );
+				fclose( $chunk_file );
+				@unlink( $ppom_chunk_file_path );
+				return UploadErrors::OPEN_OUTPUT;
+			}
+		}
+
+		fclose( $temp_file );
+		fclose( $chunk_file );
+
 		return false;
+	}
+
+	/**
+	 * Resolves the complete-file byte limit from a saved upload field.
+	 *
+	 * Unitless values are megabytes for compatibility with the field editor.
+	 * Invalid or empty settings use the renderer's legacy 10 MB fallback.
+	 *
+	 * @param mixed $file_meta Saved field definition.
+	 * @return int
+	 */
+	public static function field_file_size_limit( $file_meta ): int {
+		$configured = is_array( $file_meta ) && isset( $file_meta['file_size'] )
+			? strtolower( trim( (string) $file_meta['file_size'] ) )
+			: '';
+
+		if ( '' === $configured ) {
+			$configured = self::DEFAULT_FILE_SIZE;
+		}
+
+		if ( ! preg_match( '/^(\d+(?:\.\d+)?)\s*(b|kb|mb|gb)?$/', $configured, $matches ) ) {
+			return 10 * 1024 * 1024;
+		}
+
+		$unit        = isset( $matches[2] ) ? $matches[2] : 'mb';
+		$multipliers = array(
+			'b'  => 1,
+			'kb' => 1024,
+			'mb' => 1024 * 1024,
+			'gb' => 1024 * 1024 * 1024,
+		);
+		$bytes       = (float) $matches[1] * $multipliers[ $unit ];
+
+		if ( $bytes <= 0 || $bytes > PHP_INT_MAX ) {
+			return 10 * 1024 * 1024;
+		}
+
+		return (int) $bytes;
 	}
 
 	// Upload handlers.
@@ -401,7 +485,12 @@ final class Handler {
 
 		$uploaded_file_path_to_read = $is_multipart ? $temp_file_name : 'php://input';
 
-		$error = self::create_chunk_file( $uploaded_file_path_to_read, $chunk_file_path, $chunk == 0 ? 'wb' : 'ab' );
+		$error = self::create_chunk_file(
+			$uploaded_file_path_to_read,
+			$chunk_file_path,
+			$chunk == 0 ? 'wb' : 'ab',
+			self::field_file_size_limit( $file_meta )
+		);
 
 		if ( $is_multipart ) {
 			@unlink( $temp_file_name );
