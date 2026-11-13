@@ -297,7 +297,7 @@ final class Handler {
 			return 10 * 1024 * 1024;
 		}
 
-		$unit        = isset( $matches[2] ) && '' !== $matches[2] ? $matches[2] : 'b';
+		$unit        = isset( $matches[2] ) ? $matches[2] : 'b';
 		$multipliers = array(
 			'b'  => 1,
 			'kb' => 1024,
