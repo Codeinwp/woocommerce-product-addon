@@ -23,7 +23,7 @@ class Test_Files_Handler extends PPOM_Test_Case {
 			'megabytes'       => array( '2mb', 2 * MB_IN_BYTES ),
 			'kilobytes'       => array( '512 KB', 512 * KB_IN_BYTES ),
 			'bytes'           => array( '4096b', 4096 ),
-			'unitless is MB'  => array( '5', 5 * MB_IN_BYTES ),
+			'unitless bytes'  => array( '5000', 5000 ),
 			'decimal value'   => array( '1.5mb', (int) ( 1.5 * MB_IN_BYTES ) ),
 			'empty is legacy' => array( '', 10 * MB_IN_BYTES ),
 			'invalid fallback' => array( 'unlimited', 10 * MB_IN_BYTES ),

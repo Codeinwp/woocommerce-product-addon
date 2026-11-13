@@ -278,7 +278,7 @@ final class Handler {
 	/**
 	 * Resolves the complete-file byte limit from a saved upload field.
 	 *
-	 * Unitless values are megabytes for compatibility with the field editor.
+	 * Unitless values are bytes, as the browser uploader (plupload) reads them.
 	 * Invalid or empty settings use the renderer's legacy 10 MB fallback.
 	 *
 	 * @param mixed $file_meta Saved field definition.
@@ -297,7 +297,7 @@ final class Handler {
 			return 10 * 1024 * 1024;
 		}
 
-		$unit        = isset( $matches[2] ) ? $matches[2] : 'mb';
+		$unit        = isset( $matches[2] ) && '' !== $matches[2] ? $matches[2] : 'b';
 		$multipliers = array(
 			'b'  => 1,
 			'kb' => 1024,
