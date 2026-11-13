@@ -417,4 +417,26 @@ class Test_Svg_Upload extends WP_Ajax_UnitTestCase {
 
 		$this->assertSame( 'first chunk', (string) file_get_contents( $current[0] ) );
 	}
+
+	public function test_upload_reused_under_a_field_with_a_smaller_limit_is_dropped(): void {
+		$this->create_product_with_file_field( 'jpg' );
+		$dir = ppom_get_dir_path();
+		file_put_contents( $dir . 'ppom-ajax-large.jpg', str_repeat( 'x', MB_IN_BYTES + 1 ) );
+		file_put_contents( $dir . 'ppom-ajax-small.jpg', 'x' );
+
+		$ppom = \PPOM\Files\Handler::retain_owned_uploads(
+			array(
+				'fields' => array(
+					'artwork' => array(
+						'large' => array( 'org' => 'ppom-ajax-large.jpg' ),
+						'small' => array( 'org' => 'ppom-ajax-small.jpg' ),
+					),
+				),
+			),
+			$this->product_id,
+			array( 'ppom-ajax-large.jpg', 'ppom-ajax-small.jpg' )
+		);
+
+		$this->assertSame( array( 'small' ), array_keys( $ppom['fields']['artwork'] ) );
+	}
 }

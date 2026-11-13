@@ -214,40 +214,55 @@ final class Handler {
 	 * @return false|string The error.
 	 */
 	public static function create_chunk_file( $file_path_to_read, $ppom_chunk_file_path, $mode, int $max_bytes = 0 ) {
+		$append = 'ab' === $mode;
+
+		// A later chunk without its partial file means an earlier chunk was refused, so the upload cannot continue.
+		if ( $append && ! file_exists( $ppom_chunk_file_path ) ) {
+			return UploadErrors::OPEN_OUTPUT;
+		}
+
 		$temp_file = fopen( $file_path_to_read, 'rb' );
 		if ( ! $temp_file ) {
 			return UploadErrors::OPEN_INPUT;
 		}
 
-		$chunk_file = fopen( $ppom_chunk_file_path, $mode );
+		// 'cb' opens without truncating, so the first chunk only clears the file once it holds the lock.
+		$chunk_file = fopen( $ppom_chunk_file_path, $append ? 'ab' : 'cb' );
 		if ( ! $chunk_file ) {
 			fclose( $temp_file );
 			return UploadErrors::OPEN_OUTPUT;
 		}
+
+		$fail = function ( $error, $remove = true ) use ( $temp_file, $chunk_file, $ppom_chunk_file_path ) {
+			// Remove the partial file before releasing the lock, so a parallel request cannot lose its own write.
+			if ( $remove ) {
+				@unlink( $ppom_chunk_file_path );
+			}
+			fclose( $temp_file );
+			fclose( $chunk_file );
+
+			return $error;
+		};
+
 		if ( ! flock( $chunk_file, LOCK_EX ) ) {
-			fclose( $temp_file );
-			fclose( $chunk_file );
-			return UploadErrors::OPEN_OUTPUT;
+			return $fail( UploadErrors::OPEN_OUTPUT, false );
 		}
 
-		$file_stats     = fstat( $chunk_file );
-		$existing_bytes = 'ab' === $mode && is_array( $file_stats ) ? (int) $file_stats['size'] : 0;
-
-		if ( $max_bytes > 0 && $existing_bytes > $max_bytes ) {
-			fclose( $temp_file );
-			fclose( $chunk_file );
-			@unlink( $ppom_chunk_file_path );
-			return UploadErrors::FILE_TOO_LARGE;
+		if ( ! $append ) {
+			ftruncate( $chunk_file, 0 );
 		}
 
-		$total_bytes = $existing_bytes;
+		$file_stats  = fstat( $chunk_file );
+		$total_bytes = $append && is_array( $file_stats ) ? (int) $file_stats['size'] : 0;
+
+		if ( $max_bytes > 0 && $total_bytes > $max_bytes ) {
+			return $fail( UploadErrors::FILE_TOO_LARGE );
+		}
+
 		while ( ! feof( $temp_file ) ) {
 			$buffer = fread( $temp_file, 4096 );
 			if ( false === $buffer ) {
-				fclose( $temp_file );
-				fclose( $chunk_file );
-				@unlink( $ppom_chunk_file_path );
-				return UploadErrors::OPEN_INPUT;
+				return $fail( UploadErrors::OPEN_INPUT );
 			}
 			if ( '' === $buffer ) {
 				break;
@@ -255,17 +270,11 @@ final class Handler {
 
 			$total_bytes += strlen( $buffer );
 			if ( $max_bytes > 0 && $total_bytes > $max_bytes ) {
-				fclose( $temp_file );
-				fclose( $chunk_file );
-				@unlink( $ppom_chunk_file_path );
-				return UploadErrors::FILE_TOO_LARGE;
+				return $fail( UploadErrors::FILE_TOO_LARGE );
 			}
 
 			if ( false === fwrite( $chunk_file, $buffer ) ) {
-				fclose( $temp_file );
-				fclose( $chunk_file );
-				@unlink( $ppom_chunk_file_path );
-				return UploadErrors::OPEN_OUTPUT;
+				return $fail( UploadErrors::OPEN_OUTPUT );
 			}
 		}
 
@@ -278,8 +287,9 @@ final class Handler {
 	/**
 	 * Resolves the complete-file byte limit from a saved upload field.
 	 *
-	 * Unitless values are bytes, as the browser uploader (plupload) reads them.
-	 * Invalid or empty settings use the renderer's legacy 10 MB fallback.
+	 * Follows the browser uploader (plupload): unitless values are bytes, and k, m, g and t,
+	 * with or without a trailing "b", are binary multiples. Invalid, empty or sub-byte
+	 * settings use the renderer's legacy 10 MB fallback.
 	 *
 	 * @param mixed $file_meta Saved field definition.
 	 * @return int
@@ -293,21 +303,21 @@ final class Handler {
 			$configured = self::DEFAULT_FILE_SIZE;
 		}
 
-		if ( ! preg_match( '/^(\d+(?:\.\d+)?)\s*(b|kb|mb|gb)?$/', $configured, $matches ) ) {
-			return 10 * 1024 * 1024;
+		if ( ! preg_match( '/^(\d*\.?\d+)\s*([kmgt]?)b?$/', $configured, $matches ) ) {
+			return 10 * MB_IN_BYTES;
 		}
 
-		$unit        = isset( $matches[2] ) ? $matches[2] : 'b';
 		$multipliers = array(
-			'b'  => 1,
-			'kb' => 1024,
-			'mb' => 1024 * 1024,
-			'gb' => 1024 * 1024 * 1024,
+			''  => 1,
+			'k' => KB_IN_BYTES,
+			'm' => MB_IN_BYTES,
+			'g' => GB_IN_BYTES,
+			't' => TB_IN_BYTES,
 		);
-		$bytes       = (float) $matches[1] * $multipliers[ $unit ];
+		$bytes       = floor( (float) $matches[1] * $multipliers[ $matches[2] ] );
 
-		if ( $bytes <= 0 || $bytes > PHP_INT_MAX ) {
-			return 10 * 1024 * 1024;
+		if ( $bytes < 1 || $bytes > PHP_INT_MAX ) {
+			return 10 * MB_IN_BYTES;
 		}
 
 		return (int) $bytes;
@@ -945,8 +955,12 @@ final class Handler {
 
 		$file_name = wp_unslash( $row['org'] );
 
+		$file_path = self::get_dir_path() . $file_name;
+
 		return self::is_usable_upload( $file_name, $verified )
-			&& self::field_allows_extension( $field_meta, (string) pathinfo( $file_name, PATHINFO_EXTENSION ) );
+			&& self::field_allows_extension( $field_meta, (string) pathinfo( $file_name, PATHINFO_EXTENSION ) )
+			// An upload made through another field must still fit this field's size limit.
+			&& ( ! is_file( $file_path ) || filesize( $file_path ) <= self::field_file_size_limit( $field_meta ) );
 	}
 
 	/**
@@ -1201,12 +1215,26 @@ final class Handler {
 
 
 	// Save cropped image fro dataUrl to image
-	public static function save_data_url_to_image( $data, $file_name ) {
+	/**
+	 * Saves a cropped image sent as a data URL.
+	 *
+	 * @param string $data      Base64 data URL.
+	 * @param string $file_name Target file name in the cropped directory.
+	 * @param int    $max_bytes Maximum decoded size; zero disables the limit.
+	 *
+	 * @return bool Whether the image was saved.
+	 */
+	public static function save_data_url_to_image( $data, $file_name, int $max_bytes = 0 ) {
 
-		$data = base64_decode( preg_replace( '#^data:image/\w+;base64,#i', '', $data ) );
+		$data = base64_decode( (string) preg_replace( '#^data:image/\w+;base64,#i', '', $data ) );
+
+		if ( $max_bytes > 0 && strlen( (string) $data ) > $max_bytes ) {
+			return false;
+		}
 
 		$dest_cropped = self::get_dir_path( 'cropped' ) . $file_name;
-		file_put_contents( $dest_cropped, $data );
+
+		return false !== file_put_contents( $dest_cropped, $data );
 	}
 
 	// Building options array for croppie

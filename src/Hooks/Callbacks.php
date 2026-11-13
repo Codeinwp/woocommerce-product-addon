@@ -64,7 +64,7 @@ final class Callbacks {
 					}
 
 					$file_name = Handler::file_get_name( $file_name, $product_id );
-					Handler::save_data_url_to_image( $image_data, $file_name );
+					Handler::save_data_url_to_image( $image_data, $file_name, Handler::field_file_size_limit( $cropper ) );
 				}
 				// Saving cropped data to image
 			}
