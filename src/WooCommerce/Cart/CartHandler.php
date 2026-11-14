@@ -344,7 +344,8 @@ final class CartHandler {
 	 *
 	 * @return array
 	 *
-	 * @throws \Exception When an add that skipped WooCommerce's validation fails PPOM's.
+	 * @throws \Exception When an add that skipped WooCommerce's validation fails PPOM's,
+	 *                    or a cropped image exceeds its field's size limit.
 	 *
 	 * @see ppom_check_validation()
 	 * @see ppom_price_controller()
@@ -357,6 +358,18 @@ final class CartHandler {
 		// Before the payload and edit-removal steps; WC_Cart::add_to_cart() fails the add on throw.
 		if ( ! $is_bundled && ! ProductHandler::validate_unvalidated_add( (int) $product_id, (int) $quantity, (int) $variation_id ) ) {
 			throw new \Exception();
+		}
+
+		// A crop the field cannot store fails the add before an edited cart item is replaced.
+		$oversized_crop = $is_bundled ? null : Callbacks::oversized_crop_field( (int) $product_id, $_POST );
+		if ( null !== $oversized_crop ) {
+			throw new \Exception(
+				sprintf(
+					/* translators: %s: cropper field title */
+					esc_html__( '%s: the cropped image is larger than the allowed file size.', 'woocommerce-product-addon' ),
+					esc_html( (string) ( $oversized_crop['title'] ?? '' ) )
+				)
+			);
 		}
 
 		if ( ! isset( $_POST['ppom'] ) ) {

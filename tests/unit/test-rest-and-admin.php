@@ -168,6 +168,47 @@ class Test_Rest_And_Admin extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Field HTML merged through REST follows the post-markup rules for a shop manager without unfiltered HTML.
+	 *
+	 * @return void
+	 */
+	public function testPPOMSaveMetaProductMergeKeepsOnlyPostMarkupWithoutUnfilteredHtml() {
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+			),
+			$product->get_id()
+		);
+
+		$response = $this->dispatch_ppom_rest_request(
+			'POST',
+			'/ppom/v1/set/product/',
+			array(
+				'product_id' => $product->get_id(),
+				'secret_key' => 'expected-secret',
+				'fields'     => wp_json_encode(
+					array(
+						array(
+							'type'      => 'section',
+							'title'     => 'Notice',
+							'data_name' => 'notice',
+							'html'      => '<strong>Note</strong><script>alert(1)</script>',
+						),
+					)
+				),
+			),
+			'expected-secret'
+		);
+
+		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
+		$this->assertSame( 'success', $response->get_data()['status'] );
+
+		$stored = wp_list_filter( $this->get_ppom_fields_for_product( $product->get_id() ), array( 'data_name' => 'notice' ) );
+		$this->assertSame( '<strong>Note</strong>alert(1)', current( $stored )['html'] );
+	}
+
+	/**
 	 * Ensure deleting all REST fields removes the PPOM row and product association.
 	 *
 	 * @return void

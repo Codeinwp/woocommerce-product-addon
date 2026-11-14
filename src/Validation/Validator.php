@@ -25,9 +25,8 @@ final class Validator {
 	 * @return string
 	 */
 	public static function esc_html( $content ) {
-
-		global $allowedposttags;
-		$allowed_atts                = array(
+		$allowed_tags = wp_kses_allowed_html( 'post' );
+		$allowed_atts = array(
 			'align'      => array(),
 			'class'      => array(),
 			'type'       => array(),
@@ -60,42 +59,12 @@ final class Validator {
 			'data-*'     => true, // allows all data-* attributes
 			'style'      => array(),
 		);
-		$allowedposttags['form']     = $allowed_atts;
-		$allowedposttags['label']    = $allowed_atts;
-		$allowedposttags['input']    = $allowed_atts;
-		$allowedposttags['textarea'] = $allowed_atts;
-		$allowedposttags['iframe']   = $allowed_atts;
-		$allowedposttags['script']   = $allowed_atts;
-		$allowedposttags['style']    = $allowed_atts;
-		$allowedposttags['strong']   = $allowed_atts;
-		$allowedposttags['small']    = $allowed_atts;
-		$allowedposttags['table']    = $allowed_atts;
-		$allowedposttags['span']     = $allowed_atts;
-		$allowedposttags['abbr']     = $allowed_atts;
-		$allowedposttags['code']     = $allowed_atts;
-		$allowedposttags['pre']      = $allowed_atts;
-		$allowedposttags['div']      = $allowed_atts;
-		$allowedposttags['img']      = $allowed_atts;
-		$allowedposttags['h1']       = $allowed_atts;
-		$allowedposttags['h2']       = $allowed_atts;
-		$allowedposttags['h3']       = $allowed_atts;
-		$allowedposttags['h4']       = $allowed_atts;
-		$allowedposttags['h5']       = $allowed_atts;
-		$allowedposttags['h6']       = $allowed_atts;
-		$allowedposttags['ol']       = $allowed_atts;
-		$allowedposttags['ul']       = $allowed_atts;
-		$allowedposttags['li']       = $allowed_atts;
-		$allowedposttags['em']       = $allowed_atts;
-		$allowedposttags['hr']       = $allowed_atts;
-		$allowedposttags['br']       = $allowed_atts;
-		$allowedposttags['tr']       = $allowed_atts;
-		$allowedposttags['td']       = $allowed_atts;
-		$allowedposttags['p']        = $allowed_atts;
-		$allowedposttags['a']        = $allowed_atts;
-		$allowedposttags['b']        = $allowed_atts;
-		$allowedposttags['i']        = $allowed_atts;
-		$allowedposttags['br']       = $allowed_atts;
-		$allowed_tags                = wp_kses_allowed_html( 'post' );
+		$custom_tags = array( 'form', 'label', 'input', 'textarea', 'iframe', 'script', 'style', 'strong', 'small', 'table', 'span', 'abbr', 'code', 'pre', 'div', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ol', 'ul', 'li', 'em', 'hr', 'br', 'tr', 'td', 'p', 'a', 'b', 'i' );
+		foreach ( $custom_tags as $tag ) {
+			$allowed_tags[ $tag ] = isset( $allowed_tags[ $tag ] )
+				? array_merge( $allowed_tags[ $tag ], $allowed_atts )
+				: $allowed_atts;
+		}
 
 		return wp_kses( stripslashes_deep( $content ), $allowed_tags );
 	}
@@ -111,7 +80,9 @@ final class Validator {
 			if ( is_array( $value ) ) {
 				$value = self::sanitize_array_data( $value );
 			} elseif ( in_array( $key, self::fields_with_html(), true ) ) {
-				$value = self::esc_html( $value );
+				$value = current_user_can( 'unfiltered_html' )
+					? self::esc_html( $value )
+					: wp_kses( stripslashes_deep( $value ), wp_kses_allowed_html( 'post' ) );
 			} else {
 				$value = sanitize_text_field( $value );
 			}

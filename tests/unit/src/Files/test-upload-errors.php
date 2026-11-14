@@ -32,6 +32,10 @@ class Test_Files_Upload_Errors extends WP_UnitTestCase {
 			'{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}',
 			UploadErrors::get_message_response( UploadErrors::OPEN_DIR )
 		);
+		$this->assertSame(
+			'{"jsonrpc" : "2.0", "error" : {"code": 104, "message": "File exceeds the configured size limit."}, "id" : "id"}',
+			UploadErrors::get_message_response( UploadErrors::FILE_TOO_LARGE )
+		);
 	}
 
 	/**

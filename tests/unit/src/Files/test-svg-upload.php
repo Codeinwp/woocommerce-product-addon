@@ -145,6 +145,8 @@ class Test_Svg_Upload extends WP_Ajax_UnitTestCase {
 			$this->_handleAjax( 'ppom_upload_file' );
 		} catch ( WPAjaxDieContinueException $e ) {
 			return (array) json_decode( $this->_last_response, true );
+		} catch ( WPAjaxDieStopException $e ) {
+			return (array) json_decode( $e->getMessage(), true );
 		} catch ( PPOM_Test_Upload_Response $e ) {
 			ob_end_clean();
 			return $e->response;
@@ -416,5 +418,69 @@ class Test_Svg_Upload extends WP_Ajax_UnitTestCase {
 		$this->send_chunk( 'ppom-ajax-notes.txt', 1, 3 );
 
 		$this->assertSame( 'first chunk', (string) file_get_contents( $current[0] ) );
+	}
+
+	public function test_upload_reused_under_a_field_with_a_smaller_limit_is_dropped(): void {
+		$this->create_product_with_file_field( 'jpg' );
+		$dir = ppom_get_dir_path();
+		file_put_contents( $dir . 'ppom-ajax-large.jpg', str_repeat( 'x', MB_IN_BYTES + 1 ) );
+		file_put_contents( $dir . 'ppom-ajax-small.jpg', 'x' );
+
+		$ppom = \PPOM\Files\Handler::retain_owned_uploads(
+			array(
+				'fields' => array(
+					'artwork' => array(
+						'large' => array( 'org' => 'ppom-ajax-large.jpg' ),
+						'small' => array( 'org' => 'ppom-ajax-small.jpg' ),
+					),
+				),
+			),
+			$this->product_id,
+			array( 'ppom-ajax-large.jpg', 'ppom-ajax-small.jpg' )
+		);
+
+		$this->assertSame( array( 'small' ), array_keys( $ppom['fields']['artwork'] ) );
+	}
+
+	public function test_upload_over_the_field_limit_is_refused_and_removed(): void {
+		$this->create_product_with_file_field( 'txt' );
+
+		$this->send_chunk( 'ppom-ajax-big.txt', 0, 2 );
+		$parts = glob( ppom_get_dir_path() . 'ppom-ajax-big.*.part.bin' ) ?: array();
+		$this->assertCount( 1, $parts );
+		file_put_contents( $parts[0], str_repeat( 'x', MB_IN_BYTES + 1 ) );
+
+		$response = $this->send_chunk( 'ppom-ajax-big.txt', 1, 2 );
+
+		$this->assertSame( 104, $response['error']['code'] ?? null );
+		$this->assertCount( 0, glob( ppom_get_dir_path() . 'ppom-ajax-big.*' ) ?: array() );
+	}
+
+	/**
+	 * A chunk that arrives while another request of the same upload holds its lock
+	 * waits, and then sees that the other request removed the partial file.
+	 */
+	public function test_overlapping_chunk_waits_for_the_upload_lock(): void {
+		$this->create_product_with_file_field( 'txt' );
+
+		$this->send_chunk( 'ppom-ajax-race.txt', 0, 2 );
+		$parts = glob( ppom_get_dir_path() . 'ppom-ajax-race.*.part.bin' ) ?: array();
+		$this->assertCount( 1, $parts );
+		file_put_contents( $parts[0], 'first chunk' );
+
+		// Another request holds the lock, then refuses the upload and removes the partial file.
+		$holder = 'flock( $l = fopen( $argv[1], "c" ), LOCK_EX ); echo "locked\n"; usleep( 500000 ); unlink( $argv[2] );';
+		$proc   = proc_open(
+			array( PHP_BINARY, '-r', $holder, substr( $parts[0], 0, -9 ) . '.upload-lock', $parts[0] ),
+			array( 1 => array( 'pipe', 'w' ) ),
+			$pipes
+		);
+		$this->assertSame( "locked\n", fgets( $pipes[1] ) );
+
+		$response = $this->send_chunk( 'ppom-ajax-race.txt', 1, 2 );
+		proc_close( $proc );
+
+		$this->assertSame( 102, $response['error']['code'] ?? null );
+		$this->assertCount( 0, glob( ppom_get_dir_path() . 'ppom-ajax-race.*' ) ?: array() );
 	}
 }

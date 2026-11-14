@@ -21,6 +21,7 @@ class Test_Validator_Src extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function tearDown(): void {
+		wp_set_current_user( 0 );
 		if ( null !== $this->fields_with_html_filter ) {
 			remove_filter( 'ppom_fields_with_html', $this->fields_with_html_filter );
 			$this->fields_with_html_filter = null;
@@ -37,6 +38,41 @@ class Test_Validator_Src extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'Hello', $sanitized );
 		$this->assertStringNotContainsString( 'ppom-malicious-custom-tag', $sanitized );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_sanitize_array_data_strips_active_content_without_unfiltered_html() {
+		$user_id = self::factory()->user->create( array( 'role' => 'shop_manager' ) );
+		wp_set_current_user( $user_id );
+
+		$data      = Validator::sanitize_array_data(
+			array( 'description' => '<p onclick="alert(1)">Hello</p><script>alert(2)</script>' )
+		);
+		$sanitized = $data['description'];
+
+		$this->assertStringContainsString( '<p>Hello</p>', $sanitized );
+		$this->assertStringNotContainsString( 'onclick', $sanitized );
+		$this->assertStringNotContainsString( '<script', $sanitized );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_sanitize_array_data_preserves_supported_active_content_with_unfiltered_html() {
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		$user    = get_user_by( 'id', $user_id );
+		$user->add_cap( 'unfiltered_html' );
+		wp_set_current_user( $user_id );
+
+		$data      = Validator::sanitize_array_data(
+			array( 'description' => '<p onclick="alert(1)">Hello</p><script type="text/javascript">alert(2)</script>' )
+		);
+		$sanitized = $data['description'];
+
+		$this->assertStringContainsString( 'onclick="alert(1)"', $sanitized );
+		$this->assertStringContainsString( '<script type="text/javascript">alert(2)</script>', $sanitized );
 	}
 
 	/**
