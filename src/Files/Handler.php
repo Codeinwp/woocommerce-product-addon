@@ -451,7 +451,8 @@ final class Handler {
 		}
 
 		// Ends in .bin, so servers send partial uploads as application/octet-stream.
-		$chunk_file_path = $file_dir_path . pathinfo( $file_name, PATHINFO_FILENAME ) . '.part.bin';
+		$chunk_file_path  = $file_dir_path . pathinfo( $file_name, PATHINFO_FILENAME ) . '.part.bin';
+		$upload_lock_path = $file_dir_path . pathinfo( $file_name, PATHINFO_FILENAME ) . '.upload-lock';
 
 		// Remove old temp files
 		if ( is_dir( $file_dir_path ) && ( $dir = opendir( $file_dir_path ) ) ) {
@@ -460,7 +461,7 @@ final class Handler {
 
 				// Remove temp file if it is older than the max age and is not the current file
 				if (
-				preg_match( '/\.part(\.bin)?$/', $file ) &&
+				preg_match( '/\.(part(\.bin)?|upload-lock)$/', $file ) &&
 				( filemtime( $tmp_file_path ) < time() - $maxFileAge ) &&
 				( $tmp_file_path != $chunk_file_path )
 				) {
@@ -495,6 +496,13 @@ final class Handler {
 
 		$uploaded_file_path_to_read = $is_multipart ? $temp_file_name : 'php://input';
 
+		// One lock per upload covers the chunk write, a refused chunk's removal and the final rename,
+		// so overlapping requests for the same upload run one after another.
+		$upload_lock = self::lock_upload( $upload_lock_path );
+		if ( ! $upload_lock ) {
+			die( UploadErrors::get_message_response( UploadErrors::OPEN_OUTPUT ) );
+		}
+
 		$error = self::create_chunk_file(
 			$uploaded_file_path_to_read,
 			$chunk_file_path,
@@ -507,7 +515,10 @@ final class Handler {
 		}
 
 		if ( $error ) {
-			die( UploadErrors::get_message_response( $error ) );
+			self::unlock_upload( $upload_lock, $upload_lock_path );
+			$message = UploadErrors::get_message_response( $error );
+			// Through wp_die(), so the WordPress die handler ends the request.
+			wp_die( false === $message ? '' : $message );
 		}
 
 		// Check if the file has been uploaded completely.
@@ -517,6 +528,7 @@ final class Handler {
 			$is_svg = 'svg' === $file_ext || 'image/svg+xml' === $file_type['type'];
 			if ( $is_svg && ! self::sanitize_svg_file( $chunk_file_path ) ) {
 				@unlink( $chunk_file_path );
+				self::unlock_upload( $upload_lock, $upload_lock_path );
 				self::send_invalid_file_type( $file_ext );
 			}
 
@@ -558,6 +570,9 @@ final class Handler {
 				);
 			}
 		}
+
+		self::unlock_upload( $upload_lock, $upload_lock_path );
+
 		// Hand the uploader a capability for this one file. Session-based ownership
 		// cannot survive uploads that overlap, because WooCommerce rewrites the
 		// whole session row per request; a token belongs to the response that
@@ -569,6 +584,51 @@ final class Handler {
 		// Return JSON-RPC response
 		// die ( '{"jsonrpc" : "2.0", "result" : '. json_encode($response) .', "id" : "id"}' );
 		die( json_encode( apply_filters( 'ppom_file_upload', $response, $file_type, $file_dir_path, $file_name ) ) );
+	}
+
+	/**
+	 * Takes the exclusive lock of one upload.
+	 *
+	 * The lock file is removed on unlock, so a request that waited on a removed file
+	 * retries on the current one instead of holding a lock nobody else sees.
+	 *
+	 * @param string $lock_path Lock file path.
+	 *
+	 * @return resource|false The locked handle, or false when the lock file cannot be opened.
+	 */
+	private static function lock_upload( string $lock_path ) {
+		while ( true ) {
+			$lock = fopen( $lock_path, 'c' );
+			if ( ! $lock ) {
+				return false;
+			}
+			if ( ! flock( $lock, LOCK_EX ) ) {
+				fclose( $lock );
+				return false;
+			}
+
+			$held = fstat( $lock );
+			clearstatcache( true, $lock_path );
+			$current = @stat( $lock_path );
+			if ( is_array( $held ) && is_array( $current ) && $held['ino'] === $current['ino'] ) {
+				return $lock;
+			}
+
+			fclose( $lock );
+		}
+	}
+
+	/**
+	 * Removes the lock file of one upload, then releases its lock.
+	 *
+	 * @param resource $lock      Handle returned by self::lock_upload().
+	 * @param string   $lock_path Lock file path.
+	 *
+	 * @return void
+	 */
+	private static function unlock_upload( $lock, string $lock_path ): void {
+		@unlink( $lock_path );
+		fclose( $lock );
 	}
 
 	/**
@@ -1214,7 +1274,17 @@ final class Handler {
 	}
 
 
-	// Save cropped image fro dataUrl to image
+	/**
+	 * Decodes an image data URL to its binary content.
+	 *
+	 * @param string $data Base64 data URL.
+	 *
+	 * @return string Decoded bytes; empty when the payload is not valid base64.
+	 */
+	public static function decode_data_url( $data ): string {
+		return (string) base64_decode( (string) preg_replace( '#^data:image/\w+;base64,#i', '', (string) $data ) );
+	}
+
 	/**
 	 * Saves a cropped image sent as a data URL.
 	 *
@@ -1226,9 +1296,9 @@ final class Handler {
 	 */
 	public static function save_data_url_to_image( $data, $file_name, int $max_bytes = 0 ) {
 
-		$data = base64_decode( (string) preg_replace( '#^data:image/\w+;base64,#i', '', $data ) );
+		$data = self::decode_data_url( $data );
 
-		if ( $max_bytes > 0 && strlen( (string) $data ) > $max_bytes ) {
+		if ( $max_bytes > 0 && strlen( $data ) > $max_bytes ) {
 			return false;
 		}
 

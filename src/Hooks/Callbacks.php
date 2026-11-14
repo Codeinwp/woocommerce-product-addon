@@ -20,6 +20,38 @@ use WC_Product;
  */
 final class Callbacks {
 
+	/**
+	 * Finds the first cropper field whose posted crop exceeds the field's size limit.
+	 *
+	 * @param int                  $product_id  Product ID.
+	 * @param array<string, mixed> $posted_data Posted request data.
+	 *
+	 * @return array<string, mixed>|null The cropper field, or null when every crop fits.
+	 */
+	public static function oversized_crop_field( int $product_id, array $posted_data ): ?array {
+
+		$cropped_fields = Helpers::has_field_by_type( $product_id, 'cropper' );
+		if ( empty( $cropped_fields ) ) {
+			return null;
+		}
+
+		foreach ( $cropped_fields as $cropper ) {
+			$rows = $posted_data['ppom']['fields'][ $cropper['data_name'] ] ?? null;
+			if ( ! is_array( $rows ) ) {
+				continue;
+			}
+
+			$limit = Handler::field_file_size_limit( $cropper );
+			foreach ( $rows as $row ) {
+				if ( is_array( $row ) && isset( $row['cropped'] ) && is_string( $row['cropped'] ) && strlen( Handler::decode_data_url( $row['cropped'] ) ) > $limit ) {
+					return $cropper;
+				}
+			}
+		}
+
+		return null;
+	}
+
 	public static function save_cropped_image( $ppom_fields, $posted_data ) {
 
 		if ( ! isset( $posted_data['ppom_product_id'] ) ) {
