@@ -504,7 +504,8 @@ final class Manager {
 
 		if ( ! Helpers::is_legacy_user() ) {
 			$row['productmeta_style'] = isset( $settings['productmeta_style'] ) ? (string) $settings['productmeta_style'] : '';
-			$row['productmeta_js']    = isset( $settings['productmeta_js'] ) ? (string) $settings['productmeta_js'] : '';
+			// Group JavaScript runs on the storefront, so only users trusted with unfiltered HTML can set it.
+			$row['productmeta_js']    = isset( $settings['productmeta_js'] ) && current_user_can( 'unfiltered_html' ) ? (string) $settings['productmeta_js'] : '';
 		}
 
 		$row = apply_filters( 'ppom_settings_meta_data_new', $row );
@@ -847,7 +848,10 @@ final class Manager {
 		);
 		if ( ! Helpers::is_legacy_user() ) {
 			$ppom_settings_meta_data['productmeta_style'] = isset( $settings['productmeta_style'] ) ? (string) $settings['productmeta_style'] : '';
-			$ppom_settings_meta_data['productmeta_js']    = isset( $settings['productmeta_js'] ) ? (string) $settings['productmeta_js'] : '';
+			// Without unfiltered HTML the stored group JavaScript stays as it is.
+			if ( current_user_can( 'unfiltered_html' ) ) {
+				$ppom_settings_meta_data['productmeta_js'] = isset( $settings['productmeta_js'] ) ? (string) $settings['productmeta_js'] : '';
+			}
 		}
 
 		$dt = apply_filters( 'ppom_settings_meta_data_update', $ppom_settings_meta_data, $productmeta_id );

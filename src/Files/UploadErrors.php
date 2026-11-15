@@ -16,6 +16,7 @@ final class UploadErrors {
 	public const OPEN_OUTPUT       = 'open_output';
 	public const MISSING_TEMP_FILE = 'missing_temp_file';
 	public const OPEN_DIR          = 'open_dir';
+	public const FILE_TOO_LARGE    = 'file_too_large';
 
 	/**
 	 * @param string $error_slug Error slug.
@@ -27,6 +28,7 @@ final class UploadErrors {
 			self::OPEN_OUTPUT       => '{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}',
 			self::MISSING_TEMP_FILE => '{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}',
 			self::OPEN_DIR          => '{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}',
+			self::FILE_TOO_LARGE    => '{"jsonrpc" : "2.0", "error" : {"code": 104, "message": "File exceeds the configured size limit."}, "id" : "id"}',
 		);
 
 		return isset( $msg[ $error_slug ] ) ? $msg[ $error_slug ] : false;
