@@ -4347,7 +4347,7 @@ parameters:
 		-
 			message: '#^Constant PPOM_URL not found\.$#'
 			identifier: constant.notFound
-			count: 3
+			count: 2
 			path: src/Core/Bootstrap/SdkCompatAndMetadataRegistration.php
 
 		-
