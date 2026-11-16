@@ -34,7 +34,7 @@
         "installer-disable": "true"
     },
     "require": {
-        "codeinwp/themeisle-sdk": "^3.3.65",
+        "codeinwp/themeisle-sdk": "^3.3.71",
         "enshrined/svg-sanitize": "^1.0"
     },
     "autoload": {

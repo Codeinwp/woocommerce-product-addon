@@ -8,11 +8,138 @@
 require_once dirname( __DIR__, 2 ) . '/class-ppom-test-case.php';
 
 use PPOM\Files\Handler;
+use PPOM\Files\UploadErrors;
 
 /**
  * @covers \PPOM\Files\Handler
  */
 class Test_Files_Handler extends PPOM_Test_Case {
+
+	/**
+	 * @return array<string, array{0: mixed, 1: int}>
+	 */
+	public function configured_file_size_provider(): array {
+		return array(
+			'megabytes'       => array( '2mb', 2 * MB_IN_BYTES ),
+			'kilobytes'       => array( '512 KB', 512 * KB_IN_BYTES ),
+			'bytes'           => array( '4096b', 4096 ),
+			'unitless bytes'  => array( '5000', 5000 ),
+			'decimal value'   => array( '1.5mb', (int) ( 1.5 * MB_IN_BYTES ) ),
+			'empty is legacy' => array( '', 10 * MB_IN_BYTES ),
+			'invalid fallback' => array( 'unlimited', 10 * MB_IN_BYTES ),
+			'short unit'       => array( '20m', 20 * MB_IN_BYTES ),
+			'leading decimal'  => array( '.5mb', 512 * KB_IN_BYTES ),
+			'sub-byte'         => array( '0.5', 10 * MB_IN_BYTES ),
+		);
+	}
+
+	/**
+	 * @dataProvider configured_file_size_provider
+	 *
+	 * @param mixed $configured Stored field setting.
+	 * @param int   $expected   Expected byte limit.
+	 * @return void
+	 */
+	public function test_configured_file_size_is_converted_to_bytes( $configured, int $expected ) {
+		$this->assertSame(
+			$expected,
+			Handler::field_file_size_limit( array( 'file_size' => $configured ) )
+		);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_chunk_writer_removes_a_partial_file_that_exceeds_the_limit() {
+		$dir         = Handler::get_dir_path();
+		$source      = $dir . 'chunk-source-' . wp_generate_password( 6, false ) . '.bin';
+		$destination = $dir . 'chunk-destination-' . wp_generate_password( 6, false ) . '.part.bin';
+
+		$this->artifacts[] = $source;
+		$this->artifacts[] = $destination;
+
+		file_put_contents( $source, '56789' );
+		file_put_contents( $destination, '1234' );
+
+		$error = Handler::create_chunk_file( $source, $destination, 'ab', 8 );
+
+		$this->assertSame( UploadErrors::FILE_TOO_LARGE, $error );
+		$this->assertFileDoesNotExist( $destination );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_chunk_writer_accepts_a_file_at_the_limit() {
+		$dir         = Handler::get_dir_path();
+		$source      = $dir . 'chunk-source-' . wp_generate_password( 6, false ) . '.bin';
+		$destination = $dir . 'chunk-destination-' . wp_generate_password( 6, false ) . '.part.bin';
+
+		$this->artifacts[] = $source;
+		$this->artifacts[] = $destination;
+
+		file_put_contents( $source, '5678' );
+		file_put_contents( $destination, '1234' );
+
+		$this->assertFalse( Handler::create_chunk_file( $source, $destination, 'ab', 8 ) );
+		$this->assertSame( '12345678', (string) file_get_contents( $destination ) );
+	}
+
+	/**
+	 * A later chunk whose partial file is gone (an earlier chunk was refused) cannot restart the upload.
+	 *
+	 * @return void
+	 */
+	public function test_chunk_writer_refuses_a_later_chunk_without_its_partial_file() {
+		$dir         = Handler::get_dir_path();
+		$source      = $dir . 'chunk-source-' . wp_generate_password( 6, false ) . '.bin';
+		$destination = $dir . 'chunk-destination-' . wp_generate_password( 6, false ) . '.part.bin';
+
+		$this->artifacts[] = $source;
+		$this->artifacts[] = $destination;
+
+		file_put_contents( $source, 'DDDD' );
+
+		$this->assertSame( UploadErrors::OPEN_OUTPUT, Handler::create_chunk_file( $source, $destination, 'ab', 8 ) );
+		$this->assertFileDoesNotExist( $destination );
+	}
+
+	/**
+	 * The first chunk replaces a leftover partial file.
+	 *
+	 * @return void
+	 */
+	public function test_chunk_writer_first_chunk_replaces_a_leftover_partial_file() {
+		$dir         = Handler::get_dir_path();
+		$source      = $dir . 'chunk-source-' . wp_generate_password( 6, false ) . '.bin';
+		$destination = $dir . 'chunk-destination-' . wp_generate_password( 6, false ) . '.part.bin';
+
+		$this->artifacts[] = $source;
+		$this->artifacts[] = $destination;
+
+		file_put_contents( $source, '56' );
+		file_put_contents( $destination, '1234' );
+
+		$this->assertFalse( Handler::create_chunk_file( $source, $destination, 'wb', 8 ) );
+		$this->assertSame( '56', (string) file_get_contents( $destination ) );
+	}
+
+	/**
+	 * A cropped image larger than the field limit is not saved.
+	 *
+	 * @return void
+	 */
+	public function test_cropped_image_over_the_limit_is_not_saved() {
+		$name              = 'cropped-' . wp_generate_password( 6, false ) . '.png';
+		$this->artifacts[] = Handler::get_dir_path( 'cropped' ) . $name;
+		$data_url          = 'data:image/png;base64,' . base64_encode( str_repeat( 'x', 9 ) );
+
+		$this->assertFalse( Handler::save_data_url_to_image( $data_url, $name, 8 ) );
+		$this->assertFileDoesNotExist( Handler::get_dir_path( 'cropped' ) . $name );
+
+		$this->assertTrue( Handler::save_data_url_to_image( $data_url, $name, 9 ) );
+		$this->assertFileExists( Handler::get_dir_path( 'cropped' ) . $name );
+	}
 
 	/**
 	 * create_unique_file_name embeds the 6-char hash slug between the base name and extension.

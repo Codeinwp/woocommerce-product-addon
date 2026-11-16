@@ -37,6 +37,11 @@ final class Handler {
 	 */
 	public const DEFAULT_CROPPER_FILE_TYPES = 'jpg,png';
 
+	/**
+	 * Legacy renderer fallback when a field has no stored size setting.
+	 */
+	private const DEFAULT_FILE_SIZE = '10mb';
+
 	public static function files_setup_get_directory( $sub_dir = false ) {
 
 		$upload_dir = wp_upload_dir();
@@ -204,29 +209,118 @@ final class Handler {
 	 * @param string $file_path_to_read The file to read.
 	 * @param string $ppom_chunk_file_path The chunk file to write.
 	 * @param string $mode The writing mode for the chunk file.
+	 * @param int    $max_bytes Maximum complete file size; zero disables the limit.
 	 *
 	 * @return false|string The error.
 	 */
-	public static function create_chunk_file( $file_path_to_read, $ppom_chunk_file_path, $mode ) {
-		$chunk_file = fopen( $ppom_chunk_file_path, $mode );
-		if ( $chunk_file ) {
-			// Read binary input stream and append it to temp file
-			$temp_file = fopen( $file_path_to_read, 'rb' );
+	public static function create_chunk_file( $file_path_to_read, $ppom_chunk_file_path, $mode, int $max_bytes = 0 ) {
+		$append = 'ab' === $mode;
 
-			if ( $temp_file ) {
-				while ( $buff = fread( $temp_file, 4096 ) ) {
-					fwrite( $chunk_file, $buff );
-				}
-			} else {
-				return UploadErrors::OPEN_INPUT;
-			}
-			fclose( $temp_file );
-			fclose( $chunk_file );
-		} else {
+		// A later chunk without its partial file means an earlier chunk was refused, so the upload cannot continue.
+		if ( $append && ! file_exists( $ppom_chunk_file_path ) ) {
 			return UploadErrors::OPEN_OUTPUT;
 		}
 
+		$temp_file = fopen( $file_path_to_read, 'rb' );
+		if ( ! $temp_file ) {
+			return UploadErrors::OPEN_INPUT;
+		}
+
+		// 'cb' opens without truncating, so the first chunk only clears the file once it holds the lock.
+		$chunk_file = fopen( $ppom_chunk_file_path, $append ? 'ab' : 'cb' );
+		if ( ! $chunk_file ) {
+			fclose( $temp_file );
+			return UploadErrors::OPEN_OUTPUT;
+		}
+
+		$fail = function ( $error, $remove = true ) use ( $temp_file, $chunk_file, $ppom_chunk_file_path ) {
+			// Remove the partial file before releasing the lock, so a parallel request cannot lose its own write.
+			if ( $remove ) {
+				@unlink( $ppom_chunk_file_path );
+			}
+			fclose( $temp_file );
+			fclose( $chunk_file );
+
+			return $error;
+		};
+
+		if ( ! flock( $chunk_file, LOCK_EX ) ) {
+			return $fail( UploadErrors::OPEN_OUTPUT, false );
+		}
+
+		if ( ! $append ) {
+			ftruncate( $chunk_file, 0 );
+		}
+
+		$file_stats  = fstat( $chunk_file );
+		$total_bytes = $append && is_array( $file_stats ) ? (int) $file_stats['size'] : 0;
+
+		if ( $max_bytes > 0 && $total_bytes > $max_bytes ) {
+			return $fail( UploadErrors::FILE_TOO_LARGE );
+		}
+
+		while ( ! feof( $temp_file ) ) {
+			$buffer = fread( $temp_file, 4096 );
+			if ( false === $buffer ) {
+				return $fail( UploadErrors::OPEN_INPUT );
+			}
+			if ( '' === $buffer ) {
+				break;
+			}
+
+			$total_bytes += strlen( $buffer );
+			if ( $max_bytes > 0 && $total_bytes > $max_bytes ) {
+				return $fail( UploadErrors::FILE_TOO_LARGE );
+			}
+
+			if ( false === fwrite( $chunk_file, $buffer ) ) {
+				return $fail( UploadErrors::OPEN_OUTPUT );
+			}
+		}
+
+		fclose( $temp_file );
+		fclose( $chunk_file );
+
 		return false;
+	}
+
+	/**
+	 * Resolves the complete-file byte limit from a saved upload field.
+	 *
+	 * Follows the browser uploader (plupload): unitless values are bytes, and k, m, g and t,
+	 * with or without a trailing "b", are binary multiples. Invalid, empty or sub-byte
+	 * settings use the renderer's legacy 10 MB fallback.
+	 *
+	 * @param mixed $file_meta Saved field definition.
+	 * @return int
+	 */
+	public static function field_file_size_limit( $file_meta ): int {
+		$configured = is_array( $file_meta ) && isset( $file_meta['file_size'] )
+			? strtolower( trim( (string) $file_meta['file_size'] ) )
+			: '';
+
+		if ( '' === $configured ) {
+			$configured = self::DEFAULT_FILE_SIZE;
+		}
+
+		if ( ! preg_match( '/^(\d*\.?\d+)\s*([kmgt]?)b?$/', $configured, $matches ) ) {
+			return 10 * MB_IN_BYTES;
+		}
+
+		$multipliers = array(
+			''  => 1,
+			'k' => KB_IN_BYTES,
+			'm' => MB_IN_BYTES,
+			'g' => GB_IN_BYTES,
+			't' => TB_IN_BYTES,
+		);
+		$bytes       = floor( (float) $matches[1] * $multipliers[ $matches[2] ] );
+
+		if ( $bytes < 1 || $bytes > PHP_INT_MAX ) {
+			return 10 * MB_IN_BYTES;
+		}
+
+		return (int) $bytes;
 	}
 
 	// Upload handlers.
@@ -357,7 +451,8 @@ final class Handler {
 		}
 
 		// Ends in .bin, so servers send partial uploads as application/octet-stream.
-		$chunk_file_path = $file_dir_path . pathinfo( $file_name, PATHINFO_FILENAME ) . '.part.bin';
+		$chunk_file_path  = $file_dir_path . pathinfo( $file_name, PATHINFO_FILENAME ) . '.part.bin';
+		$upload_lock_path = $file_dir_path . pathinfo( $file_name, PATHINFO_FILENAME ) . '.upload-lock';
 
 		// Remove old temp files
 		if ( is_dir( $file_dir_path ) && ( $dir = opendir( $file_dir_path ) ) ) {
@@ -366,7 +461,7 @@ final class Handler {
 
 				// Remove temp file if it is older than the max age and is not the current file
 				if (
-				preg_match( '/\.part(\.bin)?$/', $file ) &&
+				preg_match( '/\.(part(\.bin)?|upload-lock)$/', $file ) &&
 				( filemtime( $tmp_file_path ) < time() - $maxFileAge ) &&
 				( $tmp_file_path != $chunk_file_path )
 				) {
@@ -401,14 +496,29 @@ final class Handler {
 
 		$uploaded_file_path_to_read = $is_multipart ? $temp_file_name : 'php://input';
 
-		$error = self::create_chunk_file( $uploaded_file_path_to_read, $chunk_file_path, $chunk == 0 ? 'wb' : 'ab' );
+		// One lock per upload covers the chunk write, a refused chunk's removal and the final rename,
+		// so overlapping requests for the same upload run one after another.
+		$upload_lock = self::lock_upload( $upload_lock_path );
+		if ( ! $upload_lock ) {
+			die( UploadErrors::get_message_response( UploadErrors::OPEN_OUTPUT ) );
+		}
+
+		$error = self::create_chunk_file(
+			$uploaded_file_path_to_read,
+			$chunk_file_path,
+			$chunk == 0 ? 'wb' : 'ab',
+			self::field_file_size_limit( $file_meta )
+		);
 
 		if ( $is_multipart ) {
 			@unlink( $temp_file_name );
 		}
 
 		if ( $error ) {
-			die( UploadErrors::get_message_response( $error ) );
+			self::unlock_upload( $upload_lock, $upload_lock_path );
+			$message = UploadErrors::get_message_response( $error );
+			// Through wp_die(), so the WordPress die handler ends the request.
+			wp_die( false === $message ? '' : $message );
 		}
 
 		// Check if the file has been uploaded completely.
@@ -418,6 +528,7 @@ final class Handler {
 			$is_svg = 'svg' === $file_ext || 'image/svg+xml' === $file_type['type'];
 			if ( $is_svg && ! self::sanitize_svg_file( $chunk_file_path ) ) {
 				@unlink( $chunk_file_path );
+				self::unlock_upload( $upload_lock, $upload_lock_path );
 				self::send_invalid_file_type( $file_ext );
 			}
 
@@ -459,6 +570,9 @@ final class Handler {
 				);
 			}
 		}
+
+		self::unlock_upload( $upload_lock, $upload_lock_path );
+
 		// Hand the uploader a capability for this one file. Session-based ownership
 		// cannot survive uploads that overlap, because WooCommerce rewrites the
 		// whole session row per request; a token belongs to the response that
@@ -470,6 +584,51 @@ final class Handler {
 		// Return JSON-RPC response
 		// die ( '{"jsonrpc" : "2.0", "result" : '. json_encode($response) .', "id" : "id"}' );
 		die( json_encode( apply_filters( 'ppom_file_upload', $response, $file_type, $file_dir_path, $file_name ) ) );
+	}
+
+	/**
+	 * Takes the exclusive lock of one upload.
+	 *
+	 * The lock file is removed on unlock, so a request that waited on a removed file
+	 * retries on the current one instead of holding a lock nobody else sees.
+	 *
+	 * @param string $lock_path Lock file path.
+	 *
+	 * @return resource|false The locked handle, or false when the lock file cannot be opened.
+	 */
+	private static function lock_upload( string $lock_path ) {
+		while ( true ) {
+			$lock = fopen( $lock_path, 'c' );
+			if ( ! $lock ) {
+				return false;
+			}
+			if ( ! flock( $lock, LOCK_EX ) ) {
+				fclose( $lock );
+				return false;
+			}
+
+			$held = fstat( $lock );
+			clearstatcache( true, $lock_path );
+			$current = @stat( $lock_path );
+			if ( is_array( $held ) && is_array( $current ) && $held['ino'] === $current['ino'] ) {
+				return $lock;
+			}
+
+			fclose( $lock );
+		}
+	}
+
+	/**
+	 * Removes the lock file of one upload, then releases its lock.
+	 *
+	 * @param resource $lock      Handle returned by self::lock_upload().
+	 * @param string   $lock_path Lock file path.
+	 *
+	 * @return void
+	 */
+	private static function unlock_upload( $lock, string $lock_path ): void {
+		@unlink( $lock_path );
+		fclose( $lock );
 	}
 
 	/**
@@ -856,8 +1015,12 @@ final class Handler {
 
 		$file_name = wp_unslash( $row['org'] );
 
+		$file_path = self::get_dir_path() . $file_name;
+
 		return self::is_usable_upload( $file_name, $verified )
-			&& self::field_allows_extension( $field_meta, (string) pathinfo( $file_name, PATHINFO_EXTENSION ) );
+			&& self::field_allows_extension( $field_meta, (string) pathinfo( $file_name, PATHINFO_EXTENSION ) )
+			// An upload made through another field must still fit this field's size limit.
+			&& ( ! is_file( $file_path ) || filesize( $file_path ) <= self::field_file_size_limit( $field_meta ) );
 	}
 
 	/**
@@ -1111,13 +1274,37 @@ final class Handler {
 	}
 
 
-	// Save cropped image fro dataUrl to image
-	public static function save_data_url_to_image( $data, $file_name ) {
+	/**
+	 * Decodes an image data URL to its binary content.
+	 *
+	 * @param string $data Base64 data URL.
+	 *
+	 * @return string Decoded bytes; empty when the payload is not valid base64.
+	 */
+	public static function decode_data_url( $data ): string {
+		return (string) base64_decode( (string) preg_replace( '#^data:image/\w+;base64,#i', '', (string) $data ) );
+	}
 
-		$data = base64_decode( preg_replace( '#^data:image/\w+;base64,#i', '', $data ) );
+	/**
+	 * Saves a cropped image sent as a data URL.
+	 *
+	 * @param string $data      Base64 data URL.
+	 * @param string $file_name Target file name in the cropped directory.
+	 * @param int    $max_bytes Maximum decoded size; zero disables the limit.
+	 *
+	 * @return bool Whether the image was saved.
+	 */
+	public static function save_data_url_to_image( $data, $file_name, int $max_bytes = 0 ) {
+
+		$data = self::decode_data_url( $data );
+
+		if ( $max_bytes > 0 && strlen( $data ) > $max_bytes ) {
+			return false;
+		}
 
 		$dest_cropped = self::get_dir_path( 'cropped' ) . $file_name;
-		file_put_contents( $dest_cropped, $data );
+
+		return false !== file_put_contents( $dest_cropped, $data );
 	}
 
 	// Building options array for croppie

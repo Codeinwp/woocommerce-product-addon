@@ -221,7 +221,7 @@ Interested in PPOM PRO? [Learn more](https://themeisle.com/plugins/ppom-pro/upgr
 
 ### Support
 
-Need help? Open a thread on the [Support Forum](https://wordpress.org/support/plugin/woocommerce-product-addon/).
+Need help? Ask our support team from the **Help** button on the PPOM screens, or open a thread on the [Support Forum](https://wordpress.org/support/plugin/woocommerce-product-addon/).
 
 ### Documentation
 

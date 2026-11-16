@@ -106,21 +106,33 @@ final class SdkCompatAndMetadataRegistration implements RegisterHooks {
 			}
 		);
 
+		/*
+		 * Opts into the SDK Support Hub: one Help button on PPOM's screens and the
+		 * deactivation window. It replaces the float widget. The field groups and
+		 * settings screens already fire `themeisle_internal_page`, so no `pages` list is needed.
+		 */
 		add_filter(
-			'woocommerce_product_addon_float_widget_metadata',
+			'woocommerce_product_addon_support_hub_metadata',
+			/**
+			 * @return array{is_pro: bool, links: list<array{icon: string, text: string, url: string}>}
+			 */
 			function () {
-				$support_link = defined( 'PPOM_PRO_PATH' ) ? tsdk_support_link( PPOM_PRO_PATH . '/ppom.php' ) : false;
-
 				return array(
-					'logo'                 => PPOM_URL . '/images/help.svg',
-					'nice_name'            => 'PPOM',
-					'primary_color'        => '#313350',
-					'pages'                => array( 'woocommerce_page_ppom' ),
-					'has_upgrade_menu'     => ! defined( 'PPOM_PRO_PATH' ),
-					'upgrade_link'         => tsdk_utmify( tsdk_translate_link( PPOM_UPGRADE_URL ), 'float_widget' ),
-					'documentation_link'   => 'https://rviv.ly/C1cmSQ',
-					'premium_support_link' => $support_link ? tsdk_translate_link( $support_link ) : '',
-					'feature_request_link' => tsdk_translate_link( 'https://store.themeisle.com/suggest-a-feature/' ),
+					// The SDK reads this while loading PPOM, possibly before PPOM Pro's Licenser
+					// adds the product_ppom_license_status filter, so ask PPOM Pro for the stored license.
+					'is_pro' => function_exists( '\PPOM_Pro\get_license_status' ) && 'valid' === \PPOM_Pro\get_license_status( false ),
+					'links'  => array(
+						array(
+							'icon' => 'book-alt',
+							'text' => __( 'Documentation', 'woocommerce-product-addon' ),
+							'url'  => 'https://docs.themeisle.com/collection/1695-product-option-manager',
+						),
+						array(
+							'icon' => 'groups',
+							'text' => __( 'Community Forum', 'woocommerce-product-addon' ),
+							'url'  => 'https://wordpress.org/support/plugin/woocommerce-product-addon/',
+						),
+					),
 				);
 			}
 		);

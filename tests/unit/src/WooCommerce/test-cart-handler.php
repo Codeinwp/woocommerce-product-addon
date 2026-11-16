@@ -1559,6 +1559,50 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	}
 
 	/**
+	 * A crop within the cropper's size limit is saved, and a larger one fails the add with a notice.
+	 *
+	 * @return void
+	 */
+	public function test_cropped_image_must_fit_the_cropper_size_limit() {
+		$this->initialize_woocommerce_checkout_context();
+		$product = $this->create_simple_product();
+		$this->insert_ppom_meta( array( $this->build_cropper_field( 'photo', 'Photo', array(), array( 'file_size' => '200' ) ) ), $product->get_id() );
+
+		$original = 'crop-source-' . strtolower( wp_generate_password( 6, false ) ) . '.png';
+		$gd       = imagecreatetruecolor( 2, 2 );
+		imagepng( $gd, ppom_get_dir_path() . $original );
+		imagedestroy( $gd );
+		$this->assertLessThan( 200, filesize( ppom_get_dir_path() . $original ), 'The original must fit the limit.' );
+		$cropped           = ppom_get_dir_path( 'cropped' ) . $product->get_id() . '-' . $original;
+		$this->artifacts[] = ppom_get_dir_path() . $original;
+		$this->artifacts[] = $cropped;
+		WC()->session->set( 'ppom_uploaded_files', array( $original ) );
+		$_POST['ppom_product_id'] = $product->get_id();
+
+		$crop = static function ( int $bytes ) use ( $original ): array {
+			return array(
+				'fields' => array(
+					'photo' => array(
+						array(
+							'org'     => $original,
+							'cropped' => 'data:image/png;base64,' . base64_encode( str_repeat( 'x', $bytes ) ),
+						),
+					),
+				),
+			);
+		};
+
+		$refused = $this->direct_add( $product->get_id(), $crop( 201 ) );
+		$this->assertFalse( $refused['key'] );
+		$this->assertStringContainsString( 'Photo: the cropped image is larger than the allowed file size.', $refused['notices'] );
+		$this->assertFileDoesNotExist( $cropped );
+
+		$accepted = $this->direct_add( $product->get_id(), $crop( 200 ) );
+		$this->assertIsString( $accepted['key'] );
+		$this->assertSame( str_repeat( 'x', 200 ), (string) file_get_contents( $cropped ) );
+	}
+
+	/**
 	 * Creates a product with a required "Engraving" text field.
 	 *
 	 * @return int

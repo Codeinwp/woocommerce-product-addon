@@ -8,6 +8,7 @@
 
 namespace PPOM\Rest;
 
+use PPOM\Validation\Validator;
 use WC_Product;
 
 /**
@@ -107,6 +108,8 @@ final class ProductFieldGroupService {
 	/**
 	 * Merges submitted REST fields into an existing PPOM field group.
 	 *
+	 * Submitted fields are sanitized like the field editor's before they are merged.
+	 *
 	 * @phpstan-param array<int|string, array<string, mixed>> $ppom_fields
 	 * @phpstan-return array<string, mixed>
 	 *
@@ -117,6 +120,8 @@ final class ProductFieldGroupService {
 	 * @return array
 	 */
 	public function update_meta_data( $ppom_meta, $ppom_fields, $product_id ) {
+
+		$ppom_fields = Validator::sanitize_array_data( $ppom_fields );
 
 		$existing_fields = json_decode( $ppom_meta->the_meta, true );
 
