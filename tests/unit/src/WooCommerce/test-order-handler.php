@@ -387,4 +387,39 @@ class Test_Order_Handler extends PPOM_Test_Case {
 		update_option( 'woocommerce_feature_email_improvements_enabled', 'no' );
 		$this->assertFalse( OrderHandler::wc_email_improvements_enabled() );
 	}
+
+	/**
+	 * A field the line lists as hidden is not charged, so its upload must not reach the order.
+	 *
+	 * @return void
+	 */
+	public function test_rename_files_leaves_an_upload_of_a_hidden_field_out_of_the_order(): void {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$meta_id = $this->insert_ppom_meta( array( $this->build_file_field( 'artwork', 'Artwork', array( 'file_cost' => '3' ) ) ), $product->get_id() );
+		$order   = $this->create_order_with_product( $product );
+
+		$file_name         = 'hidden-artwork.txt';
+		$pool_path         = Handler::get_dir_path() . $file_name;
+		$confirmed_path    = Handler::get_dir_path( 'confirmed/' . $order->get_id() ) . Handler::file_get_name( $file_name, $product->get_id() );
+		$this->artifacts[] = $pool_path;
+		$this->artifacts[] = $confirmed_path;
+		file_put_contents( $pool_path, 'artwork' );
+
+		$this->initialize_woocommerce_checkout_context();
+		$key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+
+		WC()->cart->cart_contents[ $key ]['ppom']                        = array(
+			'fields'               => array(
+				'id'      => (string) $meta_id,
+				'artwork' => array( 'f1' => array( 'org' => $file_name ) ),
+			),
+			'conditionally_hidden' => 'artwork',
+		);
+		WC()->cart->cart_contents[ $key ][ Handler::VERIFIED_FILES_KEY ] = array( $file_name );
+
+		OrderHandler::rename_files( $order->get_id(), array(), $order );
+
+		$this->assertFileExists( $pool_path, 'The hidden upload stays in the upload pool.' );
+		$this->assertFileDoesNotExist( $confirmed_path, 'The hidden upload is not moved into the order.' );
+	}
 }
