@@ -346,8 +346,7 @@ final class Helpers {
 				continue;
 			}
 
-			$conditionally_hidden = isset( $ppom_cart_items['conditionally_hidden'] ) ? $ppom_cart_items['conditionally_hidden'] : '';
-			if ( self::is_field_hidden_by_condition( $key, $conditionally_hidden ) ) {
+			if ( self::is_field_hidden_in_payload( (string) $key, (array) $ppom_cart_items ) ) {
 				continue;
 			}
 

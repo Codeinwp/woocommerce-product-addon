@@ -42,6 +42,16 @@ final class CartHandler {
 	private const LEGACY_UNPRICED_FIELD_TYPES = array( 'eventcalendar', 'pricematrix' );
 
 	/**
+	 * Option fields whose submitted value carries the option id rather than its label.
+	 */
+	private const LEGACY_ID_VALUED_FIELD_TYPES = array( 'image', 'audio', 'cropper' );
+
+	/**
+	 * Option fields `Helpers::get_field_option_price_by_id()` cannot price, so their rows carry the price.
+	 */
+	private const LEGACY_ROW_PRICED_FIELD_TYPES = array( 'audio', 'cropper' );
+
+	/**
 	 * Legacy option-price rows: summed quantities when `include` is empty, or 1 when `include` is `on`.
 	 *
 	 * @param array $option_prices Legacy `ppom_option_price` rows.
@@ -570,7 +580,7 @@ final class CartHandler {
 			$resolved_line_price = null;
 			if ( isset( $option['apply'] ) && ( 'variable' === $option['apply'] || 'onetime' === $option['apply'] ) ) {
 				$resolved_line_price = isset( $option['price'] ) ? $option['price'] : 0;
-				if ( isset( $option['data_name'] ) && isset( $option['option_id'] ) ) {
+				if ( isset( $option['data_name'], $option['option_id'] ) && ! isset( $option['price'] ) ) {
 					$resolved_line_price = Helpers::get_field_option_price_by_id( $option, $wc_product, $ppom_meta_ids, true );
 				}
 			}
@@ -1048,13 +1058,15 @@ final class CartHandler {
 			case 'measure':
 				return self::legacy_measure_rows( $field_meta, $value );
 			case 'text':
+			case 'color':
+			case 'date':
 				return self::legacy_text_rows( $field_meta, $value, $product );
 			case 'file':
 				return self::legacy_upload_rows( $field_meta, $value, $product );
 			case 'cropper':
-				return array_merge( self::legacy_upload_rows( $field_meta, $value, $product ), self::legacy_option_rows( $field_meta, $value ) );
+				return array_merge( self::legacy_upload_rows( $field_meta, $value, $product ), self::legacy_option_rows( $field_meta, $value, $product ) );
 			default:
-				return self::legacy_option_rows( $field_meta, $value );
+				return self::legacy_option_rows( $field_meta, $value, $product );
 		}
 	}
 
@@ -1097,15 +1109,18 @@ final class CartHandler {
 	}
 
 	/**
-	 * One row per saved option the submitted value selects; the cart prices it by its id.
+	 * One row per saved option the submitted value selects.
 	 *
 	 * @param array<string, mixed> $field_meta Saved field definition.
 	 * @param mixed                $value      Submitted value of the field.
+	 * @param \WC_Product          $product    Product the line is priced from.
 	 *
 	 * @return list<array<string, mixed>>
 	 */
-	private static function legacy_option_rows( array $field_meta, $value ): array {
-		if ( in_array( $field_meta['type'] ?? '', self::LEGACY_UNPRICED_FIELD_TYPES, true ) ) {
+	private static function legacy_option_rows( array $field_meta, $value, \WC_Product $product ): array {
+		$type = $field_meta['type'] ?? '';
+
+		if ( in_array( $type, self::LEGACY_UNPRICED_FIELD_TYPES, true ) ) {
 			return array();
 		}
 
@@ -1113,25 +1128,59 @@ final class CartHandler {
 		$rows      = array();
 
 		foreach ( self::saved_option_rows( $field_meta ) as $saved_option ) {
-			// Image values post the option as JSON, so they are matched by id rather than label.
-			$selected = self::saved_option_matches_submission( $saved_option, $submitted )
-				|| array() !== array_intersect( self::saved_option_ids( $saved_option, $field_meta ), $submitted );
-
-			if ( ! $selected ) {
+			if ( ! self::legacy_option_selected( $saved_option, $field_meta, $submitted ) ) {
 				continue;
 			}
 
-			$option_label = isset( $saved_option['option'] ) ? $saved_option['option'] : ( $saved_option['title'] ?? '' );
-
-			$rows[] = array(
+			$row = array(
 				'apply'     => self::legacy_field_apply( $field_meta ),
-				'label'     => trim( self::field_title( $field_meta ) . ' ' . ( is_scalar( $option_label ) ? (string) $option_label : '' ) ),
+				'label'     => self::legacy_option_label( $saved_option, $field_meta ),
 				'data_name' => sanitize_key( (string) $field_meta['data_name'] ),
 				'option_id' => self::legacy_option_id( $saved_option, $field_meta ),
 			);
+
+			if ( in_array( $type, self::LEGACY_ROW_PRICED_FIELD_TYPES, true ) ) {
+				$row['price'] = (float) Helpers::saved_option_amount( isset( $saved_option['price'] ) && is_scalar( $saved_option['price'] ) ? (string) $saved_option['price'] : '', $product, true );
+			}
+
+			$rows[] = $row;
 		}
 
 		return $rows;
+	}
+
+	/**
+	 * Fee label of a saved option: the field title and the option name.
+	 *
+	 * @param array<string, mixed> $saved_option Saved option row.
+	 * @param array<string, mixed> $field_meta   Saved field definition.
+	 *
+	 * @return string
+	 */
+	private static function legacy_option_label( array $saved_option, array $field_meta ): string {
+		$option_label = isset( $saved_option['option'] ) ? $saved_option['option'] : ( $saved_option['title'] ?? '' );
+
+		return trim( self::field_title( $field_meta ) . ' ' . ( is_scalar( $option_label ) ? (string) $option_label : '' ) );
+	}
+
+	/**
+	 * Whether the submitted value selects a saved option.
+	 *
+	 * Labels are merchant-editable and may equal another option's id, so ids count
+	 * only for fields that post the id itself.
+	 *
+	 * @param array<string, mixed> $saved_option Saved option row.
+	 * @param array<string, mixed> $field_meta   Saved field definition.
+	 * @param string[]             $submitted    Tokens submitted for the field.
+	 *
+	 * @return bool
+	 */
+	private static function legacy_option_selected( array $saved_option, array $field_meta, array $submitted ): bool {
+		if ( in_array( $field_meta['type'] ?? '', self::LEGACY_ID_VALUED_FIELD_TYPES, true ) ) {
+			return array() !== array_intersect( self::saved_option_ids( $saved_option, $field_meta ), $submitted );
+		}
+
+		return self::saved_option_matches_submission( $saved_option, $submitted );
 	}
 
 	/**
@@ -1153,7 +1202,10 @@ final class CartHandler {
 	}
 
 	/**
-	 * Row of a priced text field the shopper filled in.
+	 * Row of a priced text-input field the shopper filled in.
+	 *
+	 * The page prices Text and Color inputs, and Date only with the jQuery datepicker,
+	 * which renders it as a text input.
 	 *
 	 * @param array<string, mixed> $field_meta Saved field definition.
 	 * @param mixed                $value      Submitted value of the field.
@@ -1162,9 +1214,10 @@ final class CartHandler {
 	 * @return list<array<string, mixed>>
 	 */
 	private static function legacy_text_rows( array $field_meta, $value, \WC_Product $product ): array {
-		$price = isset( $field_meta['price'] ) && is_scalar( $field_meta['price'] ) ? (string) $field_meta['price'] : '';
+		$price         = isset( $field_meta['price'] ) && is_scalar( $field_meta['price'] ) ? (string) $field_meta['price'] : '';
+		$native_picker = 'date' === $field_meta['type'] && 'on' !== ( $field_meta['jquery_dp'] ?? '' );
 
-		if ( '' === $price || ! is_scalar( $value ) || '' === (string) $value ) {
+		if ( $native_picker || '' === $price || ! is_scalar( $value ) || '' === (string) $value ) {
 			return array();
 		}
 

@@ -1366,6 +1366,115 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	}
 
 	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_charges_the_selected_cropper_viewport_and_upload() {
+		$price = $this->legacy_line_price(
+			array(
+				$this->build_cropper_field(
+					'crop',
+					'Crop',
+					array(
+						array( 'option' => 'Square', 'price' => '5', 'id' => 'square' ),
+						array( 'option' => 'Wide', 'price' => '9', 'id' => 'wide' ),
+					),
+					array( 'file_cost' => '2' )
+				),
+			),
+			array(
+				'crop' => array(
+					'ratio' => 'square',
+					'f1'    => array( 'org' => 'photo.jpg' ),
+				),
+			),
+			array()
+		);
+
+		$this->assertSame( 17.0, $price );
+	}
+
+	/**
+	 * Audio fields post the chosen track as JSON; a radio posts one, a checkbox several.
+	 *
+	 * @return void
+	 */
+	public function test_update_cart_fees_charges_the_selected_audio_tracks() {
+		$first  = array( 'id' => '11', 'title' => 'Track A', 'price' => '4' );
+		$second = array( 'id' => '12', 'title' => 'Track B', 'price' => '6' );
+		$fields = array(
+			array(
+				'type'      => 'audio',
+				'title'     => 'Music',
+				'data_name' => 'music',
+				'audio'     => array( $first, $second ),
+			),
+		);
+
+		$radio    = $this->legacy_line_price( $fields, array( 'music' => array( (string) wp_json_encode( $first ) ) ), array() );
+		$checkbox = $this->legacy_line_price( $fields, array( 'music' => array( (string) wp_json_encode( $first ), (string) wp_json_encode( $second ) ) ), array() );
+
+		$this->assertSame( array( 14.0, 20.0 ), array( $radio, $checkbox ) );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_charges_a_priced_color_field() {
+		$price = $this->legacy_line_price(
+			array( array( 'type' => 'color', 'title' => 'Colour', 'data_name' => 'colour', 'price' => '4' ) ),
+			array( 'colour' => '#ff0000' ),
+			array()
+		);
+
+		$this->assertSame( 14.0, $price );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_charges_a_priced_jquery_date_field() {
+		$price = $this->legacy_line_price(
+			array(
+				array(
+					'type'      => 'date',
+					'title'     => 'Delivery',
+					'data_name' => 'delivery',
+					'price'     => '3',
+					'jquery_dp' => 'on',
+				),
+			),
+			array( 'delivery' => '2026-12-24' ),
+			array()
+		);
+
+		$this->assertSame( 13.0, $price );
+	}
+
+	/**
+	 * Option ids are editable, so one option's id may equal another option's label.
+	 *
+	 * @return void
+	 */
+	public function test_update_cart_fees_matches_select_options_by_label_only() {
+		$price = $this->legacy_line_price(
+			array(
+				$this->build_select_field(
+					'size',
+					'Size',
+					array(
+						array( 'option' => 'large', 'price' => '1', 'id' => 'opt_a' ),
+						array( 'option' => 'Huge', 'price' => '5', 'id' => 'large' ),
+					)
+				),
+			),
+			array( 'size' => 'large' ),
+			array()
+		);
+
+		$this->assertSame( 11.0, $price );
+	}
+
+	/**
 	 * Image fields post the chosen image as JSON, not as its title.
 	 *
 	 * @return void
