@@ -928,22 +928,388 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	}
 
 	/**
+	 * Prices carts the legacy way for the rest of the test; the test case restores hooks afterwards.
+	 *
+	 * @return void
+	 */
+	private function use_legacy_price_mode(): void {
+		add_filter(
+			'ppom_price_mode',
+			static function (): string {
+				return 'legacy';
+			}
+		);
+	}
+
+	/**
+	 * Cart line of a 10.00 product whose one-time Extras checkbox has the given options selected.
+	 *
+	 * @param list<array{option: string, price: string, id: string}> $options  Saved Extras options.
+	 * @param list<string>                                           $selected Labels the shopper ticked.
+	 * @param int                                                    $quantity Cart line quantity.
+	 *
+	 * @return array{product_id: int, quantity: int, ppom: array{ppom_option_price: string, fields: array{id: string, extras: list<string>}}}
+	 */
+	private function onetime_extras_cart_item( array $options, array $selected, int $quantity = 1 ): array {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$meta_id = $this->insert_ppom_meta(
+			array( $this->build_checkbox_field( 'extras', 'Extras', $options, array( 'onetime' => 'on' ) ) ),
+			$product->get_id()
+		);
+
+		$cart_item                   = $this->option_price_cart_item( $product->get_id(), array(), $quantity );
+		$cart_item['ppom']['fields'] = array(
+			'id'     => (string) $meta_id,
+			'extras' => $selected,
+		);
+
+		return $cart_item;
+	}
+
+	/**
+	 * Cart double for add_fixed_fee(): one line, fees recorded instead of totalled.
+	 *
+	 * @param array<string, mixed> $item Cart item.
+	 *
+	 * @return object{fees: list<array{name: string, amount: float, taxable: bool}>}
+	 */
+	private function fee_recording_cart( array $item ): object {
+		return new class( $item ) {
+			/**
+			 * @var list<array{name: string, amount: float, taxable: bool}>
+			 */
+			public $fees = array();
+
+			/**
+			 * @var array<string, mixed>
+			 */
+			private $item;
+
+			/**
+			 * @param array<string, mixed> $item Cart item.
+			 */
+			public function __construct( array $item ) {
+				$this->item = $item;
+			}
+
+			/**
+			 * @return array<string, array<string, mixed>>
+			 */
+			public function get_cart(): array {
+				return array( 'line' => $this->item );
+			}
+
+			/**
+			 * @param string $name    Fee name.
+			 * @param mixed  $amount  Fee amount.
+			 * @param bool   $taxable Whether the fee is taxable.
+			 */
+			public function add_fee( string $name, $amount, bool $taxable = false ): void {
+				$this->fees[] = array(
+					'name'    => $name,
+					'amount'  => (float) $amount,
+					'taxable' => $taxable,
+				);
+			}
+		};
+	}
+
+	/**
+	 * Legacy line price of a 10.00 product carrying the given fields and posted rows.
+	 *
+	 * @param list<array<string, mixed>> $fields      Saved field definitions.
+	 * @param array<string, mixed>       $values      Submitted field values, without the group id.
+	 * @param list<array<string, mixed>> $posted_rows Posted `ppom_option_price` rows.
+	 *
+	 * @return float
+	 */
+	private function legacy_line_price( array $fields, array $values, array $posted_rows ): float {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$meta_id = $this->insert_ppom_meta( $fields, $product->get_id() );
+
+		$result = CartHandler::update_cart_fees(
+			array(
+				'data'         => $product,
+				'variation_id' => 0,
+				'quantity'     => 1,
+			),
+			array(
+				'ppom' => array(
+					'fields'            => array( 'id' => (string) $meta_id ) + $values,
+					'ppom_option_price' => wp_json_encode( $posted_rows ),
+				),
+			)
+		);
+
+		return (float) $result['data']->get_price();
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_fixed_fee_charges_a_selected_option_missing_from_the_posted_rows() {
+		$item = $this->onetime_extras_cart_item(
+			array( array( 'option' => 'Gift wrap', 'price' => '3', 'id' => 'gift_wrap' ) ),
+			array( 'Gift wrap' )
+		);
+		$item['ppom']['ppom_option_price'] = wp_json_encode( array( array( 'apply' => 'variable', 'price' => '0' ) ) );
+
+		$cart = $this->fee_recording_cart( $item );
+		CartHandler::add_fixed_fee( $cart );
+
+		$this->assertSame( array( 3.0 ), wp_list_pluck( $cart->fees, 'amount' ) );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_fixed_fee_of_a_text_field_is_its_saved_price_not_the_posted_amount() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_text_field(
+					'engraving',
+					'Engraving',
+					array(
+						'price'   => '10',
+						'onetime' => 'on',
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$item                   = $this->option_price_cart_item(
+			$product->get_id(),
+			array(
+				array(
+					'apply'         => 'onetime',
+					'price'         => '0.01',
+					'label'         => 'Engraving',
+					'product_title' => 'Product',
+				),
+			)
+		);
+		$item['ppom']['fields'] = array(
+			'id'        => (string) $meta_id,
+			'engraving' => 'Hello',
+		);
+
+		$cart = $this->fee_recording_cart( $item );
+		CartHandler::add_fixed_fee( $cart );
+
+		$this->assertSame( array( 10.0 ), wp_list_pluck( $cart->fees, 'amount' ) );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_fixed_fee_skips_a_conditionally_hidden_field() {
+		$item = $this->onetime_extras_cart_item(
+			array( array( 'option' => 'Gift wrap', 'price' => '3', 'id' => 'gift_wrap' ) ),
+			array( 'Gift wrap' )
+		);
+		$item['ppom']['conditionally_hidden'] = 'extras';
+		$item['ppom']['ppom_option_price']    = wp_json_encode(
+			array(
+				array(
+					'apply'         => 'onetime',
+					'price'         => '3',
+					'label'         => 'Gift wrap',
+					'product_title' => 'Product',
+					'data_name'     => 'extras',
+					'option_id'     => 'gift_wrap',
+				),
+			)
+		);
+
+		$cart = $this->fee_recording_cart( $item );
+		CartHandler::add_fixed_fee( $cart );
+
+		$this->assertSame( array(), $cart->fees );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_charges_a_selected_option_missing_from_the_posted_rows() {
+		$price = $this->legacy_line_price(
+			array(
+				$this->build_select_field(
+					'size',
+					'Size',
+					array( array( 'option' => 'Large', 'price' => '5', 'id' => 'large' ) )
+				),
+			),
+			array( 'size' => 'Large' ),
+			array( array( 'apply' => 'variable', 'price' => '0' ) )
+		);
+
+		$this->assertSame( 15.0, $price );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_prices_a_text_field_from_its_saved_price() {
+		$price = $this->legacy_line_price(
+			array( $this->build_text_field( 'engraving', 'Engraving', array( 'price' => '4' ) ) ),
+			array( 'engraving' => 'Hello' ),
+			array(
+				array(
+					'apply' => 'variable',
+					'price' => '-15',
+				),
+			)
+		);
+
+		$this->assertSame( 14.0, $price );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_prices_quantities_from_saved_options() {
+		$price = $this->legacy_line_price(
+			array(
+				$this->build_quantities_field(
+					'sizes',
+					'Sizes',
+					array( array( 'option' => 'Small', 'price' => '4', 'id' => 'small' ) )
+				),
+			),
+			array( 'sizes' => array( 'Small' => '3' ) ),
+			array(
+				array(
+					'apply'    => 'quantities',
+					'label'    => 'Small',
+					'price'    => '0.01',
+					'quantity' => '3',
+					'include'  => 'on',
+				),
+			)
+		);
+
+		$this->assertSame( 22.0, $price );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_prices_bulk_quantity_from_the_saved_tier() {
+		$price = $this->legacy_line_price(
+			array(
+				array(
+					'type'      => 'bulkquantity',
+					'title'     => 'Bulk',
+					'data_name' => 'bulk',
+					'options'   => wp_json_encode(
+						array(
+							array(
+								'Quantity Range' => '1-10',
+								'Base Price'     => '5',
+								'Red'            => '2',
+							),
+						)
+					),
+				),
+			),
+			array(
+				'bulk' => array(
+					'option' => 'Red',
+					'qty'    => '4',
+				),
+			),
+			array(
+				array(
+					'apply'    => 'bulkquantity',
+					'label'    => 'Red',
+					'price'    => '0',
+					'base'     => '0',
+					'quantity' => '4',
+				),
+			)
+		);
+
+		$this->assertSame( 13.0, $price );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_ignores_a_posted_fixed_price_unit_price() {
+		$this->assertFalse( function_exists( 'PPOM_FPP' ), 'Fixed Price packages are priced by PPOM Pro, which this suite does not load.' );
+
+		$price = $this->legacy_line_price(
+			array(
+				array(
+					'type'      => 'fixedprice',
+					'title'     => 'Pack',
+					'data_name' => 'pack',
+					'options'   => array(
+						array(
+							'option' => '10',
+							'price'  => '50',
+						),
+					),
+				),
+			),
+			array( 'pack' => '10' ),
+			array(
+				array(
+					'apply'     => 'fixedprice',
+					'price'     => '0',
+					'unitprice' => '0.01',
+					'quantity'  => '10',
+				),
+			)
+		);
+
+		$this->assertSame( 10.0, $price );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_scales_the_price_by_the_saved_measure_multiplier() {
+		$price = $this->legacy_line_price(
+			array(
+				array(
+					'type'             => 'measure',
+					'title'            => 'Length',
+					'data_name'        => 'length',
+					'price-multiplier' => '2',
+				),
+			),
+			array( 'length' => '5' ),
+			array(
+				array(
+					'apply'            => 'measure',
+					'qty'              => '5',
+					'use_units'        => 'no',
+					'price_multiplier' => '0.001',
+				),
+			)
+		);
+
+		$this->assertSame( 100.0, $price );
+	}
+
+	/**
 	 * Regression: every selected fixed-fee option must be added to the cart line
 	 * subtotal, not just the last one.
 	 *
 	 * @return void
 	 */
 	public function test_item_subtotal_sums_every_onetime_option_price() {
-		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
-		$product_id = $product->get_id();
-
-		$cart_item = $this->option_price_cart_item(
-			$product_id,
+		$this->use_legacy_price_mode();
+		$cart_item = $this->onetime_extras_cart_item(
 			array(
-				array( 'price' => '3', 'apply' => 'onetime' ),
-				array( 'price' => '5', 'apply' => 'onetime' ),
-				array( 'price' => '9', 'apply' => 'onetime' ),
-			)
+				array( 'option' => 'Gift wrap', 'price' => '3', 'id' => 'gift_wrap' ),
+				array( 'option' => 'Candles', 'price' => '5', 'id' => 'candles' ),
+				array( 'option' => 'Card', 'price' => '9', 'id' => 'card' ),
+			),
+			array( 'Gift wrap', 'Candles', 'Card' )
 		);
 
 		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
@@ -952,41 +1318,36 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	}
 
 	/**
-	 * Rows with no `data_name`/`option_id` cannot be resolved server-side, so they
-	 * keep the legacy behaviour of trusting the payload amount.
+	 * Posted fixed-fee rows are untrusted, so without a saved field behind them they add nothing.
 	 *
 	 * @return void
 	 */
-	public function test_item_subtotal_prefers_discount_over_price_for_unresolvable_option() {
-		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
-		$product_id = $product->get_id();
+	public function test_item_subtotal_ignores_posted_fixed_fee_rows_without_a_saved_field() {
+		$this->use_legacy_price_mode();
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
 
 		$cart_item = $this->option_price_cart_item(
-			$product_id,
+			$product->get_id(),
 			array(
 				array( 'price' => '5', 'discount' => '2', 'apply' => 'onetime' ),
 				array( 'price' => '3', 'apply' => 'onetime' ),
 			)
 		);
 
-		$subtotal = CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' );
-
-		$this->assertSame( Helpers::price( 15 ), $subtotal );
+		$this->assertSame( 'original', CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' ) );
 	}
 
 	/**
 	 * @return void
 	 */
 	public function test_item_subtotal_multiplies_only_the_base_price_by_quantity() {
-		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
-		$product_id = $product->get_id();
-
-		$cart_item = $this->option_price_cart_item(
-			$product_id,
+		$this->use_legacy_price_mode();
+		$cart_item = $this->onetime_extras_cart_item(
 			array(
-				array( 'price' => '3', 'apply' => 'onetime' ),
-				array( 'price' => '5', 'apply' => 'onetime' ),
+				array( 'option' => 'Gift wrap', 'price' => '3', 'id' => 'gift_wrap' ),
+				array( 'option' => 'Candles', 'price' => '5', 'id' => 'candles' ),
 			),
+			array( 'Gift wrap', 'Candles' ),
 			2
 		);
 
@@ -999,6 +1360,7 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 * @return void
 	 */
 	public function test_item_subtotal_left_untouched_when_no_onetime_option_selected() {
+		$this->use_legacy_price_mode();
 		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
 		$product_id = $product->get_id();
 
@@ -1020,6 +1382,7 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 * @return void
 	 */
 	public function test_item_subtotal_ignores_payload_amount_when_option_resolves_from_field_meta() {
+		$this->use_legacy_price_mode();
 		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
 		$product_id = $product->get_id();
 
@@ -1063,6 +1426,7 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 * @return void
 	 */
 	public function test_item_subtotal_ignores_field_group_not_attached_to_the_product() {
+		$this->use_legacy_price_mode();
 		$product     = $this->create_simple_product( array( 'regular_price' => '10' ) );
 		$other_group = $this->insert_ppom_meta(
 			array(
@@ -1097,6 +1461,7 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 * @return void
 	 */
 	public function test_item_subtotal_ignores_option_whose_field_is_not_a_fixed_fee() {
+		$this->use_legacy_price_mode();
 		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
 		$product_id = $product->get_id();
 
@@ -1133,6 +1498,7 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 * @return void
 	 */
 	public function test_item_subtotal_ignores_option_the_shopper_did_not_select() {
+		$this->use_legacy_price_mode();
 		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
 		$product_id = $product->get_id();
 
@@ -1176,6 +1542,7 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 * @return void
 	 */
 	public function test_item_subtotal_uses_saved_discount_for_resolved_option() {
+		$this->use_legacy_price_mode();
 		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
 		$product_id = $product->get_id();
 
@@ -1215,6 +1582,7 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	 * @return void
 	 */
 	public function test_item_subtotal_resolves_fee_even_when_payload_amount_is_zero() {
+		$this->use_legacy_price_mode();
 		$product    = $this->create_simple_product( array( 'regular_price' => '10' ) );
 		$product_id = $product->get_id();
 

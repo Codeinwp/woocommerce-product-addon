@@ -2234,9 +2234,9 @@ final class Helpers {
 	 * @param string      $saved_price      Saved option price, empty when no option matched.
 	 * @param \WC_Product $product          Product of the cart line.
 	 * @param bool        $in_line_currency Convert a flat price to the currency the cart line is priced in.
-	 * @return mixed
+	 * @return int|float|string 0 when nothing is saved, otherwise a decimal amount.
 	 */
-	private static function saved_option_amount( string $saved_price, $product, bool $in_line_currency ) {
+	public static function saved_option_amount( string $saved_price, $product, bool $in_line_currency ) {
 		if ( '' === $saved_price ) {
 			return 0;
 		}
