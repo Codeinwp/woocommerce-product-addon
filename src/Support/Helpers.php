@@ -1680,6 +1680,23 @@ final class Helpers {
 	}
 
 	/**
+	 * Whether a PPOM payload lists a field as conditionally hidden.
+	 *
+	 * Unlike is_field_hidden_by_condition(), this reads only the payload's own list,
+	 * so a request for another product cannot change it.
+	 *
+	 * @param string               $data_name Field data name.
+	 * @param array<string, mixed> $ppom      Cart item PPOM payload.
+	 *
+	 * @return bool
+	 */
+	public static function is_field_hidden_in_payload( string $data_name, array $ppom ): bool {
+		$hidden = isset( $ppom['conditionally_hidden'] ) && is_string( $ppom['conditionally_hidden'] ) ? explode( ',', $ppom['conditionally_hidden'] ) : array();
+
+		return (bool) apply_filters( 'ppom_is_field_hidden_by_condition', in_array( $data_name, $hidden, true ) );
+	}
+
+	/**
 	 * Normalizes PPOM group IDs from scalar, comma-separated, or array payloads.
 	 *
 	 * @param mixed $meta_ids PPOM group IDs.

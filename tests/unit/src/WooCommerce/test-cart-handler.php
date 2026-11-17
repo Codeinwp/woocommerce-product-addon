@@ -1296,6 +1296,281 @@ class Test_Cart_Handler extends PPOM_Test_Case {
 	}
 
 	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_charges_the_saved_file_cost_per_upload() {
+		$price = $this->legacy_line_price(
+			array( array( 'type' => 'file', 'title' => 'Artwork', 'data_name' => 'artwork', 'file_cost' => '3' ) ),
+			array(
+				'artwork' => array(
+					'f1' => array( 'org' => 'front.png' ),
+					'f2' => array( 'org' => 'back.png' ),
+				),
+			),
+			array(
+				array(
+					'apply'     => 'variable',
+					'price'     => '0.01',
+					'data_name' => 'artwork',
+				),
+			)
+		);
+
+		$this->assertSame( 16.0, $price );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_charges_the_saved_cropper_upload_cost() {
+		$price = $this->legacy_line_price(
+			array( $this->build_cropper_field( 'crop', 'Crop', array(), array( 'file_cost' => '2' ) ) ),
+			array( 'crop' => array( 'f1' => array( 'org' => 'photo.jpg' ) ) ),
+			array()
+		);
+
+		$this->assertSame( 12.0, $price );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_fixed_fee_charges_the_saved_file_cost_per_upload() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'file',
+					'title'     => 'Artwork',
+					'data_name' => 'artwork',
+					'file_cost' => '3',
+					'onetime'   => 'on',
+				),
+			),
+			$product->get_id()
+		);
+
+		$item                   = $this->option_price_cart_item( $product->get_id(), array() );
+		$item['ppom']['fields'] = array(
+			'id'      => (string) $meta_id,
+			'artwork' => array(
+				'f1' => array( 'org' => 'front.png' ),
+				'f2' => array( 'org' => 'back.png' ),
+			),
+		);
+
+		$cart = $this->fee_recording_cart( $item );
+		CartHandler::add_fixed_fee( $cart );
+
+		$this->assertSame( array( 6.0 ), wp_list_pluck( $cart->fees, 'amount' ) );
+	}
+
+	/**
+	 * Image fields post the chosen image as JSON, not as its title.
+	 *
+	 * @return void
+	 */
+	public function test_update_cart_fees_charges_a_selected_image() {
+		$red   = array(
+			'id'    => 'red',
+			'title' => 'Red',
+			'price' => '5',
+		);
+		$price = $this->legacy_line_price(
+			array(
+				array(
+					'type'      => 'image',
+					'title'     => 'Colour',
+					'data_name' => 'colour',
+					'images'    => array( $red ),
+				),
+			),
+			array( 'colour' => (string) wp_json_encode( $red ) ),
+			array()
+		);
+
+		$this->assertSame( 15.0, $price );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_prices_select_quantity_from_the_saved_option() {
+		$price = $this->legacy_line_price(
+			array(
+				array(
+					'type'      => 'selectqty',
+					'title'     => 'Colour',
+					'data_name' => 'colour',
+					'options'   => array( array( 'option' => 'Red', 'price' => '4', 'id' => 'red' ) ),
+				),
+			),
+			array(
+				'colour' => array(
+					'option' => 'Red',
+					'qty'    => '3',
+				),
+			),
+			array(
+				array(
+					'apply'    => 'quantities',
+					'price'    => '0.01',
+					'quantity' => '3',
+					'include'  => 'on',
+				),
+			)
+		);
+
+		$this->assertSame( 22.0, $price );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_prices_variation_quantity_matrix_cells_from_saved_prices() {
+		$price = $this->legacy_line_price(
+			array(
+				array(
+					'type'        => 'vqmatrix',
+					'title'       => 'Matrix',
+					'data_name'   => 'matrix',
+					'options'     => array( array( 'option' => 'Red', 'option_id' => 'red', 'price' => '2' ) ),
+					'row_options' => array( array( 'option' => 'Small', 'option_id' => 'small' ) ),
+				),
+			),
+			array( 'matrix' => array( 'Red-Small' => '3' ) ),
+			array(
+				array(
+					'apply'    => 'quantities',
+					'label'    => 'Red-Small',
+					'price'    => '0.01',
+					'quantity' => '3',
+					'include'  => 'on',
+				),
+			)
+		);
+
+		$this->assertSame( 16.0, $price );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_update_cart_fees_prices_a_quantities_pack_from_saved_prices() {
+		$price = $this->legacy_line_price(
+			array(
+				array(
+					'type'      => 'qtypack',
+					'title'     => 'Pack',
+					'data_name' => 'pack',
+					'options'   => array( array( 'option' => 'Mug', 'price' => '2' ) ),
+				),
+			),
+			array( 'pack' => array( 'Mug' => '5' ) ),
+			array(
+				array(
+					'apply' => 'variable',
+					'price' => '0.01',
+					'label' => 'Pack',
+				),
+			)
+		);
+
+		$this->assertSame( 20.0, $price );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_legacy_cart_quantity_shows_the_submitted_quantities() {
+		$product = $this->create_simple_product( array( 'regular_price' => '10' ) );
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_quantities_field(
+					'sizes',
+					'Sizes',
+					array(
+						array( 'option' => 'Small', 'id' => 'small' ),
+						array( 'option' => 'Large', 'id' => 'large' ),
+					)
+				),
+			),
+			$product->get_id()
+		);
+
+		$this->initialize_woocommerce_checkout_context();
+		$key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+
+		WC()->cart->cart_contents[ $key ]['ppom'] = array(
+			'fields'            => array(
+				'id'    => (string) $meta_id,
+				'sizes' => array(
+					'Small' => '3',
+					'Large' => '4',
+				),
+			),
+			'ppom_option_price' => wp_json_encode(
+				array(
+					array(
+						'apply'    => 'quantities',
+						'quantity' => '99',
+						'include'  => '',
+					),
+				)
+			),
+		);
+
+		$this->assertSame( '<span class="ppom-cart-quantity">7</span>', CartHandler::control_cart_quantity_legacy( '1', $key ) );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_item_subtotal_untouched_in_modern_price_mode() {
+		$cart_item = $this->onetime_extras_cart_item(
+			array( array( 'option' => 'Gift wrap', 'price' => '3', 'id' => 'gift_wrap' ) ),
+			array( 'Gift wrap' )
+		);
+
+		$this->assertSame( 'original', CartHandler::item_subtotal( 'original', $cart_item, 'cart-key' ) );
+	}
+
+	/**
+	 * Another product's add request posts its own hidden list, which must not reach this line.
+	 *
+	 * @return void
+	 */
+	public function test_fixed_fee_ignores_the_hidden_list_of_another_request() {
+		$item = $this->onetime_extras_cart_item(
+			array( array( 'option' => 'Gift wrap', 'price' => '3', 'id' => 'gift_wrap' ) ),
+			array( 'Gift wrap' )
+		);
+
+		$_POST['ppom']['conditionally_hidden'] = 'extras';
+		$cart                                  = $this->fee_recording_cart( $item );
+		CartHandler::add_fixed_fee( $cart );
+
+		$this->assertSame( array( 3.0 ), wp_list_pluck( $cart->fees, 'amount' ) );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_fixed_fee_keeps_a_line_field_hidden_when_another_request_shows_it() {
+		$item                                 = $this->onetime_extras_cart_item(
+			array( array( 'option' => 'Gift wrap', 'price' => '3', 'id' => 'gift_wrap' ) ),
+			array( 'Gift wrap' )
+		);
+		$item['ppom']['conditionally_hidden'] = 'extras';
+
+		$_POST['ppom']['conditionally_hidden'] = '';
+		$cart                                  = $this->fee_recording_cart( $item );
+		CartHandler::add_fixed_fee( $cart );
+
+		$this->assertSame( array(), $cart->fees );
+	}
+
+	/**
 	 * Regression: every selected fixed-fee option must be added to the cart line
 	 * subtotal, not just the last one.
 	 *

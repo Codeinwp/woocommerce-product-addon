@@ -891,7 +891,7 @@ final class CartHandler {
 				continue;
 			}
 
-			$amount = self::canonical_onetime_price( $row, $pristine, $attached_ids, $selected_fields, $counted_fields );
+			$amount = isset( $row['onetime_amount'] ) ? (float) $row['onetime_amount'] : self::canonical_onetime_price( $row, $pristine, $attached_ids, $selected_fields, $counted_fields );
 
 			if ( null !== $amount ) {
 				$fees[] = array(
@@ -967,14 +967,13 @@ final class CartHandler {
 		}
 
 		$meta_ids      = implode( ',', $attached_ids );
-		$hidden        = isset( $ppom['conditionally_hidden'] ) && is_string( $ppom['conditionally_hidden'] ) ? $ppom['conditionally_hidden'] : '';
 		$product_title = get_post_field( 'post_title', $product_id );
 		unset( $fields['id'] );
 
 		foreach ( $fields as $data_name => $value ) {
 			$field_meta = Helpers::get_field_meta_by_dataname( 0, sanitize_key( (string) $data_name ), $meta_ids );
 
-			if ( empty( $field_meta ) || ! is_array( $field_meta ) || Helpers::is_field_hidden_by_condition( (string) $data_name, $hidden ) ) {
+			if ( empty( $field_meta ) || ! is_array( $field_meta ) || Helpers::is_field_hidden_in_payload( (string) $data_name, $ppom ) ) {
 				continue;
 			}
 
@@ -1028,15 +1027,73 @@ final class CartHandler {
 				return self::legacy_qtypack_rows( $field_meta, $value, $product );
 			case 'bulkquantity':
 				return self::legacy_bulkquantity_rows( $field_meta, $value, $product );
+			default:
+				return self::legacy_single_field_rows( $field_meta, $value, $product );
+		}
+	}
+
+	/**
+	 * Rows of the field types that do not size the order.
+	 *
+	 * @param array<string, mixed> $field_meta Saved field definition.
+	 * @param mixed                $value      Submitted value of the field.
+	 * @param \WC_Product          $product    Product the line is priced from.
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	private static function legacy_single_field_rows( array $field_meta, $value, \WC_Product $product ): array {
+		switch ( isset( $field_meta['type'] ) ? $field_meta['type'] : '' ) {
 			case 'fixedprice':
 				return self::legacy_fixedprice_rows( $field_meta, $value, $product );
 			case 'measure':
 				return self::legacy_measure_rows( $field_meta, $value );
 			case 'text':
 				return self::legacy_text_rows( $field_meta, $value, $product );
+			case 'file':
+				return self::legacy_upload_rows( $field_meta, $value, $product );
+			case 'cropper':
+				return array_merge( self::legacy_upload_rows( $field_meta, $value, $product ), self::legacy_option_rows( $field_meta, $value ) );
 			default:
 				return self::legacy_option_rows( $field_meta, $value );
 		}
+	}
+
+	/**
+	 * The row of an upload field: its saved file cost for each uploaded file.
+	 *
+	 * Fixed fees carry their store-currency amount, as the one-time fee resolver
+	 * prices only option and text fields.
+	 *
+	 * @param array<string, mixed> $field_meta Saved field definition.
+	 * @param mixed                $value      Submitted uploads keyed by file id.
+	 * @param \WC_Product          $product    Product the line is priced from.
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	private static function legacy_upload_rows( array $field_meta, $value, \WC_Product $product ): array {
+		$cost  = isset( $field_meta['file_cost'] ) && is_scalar( $field_meta['file_cost'] ) ? (string) $field_meta['file_cost'] : '';
+		$files = 0;
+
+		foreach ( is_array( $value ) ? $value : array() as $file ) {
+			$files += is_array( $file ) && isset( $file['org'] ) ? 1 : 0;
+		}
+
+		if ( '' === $cost || 0 === $files ) {
+			return array();
+		}
+
+		$row = array(
+			'apply'     => self::legacy_field_apply( $field_meta ),
+			'label'     => self::field_title( $field_meta ),
+			'price'     => (float) Helpers::saved_option_amount( $cost, $product, true ) * $files,
+			'data_name' => sanitize_key( (string) $field_meta['data_name'] ),
+		);
+
+		if ( 'onetime' === $row['apply'] ) {
+			$row['onetime_amount'] = self::canonical_amount( $cost, $product ) * $files;
+		}
+
+		return array( $row );
 	}
 
 	/**
@@ -1056,7 +1113,11 @@ final class CartHandler {
 		$rows      = array();
 
 		foreach ( self::saved_option_rows( $field_meta ) as $saved_option ) {
-			if ( empty( $submitted ) || ! self::saved_option_matches_submission( $saved_option, $submitted ) ) {
+			// Image values post the option as JSON, so they are matched by id rather than label.
+			$selected = self::saved_option_matches_submission( $saved_option, $submitted )
+				|| array() !== array_intersect( self::saved_option_ids( $saved_option, $field_meta ), $submitted );
+
+			if ( ! $selected ) {
 				continue;
 			}
 
