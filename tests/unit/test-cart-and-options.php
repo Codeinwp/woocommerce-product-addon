@@ -798,4 +798,137 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 			html_entity_decode( wp_strip_all_tags( $displayed['quantities_field'] ), ENT_QUOTES, 'UTF-8' )
 		);
 	}
+
+	/**
+	 * Render the customer processing email for an order as plain text.
+	 *
+	 * @param WC_Order $order Order to render.
+	 * @return string
+	 */
+	private function render_plain_processing_email( WC_Order $order ): string {
+		$email      = WC()->mailer()->emails['WC_Email_Customer_Processing_Order'];
+		$prev_type  = $email->email_type;
+		$prev_order = $email->object;
+
+		$email->email_type = 'plain';
+		$email->object     = $order;
+		try {
+			return $email->get_content();
+		} finally {
+			$email->email_type = $prev_type;
+			$email->object     = $prev_order;
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_plain_text_order_emails_keep_percent_and_apostrophe_in_labels(): void {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'quantities',
+					'title'     => 'Sizes',
+					'data_name' => 'sizes',
+				),
+			),
+			$product->get_id()
+		);
+
+		$order = $this->create_order_with_product( $product );
+		$items = $order->get_items();
+		$item  = reset( $items );
+		\PPOM\WooCommerce\Order\OrderHandler::order_item_meta(
+			$item,
+			'cart-key',
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields' => wp_slash(
+						array(
+							'id'    => (string) $meta_id,
+							'sizes' => array(
+								'10% off' => '2',
+								"Men's"   => '1',
+							),
+						)
+					),
+				),
+			),
+			$order
+		);
+		$item->save();
+		$order = wc_get_order( $order->get_id() );
+
+		$default = $this->render_plain_processing_email( $order );
+		$this->assertStringContainsString( '10% off = 2', $default );
+		$this->assertStringContainsString( "Men's = 1", $default );
+
+		add_action( 'woocommerce_order_item_meta_end', 'ppom_woocommerce_order_item_meta_html', 10, 2 );
+		add_filter( 'woocommerce_display_item_meta', '__return_empty_string' );
+		try {
+			$improved = $this->render_plain_processing_email( $order );
+		} finally {
+			remove_action( 'woocommerce_order_item_meta_end', 'ppom_woocommerce_order_item_meta_html', 10 );
+			remove_filter( 'woocommerce_display_item_meta', '__return_empty_string' );
+		}
+		$this->assertStringContainsString( '10% off = 2', $improved );
+		$this->assertStringContainsString( "Men's = 1", $improved );
+	}
+
+	/**
+	 * @return array<string, array{0: string}>
+	 */
+	public function array_valued_scalar_field_types(): array {
+		return array(
+			'hidden'  => array( 'hidden' ),
+			'section' => array( 'section' ),
+		);
+	}
+
+	/**
+	 * @dataProvider array_valued_scalar_field_types
+	 *
+	 * @param string $type Field type that normally holds a scalar value.
+	 * @return void
+	 */
+	public function test_cart_item_data_keeps_posted_array_keys_inert( string $type ): void {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				array(
+					'type'         => $type,
+					'title'        => 'Shopper Field',
+					'data_name'    => 'shopper_field',
+					'cart_display' => 'on',
+				),
+			),
+			$product->get_id()
+		);
+
+		$item_data = apply_filters(
+			'woocommerce_get_item_data',
+			array(),
+			array(
+				'data'       => $product,
+				'product_id' => $product->get_id(),
+				'ppom'       => array(
+					'fields' => wp_slash(
+						array(
+							'id'            => (string) $meta_id,
+							'shopper_field' => array( '<a href="https://evil.example">x</a>' => '1' ),
+						)
+					),
+				),
+			)
+		);
+
+		$rows = wp_list_filter( $item_data, array( 'name' => 'Shopper Field' ) );
+		$this->assertCount( 1, $rows );
+		$row = reset( $rows );
+		$this->assertStringContainsString( 'evil.example', $row['display'] );
+		$this->assertStringNotContainsString( '<a', wp_kses_post( $row['display'] ) );
+		$this->assertStringNotContainsString( '<a', wp_kses_post( (string) $row['value'] ) );
+	}
 }

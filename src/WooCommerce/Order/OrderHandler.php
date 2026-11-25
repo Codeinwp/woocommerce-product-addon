@@ -19,6 +19,13 @@ use PPOM\WooCommerce\Cart\CartHandler;
  */
 final class OrderHandler {
 
+	/**
+	 * Whether the order item meta being rendered is for a plain-text email.
+	 *
+	 * @var bool
+	 */
+	private static $rendering_plain_text = false;
+
 	// Order persistence.
 
 	/**
@@ -160,7 +167,31 @@ final class OrderHandler {
 
 		}
 
+		// Plain-text emails delete entities WooCommerce does not know, such as the escaped % and '.
+		if ( self::$rendering_plain_text && $field_meta && is_string( $display_value ) ) {
+			$display_value = preg_replace( array( '/&#0*37;/', '/&#0*39;/' ), array( '%', "'" ), $display_value );
+		}
+
 		return $display_value;
+	}
+
+	/**
+	 * Marks the start of an order item's meta output.
+	 *
+	 * @param bool $plain_text Whether the output is a plain-text email.
+	 * @return void
+	 */
+	public static function begin_item_meta_output( bool $plain_text ): void {
+		self::$rendering_plain_text = $plain_text;
+	}
+
+	/**
+	 * Marks the end of an order item's meta output.
+	 *
+	 * @return void
+	 */
+	public static function end_item_meta_output(): void {
+		self::$rendering_plain_text = false;
 	}
 
 

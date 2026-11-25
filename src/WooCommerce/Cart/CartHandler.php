@@ -814,12 +814,13 @@ final class CartHandler {
 		}
 
 		if ( ! empty( $meta_name ) ) {
+			// Array keys are never sanitized, so hex-encode < and > to keep the JSON out of the cart HTML.
 			if ( ! is_scalar( $meta_value ) ) {
-				$meta_value = wp_json_encode( $meta_value );
+				$meta_value = wp_json_encode( $meta_value, JSON_HEX_TAG );
 			}
 
 			if ( ! is_scalar( $display ) ) {
-				$display = wp_json_encode( $display );
+				$display = wp_json_encode( $display, JSON_HEX_TAG );
 			}
 
 			if ( apply_filters( 'ppom_show_option_price_cart', false ) && isset( $meta['price'] ) ) {
