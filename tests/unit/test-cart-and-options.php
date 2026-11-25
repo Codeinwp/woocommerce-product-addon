@@ -593,4 +593,139 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 
 		$this->assertSame( 999.0, (float) $options['Kit A']['price'] );
 	}
+
+	/**
+	 * Build cart meta for one field the way the cart stores it: raw, slashed `$_POST` values.
+	 *
+	 * @param string                                       $type  Field type.
+	 * @param array<int|string, string|array<string, string>> $value Unslashed posted field value.
+	 * @return array<string, mixed> Meta row for the field.
+	 */
+	private function make_meta_for_posted_field( string $type, array $value ): array {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => $type,
+					'title'     => 'Shopper Field',
+					'data_name' => 'shopper_field',
+				),
+			),
+			$product->get_id()
+		);
+
+		$meta = ppom_make_meta_data(
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields' => array(
+						'id'            => (string) $meta_id,
+						'shopper_field' => wp_slash( $value ),
+					),
+				),
+			),
+			'order'
+		);
+
+		$this->assertArrayHasKey( 'shopper_field', $meta );
+
+		return $meta['shopper_field'];
+	}
+
+	/**
+	 * Markup written as JSON unicode escapes, which survives tag stripping until decoded.
+	 *
+	 * @return string
+	 */
+	private function unicode_escaped_markup(): string {
+		$bs = chr( 92 );
+
+		return $bs . 'u003cb' . $bs . 'u003ex' . $bs . 'u003c/b' . $bs . 'u003e';
+	}
+
+	/**
+	 * @return array<string, array{0: string}>
+	 */
+	public function quantity_field_types(): array {
+		return array(
+			'quantities' => array( 'quantities' ),
+			'qtypack'    => array( 'qtypack' ),
+			'vm'         => array( 'vm' ),
+		);
+	}
+
+	/**
+	 * @dataProvider quantity_field_types
+	 *
+	 * @param string $type Quantity-style field type.
+	 * @return void
+	 */
+	public function test_make_meta_data_escapes_posted_quantity_labels( string $type ): void {
+		$meta = $this->make_meta_for_posted_field(
+			$type,
+			array(
+				'<b>x</b>' => '2',
+				'S & M'    => '1',
+			)
+		);
+
+		$this->assertStringNotContainsString( '<b>x', $meta['value'] );
+		$this->assertStringContainsString( '&lt;b&gt;x&lt;/b&gt; = 2', $meta['value'] );
+		$this->assertStringContainsString( 'S &amp; M = 1', $meta['value'] );
+		$this->assertStringContainsString( '<strong>', $meta['value'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_make_meta_data_escapes_posted_event_ticket_labels(): void {
+		$meta = $this->make_meta_for_posted_field(
+			'eventcalendar',
+			array( '2026-01-15' => array( '<b>x</b>' => '1' ) )
+		);
+
+		$this->assertStringNotContainsString( '<b>x', $meta['display'] );
+		$this->assertStringContainsString( '&lt;b&gt;x&lt;/b&gt; = 1', $meta['display'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_make_meta_data_escapes_decoded_audio_title(): void {
+		$meta = $this->make_meta_for_posted_field(
+			'audio',
+			array( '7' => '{"link":"https://example.com/a.mp3","title":"' . $this->unicode_escaped_markup() . '"}' )
+		);
+
+		$this->assertStringNotContainsString( '<b>x', $meta['value'] );
+		$this->assertStringContainsString( '>&lt;b&gt;x&lt;/b&gt;</a>', $meta['value'] );
+		$this->assertStringContainsString( 'href="https://example.com/a.mp3"', $meta['value'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_make_meta_data_escapes_decoded_fancycropper_label(): void {
+		$meta = $this->make_meta_for_posted_field(
+			'fancycropper',
+			array(
+				'popup1' => '{"imageURL":"a.png","fileName":"a.png","cropped":[{"croppedURL":"c.png","qty":"1","label":"' . $this->unicode_escaped_markup() . '"}]}',
+			)
+		);
+
+		$this->assertStringNotContainsString( '<b>x', $meta['value'] );
+		$this->assertStringContainsString( '<td>&lt;b&gt;x&lt;/b&gt; x 1</td>', $meta['value'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_get_image_name_escapes_decoded_image_label(): void {
+		$images = array(
+			wp_slash( '{"link":"https://example.com/a.png","raw":"' . $this->unicode_escaped_markup() . '"}' ),
+			wp_slash( '{"link":"https://example.com/b.png","raw":"Blue & Red"}' ),
+		);
+
+		$this->assertSame( '&lt;b&gt;x&lt;/b&gt;, Blue &amp; Red', ppom_get_image_name( $images ) );
+	}
 }

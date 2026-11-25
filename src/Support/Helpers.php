@@ -383,7 +383,7 @@ final class Helpers {
 					// self::pa($value);
 					foreach ( $value as $label => $qty ) {
 						if ( ! empty( $qty ) && apply_filters( 'ppom_hide_variation_if_qty_zero', true, $value ) ) {
-							$qty_values[] = "{$label} = {$qty}";
+							$qty_values[] = esc_html( "{$label} = {$qty}" );
 							// $ppom_meta[$label] = $qty;
 							$total_qty += intval( $qty );
 						}
@@ -408,7 +408,7 @@ final class Helpers {
 					// self::pa($value);
 					foreach ( $value as $label => $qty ) {
 						if ( ! empty( $qty ) ) {
-							$qty_values[] = "{$label} = {$qty}";
+							$qty_values[] = esc_html( "{$label} = {$qty}" );
 							// $ppom_meta[$label] = $qty;
 							$total_qty += intval( $qty );
 						}
@@ -434,7 +434,7 @@ final class Helpers {
 					// self::pa($value);
 					foreach ( $value as $label => $qty ) {
 						if ( ! empty( $qty ) ) {
-							$qty_values[] = "{$label} = {$qty}";
+							$qty_values[] = esc_html( "{$label} = {$qty}" );
 							// $ppom_meta[$label] = $qty;
 							$total_qty += intval( $qty );
 						}
@@ -496,7 +496,7 @@ final class Helpers {
 							foreach ( $ticket_meta as $ticket_variations => $quantity ) {
 
 								if ( ! empty( $quantity ) ) {
-									$meta_display[] = "{$ticket_variations} = {$quantity}";
+									$meta_display[] = esc_html( "{$ticket_variations} = {$quantity}" );
 									$total_qty     += intval( $quantity );
 								}
 							}
@@ -578,7 +578,7 @@ final class Helpers {
 							$ppom_html .= '<img class="img-thumbnail" style="width:' . esc_attr( self::get_thumbs_size() ) . '" src="' . esc_url( $cropped_url ) . '">';
 							$ppom_html .= '</a>';
 							$ppom_html .= '</td>';
-							$ppom_html .= '<td>' . $qtylabel . '</td>';
+							$ppom_html .= '<td>' . esc_html( $qtylabel ) . '</td>';
 							$ppom_html .= '</tr>';
 						}
 					}
@@ -684,7 +684,7 @@ final class Helpers {
 						foreach ( $value as $id => $audio_meta ) {
 							$audio_meta = json_decode( stripslashes( $audio_meta ), true );
 							$audio_url  = stripslashes( $audio_meta['link'] );
-							$audio_html = '<a href="' . esc_url( $audio_url ) . '" title="' . esc_attr( $audio_meta['title'] ) . '">' . $audio_meta['title'] . '</a>';
+							$audio_html = '<a href="' . esc_url( $audio_url ) . '" title="' . esc_attr( $audio_meta['title'] ) . '">' . esc_html( $audio_meta['title'] ) . '</a>';
 							$meta_lable = $field_title . ': ' . $ppom_file_count++;
 							// $ppom_meta[$meta_lable] = $audio_html;
 							$meta_data = array(
@@ -3104,7 +3104,7 @@ final class Helpers {
 			foreach ( $images as $image_key => $image ) {
 				$image_data = json_decode( stripslashes( $image ), true );
 				if ( isset( $image_data['raw'] ) ) {
-					$updated_value .= $image_data['raw'];
+					$updated_value .= esc_html( $image_data['raw'] );
 				}
 
 				if ( $image_key < $total_images - 1 ) {
