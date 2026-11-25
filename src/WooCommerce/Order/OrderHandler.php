@@ -168,7 +168,8 @@ final class OrderHandler {
 		}
 
 		// Plain-text emails delete entities WooCommerce does not know, such as the escaped % and '.
-		if ( self::$rendering_plain_text && $field_meta && is_string( $display_value ) ) {
+		// Not limited to current fields: values of deleted or renamed fields carry them too.
+		if ( self::$rendering_plain_text && is_string( $display_value ) ) {
 			$display_value = preg_replace( array( '/&#0*37;/', '/&#0*39;/' ), array( '%', "'" ), $display_value );
 		}
 

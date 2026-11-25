@@ -821,9 +821,11 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 	}
 
 	/**
-	 * @return void
+	 * Create an order whose item stores a quantities field with `%` and `'` in its labels.
+	 *
+	 * @return WC_Order
 	 */
-	public function test_plain_text_order_emails_keep_percent_and_apostrophe_in_labels(): void {
+	private function create_order_with_percent_and_apostrophe_labels(): WC_Order {
 		$product = $this->create_simple_product();
 		$meta_id = $this->insert_ppom_meta(
 			array(
@@ -859,7 +861,15 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 			$order
 		);
 		$item->save();
-		$order = wc_get_order( $order->get_id() );
+
+		return wc_get_order( $order->get_id() );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_plain_text_order_emails_keep_percent_and_apostrophe_in_labels(): void {
+		$order = $this->create_order_with_percent_and_apostrophe_labels();
 
 		$default = $this->render_plain_processing_email( $order );
 		$this->assertStringContainsString( '10% off = 2', $default );
@@ -878,28 +888,49 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 	}
 
 	/**
-	 * @return array<string, array{0: string}>
+	 * @return void
+	 */
+	public function test_plain_text_order_emails_keep_labels_of_fields_removed_after_the_order(): void {
+		$order = $this->create_order_with_percent_and_apostrophe_labels();
+		$items = $order->get_items();
+		$item  = reset( $items );
+		delete_post_meta( $item->get_product_id(), PPOM_PRODUCT_META_KEY );
+		$this->assertEmpty( ppom_get_field_meta_by_dataname( $item->get_product_id(), 'sizes' ) );
+
+		$email = $this->render_plain_processing_email( $order );
+		$this->assertStringContainsString( '10% off = 2', $email );
+		$this->assertStringContainsString( "Men's = 1", $email );
+	}
+
+	/**
+	 * @return array<string, array{0: string, 1: string, 2: string}>
 	 */
 	public function array_valued_scalar_field_types(): array {
 		return array(
-			'hidden'  => array( 'hidden' ),
-			'section' => array( 'section' ),
+			'hidden'                => array( 'hidden', 'Shopper Field', 'Shopper Field' ),
+			'section'               => array( 'section', 'Shopper Field', 'Shopper Field' ),
+			'hidden, empty title'   => array( 'hidden', '', 'shopper_field' ),
+			'section, empty title'  => array( 'section', '', 'shopper_field' ),
+			'hidden, "0" title'     => array( 'hidden', '0', 'shopper_field' ),
+			'section, "0" title'    => array( 'section', '0', 'shopper_field' ),
 		);
 	}
 
 	/**
 	 * @dataProvider array_valued_scalar_field_types
 	 *
-	 * @param string $type Field type that normally holds a scalar value.
+	 * @param string $type     Field type that normally holds a scalar value.
+	 * @param string $title    Field title.
+	 * @param string $row_name Name of the cart row the field produces.
 	 * @return void
 	 */
-	public function test_cart_item_data_keeps_posted_array_keys_inert( string $type ): void {
+	public function test_cart_item_data_keeps_posted_array_keys_inert( string $type, string $title, string $row_name ): void {
 		$product = $this->create_simple_product();
 		$meta_id = $this->insert_ppom_meta(
 			array(
 				array(
 					'type'         => $type,
-					'title'        => 'Shopper Field',
+					'title'        => $title,
 					'data_name'    => 'shopper_field',
 					'cart_display' => 'on',
 				),
@@ -924,7 +955,7 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 			)
 		);
 
-		$rows = wp_list_filter( $item_data, array( 'name' => 'Shopper Field' ) );
+		$rows = wp_list_filter( $item_data, array( 'name' => $row_name ) );
 		$this->assertCount( 1, $rows );
 		$row = reset( $rows );
 		$this->assertStringContainsString( 'evil.example', $row['display'] );
