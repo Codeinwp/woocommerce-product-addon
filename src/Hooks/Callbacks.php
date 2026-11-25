@@ -183,9 +183,14 @@ final class Callbacks {
 		$option_display_values = array();
 		foreach ( $is_jsone as $option ) {
 
+			if ( ! is_array( $option ) || ! isset( $option['option'] ) || ! is_scalar( $option['option'] ) ) {
+				continue;
+			}
+
 			$price = isset( $option['price'] ) ? $option['price'] : '';
 
-			$options_display = $option['option'];
+			// json_decode() turns unicode-escaped brackets back into markup.
+			$options_display = esc_html( (string) $option['option'] );
 
 			if ( $price != '' ) {
 				$options_display .= '(' . Helpers::price( $price ) . ')';
