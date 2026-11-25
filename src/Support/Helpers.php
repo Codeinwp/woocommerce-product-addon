@@ -346,8 +346,7 @@ final class Helpers {
 				continue;
 			}
 
-			$conditionally_hidden = isset( $ppom_cart_items['conditionally_hidden'] ) ? $ppom_cart_items['conditionally_hidden'] : '';
-			if ( self::is_field_hidden_by_condition( $key, $conditionally_hidden ) ) {
+			if ( self::is_field_hidden_in_payload( (string) $key, (array) $ppom_cart_items ) ) {
 				continue;
 			}
 
@@ -1680,6 +1679,23 @@ final class Helpers {
 	}
 
 	/**
+	 * Whether a PPOM payload lists a field as conditionally hidden.
+	 *
+	 * Unlike is_field_hidden_by_condition(), this reads only the payload's own list,
+	 * so a request for another product cannot change it.
+	 *
+	 * @param string               $data_name Field data name.
+	 * @param array<string, mixed> $ppom      Cart item PPOM payload.
+	 *
+	 * @return bool
+	 */
+	public static function is_field_hidden_in_payload( string $data_name, array $ppom ): bool {
+		$hidden = isset( $ppom['conditionally_hidden'] ) && is_string( $ppom['conditionally_hidden'] ) ? explode( ',', $ppom['conditionally_hidden'] ) : array();
+
+		return (bool) apply_filters( 'ppom_is_field_hidden_by_condition', in_array( $data_name, $hidden, true ) );
+	}
+
+	/**
 	 * Normalizes PPOM group IDs from scalar, comma-separated, or array payloads.
 	 *
 	 * @param mixed $meta_ids PPOM group IDs.
@@ -2234,9 +2250,9 @@ final class Helpers {
 	 * @param string      $saved_price      Saved option price, empty when no option matched.
 	 * @param \WC_Product $product          Product of the cart line.
 	 * @param bool        $in_line_currency Convert a flat price to the currency the cart line is priced in.
-	 * @return mixed
+	 * @return int|float|string 0 when nothing is saved, otherwise a decimal amount.
 	 */
-	private static function saved_option_amount( string $saved_price, $product, bool $in_line_currency ) {
+	public static function saved_option_amount( string $saved_price, $product, bool $in_line_currency ) {
 		if ( '' === $saved_price ) {
 			return 0;
 		}

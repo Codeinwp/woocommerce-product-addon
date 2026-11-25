@@ -294,6 +294,14 @@ class Test_Wcml_Cart_Option_Conversion extends PPOM_Test_Case {
 		}
 		sort( $fees );
 
+		// The row subtotal only adds fixed fees under legacy pricing; the test case restores hooks afterwards.
+		add_filter(
+			'ppom_price_mode',
+			static function (): string {
+				return 'legacy';
+			}
+		);
+
 		return array(
 			'line'     => (float) $item['data']->get_price( 'edit' ),
 			'fees'     => $fees,

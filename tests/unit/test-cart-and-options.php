@@ -49,6 +49,37 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 	}
 
 	/**
+	 * The line's own hidden list decides, as it does for pricing; a checkout request cannot reveal the field.
+	 *
+	 * @return void
+	 */
+	public function testMakeMetaDataKeepsAFieldTheLineHidesWhenTheRequestListsNone() {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array( $this->build_text_field( 'engraving', 'Engraving', array( 'price' => '10' ) ) ),
+			$product->get_id()
+		);
+
+		$_POST['ppom']['conditionally_hidden'] = '';
+
+		$meta = ppom_make_meta_data(
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields'               => array(
+						'id'        => (string) $meta_id,
+						'engraving' => 'Hello',
+					),
+					'conditionally_hidden' => 'engraving',
+				),
+			),
+			'order'
+		);
+
+		$this->assertArrayNotHasKey( 'engraving', $meta );
+	}
+
+	/**
 	 * Ensure section/HTML fields with "Show in Cart" disabled produce no cart meta entry.
 	 *
 	 * @return void

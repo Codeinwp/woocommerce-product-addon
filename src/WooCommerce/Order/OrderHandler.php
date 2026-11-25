@@ -243,7 +243,8 @@ final class OrderHandler {
 
 			foreach ( $cart_item['ppom']['fields'] as $key => $values ) {
 
-				if ( $key == 'id' ) {
+				// Hidden fields are not charged, so their uploads are not delivered.
+				if ( $key == 'id' || Helpers::is_field_hidden_in_payload( (string) $key, $cart_item['ppom'] ) ) {
 					continue;
 				}
 
