@@ -728,4 +728,74 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 
 		$this->assertSame( '&lt;b&gt;x&lt;/b&gt;, Blue &amp; Red', ppom_get_image_name( $images ) );
 	}
+
+	/**
+	 * JSON-escape every percent sign so it survives sanitization and appears only after json_decode().
+	 *
+	 * @param string $text Text holding percent-encoded octets.
+	 * @return string
+	 */
+	private function json_escaped_percents( string $text ): string {
+		return str_replace( '%', chr( 92 ) . 'u0025', $text );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_order_item_meta_keeps_percent_encoded_shopper_values_inert_after_woocommerce_decodes_them(): void {
+		$product = $this->create_simple_product();
+		$types   = array( 'quantities', 'qtypack', 'vm', 'eventcalendar', 'audio', 'fancycropper', 'image' );
+		$fields  = array();
+		foreach ( $types as $type ) {
+			$fields[] = array(
+				'type'      => $type,
+				'title'     => 'Field ' . $type,
+				'data_name' => $type . '_field',
+			);
+		}
+		$meta_id = $this->insert_ppom_meta( $fields, $product->get_id() );
+
+		$breakout = $this->json_escaped_percents( '%22%3E%3Cb%3Eu%3C/b%3E' );
+		$label    = $this->json_escaped_percents( '%3Cb%3Ex%3C/b%3E' );
+		$posted   = array(
+			'id'                 => (string) $meta_id,
+			'quantities_field'   => array( '%3Cb%3Eq%3C/b%3E' => '2' ),
+			'qtypack_field'      => array( '%3Cb%3Ep%3C/b%3E' => '2' ),
+			'vm_field'           => array( '%3Cb%3Ev%3C/b%3E' => '2' ),
+			'eventcalendar_field' => array( '2026-01-15' => array( '%3Cb%3Ee%3C/b%3E' => '1' ) ),
+			'audio_field'        => array( '7' => '{"link":"https://example.com/a.mp3' . $breakout . '","title":"' . $label . '"}' ),
+			'fancycropper_field' => array(
+				'popup1' => '{"imageURL":"a.png' . $breakout . '","fileName":"a.png","cropped":[{"croppedURL":"c.png' . $breakout . '","qty":"1","label":"' . $label . '"}]}',
+			),
+			'image_field'        => array( '3' => '{"link":"https://example.com/i.png' . $breakout . '","raw":"' . $label . '"}' ),
+		);
+
+		$order = $this->create_order_with_product( $product );
+		$items = $order->get_items();
+		$item  = reset( $items );
+		\PPOM\WooCommerce\Order\OrderHandler::order_item_meta(
+			$item,
+			'cart-key',
+			array(
+				'data' => $product,
+				'ppom' => array( 'fields' => wp_slash( $posted ) ),
+			),
+			$order
+		);
+		$item->save();
+
+		$displayed = array();
+		foreach ( \WC_Order_Factory::get_order_item( $item->get_id() )->get_all_formatted_meta_data() as $meta ) {
+			$displayed[ $meta->key ] = $meta->display_value;
+		}
+
+		foreach ( $types as $type ) {
+			$this->assertArrayHasKey( $type . '_field', $displayed, $type );
+			$this->assertStringNotContainsString( '<b>', $displayed[ $type . '_field' ], $type );
+		}
+		$this->assertStringContainsString(
+			'%3Cb%3Eq%3C/b%3E = 2',
+			html_entity_decode( wp_strip_all_tags( $displayed['quantities_field'] ), ENT_QUOTES, 'UTF-8' )
+		);
+	}
 }
