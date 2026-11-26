@@ -962,4 +962,158 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 		$this->assertStringNotContainsString( '<a', wp_kses_post( $row['display'] ) );
 		$this->assertStringNotContainsString( '<a', wp_kses_post( (string) $row['value'] ) );
 	}
+
+	/**
+	 * @return void
+	 */
+	public function test_order_save_and_order_again_keep_c_escaped_text_inert(): void {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+				$this->build_text_field( 'untitled_note', '' ),
+			),
+			$product->get_id()
+		);
+
+		$bs      = chr( 92 );
+		$payload = $bs . 'x3ca href="https://evil.example"' . $bs . 'x3ex' . $bs . 'x3c/a' . $bs . 'x3e';
+		$cart    = array(
+			'data'       => $product,
+			'product_id' => $product->get_id(),
+			'ppom'       => array(
+				'fields' => wp_slash(
+					array(
+						'id'            => (string) $meta_id,
+						'engraving'     => $payload,
+						'untitled_note' => $payload,
+					)
+				),
+			),
+		);
+
+		$initial_item_data = apply_filters( 'woocommerce_get_item_data', array(), $cart );
+		foreach ( array( 'Engraving', 'untitled_note' ) as $row_name ) {
+			$rows = wp_list_filter( $initial_item_data, array( 'name' => $row_name ) );
+			$this->assertCount( 1, $rows, $row_name );
+			$row = reset( $rows );
+			$this->assertStringNotContainsString( '<a', wp_kses_post( $row['display'] ), $row_name );
+		}
+
+		$order = $this->create_order_with_product( $product );
+		$items = $order->get_items();
+		$item  = reset( $items );
+		\PPOM\WooCommerce\Order\OrderHandler::order_item_meta( $item, 'cart-key', $cart, $order );
+		$item->save();
+
+		$saved_order = wc_get_order( $order->get_id() );
+		$saved_items = $saved_order->get_items();
+		$saved_item  = reset( $saved_items );
+
+		$reordered_data = apply_filters( 'woocommerce_order_again_cart_item_data', array(), $saved_item, $saved_order );
+		$this->assertArrayHasKey( 'ppom', $reordered_data );
+
+		$reordered_cart = array_merge(
+			array(
+				'data'       => $product,
+				'product_id' => $product->get_id(),
+			),
+			$reordered_data
+		);
+
+		$reordered_item_data = apply_filters( 'woocommerce_get_item_data', array(), $reordered_cart );
+		foreach ( array( 'Engraving', 'untitled_note' ) as $row_name ) {
+			$rows = wp_list_filter( $reordered_item_data, array( 'name' => $row_name ) );
+			$this->assertCount( 1, $rows, $row_name );
+			$row = reset( $rows );
+			$this->assertStringContainsString( 'evil.example', $row['display'], $row_name );
+			$this->assertStringNotContainsString( '<a', wp_kses_post( $row['display'] ), $row_name );
+		}
+
+		$reordered_order = $this->create_order_with_product( $product );
+		$reordered_items = $reordered_order->get_items();
+		$reordered_item  = reset( $reordered_items );
+		\PPOM\WooCommerce\Order\OrderHandler::order_item_meta( $reordered_item, 'cart-key', $reordered_cart, $reordered_order );
+		$reordered_item->save();
+
+		$displayed = array();
+		foreach ( \WC_Order_Factory::get_order_item( $reordered_item->get_id() )->get_all_formatted_meta_data() as $meta ) {
+			$displayed[ $meta->key ] = $meta->display_value;
+		}
+
+		foreach ( array( 'engraving', 'untitled_note' ) as $key ) {
+			$this->assertArrayHasKey( $key, $displayed, $key );
+			$this->assertStringContainsString( 'evil.example', $displayed[ $key ], $key );
+			$this->assertStringNotContainsString( '<a', wp_kses_post( $displayed[ $key ] ), $key );
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_order_item_meta_keeps_percent_encoded_scalar_fields_inert(): void {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'text_field', 'Text' ),
+				array(
+					'type'      => 'measure',
+					'title'     => 'Measure',
+					'data_name' => 'measure_field',
+				),
+				$this->build_section_field( 'section_field', 'Section', array( 'cart_display' => 'on' ) ),
+				array(
+					'type'         => 'hidden',
+					'title'        => 'Hidden',
+					'data_name'    => 'hidden_field',
+					'cart_display' => 'on',
+				),
+				array(
+					'type'      => 'bulkquantity',
+					'title'     => 'Bulk',
+					'data_name' => 'bulk_field',
+				),
+			),
+			$product->get_id()
+		);
+
+		$encoded_link = '%3Ca href=%22https://evil.example%22%3Ex%3C/a%3E';
+		$order        = $this->create_order_with_product( $product );
+		$items        = $order->get_items();
+		$item         = reset( $items );
+		\PPOM\WooCommerce\Order\OrderHandler::order_item_meta(
+			$item,
+			'cart-key',
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields' => wp_slash(
+						array(
+							'id'            => (string) $meta_id,
+							'text_field'    => $encoded_link,
+							'measure_field' => $encoded_link,
+							'section_field' => $encoded_link,
+							'hidden_field'  => $encoded_link,
+							'bulk_field'    => array(
+								'option' => $encoded_link,
+								'qty'    => '2',
+							),
+						)
+					),
+				),
+			),
+			$order
+		);
+		$item->save();
+
+		$displayed = array();
+		foreach ( \WC_Order_Factory::get_order_item( $item->get_id() )->get_all_formatted_meta_data() as $meta ) {
+			$displayed[ $meta->key ] = $meta->display_value;
+		}
+
+		foreach ( array( 'text_field', 'measure_field', 'section_field', 'hidden_field', 'bulk_field' ) as $key ) {
+			$this->assertArrayHasKey( $key, $displayed, $key );
+			$this->assertStringNotContainsString( '<a', wp_kses_post( $displayed[ $key ] ), $key );
+		}
+	}
 }

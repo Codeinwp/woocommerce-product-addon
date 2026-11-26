@@ -725,7 +725,7 @@ final class Helpers {
 					// $ppom_meta[$key] = $value['option'].' ('.$value['qty'].')';
 					$meta_data = array(
 						'name'  => $field_title,
-						'value' => $bq_value,
+						'value' => self::esc_meta_html( $bq_value ),
 					);
 					// A placeholder key to handle qunantity display in item meta data under myaccount
 					$ppom_meta['ppom_has_quantities'] = array(
@@ -867,7 +867,7 @@ final class Helpers {
 					}
 					$meta_data = array(
 						'name'  => $field_title,
-						'value' => $value,
+						'value' => is_scalar( $value ) ? self::esc_meta_html( (string) $value ) : $value,
 					);
 
 					break;
@@ -877,7 +877,7 @@ final class Helpers {
 					if ( $show_cart ) {
 						$meta_data = array(
 							'name'  => $field_title,
-							'value' => $value,
+							'value' => is_scalar( $value ) ? self::esc_meta_html( (string) $value ) : $value,
 						);
 					}
 					break;
@@ -886,7 +886,7 @@ final class Helpers {
 					$show_cart = isset( $field_meta['cart_display'] ) && $field_meta['cart_display'] == 'on' ? false : true;
 					$meta_data = array(
 						'name'   => $field_title,
-						'value'  => $value,
+						'value'  => is_scalar( $value ) ? self::esc_meta_html( (string) $value ) : $value,
 						'hidden' => $show_cart,
 					);
 					break;
@@ -896,7 +896,7 @@ final class Helpers {
 					// $ppom_meta[$field_title] = stripcslashes($value);
 					$meta_data = array(
 						'name'  => $field_title,
-						'value' => stripcslashes( $value ),
+						'value' => self::esc_meta_html( stripcslashes( (string) $value ) ),
 					);
 					break;
 			}
