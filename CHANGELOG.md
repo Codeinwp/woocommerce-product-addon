@@ -1,3 +1,8 @@
+##### [Version 34.0.15](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.14...v34.0.15) (2026-11-26)
+
+- Enhanced security
+- Updated dependencies
+
 ##### [Version 34.0.14](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.13...v34.0.14) (2026-11-16)
 
 - Added a Help panel to make it easier to contact support and find answers

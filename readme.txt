@@ -3,7 +3,7 @@ Contributors: themeisle
 Tags: product addons, woocommerce product addons, woocommerce product options, custom fields, variable products
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 34.0.14
+Stable tag: 34.0.15
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.2
@@ -259,9 +259,8 @@ Please follow the reporting protocols outlined on our [Security Page](https://th
 
 == Changelog ==
 
-##### [Version 34.0.14](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.13...v34.0.14) (2026-11-16)
+##### [Version 34.0.15](https://github.com/Codeinwp/woocommerce-product-addon/compare/v34.0.14...v34.0.15) (2026-11-26)
 
-- Added a Help panel to make it easier to contact support and find answers
 - Enhanced security
 - Updated dependencies
 
