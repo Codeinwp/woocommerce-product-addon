@@ -1036,15 +1036,16 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 		\PPOM\WooCommerce\Order\OrderHandler::order_item_meta( $reordered_item, 'cart-key', $reordered_cart, $reordered_order );
 		$reordered_item->save();
 
-		$displayed = array();
+		$formatted = array();
 		foreach ( \WC_Order_Factory::get_order_item( $reordered_item->get_id() )->get_all_formatted_meta_data() as $meta ) {
-			$displayed[ $meta->key ] = $meta->display_value;
+			$formatted[ $meta->key ] = $meta;
 		}
 
 		foreach ( array( 'engraving', 'untitled_note' ) as $key ) {
-			$this->assertArrayHasKey( $key, $displayed, $key );
-			$this->assertStringContainsString( 'evil.example', $displayed[ $key ], $key );
-			$this->assertStringNotContainsString( '<a', wp_kses_post( $displayed[ $key ] ), $key );
+			$this->assertArrayHasKey( $key, $formatted, $key );
+			$this->assertStringNotContainsString( '<a', wp_kses_post( (string) $formatted[ $key ]->value ), $key );
+			$this->assertStringContainsString( '&lt;a href=&quot;', $formatted[ $key ]->display_value, $key );
+			$this->assertStringNotContainsString( '>x</a>', $formatted[ $key ]->display_value, $key );
 		}
 	}
 
