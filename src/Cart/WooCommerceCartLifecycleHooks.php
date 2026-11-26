@@ -87,6 +87,9 @@ final class WooCommerceCartLifecycleHooks {
 		add_filter( 'woocommerce_order_item_display_meta_key', 'ppom_woocommerce_order_key', 10, 3 );
 
 		add_filter( 'woocommerce_order_item_display_meta_value', 'ppom_woocommerce_order_value', 10, 3 );
+		// Last on _end, so PPOM's own item meta output above still sees the plain-text flag.
+		add_action( 'woocommerce_order_item_meta_start', 'ppom_woocommerce_begin_item_meta_output', 10, 4 );
+		add_action( 'woocommerce_order_item_meta_end', 'ppom_woocommerce_end_item_meta_output', PHP_INT_MAX );
 		if ( ppom_wc_email_improvements_enabled() ) {
 			add_action( 'woocommerce_order_item_meta_end', 'ppom_woocommerce_order_item_meta_html', 10, 2 );
 			add_filter( 'woocommerce_display_item_meta', '__return_empty_string' );

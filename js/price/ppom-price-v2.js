@@ -55,6 +55,14 @@ const nmh = {
 		}
 	},
 
+	/**
+	 * @param {unknown} s Text to show inside HTML.
+	 * @return {string} The text with HTML special characters escaped.
+	 */
+	escape_html( s ) {
+		return $( '<div/>' ).text( String( s ) ).html();
+	},
+
 	working( m ) {
 		$( '#' + this.working_dom ).html( m );
 	},
@@ -231,7 +239,9 @@ class PPOM_Price_Class {
 			// break;
 
 			default:
-				value_label = `${ this.label } [${ this.value }]`;
+				value_label = `${ this.label } [${ nmh.escape_html(
+					this.value
+				) }]`;
 		}
 
 		return value_label;
