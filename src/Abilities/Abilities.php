@@ -1034,7 +1034,7 @@ final class Abilities implements RegisterHooks {
 	 */
 	private function to_text( $value ) {
 		if ( is_scalar( $value ) ) {
-			return trim( wp_strip_all_tags( (string) $value ) );
+			return trim( html_entity_decode( wp_strip_all_tags( (string) $value ), ENT_QUOTES, 'UTF-8' ) );
 		}
 
 		$json = wp_json_encode( $value );

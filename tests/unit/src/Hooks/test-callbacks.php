@@ -99,6 +99,47 @@ class Test_Callbacks_Src extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers \PPOM\Hooks\Callbacks::format_order_value
+	 *
+	 * @return void
+	 */
+	public function test_format_order_value_escapes_markup_decoded_from_option_json(): void {
+		$bs    = chr( 92 );
+		$value = '[{"option":"' . $bs . 'u003cb' . $bs . 'u003ex' . $bs . 'u003c/b' . $bs . 'u003e"}]';
+
+		$display = Callbacks::format_order_value( $value, null, null );
+
+		$this->assertStringNotContainsString( '<b>', $display );
+		$this->assertSame( '&lt;b&gt;x&lt;/b&gt;', $display );
+	}
+
+	/**
+	 * @covers \PPOM\Hooks\Callbacks::format_order_value
+	 *
+	 * @return void
+	 */
+	public function test_format_order_value_keeps_option_labels_with_prices(): void {
+		$value = '[{"option":"Large & Bold","price":"5"},{"option":"Red"}]';
+
+		$this->assertSame(
+			'Large &amp; Bold(' . \PPOM\Support\Helpers::price( 5 ) . '),Red',
+			Callbacks::format_order_value( $value, null, null )
+		);
+		$this->assertSame( 'Plain text', Callbacks::format_order_value( 'Plain text', null, null ) );
+	}
+
+	/**
+	 * @covers \PPOM\Hooks\Callbacks::format_order_value
+	 *
+	 * @return void
+	 */
+	public function test_format_order_value_skips_malformed_option_rows(): void {
+		$value = '[{"option":"Large"},"x",{"price":"2"},{"option":["nested"]}]';
+
+		$this->assertSame( 'Large', Callbacks::format_order_value( $value, null, null ) );
+	}
+
+	/**
 	 * @return void
 	 */
 	public function test_register_wpml_does_not_warn_when_meta_row_has_no_title() {

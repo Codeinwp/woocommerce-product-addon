@@ -624,4 +624,528 @@ class Test_Cart_And_Options extends PPOM_Test_Case {
 
 		$this->assertSame( 999.0, (float) $options['Kit A']['price'] );
 	}
+
+	/**
+	 * Build cart meta for one field the way the cart stores it: raw, slashed `$_POST` values.
+	 *
+	 * @param string                                       $type  Field type.
+	 * @param array<int|string, string|array<string, string>> $value Unslashed posted field value.
+	 * @return array<string, mixed> Meta row for the field.
+	 */
+	private function make_meta_for_posted_field( string $type, array $value ): array {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => $type,
+					'title'     => 'Shopper Field',
+					'data_name' => 'shopper_field',
+				),
+			),
+			$product->get_id()
+		);
+
+		$meta = ppom_make_meta_data(
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields' => array(
+						'id'            => (string) $meta_id,
+						'shopper_field' => wp_slash( $value ),
+					),
+				),
+			),
+			'order'
+		);
+
+		$this->assertArrayHasKey( 'shopper_field', $meta );
+
+		return $meta['shopper_field'];
+	}
+
+	/**
+	 * Markup written as JSON unicode escapes, which survives tag stripping until decoded.
+	 *
+	 * @return string
+	 */
+	private function unicode_escaped_markup(): string {
+		$bs = chr( 92 );
+
+		return $bs . 'u003cb' . $bs . 'u003ex' . $bs . 'u003c/b' . $bs . 'u003e';
+	}
+
+	/**
+	 * @return array<string, array{0: string}>
+	 */
+	public function quantity_field_types(): array {
+		return array(
+			'quantities' => array( 'quantities' ),
+			'qtypack'    => array( 'qtypack' ),
+			'vm'         => array( 'vm' ),
+		);
+	}
+
+	/**
+	 * @dataProvider quantity_field_types
+	 *
+	 * @param string $type Quantity-style field type.
+	 * @return void
+	 */
+	public function test_make_meta_data_escapes_posted_quantity_labels( string $type ): void {
+		$meta = $this->make_meta_for_posted_field(
+			$type,
+			array(
+				'<b>x</b>' => '2',
+				'S & M'    => '1',
+			)
+		);
+
+		$this->assertStringNotContainsString( '<b>x', $meta['value'] );
+		$this->assertStringContainsString( '&lt;b&gt;x&lt;/b&gt; = 2', $meta['value'] );
+		$this->assertStringContainsString( 'S &amp; M = 1', $meta['value'] );
+		$this->assertStringContainsString( '<strong>', $meta['value'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_make_meta_data_escapes_posted_event_ticket_labels(): void {
+		$meta = $this->make_meta_for_posted_field(
+			'eventcalendar',
+			array( '2026-01-15' => array( '<b>x</b>' => '1' ) )
+		);
+
+		$this->assertStringNotContainsString( '<b>x', $meta['display'] );
+		$this->assertStringContainsString( '&lt;b&gt;x&lt;/b&gt; = 1', $meta['display'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_make_meta_data_escapes_decoded_audio_title(): void {
+		$meta = $this->make_meta_for_posted_field(
+			'audio',
+			array( '7' => '{"link":"https://example.com/a.mp3","title":"' . $this->unicode_escaped_markup() . '"}' )
+		);
+
+		$this->assertStringNotContainsString( '<b>x', $meta['value'] );
+		$this->assertStringContainsString( '>&lt;b&gt;x&lt;/b&gt;</a>', $meta['value'] );
+		$this->assertStringContainsString( 'href="https://example.com/a.mp3"', $meta['value'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_make_meta_data_escapes_decoded_fancycropper_label(): void {
+		$meta = $this->make_meta_for_posted_field(
+			'fancycropper',
+			array(
+				'popup1' => '{"imageURL":"a.png","fileName":"a.png","cropped":[{"croppedURL":"c.png","qty":"1","label":"' . $this->unicode_escaped_markup() . '"}]}',
+			)
+		);
+
+		$this->assertStringNotContainsString( '<b>x', $meta['value'] );
+		$this->assertStringContainsString( '<td>&lt;b&gt;x&lt;/b&gt; x 1</td>', $meta['value'] );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_get_image_name_escapes_decoded_image_label(): void {
+		$images = array(
+			wp_slash( '{"link":"https://example.com/a.png","raw":"' . $this->unicode_escaped_markup() . '"}' ),
+			wp_slash( '{"link":"https://example.com/b.png","raw":"Blue & Red"}' ),
+		);
+
+		$this->assertSame( '&lt;b&gt;x&lt;/b&gt;, Blue &amp; Red', ppom_get_image_name( $images ) );
+	}
+
+	/**
+	 * JSON-escape every percent sign so it survives sanitization and appears only after json_decode().
+	 *
+	 * @param string $text Text holding percent-encoded octets.
+	 * @return string
+	 */
+	private function json_escaped_percents( string $text ): string {
+		return str_replace( '%', chr( 92 ) . 'u0025', $text );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_order_item_meta_keeps_percent_encoded_shopper_values_inert_after_woocommerce_decodes_them(): void {
+		$product = $this->create_simple_product();
+		$types   = array( 'quantities', 'qtypack', 'vm', 'eventcalendar', 'audio', 'fancycropper', 'image' );
+		$fields  = array();
+		foreach ( $types as $type ) {
+			$fields[] = array(
+				'type'      => $type,
+				'title'     => 'Field ' . $type,
+				'data_name' => $type . '_field',
+			);
+		}
+		$meta_id = $this->insert_ppom_meta( $fields, $product->get_id() );
+
+		$breakout = $this->json_escaped_percents( '%22%3E%3Cb%3Eu%3C/b%3E' );
+		$label    = $this->json_escaped_percents( '%3Cb%3Ex%3C/b%3E' );
+		$posted   = array(
+			'id'                 => (string) $meta_id,
+			'quantities_field'   => array( '%3Cb%3Eq%3C/b%3E' => '2' ),
+			'qtypack_field'      => array( '%3Cb%3Ep%3C/b%3E' => '2' ),
+			'vm_field'           => array( '%3Cb%3Ev%3C/b%3E' => '2' ),
+			'eventcalendar_field' => array( '2026-01-15' => array( '%3Cb%3Ee%3C/b%3E' => '1' ) ),
+			'audio_field'        => array( '7' => '{"link":"https://example.com/a.mp3' . $breakout . '","title":"' . $label . '"}' ),
+			'fancycropper_field' => array(
+				'popup1' => '{"imageURL":"a.png' . $breakout . '","fileName":"a.png","cropped":[{"croppedURL":"c.png' . $breakout . '","qty":"1","label":"' . $label . '"}]}',
+			),
+			'image_field'        => array( '3' => '{"link":"https://example.com/i.png' . $breakout . '","raw":"' . $label . '"}' ),
+		);
+
+		$order = $this->create_order_with_product( $product );
+		$items = $order->get_items();
+		$item  = reset( $items );
+		\PPOM\WooCommerce\Order\OrderHandler::order_item_meta(
+			$item,
+			'cart-key',
+			array(
+				'data' => $product,
+				'ppom' => array( 'fields' => wp_slash( $posted ) ),
+			),
+			$order
+		);
+		$item->save();
+
+		$displayed = array();
+		foreach ( \WC_Order_Factory::get_order_item( $item->get_id() )->get_all_formatted_meta_data() as $meta ) {
+			$displayed[ $meta->key ] = $meta->display_value;
+		}
+
+		foreach ( $types as $type ) {
+			$this->assertArrayHasKey( $type . '_field', $displayed, $type );
+			$this->assertStringNotContainsString( '<b>', $displayed[ $type . '_field' ], $type );
+		}
+		$this->assertStringContainsString(
+			'%3Cb%3Eq%3C/b%3E = 2',
+			html_entity_decode( wp_strip_all_tags( $displayed['quantities_field'] ), ENT_QUOTES, 'UTF-8' )
+		);
+	}
+
+	/**
+	 * Render the customer processing email for an order as plain text.
+	 *
+	 * @param WC_Order $order Order to render.
+	 * @return string
+	 */
+	private function render_plain_processing_email( WC_Order $order ): string {
+		$email      = WC()->mailer()->emails['WC_Email_Customer_Processing_Order'];
+		$prev_type  = $email->email_type;
+		$prev_order = $email->object;
+
+		$email->email_type = 'plain';
+		$email->object     = $order;
+		try {
+			return $email->get_content();
+		} finally {
+			$email->email_type = $prev_type;
+			$email->object     = $prev_order;
+		}
+	}
+
+	/**
+	 * Create an order whose item stores a quantities field with `%` and `'` in its labels.
+	 *
+	 * @return WC_Order
+	 */
+	private function create_order_with_percent_and_apostrophe_labels(): WC_Order {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				array(
+					'type'      => 'quantities',
+					'title'     => 'Sizes',
+					'data_name' => 'sizes',
+				),
+			),
+			$product->get_id()
+		);
+
+		$order = $this->create_order_with_product( $product );
+		$items = $order->get_items();
+		$item  = reset( $items );
+		\PPOM\WooCommerce\Order\OrderHandler::order_item_meta(
+			$item,
+			'cart-key',
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields' => wp_slash(
+						array(
+							'id'    => (string) $meta_id,
+							'sizes' => array(
+								'10% off' => '2',
+								"Men's"   => '1',
+							),
+						)
+					),
+				),
+			),
+			$order
+		);
+		$item->save();
+
+		return wc_get_order( $order->get_id() );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_plain_text_order_emails_keep_percent_and_apostrophe_in_labels(): void {
+		$order = $this->create_order_with_percent_and_apostrophe_labels();
+
+		$default = $this->render_plain_processing_email( $order );
+		$this->assertStringContainsString( '10% off = 2', $default );
+		$this->assertStringContainsString( "Men's = 1", $default );
+
+		add_action( 'woocommerce_order_item_meta_end', 'ppom_woocommerce_order_item_meta_html', 10, 2 );
+		add_filter( 'woocommerce_display_item_meta', '__return_empty_string' );
+		try {
+			$improved = $this->render_plain_processing_email( $order );
+		} finally {
+			remove_action( 'woocommerce_order_item_meta_end', 'ppom_woocommerce_order_item_meta_html', 10 );
+			remove_filter( 'woocommerce_display_item_meta', '__return_empty_string' );
+		}
+		$this->assertStringContainsString( '10% off = 2', $improved );
+		$this->assertStringContainsString( "Men's = 1", $improved );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_plain_text_order_emails_keep_labels_of_fields_removed_after_the_order(): void {
+		$order = $this->create_order_with_percent_and_apostrophe_labels();
+		$items = $order->get_items();
+		$item  = reset( $items );
+		delete_post_meta( $item->get_product_id(), PPOM_PRODUCT_META_KEY );
+		$this->assertEmpty( ppom_get_field_meta_by_dataname( $item->get_product_id(), 'sizes' ) );
+
+		$email = $this->render_plain_processing_email( $order );
+		$this->assertStringContainsString( '10% off = 2', $email );
+		$this->assertStringContainsString( "Men's = 1", $email );
+	}
+
+	/**
+	 * @return array<string, array{0: string, 1: string, 2: string}>
+	 */
+	public function array_valued_scalar_field_types(): array {
+		return array(
+			'hidden'                => array( 'hidden', 'Shopper Field', 'Shopper Field' ),
+			'section'               => array( 'section', 'Shopper Field', 'Shopper Field' ),
+			'hidden, empty title'   => array( 'hidden', '', 'shopper_field' ),
+			'section, empty title'  => array( 'section', '', 'shopper_field' ),
+			'hidden, "0" title'     => array( 'hidden', '0', 'shopper_field' ),
+			'section, "0" title'    => array( 'section', '0', 'shopper_field' ),
+		);
+	}
+
+	/**
+	 * @dataProvider array_valued_scalar_field_types
+	 *
+	 * @param string $type     Field type that normally holds a scalar value.
+	 * @param string $title    Field title.
+	 * @param string $row_name Name of the cart row the field produces.
+	 * @return void
+	 */
+	public function test_cart_item_data_keeps_posted_array_keys_inert( string $type, string $title, string $row_name ): void {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				array(
+					'type'         => $type,
+					'title'        => $title,
+					'data_name'    => 'shopper_field',
+					'cart_display' => 'on',
+				),
+			),
+			$product->get_id()
+		);
+
+		$item_data = apply_filters(
+			'woocommerce_get_item_data',
+			array(),
+			array(
+				'data'       => $product,
+				'product_id' => $product->get_id(),
+				'ppom'       => array(
+					'fields' => wp_slash(
+						array(
+							'id'            => (string) $meta_id,
+							'shopper_field' => array( '<a href="https://evil.example">x</a>' => '1' ),
+						)
+					),
+				),
+			)
+		);
+
+		$rows = wp_list_filter( $item_data, array( 'name' => $row_name ) );
+		$this->assertCount( 1, $rows );
+		$row = reset( $rows );
+		$this->assertStringContainsString( 'evil.example', $row['display'] );
+		$this->assertStringNotContainsString( '<a', wp_kses_post( $row['display'] ) );
+		$this->assertStringNotContainsString( '<a', wp_kses_post( (string) $row['value'] ) );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_order_save_and_order_again_keep_c_escaped_text_inert(): void {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'engraving', 'Engraving' ),
+				$this->build_text_field( 'untitled_note', '' ),
+			),
+			$product->get_id()
+		);
+
+		$bs      = chr( 92 );
+		$payload = $bs . 'x3ca href="https://evil.example"' . $bs . 'x3ex' . $bs . 'x3c/a' . $bs . 'x3e';
+		$cart    = array(
+			'data'       => $product,
+			'product_id' => $product->get_id(),
+			'ppom'       => array(
+				'fields' => wp_slash(
+					array(
+						'id'            => (string) $meta_id,
+						'engraving'     => $payload,
+						'untitled_note' => $payload,
+					)
+				),
+			),
+		);
+
+		$initial_item_data = apply_filters( 'woocommerce_get_item_data', array(), $cart );
+		foreach ( array( 'Engraving', 'untitled_note' ) as $row_name ) {
+			$rows = wp_list_filter( $initial_item_data, array( 'name' => $row_name ) );
+			$this->assertCount( 1, $rows, $row_name );
+			$row = reset( $rows );
+			$this->assertStringNotContainsString( '<a', wp_kses_post( $row['display'] ), $row_name );
+		}
+
+		$order = $this->create_order_with_product( $product );
+		$items = $order->get_items();
+		$item  = reset( $items );
+		\PPOM\WooCommerce\Order\OrderHandler::order_item_meta( $item, 'cart-key', $cart, $order );
+		$item->save();
+
+		$saved_order = wc_get_order( $order->get_id() );
+		$saved_items = $saved_order->get_items();
+		$saved_item  = reset( $saved_items );
+
+		$reordered_data = apply_filters( 'woocommerce_order_again_cart_item_data', array(), $saved_item, $saved_order );
+		$this->assertArrayHasKey( 'ppom', $reordered_data );
+
+		$reordered_cart = array_merge(
+			array(
+				'data'       => $product,
+				'product_id' => $product->get_id(),
+			),
+			$reordered_data
+		);
+
+		$reordered_item_data = apply_filters( 'woocommerce_get_item_data', array(), $reordered_cart );
+		foreach ( array( 'Engraving', 'untitled_note' ) as $row_name ) {
+			$rows = wp_list_filter( $reordered_item_data, array( 'name' => $row_name ) );
+			$this->assertCount( 1, $rows, $row_name );
+			$row = reset( $rows );
+			$this->assertStringContainsString( 'evil.example', $row['display'], $row_name );
+			$this->assertStringNotContainsString( '<a', wp_kses_post( $row['display'] ), $row_name );
+		}
+
+		$reordered_order = $this->create_order_with_product( $product );
+		$reordered_items = $reordered_order->get_items();
+		$reordered_item  = reset( $reordered_items );
+		\PPOM\WooCommerce\Order\OrderHandler::order_item_meta( $reordered_item, 'cart-key', $reordered_cart, $reordered_order );
+		$reordered_item->save();
+
+		$formatted = array();
+		foreach ( \WC_Order_Factory::get_order_item( $reordered_item->get_id() )->get_all_formatted_meta_data() as $meta ) {
+			$formatted[ $meta->key ] = $meta;
+		}
+
+		foreach ( array( 'engraving', 'untitled_note' ) as $key ) {
+			$this->assertArrayHasKey( $key, $formatted, $key );
+			$this->assertStringNotContainsString( '<a', wp_kses_post( (string) $formatted[ $key ]->value ), $key );
+			$this->assertStringContainsString( '&lt;a href=&quot;', $formatted[ $key ]->display_value, $key );
+			$this->assertStringNotContainsString( '>x</a>', $formatted[ $key ]->display_value, $key );
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_order_item_meta_keeps_percent_encoded_scalar_fields_inert(): void {
+		$product = $this->create_simple_product();
+		$meta_id = $this->insert_ppom_meta(
+			array(
+				$this->build_text_field( 'text_field', 'Text' ),
+				array(
+					'type'      => 'measure',
+					'title'     => 'Measure',
+					'data_name' => 'measure_field',
+				),
+				$this->build_section_field( 'section_field', 'Section', array( 'cart_display' => 'on' ) ),
+				array(
+					'type'         => 'hidden',
+					'title'        => 'Hidden',
+					'data_name'    => 'hidden_field',
+					'cart_display' => 'on',
+				),
+				array(
+					'type'      => 'bulkquantity',
+					'title'     => 'Bulk',
+					'data_name' => 'bulk_field',
+				),
+			),
+			$product->get_id()
+		);
+
+		$encoded_link = '%3Ca href=%22https://evil.example%22%3Ex%3C/a%3E';
+		$order        = $this->create_order_with_product( $product );
+		$items        = $order->get_items();
+		$item         = reset( $items );
+		\PPOM\WooCommerce\Order\OrderHandler::order_item_meta(
+			$item,
+			'cart-key',
+			array(
+				'data' => $product,
+				'ppom' => array(
+					'fields' => wp_slash(
+						array(
+							'id'            => (string) $meta_id,
+							'text_field'    => $encoded_link,
+							'measure_field' => $encoded_link,
+							'section_field' => $encoded_link,
+							'hidden_field'  => $encoded_link,
+							'bulk_field'    => array(
+								'option' => $encoded_link,
+								'qty'    => '2',
+							),
+						)
+					),
+				),
+			),
+			$order
+		);
+		$item->save();
+
+		$displayed = array();
+		foreach ( \WC_Order_Factory::get_order_item( $item->get_id() )->get_all_formatted_meta_data() as $meta ) {
+			$displayed[ $meta->key ] = $meta->display_value;
+		}
+
+		foreach ( array( 'text_field', 'measure_field', 'section_field', 'hidden_field', 'bulk_field' ) as $key ) {
+			$this->assertArrayHasKey( $key, $displayed, $key );
+			$this->assertStringNotContainsString( '<a', wp_kses_post( $displayed[ $key ] ), $key );
+		}
+	}
 }

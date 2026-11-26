@@ -64,6 +64,28 @@ function ppom_woocommerce_order_item_meta_html( $item_id, $item ) {
 	\PPOM\WooCommerce\Order\OrderHandler::order_item_meta_html( $item_id, $item );
 }
 
+/**
+ * Notes whether the order item meta about to be output is for a plain-text email.
+ *
+ * @param int             $item_id    Order item ID.
+ * @param \WC_Order_Item  $item       Order item.
+ * @param \WC_Order|false $order      Order.
+ * @param bool            $plain_text Whether the output is a plain-text email.
+ * @return void
+ */
+function ppom_woocommerce_begin_item_meta_output( $item_id, $item, $order, $plain_text = false ): void {
+	\PPOM\WooCommerce\Order\OrderHandler::begin_item_meta_output( (bool) $plain_text );
+}
+
+/**
+ * Clears the plain-text email note once an order item's meta output ends.
+ *
+ * @return void
+ */
+function ppom_woocommerce_end_item_meta_output(): void {
+	\PPOM\WooCommerce\Order\OrderHandler::end_item_meta_output();
+}
+
 function ppom_wc_email_improvements_enabled() {
 	return \PPOM\WooCommerce\Order\OrderHandler::wc_email_improvements_enabled();
 }

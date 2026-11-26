@@ -254,6 +254,31 @@ final class Helpers {
 		return $field_value;
 	}
 
+	/**
+	 * Escapes shopper text for stored item meta HTML (text or attribute value).
+	 *
+	 * WooCommerce rawurldecode()s order item meta before display, so `%` is
+	 * stored as an entity to keep percent-encoded markup inert.
+	 *
+	 * @param string $text Shopper-supplied text.
+	 * @return string
+	 */
+	private static function esc_meta_html( string $text ): string {
+		return str_replace( '%', '&#37;', esc_html( $text ) );
+	}
+
+	/**
+	 * Escapes a shopper-supplied URL for stored item meta HTML.
+	 *
+	 * @see self::esc_meta_html()
+	 *
+	 * @param string $url Shopper-supplied URL.
+	 * @return string
+	 */
+	private static function esc_meta_url( string $url ): string {
+		return str_replace( '%', '&#37;', esc_url( $url ) );
+	}
+
 	// Cart and order metadata.
 
 	/**
@@ -382,7 +407,7 @@ final class Helpers {
 					// self::pa($value);
 					foreach ( $value as $label => $qty ) {
 						if ( ! empty( $qty ) && apply_filters( 'ppom_hide_variation_if_qty_zero', true, $value ) ) {
-							$qty_values[] = "{$label} = {$qty}";
+							$qty_values[] = self::esc_meta_html( "{$label} = {$qty}" );
 							// $ppom_meta[$label] = $qty;
 							$total_qty += intval( $qty );
 						}
@@ -407,7 +432,7 @@ final class Helpers {
 					// self::pa($value);
 					foreach ( $value as $label => $qty ) {
 						if ( ! empty( $qty ) ) {
-							$qty_values[] = "{$label} = {$qty}";
+							$qty_values[] = self::esc_meta_html( "{$label} = {$qty}" );
 							// $ppom_meta[$label] = $qty;
 							$total_qty += intval( $qty );
 						}
@@ -433,7 +458,7 @@ final class Helpers {
 					// self::pa($value);
 					foreach ( $value as $label => $qty ) {
 						if ( ! empty( $qty ) ) {
-							$qty_values[] = "{$label} = {$qty}";
+							$qty_values[] = self::esc_meta_html( "{$label} = {$qty}" );
 							// $ppom_meta[$label] = $qty;
 							$total_qty += intval( $qty );
 						}
@@ -495,7 +520,7 @@ final class Helpers {
 							foreach ( $ticket_meta as $ticket_variations => $quantity ) {
 
 								if ( ! empty( $quantity ) ) {
-									$meta_display[] = "{$ticket_variations} = {$quantity}";
+									$meta_display[] = self::esc_meta_html( "{$ticket_variations} = {$quantity}" );
 									$total_qty     += intval( $quantity );
 								}
 							}
@@ -557,7 +582,7 @@ final class Helpers {
 
 						$ppom_html .= '<tr>';
 						$ppom_html .= '<td>';
-						$ppom_html .= '<a href="' . esc_url( $imageURL ) . '"><img class="img-thumbnail" style="width:' . esc_attr( self::get_thumbs_size() ) . '" src="' . esc_url( $imageURL ) . '" title="' . esc_attr( $fileName ) . '"></a>';
+						$ppom_html .= '<a href="' . self::esc_meta_url( $imageURL ) . '"><img class="img-thumbnail" style="width:' . esc_attr( self::get_thumbs_size() ) . '" src="' . self::esc_meta_url( $imageURL ) . '" title="' . self::esc_meta_html( $fileName ) . '"></a>';
 						$ppom_html .= '</td>';
 						$ppom_html .= '<td>' . __( 'Original Image', 'woocommerce-product-addon' ) . '</td>';
 						$ppom_html .= '</tr>';
@@ -573,11 +598,11 @@ final class Helpers {
 
 							$ppom_html .= '<tr>';
 							$ppom_html .= '<td>';
-							$ppom_html .= '<a href="' . esc_url( $cropped_url ) . '" class="lightbox">';
-							$ppom_html .= '<img class="img-thumbnail" style="width:' . esc_attr( self::get_thumbs_size() ) . '" src="' . esc_url( $cropped_url ) . '">';
+							$ppom_html .= '<a href="' . self::esc_meta_url( $cropped_url ) . '" class="lightbox">';
+							$ppom_html .= '<img class="img-thumbnail" style="width:' . esc_attr( self::get_thumbs_size() ) . '" src="' . self::esc_meta_url( $cropped_url ) . '">';
 							$ppom_html .= '</a>';
 							$ppom_html .= '</td>';
-							$ppom_html .= '<td>' . $qtylabel . '</td>';
+							$ppom_html .= '<td>' . self::esc_meta_html( $qtylabel ) . '</td>';
 							$ppom_html .= '</tr>';
 						}
 					}
@@ -683,7 +708,7 @@ final class Helpers {
 						foreach ( $value as $id => $audio_meta ) {
 							$audio_meta = json_decode( stripslashes( $audio_meta ), true );
 							$audio_url  = stripslashes( $audio_meta['link'] );
-							$audio_html = '<a href="' . esc_url( $audio_url ) . '" title="' . esc_attr( $audio_meta['title'] ) . '">' . $audio_meta['title'] . '</a>';
+							$audio_html = '<a href="' . self::esc_meta_url( $audio_url ) . '" title="' . self::esc_meta_html( (string) $audio_meta['title'] ) . '">' . self::esc_meta_html( (string) $audio_meta['title'] ) . '</a>';
 							$meta_lable = $field_title . ': ' . $ppom_file_count++;
 							// $ppom_meta[$meta_lable] = $audio_html;
 							$meta_data = array(
@@ -699,7 +724,7 @@ final class Helpers {
 					// $ppom_meta[$key] = $value['option'].' ('.$value['qty'].')';
 					$meta_data = array(
 						'name'  => $field_title,
-						'value' => $bq_value,
+						'value' => self::esc_meta_html( $bq_value ),
 					);
 					// A placeholder key to handle qunantity display in item meta data under myaccount
 					$ppom_meta['ppom_has_quantities'] = array(
@@ -841,7 +866,7 @@ final class Helpers {
 					}
 					$meta_data = array(
 						'name'  => $field_title,
-						'value' => $value,
+						'value' => is_scalar( $value ) ? self::esc_meta_html( (string) $value ) : $value,
 					);
 
 					break;
@@ -851,7 +876,7 @@ final class Helpers {
 					if ( $show_cart ) {
 						$meta_data = array(
 							'name'  => $field_title,
-							'value' => $value,
+							'value' => is_scalar( $value ) ? self::esc_meta_html( (string) $value ) : $value,
 						);
 					}
 					break;
@@ -860,7 +885,7 @@ final class Helpers {
 					$show_cart = isset( $field_meta['cart_display'] ) && $field_meta['cart_display'] == 'on' ? false : true;
 					$meta_data = array(
 						'name'   => $field_title,
-						'value'  => $value,
+						'value'  => is_scalar( $value ) ? self::esc_meta_html( (string) $value ) : $value,
 						'hidden' => $show_cart,
 					);
 					break;
@@ -870,7 +895,7 @@ final class Helpers {
 					// $ppom_meta[$field_title] = stripcslashes($value);
 					$meta_data = array(
 						'name'  => $field_title,
-						'value' => stripcslashes( $value ),
+						'value' => self::esc_meta_html( stripcslashes( (string) $value ) ),
 					);
 					break;
 			}
@@ -2094,10 +2119,10 @@ final class Helpers {
 			$images_meta = json_decode( stripslashes( $images_meta ), true );
 			$image_url   = stripslashes( $images_meta['link'] );
 			$image_label = isset( $images_meta['raw'] ) ? $images_meta['raw'] : '';
-			$image_html  = '<img class="img-thumbnail" style="width:' . esc_attr( self::get_thumbs_size( 75 ) ) . '" src="' . esc_url( $image_url ) . '" title="' . esc_attr( $image_label ) . '">';
+			$image_html  = '<img class="img-thumbnail" style="width:' . esc_attr( self::get_thumbs_size( 75 ) ) . '" src="' . self::esc_meta_url( $image_url ) . '" title="' . self::esc_meta_html( (string) $image_label ) . '">';
 
-			$ppom_html .= '<tr><td><a href="' . esc_url( $image_url ) . '" class="lightbox" itemprop="image" title="' . esc_attr( $image_label ) . '">' . $image_html . '</a></td>';
-			$ppom_html .= '<td>' . esc_attr( Handler::files_trim_name( $image_label ) ) . '</td>';
+			$ppom_html .= '<tr><td><a href="' . self::esc_meta_url( $image_url ) . '" class="lightbox" itemprop="image" title="' . self::esc_meta_html( (string) $image_label ) . '">' . $image_html . '</a></td>';
+			$ppom_html .= '<td>' . self::esc_meta_html( (string) Handler::files_trim_name( $image_label ) ) . '</td>';
 			$ppom_html .= '</tr>';
 
 		}
@@ -3120,7 +3145,7 @@ final class Helpers {
 			foreach ( $images as $image_key => $image ) {
 				$image_data = json_decode( stripslashes( $image ), true );
 				if ( isset( $image_data['raw'] ) ) {
-					$updated_value .= $image_data['raw'];
+					$updated_value .= self::esc_meta_html( (string) $image_data['raw'] );
 				}
 
 				if ( $image_key < $total_images - 1 ) {
